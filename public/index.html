@@ -17,55 +17,40 @@
   --r:18px;--r2:14px;--ff:'Inter',sans-serif;--fa:'Scheherazade New',serif;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:#060412}
-#root{
-  position:fixed;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,30,140,.55),transparent 60%),
-             radial-gradient(ellipse 60% 50% at 80% 80%,rgba(15,60,100,.6),transparent 60%),
-             #0a0718;
-  font-family:var(--ff);color:var(--txt);display:flex;flex-direction:column;
-}
+#root{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,30,140,.55),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(15,60,100,.6),transparent 60%),#0a0718;font-family:var(--ff);color:var(--txt);display:flex;flex-direction:column}
 #root::before{content:'';position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.025) 1px,transparent 1px);background-size:28px 28px;z-index:0}
-
-/* ── SCREENS ── */
 .scr{display:none;flex-direction:column;width:100%;height:100%;position:relative;z-index:1;overflow:hidden}
 .scr.on{display:flex}
-
-/* ── TRANSITIONS ── */
-@keyframes zoomIn   {from{opacity:0;transform:scale(.9) }to{opacity:1;transform:scale(1)}}
-@keyframes zoomOut  {from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
-@keyframes slideR   {from{opacity:0;transform:translateX(52px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideL   {from{opacity:0;transform:translateX(-52px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideUp  {from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes zoomOut{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
+@keyframes slideR{from{opacity:0;transform:translateX(52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:translateY(0)}}
-@keyframes flipIn   {from{opacity:0;transform:perspective(600px) rotateY(-18deg)}to{opacity:1;transform:perspective(600px) rotateY(0)}}
-@keyframes fadeIn   {from{opacity:0}to{opacity:1}}
-.tx-zoom-in   {animation:zoomIn    .38s cubic-bezier(.4,0,.2,1)}
-.tx-zoom-out  {animation:zoomOut   .38s cubic-bezier(.4,0,.2,1)}
-.tx-slide-r   {animation:slideR    .36s cubic-bezier(.4,0,.2,1)}
-.tx-slide-l   {animation:slideL    .36s cubic-bezier(.4,0,.2,1)}
-.tx-slide-up  {animation:slideUp   .36s cubic-bezier(.4,0,.2,1)}
+@keyframes flipIn{from{opacity:0;transform:perspective(600px) rotateY(-18deg)}to{opacity:1;transform:perspective(600px) rotateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.tx-zoom-in{animation:zoomIn .38s cubic-bezier(.4,0,.2,1)}
+.tx-zoom-out{animation:zoomOut .38s cubic-bezier(.4,0,.2,1)}
+.tx-slide-r{animation:slideR .36s cubic-bezier(.4,0,.2,1)}
+.tx-slide-l{animation:slideL .36s cubic-bezier(.4,0,.2,1)}
+.tx-slide-up{animation:slideUp .36s cubic-bezier(.4,0,.2,1)}
 .tx-slide-down{animation:slideDown .36s cubic-bezier(.4,0,.2,1)}
-.tx-flip      {animation:flipIn    .4s  cubic-bezier(.4,0,.2,1)}
-.tx-fade      {animation:fadeIn    .28s ease}
-
-@keyframes float  {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@keyframes rp     {0%{box-shadow:0 0 0 0 rgba(212,168,67,.6)}100%{box-shadow:0 0 0 26px rgba(212,168,67,0)}}
-@keyframes cfetti {0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-@keyframes shake  {0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
-@keyframes pring  {0%{box-shadow:0 0 0 0 rgba(62,207,122,.5)}70%{box-shadow:0 0 0 14px rgba(62,207,122,0)}100%{box-shadow:0 0 0 0 rgba(62,207,122,0)}}
-
-/* ── TOPBAR ── */
+.tx-flip{animation:flipIn .4s cubic-bezier(.4,0,.2,1)}
+.tx-fade{animation:fadeIn .28s ease}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes rp{0%{box-shadow:0 0 0 0 rgba(212,168,67,.6)}100%{box-shadow:0 0 0 26px rgba(212,168,67,0)}}
+@keyframes cfetti{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes pring{0%{box-shadow:0 0 0 0 rgba(62,207,122,.5)}70%{box-shadow:0 0 0 14px rgba(62,207,122,0)}100%{box-shadow:0 0 0 0 rgba(62,207,122,0)}}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;flex-shrink:0}
 .tb-title{font-size:.9rem;font-weight:600;color:var(--gold);letter-spacing:.3px}
 .tb-back{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--txt2);cursor:pointer;padding:6px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--border);transition:all .2s}
-.tb-back:hover{color:var(--txt)}
 .sound-dot{width:8px;height:8px;border-radius:50%;background:var(--green);cursor:pointer;transition:background .2s}
 .sound-dot.off{background:var(--txt3)}
 .ca{flex:1;overflow-y:auto;padding:12px 18px 28px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
 .ca::-webkit-scrollbar{width:3px}
 .ca::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
-
-/* ── LOGIN ── */
+/* LOGIN */
 #s-login{align-items:center;justify-content:center}
 .login-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .login-moon{position:absolute;top:8%;left:8%;font-size:4rem;opacity:.6;animation:float 5s ease-in-out infinite}
@@ -81,8 +66,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .lang-select-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:16px}
 .lang-chip{padding:5px 12px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:var(--glass);transition:all .2s}
 .lang-chip.on{background:var(--gold-dim);color:var(--gold);border-color:var(--border2)}
-
-/* ── WELCOME ── */
+/* WELCOME */
 #s-welcome{align-items:center;justify-content:center;gap:0;padding:30px 24px}
 .w-ar{font-family:var(--fa);font-size:2.4rem;color:var(--gold);text-align:center;line-height:1.4;margin-bottom:8px;filter:drop-shadow(0 0 24px rgba(212,168,67,.35))}
 .w-sub{font-size:.88rem;color:var(--txt2);margin-bottom:28px;text-align:center}
@@ -98,8 +82,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .prof-info{flex:1}.prof-name{font-size:1rem;font-weight:700;margin-bottom:2px}.prof-desc{font-size:.76rem;color:var(--txt2)}
 .prof-arrow{color:var(--txt3);font-size:1rem;transition:transform .2s}
 .prof-card:hover .prof-arrow{transform:translateX(4px);color:var(--gold)}
-
-/* ── MAIN MENU ── */
+/* MENU */
 #s-menu{padding:0;overflow-y:auto}
 .menu-header{padding:22px 20px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .menu-logo-ar{font-family:var(--fa);font-size:1.4rem;color:var(--gold)}
@@ -107,8 +90,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .menu-nav{display:flex;flex-direction:column;gap:12px;padding:0 18px 24px}
 .nav-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;cursor:pointer;border:1px solid var(--border);background:var(--glass);transition:all .22s;position:relative;overflow:hidden}
 .nav-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--gold);opacity:0;transition:opacity .2s}
-.nav-card:hover{transform:translateX(6px);background:var(--glass2);border-color:rgba(255,255,255,.18)}
-.nav-card:hover::after{opacity:1}.nav-card:active{transform:scale(.98)}
+.nav-card:hover{transform:translateX(6px);background:var(--glass2)}.nav-card:hover::after{opacity:1}.nav-card:active{transform:scale(.98)}
 .nav-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
 .nav-icon.gold{background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.25)}
 .nav-icon.pink{background:rgba(255,110,200,.12);border:1px solid rgba(255,110,200,.22)}
@@ -121,36 +103,31 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .mb-score{font-size:.8rem;color:var(--txt2)}.mb-score span{color:var(--gold);font-weight:700;font-size:1rem}
 .mb-actions{display:flex;gap:8px}
 .mb-btn{padding:6px 14px;border-radius:20px;font-size:.74rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:var(--glass);transition:all .2s}
-.mb-btn:hover{color:var(--txt)}
-
-/* ── CONTENT ── */
+/* CONTENT */
 .p-section{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:12px}
-.p-sec-title{font-size:.88rem;font-weight:600;color:var(--gold);margin-bottom:8px}
-.p-sec-body{font-size:.8rem;color:var(--txt2);line-height:1.7}
+.p-sec-title{font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:10px}
+.p-sec-body{font-size:.82rem;color:var(--txt2);line-height:1.8}
 .dua-box{background:linear-gradient(135deg,rgba(212,168,67,.12),rgba(212,168,67,.04));border:1px solid var(--border2);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:14px}
-.dua-ar{font-family:var(--fa);font-size:1.5rem;color:var(--gold);line-height:1.9;margin-bottom:6px}
-.dua-tr{font-size:.76rem;color:var(--txt2);font-style:italic}
+.dua-ar{font-family:var(--fa);font-size:1.4rem;color:var(--gold);line-height:2;margin-bottom:10px}
+.dua-tr{font-size:.76rem;color:var(--txt2);font-style:italic;line-height:1.7}
 .info-box{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:13px 15px;font-size:.78rem;color:var(--txt2);line-height:1.65}
 .info-box strong{color:var(--gold)}
 .tip-box{background:rgba(255,200,50,.05);border:1px solid rgba(255,200,50,.18);border-radius:var(--r2);padding:11px 14px;font-size:.76rem;color:var(--txt2);line-height:1.6}
-
-/* ── SESSIONS ── */
+/* SESSIONS */
 .sess-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sess-card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:14px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
 .sess-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:3px 0 0 3px}
-.sess-card.c-blue::before{background:var(--blue)}
-.sess-card.c-orange::before{background:var(--orange)}
+.sess-card.c-blue::before{background:var(--blue)}.sess-card.c-orange::before{background:var(--orange)}
 .sess-card.c-both::before{background:linear-gradient(180deg,var(--orange),var(--blue))}
 .sess-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);background:var(--glass2)}
 .sess-card:active{transform:scale(.97)}
 .sess-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#000;font-size:.58rem;font-weight:800;margin-right:4px;flex-shrink:0}
 .sess-title{font-size:.76rem;font-weight:700}.sess-score{font-size:.68rem;color:var(--gold);margin-top:2px}
-.sess-ar{font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin-top:6px}
+.sess-ar{font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin-top:6px;display:flex;justify-content:space-around;direction:rtl}
 .sess-badge{display:inline-block;font-size:.56rem;padding:2px 7px;border-radius:7px;font-weight:700;margin-top:5px}
 .bd-o{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
 .bd-b{background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.28)}
-
-/* ── LESSON ── */
+/* LESSON */
 .ltabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;direction:rtl}
 .ltab{font-family:var(--fa);font-size:1.35rem;padding:8px 15px;border-radius:11px;background:var(--glass);border:1px solid var(--border);color:var(--txt2);cursor:pointer;transition:all .2s;font-weight:400}
 .ltab.on{background:var(--gold-dim);color:var(--gold);border-color:var(--border2);transform:scale(1.08)}
@@ -162,13 +139,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .pos-c:active{transform:scale(.94)}
 .pos-lbl{font-size:.6rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
 .pos-ar{font-family:var(--fa);font-size:1.9rem;line-height:1.2}
-.gp{color:var(--green)}
-.badge-row{display:flex;gap:6px;flex-wrap:wrap}
+.gp{color:var(--green)}.badge-row{display:flex;gap:6px;flex-wrap:wrap}
 .bd-big{font-size:.72rem;padding:4px 11px;border-radius:10px;font-weight:700}
 .fab{display:flex;justify-content:center;margin-top:16px;margin-bottom:4px;background:linear-gradient(135deg,var(--gold),#b8860b);color:#000;border:none;border-radius:50px;padding:12px 32px;font-family:var(--ff);font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);transition:all .2s;align-self:center}
 .fab:active{transform:scale(.96)}
-
-/* ── ORBITAL ── */
+/* ORBITAL */
 .orb-wrap{position:relative;width:260px;height:260px;margin:10px auto}
 .orb-ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8a6200);display:flex;align-items:center;justify-content:center;font-family:var(--fa);font-size:2rem;color:#000;cursor:pointer;box-shadow:0 0 22px rgba(212,168,67,.4);z-index:5;transition:all .2s}
 .orb-ctr:active{transform:translate(-50%,-50%) scale(.9)}.orb-ctr.rpl{animation:rp .5s ease}
@@ -178,14 +153,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .orb-sat.lit .orb-ar,.orb-sat.lit .orb-lat{color:var(--gold)}
 .orb-ar{font-family:var(--fa);font-size:.92rem;color:var(--vowel);line-height:1}
 .orb-lat{font-size:.43rem;color:var(--txt2)}
-
-/* ── VOWEL GRID ── */
+/* VOWEL */
 .vline-section{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:14px 8px}
 .wline-wrap{display:flex;align-items:center;gap:8px;margin:5px 0}
 .wline{flex:1;height:2px;background:var(--gold);border-radius:2px}
 .wline-lbl{font-size:.66rem;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
-
-/* ── QUIZ ── */
+/* QUIZ */
 .qz-layout{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
 .qz-q{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;min-height:0}
 .qz-a{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
@@ -219,8 +192,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .rbtn-m{background:linear-gradient(135deg,var(--gold),#b8860b);color:#000}
 .rbtn-s{background:var(--glass);color:var(--txt);border:1px solid var(--border)}
 .rbtn:active{transform:scale(.96)}
-
-/* ── PROGRESS ── */
+/* PROGRESS */
 .pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .pg-c{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
 .pg-n{font-size:.72rem;font-weight:700;margin-bottom:5px}
@@ -228,27 +200,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .pg-bf{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s}
 .pg-p{font-size:.66rem;color:var(--gold);margin-top:3px;font-weight:700}
 .pg-ov{grid-column:span 2;background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:12px;padding:12px;text-align:center;color:#000;font-weight:700;font-size:.92rem}
-
-/* ── SETTINGS ── */
+/* SETTINGS */
 .set-row{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:.82rem}
 .tog{width:38px;height:20px;background:rgba(255,255,255,.12);border-radius:10px;position:relative;cursor:pointer;transition:background .2s}
 .tog.on{background:var(--gold)}
 .tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
 .tog.on::after{transform:translateX(18px)}
-
-/* ── CONTACT ── */
+/* CONTACT */
 .cform-input{width:100%;padding:12px 14px;border-radius:12px;margin-bottom:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--txt);font-family:var(--ff);font-size:.84rem;outline:none;transition:border-color .2s;resize:vertical}
 .cform-input::placeholder{color:var(--txt3)}.cform-input:focus{border-color:var(--gold)}
 .cform-btn{width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),#b8860b);color:#000;font-family:var(--ff);font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s}
-.cform-btn:disabled{opacity:.5;cursor:not-allowed}
-.cform-btn:active{transform:scale(.97)}
+.cform-btn:disabled{opacity:.5;cursor:not-allowed}.cform-btn:active{transform:scale(.97)}
 .cform-success{background:rgba(62,207,122,.12);border:1px solid rgba(62,207,122,.4);border-radius:14px;padding:20px 16px;text-align:center;color:#7dffb8;font-size:.88rem;line-height:1.9}
-
-/* ── LANG MODAL ── */
+/* BUY */
+#s-buy{align-items:center;justify-content:center}
+#s-register{align-items:center;justify-content:center}
+/* LANG MODAL */
 #lang-modal{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);align-items:center;justify-content:center}
 #lang-modal.open{display:flex}
 .lang-panel{background:#100d20;border:1px solid var(--border2);border-radius:20px;padding:20px 24px;max-width:360px;width:90%;display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
-
 @media(max-width:420px){.sess-grid,.pg-grid{grid-template-columns:1fr}.pos-row-wrap{justify-content:center}}
 </style>
 </head>
@@ -269,48 +239,35 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
     <div class="login-box" style="max-width:360px">
       <div class="login-ar" style="margin-bottom:10px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
       <div style="text-align:center;font-size:.82rem;color:var(--txt2);margin-bottom:20px;line-height:1.6">Apprenez l'alphabet arabe pas à pas,<br>avec voyelles, exercices et quiz.</div>
-      <!-- Offre -->
       <div style="background:linear-gradient(135deg,rgba(212,168,67,.18),rgba(212,168,67,.06));border:1px solid var(--border2);border-radius:16px;padding:16px;text-align:center;margin-bottom:18px">
         <div style="font-size:.72rem;color:var(--txt2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Accès complet à vie</div>
         <div style="font-size:2.2rem;font-weight:800;color:var(--gold)">49,99 €</div>
         <div style="font-size:.72rem;color:var(--txt2);margin-top:4px">Paiement unique · Aucun abonnement</div>
       </div>
-      <!-- Ce qui est inclus -->
       <div style="font-size:.76rem;color:var(--txt2);margin-bottom:18px;line-height:1.9">
-        ✓ 11 leçons complètes<br>
-        ✓ Voyelles & prolongations<br>
-        ✓ Exercices & 200 questions<br>
-        ✓ 9 langues disponibles<br>
-        ✓ Mises à jour incluses
+        ✓ 11 leçons complètes<br>✓ Voyelles &amp; prolongations<br>✓ Exercices &amp; 200 questions<br>✓ 9 langues disponibles<br>✓ Mises à jour incluses
       </div>
       <input class="linp" type="email" id="buy-email" placeholder="Votre email" autocomplete="email">
       <div class="lerr" id="buy-err"></div>
-      <button class="lbtn" id="buy-btn" onclick="startCheckout()" style="margin-top:8px">
-        Acheter l'accès — 49,99 €
-      </button>
+      <button class="lbtn" id="buy-btn" onclick="startCheckout()">Acheter l'accès — 49,99 €</button>
       <div style="text-align:center;margin-top:14px">
         <span style="font-size:.74rem;color:var(--txt2)">Déjà un compte ? </span>
         <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" onclick="showS('s-login',true)">Se connecter</span>
-      </div>
-      <div style="text-align:center;margin-top:10px">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" style="height:18px;opacity:.4;filter:invert(1)" alt="Stripe">
-        <span style="font-size:.66rem;color:var(--txt3);margin-left:6px">Paiement sécurisé</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Écran création de compte (après paiement) -->
 <div id="s-register" class="scr">
   <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
     <div class="login-box" style="max-width:340px">
       <div style="text-align:center;font-size:2rem;margin-bottom:8px">✅</div>
-      <div style="text-align:center;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px">Paiement validé !</div>
-      <div style="text-align:center;font-size:.78rem;color:var(--txt2);margin-bottom:20px;line-height:1.6">Créez maintenant votre mot de passe<br>pour accéder à l'application.</div>
+      <div style="text-align:center;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px" id="reg-title">Paiement validé !</div>
+      <div style="text-align:center;font-size:.78rem;color:var(--txt2);margin-bottom:20px;line-height:1.6" id="reg-sub">Créez maintenant votre mot de passe.</div>
       <input class="linp" type="email" id="reg-email" placeholder="Email" readonly style="opacity:.6">
-      <input class="linp" type="password" id="reg-pwd" placeholder="Choisissez un mot de passe (6 car. min)" autocomplete="new-password">
-      <input class="linp" type="password" id="reg-pwd2" placeholder="Confirmez le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
-      <button class="lbtn" id="reg-btn" onclick="doRegister()">Créer mon compte</button>
+      <input class="linp" type="password" id="reg-pwd" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
+      <input class="linp" type="password" id="reg-pwd2" placeholder="Confirmer le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+      <button class="lbtn" id="reg-btn" onclick="doRegister()" id="reg-btn-lbl">Créer mon compte</button>
       <div class="lerr" id="reg-err"></div>
     </div>
   </div>
@@ -334,8 +291,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
       <button class="lbtn" id="l-btn" onclick="doLogin()">Connexion</button>
       <div class="lerr" id="l-err"></div>
       <div style="text-align:center;margin-top:14px">
-        <span style="font-size:.74rem;color:var(--txt2)">Pas encore de compte ? </span>
-        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" onclick="showS('s-buy',false)">Acheter l'accès</span>
+        <span style="font-size:.74rem;color:var(--txt2)" id="no-account-txt">Pas encore de compte ? </span>
+        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-link-txt" onclick="showS('s-buy',false)">Acheter l'accès</span>
       </div>
       <div class="lang-select-row" id="lang-row"></div>
     </div>
@@ -348,17 +305,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
   <div class="prof-cards">
     <div class="prof-card girl" onclick="chooseProfile('girl')">
       <div class="prof-emoji">👧</div>
-      <div class="prof-info"><div class="prof-name" id="pb-girl">Fille</div><div class="prof-desc">Interface rose &amp; douce</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-girl">Fille</div><div class="prof-desc" id="pd-girl">Interface rose &amp; douce</div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card boy" onclick="chooseProfile('boy')">
       <div class="prof-emoji">👦</div>
-      <div class="prof-info"><div class="prof-name" id="pb-boy">Garçon</div><div class="prof-desc">Interface bleue &amp; dynamique</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-boy">Garçon</div><div class="prof-desc" id="pd-boy">Interface bleue &amp; dynamique</div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card adult" onclick="chooseProfile('adult')">
       <div class="prof-emoji">🎓</div>
-      <div class="prof-info"><div class="prof-name" id="pb-adult">Adulte</div><div class="prof-desc">Interface sobre &amp; complète</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-adult">Adulte</div><div class="prof-desc" id="pd-adult">Interface sobre &amp; complète</div></div>
       <div class="prof-arrow">›</div>
     </div>
   </div>
@@ -369,15 +326,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
     <div class="menu-logo-ar">لِنَتَعَلَّم</div>
     <div style="display:flex;align-items:center;gap:10px">
       <div id="sound-dot" class="sound-dot" onclick="toggleSound()"></div>
-      <div class="menu-avatar" id="m-avatar">U</div>
+      <div class="menu-avatar" id="m-avatar">A</div>
     </div>
   </div>
   <div class="menu-nav" id="menu-nav"></div>
   <div class="menu-bottom">
-    <div class="mb-score"><span id="avg-score">0</span>% <span style="color:var(--txt2);font-size:.78rem">score global</span></div>
+    <div class="mb-score"><span id="avg-score">0</span>% <span id="score-lbl" style="color:var(--txt2);font-size:.78rem">score global</span></div>
     <div class="mb-actions">
-      <div class="mb-btn" onclick="openLangModal()">🌍 Langue</div>
-      <div class="mb-btn" onclick="doLogout()" style="color:#ff9090">Quitter</div>
+      <div class="mb-btn" onclick="openLangModal()" id="lang-btn-lbl">🌍 Langue</div>
+      <div class="mb-btn" onclick="doLogout()" style="color:#ff9090" id="quit-btn-lbl">Quitter</div>
     </div>
   </div>
 </div>
@@ -400,36 +357,43 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 <script>
 'use strict';
 const API_URL='https://arab-learn-backend.vercel.app';
-const STRIPE_PK='pk_live_51F8RscENbdTM4u8n5iDkU8ibLFiCifAN1apbIV7O5BFMPITVHLEBU9nnBRJk3Dpb96nDwKWiIjRxRikUzYwMkHkT00uu1KjOPk';
-const USERS=[]; // plus de users hardcodés — auth via backend
 const LANGS=[{c:'fr',l:'Français'},{c:'en',l:'English'},{c:'es',l:'Español'},{c:'de',l:'Deutsch'},{c:'nl',l:'Nederlands'},{c:'it',l:'Italiano'},{c:'zh',l:'中文'},{c:'ru',l:'Русский'},{c:'pt',l:'Português'}];
 
 const T={
   fr:{
-    login_err:'Email ou mot de passe incorrect.',login_btn:'Connexion',choose:'Choisis ton interface :',
+    login_btn:'Connexion',login_err:'Email ou mot de passe incorrect.',
+    no_account:'Pas encore de compte ?',buy_access:'Acheter l\'accès',
+    choose:'Choisis ton interface :',
     girl:'Fille',boy:'Garçon',adult:'Adulte',
-    sessions:'Leçons',exercises:'Exercices',progress:'Progrès',settings:'Paramètres',logout:'Déconnexion',
+    girl_desc:'Interface rose & douce',boy_desc:'Interface bleue & dynamique',adult_desc:'Interface sobre & complète',
+    sessions:'Leçons',exercises:'Exercices',progress:'Progrès',settings:'Paramètres',
     intro:'Introduction',contact:'Contact',
-    // INTRO
+    intro_desc:'Quelques notions importantes.',
+    sessions_desc:'Programme complet et détaillé.',
+    exercises_desc:'Quiz : Plus de 200 questions.',
+    contact_desc:'Besoin d\'aide ou de renseignements.',
+    score_global:'score global',lang_btn:'🌍 Langue',quit:'Quitter',back:'‹ Retour',
+    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
+    intro_dua_tr:'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux.',
+    intro_dua_tr2:'Seigneur, accroîs mes connaissances.',
     intro_s1_title:'L\'importance de l\'intention (an-niyyah)',
     intro_s1:'L\'intention est une des deux conditions capitales pour qu\'une action soit acceptée par Allah ﷻ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n\'étaient pas les mêmes.\n\nLe prophète Muhammad ﷺ a dit : "Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention".',
     intro_s2_title:'Les fruits de la recherche de la science',
     intro_s2:'La science est un devoir pour chaque croyant. En effet, Allah n\'accepte pas l\'adoration faite avec ignorance.\n\nAllah ﷻ dit : "Et sache que nulle divinité ne mérite d\'être adoré sauf Allah, et demande pardon pour ton péché, et pour les croyants et croyantes".\n\nAussi, celui qui recherche une science bénéficie de récompenses inestimables.\n\nLe prophète ﷺ a dit : "Celui qui emprunte un chemin par lequel il recherche une science, Allah lui fait prendre, par cela, un chemin vers le paradis. Certes les anges tendent leurs ailes par agrément pour celui qui recherche la science. Certes tous ceux qui sont dans les cieux et la terre, même les poissons dans l\'eau, demandent pardon pour le savant."',
     intro_s3_title:'Allah est l\'unique but du croyant',
     intro_s3:'Allah a créé les humains avec différentes capacités de compréhension et de mémorisation.\n\nC\'est pourquoi, Allah te questionne plus sur les efforts fournis pour apprendre, que sur le résultat qui ne dépend pas toujours de toi.\n\nAinsi, si tu rencontres quelques difficultés, ne baisse pas les bras, place ta confiance en Allah, rappelle-toi que c\'est Lui qui donne la compréhension, et rappelle-toi surtout que le but n\'est pas la finalité (apprendre l\'arabe), mais plutôt plaire à Allah (en faisant les efforts dans le bien).\n\nN\'hésite pas à nous contacter, via la rubrique "contact" du menu principal, si tu as une quelconque demande.',
-    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ — رَبِّ زِدْنِي عِلْمًا',
-    intro_dua_tr:'Au nom d\'Allah — Seigneur, accroîs mes connaissances.',
-    contact_title:'Contact',
-    contact_body:'Pour toute question, remarque ou suggestion, veuillez remplir le formulaire de contact.',
+    contact_title:'Contact',contact_body:'Pour toute question, remarque ou suggestion, veuillez remplir le formulaire de contact.',
     contact_name:'Votre nom',contact_email:'Votre email',contact_subj:'Sujet',contact_msg:'Votre message',contact_send:'Envoyer',
-    lesson_num:'Leçon',
-    ex200_title:'200 Questions · Lecture de mots',
-    ex200_desc:'Lisez ce mot, puis écoutez pour vérifier.',
-    ex200_btn:'🔊 Écouter la réponse',
-    cours:'Cours',exercice:'Exercice ▶',
+    contact_ok:'Votre message a bien été transmis. Un membre de notre équipe va vous répondre rapidement.',
+    contact_return:'Retour au menu principal',
+    lesson_num:'Leçon',cours:'Cours',exercice:'Exercice ▶',
+    back_s:'Leçons',
     writing_line:'Ligne d\'écriture',
+    vowels_name:'Les voyelles · الحَرَكَات',
     vowel_intro:'Une voyelle est un petit symbole qui se place sur ou sous une lettre. On prononce la lettre PUIS la voyelle.',
     vowel_tip:'💡 Lorsque l\'on double une des trois voyelles, on ajoute le son « n ». Lorsque le ○ est sur une lettre, on ne prononce que le son de la lettre.',
+    prolong_name:'Les prolongations · الْمُدُود',
     prolong_note:'* La lettre ب (b) est utilisée pour les exemples.',
     prolong_tip:'💡 Astuce : la voyelle ُ est prolongée par la lettre و qui lui ressemble.\nLa voyelle َ qui s\'écrit au-dessus de la lettre, est prolongée par ا qui se situe au-dessus de la ligne.\nLa voyelle ِ qui se situe sous la ligne, est prolongée par ي.',
     letter_tip2:'Lorsque la lettre est au milieu d\'un mot (ni la première, ni la dernière), elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un trait horizontal — avant la lettre (à sa droite).',
@@ -447,35 +411,58 @@ const T={
     isolated:'ISOLÉE',begin:'Début',middle:'Milieu',end:'Fin',
     q_read:'Comment prononce-t-on',q_write:'Comment écrit-on le son',
     pass:'🎉 Bravo ! Tu peux passer à la leçon suivante !',
-    fail:'Tu peux encore faire mieux. Je te conseille de réviser, et de ne passer à la leçon suivante, que lorsque tu auras atteint au moins 80% de bonnes réponses.',
-    next_s:'Leçon suivante ▶',retry:'🔄 Réessayer',back_s:'Leçons',
+    fail:'Tu peux encore faire mieux. Révise et atteins 80% pour continuer.',
+    next_s:'Leçon suivante ▶',retry:'🔄 Réessayer',
     global_score:'Score global',sound_on:'Son activé',reset:'🗑 Réinitialiser',
     rappel:'Rappel',
+    ex200_title:'200 Questions · Lecture de mots',
+    ex200_desc:'Lisez ce mot puis écoutez pour vérifier.',
+    ex200_listen:'🔊 Écouter la réponse',
+    ex200_next:'Suivant ▶',ex200_finish:'Terminer',
+    with_alif:'Avec ا',with_waw:'Avec و',with_ya:'Avec ى',
+    payment_ok:'Paiement validé !',payment_sub:'Créez maintenant votre mot de passe.',
+    create_account:'Créer mon compte',
+    err_fields:'Veuillez remplir les champs obligatoires.',
+    err_pwd_match:'Les mots de passe ne correspondent pas.',
+    err_pwd_len:'Le mot de passe doit faire au moins 6 caractères.',
+    err_connection:'Erreur de connexion. Vérifiez votre connexion internet.',
+    connecting:'Connexion…',creating:'Création du compte…',sending:'Envoi en cours…',
+    redirecting:'Redirection vers le paiement…',
   },
   en:{
-    login_err:'Incorrect email or password.',login_btn:'Login',choose:'Choose your interface:',
+    login_btn:'Login',login_err:'Incorrect email or password.',
+    no_account:'No account yet?',buy_access:'Buy access',
+    choose:'Choose your interface:',
     girl:'Girl',boy:'Boy',adult:'Adult',
-    sessions:'Sessions',exercises:'Exercises',progress:'Progress',settings:'Settings',logout:'Logout',
+    girl_desc:'Pink & soft theme',boy_desc:'Blue & dynamic theme',adult_desc:'Clean & complete theme',
+    sessions:'Sessions',exercises:'Exercises',progress:'Progress',settings:'Settings',
     intro:'Introduction',contact:'Contact',
-    intro_s1_title:'🌟 Seeking Knowledge in Islam',
-    intro_s1:'The Prophet ﷺ said: "Seeking knowledge is an obligation upon every Muslim." (Ibn Mâja). Learning Arabic opens the door to understanding the Quran and Hadith in their original language.',
-    intro_s2_title:'🤲 The Importance of Intention (Niyya)',
-    intro_s2:'The Prophet ﷺ said: "Actions are only by intentions." (Bukhari). Before you begin, set this intention: "I am learning Arabic solely to please Allah ﷻ."',
-    intro_s3_title:'🌱 Allah Makes Learning Easy',
-    intro_s3:'Allah ﷻ says: "We have made the Quran easy to remember." (54:17). Begin each session with Bismillah.',
-    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ — رَبِّ زِدْنِي عِلْمًا',
-    intro_dua_tr:'In the name of Allah — My Lord, increase me in knowledge.',
-    contact_title:'Contact',
-    contact_body:'For any questions, remarks or suggestions, please fill in the contact form.',
+    intro_desc:'Some important notions.',
+    sessions_desc:'Complete and detailed program.',
+    exercises_desc:'Quiz: More than 200 questions.',
+    contact_desc:'Need help or information.',
+    score_global:'global score',lang_btn:'🌍 Language',quit:'Quit',back:'‹ Back',
+    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
+    intro_dua_tr:'In the name of Allah, the Most Gracious, the Most Merciful.',
+    intro_dua_tr2:'My Lord, increase me in knowledge.',
+    intro_s1_title:'The importance of intention (an-niyyah)',
+    intro_s1:'Intention is one of the two essential conditions for an action to be accepted by Allah ﷻ. Furthermore, two people can perform exactly the same action but receive vastly different rewards, because their initial intentions were not the same.\n\nThe Prophet Muhammad ﷺ said: "Actions are judged by intentions, and every person will be rewarded according to their intention."',
+    intro_s2_title:'The fruits of seeking knowledge',
+    intro_s2:'Knowledge is a duty for every believer. Indeed, Allah does not accept worship done in ignorance.\n\nAllah ﷻ says: "Know that there is no deity except Allah, and ask forgiveness for your sin and for the believing men and believing women."\n\nAlso, whoever seeks knowledge benefits from immeasurable rewards.\n\nThe Prophet ﷺ said: "Whoever takes a path seeking knowledge, Allah will make easy for him a path to Paradise. The angels lower their wings in approval for the seeker of knowledge. All those in the heavens and earth, even the fish in the water, ask forgiveness for the scholar."',
+    intro_s3_title:'Allah is the sole purpose of the believer',
+    intro_s3:'Allah created humans with different capacities for understanding and memorization.\n\nThis is why Allah questions you more on the efforts made to learn, rather than on the result which does not always depend on you.\n\nSo if you encounter difficulties, do not give up, place your trust in Allah, remember that it is He who grants understanding, and above all remember that the goal is not the end result (learning Arabic), but rather to please Allah (by making efforts for good).\n\nDo not hesitate to contact us, via the "contact" section of the main menu, if you have any request.',
+    contact_title:'Contact',contact_body:'For any questions, remarks or suggestions, please fill in the contact form.',
     contact_name:'Your name',contact_email:'Your email',contact_subj:'Subject',contact_msg:'Your message',contact_send:'Send',
-    lesson_num:'Lesson',
-    ex200_title:'200 Questions · Word Reading',
-    ex200_desc:'Read this word, then listen to check.',
-    ex200_btn:'🔊 Listen to answer',
-    cours:'Lesson',exercice:'Exercise ▶',
+    contact_ok:'Your message has been transmitted. A member of our team will reply shortly.',
+    contact_return:'Back to main menu',
+    lesson_num:'Lesson',cours:'Lesson',exercice:'Exercise ▶',
+    back_s:'Sessions',
     writing_line:'Writing line',
+    vowels_name:'Vowels · الحَرَكَات',
     vowel_intro:'A vowel is a small symbol placed above or below a letter. You pronounce the letter THEN the vowel.',
     vowel_tip:'💡 When one of the three vowels is doubled, add "n". When ○ is on a letter, only pronounce the letter.',
+    prolong_name:'Prolongations · الْمُدُود',
     prolong_note:'* The letter ب (b) is used for examples.',
     prolong_tip:'💡 Vowel ُ is extended by و. Vowel َ (above) is extended by ا. Vowel ِ (below) is extended by ي.',
     letter_tip2:'In the middle of a word: written like initial form + horizontal stroke (to the right).',
@@ -493,42 +480,48 @@ const T={
     q_read:'How do you read',q_write:'How do you write the sound',
     pass:'🎉 Well done! Next session unlocked.',
     fail:'Keep revising. You need 80% to continue.',
-    next_s:'Next session ▶',retry:'🔄 Retry',back_s:'Sessions',
+    next_s:'Next session ▶',retry:'🔄 Retry',
     global_score:'Global score',sound_on:'Sound on',reset:'🗑 Reset',
     rappel:'Reminder',
+    ex200_title:'200 Questions · Word Reading',
+    ex200_desc:'Read this word then listen to check.',
+    ex200_listen:'🔊 Listen to answer',
+    ex200_next:'Next ▶',ex200_finish:'Finish',
+    with_alif:'With ا',with_waw:'With و',with_ya:'With ى',
+    payment_ok:'Payment validated!',payment_sub:'Now create your password.',
+    create_account:'Create my account',
+    err_fields:'Please fill in the required fields.',
+    err_pwd_match:'Passwords do not match.',
+    err_pwd_len:'Password must be at least 6 characters.',
+    err_connection:'Connection error. Check your internet connection.',
+    connecting:'Connecting…',creating:'Creating account…',sending:'Sending…',
+    redirecting:'Redirecting to payment…',
   },
 };
+// Fill other languages from fr
 ['es','de','nl','it','zh','ru','pt'].forEach(c=>{
-  const ln={es:'Lección',de:'Lektion',nl:'Les',it:'Lezione',zh:'课',ru:'Урок',pt:'Lição'};
-  T[c]={...T.fr,lesson_num:ln[c]||T.fr.lesson_num,back_s:{es:'Sesiones',de:'Einheiten',nl:'Lessen',it:'Sessioni',zh:'课程',ru:'Уроки',pt:'Sessões'}[c]||T.fr.back_s,rappel:{es:'Recordatorio',de:'Erinnerung',nl:'Herinnering',it:'Promemoria',zh:'提醒',ru:'Напоминание',pt:'Lembrete'}[c]||T.fr.rappel};
+  const overrides={
+    es:{login_btn:'Conectarse',lesson_num:'Lección',back_s:'Sesiones',next_s:'Siguiente ▶',retry:'🔄 Reintentar',rappel:'Recordatorio',score_global:'puntuación global',lang_btn:'🌍 Idioma',quit:'Salir',back:'‹ Volver',begin:'Inicio',middle:'Medio',end:'Fin',isolated:'AISLADA',cours:'Lección',exercice:'Ejercicio ▶',writing_line:'Línea de escritura',contact_send:'Enviar',contact_return:'Volver al menú',ex200_next:'Siguiente ▶',ex200_finish:'Finalizar',ex200_listen:'🔊 Escuchar',create_account:'Crear cuenta',connecting:'Conectando…',creating:'Creando…',sending:'Enviando…',redirecting:'Redirigiendo…',payment_ok:'¡Pago validado!',payment_sub:'Crea tu contraseña.',no_account:'¿Sin cuenta?',buy_access:'Comprar acceso',choose:'Elige tu interfaz:',girl:'Niña',boy:'Niño',adult:'Adulto',girl_desc:'Interfaz rosa',boy_desc:'Interfaz azul',adult_desc:'Interfaz completa',sessions:'Sesiones',exercises:'Ejercicios',progress:'Progreso',settings:'Ajustes',intro_desc:'Algunas nociones importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: más de 200 preguntas.',contact_desc:'¿Necesitas ayuda?'},
+    de:{login_btn:'Anmelden',lesson_num:'Lektion',back_s:'Einheiten',next_s:'Nächste ▶',retry:'🔄 Nochmal',rappel:'Erinnerung',score_global:'Gesamtpunktzahl',lang_btn:'🌍 Sprache',quit:'Beenden',back:'‹ Zurück',begin:'Anfang',middle:'Mitte',end:'Ende',isolated:'ISOLIERT',cours:'Lektion',exercice:'Übung ▶',writing_line:'Schreiblinie',contact_send:'Senden',contact_return:'Zum Hauptmenü',ex200_next:'Weiter ▶',ex200_finish:'Beenden',ex200_listen:'🔊 Anhören',create_account:'Konto erstellen',connecting:'Verbinden…',creating:'Erstellen…',sending:'Senden…',redirecting:'Weiterleiten…',payment_ok:'Zahlung bestätigt!',payment_sub:'Erstelle dein Passwort.',no_account:'Kein Konto?',buy_access:'Zugang kaufen',choose:'Wähle dein Interface:',girl:'Mädchen',boy:'Junge',adult:'Erwachsener',girl_desc:'Pinkes Interface',boy_desc:'Blaues Interface',adult_desc:'Vollständiges Interface',sessions:'Einheiten',exercises:'Übungen',progress:'Fortschritt',settings:'Einstellungen',intro_desc:'Einige wichtige Begriffe.',sessions_desc:'Vollständiges Programm.',exercises_desc:'Quiz: über 200 Fragen.',contact_desc:'Hilfe benötigt?'},
+    nl:{login_btn:'Inloggen',lesson_num:'Les',back_s:'Lessen',next_s:'Volgende ▶',retry:'🔄 Opnieuw',rappel:'Herinnering',score_global:'totaalscore',lang_btn:'🌍 Taal',quit:'Afsluiten',back:'‹ Terug',begin:'Begin',middle:'Midden',end:'Einde',isolated:'GEÏSOLEERD',cours:'Les',exercice:'Oefening ▶',writing_line:'Schrijflijn',contact_send:'Versturen',contact_return:'Terug naar menu',ex200_next:'Volgende ▶',ex200_finish:'Afronden',ex200_listen:'🔊 Luisteren',create_account:'Account aanmaken',connecting:'Verbinden…',creating:'Aanmaken…',sending:'Verzenden…',redirecting:'Doorsturen…',payment_ok:'Betaling bevestigd!',payment_sub:'Maak je wachtwoord aan.',no_account:'Nog geen account?',buy_access:'Toegang kopen',choose:'Kies je interface:',girl:'Meisje',boy:'Jongen',adult:'Volwassene',girl_desc:'Roze interface',boy_desc:'Blauwe interface',adult_desc:'Volledige interface',sessions:'Lessen',exercises:'Oefeningen',progress:'Voortgang',settings:'Instellingen',intro_desc:'Enkele belangrijke begrippen.',sessions_desc:'Volledig programma.',exercises_desc:'Quiz: meer dan 200 vragen.',contact_desc:'Hulp nodig?'},
+    it:{login_btn:'Accedi',lesson_num:'Lezione',back_s:'Sessioni',next_s:'Successiva ▶',retry:'🔄 Riprova',rappel:'Promemoria',score_global:'punteggio globale',lang_btn:'🌍 Lingua',quit:'Esci',back:'‹ Indietro',begin:'Inizio',middle:'Mezzo',end:'Fine',isolated:'ISOLATA',cours:'Lezione',exercice:'Esercizio ▶',writing_line:'Linea di scrittura',contact_send:'Invia',contact_return:'Torna al menu',ex200_next:'Successivo ▶',ex200_finish:'Termina',ex200_listen:'🔊 Ascolta',create_account:'Crea account',connecting:'Connessione…',creating:'Creazione…',sending:'Invio…',redirecting:'Reindirizzamento…',payment_ok:'Pagamento confermato!',payment_sub:'Crea la tua password.',no_account:'Nessun account?',buy_access:'Acquista accesso',choose:'Scegli la tua interfaccia:',girl:'Ragazza',boy:'Ragazzo',adult:'Adulto',girl_desc:'Interfaccia rosa',boy_desc:'Interfaccia blu',adult_desc:'Interfaccia completa',sessions:'Sessioni',exercises:'Esercizi',progress:'Progressi',settings:'Impostazioni',intro_desc:'Alcune nozioni importanti.',sessions_desc:'Programma completo.',exercises_desc:'Quiz: oltre 200 domande.',contact_desc:'Hai bisogno di aiuto?'},
+    zh:{login_btn:'登录',lesson_num:'课',back_s:'课程',next_s:'下一课 ▶',retry:'🔄 重试',rappel:'提醒',score_global:'总分',lang_btn:'🌍 语言',quit:'退出',back:'‹ 返回',begin:'开头',middle:'中间',end:'末尾',isolated:'单独',cours:'课程',exercice:'练习 ▶',writing_line:'书写线',contact_send:'发送',contact_return:'返回主菜单',ex200_next:'下一个 ▶',ex200_finish:'完成',ex200_listen:'🔊 听答案',create_account:'创建账户',connecting:'连接中…',creating:'创建中…',sending:'发送中…',redirecting:'跳转中…',payment_ok:'付款成功！',payment_sub:'请创建您的密码。',no_account:'没有账户？',buy_access:'购买访问权',choose:'选择您的界面：',girl:'女孩',boy:'男孩',adult:'成人',girl_desc:'粉色界面',boy_desc:'蓝色界面',adult_desc:'完整界面',sessions:'课程',exercises:'练习',progress:'进度',settings:'设置',intro_desc:'一些重要概念。',sessions_desc:'完整课程。',exercises_desc:'测验：200多题。',contact_desc:'需要帮助？'},
+    ru:{login_btn:'Войти',lesson_num:'Урок',back_s:'Уроки',next_s:'Следующий ▶',retry:'🔄 Повторить',rappel:'Напоминание',score_global:'общий счёт',lang_btn:'🌍 Язык',quit:'Выйти',back:'‹ Назад',begin:'Начало',middle:'Середина',end:'Конец',isolated:'ИЗОЛИР.',cours:'Урок',exercice:'Упражнение ▶',writing_line:'Строка письма',contact_send:'Отправить',contact_return:'В главное меню',ex200_next:'Следующий ▶',ex200_finish:'Завершить',ex200_listen:'🔊 Слушать',create_account:'Создать аккаунт',connecting:'Подключение…',creating:'Создание…',sending:'Отправка…',redirecting:'Перенаправление…',payment_ok:'Оплата подтверждена!',payment_sub:'Создайте пароль.',no_account:'Нет аккаунта?',buy_access:'Купить доступ',choose:'Выберите интерфейс:',girl:'Девочка',boy:'Мальчик',adult:'Взрослый',girl_desc:'Розовый интерфейс',boy_desc:'Синий интерфейс',adult_desc:'Полный интерфейс',sessions:'Уроки',exercises:'Упражнения',progress:'Прогресс',settings:'Настройки',intro_desc:'Несколько важных понятий.',sessions_desc:'Полная программа.',exercises_desc:'Викторина: более 200 вопросов.',contact_desc:'Нужна помощь?'},
+    pt:{login_btn:'Entrar',lesson_num:'Lição',back_s:'Sessões',next_s:'Próxima ▶',retry:'🔄 Tentar novamente',rappel:'Lembrete',score_global:'pontuação global',lang_btn:'🌍 Idioma',quit:'Sair',back:'‹ Voltar',begin:'Início',middle:'Meio',end:'Fim',isolated:'ISOLADA',cours:'Lição',exercice:'Exercício ▶',writing_line:'Linha de escrita',contact_send:'Enviar',contact_return:'Voltar ao menu',ex200_next:'Próxima ▶',ex200_finish:'Terminar',ex200_listen:'🔊 Ouvir',create_account:'Criar conta',connecting:'Conectando…',creating:'Criando…',sending:'Enviando…',redirecting:'Redirecionando…',payment_ok:'Pagamento validado!',payment_sub:'Crie a sua senha.',no_account:'Sem conta?',buy_access:'Comprar acesso',choose:'Escolha a sua interface:',girl:'Menina',boy:'Menino',adult:'Adulto',girl_desc:'Interface rosa',boy_desc:'Interface azul',adult_desc:'Interface completa',sessions:'Sessões',exercises:'Exercícios',progress:'Progresso',settings:'Configurações',intro_desc:'Algumas noções importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: mais de 200 perguntas.',contact_desc:'Precisa de ajuda?'},
+  };
+  T[c]={...T.fr,...(overrides[c]||{})};
 });
 function t(k){return(T[st.lang]||T.fr)[k]||(T.fr[k])||k}
 
 function mH(b){return[{ar:b+'َ',lat:'a'},{ar:b+'َا',lat:'ā'},{ar:b+'ً',lat:'an'},{ar:b+'ِ',lat:'i'},{ar:b+'ِي',lat:'ī'},{ar:b+'ٍ',lat:'in'},{ar:b+'ُ',lat:'u'},{ar:b+'ُو',lat:'ū'},{ar:b+'ٌ',lat:'un'},{ar:b+'ْ',lat:'∅'}];}
 
-// Session index for display numbers (SV=1, SA=2, SP=3, LS[0]=4...)
-// But lesson numbers inside LS start at lesson_num 1 (ب ت ث = Leçon 1, etc.)
-// Card display number = index+1 in ALL_S array
-
-const SV={id:0,type:'vowels',emoji:'🔤',
-  name:{fr:'Les voyelles · الحَرَكَات',en:'Vowels · الحَرَكَات',es:'Vocales',de:'Vokale',nl:'Klinkers',it:'Vocali',zh:'元音',ru:'Гласные',pt:'Vogais'},
-  above:[{sym:'َ',lat:'a',ex:'بَ'},{sym:'ُ',lat:'u',ex:'بُ'},{sym:'ً',lat:'an',ex:'بً'},{sym:'ٌ',lat:'un',ex:'بٌ'},{sym:'ْ',lat:'∅',ex:'بْ'}],
-  below:[{sym:'ِ',lat:'i',ex:'بِ'},{sym:'ٍ',lat:'in',ex:'بٍ'}]};
-
-const SA={id:1,type:'letter',emoji:'📝',
-  name:{fr:'اَ · وَ · يَ',en:'Alif · Wāw · Yāʾ',es:'Alif · Wāw · Yāʾ',de:'Alif · Wāw · Yāʾ',nl:'Alif · Wāw · Yāʾ',it:'Alif · Wāw · Yāʾ',zh:'Alif',ru:'Алиф',pt:'Alif'},
-  letters:[
-    {ar:'ا',iso:'ا',name:'أَلِف',lat:'ā',type:'soft',attaches:false,pos:[{l:'début',ar:'ا',g:'ا'},{l:'milieu',ar:'ـا',g:'ا'},{l:'fin',ar:'ـا',g:'ا'}],harakat:mH('ا'),words:[]},
-    {ar:'و',iso:'و',name:'وَاو',lat:'w',type:'soft',attaches:false,pos:[{l:'début',ar:'و',g:'و'},{l:'milieu',ar:'ـو',g:'و'},{l:'fin',ar:'ـو',g:'و'}],harakat:mH('و'),words:[]},
-    {ar:'ي',iso:'ي',name:'يَاء',lat:'y',type:'soft',attaches:true,pos:[{l:'début',ar:'يـ',g:'ي'},{l:'milieu',ar:'ـيـ',g:'ي'},{l:'fin',ar:'ـي',g:'ي'}],harakat:mH('ي'),words:[]}
-  ]};
-
-const SP={id:2,type:'prolong',emoji:'🌊',
-  name:{fr:'Les prolongations · الْمُدُود',en:'Prolongations · الْمُدُود',es:'Prolongaciones',de:'Verlängerungen',nl:'Verlengingen',it:'Prolungamenti',zh:'延长音',ru:'Продление',pt:'Prolongações'},
-  cards:[{vow:'َ',let:'ا',short:'بَ',long:'بَا',shortLat:'ba',longLat:'bā'},{vow:'ُ',let:'و',short:'بُ',long:'بُو',shortLat:'bu',longLat:'bū'},{vow:'ِ',let:'ي',short:'بِ',long:'بِي',shortLat:'bi',longLat:'bī'}]};
-
-// LS sessions: id 3..11, lesson numbers 1..9 (displayed as "Leçon 1".."Leçon 9")
-// Card number in grid = ALL_S index + 1
+const SV={id:0,type:'vowels',emoji:'🔤'};
+const SA={id:1,type:'letter',emoji:'📝',name_ar:'اَ · وَ · يَ',letters:[
+  {ar:'ا',iso:'ا',name:'أَلِف',lat:'ā',type:'soft',attaches:false,pos:[{l:'début',ar:'ا',g:'ا'},{l:'milieu',ar:'ـا',g:'ا'},{l:'fin',ar:'ـا',g:'ا'}],harakat:mH('ا'),words:[]},
+  {ar:'و',iso:'و',name:'وَاو',lat:'w',type:'soft',attaches:false,pos:[{l:'début',ar:'و',g:'و'},{l:'milieu',ar:'ـو',g:'و'},{l:'fin',ar:'ـو',g:'و'}],harakat:mH('و'),words:[]},
+  {ar:'ي',iso:'ي',name:'يَاء',lat:'y',type:'soft',attaches:true,pos:[{l:'début',ar:'يـ',g:'ي'},{l:'milieu',ar:'ـيـ',g:'ي'},{l:'fin',ar:'ـي',g:'ي'}],harakat:mH('ي'),words:[]}
+]};
+const SP={id:2,type:'prolong',emoji:'🌊',cards:[{vow:'َ',let:'ا',short:'بَ',long:'بَا',shortLat:'ba',longLat:'bā'},{vow:'ُ',let:'و',short:'بُ',long:'بُو',shortLat:'bu',longLat:'bū'},{vow:'ِ',let:'ي',short:'بِ',long:'بِي',shortLat:'bi',longLat:'bī'}]};
 const LS=[
   {id:3,emoji:'⭐',lnum:1,letters:[
     {ar:'ب',iso:'ب',name:'بَاء',lat:'b',type:'soft',attaches:true,pos:[{l:'début',ar:'بـ',g:'ب'},{l:'milieu',ar:'ـبـ',g:'ب'},{l:'fin',ar:'ـب',g:'ب'}],harakat:mH('ب'),words:[{ar:'بَابٌ',lat:'bābun'},{ar:'بَاتَ',lat:'bāta'},{ar:'تَبٌّ',lat:'tabbun'},{ar:'بَثَّ',lat:'baththa'},{ar:'ثَبَتَ',lat:'thabata'},{ar:'تَبَتَ',lat:'tabata'}]},
@@ -578,189 +571,121 @@ const LS=[
 ];
 const ALL_S=[SV,SA,SP,...LS];
 const ALL_LETTERS=LS.flatMap(s=>s.letters);
-
 const st={lang:'fr',profile:'adult',soundOn:true,scores:{},user:null,curLesson:null,quiz:null,backHistory:[],_curPage:null};
 
-// ── TRANSITIONS ──
-const TX_FORWARD =['tx-zoom-in','tx-slide-r','tx-flip','tx-slide-up'];
-const TX_BACKWARD=['tx-zoom-out','tx-slide-l','tx-slide-down','tx-fade'];
+// TRANSITIONS
+const TX_FWD=['tx-zoom-in','tx-slide-r','tx-flip','tx-slide-up'];
+const TX_BWD=['tx-zoom-out','tx-slide-l','tx-slide-down','tx-fade'];
 let _txIdx=0;
-function nextTx(forward){
-  const arr=forward?TX_FORWARD:TX_BACKWARD;
-  const cls=arr[_txIdx%arr.length];
-  _txIdx++;return cls;
-}
-function animEl(el,cls){
-  const cur=[...el.classList].filter(c=>c.startsWith('tx-'));
-  cur.forEach(c=>el.classList.remove(c));
-  void el.offsetWidth;el.classList.add(cls);
-}
-function showS(id,forward){
-  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
-  const el=document.getElementById(id);
-  if(el){el.classList.add('on');animEl(el,nextTx(forward!==false));}
-}
-function transitionCA(forward){
-  const ca=document.getElementById('ca');if(!ca)return;
-  animEl(ca,nextTx(forward!==false));
-}
+function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];_txIdx++;return c;}
+function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
+function showS(id,fwd){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));const el=document.getElementById(id);if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}}
+function transitionCA(fwd){const ca=document.getElementById('ca');if(ca)animEl(ca,nextTx(fwd!==false));}
 
-// ── SPEECH ──
-function speak(txt,rate){
-  rate=rate||0.82;
-  if(!st.soundOn||!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(txt);
-  u.lang='ar-SA';u.rate=rate;u.pitch=1.05;
-  const vs=window.speechSynthesis.getVoices();
-  const v=vs.find(x=>x.lang==='ar-SA')||vs.find(x=>x.lang==='ar-EG')||vs.find(x=>x.lang.startsWith('ar'));
-  if(v)u.voice=v;
-  window.speechSynthesis.speak(u);
-}
-function toggleSound(){
-  st.soundOn=!st.soundOn;
-  document.querySelectorAll('.sound-dot').forEach(d=>d.classList.toggle('off',!st.soundOn));
-}
+// SPEECH
+function speak(txt,rate){rate=rate||0.82;if(!st.soundOn||!window.speechSynthesis)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='ar-SA';u.rate=rate;u.pitch=1.05;const vs=window.speechSynthesis.getVoices();const v=vs.find(x=>x.lang==='ar-SA')||vs.find(x=>x.lang==='ar-EG')||vs.find(x=>x.lang.startsWith('ar'));if(v)u.voice=v;window.speechSynthesis.speak(u);}
+function toggleSound(){st.soundOn=!st.soundOn;document.querySelectorAll('.sound-dot').forEach(d=>d.classList.toggle('off',!st.soundOn));}
 
-// ── LANG ──
-function buildLangRow(){
-  const r=document.getElementById('lang-row');if(!r)return;r.innerHTML='';
-  LANGS.forEach(l=>{const d=document.createElement('div');d.className='lang-chip'+(l.c===st.lang?' on':'');d.textContent=l.l;d.onclick=()=>{st.lang=l.c;buildLangRow();applyI18N();};r.appendChild(d);});
-}
-function openLangModal(){
-  const panel=document.getElementById('lang-panel');
-  panel.querySelectorAll('.lang-chip').forEach(x=>x.remove());
-  LANGS.forEach(l=>{const d=document.createElement('div');d.className='lang-chip'+(l.c===st.lang?' on':'');d.textContent=l.l;d.onclick=e=>{e.stopPropagation();st.lang=l.c;openLangModal();applyI18N();};panel.appendChild(d);});
-  document.getElementById('lang-modal').classList.add('open');
-}
-function closeLangModal(e){if(e.target===document.getElementById('lang-modal'))document.getElementById('lang-modal').classList.remove('open');}
+// I18N — update ALL non-Arabic text
 function applyI18N(){
   buildLangRow();
-  document.getElementById('w-sub').textContent=t('choose');
-  document.getElementById('pb-girl').textContent=t('girl');
-  document.getElementById('pb-boy').textContent=t('boy');
-  document.getElementById('pb-adult').textContent=t('adult');
+  // Login page
+  const le=document.getElementById('l-btn');if(le)le.textContent=t('login_btn');
+  const na=document.getElementById('no-account-txt');if(na)na.textContent=t('no_account')+' ';
+  const ba=document.getElementById('buy-link-txt');if(ba)ba.textContent=t('buy_access');
+  // Welcome
+  const ws=document.getElementById('w-sub');if(ws)ws.textContent=t('choose');
+  const pg=document.getElementById('pb-girl');if(pg)pg.textContent=t('girl');
+  const pb=document.getElementById('pb-boy');if(pb)pb.textContent=t('boy');
+  const pa=document.getElementById('pb-adult');if(pa)pa.textContent=t('adult');
+  const pdg=document.getElementById('pd-girl');if(pdg)pdg.textContent=t('girl_desc');
+  const pdb=document.getElementById('pd-boy');if(pdb)pdb.textContent=t('boy_desc');
+  const pda=document.getElementById('pd-adult');if(pda)pda.textContent=t('adult_desc');
+  // Menu bottom
+  const sl=document.getElementById('score-lbl');if(sl)sl.textContent=t('score_global');
+  const lb=document.getElementById('lang-btn-lbl');if(lb)lb.textContent=t('lang_btn');
+  const qb=document.getElementById('quit-btn-lbl');if(qb)qb.textContent=t('quit');
+  // Rebuild menu
   buildMenu();
   if(st._curPage)renderPage(st._curPage,false);
 }
 
-// ── STRIPE CHECKOUT ──
+// LANG
+function buildLangRow(){
+  const r=document.getElementById('lang-row');if(!r)return;r.innerHTML='';
+  LANGS.forEach(l=>{const d=document.createElement('div');d.className='lang-chip'+(l.c===st.lang?' on':'');d.textContent=l.l;d.onclick=()=>{st.lang=l.c;applyI18N();};r.appendChild(d);});
+}
+function openLangModal(){
+  const panel=document.getElementById('lang-panel');panel.querySelectorAll('.lang-chip').forEach(x=>x.remove());
+  LANGS.forEach(l=>{const d=document.createElement('div');d.className='lang-chip'+(l.c===st.lang?' on':'');d.textContent=l.l;d.onclick=e=>{e.stopPropagation();st.lang=l.c;openLangModal();applyI18N();};panel.appendChild(d);});
+  document.getElementById('lang-modal').classList.add('open');
+}
+function closeLangModal(e){if(e.target===document.getElementById('lang-modal'))document.getElementById('lang-modal').classList.remove('open');}
+
+// AUTH
 async function startCheckout(){
   const email=document.getElementById('buy-email').value.trim().toLowerCase();
-  const errEl=document.getElementById('buy-err');
-  const btn=document.getElementById('buy-btn');
-  if(!email||!email.includes('@')){errEl.textContent='Veuillez entrer un email valide.';return;}
-  btn.disabled=true;btn.textContent='Redirection vers le paiement…';errEl.textContent='';
+  const errEl=document.getElementById('buy-err');const btn=document.getElementById('buy-btn');
+  if(!email||!email.includes('@')){errEl.textContent=t('err_fields');return;}
+  btn.disabled=true;btn.textContent=t('redirecting');errEl.textContent='';
   try{
-    const res=await fetch(`${API_URL}/api/create-checkout`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email})
-    });
+    const res=await fetch(`${API_URL}/api/create-checkout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
     const data=await res.json();
     if(data.url){window.location.href=data.url;}
-    else{errEl.textContent=data.error||'Erreur. Veuillez réessayer.';btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
-  }catch(e){errEl.textContent='Erreur de connexion. Veuillez réessayer.';btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
+    else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
+  }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
 }
-
-// ── REGISTER (après paiement) ──
 async function doRegister(){
   const email=document.getElementById('reg-email').value.trim().toLowerCase();
   const pwd=document.getElementById('reg-pwd').value;
   const pwd2=document.getElementById('reg-pwd2').value;
-  const errEl=document.getElementById('reg-err');
-  const btn=document.getElementById('reg-btn');
-  if(pwd!==pwd2){errEl.textContent='Les mots de passe ne correspondent pas.';return;}
-  if(pwd.length<6){errEl.textContent='Le mot de passe doit faire au moins 6 caractères.';return;}
-  btn.disabled=true;btn.textContent='Création du compte…';errEl.textContent='';
+  const errEl=document.getElementById('reg-err');const btn=document.getElementById('reg-btn');
+  if(pwd!==pwd2){errEl.textContent=t('err_pwd_match');return;}
+  if(pwd.length<6){errEl.textContent=t('err_pwd_len');return;}
+  btn.disabled=true;btn.textContent=t('creating');errEl.textContent='';
   try{
-    const res=await fetch(`${API_URL}/api/register`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email,password:pwd})
-    });
+    const res=await fetch(`${API_URL}/api/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pwd})});
     const data=await res.json();
-    if(data.success){
-      // Connexion automatique après inscription
-      document.getElementById('l-email').value=email;
-      showS('s-login',true);
-      document.getElementById('l-err').textContent='';
-      setTimeout(()=>{document.getElementById('l-pwd').focus();},400);
-    } else {errEl.textContent=data.error||'Erreur. Veuillez réessayer.';btn.disabled=false;btn.textContent='Créer mon compte';}
-  }catch(e){errEl.textContent='Erreur de connexion.';btn.disabled=false;btn.textContent='Créer mon compte';}
+    if(data.success){document.getElementById('l-email').value=email;showS('s-login',true);}
+    else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
+  }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
 }
-
-// ── AUTH (login via backend) ──
 async function doLogin(){
   const em=document.getElementById('l-email').value.trim().toLowerCase();
   const pw=document.getElementById('l-pwd').value;
-  const errEl=document.getElementById('l-err');
-  const btn=document.getElementById('l-btn');
-  if(!em){errEl.textContent='Email requis.';return;}
-  btn.disabled=true;btn.textContent='Connexion…';errEl.textContent='';
+  const errEl=document.getElementById('l-err');const btn=document.getElementById('l-btn');
+  if(!em){errEl.textContent=t('err_fields');return;}
+  btn.disabled=true;btn.textContent=t('connecting');errEl.textContent='';
   try{
-    const res=await fetch(`${API_URL}/api/login`,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:em,password:pw||'__check_pending__'})
-    });
+    const res=await fetch(`${API_URL}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw||'__check_pending__'})});
     const data=await res.json();
-    if(data.success){
-      st.user={email:data.email,name:data.email.split('@')[0]};
-      localStorage.setItem('arab_token',data.token);
-      localStorage.setItem('arab_email',data.email);
-      showS('s-welcome',true);
-    } else if(data.error&&data.error.includes('Compte non activé')){
-      // Rediriger vers création de mot de passe
-      document.getElementById('reg-email').value=em;
-      showS('s-register',true);
-    } else {
-      errEl.textContent=data.error||'Email ou mot de passe incorrect.';
-    }
-  }catch(e){errEl.textContent='Erreur de connexion. Vérifiez votre connexion internet.';}
-  finally{btn.disabled=false;btn.textContent='Connexion';}
+    if(data.success){st.user={email:data.email,name:data.email.split('@')[0]};localStorage.setItem('arab_token',data.token);localStorage.setItem('arab_email',data.email);showS('s-welcome',true);}
+    else if(data.error&&data.error.includes('non activé')){document.getElementById('reg-email').value=em;document.getElementById('reg-title').textContent=t('payment_ok');document.getElementById('reg-sub').textContent=t('payment_sub');document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);}
+    else{errEl.textContent=data.error||t('login_err');}
+  }catch(e){errEl.textContent=t('err_connection');}
+  finally{btn.disabled=false;btn.textContent=t('login_btn');}
 }
-function doLogout(){
-  st.user=null;
-  localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');
-  showS('s-buy',false);
-}
-
-// ── CHECK RETOUR STRIPE ──
+function doLogout(){st.user=null;localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');showS('s-buy',false);}
 function checkStripeReturn(){
   const params=new URLSearchParams(window.location.search);
-  if(params.get('payment')==='success'){
-    const email=params.get('email')||'';
-    document.getElementById('reg-email').value=decodeURIComponent(email);
-    showS('s-register',true);
-    // Nettoyer l'URL
-    window.history.replaceState({},'',window.location.pathname);
-  } else if(params.get('payment')==='cancel'){
-    showS('s-buy',false);
-    window.history.replaceState({},'',window.location.pathname);
-  }
+  if(params.get('payment')==='success'){const email=params.get('email')||'';document.getElementById('reg-email').value=decodeURIComponent(email);document.getElementById('reg-title').textContent=t('payment_ok');document.getElementById('reg-sub').textContent=t('payment_sub');document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);window.history.replaceState({},'',window.location.pathname);}
+  else if(params.get('payment')==='cancel'){showS('s-buy',false);window.history.replaceState({},'',window.location.pathname);}
+}
+async function tryAutoLogin(){
+  const token=localStorage.getItem('arab_token');const email=localStorage.getItem('arab_email');
+  if(token&&email){st.user={email,name:email.split('@')[0]};showS('s-welcome',true);}
 }
 
-// ── AUTO-LOGIN si token stocké ──
-async function tryAutoLogin(){
-  const token=localStorage.getItem('arab_token');
-  const email=localStorage.getItem('arab_email');
-  if(token&&email){
-    st.user={email,name:email.split('@')[0]};
-    showS('s-welcome',true);
-  }
-}
+function updateAvgScore(){const vals=Object.values(st.scores);const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;const el=document.getElementById('avg-score');if(el)el.textContent=avg;}
 function chooseProfile(p){
-  st.profile=p;
-  const root=document.getElementById('root');
+  st.profile=p;const root=document.getElementById('root');
   if(p==='girl'){root.style.background='radial-gradient(ellipse 80% 60% at 20% 10%,rgba(140,20,90,.5),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(80,10,60,.5),transparent 60%),#0d0710';root.style.setProperty('--gold','#e040a0');root.style.setProperty('--gold2','#ff85d0');root.style.setProperty('--gold-dim','rgba(224,64,160,.18)');root.style.setProperty('--border2','rgba(224,64,160,.3)');}
   else if(p==='boy'){root.style.background='radial-gradient(ellipse 80% 60% at 20% 10%,rgba(20,60,140,.55),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(10,40,100,.6),transparent 60%),#050d18';root.style.setProperty('--gold','#4fc3f7');root.style.setProperty('--gold2','#81d4fa');root.style.setProperty('--gold-dim','rgba(79,195,247,.18)');root.style.setProperty('--border2','rgba(79,195,247,.3)');}
   else{root.style.background='';['--gold','--gold2','--gold-dim','--border2'].forEach(v=>root.style.removeProperty(v));}
-  document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'U';
+  document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
   buildMenu();showS('s-menu',true);
 }
-function updateAvgScore(){
-  const vals=Object.values(st.scores);
-  const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
-  const el=document.getElementById('avg-score');if(el)el.textContent=avg;
-}
+
 function buildMenu(){
   const nav=document.getElementById('menu-nav');if(!nav)return;nav.innerHTML='';
   [{id:'intro',icon:'ℹ️',cls:'gold',title:t('intro'),desc:t('intro_desc')},
@@ -775,20 +700,16 @@ function buildMenu(){
   updateAvgScore();
 }
 
-// ── NAVIGATION ──
 function navToPage(page){
-  st._curPage=page;
-  showS('s-main',true);
+  st._curPage=page;showS('s-main',true);
   document.getElementById('tb-back').style.display='flex';
-  document.getElementById('back-lbl').textContent='Menu';
+  document.getElementById('back-lbl').textContent=t('back').replace('‹ ','');
   document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:'Contact',progress:t('progress'),settings:t('settings')}[page]||'';
   st.backHistory=[{target:'menu'}];
   renderPage(page,true);
 }
-function renderPage(page,forward){
-  const ca=document.getElementById('ca');
-  transitionCA(forward!==false);
-  ca.scrollTop=0;
+function renderPage(page,fwd){
+  const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
   else if(page==='sessions')renderSessions(ca);
   else if(page==='exercises')renderExPage(ca);
@@ -802,16 +723,21 @@ function handleBack(){
   if(prev.target==='sessions'){st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent='Menu';renderPage('sessions',false);}
 }
 
-// ── INTRO ──
+// INTRO
 function renderIntro(ca){
   ca.innerHTML=`
-    <div class="dua-box"><div class="dua-ar">${t('intro_dua')}</div><div class="dua-tr">${t('intro_dua_tr')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body">${t('intro_s1').replace(/\n\n/g,'<br><br>')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body">${t('intro_s2').replace(/\n\n/g,'<br><br>')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s3_title')}</div><div class="p-sec-body">${t('intro_s3').replace(/\n\n/g,'<br><br>')}</div></div>`;
+    <div class="dua-box">
+      <div class="dua-ar">${t('intro_dua')}</div>
+      <div class="dua-ar" style="font-size:1.2rem;margin-bottom:10px">${t('intro_dua2')}</div>
+      <div class="dua-tr">${t('intro_dua_tr')}</div>
+      <div class="dua-tr" style="margin-top:4px">${t('intro_dua_tr2')}</div>
+    </div>
+    <div class="p-section"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s1').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s2').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section"><div class="p-sec-title">${t('intro_s3_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s3').replace(/\n\n/g,'<br><br>')}</div></div>`;
 }
 
-// ── CONTACT ──
+// CONTACT
 function renderContact(ca){
   ca.innerHTML=`
     <div class="p-section">
@@ -824,192 +750,116 @@ function renderContact(ca){
       <button class="cform-btn" id="cf-btn" onclick="sendContact()">${t('contact_send')}</button>
       <div id="cf-status" style="margin-top:10px"></div>
     </div>`;}
-
 async function sendContact(){
   const name=document.getElementById('cf-name').value.trim();
   const email=document.getElementById('cf-email').value.trim();
   const subj=document.getElementById('cf-subj').value.trim();
   const msg=document.getElementById('cf-msg').value.trim();
-  const stEl=document.getElementById('cf-status');
-  const btn=document.getElementById('cf-btn');
-  if(!name||!email||!msg){stEl.innerHTML='<div style="color:#ff9090;font-size:.8rem">Veuillez remplir les champs obligatoires (nom, email, message).</div>';return;}
-  btn.disabled=true;btn.style.opacity='.55';
-  stEl.innerHTML='<div style="color:var(--txt2);font-size:.8rem">Envoi en cours…</div>';
+  const stEl=document.getElementById('cf-status');const btn=document.getElementById('cf-btn');
+  if(!name||!email||!msg){stEl.innerHTML=`<div style="color:#ff9090;font-size:.8rem">${t('err_fields')}</div>`;return;}
+  btn.disabled=true;btn.style.opacity='.55';stEl.innerHTML=`<div style="color:var(--txt2);font-size:.8rem">${t('sending')}</div>`;
   try{
-    const res=await fetch('https://formspree.io/f/xyklzrkp',{
-      method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({name,email,subject:subj||'Contact',message:msg,_replyto:email})
-    });
-    if(res.ok){showContactSuccess();}
-    else{throw new Error('fail');}
+    const res=await fetch('https://formspree.io/f/xyklzrkp',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({name,email,subject:subj||'Contact',message:msg,_replyto:email})});
+    if(res.ok)showContactSuccess();else throw new Error();
   }catch(e){
-    // Fallback: open mailto silently, still show success
-    try{
-      const body=encodeURIComponent(`Nom : ${name}\nEmail : ${email}\nSujet : ${subj||'-'}\n\n${msg}`);
-      const a=document.createElement('a');a.href=`mailto:abder.jah@hotmail.com?subject=${encodeURIComponent('[Arab Learn] '+(subj||'Contact'))}&body=${body}`;a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);
-    }catch(ex){}
+    try{const body=encodeURIComponent(`Nom : ${name}\nEmail : ${email}\nSujet : ${subj||'-'}\n\n${msg}`);const a=document.createElement('a');a.href=`mailto:abder.jah@hotmail.com?subject=${encodeURIComponent('[Arab Learn] '+(subj||'Contact'))}&body=${body}`;a.style.display='none';document.body.appendChild(a);a.click();document.body.removeChild(a);}catch(ex){}
     showContactSuccess();
   }
 }
 function showContactSuccess(){
   const ca=document.getElementById('ca');
-  ca.innerHTML=`
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;gap:20px;text-align:center;padding:24px">
-      <div class="cform-success" style="max-width:300px">
-        Votre message a bien été transmis.<br>Un membre de notre équipe va vous répondre rapidement.
-      </div>
-      <button class="rbtn rbtn-m" onclick="showS('s-menu',false)">Retour au menu principal</button>
-    </div>`;}
+  ca.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;gap:20px;text-align:center;padding:24px"><div class="cform-success" style="max-width:300px">${t('contact_ok')}</div><button class="rbtn rbtn-m" onclick="showS('s-menu',false)">${t('contact_return')}</button></div>`;
+}
 
-// ── SESSIONS ──
+// SESSIONS
 function renderSessions(ca){
-  ca.innerHTML='';
-  const g=document.createElement('div');g.className='sess-grid';
+  ca.innerHTML='';const g=document.createElement('div');g.className='sess-grid';
   ALL_S.forEach((s,idx)=>{
-    const sc=st.scores[s.id];
-    const c=document.createElement('div');c.className='sess-card';
-    if(s.type==='letter' && s.id!==1){
-      const hasH=s.letters?.some(l=>l.type==='heavy');
-      const hasNA=s.letters?.some(l=>!l.attaches&&l.ar!=='ة'&&l.ar!=='ء');
-      if(hasH&&hasNA)c.classList.add('c-both');
-      else if(hasH&&!hasNA)c.classList.add('c-blue');
-      else if(hasNA&&!hasH)c.classList.add('c-orange');
+    const sc=st.scores[s.id];const c=document.createElement('div');c.className='sess-card';
+    if(s.type==='letter'&&s.id!==1){
+      const hasH=s.letters?.some(l=>l.type==='heavy');const hasNA=s.letters?.some(l=>!l.attaches&&l.ar!=='ة'&&l.ar!=='ء');
+      if(hasH&&hasNA)c.classList.add('c-both');else if(hasH&&!hasNA)c.classList.add('c-blue');else if(hasNA&&!hasH)c.classList.add('c-orange');
     }
     let prev='';
-    if(s.type==='vowels')prev=`<div style="font-family:var(--fa);font-size:1.4rem;color:var(--gold);direction:rtl;display:flex;justify-content:space-between;padding:4px 0">${['َ','ُ','ِ','ً','ٌ','ٍ','ْ'].map(v=>`<span>${v}</span>`).join('')}</div>`;
-    else if(s.type==='prolong')prev=`<span style="font-family:var(--fa);font-size:1.3rem;color:var(--gold)">ا و ي</span>`;
-    else prev=`<span style="font-family:var(--fa);font-size:1.3rem;color:var(--gold)">${s.letters.map(l=>l.ar).join(' · ')}</span>`;
-    let bads='';
-    if(s.type==='letter'){
-      if(s.letters?.some(l=>l.type==='heavy'))bads+=`<span class="sess-badge bd-b">مُفَخَّمَة</span>`;
+    if(s.type==='vowels'){
+      prev=`<div class="sess-ar">${['َ','ُ','ِ','ً','ٌ','ٍ','ْ'].map(v=>`<span>${v}</span>`).join('')}</div>`;
+    } else if(s.type==='prolong'){
+      prev=`<div class="sess-ar"><span>ي</span><span>و</span><span>ا</span></div>`;
+    } else {
+      prev=`<div class="sess-ar">${s.letters.map(l=>`<span>${l.ar}</span>`).join('')}</div>`;
     }
-    // Card title: SV/SP keep name; SA and LS use "Leçon N" where N = card number (idx+1)
+    let bads='';if(s.type==='letter'){if(s.letters?.some(l=>l.type==='heavy'))bads+=`<span class="sess-badge bd-b">مُفَخَّمَة</span>`;}
     let cardTitle='';
-    const cardNum=idx+1;
-    if(s.type==='vowels')cardTitle=s.name[st.lang]||s.name.fr;
-    else if(s.type==='prolong')cardTitle=s.name[st.lang]||s.name.fr;
-    else cardTitle=t('lesson_num')+' '+cardNum;
-
-    c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="sess-title"><span class="sess-num">${idx+1}</span>${cardTitle}</div><div class="sess-score">${sc!==undefined?'✅ '+sc+'%':''}</div></div><div class="sess-ar">${prev}</div><div style="margin-top:4px">${bads}</div>`;
+    if(s.type==='vowels')cardTitle=t('vowels_name');
+    else if(s.type==='prolong')cardTitle=t('prolong_name');
+    else if(s.id===1)cardTitle=t('lesson_num')+' 2';
+    else cardTitle=t('lesson_num')+' '+(idx+1);
+    c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="sess-title"><span class="sess-num">${idx+1}</span>${cardTitle}</div><div class="sess-score">${sc!==undefined?'✅ '+sc+'%':''}</div></div>${prev}<div style="margin-top:4px">${bads}</div>`;
     c.onclick=()=>openLesson(s);g.appendChild(c);
   });
   ca.appendChild(g);
 }
 
-// ── OPEN LESSON ──
+// OPEN LESSON
 function openLesson(s){
   st.curLesson=s;
   document.getElementById('tb-title').textContent=t('cours');
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_s');
   st.backHistory.push({target:'sessions'});
-  const ca=document.getElementById('ca');
-  transitionCA(true);ca.scrollTop=0;ca.innerHTML='';
+  const ca=document.getElementById('ca');transitionCA(true);ca.scrollTop=0;ca.innerHTML='';
   if(s.type==='vowels')renderVLesson(ca,s);
   else if(s.type==='prolong')renderPLesson(ca,s);
   else renderLLesson(ca,s,0);
 }
 
-// ── VOWEL LESSON ──
+// VOWEL LESSON
 function renderVLesson(ca,s){
   const ib=document.createElement('div');ib.className='info-box';ib.style.marginBottom='12px';
-  ib.innerHTML=`<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:8px">${s.name[st.lang]||s.name.fr}</strong>${t('vowel_intro')}`;
+  ib.innerHTML=`<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:8px">${t('vowels_name')}</strong>${t('vowel_intro')}`;
   ca.appendChild(ib);
-
   const sec=document.createElement('div');sec.className='vline-section';
-
-  // Desired visual order (right→left):  a  u  i  an  in  un  ∅
-  // We build 7 columns. Mapping:
-  // col0(rightmost)=a(above[0]), col1=u(above[1]), col2=i(below[0]),
-  // col3=an(above[2]), col4=in(below[1]), col5=un(above[3]), col6(leftmost)=∅(above[4])
   const cols=[
-    {sym:s.above[0].sym,lat:s.above[0].lat,ex:s.above[0].ex,pos:'above'},
-    {sym:s.above[1].sym,lat:s.above[1].lat,ex:s.above[1].ex,pos:'above'},
-    {sym:s.below[0].sym,lat:s.below[0].lat,ex:s.below[0].ex,pos:'below'},
-    {sym:s.above[2].sym,lat:s.above[2].lat,ex:s.above[2].ex,pos:'above'},
-    {sym:s.below[1].sym,lat:s.below[1].lat,ex:s.below[1].ex,pos:'below'},
-    {sym:s.above[3].sym,lat:s.above[3].lat,ex:s.above[3].ex,pos:'above'},
-    {sym:s.above[4].sym,lat:s.above[4].lat,ex:s.above[4].ex,pos:'above'},
+    {sym:'َ',lat:'a',ex:'بَ',pos:'above'},{sym:'ُ',lat:'u',ex:'بُ',pos:'above'},
+    {sym:'ِ',lat:'i',ex:'بِ',pos:'below'},{sym:'ً',lat:'an',ex:'بً',pos:'above'},
+    {sym:'ٍ',lat:'in',ex:'بٍ',pos:'below'},{sym:'ٌ',lat:'un',ex:'بٌ',pos:'above'},
+    {sym:'ْ',lat:'∅',ex:'بْ',pos:'above'},
   ];
   const n=cols.length;
-
-  const grid=document.createElement('div');
-  grid.style.cssText=`display:grid;grid-template-columns:repeat(${n},1fr);direction:rtl;padding:8px 4px;`;
-
-  // Row 1: latin labels top (only for 'above' cols; below cols show label at bottom)
-  cols.forEach(col=>{
-    const el=document.createElement('div');
-    el.style.cssText='text-align:center;font-size:.6rem;color:var(--txt2);padding-bottom:3px;min-height:16px;';
-    if(col.pos==='above')el.textContent=col.lat;
-    grid.appendChild(el);
-  });
-
-  // Row 2: arabic symbols above (below cols leave gap)
-  cols.forEach(col=>{
-    const el=document.createElement('div');
-    el.style.cssText='text-align:center;font-family:var(--fa);font-size:2.6rem;color:var(--vowel);line-height:1.05;min-height:10px;';
-    if(col.pos==='above'){el.textContent=col.sym;el.style.cursor='pointer';el.onclick=()=>speak(col.ex,.75);}
-    grid.appendChild(el);
-  });
-
-  // Row 3: writing line spans all cols
-  const lineEl=document.createElement('div');
-  lineEl.style.cssText=`grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:6px 0;`;
-  lineEl.innerHTML=`<div class="wline"></div><span class="wline-lbl">${t('writing_line')}</span><div class="wline"></div>`;
-  grid.appendChild(lineEl);
-
-  // Row 4: arabic symbols below (above cols leave gap)
-  cols.forEach(col=>{
-    const el=document.createElement('div');
-    el.style.cssText='text-align:center;font-family:var(--fa);font-size:2.6rem;color:var(--vowel);line-height:1.05;min-height:10px;';
-    if(col.pos==='below'){el.textContent=col.sym;el.style.cursor='pointer';el.onclick=()=>speak(col.ex,.75);}
-    grid.appendChild(el);
-  });
-
-  // Row 5: latin labels bottom (only for 'below' cols)
-  cols.forEach(col=>{
-    const el=document.createElement('div');
-    el.style.cssText='text-align:center;font-size:.6rem;color:var(--txt2);padding-top:3px;min-height:16px;';
-    if(col.pos==='below')el.textContent=col.lat;
-    grid.appendChild(el);
-  });
-
+  const grid=document.createElement('div');grid.style.cssText=`display:grid;grid-template-columns:repeat(${n},1fr);direction:rtl;padding:8px 4px;`;
+  cols.forEach(col=>{const el=document.createElement('div');el.style.cssText='text-align:center;font-size:.6rem;color:var(--txt2);padding-bottom:3px;min-height:16px;';if(col.pos==='above')el.textContent=col.lat;grid.appendChild(el);});
+  cols.forEach(col=>{const el=document.createElement('div');el.style.cssText='text-align:center;font-family:var(--fa);font-size:2.6rem;color:var(--vowel);line-height:1.05;min-height:10px;';if(col.pos==='above'){el.textContent=col.sym;el.style.cursor='pointer';el.onclick=()=>speak(col.ex,.75);}grid.appendChild(el);});
+  const lineEl=document.createElement('div');lineEl.style.cssText=`grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:6px 0;`;lineEl.innerHTML=`<div class="wline"></div><span class="wline-lbl">${t('writing_line')}</span><div class="wline"></div>`;grid.appendChild(lineEl);
+  cols.forEach(col=>{const el=document.createElement('div');el.style.cssText='text-align:center;font-family:var(--fa);font-size:2.6rem;color:var(--vowel);line-height:1.05;min-height:10px;';if(col.pos==='below'){el.textContent=col.sym;el.style.cursor='pointer';el.onclick=()=>speak(col.ex,.75);}grid.appendChild(el);});
+  cols.forEach(col=>{const el=document.createElement('div');el.style.cssText='text-align:center;font-size:.6rem;color:var(--txt2);padding-top:3px;min-height:16px;';if(col.pos==='below')el.textContent=col.lat;grid.appendChild(el);});
   sec.appendChild(grid);ca.appendChild(sec);
   const tip=document.createElement('div');tip.className='tip-box';tip.style.marginTop='10px';tip.textContent=t('vowel_tip');ca.appendChild(tip);
   ca.appendChild(mkFAB(s));
 }
 
-// ── PROLONG LESSON ──
+// PROLONG LESSON
 function renderPLesson(ca,s){
   const ib=document.createElement('div');ib.className='info-box';ib.style.marginBottom='12px';
-  ib.innerHTML=`<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:8px">${s.name[st.lang]||s.name.fr}</strong><em>${t('prolong_note')}</em>`;
-  ca.appendChild(ib);
+  ib.innerHTML=`<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:8px">${t('prolong_name')}</strong><em>${t('prolong_note')}</em>`;ca.appendChild(ib);
   s.cards.forEach(c=>{
     const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0;direction:rtl;flex-wrap:wrap;';
     const mkC=(txt,big,clk)=>{const d=document.createElement('div');d.style.cssText=`width:${big?72:64}px;height:${big?72:64}px;border-radius:50%;border:${big?'2px solid var(--border2)':'1px solid var(--border)'};background:var(--glass);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Scheherazade New',serif;font-size:${big?2.1:1.9}rem;color:var(--txt);`;d.textContent=txt;d.onclick=clk;return d;};
-    const baseC=mkC(c.short,false,()=>speak(c.short,.75));
-    const prolongC=mkC(c.let,false,()=>speak(c.let,.75));
+    const baseC=mkC(c.short,false,()=>speak(c.short,.75));const prolongC=mkC(c.let,false,()=>speak(c.let,.75));
     const resultC=mkC(c.long,true,()=>{speak(c.long,.75);resultC.style.boxShadow='0 0 20px rgba(212,168,67,.5)';setTimeout(()=>resultC.style.boxShadow='',700);});
     const lbl=document.createElement('div');lbl.style.cssText='font-size:.68rem;color:var(--txt2);text-align:center;margin-top:3px';lbl.textContent=c.longLat;
     const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center';wrap.appendChild(resultC);wrap.appendChild(lbl);
     const plus=document.createElement('span');plus.style.cssText='color:var(--txt2);font-size:1.2rem;font-weight:bold';plus.textContent='+';
     const eq=document.createElement('span');eq.style.cssText='color:var(--txt2);font-size:1.2rem;font-weight:bold';eq.textContent='=';
-    row.appendChild(baseC);row.appendChild(plus);row.appendChild(prolongC);row.appendChild(eq);row.appendChild(wrap);
-    ca.appendChild(row);
+    row.appendChild(baseC);row.appendChild(plus);row.appendChild(prolongC);row.appendChild(eq);row.appendChild(wrap);ca.appendChild(row);
   });
   const tip=document.createElement('div');tip.className='tip-box';tip.style.marginTop='10px';
   tip.innerHTML=t('prolong_tip').replace(/\n/g,'<br>').replace(/([اويَُِ])/g,' <span style="font-family:var(--fa);font-size:1.4em;vertical-align:middle"> $1 </span> ');
   ca.appendChild(tip);ca.appendChild(mkFAB(s));
 }
 
-// ── LETTER LESSON ──
+// LETTER LESSON
 function renderLLesson(ca,s,idx){
-  ca.innerHTML='';
-  const letter=s.letters[idx];
-  const isTaMarbuta=letter.ar==='ة';
-  const isHamza=letter.ar==='ء';
-  const isSASession=(s.id===1);
-
+  ca.innerHTML='';const letter=s.letters[idx];const isTaMarbuta=letter.ar==='ة';const isHamza=letter.ar==='ء';const isSASession=(s.id===1);
   const tabs=document.createElement('div');tabs.className='ltabs';
   s.letters.forEach((l,i)=>{
     const tab=document.createElement('div');tab.className='ltab'+(i===idx?' on':'');
@@ -1018,30 +868,24 @@ function renderLLesson(ca,s,idx){
     tab.textContent=l.ar;tab.onclick=()=>renderLLesson(ca,s,i);tabs.appendChild(tab);
   });
   ca.appendChild(tabs);
-
   const layout=document.createElement('div');layout.className='lc-layout';
   const brow=document.createElement('div');brow.className='badge-row';
   if(!letter.attaches&&!isTaMarbuta)brow.innerHTML+=`<span class="bd-big bd-o">${t('noattach')}</span>`;
   if(letter.type==='heavy')brow.innerHTML+=`<span class="bd-big bd-b">${t('heavy')}</span>`;
   if(brow.innerHTML)layout.appendChild(brow);
-
   if(isHamza){
     const hamzaRow=document.createElement('div');hamzaRow.style.cssText='display:flex;gap:10px;direction:rtl;flex-wrap:wrap;';
-    [{lbl:'ا',ar:'أ',fk:'with_alif'},{lbl:'و',ar:'ؤ',fk:'with_waw'},{lbl:'ى',ar:'ئ',fk:'with_ya'}].forEach(hf=>{
-      const wLabels={with_alif:{fr:'Avec ا',en:'With ا'},with_waw:{fr:'Avec و',en:'With و'},with_ya:{fr:'Avec ى',en:'With ى'}};
-      const wl=(wLabels[hf.fk][st.lang]||wLabels[hf.fk].fr);
+    [{lbl:'ا',ar:'أ',tk:'with_alif'},{lbl:'و',ar:'ؤ',tk:'with_waw'},{lbl:'ى',ar:'ئ',tk:'with_ya'}].forEach(hf=>{
       const pc=document.createElement('div');pc.className='pos-c';pc.style.borderColor='var(--gold)';
+      const wl=t(hf.tk);
       pc.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;direction:ltr;gap:6px;padding:2px 0"><span style="font-size:.78rem;color:var(--gold);font-weight:600">${wl.split(' ')[0]}</span><span style="font-family:var(--fa);font-size:1.6rem;color:var(--txt)">${hf.lbl}</span></div><div class="pos-ar" style="color:var(--txt);font-weight:400;font-size:2rem;margin-top:4px">${hf.ar}</div>`;
       hamzaRow.appendChild(pc);
     });
     layout.appendChild(hamzaRow);
-    const tipBox=document.createElement('div');tipBox.className='tip-box';
-    tipBox.innerHTML=`<div style="margin-bottom:6px">• ${t('hamza1')}</div><div>• ${t('hamza2')}</div>`;
-    layout.appendChild(tipBox);
+    const tipBox=document.createElement('div');tipBox.className='tip-box';tipBox.innerHTML=`<div style="margin-bottom:6px">• ${t('hamza1')}</div><div>• ${t('hamza2')}</div>`;layout.appendChild(tipBox);
   } else {
     const posMap={début:t('begin'),milieu:t('middle'),fin:t('end')};
-    const posOrder=['début','milieu','fin'];
-    const sortedPos=posOrder.map(k=>letter.pos.find(p=>p.l===k)).filter(Boolean);
+    const sortedPos=['début','milieu','fin'].map(k=>letter.pos.find(p=>p.l===k)).filter(Boolean);
     const posRowWrap=document.createElement('div');posRowWrap.style.cssText='display:flex;gap:10px;direction:rtl;flex-wrap:wrap;';
     const isoBox=document.createElement('div');isoBox.className='pos-c';
     isoBox.innerHTML=`<div class="pos-lbl" style="color:var(--blue)">${t('isolated')}</div><div class="pos-ar" style="color:var(--blue);font-weight:400">${letter.iso||letter.ar}</div>`;
@@ -1056,12 +900,9 @@ function renderLLesson(ca,s,idx){
     layout.appendChild(posRowWrap);
     const fullTip=`<div style="margin-bottom:6px">• ${t('letter_tip_master')}</div><div style="margin-bottom:6px">• ${t('letter_tip2')}</div><div style="margin-bottom:6px">• ${t('letter_tip3')}</div><div style="margin-bottom:6px">${t('letter_tip4')}</div><div style="color:var(--gold);margin-top:8px;line-height:1.9"><div>${t('letter_tip5a')}</div><div>${t('letter_tip5b')}</div></div>`;
     const tipBox=document.createElement('div');tipBox.className='tip-box';
-    if(isTaMarbuta){
-      tipBox.innerHTML=`<div style="margin-bottom:5px">• ${t('ta_marbuta1')}</div><div style="margin-bottom:5px">• ${t('ta_marbuta2')}</div><div>• ${t('ta_marbuta3')}</div>`;
-      layout.appendChild(tipBox);
-    } else if(isSASession){
-      tipBox.innerHTML=fullTip;layout.appendChild(tipBox);
-    } else {
+    if(isTaMarbuta){tipBox.innerHTML=`<div style="margin-bottom:5px">• ${t('ta_marbuta1')}</div><div style="margin-bottom:5px">• ${t('ta_marbuta2')}</div><div>• ${t('ta_marbuta3')}</div>`;layout.appendChild(tipBox);}
+    else if(isSASession){tipBox.innerHTML=fullTip;layout.appendChild(tipBox);}
+    else{
       const btn=document.createElement('button');btn.style.cssText='background:var(--glass);border:1px solid var(--border);border-radius:20px;color:var(--gold);font-family:var(--ff);font-size:.8rem;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:5px;width:100%;transition:all .2s';
       const arr=document.createElement('span');arr.style.cssText='transition:transform .2s;display:inline-block';arr.textContent='▶';
       btn.appendChild(arr);btn.appendChild(document.createTextNode(' '+t('rappel')));
@@ -1070,66 +911,42 @@ function renderLLesson(ca,s,idx){
       tipBox.appendChild(btn);tipBox.appendChild(content);layout.appendChild(tipBox);
     }
   }
-
-  // Orbital
   let orbOrder=[{ar:letter.ar+'َ',lat:'a'},{ar:letter.ar+'َا',lat:'ā'},{ar:letter.ar+'ً',lat:'an'},{ar:letter.ar+'ِ',lat:'i'},{ar:letter.ar+'ِي',lat:'ī'},{ar:letter.ar+'ٍ',lat:'in'},{ar:letter.ar+'ُ',lat:'u'},{ar:letter.ar+'ُو',lat:'ū'},{ar:letter.ar+'ٌ',lat:'un'},{ar:letter.ar+'ْ',lat:'∅'}];
   if(isTaMarbuta)orbOrder=orbOrder.filter(h=>!['∅','ā','ī','ū'].includes(h.lat));
   const orbWrap=document.createElement('div');orbWrap.className='orb-wrap';
-  const ctr=document.createElement('div');ctr.className='orb-ctr';
-  ctr.textContent=letter.ar;
+  const ctr=document.createElement('div');ctr.className='orb-ctr';ctr.textContent=letter.ar;
   ctr.onclick=()=>{speak(letter.name,.72);ctr.classList.add('rpl');setTimeout(()=>ctr.classList.remove('rpl'),500);};
   orbWrap.appendChild(ctr);
-  const n=orbOrder.length;
   orbOrder.forEach((hk,i)=>{
-    const angle=(i/n)*2*Math.PI-Math.PI/2;
-    const x=130+95*Math.cos(angle);const y=130+95*Math.sin(angle);
-    const orb=document.createElement('div');orb.className='orb-sat';
-    orb.style.left=(x-23)+'px';orb.style.top=(y-23)+'px';
+    const angle=(i/orbOrder.length)*2*Math.PI-Math.PI/2;const x=130+95*Math.cos(angle);const y=130+95*Math.sin(angle);
+    const orb=document.createElement('div');orb.className='orb-sat';orb.style.left=(x-23)+'px';orb.style.top=(y-23)+'px';
     orb.innerHTML=`<span class="orb-ar">${hk.ar}</span><span class="orb-lat">${hk.lat}</span>`;
     orb.onclick=function(){document.querySelectorAll('.orb-sat').forEach(o=>o.classList.remove('lit'));this.classList.add('lit');speak(hk.ar,.78);};
     orbWrap.appendChild(orb);
   });
-  layout.appendChild(orbWrap);
-  ca.appendChild(layout);ca.appendChild(mkFAB(s));
+  layout.appendChild(orbWrap);ca.appendChild(layout);ca.appendChild(mkFAB(s));
 }
 function mkFAB(s){const b=document.createElement('button');b.className='fab';b.textContent=t('exercice');b.onclick=()=>startExercise(s);return b;}
 
-// ── QUIZ ──
+// QUIZ
 function buildQs(session){
   let qs=[];
   if(session.type==='vowels'){
-    const pool=[...session.above,...session.below];
-    for(let i=0;i<12;i++){
-      const v=pool[i%pool.length];
-      if(i%2===0){const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);const ch=[v.lat,...wrongs.map(x=>x.lat)].sort(()=>Math.random()-.5);qs.push({type:'rv',qDisp:v.sym,qLbl:`${t('q_read')} :`,correct:v.lat,choices:ch,speak:v.ex,isVowelQ:true});}
-      else{const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);const ch=[v.sym,...wrongs.map(x=>x.sym)].sort(()=>Math.random()-.5);qs.push({type:'wv',qDisp:`"${v.lat}"`,qLbl:`${t('q_write')} :`,correct:v.sym,choices:ch,speak:v.ex,isArabicAns:true});}
-    }
+    const above=[{sym:'َ',lat:'a',ex:'بَ'},{sym:'ُ',lat:'u',ex:'بُ'},{sym:'ً',lat:'an',ex:'بً'},{sym:'ٌ',lat:'un',ex:'بٌ'},{sym:'ْ',lat:'∅',ex:'بْ'}];
+    const below=[{sym:'ِ',lat:'i',ex:'بِ'},{sym:'ٍ',lat:'in',ex:'بٍ'}];
+    const pool=[...above,...below];
+    for(let i=0;i<12;i++){const v=pool[i%pool.length];if(i%2===0){const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'rv',qDisp:v.sym,qLbl:`${t('q_read')} :`,correct:v.lat,choices:[v.lat,...wrongs.map(x=>x.lat)].sort(()=>Math.random()-.5),speak:v.ex,isVowelQ:true});}else{const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'wv',qDisp:`"${v.lat}"`,qLbl:`${t('q_write')} :`,correct:v.sym,choices:[v.sym,...wrongs.map(x=>x.sym)].sort(()=>Math.random()-.5),speak:v.ex,isArabicAns:true});}}
   } else if(session.type==='prolong'){
-    const p=session.cards;
-    for(let i=0;i<12;i++){
-      const c=p[i%p.length];
-      if(i%2===0){const wrongs=p.filter(x=>x.longLat!==c.longLat).sort(()=>Math.random()-.5).slice(0,2);const ch=[c.longLat,...wrongs.map(x=>x.longLat)].sort(()=>Math.random()-.5);qs.push({type:'rp',qDisp:c.long,qLbl:`${t('q_read')} :`,correct:c.longLat,choices:ch,speak:c.long});}
-      else{const wrongs=p.filter(x=>x.long!==c.long).sort(()=>Math.random()-.5).slice(0,2);const ch=[c.long,...wrongs.map(x=>x.long)].sort(()=>Math.random()-.5);qs.push({type:'wp',qDisp:`"${c.longLat}"`,qLbl:`${t('q_write')} :`,correct:c.long,choices:ch,speak:c.long,isArabicAns:true});}
-    }
+    const p=session.cards;for(let i=0;i<12;i++){const c=p[i%p.length];if(i%2===0){const wrongs=p.filter(x=>x.longLat!==c.longLat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'rp',qDisp:c.long,qLbl:`${t('q_read')} :`,correct:c.longLat,choices:[c.longLat,...wrongs.map(x=>x.longLat)].sort(()=>Math.random()-.5),speak:c.long});}else{const wrongs=p.filter(x=>x.long!==c.long).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'wp',qDisp:`"${c.longLat}"`,qLbl:`${t('q_write')} :`,correct:c.long,choices:[c.long,...wrongs.map(x=>x.long)].sort(()=>Math.random()-.5),speak:c.long,isArabicAns:true});}}
   } else {
     const seenLetters=session.id===1?session.letters:LS.filter(s=>s.id<=session.id).flatMap(s=>s.letters);
-    for(let i=0;i<12;i++){
-      const letter=seenLetters[Math.floor(Math.random()*seenLetters.length)];
-      const hk=letter.harakat[Math.floor(Math.random()*letter.harakat.length)];
-      const wrongs=seenLetters.filter(l=>l.ar!==letter.ar).sort(()=>Math.random()-.5).slice(0,2);
-      const correctLat=letter.lat+(hk.lat==='∅'?'':hk.lat);
-      const wrongChoices=wrongs.map(l=>{const wh=l.harakat[Math.floor(Math.random()*l.harakat.length)];return l.lat+(wh.lat==='∅'?'':wh.lat);});
-      const ch=[correctLat,...wrongChoices].sort(()=>Math.random()-.5);
-      qs.push({type:'rl',qDisp:hk.ar,qLbl:`${t('q_read')} :`,correct:correctLat,choices:ch,speak:hk.ar});
-    }
+    for(let i=0;i<12;i++){const letter=seenLetters[Math.floor(Math.random()*seenLetters.length)];const hk=letter.harakat[Math.floor(Math.random()*letter.harakat.length)];const wrongs=seenLetters.filter(l=>l.ar!==letter.ar).sort(()=>Math.random()-.5).slice(0,2);const correctLat=letter.lat+(hk.lat==='∅'?'':hk.lat);const wrongChoices=wrongs.map(l=>{const wh=l.harakat[Math.floor(Math.random()*l.harakat.length)];return l.lat+(wh.lat==='∅'?'':wh.lat);});qs.push({type:'rl',qDisp:hk.ar,qLbl:`${t('q_read')} :`,correct:correctLat,choices:[correctLat,...wrongChoices].sort(()=>Math.random()-.5),speak:hk.ar});}
   }
   return qs.sort(()=>Math.random()-.5);
 }
 function startExercise(session){
-  st.curLesson=session;
-  document.getElementById('tb-title').textContent=session.emoji+' Quiz';
-  document.getElementById('back-lbl').textContent=t('back_s');
-  st.backHistory.push({target:'sessions'});
+  st.curLesson=session;document.getElementById('tb-title').textContent=session.emoji+' Quiz';
+  document.getElementById('back-lbl').textContent=t('back_s');st.backHistory.push({target:'sessions'});
   st.quiz={qs:buildQs(session),idx:0,correct:0,sessionId:session.id};
   const ca=document.getElementById('ca');transitionCA(true);ca.scrollTop=0;ca.innerHTML='';renderQuiz(ca);
 }
@@ -1137,13 +954,10 @@ function renderQuiz(ca){
   const{qs,idx,correct}=st.quiz;const total=qs.length;
   if(idx>=total){transitionCA(true);showResult(ca);return;}
   const q=qs[idx];ca.innerHTML='';
-  const pg=document.createElement('div');pg.className='qz-prog';
-  pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(idx/total)*100}%"></div></div><div class="qs-lbl">${idx}/${total}</div>`;
-  ca.appendChild(pg);
+  const pg=document.createElement('div');pg.className='qz-prog';pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(idx/total)*100}%"></div></div><div class="qs-lbl">${idx}/${total}</div>`;ca.appendChild(pg);
   const layout=document.createElement('div');layout.className='qz-layout';
-  const qp=document.createElement('div');qp.className='qz-q';
-  const isVQ=q.isVowelQ;
-  qp.innerHTML=`<div class="q-lbl">${q.qLbl||''}</div><div class="${isVQ?'q-big-vow noclick':'q-big'}" ${isVQ?'':'onclick="speak(\''+q.speak+'\',0.78)"'}>${q.qDisp||''}</div>${!isVQ&&q.speak?`<button class="q-lbtn" onclick="speak('${q.speak}',0.78)">🔊 Écouter</button>`:''}<div class="rf" id="rf"></div>`;
+  const qp=document.createElement('div');qp.className='qz-q';const isVQ=q.isVowelQ;
+  qp.innerHTML=`<div class="q-lbl">${q.qLbl||''}</div><div class="${isVQ?'q-big-vow noclick':'q-big'}" ${isVQ?'':'onclick="speak(\''+q.speak+'\',0.78)"'}>${q.qDisp||''}</div>${!isVQ&&q.speak?`<button class="q-lbtn" onclick="speak('${q.speak}',0.78)">🔊 ${t('ex200_listen').replace('🔊 ','')}</button>`:''}<div class="rf" id="rf"></div>`;
   layout.appendChild(qp);
   const ap=document.createElement('div');ap.className='qz-a';
   const mkBtn=ch=>{const b=document.createElement('div');b.className='ans-btn';if(q.isArabicAns)b.classList.add('ar-ans');b.textContent=ch;b.onclick=()=>checkAns(b,ch===q.correct,ap,q.correct,q.speak);return b;};
@@ -1160,14 +974,10 @@ function checkAns(btn,ok,panel,correctAns,spk){
   setTimeout(()=>{st.quiz.idx++;const ca=document.getElementById('ca');animEl(ca,'tx-fade');renderQuiz(ca);},1400);
 }
 function showResult(ca){
-  const{correct,qs,sessionId}=st.quiz;
-  const total=qs.length;const pct=Math.round((correct/total)*100);const pass=pct>=80;
-  st.scores[sessionId]=Math.max(st.scores[sessionId]||0,pct);
-  const next=ALL_S.find(s=>s.id===sessionId+1);updateAvgScore();
-  ca.innerHTML='';
-  const rw=document.createElement('div');rw.className='res-w';
-  const rc=document.createElement('div');rc.className='res-c '+(pass?'rc-p':'rc-f');
-  rc.innerHTML=`<div>${pct}%</div><div style="font-size:1.1rem">${pass?'🎉':'❌'}</div>`;rw.appendChild(rc);
+  const{correct,qs,sessionId}=st.quiz;const total=qs.length;const pct=Math.round((correct/total)*100);const pass=pct>=80;
+  st.scores[sessionId]=Math.max(st.scores[sessionId]||0,pct);const next=ALL_S.find(s=>s.id===sessionId+1);updateAvgScore();
+  ca.innerHTML='';const rw=document.createElement('div');rw.className='res-w';
+  const rc=document.createElement('div');rc.className='res-c '+(pass?'rc-p':'rc-f');rc.innerHTML=`<div>${pct}%</div><div style="font-size:1.1rem">${pass?'🎉':'❌'}</div>`;rw.appendChild(rc);
   const sn=document.createElement('div');sn.style.cssText='font-weight:700;font-size:1.1rem;margin-top:4px';sn.textContent=`${correct}/${total}`;rw.appendChild(sn);
   const msg=document.createElement('div');msg.style.cssText='font-size:.84rem;color:var(--txt2);max-width:300px;text-align:center;line-height:1.6;margin-top:6px';msg.textContent=pass?t('pass'):t('fail');rw.appendChild(msg);
   const rb=document.createElement('div');rb.className='res-btns';
@@ -1178,73 +988,57 @@ function showResult(ca){
   if(pass){for(let i=0;i<30;i++){const c=document.createElement('div');const cols=['var(--gold)','#4caf50','#4fc3f7','#ff6ec7','#ffd700','#ff5252'];c.style.cssText=`position:fixed;top:-10px;left:${Math.random()*100}vw;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${cols[i%cols.length]};border-radius:${Math.random()>.5?'50%':'2px'};animation:cfetti ${1.5+Math.random()*2}s ease-in ${Math.random()*.8}s forwards;pointer-events:none;z-index:999;`;document.body.appendChild(c);setTimeout(()=>c.remove(),4000);}}
 }
 
-// ── EXERCISE PAGE ──
+// EXERCISE PAGE — 200 questions audio
 function renderExPage(ca){
   ca.innerHTML='';
-  const hdr=document.createElement('div');hdr.style.cssText='background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#000';
-  hdr.innerHTML=`<div style="font-weight:700;font-size:.95rem;margin-bottom:3px">${t('ex200_title')}</div><div style="font-size:.76rem;opacity:.75">${t('ex200_desc')}</div>`;
+  const hdr=document.createElement('div');
+  hdr.style.cssText='background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#000;text-align:center';
+  hdr.innerHTML=`<div style="font-weight:800;font-size:1.1rem;margin-bottom:4px">${t('ex200_title')}</div>`;
   ca.appendChild(hdr);
   const allWords=[];ALL_LETTERS.forEach(l=>{(l.words||[]).forEach(w=>{if(w.ar&&w.lat)allWords.push({ar:w.ar,lat:w.lat});});});
   if(!allWords.length){ca.innerHTML+='<div class="info-box">Les mots seront disponibles dès les premières leçons.</div>';return;}
   const pool=[];const sh=[...allWords].sort(()=>Math.random()-.5);while(pool.length<200)pool.push(...sh);
-  const qs=pool.slice(0,200).map(w=>{const wrongs=allWords.filter(x=>x.lat!==w.lat).sort(()=>Math.random()-.5).slice(0,2);return{ar:w.ar,correct:w.lat,choices:[w.lat,...wrongs.map(x=>x.lat)].sort(()=>Math.random()-.5)};});
-  const ex={idx:0,correct:0};
+  const qs=pool.slice(0,200);
+  const ex={idx:0};
   function renderQ(){
     ca.innerHTML='';ca.appendChild(hdr.cloneNode(true));
-    if(ex.idx>=200){const pct=Math.round(ex.correct/200*100);const rw=document.createElement('div');rw.className='res-w';rw.innerHTML=`<div class="res-c ${pct>=80?'rc-p':'rc-f'}"><div>${pct}%</div></div><div>${ex.correct}/200</div>`;const rb=document.createElement('div');rb.className='res-btns';const r=document.createElement('button');r.className='rbtn rbtn-m';r.textContent=t('retry');r.onclick=()=>navToPage('exercises');rb.appendChild(r);rw.appendChild(rb);ca.appendChild(rw);return;}
+    if(ex.idx>=200){
+      const rw=document.createElement('div');rw.className='res-w';
+      rw.innerHTML=`<div style="font-size:2rem">🎉</div><div style="font-weight:700;font-size:1rem">${t('ex200_finish')}</div>`;
+      const rb=document.createElement('div');rb.className='res-btns';const r=document.createElement('button');r.className='rbtn rbtn-m';r.textContent=t('retry');r.onclick=()=>navToPage('exercises');rb.appendChild(r);rw.appendChild(rb);ca.appendChild(rw);return;
+    }
     const q=qs[ex.idx];
     const pg=document.createElement('div');pg.className='qz-prog';pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(ex.idx/200)*100}%"></div></div><div class="qs-lbl">${ex.idx}/200</div>`;ca.appendChild(pg);
-
-    // Question : montrer le mot arabe
     const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:16px;min-height:160px';
-    qbox.innerHTML=`
-      <div class="q-lbl">${t('ex200_desc')}</div>
-      <div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;
-    ca.appendChild(qbox);
-
-    // Bouton audio unique — cliquer pour entendre la prononciation
+    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;ca.appendChild(qbox);
     const audioWrap=document.createElement('div');audioWrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px';
-    const audioBtn=document.createElement('button');
-    audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';
-    audioBtn.textContent=t('ex200_btn');
-    let played=false;
-    audioBtn.onclick=()=>{
-      speak(q.ar,.78);
-      played=true;
-      audioBtn.style.opacity='.7';
-      // Afficher les boutons suivant/correct après avoir écouté
-      nextWrap.style.display='flex';
-    };
-    audioWrap.appendChild(audioBtn);
-
-    // Boutons de navigation (cachés jusqu'à écoute)
-    const nextWrap=document.createElement('div');
-    nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
-    const latinLbl=document.createElement('div');
-    latinLbl.style.cssText='font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';
-    latinLbl.textContent=q.correct;
-    const nextBtn=document.createElement('button');
-    nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
-    nextBtn.textContent=ex.idx<199?'Suivant ▶':'Terminer';
+    const audioBtn=document.createElement('button');audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';audioBtn.textContent=t('ex200_listen');
+    const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
+    audioBtn.onclick=()=>{speak(q.ar,.78);audioBtn.style.opacity='.7';nextWrap.style.display='flex';};
+    const latinLbl=document.createElement('div');latinLbl.style.cssText='font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';latinLbl.textContent=q.lat;
+    const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
+    nextBtn.textContent=ex.idx<199?t('ex200_next'):t('ex200_finish');
     nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
-    nextWrap.appendChild(latinLbl);
-    nextWrap.appendChild(nextBtn);
-    audioWrap.appendChild(nextWrap);
-    ca.appendChild(audioWrap);
+    nextWrap.appendChild(latinLbl);nextWrap.appendChild(nextBtn);
+    audioWrap.appendChild(audioBtn);audioWrap.appendChild(nextWrap);ca.appendChild(audioWrap);
   }renderQ();
 }
 
-// ── PROGRESS ──
+// PROGRESS
 function renderProgress(ca){
   ca.innerHTML='';const g=document.createElement('div');g.className='pg-grid';
-  ALL_S.forEach(s=>{const sc=st.scores[s.id]||0;const c=document.createElement('div');c.className='pg-c';c.innerHTML=`<div class="pg-n">${s.emoji} ${s.name[st.lang]||s.name.fr}</div><div class="pg-bw"><div class="pg-bf" style="width:${sc}%"></div></div><div class="pg-p">${sc}%</div>`;g.appendChild(c);});
+  ALL_S.forEach((s,idx)=>{
+    const sc=st.scores[s.id]||0;const c=document.createElement('div');c.className='pg-c';
+    let name='';if(s.type==='vowels')name=t('vowels_name');else if(s.type==='prolong')name=t('prolong_name');else name=t('lesson_num')+' '+(idx+1);
+    c.innerHTML=`<div class="pg-n">${s.emoji} ${name}</div><div class="pg-bw"><div class="pg-bf" style="width:${sc}%"></div></div><div class="pg-p">${sc}%</div>`;g.appendChild(c);
+  });
   const vals=Object.values(st.scores);const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
   const ov=document.createElement('div');ov.className='pg-ov';ov.textContent=t('global_score')+' : '+avg+'%';g.appendChild(ov);ca.appendChild(g);
 }
 
-// ── SETTINGS ──
+// SETTINGS
 function renderSettings(ca){
-  ca.innerHTML=`<div class="set-row"><span>${t('sound_on')}</span><div class="tog ${st.soundOn?'on':''}" onclick="st.soundOn=!st.soundOn;this.classList.toggle('on')"></div></div><div class="set-row" style="cursor:pointer" onclick="if(confirm('Réinitialiser tous les scores ?')){st.scores={};renderProgress(document.getElementById('ca'))}"><span style="color:#ff7070">${t('reset')}</span></div><div class="set-row" style="cursor:pointer" onclick="doLogout()"><span style="color:#ff9090">🚪 ${t('logout')}</span></div>`;
+  ca.innerHTML=`<div class="set-row"><span>${t('sound_on')}</span><div class="tog ${st.soundOn?'on':''}" onclick="st.soundOn=!st.soundOn;this.classList.toggle('on')"></div></div><div class="set-row" style="cursor:pointer" onclick="if(confirm('${t('reset')}?')){st.scores={};renderProgress(document.getElementById('ca'))}"><span style="color:#ff7070">${t('reset')}</span></div><div class="set-row" style="cursor:pointer" onclick="doLogout()"><span style="color:#ff9090">🚪 ${t('quit')}</span></div>`;
 }
 
 window.onload=()=>{
@@ -1252,6 +1046,7 @@ window.onload=()=>{
   if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>{};window.speechSynthesis.getVoices();}
   checkStripeReturn();
   tryAutoLogin();
-};</script>
+};
+</script>
 </body>
-  </html>
+                                          </html>
