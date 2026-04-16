@@ -121,9 +121,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 .sess-card.c-both::before{background:linear-gradient(180deg,var(--orange),var(--blue))}
 .sess-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);background:var(--glass2)}
 .sess-card:active{transform:scale(.97)}
-.sess-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#000;font-size:.6rem;font-weight:800;flex-shrink:0}
-.sess-title{font-size:.82rem;font-weight:700;text-align:center;margin:6px 0 4px;flex:1}
-.sess-score{font-size:.68rem;color:var(--gold)}
+/* FIXED: numéro aligné à gauche, sans cercle */
+.sess-num{font-size:.65rem;font-weight:800;color:var(--txt2);margin-right:5px;flex-shrink:0}
+.sess-title{font-size:.82rem;font-weight:700;margin:6px 0 4px;flex:1;text-align:center}
+.sess-title-row{display:flex;align-items:center;justify-content:flex-start;margin-bottom:5px;gap:0}
+.sess-score{font-size:.68rem;color:var(--gold);margin-left:auto}
 .sess-ar{font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin-top:6px;display:flex;justify-content:space-around;direction:rtl}
 .sess-badge{display:inline-block;font-size:.56rem;padding:2px 7px;border-radius:7px;font-weight:700;margin-top:5px}
 .bd-o{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
@@ -226,6 +228,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 <body>
 <div id="root">
 
+<!-- BUY SCREEN -->
 <div id="s-buy" class="scr on">
   <div class="login-deco">
     <div class="login-moon">🌙</div>
@@ -236,44 +239,46 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
       <rect x="626" y="45" width="14" height="45"/><path d="M629 45 Q633 32 637 45"/><circle cx="633" cy="30" r="5"/>
     </svg>
   </div>
-  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:0">
+    <!-- Sélecteur de langue sur la page d'achat -->
+    <div class="lang-select-row" id="buy-lang-row" style="margin-bottom:12px"></div>
     <div class="login-box" style="max-width:360px">
       <div class="login-ar" style="margin-bottom:10px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
-      <div style="text-align:center;font-size:.82rem;color:var(--txt2);margin-bottom:20px;line-height:1.6">Apprenez l'alphabet arabe pas à pas,<br>avec voyelles, exercices et quiz.</div>
+      <div id="buy-desc" style="text-align:center;font-size:.82rem;color:var(--txt2);margin-bottom:20px;line-height:1.6"></div>
       <div style="background:linear-gradient(135deg,rgba(212,168,67,.18),rgba(212,168,67,.06));border:1px solid var(--border2);border-radius:16px;padding:16px;text-align:center;margin-bottom:18px">
-        <div style="font-size:.72rem;color:var(--txt2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Accès complet à vie</div>
+        <div id="buy-access-lbl" style="font-size:.72rem;color:var(--txt2);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px"></div>
         <div style="font-size:2.2rem;font-weight:800;color:var(--gold)">49,99 €</div>
-        <div style="font-size:.72rem;color:var(--txt2);margin-top:4px">Paiement unique · Aucun abonnement</div>
+        <div id="buy-payment-lbl" style="font-size:.72rem;color:var(--txt2);margin-top:4px"></div>
       </div>
-      <div style="font-size:.76rem;color:var(--txt2);margin-bottom:18px;line-height:1.9">
-        ✓ 11 leçons complètes<br>✓ Voyelles &amp; prolongations<br>✓ Exercices &amp; 200 questions<br>✓ 9 langues disponibles<br>✓ Mises à jour incluses
-      </div>
-      <input class="linp" type="email" id="buy-email" placeholder="Votre email" autocomplete="email">
+      <div id="buy-features" style="font-size:.76rem;color:var(--txt2);margin-bottom:18px;line-height:1.9"></div>
+      <input class="linp" type="email" id="buy-email" placeholder="" autocomplete="email">
       <div class="lerr" id="buy-err"></div>
-      <button class="lbtn" id="buy-btn" onclick="startCheckout()">Acheter l'accès — 49,99 €</button>
+      <button class="lbtn" id="buy-btn" onclick="startCheckout()"></button>
       <div style="text-align:center;margin-top:14px">
-        <span style="font-size:.74rem;color:var(--txt2)">Déjà un compte ? </span>
-        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" onclick="showS('s-login',true)">Se connecter</span>
+        <span id="buy-already-lbl" style="font-size:.74rem;color:var(--txt2)"></span>
+        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-login-link" onclick="showS('s-login',true)"></span>
       </div>
     </div>
   </div>
 </div>
 
+<!-- REGISTER SCREEN -->
 <div id="s-register" class="scr">
   <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
     <div class="login-box" style="max-width:340px">
       <div style="text-align:center;font-size:2rem;margin-bottom:8px">✅</div>
-      <div style="text-align:center;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px" id="reg-title">Paiement validé !</div>
-      <div style="text-align:center;font-size:.78rem;color:var(--txt2);margin-bottom:20px;line-height:1.6" id="reg-sub">Créez maintenant votre mot de passe.</div>
+      <div style="text-align:center;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px" id="reg-title"></div>
+      <div style="text-align:center;font-size:.78rem;color:var(--txt2);margin-bottom:20px;line-height:1.6" id="reg-sub"></div>
       <input class="linp" type="email" id="reg-email" placeholder="Email" readonly style="opacity:.6">
-      <input class="linp" type="password" id="reg-pwd" placeholder="Mot de passe (6 car. min)" autocomplete="new-password">
-      <input class="linp" type="password" id="reg-pwd2" placeholder="Confirmer le mot de passe" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
-      <button class="lbtn" id="reg-btn" onclick="doRegister()" id="reg-btn-lbl">Créer mon compte</button>
+      <input class="linp" type="password" id="reg-pwd" placeholder="" autocomplete="new-password">
+      <input class="linp" type="password" id="reg-pwd2" placeholder="" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+      <button class="lbtn" id="reg-btn" onclick="doRegister()"></button>
       <div class="lerr" id="reg-err"></div>
     </div>
   </div>
 </div>
 
+<!-- LOGIN SCREEN -->
 <div id="s-login" class="scr">
   <div class="login-deco">
     <div class="login-moon">🌙</div>
@@ -288,40 +293,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
     <div class="login-box">
       <div class="login-ar">مَرْحَبًا بِكَ<br><span style="font-size:1.1rem">لِنَتَعَلَّمِ اللُّغَةَ الْعَرَبِيَّة</span></div>
       <input class="linp" type="email" id="l-email" placeholder="Email" autocomplete="email">
-      <input class="linp" type="password" id="l-pwd" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="lbtn" id="l-btn" onclick="doLogin()">Connexion</button>
+      <input class="linp" type="password" id="l-pwd" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="lbtn" id="l-btn" onclick="doLogin()"></button>
       <div class="lerr" id="l-err"></div>
       <div style="text-align:center;margin-top:14px">
-        <span style="font-size:.74rem;color:var(--txt2)" id="no-account-txt">Pas encore de compte ? </span>
-        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-link-txt" onclick="showS('s-buy',false)">Acheter l'accès</span>
+        <span style="font-size:.74rem;color:var(--txt2)" id="no-account-txt"></span>
+        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-link-txt" onclick="showS('s-buy',false)"></span>
       </div>
       <div class="lang-select-row" id="lang-row"></div>
     </div>
   </div>
 </div>
 
+<!-- WELCOME SCREEN -->
 <div id="s-welcome" class="scr">
   <div class="w-ar">مَرْحَبًا بِكَ<br><span style="font-size:1.5rem">لِنَتَعَلَّمِ الْعَرَبِيَّة</span></div>
-  <div class="w-sub" id="w-sub">Choisis ton interface :</div>
+  <div class="w-sub" id="w-sub"></div>
   <div class="prof-cards">
     <div class="prof-card girl" onclick="chooseProfile('girl')">
       <div class="prof-emoji">👧</div>
-      <div class="prof-info"><div class="prof-name" id="pb-girl">Fille</div><div class="prof-desc" id="pd-girl">Interface rose &amp; douce</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-girl"></div><div class="prof-desc" id="pd-girl"></div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card boy" onclick="chooseProfile('boy')">
       <div class="prof-emoji">👦</div>
-      <div class="prof-info"><div class="prof-name" id="pb-boy">Garçon</div><div class="prof-desc" id="pd-boy">Interface bleue &amp; dynamique</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-boy"></div><div class="prof-desc" id="pd-boy"></div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card adult" onclick="chooseProfile('adult')">
       <div class="prof-emoji">🎓</div>
-      <div class="prof-info"><div class="prof-name" id="pb-adult">Adulte</div><div class="prof-desc" id="pd-adult">Interface sobre &amp; complète</div></div>
+      <div class="prof-info"><div class="prof-name" id="pb-adult"></div><div class="prof-desc" id="pd-adult"></div></div>
       <div class="prof-arrow">›</div>
     </div>
   </div>
 </div>
 
+<!-- MENU SCREEN -->
 <div id="s-menu" class="scr">
   <div class="menu-header">
     <div class="menu-logo-ar">لِنَتَعَلَّم</div>
@@ -332,26 +339,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
   </div>
   <div class="menu-nav" id="menu-nav"></div>
   <div class="menu-bottom">
-    <div class="mb-score"><span id="avg-score">0</span>% <span id="score-lbl" style="color:var(--txt2);font-size:.78rem">score global</span></div>
+    <div class="mb-score"><span id="avg-score">0</span>% <span id="score-lbl" style="color:var(--txt2);font-size:.78rem"></span></div>
     <div class="mb-actions">
-      <div class="mb-btn" onclick="openLangModal()" id="lang-btn-lbl">🌍 Langue</div>
-      <div class="mb-btn" onclick="doLogout()" style="color:#ff9090" id="quit-btn-lbl">Quitter</div>
+      <div class="mb-btn" onclick="openLangModal()" id="lang-btn-lbl"></div>
+      <div class="mb-btn" onclick="doLogout()" style="color:#ff9090" id="quit-btn-lbl"></div>
     </div>
   </div>
 </div>
 
+<!-- MAIN CONTENT SCREEN -->
 <div id="s-main" class="scr">
   <div class="topbar">
-    <div class="tb-back" id="tb-back" style="display:none" onclick="handleBack()">‹ <span id="back-lbl">Retour</span></div>
+    <div class="tb-back" id="tb-back" style="display:none" onclick="handleBack()">‹ <span id="back-lbl"></span></div>
     <div class="tb-title" id="tb-title"></div>
     <div class="sound-dot" id="sound-dot2" onclick="toggleSound()"></div>
   </div>
   <div class="ca" id="ca"></div>
 </div>
 
+<!-- LANG MODAL -->
 <div id="lang-modal" onclick="closeLangModal(event)">
   <div class="lang-panel" id="lang-panel">
-    <div style="width:100%;text-align:center;font-size:.88rem;font-weight:600;color:var(--gold);margin-bottom:4px">🌍 Langue</div>
+    <div style="width:100%;text-align:center;font-size:.88rem;font-weight:600;color:var(--gold);margin-bottom:4px">🌍</div>
   </div>
 </div>
 
@@ -362,8 +371,11 @@ const LANGS=[{c:'fr',l:'Français'},{c:'en',l:'English'},{c:'es',l:'Español'},{
 
 const T={
   fr:{
+    login_btn:'Connexion',
     email_placeholder:'Email',
     pwd_placeholder:'Mot de passe',
+    pwd_placeholder2:'Confirmer le mot de passe',
+    pwd_new_placeholder:'Mot de passe (6 car. min)',
     no_account:'Pas encore de compte ?',buy_access:'Acheter l\'accès',
     choose:'Choisis ton interface :',
     girl:'Fille',boy:'Garçon',adult:'Adulte',
@@ -375,6 +387,16 @@ const T={
     exercises_desc:'Quiz : Plus de 200 questions.',
     contact_desc:'Besoin d\'aide ou de renseignements.',
     score_global:'score global',lang_btn:'🌍 Langue',quit:'Quitter',back:'‹ Retour',
+    // Buy page
+    buy_desc:'Apprenez l\'alphabet arabe pas à pas,\navec voyelles, exercices et quiz.',
+    buy_access_lbl:'Accès complet à vie',
+    buy_payment_lbl:'Paiement unique · Aucun abonnement',
+    buy_features:'✓ 11 leçons complètes\n✓ Voyelles & prolongations\n✓ Exercices & 200 questions\n✓ 9 langues disponibles\n✓ Mises à jour incluses',
+    buy_email_placeholder:'Votre email',
+    buy_btn:'Acheter l\'accès — 49,99 €',
+    buy_already:'Déjà un compte ?',
+    buy_login:'Se connecter',
+    // Intro
     intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
     intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
     intro_dua_tr:'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux.',
@@ -382,9 +404,9 @@ const T={
     intro_s1_title:'L\'importance de l\'intention (an-niyyah)',
     intro_s1:'L\'intention est une des deux conditions capitales pour qu\'une action soit acceptée par Allah ﷻ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n\'étaient pas les mêmes.\n\nLe prophète Muhammad ﷺ a dit : "Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention".',
     intro_s2_title:'Les fruits de la recherche de la science',
-    intro_s2:'La science est un devoir pour chaque croyant. En effet, Allah n\'accepte pas l\'adoration faite avec ignorance.\n\nAllah ﷻ dit : "Et sache que nulle divinité ne mérite d\'être adoré sauf Allah, et demande pardon pour ton péché, et pour les croyants et croyantes".\n\nAussi, celui qui recherche une science bénéficie de récompenses inestimables.\n\nLe prophète ﷺ a dit : "Celui qui emprunte un chemin par lequel il recherche une science, Allah lui fait prendre, par cela, un chemin vers le paradis. Certes les anges tendent leurs ailes par agrément pour celui qui recherche la science. Certes tous ceux qui sont dans les cieux et la terre, même les poissons dans l\'eau, demandent pardon pour le savant."',
+    intro_s2:'La science est un devoir pour chaque croyant. En effet, Allah n\'accepte pas l\'adoration faite avec ignorance.\n\nAllah ﷻ dit : "Et sache que nulle divinité ne mérite d\'être adoré sauf Allah, et demande pardon pour ton péché, et pour les croyants et croyantes".\n\nAussi, celui qui recherche une science bénéficie de récompenses inestimables.\n\nLe prophète ﷺ a dit : "Celui qui emprunte un chemin par lequel il recherche une science, Allah lui fait prendre, par cela, un chemin vers le paradis."',
     intro_s3_title:'Allah est l\'unique but du croyant',
-    intro_s3:'Allah a créé les humains avec différentes capacités de compréhension et de mémorisation.\n\nC\'est pourquoi, Allah te questionne plus sur les efforts fournis pour apprendre, que sur le résultat qui ne dépend pas toujours de toi.\n\nAinsi, si tu rencontres quelques difficultés, ne baisse pas les bras, place ta confiance en Allah, rappelle-toi que c\'est Lui qui donne la compréhension, et rappelle-toi surtout que le but n\'est pas la finalité (apprendre l\'arabe), mais plutôt plaire à Allah (en faisant les efforts dans le bien).\n\nN\'hésite pas à nous contacter, via la rubrique "contact" du menu principal, si tu as une quelconque demande.',
+    intro_s3:'Allah a créé les humains avec différentes capacités de compréhension et de mémorisation.\n\nC\'est pourquoi, Allah te questionne plus sur les efforts fournis pour apprendre, que sur le résultat qui ne dépend pas toujours de toi.\n\nAinsi, si tu rencontres quelques difficultés, ne baisse pas les bras, place ta confiance en Allah.\n\nN\'hésite pas à nous contacter, via la rubrique "contact" du menu principal.',
     contact_title:'Contact',contact_body:'Pour toute question, remarque ou suggestion, veuillez remplir le formulaire de contact.',
     contact_name:'Votre nom',contact_email:'Votre email',contact_subj:'Sujet',contact_msg:'Votre message',contact_send:'Envoyer',
     contact_ok:'Votre message a bien été transmis. Un membre de notre équipe va vous répondre rapidement.',
@@ -430,11 +452,14 @@ const T={
     err_connection:'Erreur de connexion. Vérifiez votre connexion internet.',
     connecting:'Connexion…',creating:'Création du compte…',sending:'Envoi en cours…',
     redirecting:'Redirection vers le paiement…',
+    correct_lbl:'Correct !',
   },
   en:{
-    login_btn:'Login',login_err:'Incorrect email or password.',
+    login_btn:'Login',
     email_placeholder:'Email',
     pwd_placeholder:'Password',
+    pwd_placeholder2:'Confirm password',
+    pwd_new_placeholder:'Password (min. 6 chars)',
     no_account:'No account yet?',buy_access:'Buy access',
     choose:'Choose your interface:',
     girl:'Girl',boy:'Boy',adult:'Adult',
@@ -446,6 +471,14 @@ const T={
     exercises_desc:'Quiz: More than 200 questions.',
     contact_desc:'Need help or information.',
     score_global:'global score',lang_btn:'🌍 Language',quit:'Quit',back:'‹ Back',
+    buy_desc:'Learn the Arabic alphabet step by step,\nwith vowels, exercises and quizzes.',
+    buy_access_lbl:'Lifetime full access',
+    buy_payment_lbl:'One-time payment · No subscription',
+    buy_features:'✓ 11 complete lessons\n✓ Vowels & prolongations\n✓ Exercises & 200 questions\n✓ 9 languages available\n✓ Updates included',
+    buy_email_placeholder:'Your email',
+    buy_btn:'Buy access — 49.99 €',
+    buy_already:'Already have an account?',
+    buy_login:'Log in',
     intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
     intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
     intro_dua_tr:'In the name of Allah, the Most Gracious, the Most Merciful.',
@@ -453,9 +486,9 @@ const T={
     intro_s1_title:'The importance of intention (an-niyyah)',
     intro_s1:'Intention is one of the two essential conditions for an action to be accepted by Allah ﷻ. Furthermore, two people can perform exactly the same action but receive vastly different rewards, because their initial intentions were not the same.\n\nThe Prophet Muhammad ﷺ said: "Actions are judged by intentions, and every person will be rewarded according to their intention."',
     intro_s2_title:'The fruits of seeking knowledge',
-    intro_s2:'Knowledge is a duty for every believer. Indeed, Allah does not accept worship done in ignorance.\n\nAllah ﷻ says: "Know that there is no deity except Allah, and ask forgiveness for your sin and for the believing men and believing women."\n\nAlso, whoever seeks knowledge benefits from immeasurable rewards.\n\nThe Prophet ﷺ said: "Whoever takes a path seeking knowledge, Allah will make easy for him a path to Paradise. The angels lower their wings in approval for the seeker of knowledge. All those in the heavens and earth, even the fish in the water, ask forgiveness for the scholar."',
+    intro_s2:'Knowledge is a duty for every believer. Indeed, Allah does not accept worship done in ignorance.\n\nAllah ﷻ says: "Know that there is no deity except Allah, and ask forgiveness for your sin and for the believing men and believing women."\n\nAlso, whoever seeks knowledge benefits from immeasurable rewards.\n\nThe Prophet ﷺ said: "Whoever takes a path seeking knowledge, Allah will make easy for him a path to Paradise."',
     intro_s3_title:'Allah is the sole purpose of the believer',
-    intro_s3:'Allah created humans with different capacities for understanding and memorization.\n\nThis is why Allah questions you more on the efforts made to learn, rather than on the result which does not always depend on you.\n\nSo if you encounter difficulties, do not give up, place your trust in Allah, remember that it is He who grants understanding, and above all remember that the goal is not the end result (learning Arabic), but rather to please Allah (by making efforts for good).\n\nDo not hesitate to contact us, via the "contact" section of the main menu, if you have any request.',
+    intro_s3:'Allah created humans with different capacities for understanding and memorization.\n\nThis is why Allah questions you more on the efforts made to learn, rather than on the result.\n\nSo if you encounter difficulties, do not give up, place your trust in Allah.\n\nDo not hesitate to contact us via the "contact" section of the main menu.',
     contact_title:'Contact',contact_body:'For any questions, remarks or suggestions, please fill in the contact form.',
     contact_name:'Your name',contact_email:'Your email',contact_subj:'Subject',contact_msg:'Your message',contact_send:'Send',
     contact_ok:'Your message has been transmitted. A member of our team will reply shortly.',
@@ -500,21 +533,24 @@ const T={
     err_connection:'Connection error. Check your internet connection.',
     connecting:'Connecting…',creating:'Creating account…',sending:'Sending…',
     redirecting:'Redirecting to payment…',
+    correct_lbl:'Correct!',
   },
 };
+
 // Fill other languages from fr
 ['es','de','nl','it','zh','ru','pt'].forEach(c=>{
   const overrides={
-    es:{login_btn:'Conectarse',email_placeholder:'Correo electrónico',pwd_placeholder:'Contraseña',lesson_num:'Lección',back_s:'Sesiones',next_s:'Siguiente ▶',retry:'🔄 Reintentar',rappel:'Recordatorio',score_global:'puntuación global',lang_btn:'🌍 Idioma',quit:'Salir',back:'‹ Volver',begin:'Inicio',middle:'Medio',end:'Fin',isolated:'AISLADA',cours:'Lección',exercice:'Ejercicio ▶',writing_line:'Línea de escritura',contact_send:'Enviar',contact_return:'Volver al menú',contact_title:'Contacto',contact_body:'Para cualquier pregunta, observación o sugerencia, por favor rellena el formulario de contacto.',contact_name:'Tu nombre',contact_email:'Tu correo',contact_subj:'Asunto',contact_msg:'Tu mensaje',ex200_title:'200 Preguntas · Lectura de palabras',ex200_desc:'Lee esta palabra y escucha para verificar.',ex200_listen:'🔊 Escuchar',ex200_next:'Siguiente ▶',ex200_finish:'Finalizar',create_account:'Crear cuenta',connecting:'Conectando…',creating:'Creando…',sending:'Enviando…',redirecting:'Redirigiendo…',payment_ok:'¡Pago validado!',payment_sub:'Crea tu contraseña.',no_account:'¿Sin cuenta?',buy_access:'Comprar acceso',choose:'Elige tu interfaz:',girl:'Niña',boy:'Niño',adult:'Adulto',girl_desc:'Interfaz rosa',boy_desc:'Interfaz azul',adult_desc:'Interfaz completa',sessions:'Sesiones',exercises:'Ejercicios',progress:'Progreso',settings:'Ajustes',intro:'Introducción',intro_desc:'Algunas nociones importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: más de 200 preguntas.',contact_desc:'¿Necesitas ayuda?'},
-    de:{login_btn:'Anmelden',email_placeholder:'E-Mail',pwd_placeholder:'Passwort',lesson_num:'Lektion',back_s:'Einheiten',next_s:'Nächste ▶',retry:'🔄 Nochmal',rappel:'Erinnerung',score_global:'Gesamtpunktzahl',lang_btn:'🌍 Sprache',quit:'Beenden',back:'‹ Zurück',begin:'Anfang',middle:'Mitte',end:'Ende',isolated:'ISOLIERT',cours:'Lektion',exercice:'Übung ▶',writing_line:'Schreiblinie',contact_send:'Senden',contact_return:'Zum Hauptmenü',contact_title:'Kontakt',contact_body:'Für Fragen, Anmerkungen oder Vorschläge, bitte das Kontaktformular ausfüllen.',contact_name:'Ihr Name',contact_email:'Ihre E-Mail',contact_subj:'Betreff',contact_msg:'Ihre Nachricht',ex200_title:'200 Fragen · Wörter lesen',ex200_desc:'Lesen Sie dieses Wort und hören Sie zur Überprüfung.',ex200_listen:'🔊 Anhören',ex200_next:'Weiter ▶',ex200_finish:'Beenden',create_account:'Konto erstellen',connecting:'Verbinden…',creating:'Erstellen…',sending:'Senden…',redirecting:'Weiterleiten…',payment_ok:'Zahlung bestätigt!',payment_sub:'Erstelle dein Passwort.',no_account:'Kein Konto?',buy_access:'Zugang kaufen',choose:'Wähle dein Interface:',girl:'Mädchen',boy:'Junge',adult:'Erwachsener',girl_desc:'Pinkes Interface',boy_desc:'Blaues Interface',adult_desc:'Vollständiges Interface',sessions:'Einheiten',exercises:'Übungen',progress:'Fortschritt',settings:'Einstellungen',intro:'Einführung',intro_desc:'Einige wichtige Begriffe.',sessions_desc:'Vollständiges Programm.',exercises_desc:'Quiz: über 200 Fragen.',contact_desc:'Hilfe benötigt?'},
-    nl:{login_btn:'Inloggen',email_placeholder:'E-mailadres',pwd_placeholder:'Wachtwoord',lesson_num:'Les',back_s:'Lessen',next_s:'Volgende ▶',retry:'🔄 Opnieuw',rappel:'Herinnering',score_global:'totaalscore',lang_btn:'🌍 Taal',quit:'Afsluiten',back:'‹ Terug',begin:'Begin',middle:'Midden',end:'Einde',isolated:'GEÏS.',cours:'Les',exercice:'Oefening ▶',writing_line:'Schrijflijn',contact_send:'Versturen',contact_return:'Terug naar menu',contact_title:'Contact',contact_body:'Voor vragen, opmerkingen of suggesties, vul het contactformulier in.',contact_name:'Uw naam',contact_email:'Uw e-mail',contact_subj:'Onderwerp',contact_msg:'Uw bericht',ex200_title:'200 Vragen · Woorden lezen',ex200_desc:'Lees dit woord en luister ter controle.',ex200_listen:'🔊 Luisteren',ex200_next:'Volgende ▶',ex200_finish:'Afronden',create_account:'Account aanmaken',connecting:'Verbinden…',creating:'Aanmaken…',sending:'Verzenden…',redirecting:'Doorsturen…',payment_ok:'Betaling bevestigd!',payment_sub:'Maak je wachtwoord aan.',no_account:'Nog geen account?',buy_access:'Toegang kopen',choose:'Kies je interface:',girl:'Meisje',boy:'Jongen',adult:'Volwassene',girl_desc:'Roze interface',boy_desc:'Blauwe interface',adult_desc:'Volledige interface',sessions:'Lessen',exercises:'Oefeningen',progress:'Voortgang',settings:'Instellingen',intro:'Introductie',intro_desc:'Enkele belangrijke begrippen.',sessions_desc:'Volledig programma.',exercises_desc:'Quiz: meer dan 200 vragen.',contact_desc:'Hulp nodig?'},
-    it:{login_btn:'Accedi',email_placeholder:'Email',pwd_placeholder:'Password',lesson_num:'Lezione',back_s:'Sessioni',next_s:'Successiva ▶',retry:'🔄 Riprova',rappel:'Promemoria',score_global:'punteggio globale',lang_btn:'🌍 Lingua',quit:'Esci',back:'‹ Indietro',begin:'Inizio',middle:'Mezzo',end:'Fine',isolated:'ISOL.',cours:'Lezione',exercice:'Esercizio ▶',writing_line:'Linea di scrittura',contact_send:'Invia',contact_return:'Torna al menu',contact_title:'Contatto',contact_body:'Per domande, osservazioni o suggerimenti, compila il modulo di contatto.',contact_name:'Il tuo nome',contact_email:'La tua email',contact_subj:'Oggetto',contact_msg:'Il tuo messaggio',ex200_title:'200 Domande · Lettura di parole',ex200_desc:'Leggi questa parola e ascolta per verificare.',ex200_listen:'🔊 Ascolta',ex200_next:'Successivo ▶',ex200_finish:'Termina',create_account:'Crea account',connecting:'Connessione…',creating:'Creazione…',sending:'Invio…',redirecting:'Reindirizzamento…',payment_ok:'Pagamento confermato!',payment_sub:'Crea la tua password.',no_account:'Nessun account?',buy_access:'Acquista accesso',choose:'Scegli la tua interfaccia:',girl:'Ragazza',boy:'Ragazzo',adult:'Adulto',girl_desc:'Interfaccia rosa',boy_desc:'Interfaccia blu',adult_desc:'Interfaccia completa',sessions:'Sessioni',exercises:'Esercizi',progress:'Progressi',settings:'Impostazioni',intro:'Introduzione',intro_desc:'Alcune nozioni importanti.',sessions_desc:'Programma completo.',exercises_desc:'Quiz: oltre 200 domande.',contact_desc:'Hai bisogno di aiuto?'},
-    zh:{login_btn:'登录',email_placeholder:'电子邮件',pwd_placeholder:'密码',lesson_num:'课',back_s:'课程',next_s:'下一课 ▶',retry:'🔄 重试',rappel:'提醒',score_global:'总分',lang_btn:'🌍 语言',quit:'退出',back:'‹ 返回',begin:'开头',middle:'中间',end:'末尾',isolated:'独',cours:'课程',exercice:'练习 ▶',writing_line:'书写线',contact_send:'发送',contact_return:'返回主菜单',contact_title:'联系',contact_body:'如有任何问题、意见或建议，请填写联系表格。',contact_name:'您的姓名',contact_email:'您的邮箱',contact_subj:'主题',contact_msg:'您的留言',ex200_title:'200问题 · 读单词',ex200_desc:'读这个词，然后听以核对。',ex200_listen:'🔊 听答案',ex200_next:'下一个 ▶',ex200_finish:'完成',create_account:'创建账户',connecting:'连接中…',creating:'创建中…',sending:'发送中…',redirecting:'跳转中…',payment_ok:'付款成功！',payment_sub:'请创建您的密码。',no_account:'没有账户？',buy_access:'购买访问权',choose:'选择您的界面：',girl:'女孩',boy:'男孩',adult:'成人',girl_desc:'粉色界面',boy_desc:'蓝色界面',adult_desc:'完整界面',sessions:'课程',exercises:'练习',progress:'进度',settings:'设置',intro:'介绍',intro_desc:'一些重要概念。',sessions_desc:'完整课程。',exercises_desc:'测验：200多题。',contact_desc:'需要帮助？'},
-    ru:{login_btn:'Войти',email_placeholder:'Email',pwd_placeholder:'Пароль',lesson_num:'Урок',back_s:'Уроки',next_s:'Следующий ▶',retry:'🔄 Повторить',rappel:'Напоминание',score_global:'общий счёт',lang_btn:'🌍 Язык',quit:'Выйти',back:'‹ Назад',begin:'Начало',middle:'Середина',end:'Конец',isolated:'ИЗО.',cours:'Урок',exercice:'Упражнение ▶',writing_line:'Строка письма',contact_send:'Отправить',contact_return:'В главное меню',contact_title:'Контакт',contact_body:'По любым вопросам, замечаниям или предложениям, пожалуйста, заполните контактную форму.',contact_name:'Ваше имя',contact_email:'Ваш email',contact_subj:'Тема',contact_msg:'Ваше сообщение',ex200_title:'200 вопросов · Чтение слов',ex200_desc:'Прочитайте слово, затем послушайте для проверки.',ex200_listen:'🔊 Слушать',ex200_next:'Следующий ▶',ex200_finish:'Завершить',create_account:'Создать аккаунт',connecting:'Подключение…',creating:'Создание…',sending:'Отправка…',redirecting:'Перенаправление…',payment_ok:'Оплата подтверждена!',payment_sub:'Создайте пароль.',no_account:'Нет аккаунта?',buy_access:'Купить доступ',choose:'Выберите интерфейс:',girl:'Девочка',boy:'Мальчик',adult:'Взрослый',girl_desc:'Розовый интерфейс',boy_desc:'Синий интерфейс',adult_desc:'Полный интерфейс',sessions:'Уроки',exercises:'Упражнения',progress:'Прогресс',settings:'Настройки',intro:'Введение',intro_desc:'Несколько важных понятий.',sessions_desc:'Полная программа.',exercises_desc:'Викторина: более 200 вопросов.',contact_desc:'Нужна помощь?'},
-    pt:{login_btn:'Entrar',email_placeholder:'Email',pwd_placeholder:'Senha',lesson_num:'Lição',back_s:'Sessões',next_s:'Próxima ▶',retry:'🔄 Tentar novamente',rappel:'Lembrete',score_global:'pontuação global',lang_btn:'🌍 Idioma',quit:'Sair',back:'‹ Voltar',begin:'Início',middle:'Meio',end:'Fim',isolated:'ISOL.',cours:'Lição',exercice:'Exercício ▶',writing_line:'Linha de escrita',contact_send:'Enviar',contact_return:'Voltar ao menu',contact_title:'Contacto',contact_body:'Para qualquer questão, observação ou sugestão, por favor preencha o formulário de contacto.',contact_name:'O seu nome',contact_email:'O seu email',contact_subj:'Assunto',contact_msg:'A sua mensagem',ex200_title:'200 Perguntas · Leitura de palavras',ex200_desc:'Leia esta palavra e ouça para verificar.',ex200_listen:'🔊 Ouvir',ex200_next:'Próxima ▶',ex200_finish:'Terminar',create_account:'Criar conta',connecting:'Conectando…',creating:'Criando…',sending:'Enviando…',redirecting:'Redirecionando…',payment_ok:'Pagamento validado!',payment_sub:'Crie a sua senha.',no_account:'Sem conta?',buy_access:'Comprar acesso',choose:'Escolha a sua interface:',girl:'Menina',boy:'Menino',adult:'Adulto',girl_desc:'Interface rosa',boy_desc:'Interface azul',adult_desc:'Interface completa',sessions:'Sessões',exercises:'Exercícios',progress:'Progresso',settings:'Configurações',intro:'Introdução',intro_desc:'Algumas noções importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: mais de 200 perguntas.',contact_desc:'Precisa de ajuda?'},
+    es:{login_btn:'Conectarse',email_placeholder:'Correo electrónico',pwd_placeholder:'Contraseña',pwd_placeholder2:'Confirmar contraseña',pwd_new_placeholder:'Contraseña (mín. 6 car.)',lesson_num:'Lección',back_s:'Sesiones',next_s:'Siguiente ▶',retry:'🔄 Reintentar',rappel:'Recordatorio',score_global:'puntuación global',lang_btn:'🌍 Idioma',quit:'Salir',back:'‹ Volver',begin:'Inicio',middle:'Medio',end:'Fin',isolated:'AISLADA',cours:'Lección',exercice:'Ejercicio ▶',writing_line:'Línea de escritura',contact_send:'Enviar',contact_return:'Volver al menú',contact_title:'Contacto',contact_body:'Para cualquier pregunta, rellena el formulario.',contact_name:'Tu nombre',contact_email:'Tu correo',contact_subj:'Asunto',contact_msg:'Tu mensaje',ex200_title:'200 Preguntas · Lectura de palabras',ex200_desc:'Lee esta palabra y escucha para verificar.',ex200_listen:'🔊 Escuchar',ex200_next:'Siguiente ▶',ex200_finish:'Finalizar',create_account:'Crear cuenta',connecting:'Conectando…',creating:'Creando…',sending:'Enviando…',redirecting:'Redirigiendo…',payment_ok:'¡Pago validado!',payment_sub:'Crea tu contraseña.',no_account:'¿Sin cuenta?',buy_access:'Comprar acceso',buy_desc:'Aprende el alfabeto árabe paso a paso,\ncon vocales, ejercicios y quiz.',buy_access_lbl:'Acceso completo de por vida',buy_payment_lbl:'Pago único · Sin suscripción',buy_features:'✓ 11 lecciones completas\n✓ Vocales & prolongaciones\n✓ Ejercicios & 200 preguntas\n✓ 9 idiomas disponibles\n✓ Actualizaciones incluidas',buy_email_placeholder:'Tu correo',buy_btn:'Comprar acceso — 49,99 €',buy_already:'¿Ya tienes cuenta?',buy_login:'Iniciar sesión',choose:'Elige tu interfaz:',girl:'Niña',boy:'Niño',adult:'Adulto',girl_desc:'Interfaz rosa',boy_desc:'Interfaz azul',adult_desc:'Interfaz completa',sessions:'Sesiones',exercises:'Ejercicios',progress:'Progreso',settings:'Ajustes',intro:'Introducción',intro_desc:'Algunas nociones importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: más de 200 preguntas.',contact_desc:'¿Necesitas ayuda?',noattach:'Nunca se une a la siguiente letra.',heavy:'Letra grave مُفَخَّمَة',vowels_name:'Vocales · الحَرَكَات',vowel_intro:'Una vocal es un pequeño símbolo que se coloca sobre o bajo una letra.',vowel_tip:'💡 Al duplicar una vocal, añade "n". Cuando ○ está sobre una letra, solo se pronuncia la letra.',prolong_name:'Prolongaciones · الْمُدُود',prolong_note:'* La letra ب (b) se usa para los ejemplos.',prolong_tip:'💡 La vocal ُ se prolonga con و. La vocal َ se prolonga con ا. La vocal ِ se prolonga con ي.',letter_tip_master:'Es esencial dominar las formas aislada e inicial.',letter_tip2:'En medio de palabra: igual que la forma inicial + trazo horizontal.',letter_tip3:'Al final de palabra: igual que la forma aislada + trazo horizontal.',letter_tip4:'<em>Nota: solo ع y غ no siguen estas reglas.</em>',letter_tip5a:'<em>Medial = Inicial + "—"</em>',letter_tip5b:'<em>Final = Aislada + "—"</em>',ta_marbuta1:'Esta letra SIEMPRE está al final de palabra.',ta_marbuta2:'Después de una de las 6 letras no conectoras → forma aislada.',ta_marbuta3:'En caso contrario → forma final.',hamza1:'Sea cual sea la letra, se pronuncia ÚNICAMENTE la vocal.',hamza2:'Si ء está sobre ي, se escribe sin los 2 puntos.',q_read:'¿Cómo se pronuncia',q_write:'¿Cómo se escribe el sonido',pass:'🎉 ¡Muy bien! Puedes pasar a la siguiente.',fail:'Sigue repasando. Necesitas 80% para continuar.',global_score:'Puntuación global',sound_on:'Sonido activado',reset:'🗑 Reiniciar',rappel_more:'Más',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'En el nombre de Allah, el Misericordioso.',intro_dua_tr2:'Señor, aumenta mi conocimiento.',intro_s1_title:'La importancia de la intención (an-niyyah)',intro_s1:'La intención es una de las dos condiciones esenciales para que Allah ﷻ acepte una acción.\n\nEl Profeta ﷺ dijo: "Las acciones son juzgadas por las intenciones."',intro_s2_title:'Los frutos de buscar el conocimiento',intro_s2:'El conocimiento es una obligación para cada creyente.\n\nEl Profeta ﷺ dijo: "Quien toma un camino buscando conocimiento, Allah le facilita el camino al Paraíso."',intro_s3_title:'Allah es el único objetivo del creyente',intro_s3:'Allah creó a los humanos con diferentes capacidades.\n\nNo dudes en contactarnos a través de la sección "contacto".',err_fields:'Por favor, rellena los campos obligatorios.',err_pwd_match:'Las contraseñas no coinciden.',err_pwd_len:'La contraseña debe tener al menos 6 caracteres.',err_connection:'Error de conexión.',correct_lbl:'¡Correcto!',with_alif:'Con ا',with_waw:'Con و',with_ya:'Con ى'},
+    de:{login_btn:'Anmelden',email_placeholder:'E-Mail',pwd_placeholder:'Passwort',pwd_placeholder2:'Passwort bestätigen',pwd_new_placeholder:'Passwort (min. 6 Zeichen)',lesson_num:'Lektion',back_s:'Einheiten',next_s:'Nächste ▶',retry:'🔄 Nochmal',rappel:'Erinnerung',score_global:'Gesamtpunktzahl',lang_btn:'🌍 Sprache',quit:'Beenden',back:'‹ Zurück',begin:'Anfang',middle:'Mitte',end:'Ende',isolated:'ISOLIERT',cours:'Lektion',exercice:'Übung ▶',writing_line:'Schreiblinie',contact_send:'Senden',contact_return:'Zum Hauptmenü',contact_title:'Kontakt',contact_body:'Für Fragen, bitte das Kontaktformular ausfüllen.',contact_name:'Ihr Name',contact_email:'Ihre E-Mail',contact_subj:'Betreff',contact_msg:'Ihre Nachricht',ex200_title:'200 Fragen · Wörter lesen',ex200_desc:'Lesen Sie dieses Wort und hören Sie zur Überprüfung.',ex200_listen:'🔊 Anhören',ex200_next:'Weiter ▶',ex200_finish:'Beenden',create_account:'Konto erstellen',connecting:'Verbinden…',creating:'Erstellen…',sending:'Senden…',redirecting:'Weiterleiten…',payment_ok:'Zahlung bestätigt!',payment_sub:'Erstelle dein Passwort.',no_account:'Kein Konto?',buy_access:'Zugang kaufen',buy_desc:'Arabisches Alphabet Schritt für Schritt lernen.',buy_access_lbl:'Lebenslanger Vollzugang',buy_payment_lbl:'Einmalige Zahlung · Kein Abo',buy_features:'✓ 11 vollständige Lektionen\n✓ Vokale & Verlängerungen\n✓ Übungen & 200 Fragen\n✓ 9 Sprachen verfügbar\n✓ Updates inklusive',buy_email_placeholder:'Ihre E-Mail',buy_btn:'Zugang kaufen — 49,99 €',buy_already:'Bereits ein Konto?',buy_login:'Anmelden',choose:'Wähle dein Interface:',girl:'Mädchen',boy:'Junge',adult:'Erwachsener',girl_desc:'Pinkes Interface',boy_desc:'Blaues Interface',adult_desc:'Vollständiges Interface',sessions:'Einheiten',exercises:'Übungen',progress:'Fortschritt',settings:'Einstellungen',intro:'Einführung',intro_desc:'Einige wichtige Begriffe.',sessions_desc:'Vollständiges Programm.',exercises_desc:'Quiz: über 200 Fragen.',contact_desc:'Hilfe benötigt?',noattach:'Verbindet sich nie mit dem nächsten Buchstaben.',heavy:'Schwerer Buchstabe مُفَخَّمَة',vowels_name:'Vokale · الحَرَكَات',vowel_intro:'Ein Vokal ist ein kleines Symbol über oder unter einem Buchstaben.',vowel_tip:'💡 Wenn ein Vokal verdoppelt wird, wird "n" hinzugefügt.',prolong_name:'Verlängerungen · الْمُدُود',prolong_note:'* Der Buchstabe ب (b) wird für Beispiele verwendet.',prolong_tip:'💡 Vokal ُ wird durch و verlängert. Vokal َ durch ا. Vokal ِ durch ي.',letter_tip_master:'Die isolierte und Anfangsform zu beherrschen ist wesentlich.',letter_tip2:'In der Wortmitte: wie Anfangsform + waagerechter Strich.',letter_tip3:'Am Wortende: wie isolierte Form + waagerechter Strich.',letter_tip4:'<em>Hinweis: nur ع und غ folgen diesen Regeln nicht.</em>',letter_tip5a:'<em>Medial = Initial + "—"</em>',letter_tip5b:'<em>Final = Isoliert + "—"</em>',ta_marbuta1:'Dieser Buchstabe steht IMMER am Wortende.',ta_marbuta2:'Nach einem der 6 nicht verbindenden Buchstaben → isolierte Form.',ta_marbuta3:'Andernfalls → Endform.',hamza1:'Unabhängig vom Buchstaben wird NUR der Vokal ausgesprochen.',hamza2:'Wenn ء auf ي steht, ohne die 2 Punkte schreiben.',q_read:'Wie liest man',q_write:'Wie schreibt man den Laut',pass:'🎉 Gut gemacht! Nächste Lektion freigeschaltet.',fail:'Weiter üben. 80% nötig um fortzufahren.',global_score:'Gesamtpunktzahl',sound_on:'Ton an',reset:'🗑 Zurücksetzen',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'Im Namen Allahs, des Allbarmherzigen.',intro_dua_tr2:'Mein Herr, vermehre mein Wissen.',intro_s1_title:'Die Bedeutung der Absicht (an-niyyah)',intro_s1:'Die Absicht ist eine der wesentlichen Bedingungen damit Allah ﷻ eine Handlung annimmt.\n\nDer Prophet ﷺ sagte: „Taten werden nach Absichten beurteilt."',intro_s2_title:'Die Früchte der Wissenssuche',intro_s2:'Wissen ist eine Pflicht für jeden Gläubigen.\n\nDer Prophet ﷺ sagte: „Wer einen Weg geht, um Wissen zu suchen, dem erleichtert Allah den Weg ins Paradies."',intro_s3_title:'Allah ist das einzige Ziel des Gläubigen',intro_s3:'Allah schuf Menschen mit unterschiedlichen Fähigkeiten.\n\nKontaktiere uns gerne über den Menüpunkt „Kontakt".',err_fields:'Bitte alle Pflichtfelder ausfüllen.',err_pwd_match:'Passwörter stimmen nicht überein.',err_pwd_len:'Passwort muss mindestens 6 Zeichen haben.',err_connection:'Verbindungsfehler.',correct_lbl:'Richtig!',with_alif:'Mit ا',with_waw:'Mit و',with_ya:'Mit ى'},
+    nl:{login_btn:'Inloggen',email_placeholder:'E-mailadres',pwd_placeholder:'Wachtwoord',pwd_placeholder2:'Wachtwoord bevestigen',pwd_new_placeholder:'Wachtwoord (min. 6 tekens)',lesson_num:'Les',back_s:'Lessen',next_s:'Volgende ▶',retry:'🔄 Opnieuw',rappel:'Herinnering',score_global:'totaalscore',lang_btn:'🌍 Taal',quit:'Afsluiten',back:'‹ Terug',begin:'Begin',middle:'Midden',end:'Einde',isolated:'GEÏS.',cours:'Les',exercice:'Oefening ▶',writing_line:'Schrijflijn',contact_send:'Versturen',contact_return:'Terug naar menu',contact_title:'Contact',contact_body:'Voor vragen, vul het contactformulier in.',contact_name:'Uw naam',contact_email:'Uw e-mail',contact_subj:'Onderwerp',contact_msg:'Uw bericht',ex200_title:'200 Vragen · Woorden lezen',ex200_desc:'Lees dit woord en luister ter controle.',ex200_listen:'🔊 Luisteren',ex200_next:'Volgende ▶',ex200_finish:'Afronden',create_account:'Account aanmaken',connecting:'Verbinden…',creating:'Aanmaken…',sending:'Verzenden…',redirecting:'Doorsturen…',payment_ok:'Betaling bevestigd!',payment_sub:'Maak je wachtwoord aan.',no_account:'Nog geen account?',buy_access:'Toegang kopen',buy_desc:'Leer het Arabische alfabet stap voor stap.',buy_access_lbl:'Levenslange volledige toegang',buy_payment_lbl:'Eenmalige betaling · Geen abonnement',buy_features:'✓ 11 volledige lessen\n✓ Klinkers & verlengingen\n✓ Oefeningen & 200 vragen\n✓ 9 talen beschikbaar\n✓ Updates inbegrepen',buy_email_placeholder:'Uw e-mail',buy_btn:'Toegang kopen — 49,99 €',buy_already:'Al een account?',buy_login:'Inloggen',choose:'Kies je interface:',girl:'Meisje',boy:'Jongen',adult:'Volwassene',girl_desc:'Roze interface',boy_desc:'Blauwe interface',adult_desc:'Volledige interface',sessions:'Lessen',exercises:'Oefeningen',progress:'Voortgang',settings:'Instellingen',intro:'Introductie',intro_desc:'Enkele belangrijke begrippen.',sessions_desc:'Volledig programma.',exercises_desc:'Quiz: meer dan 200 vragen.',contact_desc:'Hulp nodig?',noattach:'Verbindt nooit met de volgende letter.',heavy:'Zware letter مُفَخَّمَة',vowels_name:'Klinkers · الحَرَكَات',vowel_intro:'Een klinker is een klein symbool boven of onder een letter.',vowel_tip:'💡 Als een klinker verdubbeld wordt, voeg je "n" toe.',prolong_name:'Verlengingen · الْمُدُود',prolong_note:'* De letter ب (b) wordt gebruikt voor voorbeelden.',prolong_tip:'💡 Klinker ُ wordt verlengd door و. Klinker َ door ا. Klinker ِ door ي.',letter_tip_master:'Het beheersen van de geïsoleerde en beginvorm is essentieel.',letter_tip2:'In het midden van een woord: zoals beginvorm + horizontale streep.',letter_tip3:'Aan het einde: zoals geïsoleerde vorm + horizontale streep.',letter_tip4:'<em>Opmerking: alleen ع en غ volgen deze regels niet.</em>',letter_tip5a:'<em>Midden = Begin + "—"</em>',letter_tip5b:'<em>Einde = Geïsoleerd + "—"</em>',ta_marbuta1:'Deze letter staat ALTIJD aan het einde van een woord.',ta_marbuta2:'Na een van de 6 niet-verbindende letters → geïsoleerde vorm.',ta_marbuta3:'Anders → eindvorm.',hamza1:'Ongeacht de letter, spreek je ALLEEN de klinker uit.',hamza2:'Als ء op een ي staat, schrijf het zonder de 2 puntjes.',q_read:'Hoe lees je',q_write:'Hoe schrijf je de klank',pass:'🎉 Goed gedaan! Volgende les ontgrendeld.',fail:'Blijf oefenen. Je hebt 80% nodig om door te gaan.',global_score:'Totaalscore',sound_on:'Geluid aan',reset:'🗑 Opnieuw instellen',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'In de naam van Allah, de Barmhartige.',intro_dua_tr2:'Heer, vergroot mijn kennis.',intro_s1_title:'Het belang van intentie (an-niyyah)',intro_s1:'Intentie is een van de twee essentiële voorwaarden voor Allah ﷻ om een handeling te aanvaarden.\n\nDe Profeet ﷺ zei: "Daden worden beoordeeld op intenties."',intro_s2_title:'De vruchten van het zoeken naar kennis',intro_s2:'Kennis is een plicht voor elke gelovige.\n\nDe Profeet ﷺ zei: "Wie een pad bewandelt op zoek naar kennis, Allah maakt het pad naar het Paradijs gemakkelijk."',intro_s3_title:'Allah is het enige doel van de gelovige',intro_s3:'Allah schiep mensen met verschillende capaciteiten.\n\nNeem gerust contact met ons op via de sectie "contact".',err_fields:'Vul alle verplichte velden in.',err_pwd_match:'Wachtwoorden komen niet overeen.',err_pwd_len:'Wachtwoord moet minimaal 6 tekens hebben.',err_connection:'Verbindingsfout.',correct_lbl:'Correct!',with_alif:'Met ا',with_waw:'Met و',with_ya:'Met ى'},
+    it:{login_btn:'Accedi',email_placeholder:'Email',pwd_placeholder:'Password',pwd_placeholder2:'Conferma password',pwd_new_placeholder:'Password (min. 6 car.)',lesson_num:'Lezione',back_s:'Sessioni',next_s:'Successiva ▶',retry:'🔄 Riprova',rappel:'Promemoria',score_global:'punteggio globale',lang_btn:'🌍 Lingua',quit:'Esci',back:'‹ Indietro',begin:'Inizio',middle:'Mezzo',end:'Fine',isolated:'ISOL.',cours:'Lezione',exercice:'Esercizio ▶',writing_line:'Linea di scrittura',contact_send:'Invia',contact_return:'Torna al menu',contact_title:'Contatto',contact_body:'Per domande, compila il modulo di contatto.',contact_name:'Il tuo nome',contact_email:'La tua email',contact_subj:'Oggetto',contact_msg:'Il tuo messaggio',ex200_title:'200 Domande · Lettura di parole',ex200_desc:'Leggi questa parola e ascolta per verificare.',ex200_listen:'🔊 Ascolta',ex200_next:'Successivo ▶',ex200_finish:'Termina',create_account:'Crea account',connecting:'Connessione…',creating:'Creazione…',sending:'Invio…',redirecting:'Reindirizzamento…',payment_ok:'Pagamento confermato!',payment_sub:'Crea la tua password.',no_account:'Nessun account?',buy_access:'Acquista accesso',buy_desc:'Impara l\'alfabeto arabo passo dopo passo.',buy_access_lbl:'Accesso completo a vita',buy_payment_lbl:'Pagamento unico · Nessun abbonamento',buy_features:'✓ 11 lezioni complete\n✓ Vocali & prolungamenti\n✓ Esercizi & 200 domande\n✓ 9 lingue disponibili\n✓ Aggiornamenti inclusi',buy_email_placeholder:'La tua email',buy_btn:'Acquista accesso — 49,99 €',buy_already:'Hai già un account?',buy_login:'Accedi',choose:'Scegli la tua interfaccia:',girl:'Ragazza',boy:'Ragazzo',adult:'Adulto',girl_desc:'Interfaccia rosa',boy_desc:'Interfaccia blu',adult_desc:'Interfaccia completa',sessions:'Sessioni',exercises:'Esercizi',progress:'Progressi',settings:'Impostazioni',intro:'Introduzione',intro_desc:'Alcune nozioni importanti.',sessions_desc:'Programma completo.',exercises_desc:'Quiz: oltre 200 domande.',contact_desc:'Hai bisogno di aiuto?',noattach:'Non si unisce mai alla lettera successiva.',heavy:'Lettera grave مُفَخَّمَة',vowels_name:'Vocali · الحَرَكَات',vowel_intro:'Una vocale è un piccolo simbolo sopra o sotto una lettera.',vowel_tip:'💡 Se si raddoppia una vocale, si aggiunge "n".',prolong_name:'Prolungamenti · الْمُدُود',prolong_note:'* La lettera ب (b) è usata per gli esempi.',prolong_tip:'💡 Vocale ُ si prolunga con و. Vocale َ con ا. Vocale ِ con ي.',letter_tip_master:'Padroneggiare le forme isolata e iniziale è essenziale.',letter_tip2:'A metà parola: come la forma iniziale + tratto orizzontale.',letter_tip3:'Alla fine: come la forma isolata + tratto orizzontale.',letter_tip4:'<em>Nota: solo ع e غ non seguono queste regole.</em>',letter_tip5a:'<em>Mediale = Iniziale + "—"</em>',letter_tip5b:'<em>Finale = Isolata + "—"</em>',ta_marbuta1:'Questa lettera è SEMPRE alla fine di parola.',ta_marbuta2:'Dopo una delle 6 lettere non connettenti → forma isolata.',ta_marbuta3:'Altrimenti → forma finale.',hamza1:'Qualunque sia la lettera, si pronuncia SOLO la vocale.',hamza2:'Se ء è su ي, si scrive senza i 2 punti.',q_read:'Come si pronuncia',q_write:'Come si scrive il suono',pass:'🎉 Bravo! Prossima sessione sbloccata.',fail:'Continua a ripassare. Servono 80% per proseguire.',global_score:'Punteggio globale',sound_on:'Audio attivo',reset:'🗑 Reimposta',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'In nome di Allah, il Compassionevole.',intro_dua_tr2:'Signore, aumenta la mia conoscenza.',intro_s1_title:'L\'importanza dell\'intenzione (an-niyyah)',intro_s1:'L\'intenzione è una delle due condizioni essenziali affinché Allah ﷻ accetti un\'azione.\n\nIl Profeta ﷺ disse: "Le azioni sono giudicate dalle intenzioni."',intro_s2_title:'I frutti della ricerca della conoscenza',intro_s2:'La conoscenza è un dovere per ogni credente.\n\nIl Profeta ﷺ disse: "Chi percorre una via cercando la conoscenza, Allah gli facilita il cammino verso il Paradiso."',intro_s3_title:'Allah è l\'unico scopo del credente',intro_s3:'Allah ha creato gli esseri umani con diverse capacità.\n\nNon esitare a contattarci tramite la sezione "contatto".',err_fields:'Compila tutti i campi obbligatori.',err_pwd_match:'Le password non corrispondono.',err_pwd_len:'La password deve avere almeno 6 caratteri.',err_connection:'Errore di connessione.',correct_lbl:'Corretto!',with_alif:'Con ا',with_waw:'Con و',with_ya:'Con ى'},
+    zh:{login_btn:'登录',email_placeholder:'电子邮件',pwd_placeholder:'密码',pwd_placeholder2:'确认密码',pwd_new_placeholder:'密码（最少6位）',lesson_num:'课',back_s:'课程',next_s:'下一课 ▶',retry:'🔄 重试',rappel:'提醒',score_global:'总分',lang_btn:'🌍 语言',quit:'退出',back:'‹ 返回',begin:'开头',middle:'中间',end:'末尾',isolated:'独',cours:'课程',exercice:'练习 ▶',writing_line:'书写线',contact_send:'发送',contact_return:'返回主菜单',contact_title:'联系',contact_body:'如有问题，请填写联系表格。',contact_name:'您的姓名',contact_email:'您的邮箱',contact_subj:'主题',contact_msg:'您的留言',ex200_title:'200问题 · 读单词',ex200_desc:'读这个词，然后听以核对。',ex200_listen:'🔊 听答案',ex200_next:'下一个 ▶',ex200_finish:'完成',create_account:'创建账户',connecting:'连接中…',creating:'创建中…',sending:'发送中…',redirecting:'跳转中…',payment_ok:'付款成功！',payment_sub:'请创建您的密码。',no_account:'没有账户？',buy_access:'购买访问权',buy_desc:'逐步学习阿拉伯字母。',buy_access_lbl:'终身完整访问',buy_payment_lbl:'一次性付款 · 无订阅',buy_features:'✓ 11节完整课程\n✓ 元音 & 延长音\n✓ 练习 & 200题\n✓ 9种语言\n✓ 包含更新',buy_email_placeholder:'您的邮箱',buy_btn:'购买访问权 — 49.99 €',buy_already:'已有账户？',buy_login:'登录',choose:'选择您的界面：',girl:'女孩',boy:'男孩',adult:'成人',girl_desc:'粉色界面',boy_desc:'蓝色界面',adult_desc:'完整界面',sessions:'课程',exercises:'练习',progress:'进度',settings:'设置',intro:'介绍',intro_desc:'一些重要概念。',sessions_desc:'完整课程。',exercises_desc:'测验：200多题。',contact_desc:'需要帮助？',noattach:'永远不与下一个字母相连。',heavy:'重音字母 مُفَخَّمَة',vowels_name:'元音 · الحَرَكَات',vowel_intro:'元音是放在字母上方或下方的小符号。',vowel_tip:'💡 当元音加倍时，添加"n"音。',prolong_name:'延长音 · الْمُدُود',prolong_note:'* 字母 ب (b) 用于示例。',prolong_tip:'💡 元音 ُ 用 و 延长。元音 َ 用 ا 延长。元音 ِ 用 ي 延长。',letter_tip_master:'掌握孤立形和词首形至关重要。',letter_tip2:'词中间：与词首形相同 + 水平连接线。',letter_tip3:'词末：与孤立形相同 + 水平连接线。',letter_tip4:'<em>注：只有 ع 和 غ 不遵循这些规则。</em>',letter_tip5a:'<em>词中 = 词首 + "—"</em>',letter_tip5b:'<em>词末 = 孤立 + "—"</em>',ta_marbuta1:'这个字母总是在词尾。',ta_marbuta2:'在6个不连接字母之后 → 孤立形。',ta_marbuta3:'否则 → 词末形。',hamza1:'无论在哪个字母上，只发元音。',hamza2:'如果 ء 在 ي 上，不写两点。',q_read:'如何发音',q_write:'如何书写该音',pass:'🎉 很好！下一课已解锁。',fail:'继续复习。需要80%才能继续。',global_score:'总分',sound_on:'声音开启',reset:'🗑 重置',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'奉真主之名，最仁慈的。',intro_dua_tr2:'主啊，增加我的知识。',intro_s1_title:'意图的重要性（an-niyyah）',intro_s1:'意图是真主ﷻ接受行为的两个基本条件之一。\n\n先知ﷺ说："行为以意图来评判。"',intro_s2_title:'求知的果实',intro_s2:'知识是每个信士的义务。\n\n先知ﷺ说："走上求知之路者，真主为其打开通往天堂之路。"',intro_s3_title:'真主是信士唯一的目标',intro_s3:'真主创造了具有不同理解能力的人。\n\n请通过"联系"菜单联系我们。',err_fields:'请填写所有必填字段。',err_pwd_match:'密码不匹配。',err_pwd_len:'密码至少需要6个字符。',err_connection:'连接错误。',correct_lbl:'正确！',with_alif:'用 ا',with_waw:'用 و',with_ya:'用 ى'},
+    ru:{login_btn:'Войти',email_placeholder:'Email',pwd_placeholder:'Пароль',pwd_placeholder2:'Подтвердите пароль',pwd_new_placeholder:'Пароль (мин. 6 символов)',lesson_num:'Урок',back_s:'Уроки',next_s:'Следующий ▶',retry:'🔄 Повторить',rappel:'Напоминание',score_global:'общий счёт',lang_btn:'🌍 Язык',quit:'Выйти',back:'‹ Назад',begin:'Начало',middle:'Середина',end:'Конец',isolated:'ИЗО.',cours:'Урок',exercice:'Упражнение ▶',writing_line:'Строка письма',contact_send:'Отправить',contact_return:'В главное меню',contact_title:'Контакт',contact_body:'По любым вопросам заполните контактную форму.',contact_name:'Ваше имя',contact_email:'Ваш email',contact_subj:'Тема',contact_msg:'Ваше сообщение',ex200_title:'200 вопросов · Чтение слов',ex200_desc:'Прочитайте слово, затем послушайте.',ex200_listen:'🔊 Слушать',ex200_next:'Следующий ▶',ex200_finish:'Завершить',create_account:'Создать аккаунт',connecting:'Подключение…',creating:'Создание…',sending:'Отправка…',redirecting:'Перенаправление…',payment_ok:'Оплата подтверждена!',payment_sub:'Создайте пароль.',no_account:'Нет аккаунта?',buy_access:'Купить доступ',buy_desc:'Учите арабский алфавит шаг за шагом.',buy_access_lbl:'Полный пожизненный доступ',buy_payment_lbl:'Единовременная оплата · Без подписки',buy_features:'✓ 11 полных уроков\n✓ Гласные & продления\n✓ Упражнения & 200 вопросов\n✓ 9 языков доступно\n✓ Обновления включены',buy_email_placeholder:'Ваш email',buy_btn:'Купить доступ — 49,99 €',buy_already:'Уже есть аккаунт?',buy_login:'Войти',choose:'Выберите интерфейс:',girl:'Девочка',boy:'Мальчик',adult:'Взрослый',girl_desc:'Розовый интерфейс',boy_desc:'Синий интерфейс',adult_desc:'Полный интерфейс',sessions:'Уроки',exercises:'Упражнения',progress:'Прогресс',settings:'Настройки',intro:'Введение',intro_desc:'Несколько важных понятий.',sessions_desc:'Полная программа.',exercises_desc:'Викторина: более 200 вопросов.',contact_desc:'Нужна помощь?',noattach:'Никогда не соединяется со следующей буквой.',heavy:'Тяжёлая буква مُفَخَّمَة',vowels_name:'Гласные · الحَرَكَات',vowel_intro:'Гласная — маленький символ над или под буквой.',vowel_tip:'💡 При удвоении гласной добавляется "н".',prolong_name:'Продления · الْمُدُود',prolong_note:'* Буква ب (б) используется для примеров.',prolong_tip:'💡 Гласная ُ продлевается буквой و. Гласная َ — буквой ا. Гласная ِ — буквой ي.',letter_tip_master:'Освоить изолированную и начальную форму обязательно.',letter_tip2:'В середине слова: как начальная форма + горизонтальная черта.',letter_tip3:'В конце слова: как изолированная форма + горизонтальная черта.',letter_tip4:'<em>Примечание: только ع и غ не следуют этим правилам.</em>',letter_tip5a:'<em>Средняя = Начальная + "—"</em>',letter_tip5b:'<em>Конечная = Изолированная + "—"</em>',ta_marbuta1:'Эта буква ВСЕГДА стоит в конце слова.',ta_marbuta2:'После одной из 6 несоединяющихся букв → изолированная форма.',ta_marbuta3:'В остальных случаях → конечная форма.',hamza1:'Независимо от буквы, произносится ТОЛЬКО гласная.',hamza2:'Если ء стоит на ي, пишется без 2 точек.',q_read:'Как читается',q_write:'Как пишется звук',pass:'🎉 Отлично! Следующий урок открыт.',fail:'Продолжай учиться. Нужно 80% для продолжения.',global_score:'Общий счёт',sound_on:'Звук включён',reset:'🗑 Сбросить',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'Во имя Аллаха, Милостивого.',intro_dua_tr2:'Господь мой, прибавь мне знания.',intro_s1_title:'Важность намерения (ан-ниййа)',intro_s1:'Намерение — одно из двух основных условий для принятия действия Аллахом ﷻ.\n\nПророк ﷺ сказал: "Дела оцениваются по намерениям."',intro_s2_title:'Плоды поиска знаний',intro_s2:'Знание — обязанность каждого верующего.\n\nПророк ﷺ сказал: "Кто встал на путь поиска знаний, тому Аллах облегчает путь в Рай."',intro_s3_title:'Аллах — единственная цель верующего',intro_s3:'Аллах создал людей с разными способностями.\n\nНе стесняйтесь обращаться к нам через раздел "контакт".',err_fields:'Заполните все обязательные поля.',err_pwd_match:'Пароли не совпадают.',err_pwd_len:'Пароль должен содержать не менее 6 символов.',err_connection:'Ошибка подключения.',correct_lbl:'Правильно!',with_alif:'С ا',with_waw:'С و',with_ya:'С ى'},
+    pt:{login_btn:'Entrar',email_placeholder:'Email',pwd_placeholder:'Senha',pwd_placeholder2:'Confirmar senha',pwd_new_placeholder:'Senha (mín. 6 car.)',lesson_num:'Lição',back_s:'Sessões',next_s:'Próxima ▶',retry:'🔄 Tentar novamente',rappel:'Lembrete',score_global:'pontuação global',lang_btn:'🌍 Idioma',quit:'Sair',back:'‹ Voltar',begin:'Início',middle:'Meio',end:'Fim',isolated:'ISOL.',cours:'Lição',exercice:'Exercício ▶',writing_line:'Linha de escrita',contact_send:'Enviar',contact_return:'Voltar ao menu',contact_title:'Contacto',contact_body:'Para qualquer questão, preencha o formulário.',contact_name:'O seu nome',contact_email:'O seu email',contact_subj:'Assunto',contact_msg:'A sua mensagem',ex200_title:'200 Perguntas · Leitura de palavras',ex200_desc:'Leia esta palavra e ouça para verificar.',ex200_listen:'🔊 Ouvir',ex200_next:'Próxima ▶',ex200_finish:'Terminar',create_account:'Criar conta',connecting:'Conectando…',creating:'Criando…',sending:'Enviando…',redirecting:'Redirecionando…',payment_ok:'Pagamento validado!',payment_sub:'Crie a sua senha.',no_account:'Sem conta?',buy_access:'Comprar acesso',buy_desc:'Aprenda o alfabeto árabe passo a passo.',buy_access_lbl:'Acesso completo vitalício',buy_payment_lbl:'Pagamento único · Sem assinatura',buy_features:'✓ 11 lições completas\n✓ Vogais & prolongamentos\n✓ Exercícios & 200 perguntas\n✓ 9 idiomas disponíveis\n✓ Atualizações incluídas',buy_email_placeholder:'O seu email',buy_btn:'Comprar acesso — 49,99 €',buy_already:'Já tem conta?',buy_login:'Entrar',choose:'Escolha a sua interface:',girl:'Menina',boy:'Menino',adult:'Adulto',girl_desc:'Interface rosa',boy_desc:'Interface azul',adult_desc:'Interface completa',sessions:'Sessões',exercises:'Exercícios',progress:'Progresso',settings:'Configurações',intro:'Introdução',intro_desc:'Algumas noções importantes.',sessions_desc:'Programa completo.',exercises_desc:'Quiz: mais de 200 perguntas.',contact_desc:'Precisa de ajuda?',noattach:'Nunca se liga à letra seguinte.',heavy:'Letra grave مُفَخَّمَة',vowels_name:'Vogais · الحَرَكَات',vowel_intro:'Uma vogal é um pequeno símbolo colocado acima ou abaixo de uma letra.',vowel_tip:'💡 Quando uma vogal é duplicada, adiciona-se "n".',prolong_name:'Prolongamentos · الْمُدُود',prolong_note:'* A letra ب (b) é usada para exemplos.',prolong_tip:'💡 Vogal ُ prolonga-se com و. Vogal َ com ا. Vogal ِ com ي.',letter_tip_master:'Dominar as formas isolada e inicial é essencial.',letter_tip2:'No meio de uma palavra: como a forma inicial + traço horizontal.',letter_tip3:'No final: como a forma isolada + traço horizontal.',letter_tip4:'<em>Nota: apenas ع e غ não seguem estas regras.</em>',letter_tip5a:'<em>Medial = Inicial + "—"</em>',letter_tip5b:'<em>Final = Isolada + "—"</em>',ta_marbuta1:'Esta letra está SEMPRE no final de uma palavra.',ta_marbuta2:'Após uma das 6 letras não conectoras → forma isolada.',ta_marbuta3:'Caso contrário → forma final.',hamza1:'Independentemente da letra, pronuncia-se APENAS a vogal.',hamza2:'Se ء estiver sobre ي, escreve-se sem os 2 pontos.',q_read:'Como se pronuncia',q_write:'Como se escreve o som',pass:'🎉 Muito bem! Próxima sessão desbloqueada.',fail:'Continue a revisar. Precisa de 80% para continuar.',global_score:'Pontuação global',sound_on:'Som ativado',reset:'🗑 Reiniciar',intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',intro_dua2:'رَبِّ زِدْنِي عِلْمًا',intro_dua_tr:'Em nome de Allah, o Misericordioso.',intro_dua_tr2:'Senhor, aumenta o meu conhecimento.',intro_s1_title:'A importância da intenção (an-niyyah)',intro_s1:'A intenção é uma das duas condições essenciais para que Allah ﷻ aceite uma ação.\n\nO Profeta ﷺ disse: "As ações são julgadas pelas intenções."',intro_s2_title:'Os frutos da busca do conhecimento',intro_s2:'O conhecimento é um dever para cada crente.\n\nO Profeta ﷺ disse: "Quem segue um caminho em busca de conhecimento, Allah facilita-lhe o caminho para o Paraíso."',intro_s3_title:'Allah é o único objetivo do crente',intro_s3:'Allah criou os seres humanos com diferentes capacidades.\n\nNão hesite em contactar-nos através da secção "contacto".',err_fields:'Por favor, preencha os campos obrigatórios.',err_pwd_match:'As senhas não correspondem.',err_pwd_len:'A senha deve ter pelo menos 6 caracteres.',err_connection:'Erro de ligação.',correct_lbl:'Correto!',with_alif:'Com ا',with_waw:'Com و',with_ya:'Com ى'},
   };
   T[c]={...T.fr,...(overrides[c]||{})};
 });
+
 function t(k){return(T[st.lang]||T.fr)[k]||(T.fr[k])||k}
 
 function mH(b){return[{ar:b+'َ',lat:'a'},{ar:b+'َا',lat:'ā'},{ar:b+'ً',lat:'an'},{ar:b+'ِ',lat:'i'},{ar:b+'ِي',lat:'ī'},{ar:b+'ٍ',lat:'in'},{ar:b+'ُ',lat:'u'},{ar:b+'ُو',lat:'ū'},{ar:b+'ٌ',lat:'un'},{ar:b+'ْ',lat:'∅'}];}
@@ -592,14 +628,38 @@ function toggleSound(){st.soundOn=!st.soundOn;document.querySelectorAll('.sound-
 
 // I18N — update ALL non-Arabic text
 function applyI18N(){
-  buildLangRow();
-  // Login placeholders & button
+  buildLangRow('lang-row');
+  buildLangRow('buy-lang-row');
+  // === BUY PAGE ===
+  const buyDesc=document.getElementById('buy-desc');
+  if(buyDesc)buyDesc.innerHTML=t('buy_desc').replace('\n','<br>');
+  const buyAccessLbl=document.getElementById('buy-access-lbl');
+  if(buyAccessLbl)buyAccessLbl.textContent=t('buy_access_lbl');
+  const buyPaymentLbl=document.getElementById('buy-payment-lbl');
+  if(buyPaymentLbl)buyPaymentLbl.textContent=t('buy_payment_lbl');
+  const buyFeatures=document.getElementById('buy-features');
+  if(buyFeatures)buyFeatures.innerHTML=t('buy_features').replace(/\n/g,'<br>');
+  const buyEmail=document.getElementById('buy-email');
+  if(buyEmail)buyEmail.placeholder=t('buy_email_placeholder');
+  const buyBtn=document.getElementById('buy-btn');
+  if(buyBtn)buyBtn.textContent=t('buy_btn');
+  const buyAlreadyLbl=document.getElementById('buy-already-lbl');
+  if(buyAlreadyLbl)buyAlreadyLbl.textContent=t('buy_already')+' ';
+  const buyLoginLink=document.getElementById('buy-login-link');
+  if(buyLoginLink)buyLoginLink.textContent=t('buy_login');
+  // === LOGIN PAGE ===
   const le=document.getElementById('l-email');if(le)le.placeholder=t('email_placeholder');
   const lp=document.getElementById('l-pwd');if(lp)lp.placeholder=t('pwd_placeholder');
   const lb=document.getElementById('l-btn');if(lb)lb.textContent=t('login_btn');
   const na=document.getElementById('no-account-txt');if(na)na.textContent=t('no_account')+' ';
   const ba=document.getElementById('buy-link-txt');if(ba)ba.textContent=t('buy_access');
-  // Welcome
+  // === REGISTER PAGE ===
+  const rp=document.getElementById('reg-pwd');if(rp)rp.placeholder=t('pwd_new_placeholder');
+  const rp2=document.getElementById('reg-pwd2');if(rp2)rp2.placeholder=t('pwd_placeholder2');
+  const rb=document.getElementById('reg-btn');if(rb)rb.textContent=t('create_account');
+  const rt=document.getElementById('reg-title');if(rt&&!rt.dataset.set)rt.textContent=t('payment_ok');
+  const rs=document.getElementById('reg-sub');if(rs&&!rs.dataset.set)rs.textContent=t('payment_sub');
+  // === WELCOME ===
   const ws=document.getElementById('w-sub');if(ws)ws.textContent=t('choose');
   const pg=document.getElementById('pb-girl');if(pg)pg.textContent=t('girl');
   const pb=document.getElementById('pb-boy');if(pb)pb.textContent=t('boy');
@@ -607,17 +667,19 @@ function applyI18N(){
   const pdg=document.getElementById('pd-girl');if(pdg)pdg.textContent=t('girl_desc');
   const pdb=document.getElementById('pd-boy');if(pdb)pdb.textContent=t('boy_desc');
   const pda=document.getElementById('pd-adult');if(pda)pda.textContent=t('adult_desc');
-  // Menu bottom
+  // === MENU BOTTOM ===
   const sl=document.getElementById('score-lbl');if(sl)sl.textContent=t('score_global');
   const langb=document.getElementById('lang-btn-lbl');if(langb)langb.textContent=t('lang_btn');
   const qb=document.getElementById('quit-btn-lbl');if(qb)qb.textContent=t('quit');
+  // === BACK BUTTON ===
+  const backLbl=document.getElementById('back-lbl');if(backLbl)backLbl.textContent=t('back').replace('‹ ','');
   buildMenu();
   if(st._curPage)renderPage(st._curPage,false);
 }
 
 // LANG
-function buildLangRow(){
-  const r=document.getElementById('lang-row');if(!r)return;r.innerHTML='';
+function buildLangRow(rowId){
+  const r=document.getElementById(rowId);if(!r)return;r.innerHTML='';
   LANGS.forEach(l=>{const d=document.createElement('div');d.className='lang-chip'+(l.c===st.lang?' on':'');d.textContent=l.l;d.onclick=()=>{st.lang=l.c;applyI18N();};r.appendChild(d);});
 }
 function openLangModal(){
@@ -637,8 +699,8 @@ async function startCheckout(){
     const res=await fetch(`${API_URL}/api/create-checkout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
     const data=await res.json();
     if(data.url){window.location.href=data.url;}
-    else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
-  }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent='Acheter l\'accès — 49,99 €';}
+    else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent=t('buy_btn');}
+  }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent=t('buy_btn');}
 }
 async function doRegister(){
   const email=document.getElementById('reg-email').value.trim().toLowerCase();
@@ -665,15 +727,15 @@ async function doLogin(){
     const res=await fetch(`${API_URL}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw||'__check_pending__'})});
     const data=await res.json();
     if(data.success){st.user={email:data.email,name:data.email.split('@')[0]};localStorage.setItem('arab_token',data.token);localStorage.setItem('arab_email',data.email);showS('s-welcome',true);}
-    else if(data.error&&data.error.includes('non activé')){document.getElementById('reg-email').value=em;document.getElementById('reg-title').textContent=t('payment_ok');document.getElementById('reg-sub').textContent=t('payment_sub');document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);}
-    else{errEl.textContent=data.error||t('login_err');}
+    else if(data.error&&data.error.includes('non activé')){document.getElementById('reg-email').value=em;const rt=document.getElementById('reg-title');rt.textContent=t('payment_ok');rt.dataset.set='1';const rs=document.getElementById('reg-sub');rs.textContent=t('payment_sub');rs.dataset.set='1';document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);}
+    else{errEl.textContent=data.error||t('login_err')||t('err_connection');}
   }catch(e){errEl.textContent=t('err_connection');}
   finally{btn.disabled=false;btn.textContent=t('login_btn');}
 }
-function doLogout(){st.user=null;localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');showS('s-buy',false);}
+function doLogout(){st.user=null;localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');applyI18N();showS('s-buy',false);}
 function checkStripeReturn(){
   const params=new URLSearchParams(window.location.search);
-  if(params.get('payment')==='success'){const email=params.get('email')||'';document.getElementById('reg-email').value=decodeURIComponent(email);document.getElementById('reg-title').textContent=t('payment_ok');document.getElementById('reg-sub').textContent=t('payment_sub');document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);window.history.replaceState({},'',window.location.pathname);}
+  if(params.get('payment')==='success'){const email=params.get('email')||'';document.getElementById('reg-email').value=decodeURIComponent(email);const rt=document.getElementById('reg-title');rt.textContent=t('payment_ok');rt.dataset.set='1';const rs=document.getElementById('reg-sub');rs.textContent=t('payment_sub');rs.dataset.set='1';document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);window.history.replaceState({},'',window.location.pathname);}
   else if(params.get('payment')==='cancel'){showS('s-buy',false);window.history.replaceState({},'',window.location.pathname);}
 }
 async function tryAutoLogin(){
@@ -725,7 +787,7 @@ function renderPage(page,fwd){
 function handleBack(){
   const prev=st.backHistory.pop();
   if(!prev||prev.target==='menu'){showS('s-menu',false);return;}
-  if(prev.target==='sessions'){st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent='Menu';renderPage('sessions',false);}
+  if(prev.target==='sessions'){st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent=t('back').replace('‹ ','');renderPage('sessions',false);}
 }
 
 // INTRO
@@ -776,7 +838,7 @@ function showContactSuccess(){
   ca.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;gap:20px;text-align:center;padding:24px"><div class="cform-success" style="max-width:300px">${t('contact_ok')}</div><button class="rbtn rbtn-m" onclick="showS('s-menu',false)">${t('contact_return')}</button></div>`;
 }
 
-// SESSIONS
+// SESSIONS — FIXED: numéro aligné à gauche, pas de cercle, titre centré
 function renderSessions(ca){
   ca.innerHTML='';const g=document.createElement('div');g.className='sess-grid';
   ALL_S.forEach((s,idx)=>{
@@ -799,7 +861,16 @@ function renderSessions(ca){
     else if(s.type==='prolong')cardTitle=t('prolong_name');
     else if(s.id===1)cardTitle=t('lesson_num')+' 2';
     else cardTitle=t('lesson_num')+' '+(idx+1);
-    c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="sess-title"><span class="sess-num">${idx+1}</span>${cardTitle}</div><div class="sess-score">${sc!==undefined?'✅ '+sc+'%':''}</div></div>${prev}<div style="margin-top:4px">${bads}</div>`;
+
+    // FIXED layout: numéro à gauche (petit, discret), titre centré, score à droite
+    c.innerHTML=`
+      <div style="display:flex;align-items:center;margin-bottom:4px">
+        <span class="sess-num">${idx+1}</span>
+        <div style="flex:1;text-align:center;font-size:.82rem;font-weight:700">${cardTitle}</div>
+        <div style="font-size:.68rem;color:var(--gold);min-width:32px;text-align:right">${sc!==undefined?'✅ '+sc+'%':''}</div>
+      </div>
+      ${prev}
+      <div style="margin-top:4px">${bads}</div>`;
     c.onclick=()=>openLesson(s);g.appendChild(c);
   });
   ca.appendChild(g);
@@ -975,7 +1046,7 @@ function checkAns(btn,ok,panel,correctAns,spk){
   panel.querySelectorAll('.ans-btn').forEach(b=>b.onclick=null);
   if(ok){btn.classList.add('correct');st.quiz.correct++;if(spk)speak(spk,.75);}
   else{btn.classList.add('wrong');panel.querySelectorAll('.ans-btn').forEach(b=>{if(b.textContent===correctAns)b.classList.add('reveal');else if(b!==btn)b.style.opacity='.35';});}
-  const rf=document.getElementById('rf');if(rf){rf.className='rf on '+(ok?'ok':'bad');rf.textContent=ok?'✅ Correct !':'❌ → '+correctAns;}
+  const rf=document.getElementById('rf');if(rf){rf.className='rf on '+(ok?'ok':'bad');rf.textContent=ok?'✅ '+t('correct_lbl'):'❌ → '+correctAns;}
   setTimeout(()=>{st.quiz.idx++;const ca=document.getElementById('ca');animEl(ca,'tx-fade');renderQuiz(ca);},1400);
 }
 function showResult(ca){
@@ -1047,11 +1118,11 @@ function renderSettings(ca){
 }
 
 window.onload=()=>{
-  buildLangRow();
+  applyI18N();
   if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>{};window.speechSynthesis.getVoices();}
   checkStripeReturn();
   tryAutoLogin();
 };
 </script>
 </body>
-  </html>
+</html>
