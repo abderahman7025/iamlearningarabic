@@ -410,19 +410,22 @@ const T={
     girl:'Fille',boy:'Garçon',adult:'Adulte',
     sessions:'Leçons',exercises:'Exercices',progress:'Progrès',settings:'Paramètres',logout:'Déconnexion',
     intro:'Introduction',contact:'Contact',
-    intro_s1_title:'🌟 La recherche de la science en Islam',
-    intro_s1:'Le Prophète ﷺ a dit : « La recherche de la science est une obligation pour tout musulman. » (Ibn Mâja). Les savants sont les héritiers des prophètes. Apprendre l\'arabe, c\'est ouvrir la porte à la compréhension du Coran et des Hadiths dans leur langue originelle.',
-    intro_s2_title:'🤲 L\'importance de l\'intention (Niyya)',
-    intro_s2:'Le Prophète ﷺ a dit : « Les actions ne valent que par les intentions. » (Boukhari). Avant de commencer, pose-toi cette intention dans ton cœur : « J\'apprends l\'arabe uniquement pour plaire à Allah ﷻ, pour mieux comprendre Son Livre et la Sunna de Son Prophète ﷺ. »',
-    intro_s3_title:'🌱 C\'est Allah qui facilite l\'apprentissage',
-    intro_s3:'Allah ﷻ dit dans le Coran : « Nous avons rendu le Coran facile à méditer. Y a-t-il quelqu\'un pour s\'en souvenir ? » (54:17). Demande à Allah de te faciliter cet apprentissage. Commence chaque session par Bismillah et par une invocation.',
+    // INTRO
+    intro_s1_title:'L\'importance de l\'intention (an-niyyah)',
+    intro_s1:'L\'intention est une des deux conditions capitales pour qu\'une action soit acceptée par Allah ﷻ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n\'étaient pas les mêmes.\n\nLe prophète Muhammad ﷺ a dit : "Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention".',
+    intro_s2_title:'Les fruits de la recherche de la science',
+    intro_s2:'La science est un devoir pour chaque croyant. En effet, Allah n\'accepte pas l\'adoration faite avec ignorance.\n\nAllah ﷻ dit : "Et sache que nulle divinité ne mérite d\'être adoré sauf Allah, et demande pardon pour ton péché, et pour les croyants et croyantes".\n\nAussi, celui qui recherche une science bénéficie de récompenses inestimables.\n\nLe prophète ﷺ a dit : "Celui qui emprunte un chemin par lequel il recherche une science, Allah lui fait prendre, par cela, un chemin vers le paradis. Certes les anges tendent leurs ailes par agrément pour celui qui recherche la science. Certes tous ceux qui sont dans les cieux et la terre, même les poissons dans l\'eau, demandent pardon pour le savant."',
+    intro_s3_title:'Allah est l\'unique but du croyant',
+    intro_s3:'Allah a créé les humains avec différentes capacités de compréhension et de mémorisation.\n\nC\'est pourquoi, Allah te questionne plus sur les efforts fournis pour apprendre, que sur le résultat qui ne dépend pas toujours de toi.\n\nAinsi, si tu rencontres quelques difficultés, ne baisse pas les bras, place ta confiance en Allah, rappelle-toi que c\'est Lui qui donne la compréhension, et rappelle-toi surtout que le but n\'est pas la finalité (apprendre l\'arabe), mais plutôt plaire à Allah (en faisant les efforts dans le bien).\n\nN\'hésite pas à nous contacter, via la rubrique "contact" du menu principal, si tu as une quelconque demande.',
     intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ — رَبِّ زِدْنِي عِلْمًا',
     intro_dua_tr:'Au nom d\'Allah — Seigneur, accroîs mes connaissances.',
     contact_title:'Contact',
     contact_body:'Pour toute question, remarque ou suggestion, veuillez remplir le formulaire de contact.',
     contact_name:'Votre nom',contact_email:'Votre email',contact_subj:'Sujet',contact_msg:'Votre message',contact_send:'Envoyer',
     lesson_num:'Leçon',
-    ex200_title:'200 Questions · Lecture de mots',ex200_desc:'Comment lit-on ce mot ?',
+    ex200_title:'200 Questions · Lecture de mots',
+    ex200_desc:'Lisez ce mot, puis écoutez pour vérifier.',
+    ex200_btn:'🔊 Écouter la réponse',
     cours:'Cours',exercice:'Exercice ▶',
     writing_line:'Ligne d\'écriture',
     vowel_intro:'Une voyelle est un petit symbole qui se place sur ou sous une lettre. On prononce la lettre PUIS la voyelle.',
@@ -466,7 +469,9 @@ const T={
     contact_body:'For any questions, remarks or suggestions, please fill in the contact form.',
     contact_name:'Your name',contact_email:'Your email',contact_subj:'Subject',contact_msg:'Your message',contact_send:'Send',
     lesson_num:'Lesson',
-    ex200_title:'200 Questions · Word Reading',ex200_desc:'How do you read this word?',
+    ex200_title:'200 Questions · Word Reading',
+    ex200_desc:'Read this word, then listen to check.',
+    ex200_btn:'🔊 Listen to answer',
     cours:'Lesson',exercice:'Exercise ▶',
     writing_line:'Writing line',
     vowel_intro:'A vowel is a small symbol placed above or below a letter. You pronounce the letter THEN the vowel.',
@@ -758,12 +763,10 @@ function updateAvgScore(){
 }
 function buildMenu(){
   const nav=document.getElementById('menu-nav');if(!nav)return;nav.innerHTML='';
-  const descMap={
-    fr:{intro:"Islam & intention d'apprendre",sessions:'Alphabet arabe complet',exercises:'Exercices & quiz',contact:'Aide & nous contacter'},
-    en:{intro:'Islam & learning intention',sessions:'Full Arabic alphabet',exercises:'Exercises & quizzes',contact:'Help & contact'},
-  };
-  const d=descMap[st.lang]||descMap.fr;
-  [{id:'intro',icon:'ℹ️',cls:'gold',title:t('intro'),desc:d.intro},{id:'sessions',icon:'📚',cls:'pink',title:t('sessions'),desc:d.sessions},{id:'exercises',icon:'✏️',cls:'blue',title:t('exercises'),desc:d.exercises},{id:'contact',icon:'✉️',cls:'green',title:'Contact',desc:d.contact}]
+  [{id:'intro',icon:'ℹ️',cls:'gold',title:t('intro'),desc:t('intro_desc')},
+   {id:'sessions',icon:'📚',cls:'pink',title:t('sessions'),desc:t('sessions_desc')},
+   {id:'exercises',icon:'✏️',cls:'blue',title:t('exercises'),desc:t('exercises_desc')},
+   {id:'contact',icon:'✉️',cls:'green',title:'Contact',desc:t('contact_desc')}]
   .forEach(it=>{
     const el=document.createElement('div');el.className='nav-card';
     el.innerHTML=`<div class="nav-icon ${it.cls}">${it.icon}</div><div class="nav-text"><div class="nav-title">${it.title}</div><div class="nav-desc">${it.desc}</div></div><div class="nav-arrow">›</div>`;
@@ -803,9 +806,9 @@ function handleBack(){
 function renderIntro(ca){
   ca.innerHTML=`
     <div class="dua-box"><div class="dua-ar">${t('intro_dua')}</div><div class="dua-tr">${t('intro_dua_tr')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body">${t('intro_s1')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body">${t('intro_s2')}</div></div>
-    <div class="p-section"><div class="p-sec-title">${t('intro_s3_title')}</div><div class="p-sec-body">${t('intro_s3')}</div></div>`;
+    <div class="p-section"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body">${t('intro_s1').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body">${t('intro_s2').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section"><div class="p-sec-title">${t('intro_s3_title')}</div><div class="p-sec-body">${t('intro_s3').replace(/\n\n/g,'<br><br>')}</div></div>`;
 }
 
 // ── CONTACT ──
@@ -1191,10 +1194,43 @@ function renderExPage(ca){
     if(ex.idx>=200){const pct=Math.round(ex.correct/200*100);const rw=document.createElement('div');rw.className='res-w';rw.innerHTML=`<div class="res-c ${pct>=80?'rc-p':'rc-f'}"><div>${pct}%</div></div><div>${ex.correct}/200</div>`;const rb=document.createElement('div');rb.className='res-btns';const r=document.createElement('button');r.className='rbtn rbtn-m';r.textContent=t('retry');r.onclick=()=>navToPage('exercises');rb.appendChild(r);rw.appendChild(rb);ca.appendChild(rw);return;}
     const q=qs[ex.idx];
     const pg=document.createElement('div');pg.className='qz-prog';pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(ex.idx/200)*100}%"></div></div><div class="qs-lbl">${ex.idx}/200</div>`;ca.appendChild(pg);
-    const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:12px;min-height:140px';qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" onclick="speak('${q.ar}',0.78)">${q.ar}</div><button class="q-lbtn" onclick="speak('${q.ar}',0.78)">🔊</button><div class="rf" id="rf200"></div>`;ca.appendChild(qbox);
-    const ap=document.createElement('div');ap.className='qz-a';const row=document.createElement('div');row.className='qz-a-row';const bot=document.createElement('div');bot.className='qz-a-center';
-    q.choices.forEach((ch,i)=>{const b=document.createElement('div');b.className='ans-btn';b.textContent=ch;b.onclick=()=>{ap.querySelectorAll('.ans-btn').forEach(x=>x.onclick=null);const ok=ch===q.correct;if(ok){b.classList.add('correct');ex.correct++;speak(q.ar,.75);}else{b.classList.add('wrong');ap.querySelectorAll('.ans-btn').forEach(x=>{if(x.textContent===q.correct)x.classList.add('reveal');else if(x!==b)x.style.opacity='.35';});}const rf=document.getElementById('rf200');if(rf){rf.className='rf on '+(ok?'ok':'bad');rf.textContent=ok?'✅ Correct !':'❌ → '+q.correct;}setTimeout(()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();},1400);};if(i<2)row.appendChild(b);else bot.appendChild(b);});
-    ap.appendChild(row);ap.appendChild(bot);ca.appendChild(ap);
+
+    // Question : montrer le mot arabe
+    const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:16px;min-height:160px';
+    qbox.innerHTML=`
+      <div class="q-lbl">${t('ex200_desc')}</div>
+      <div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;
+    ca.appendChild(qbox);
+
+    // Bouton audio unique — cliquer pour entendre la prononciation
+    const audioWrap=document.createElement('div');audioWrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px';
+    const audioBtn=document.createElement('button');
+    audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';
+    audioBtn.textContent=t('ex200_btn');
+    let played=false;
+    audioBtn.onclick=()=>{
+      speak(q.ar,.78);
+      played=true;
+      audioBtn.style.opacity='.7';
+      // Afficher les boutons suivant/correct après avoir écouté
+      nextWrap.style.display='flex';
+    };
+    audioWrap.appendChild(audioBtn);
+
+    // Boutons de navigation (cachés jusqu'à écoute)
+    const nextWrap=document.createElement('div');
+    nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
+    const latinLbl=document.createElement('div');
+    latinLbl.style.cssText='font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';
+    latinLbl.textContent=q.correct;
+    const nextBtn=document.createElement('button');
+    nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
+    nextBtn.textContent=ex.idx<199?'Suivant ▶':'Terminer';
+    nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
+    nextWrap.appendChild(latinLbl);
+    nextWrap.appendChild(nextBtn);
+    audioWrap.appendChild(nextWrap);
+    ca.appendChild(audioWrap);
   }renderQ();
 }
 
@@ -1218,4 +1254,4 @@ window.onload=()=>{
   tryAutoLogin();
 };</script>
 </body>
-</html>
+  </html>
