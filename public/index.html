@@ -229,16 +229,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 /* lang-modal removed */
 @media(max-width:420px){.sess-grid,.pg-grid{grid-template-columns:1fr}.pos-row-wrap{justify-content:center}}
 /* TAWK FIX */
-body { overflow: visible !important; }
-#tawk-bubble-container, .widget-visible,
+#tawk-bubble-container,
 [class*="tawk-"], [id*="tawk-"],
 iframe[src*="tawk.to"] {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: 2147483647 !important;
-  position: fixed !important;
+  z-index: 99999 !important;
 }
 </style>
 </head>
@@ -915,7 +909,7 @@ function renderSessions(ca){
     if(s.type==='vowels'){
       prev=`<div class="sess-ar">${['َ','ُ','ِ','ً','ٌ','ٍ','ْ'].map(v=>`<span>${v}</span>`).join('')}</div>`;
     } else if(s.type==='prolong'){
-      prev=`<div class="sess-ar"><span>ي</span><span>و</span><span>ا</span></div>`;
+      prev=`<div class="sess-ar"><span>ي</span><span>ا</span><span>و</span></div>`;
     } else {
       prev=`<div class="sess-ar">${s.letters.map(l=>`<span>${l.ar}</span>`).join('')}</div>`;
     }
@@ -1231,4 +1225,4 @@ var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 </script>
 
 </body>
-</html>
+  </html>
