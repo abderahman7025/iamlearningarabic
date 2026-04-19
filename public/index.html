@@ -431,7 +431,7 @@ const T={
     buy_already:'Déjà un compte ?',
     buy_login:'Se connecter',
     // Intro
-    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم',
     intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
     intro_dua_tr:'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux.',
     intro_dua_tr2:'Seigneur, accroîs mes connaissances.',
@@ -453,7 +453,7 @@ const T={
     vowel_tip:'💡 Lorsque l\'on double une des trois voyelles, on ajoute le son [n]. Lorsque le sukun (°) est sur une lettre, on ne prononce que le son de la lettre.',
     prolong_name:'Les prolongations · الْمُدُود',
     prolong_note:'* La lettre ب est utilisée pour les exemples.',
-    prolong_tip:'Astuce : la dammah ُ est prolongée par le waw و, qui lui ressemble.\nLa fathah َ qui s\'écrit au-dessus de la lettre, est prolongée par le alif ا qui se situe au-dessus de la ligne.\nLa kasrah ِ qui se situe sous la ligne, est prolongée par le ya ي, qui descend sous la ligne aussi.',
+    prolong_tip:'Astuce : la dammah ُ est prolongée par le و, qui lui ressemble.\nLa fathah َ qui s\'écrit au-dessus de la lettre, est prolongée par le ا qui se situe au-dessus de la ligne.\nLa kasrah ِ qui se situe sous la ligne, est prolongée par le ي, qui descend sous la ligne aussi.',
     completion_title:'🎉 Félicitations !',
     completion_msg:'Tu as validé 100% de la formation ! Tu maîtrises maintenant l\'alphabet arabe. Pour consolider tes acquis, mets-toi à l\'épreuve avec le quiz complet de 200 questions.',
     completion_btn:'Lancer le quiz 200 questions ▶',
@@ -1307,3 +1307,520 @@ Tawk_API.onLoad=function(){
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>لنتعلم العربية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --gold:#d4a843;--gold2:#f0c96a;--gold-dim:rgba(212,168,67,.18);
+  --glass:rgba(255,255,255,0.055);--glass2:rgba(255,255,255,0.09);
+  --border:rgba(255,255,255,0.1);--border2:rgba(212,168,67,0.3);
+  --txt:#f5efe0;--txt2:rgba(245,239,224,0.55);--txt3:rgba(245,239,224,0.35);
+  --green:#3ecf7a;--red:#ff5f5f;--blue:#4fc3f7;--orange:#ff8c42;--vowel:#ff9500;
+  --r:18px;--r2:14px;--ff:'Inter',sans-serif;--fa:'Scheherazade New',serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:#060412}
+#root{position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(80,30,140,.55),transparent 60%),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(15,60,100,.6),transparent 60%),#0a0718;font-family:var(--ff);color:var(--txt);display:flex;flex-direction:column}
+#root::before{content:'';position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.025) 1px,transparent 1px);background-size:28px 28px;z-index:0}
+.scr{display:none;flex-direction:column;width:100%;height:100%;position:relative;z-index:1;overflow:hidden}
+.scr.on{display:flex}
+@keyframes zoomIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes zoomOut{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
+@keyframes slideR{from{opacity:0;transform:translateX(52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes flipIn{from{opacity:0;transform:perspective(600px) rotateY(-18deg)}to{opacity:1;transform:perspective(600px) rotateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.tx-zoom-in{animation:zoomIn .38s cubic-bezier(.4,0,.2,1)}
+.tx-zoom-out{animation:zoomOut .38s cubic-bezier(.4,0,.2,1)}
+.tx-slide-r{animation:slideR .36s cubic-bezier(.4,0,.2,1)}
+.tx-slide-l{animation:slideL .36s cubic-bezier(.4,0,.2,1)}
+.tx-slide-up{animation:slideUp .36s cubic-bezier(.4,0,.2,1)}
+.tx-slide-down{animation:slideDown .36s cubic-bezier(.4,0,.2,1)}
+.tx-flip{animation:flipIn .4s cubic-bezier(.4,0,.2,1)}
+.tx-fade{animation:fadeIn .28s ease}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes rp{0%{box-shadow:0 0 0 0 rgba(212,168,67,.6)}100%{box-shadow:0 0 0 26px rgba(212,168,67,0)}}
+@keyframes cfetti{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes pring{0%{box-shadow:0 0 0 0 rgba(62,207,122,.5)}70%{box-shadow:0 0 0 14px rgba(62,207,122,0)}100%{box-shadow:0 0 0 0 rgba(62,207,122,0)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;flex-shrink:0}
+.tb-title{font-size:.9rem;font-weight:600;color:var(--gold);letter-spacing:.3px}
+.tb-back{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--txt2);cursor:pointer;padding:6px 12px;border-radius:20px;background:var(--glass);border:1px solid var(--border);transition:all .2s}
+.sound-dot{width:8px;height:8px;border-radius:50%;background:var(--green);cursor:pointer;transition:background .2s}
+.sound-dot.off{background:var(--txt3)}
+.ca{flex:1;overflow-y:auto;padding:12px 18px 28px;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.ca::-webkit-scrollbar{width:3px}
+.ca::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
+/* LOGIN */
+#s-login{align-items:center;justify-content:center}
+.login-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.login-moon{position:absolute;top:8%;left:8%;font-size:4rem;opacity:.6;animation:float 5s ease-in-out infinite}
+.login-stars{position:absolute;top:6%;right:10%;font-size:1rem;opacity:.6;letter-spacing:14px}
+.mosque-svg{position:absolute;bottom:0;left:0;right:0;opacity:.07}
+.login-box{position:relative;z-index:2;width:min(340px,90vw);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:32px 28px;backdrop-filter:blur(24px);box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.login-ar{font-family:var(--fa);font-size:1.8rem;color:var(--gold);text-align:center;line-height:1.5;margin-bottom:22px}
+.linp{width:100%;padding:13px 16px;border-radius:12px;margin-bottom:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--txt);font-family:var(--ff);font-size:.88rem;outline:none;transition:border-color .2s}
+.linp::placeholder{color:var(--txt3)}.linp:focus{border-color:var(--gold)}
+.lbtn{width:100%;padding:14px;border-radius:50px;border:none;margin-top:6px;background:linear-gradient(135deg,var(--gold),#b8860b);color:#000;font-family:var(--ff);font-size:.92rem;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:all .2s}
+.lbtn:active{transform:scale(.97)}
+.lerr{color:#ff7070;font-size:.74rem;text-align:center;margin-top:8px;min-height:18px}
+/* GLOBE LANG BUTTON */
+.lang-globe-wrap{position:relative;display:inline-flex;justify-content:center;margin-top:16px}
+.lang-globe-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:24px;border:1px solid var(--border2);background:var(--gold-dim);color:var(--gold);font-family:var(--ff);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;backdrop-filter:blur(8px)}
+.lang-globe-btn:active{transform:scale(.96)}
+.lang-globe-btn .globe-icon{font-size:1.1rem}
+.lang-dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#100d20;border:1px solid var(--border2);border-radius:16px;padding:10px;display:none;flex-wrap:wrap;gap:7px;justify-content:center;z-index:200;box-shadow:0 12px 40px rgba(0,0,0,.7);min-width:260px;max-width:320px;backdrop-filter:blur(16px)}
+.lang-dropdown.open{display:flex}
+.lang-chip{padding:6px 13px;border-radius:18px;font-size:.74rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:var(--glass);transition:all .2s;white-space:nowrap}
+.lang-chip:active{transform:scale(.95)}
+.lang-chip.on{background:var(--gold-dim);color:var(--gold);border-color:var(--border2)}
+/* WELCOME */
+#s-welcome{align-items:center;justify-content:center;gap:0;padding:30px 24px}
+.w-ar{font-family:var(--fa);font-size:2.4rem;color:var(--gold);text-align:center;line-height:1.4;margin-bottom:8px;filter:drop-shadow(0 0 24px rgba(212,168,67,.35))}
+.w-sub{font-size:.88rem;color:var(--txt2);margin-bottom:28px;text-align:center}
+.prof-cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px}
+.prof-card{display:flex;align-items:center;gap:16px;padding:18px 22px;border-radius:18px;cursor:pointer;border:1px solid var(--border);background:var(--glass);transition:all .22s;position:relative;overflow:hidden}
+.prof-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s}
+.prof-card:hover{transform:translateX(4px)}.prof-card:active{transform:scale(.98)}
+.prof-card.girl::before{background:linear-gradient(135deg,rgba(255,110,200,.12),transparent)}
+.prof-card.boy::before{background:linear-gradient(135deg,rgba(79,195,247,.12),transparent)}
+.prof-card.adult::before{background:linear-gradient(135deg,rgba(212,168,67,.15),transparent)}
+.prof-card:hover::before{opacity:1}
+.prof-emoji{font-size:2rem;flex-shrink:0}
+.prof-info{flex:1}.prof-name{font-size:1rem;font-weight:700;margin-bottom:2px}.prof-desc{font-size:.76rem;color:var(--txt2)}
+.prof-arrow{color:var(--txt3);font-size:1rem;transition:transform .2s}
+.prof-card:hover .prof-arrow{transform:translateX(4px);color:var(--gold)}
+/* MENU */
+#s-menu{padding:0;overflow-y:auto}
+.menu-header{padding:22px 20px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.menu-logo-ar{font-family:var(--fa);font-size:1.4rem;color:var(--gold)}
+.menu-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8a5c00);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#000}
+.menu-nav{display:flex;flex-direction:column;gap:12px;padding:0 18px 24px}
+.nav-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;cursor:pointer;border:1px solid var(--border);background:var(--glass);transition:all .22s;position:relative;overflow:hidden}
+.nav-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;background:var(--gold);opacity:0;transition:opacity .2s}
+.nav-card:hover{transform:translateX(6px);background:var(--glass2)}.nav-card:hover::after{opacity:1}.nav-card:active{transform:scale(.98)}
+.nav-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+.nav-icon.gold{background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.25)}
+.nav-icon.pink{background:rgba(255,110,200,.12);border:1px solid rgba(255,110,200,.22)}
+.nav-icon.blue{background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.2)}
+.nav-icon.green{background:rgba(62,207,122,.1);border:1px solid rgba(62,207,122,.2)}
+.nav-text{flex:1}.nav-title{font-size:.95rem;font-weight:600;margin-bottom:2px}.nav-desc{font-size:.74rem;color:var(--txt2)}
+.nav-arrow{color:var(--txt3);font-size:.9rem;transition:transform .2s}
+.nav-card:hover .nav-arrow{transform:translateX(4px);color:var(--gold)}
+.menu-bottom{margin:0 18px 20px;padding:14px 18px;border-radius:16px;background:var(--glass);border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mb-score{font-size:.8rem;color:var(--txt2)}.mb-score span{color:var(--gold);font-weight:700;font-size:1rem}
+.mb-actions{display:flex;gap:8px}
+.mb-btn{padding:6px 14px;border-radius:20px;font-size:.74rem;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--txt2);background:var(--glass);transition:all .2s}
+/* CONTENT */
+.p-section{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:16px 18px;margin-bottom:12px}
+.p-sec-title{font-size:.92rem;font-weight:700;color:var(--gold);margin-bottom:10px}
+.p-sec-body{font-size:.82rem;color:var(--txt2);line-height:1.8}
+.dua-box{background:linear-gradient(135deg,rgba(212,168,67,.12),rgba(212,168,67,.04));border:1px solid var(--border2);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:14px}
+.dua-ar{font-family:var(--fa);font-size:1.4rem;color:var(--gold);line-height:2;margin-bottom:10px}
+.dua-tr{font-size:.76rem;color:var(--txt2);font-style:italic;line-height:1.7}
+.info-box{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:13px 15px;font-size:.78rem;color:var(--txt2);line-height:1.65}
+.info-box strong{color:var(--gold)}
+.tip-box{background:rgba(255,200,50,.05);border:1px solid rgba(255,200,50,.18);border-radius:var(--r2);padding:11px 14px;font-size:.76rem;color:var(--txt2);line-height:1.6}
+/* SESSIONS */
+.sess-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sess-card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:14px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.sess-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:3px 0 0 3px}
+.sess-card.c-blue::before{background:var(--blue)}.sess-card.c-orange::before{background:var(--orange)}
+.sess-card.c-both::before{background:linear-gradient(180deg,var(--orange),var(--blue))}
+.sess-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);background:var(--glass2)}
+.sess-card:active{transform:scale(.97)}
+/* FIXED: numéro aligné à gauche, sans cercle */
+.sess-num{font-size:.65rem;font-weight:800;color:var(--txt2);margin-right:5px;flex-shrink:0}
+.sess-title{font-size:.82rem;font-weight:700;margin:6px 0 4px;flex:1;text-align:center}
+.sess-title-row{display:flex;align-items:center;justify-content:flex-start;margin-bottom:5px;gap:0}
+.sess-score{font-size:.68rem;color:var(--gold);margin-left:auto}
+.sess-ar{font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin-top:6px;display:flex;justify-content:space-around;direction:rtl}
+.sess-badge{display:inline-block;font-size:.56rem;padding:2px 7px;border-radius:7px;font-weight:700;margin-top:5px}
+.bd-o{background:rgba(255,140,66,.15);color:var(--orange);border:1px solid rgba(255,140,66,.3)}
+.bd-b{background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.28)}
+/* LESSON */
+.ltabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;direction:rtl}
+.ltab{font-family:var(--fa);font-size:1.35rem;padding:8px 15px;border-radius:11px;background:var(--glass);border:1px solid var(--border);color:var(--txt2);cursor:pointer;transition:all .2s;font-weight:400}
+.ltab.on{background:var(--gold-dim);color:var(--gold);border-color:var(--border2);transform:scale(1.08)}
+.ltab.t-o{border-color:var(--orange)}.ltab.t-b{border-color:var(--blue)}
+.ltab.t-ob{border-color:var(--orange);outline:1px solid var(--blue);outline-offset:1px}
+.lc-layout{display:flex;flex-direction:column;gap:12px}
+.pos-row-wrap{display:flex;gap:10px;direction:rtl;flex-wrap:wrap}
+.pos-c{background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:12px 14px;text-align:center;min-width:74px;flex:1;max-width:110px;cursor:pointer;transition:all .18s}
+.pos-c:active{transform:scale(.94)}
+.pos-lbl{font-size:.52rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;word-break:break-word;hyphens:auto}
+.pos-ar{font-family:var(--fa);font-size:1.9rem;line-height:1.2}
+.gp{color:var(--green)}.badge-row{display:flex;gap:6px;flex-wrap:wrap}
+.bd-big{font-size:.72rem;padding:4px 11px;border-radius:10px;font-weight:700}
+.fab{display:flex;justify-content:center;margin-top:16px;margin-bottom:4px;background:linear-gradient(135deg,var(--gold),#b8860b);color:#000;border:none;border-radius:50px;padding:12px 32px;font-family:var(--ff);font-size:.88rem;font-weight:700;cursor:pointer;box-shadow:0 6px 22px rgba(0,0,0,.4);transition:all .2s;align-self:center}
+.fab:active{transform:scale(.96)}
+/* ORBITAL */
+.orb-wrap{position:relative;width:260px;height:260px;margin:10px auto}
+.orb-ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8a6200);display:flex;align-items:center;justify-content:center;font-family:var(--fa);font-size:2rem;color:#000;cursor:pointer;box-shadow:0 0 22px rgba(212,168,67,.4);z-index:5;transition:all .2s}
+.orb-ctr:active{transform:translate(-50%,-50%) scale(.9)}.orb-ctr.rpl{animation:rp .5s ease}
+.orb-sat{position:absolute;width:46px;height:46px;border-radius:50%;background:var(--glass);border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;gap:1px}
+.orb-sat:active{transform:scale(.85)!important}
+.orb-sat.lit{background:var(--gold-dim);border-color:var(--border2)}
+.orb-sat.lit .orb-ar,.orb-sat.lit .orb-lat{color:var(--gold)}
+.orb-ar{font-family:var(--fa);font-size:.92rem;color:var(--vowel);line-height:1}
+.orb-lat{font-size:.43rem;color:var(--txt2)}
+/* VOWEL */
+.vline-section{background:var(--glass);border:1px solid var(--border);border-radius:var(--r2);padding:14px 8px}
+.wline-wrap{display:flex;align-items:center;gap:8px;margin:5px 0}
+.wline{flex:1;height:2px;background:var(--gold);border-radius:2px}
+.wline-lbl{font-size:.66rem;font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0}
+/* QUIZ */
+.qz-layout{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.qz-q{background:var(--glass);border:1px solid var(--border);border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;min-height:0}
+.qz-a{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.qz-a-row{display:flex;gap:8px}.qz-a-row .ans-btn{flex:1}
+.qz-a-center{display:flex;justify-content:center}.qz-a-center .ans-btn{width:60%;min-width:180px}
+.q-lbl{font-size:.78rem;color:var(--txt2);margin-bottom:8px}
+.q-big{font-family:var(--fa);font-size:3.2rem;color:var(--gold);line-height:1;cursor:pointer}
+.q-big.noclick{cursor:default;pointer-events:none}
+.q-big-vow{font-family:var(--fa);font-size:3.2rem;color:var(--vowel);line-height:1;cursor:pointer}
+.q-big-vow.noclick{cursor:default;pointer-events:none}
+.q-lbtn{background:var(--glass);border:1px solid var(--border);border-radius:22px;padding:7px 16px;color:var(--txt);cursor:pointer;font-size:.76rem;display:inline-flex;align-items:center;gap:5px;margin-top:8px;transition:all .2s}
+.ans-btn{background:var(--glass);border:2px solid var(--border);border-radius:13px;padding:12px;cursor:pointer;font-weight:600;font-size:.85rem;color:var(--txt);transition:all .2s;text-align:center}
+.ans-btn.ar-ans{font-family:var(--fa);font-size:1.5rem}
+.ans-btn:active{transform:scale(.96)}
+.ans-btn.correct{background:rgba(62,207,122,.2);border-color:var(--green);color:#80ffb0;animation:pring .5s ease}
+.ans-btn.wrong{background:rgba(255,95,95,.18);border-color:var(--red);color:#ffb0b0;animation:shake .4s ease}
+.ans-btn.reveal{border-color:var(--green);opacity:.55}
+.rf{padding:7px 12px;border-radius:10px;font-weight:700;font-size:.8rem;display:none;text-align:center;margin-top:6px}
+.rf.on{display:block}.rf.ok{background:rgba(62,207,122,.18);border:1px solid var(--green);color:#80ffb0}
+.rf.bad{background:rgba(255,95,95,.15);border:1px solid var(--red);color:#ffb0b0}
+.qz-prog{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-shrink:0}
+.qpb{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.qpf{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s;border-radius:3px}
+.qs-lbl{font-size:.73rem;color:var(--gold);font-weight:700;white-space:nowrap}
+.res-w{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center}
+.res-c{width:100px;height:100px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.9rem;font-weight:700}
+.rc-p{background:radial-gradient(circle,#3ecf7a,#1a8c4e);box-shadow:0 0 30px rgba(62,207,122,.5)}
+.rc-f{background:radial-gradient(circle,#ff5f5f,#cc2222);box-shadow:0 0 30px rgba(255,95,95,.4)}
+.res-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.rbtn{padding:10px 22px;border-radius:28px;border:none;font-family:var(--ff);font-size:.84rem;font-weight:700;cursor:pointer;transition:all .2s}
+.rbtn-m{background:linear-gradient(135deg,var(--gold),#b8860b);color:#000}
+.rbtn-s{background:var(--glass);color:var(--txt);border:1px solid var(--border)}
+.rbtn:active{transform:scale(.96)}
+/* PROGRESS */
+.pg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pg-c{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.pg-n{font-size:.72rem;font-weight:700;margin-bottom:5px}
+.pg-bw{height:4px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.pg-bf{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .6s}
+.pg-p{font-size:.66rem;color:var(--gold);margin-top:3px;font-weight:700}
+.pg-ov{grid-column:span 2;background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:12px;padding:12px;text-align:center;color:#000;font-weight:700;font-size:.92rem}
+/* SETTINGS */
+.set-row{background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:.82rem}
+.tog{width:38px;height:20px;background:rgba(255,255,255,.12);border-radius:10px;position:relative;cursor:pointer;transition:background .2s}
+.tog.on{background:var(--gold)}
+.tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s}
+.tog.on::after{transform:translateX(18px)}
+/* CONTACT */
+.cform-input{width:100%;padding:12px 14px;border-radius:12px;margin-bottom:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--txt);font-family:var(--ff);font-size:.84rem;outline:none;transition:border-color .2s;resize:vertical}
+.cform-input::placeholder{color:var(--txt3)}.cform-input:focus{border-color:var(--gold)}
+.cform-btn{width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),#b8860b);color:#000;font-family:var(--ff);font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s}
+.cform-btn:disabled{opacity:.5;cursor:not-allowed}.cform-btn:active{transform:scale(.97)}
+.cform-success{background:rgba(62,207,122,.12);border:1px solid rgba(62,207,122,.4);border-radius:14px;padding:20px 16px;text-align:center;color:#7dffb8;font-size:.88rem;line-height:1.9}
+/* BUY */
+#s-buy{align-items:center;justify-content:center}
+#s-register{align-items:center;justify-content:center}
+/* LANG MODAL */
+/* lang-modal removed */
+@media(max-width:420px){.sess-grid,.pg-grid{grid-template-columns:1fr}.pos-row-wrap{justify-content:center}}
+/* TAWK FIX */
+body > div[style*="z-index"],
+body > iframe,
+#tawk-bubble-container,
+[class*="tawk-"],
+[id*="tawk-"],
+iframe[src*="tawk.to"],
+.tawk-min-container,
+.tawk-bubble-container {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  pointer-events: auto !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+</style>
+</head>
+<body>
+<div id="root">
+
+<!-- BUY SCREEN -->
+<div id="s-buy" class="scr on">
+  <div class="login-deco">
+    <div class="login-moon">🌙</div>
+    <div class="login-stars">✦ ✦ ✦</div>
+    <svg class="mosque-svg" viewBox="0 0 800 160" fill="none" stroke="white" stroke-width="1">
+      <rect x="120" y="90" width="560" height="70"/><path d="M350 90 Q400 30 450 90"/>
+      <rect x="160" y="45" width="14" height="45"/><path d="M163 45 Q167 32 171 45"/><circle cx="167" cy="30" r="5"/>
+      <rect x="626" y="45" width="14" height="45"/><path d="M629 45 Q633 32 637 45"/><circle cx="633" cy="30" r="5"/>
+    </svg>
+  </div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;gap:0">
+    <!-- Globe langue page achat -->
+    <div class="lang-globe-wrap" style="margin-bottom:14px">
+      <div class="lang-globe-btn" id="buy-globe-btn" onclick="toggleLangDropdown('buy-lang-dd',event)">
+        <span class="globe-icon">🌍</span><span id="buy-globe-lbl">Français</span><span style="font-size:.7rem;opacity:.7">▾</span>
+      </div>
+      <div class="lang-dropdown" id="buy-lang-dd"></div>
+    </div>
+    <div class="login-box" style="max-width:360px">
+      <div class="login-ar" style="margin-bottom:10px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
+      <div id="buy-desc" style="text-align:center;font-size:.86rem;color:var(--txt2);margin-bottom:20px;line-height:1.6;font-weight:700"></div>
+      <div style="background:linear-gradient(135deg,rgba(212,168,67,.18),rgba(212,168,67,.06));border:1px solid var(--border2);border-radius:16px;padding:16px;text-align:center;margin-bottom:18px">
+        <div id="buy-access-lbl" style="font-size:.72rem;color:var(--txt2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px"></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+          <div id="buy-price-old" style="font-size:1.3rem;font-weight:600;color:var(--txt3);text-decoration:line-through"></div>
+          <div id="buy-price-new" style="font-size:2.4rem;font-weight:800;color:var(--gold)"></div>
+        </div>
+        <div id="buy-payment-lbl" style="font-size:.72rem;color:var(--txt2);margin-top:4px"></div>
+      </div>
+      <div id="buy-features" style="font-size:.76rem;color:var(--txt2);margin-bottom:18px;line-height:1.9;font-weight:600"></div>
+      <input class="linp" type="email" id="buy-email" placeholder="" autocomplete="email">
+      <div class="lerr" id="buy-err"></div>
+      <button class="lbtn" id="buy-btn" onclick="startCheckout()"></button>
+      <div style="text-align:center;margin-top:14px">
+        <span id="buy-already-lbl" style="font-size:.74rem;color:var(--txt2)"></span>
+        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-login-link" onclick="showS('s-login',true)"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER SCREEN -->
+<div id="s-register" class="scr">
+  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+    <div class="login-box" style="max-width:340px">
+      <div style="text-align:center;font-size:2rem;margin-bottom:8px">✅</div>
+      <div style="text-align:center;font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:6px" id="reg-title"></div>
+      <div style="text-align:center;font-size:.78rem;color:var(--txt2);margin-bottom:20px;line-height:1.6" id="reg-sub"></div>
+      <input class="linp" type="email" id="reg-email" placeholder="Email" readonly style="opacity:.6">
+      <input class="linp" type="password" id="reg-pwd" placeholder="" autocomplete="new-password">
+      <input class="linp" type="password" id="reg-pwd2" placeholder="" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+      <button class="lbtn" id="reg-btn" onclick="doRegister()"></button>
+      <div class="lerr" id="reg-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div id="s-login" class="scr">
+  <div class="login-deco">
+    <div class="login-moon">🌙</div>
+    <div class="login-stars">✦ ✦ ✦</div>
+    <svg class="mosque-svg" viewBox="0 0 800 160" fill="none" stroke="white" stroke-width="1">
+      <rect x="120" y="90" width="560" height="70"/><path d="M350 90 Q400 30 450 90"/>
+      <rect x="160" y="45" width="14" height="45"/><path d="M163 45 Q167 32 171 45"/><circle cx="167" cy="30" r="5"/>
+      <rect x="626" y="45" width="14" height="45"/><path d="M629 45 Q633 32 637 45"/><circle cx="633" cy="30" r="5"/>
+    </svg>
+  </div>
+  <div style="position:relative;z-index:2;display:flex;align-items:center;justify-content:center;width:100%;height:100%">
+    <div class="login-box">
+      <div class="login-ar">مَرْحَبًا بِكَ<br><span style="font-size:1.1rem">لِنَتَعَلَّمِ اللُّغَةَ الْعَرَبِيَّة</span></div>
+      <input class="linp" type="email" id="l-email" placeholder="Email" autocomplete="email">
+      <input class="linp" type="password" id="l-pwd" placeholder="" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="lbtn" id="l-btn" onclick="doLogin()"></button>
+      <div class="lerr" id="l-err"></div>
+      <div style="text-align:center;margin-top:14px">
+        <span style="font-size:.74rem;color:var(--txt2)" id="no-account-txt"></span>
+        <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-link-txt" onclick="showS('s-buy',false)"></span>
+      </div>
+      <div class="lang-globe-wrap" style="width:100%;justify-content:center">
+        <div class="lang-globe-btn" id="login-globe-btn" onclick="toggleLangDropdown('login-lang-dd',event)">
+          <span class="globe-icon">🌍</span><span id="login-globe-lbl">Français</span><span style="font-size:.7rem;opacity:.7">▾</span>
+        </div>
+        <div class="lang-dropdown" id="login-lang-dd"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WELCOME SCREEN -->
+<div id="s-welcome" class="scr">
+  <div class="w-ar">مَرْحَبًا بِكَ<br><span style="font-size:1.5rem">لِنَتَعَلَّمِ الْعَرَبِيَّة</span></div>
+  <div class="w-sub" id="w-sub"></div>
+  <div class="prof-cards">
+    <div class="prof-card girl" onclick="chooseProfile('girl')">
+      <div class="prof-emoji">👧</div>
+      <div class="prof-info"><div class="prof-name" id="pb-girl"></div><div class="prof-desc" id="pd-girl"></div></div>
+      <div class="prof-arrow">›</div>
+    </div>
+    <div class="prof-card boy" onclick="chooseProfile('boy')">
+      <div class="prof-emoji">👦</div>
+      <div class="prof-info"><div class="prof-name" id="pb-boy"></div><div class="prof-desc" id="pd-boy"></div></div>
+      <div class="prof-arrow">›</div>
+    </div>
+    <div class="prof-card adult" onclick="chooseProfile('adult')">
+      <div class="prof-emoji">🎓</div>
+      <div class="prof-info"><div class="prof-name" id="pb-adult"></div><div class="prof-desc" id="pd-adult"></div></div>
+      <div class="prof-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU SCREEN -->
+<div id="s-menu" class="scr">
+  <div class="menu-header">
+    <div class="menu-logo-ar">لِنَتَعَلَّم</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="sound-dot" class="sound-dot" onclick="toggleSound()"></div>
+      <div class="menu-avatar" id="m-avatar">A</div>
+    </div>
+  </div>
+  <div class="menu-nav" id="menu-nav"></div>
+  <div class="menu-bottom">
+    <div class="mb-score"><span id="avg-score">0</span>% <span id="score-lbl" style="color:var(--txt2);font-size:.78rem"></span></div>
+    <div class="mb-actions">
+      <div style="position:relative">
+        <div class="mb-btn" id="lang-btn-lbl" onclick="toggleLangDropdown('menu-lang-dd',event)"></div>
+        <div class="lang-dropdown" id="menu-lang-dd" style="top:auto;bottom:calc(100% + 8px)"></div>
+      </div>
+      <div class="mb-btn" onclick="doLogout()" style="color:#ff9090" id="quit-btn-lbl"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT SCREEN -->
+<div id="s-main" class="scr">
+  <div class="topbar">
+    <div class="tb-back" id="tb-back" style="display:none" onclick="handleBack()">‹ <span id="back-lbl"></span></div>
+    <div class="tb-title" id="tb-title"></div>
+    <div class="sound-dot" id="sound-dot2" onclick="toggleSound()"></div>
+  </div>
+  <div class="ca" id="ca"></div>
+</div>
+
+<!-- Lang modal removed - replaced by globe dropdown -->
+
+<script>
+'use strict';
+const API_URL='https://arab-learn-backend.vercel.app';
+const LANGS=[{c:'fr',l:'Français'},{c:'en',l:'English'},{c:'es',l:'Español'},{c:'de',l:'Deutsch'},{c:'nl',l:'Nederlands'},{c:'it',l:'Italiano'},{c:'zh',l:'中文'},{c:'ru',l:'Русский'},{c:'pt',l:'Português'},{c:'tr',l:'Türkçe'}];
+
+const T={
+  fr:{
+    login_btn:'Connexion',
+    email_placeholder:'Email',
+    pwd_placeholder:'Mot de passe',
+    pwd_placeholder2:'Confirmer le mot de passe',
+    pwd_new_placeholder:'Mot de passe (6 car. min)',
+    no_account:'Pas encore de compte ?',buy_access:'Acheter l\'accès',
+    choose:'Choisis ton interface :',
+    girl:'Fille',boy:'Garçon',adult:'Adulte',
+    girl_desc:'Interface rose & douce',boy_desc:'Interface bleue & dynamique',adult_desc:'Interface sobre & complète',
+    sessions:'Leçons',exercises:'Exercices',progress:'Progrès',settings:'Paramètres',
+    intro:'Introduction',contact:'Contact',
+    intro_desc:'Quelques notions importantes.',
+    sessions_desc:'Programme complet et détaillé.',
+    exercises_desc:'Quiz : Plus de 200 questions.',
+    contact_desc:'Besoin d\'aide ou de renseignements.',
+    score_global:'score global',lang_btn:'🌍 Langue',quit:'Quitter',back:'‹ Retour',back_menu:'Retour',
+    // Buy page
+    buy_desc:'Apprenez à lire l\'arabe pas à pas.',
+    buy_access_lbl:'Prix exceptionnel',
+    buy_payment_lbl:'Formation complète',
+    buy_price_old:'149,99 €',
+    buy_price_new:'74,99 €',
+    buy_features:'✓ Accès à vie\n✓ 12 leçons détaillées\n✓ Exercices & Quiz — 200 questions\n✓ Aide 24/7\n✓ 9 langues disponibles\n✓ Mises à jour incluses',
+    buy_email_placeholder:'Votre email',
+    buy_btn:'Acheter l\'accès — 74,99 €',
+    buy_already:'Déjà un compte ?',
+    buy_login:'Se connecter',
+    // Intro
+    intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+    intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
+    intro_dua_tr:'Au nom d\'Allah, le Tout Miséricordieux, le Très Miséricordieux.',
+    intro_dua_tr2:'Seigneur, accroîs mes connaissances.',
+    intro_s1_title:'L\'importance de l\'intention (an-niyyah)',
+    intro_s1:'L\'intention est une des deux conditions capitales pour qu\'une action soit acceptée par Allah ﷻ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n\'étaient pas les mêmes.\n\nLe prophète Muhammad ﷺ a dit : "Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention".',
+    intro_s2_title:'Les fruits de la recherche de la science',
+    intro_s2:'La science est un devoir pour chaque croyant. En effet, Allah n\'accepte pas l\'adoration faite avec ignorance.\n\nAllah ﷻ dit : "Et sache que nulle divinité ne mérite d\'être adoré sauf Allah, et demande pardon pour ton péché, et pour les croyants et croyantes".\n\nAussi, celui qui recherche une science bénéficie de récompenses inestimables.\n\nLe prophète ﷺ a dit : "Celui qui emprunte un chemin par lequel il recherche une science, Allah lui fait prendre, par cela, un chemin vers le paradis."',
+    intro_s3_title:'Allah est l\'unique but du croyant',
+    intro_s3:'Allah a créé les humains avec différentes capacités de compréhension et de mémorisation.\n\nC\'est pourquoi, Allah te questionne plus sur les efforts fournis pour apprendre, que sur le résultat qui ne dépend pas toujours de toi.\n\nAinsi, si tu rencontres quelques difficultés, ne baisse pas les bras, place ta confiance en Allah.\n\nN\'hésite pas à nous contacter, via la rubrique "contact" du menu principal.',
+    contact_title:'Contact',contact_body:'Pour toute question, remarque ou suggestion, veuillez remplir le formulaire de contact.',
+    contact_name:'Votre nom',contact_email:'Votre email',contact_subj:'Sujet',contact_msg:'Votre message',contact_send:'Envoyer',
+    contact_ok:'Votre message a bien été transmis. Un membre de notre équipe va vous répondre rapidement.',
+    contact_return:'Retour au menu principal',
+    lesson_num:'Leçon',cours:'Cours',exercice:'Exercice ▶',
+    back_s:'Leçons',
+    writing_line:'Ligne d\'écriture',
+    vowels_name:'Les voyelles · الحَرَكَات',
+    vowel_intro:'Une voyelle est un petit symbole qui se place sur ou sous une lettre. On prononce la lettre PUIS la voyelle.',
+    vowel_tip:'💡 Lorsque l\'on double une des trois voyelles, on ajoute le son [n]. Lorsque le sukun (°) est sur une lettre, on ne prononce que le son de la lettre.',
+    prolong_name:'Les prolongations · الْمُدُود',
+    prolong_note:'* La lettre ب est utilisée pour les exemples.',
+    prolong_tip:'Astuce : la dammah ُ est prolongée par le و, qui lui ressemble.\nLa fathah َ qui s\'écrit au-dessus de la lettre, est prolongée par le ا qui se situe au-dessus de la ligne.\nLa kasrah ِ qui se situe sous la ligne, est prolongée par le ي, qui descend sous la ligne aussi.',
+    completion_title:'🎉 Félicitations !',
+    completion_msg:'Tu as validé 100% de la formation ! Tu maîtrises maintenant l\'alphabet arabe. Pour consolider tes acquis, mets-toi à l\'épreuve avec le quiz complet de 200 questions.',
+    completion_btn:'Lancer le quiz 200 questions ▶',
+    completion_dismiss:'Fermer',
+    letter_tip2:'Lorsque la lettre est au milieu d\'un mot (ni la première, ni la dernière), elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite).',
+    letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée (seule), en y ajoutant un — avant la lettre (à sa droite).',
+    letter_tip4:'<em>Remarque : seules les lettres ع et غ ne respectent pas les deux derniers points.</em>',
+    letter_tip5a:'<em>Lettre du milieu = Lettre du début + "—"</em>',
+    letter_tip5b:'<em>Lettre de fin = Lettre isolée + "—"</em>',
+    letter_tip_master:'Il est primordial de maîtriser parfaitement la façon d\'écrire la lettre lorsqu\'elle est isolée (seule) et lorsqu\'elle est en début de mot.',
+    ta_marbuta1:'Cette lettre sera TOUJOURS en fin de mot.',
+    ta_marbuta2:'Si elle est précédée d\'une des lettres qui ne s\'attachent pas, on l\'écrira de la façon isolée.',
+    ta_marbuta3:'Dans le cas contraire, on l\'écrira de la façon "fin".',
+    hamza1:'Quelque soit la lettre sur laquelle se trouve le ء, on prononce UNIQUEMENT la voyelle.',
+    hamza2:'Si le ء se trouve sur un ي, on l\'écrit sans les 2 points.',
+    noattach:'Ne s\'attache jamais à la lettre suivante.',heavy:'Lettre grave مُفَخَّمَة',
+    isolated:'ISOLÉE',begin:'Début',middle:'Milieu',end:'Fin',
+    q_read:'Comment prononce-t-on',q_write:'Comment écrit-on le son',
+    pass:'🎉 Bravo ! Tu peux passer à la leçon suivante !',
+    fail:'Tu peux encore faire mieux. Révise et atteins 80% pour continuer.',
+    next_s:'Leçon suivante ▶',retry:'🔄 Réessayer',
+    global_score:'Score global',sound_on:'Son activé',reset:'🗑 Réinitialiser',
+    rappel:'Rappel',
+    ex200_title:'200 Questions · Lecture de mots',
+    ex200_desc:'Lisez ce mot puis écoutez pour vérifier.',
+    ex200_listen:'🔊 Écouter la réponse',
+    ex200_next:'Suivant ▶',ex200_finish:'Terminer',
+    with_alif:'Avec ا',with_waw:'Avec و',with_ya:'Avec ى',
+    payment_ok:'Paiement validé !',payment_sub:'Créez maintenant votre mot de passe.',
+    create_account:'Créer mon compte',
+    err_fields:'Veuillez remplir les champs obligatoires.',
+    err_pwd_match:'Les mots de passe ne correspondent pas.',
+    err_pwd_len:'Le mot de passe doit faire au moins 6 caractères.',
+    err_connection:'Erreur de connexion. Vérifiez votre connexion internet.',
+    connecting:'Connexion…',creating:'Création du compte…',sending:'Envoi en cours…',
+    redirecting:'Redirection vers le paiement…',
+    correct_lbl:'Correct !',
+  },
+  en:{
+    login_btn:'Login',
+    email_placeholder:'Email',
+    pwd_placeholder:'Password',
+    pwd_placeholder2:'Confirm password',
+    pwd_new_placeholder:'Password (min. 6 chars)',
+    no_account:'No account yet?',buy_access:'Buy access',
+    choose:'Choose your interface:',
+    girl:'Girl',boy:'Boy',adult:'Adult',
+    girl_desc:'Pink & soft theme',boy_desc:'Blue & dynamic theme',adult_desc:'Clean & complete theme',
+    sessions:'Sessions',exercises:'Exercises',progress:'Progress',settings:'Settings',
+    intro:'Introduction',contact:'Contact',
+    intro_desc:'Some important notions.',
+    sessions_desc:'Complete and detailed program.',
+    exercises_desc:'Quiz: More than 200 questions.',
+    contact_desc:'Need help or information.',
+    score_global:'global score',lang_btn:'🌍 Language',quit:'Quit',back:'‹ Back',back_menu:'Back',
+    buy_desc:'Learn to read Arabic step by step.',
+    buy_access_lbl:'Exceptional price',
+    buy_payment_lbl:'Complete training',
+    buy_price_old:'149.99 €',
+    buy_price_new:'74.99 €',
+    buy_features:'✓ Lifetime access\n✓ 12 detailed lessons\n
