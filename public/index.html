@@ -228,22 +228,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#060412}
 /* LANG MODAL */
 /* lang-modal removed */
 @media(max-width:420px){.sess-grid,.pg-grid{grid-template-columns:1fr}.pos-row-wrap{justify-content:center}}
-/* TAWK FIX */
-body > div[style*="z-index"],
-body > iframe,
-#tawk-bubble-container,
-[class*="tawk-"],
-[id*="tawk-"],
-iframe[src*="tawk.to"],
-.tawk-min-container,
-.tawk-bubble-container {
-  z-index: 2147483647 !important;
-  position: fixed !important;
-  pointer-events: auto !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
+
 </style>
 </head>
 <body>
@@ -458,12 +443,12 @@ const T={
     completion_msg:'Tu as validé 100% de la formation ! Tu maîtrises maintenant l\'alphabet arabe. Pour consolider tes acquis, mets-toi à l\'épreuve avec le quiz complet de 200 questions.',
     completion_btn:'Lancer le quiz 200 questions ▶',
     completion_dismiss:'Fermer',
-    letter_tip2:'Lorsque la lettre est au milieu d\'un mot, elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite)',
-    letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée (seule), en y ajoutant un — avant la lettre',
+    letter_tip2:'Lorsque la lettre est au milieu d\'un mot, elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite).',
+    letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée, en y ajoutant un — avant la lettre.',
     letter_tip4:'<em>Remarque : Ces points ne sont pas respectés pour ces deux lettres : ع et غ.</em>',
     letter_tip5a:'<em>Conclusion : Lettre du milieu = Lettre du début + "—".</em>',
     letter_tip5b:'<em>Lettre de fin = Lettre isolée + "—".</em>',
-    letter_tip_master:'Il est primordial de maîtriser parfaitement la façon d\'écrire la lettre lorsqu\'elle est isolée (seule) et lorsqu\'elle est en début de mot.',
+    letter_tip_master:'Il est primordial de maîtriser parfaitement la façon d\'écrire la lettre lorsqu\'elle est isolée et lorsqu\'elle est en début de mot.',
     ta_marbuta1:'Cette lettre sera TOUJOURS en fin de mot.',
     ta_marbuta2:'Si elle est précédée d\'une des lettres qui ne s\'attachent pas, on l\'écrira de la façon isolée.',
     ta_marbuta3:'Dans le cas contraire, on l\'écrira de la façon "fin".',
@@ -871,7 +856,7 @@ function speakText(txt,lang,el){
   txt=txt.replace(/\[n\]/g,'n').replace(/\bn\b/g,'n').replace(/« n »/g,'n');
   // Prononciation lettres arabes dans textes non-arabes
   if(lang&&!lang.startsWith('ar')){
-    txt=txt.replace(/:\s*ع\s*et\s*غ\.?/g,'. Conclusion.').replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
+    txt=txt.replace(/:\s*ع\s*et\s*غ\.?/g,'.').replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
            .replace(/ء/g,'hamza').replace(/ي(?!\w)/g,'ya')
            .replace(/ب/g,'ba').replace(/ا/g,'alif')
            .replace(/و/g,'waw').replace(/sukun\s*\(\s*ْ\s*\)/g,'sukun').replace(/sukun\s*\(°\)/g,'soukoun').replace(/ْ/g,'soukoun')
@@ -1101,12 +1086,20 @@ function renderLLesson(ca,s,idx){
     if(isTaMarbuta){tipBox.innerHTML=`<div style="margin-bottom:5px">• ${t('ta_marbuta1')}</div><div style="margin-bottom:5px">• ${t('ta_marbuta2')}</div><div>• ${t('ta_marbuta3')}</div>`;tipBox.style.cursor='pointer';tipBox.title='🔊';tipBox.onclick=function(){speakText(this.textContent,getLang(),this);};layout.appendChild(tipBox);}
     else if(isSASession){tipBox.innerHTML=fullTip;tipBox.style.cursor='pointer';tipBox.title='🔊';tipBox.onclick=function(){speakText(this.textContent,getLang(),this);};layout.appendChild(tipBox);}
     else{
-      const btn=document.createElement('button');btn.style.cssText='background:var(--glass);border:1px solid var(--border);border-radius:20px;color:var(--gold);font-family:var(--ff);font-size:.8rem;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:5px;width:100%;transition:all .2s';
-      const arr=document.createElement('span');arr.style.cssText='transition:transform .2s;display:inline-block';arr.textContent='▶';
-      btn.appendChild(arr);btn.appendChild(document.createTextNode(' '+t('rappel')));
-      const content=document.createElement('div');content.style.cssText='display:none;margin-top:8px;font-size:.76rem;color:var(--txt2);line-height:1.7;cursor:pointer';content.title='🔊';content.innerHTML=fullTip;content.onclick=function(e){if(e.target===btn||e.target===arr)return;speakText(this.textContent,getLang(),this);};
-      let open=false;btn.onclick=()=>{open=!open;content.style.display=open?'block':'none';arr.style.transform=open?'rotate(90deg)':'';};
-      tipBox.appendChild(btn);tipBox.appendChild(content);layout.appendChild(tipBox);
+      if(isAynGhayn){
+        // Pour ع et غ : afficher directement sans bouton Rappel
+        tipBox.innerHTML=fullTip;
+        tipBox.style.cursor='pointer';tipBox.title='🔊';
+        tipBox.onclick=function(){speakText(this.textContent,getLang(),this);};
+        layout.appendChild(tipBox);
+      } else {
+        const btn=document.createElement('button');btn.style.cssText='background:var(--glass);border:1px solid var(--border);border-radius:20px;color:var(--gold);font-family:var(--ff);font-size:.8rem;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:5px;width:100%;transition:all .2s';
+        const arr=document.createElement('span');arr.style.cssText='transition:transform .2s;display:inline-block';arr.textContent='▶';
+        btn.appendChild(arr);btn.appendChild(document.createTextNode(' '+t('rappel')));
+        const content=document.createElement('div');content.style.cssText='display:none;margin-top:8px;font-size:.76rem;color:var(--txt2);line-height:1.7;cursor:pointer';content.title='🔊';content.innerHTML=fullTip;content.onclick=function(e){if(e.target===btn||e.target===arr)return;speakText(this.textContent,getLang(),this);};
+        let open=false;btn.onclick=()=>{open=!open;content.style.display=open?'block':'none';arr.style.transform=open?'rotate(90deg)':'';};
+        tipBox.appendChild(btn);tipBox.appendChild(content);layout.appendChild(tipBox);
+      }
     }
   }
   let orbOrder=[{ar:letter.ar+'َ',lat:'a'},{ar:letter.ar+'َا',lat:'ā'},{ar:letter.ar+'ً',lat:'an'},{ar:letter.ar+'ِ',lat:'i'},{ar:letter.ar+'ِي',lat:'ī'},{ar:letter.ar+'ٍ',lat:'in'},{ar:letter.ar+'ُ',lat:'u'},{ar:letter.ar+'ُو',lat:'ū'},{ar:letter.ar+'ٌ',lat:'un'},{ar:letter.ar+'ْ',lat:'∅'}];
@@ -1286,41 +1279,21 @@ window.onload=()=>{
   if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=()=>{};window.speechSynthesis.getVoices();}
   checkStripeReturn();
   tryAutoLogin();
-  // Forcer Tawk visible au-dessus de #root
-  setTimeout(function(){
-    var els=document.querySelectorAll('[id*="tawk"],[class*="tawk"],iframe[src*="tawk"]');
-    els.forEach(function(el){
-      el.style.zIndex='2147483647';
-      el.style.position='fixed';
-    });
-  },3000);
+
 };
 </script>
 <!-- TAWK.TO LIVE CHAT -->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-Tawk_API.onLoad=function(){
-  // Forcer Tawk au-dessus de tout
-  var frames=document.querySelectorAll('iframe[src*="tawk"]');
-  frames.forEach(function(f){
-    f.style.zIndex='2147483647';
-    f.style.position='fixed';
-    if(f.parentElement){
-      f.parentElement.style.zIndex='2147483647';
-      f.parentElement.style.position='fixed';
-    }
-  });
-};
 (function(){
   var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
   s1.async=true;
-  s1.src="https://embed.tawk.to/69e1eca6e1417a1c35f83c20/1i1qjvvmr";
-  s1.charset="UTF-8";
-  s1.setAttribute("crossorigin","*");
+  s1.src='https://embed.tawk.to/69e1eca6e1417a1c35f83c20/1i1qjvvmr';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
   s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
 
 </body>
   </html>
-
