@@ -453,15 +453,15 @@ const T={
     vowel_tip:'💡 Lorsque l\'on double une des trois voyelles, on ajoute le son [n]. Lorsque le sukun (°) est sur une lettre, on ne prononce que le son de la lettre.',
     prolong_name:'Les prolongations · الْمُدُود',
     prolong_note:'* La lettre ب est utilisée pour les exemples.',
-    prolong_tip:'Astuce : la dammah ُ est prolongée par le waw و, qui lui ressemble.\nLa fathah َ qui s\'écrit au-dessus de la lettre, est prolongée par le alif ا qui se situe au-dessus de la ligne.\nLa kasrah ِ qui se situe sous la ligne, est prolongée par le ya ي, qui descend sous la ligne aussi.',
+    prolong_tip:'💡 La dammah ُ est prolongée par le و, qui lui ressemble.\nLa fathah َ qui s\'écrit au-dessus de la lettre, est prolongée par le ا qui se situe au-dessus de la ligne.\nLa kasrah ِ qui se situe sous la ligne, est prolongée par le ي, qui descend sous la ligne aussi.',
     completion_title:'🎉 Félicitations !',
     completion_msg:'Tu as validé 100% de la formation ! Tu maîtrises maintenant l\'alphabet arabe. Pour consolider tes acquis, mets-toi à l\'épreuve avec le quiz complet de 200 questions.',
     completion_btn:'Lancer le quiz 200 questions ▶',
     completion_dismiss:'Fermer',
-    letter_tip2:'Lorsque la lettre est au milieu d\'un mot (ni la première, ni la dernière), elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite).',
-    letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée (seule), en y ajoutant un — avant la lettre (à sa droite).',
-    letter_tip4:'<em>Remarque : seules les lettres ع et غ ne respectent pas les deux derniers points.</em>',
-    letter_tip5a:'<em>Lettre du milieu = Lettre du début + "—"</em>',
+    letter_tip2:'Lorsque la lettre est au milieu d\'un mot, elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite)',
+    letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée (seule), en y ajoutant un — avant la lettre',
+    letter_tip4:'<em>Remarque : Ces points ne sont pas respectés pour ces deux lettres : ع et غ.</em>',
+    letter_tip5a:'<em>Conclusion : Lettre du milieu = Lettre du début + "—"</em>',
     letter_tip5b:'<em>Lettre de fin = Lettre isolée + "—"</em>',
     letter_tip_master:'Il est primordial de maîtriser parfaitement la façon d\'écrire la lettre lorsqu\'elle est isolée (seule) et lorsqu\'elle est en début de mot.',
     ta_marbuta1:'Cette lettre sera TOUJOURS en fin de mot.',
@@ -868,12 +868,12 @@ function speakText(txt,lang,el){
   txt=txt.replace(/💡\s*/g,'').replace(/[\u{1F300}-\u{1F9FF}]/gu,'').trim();
   if(!txt)return;
   // Remplacements phonétiques
-  txt=txt.replace(/\bn\b/g,'n').replace(/« n »/g,'n');
+  txt=txt.replace(/\[n\]/g,'n').replace(/\bn\b/g,'n').replace(/« n »/g,'n');
   // Prononciation lettres arabes dans textes non-arabes
   if(lang&&!lang.startsWith('ar')){
     txt=txt.replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
            .replace(/ء/g,'hamza').replace(/ي(?!\w)/g,'ya')
-           .replace(/ب/g,'baa').replace(/ا/g,'alif')
+           .replace(/ب/g,'ba').replace(/ا/g,'alif')
            .replace(/و/g,'waw').replace(/sukun\s*\(\s*ْ\s*\)/g,'sukun').replace(/sukun\s*\(°\)/g,'soukoun').replace(/ْ/g,'soukoun')
            .replace(/—/g,' trait horizontal ')
            .replace(/«|»/g,'');
