@@ -853,7 +853,7 @@ function speakText(txt,lang,el){
   txt=txt.replace(/💡\s*/g,'').replace(/[\u{1F300}-\u{1F9FF}]/gu,'').trim();
   if(!txt)return;
   // Remplacements phonétiques
-  txt=txt.replace(/\[n\]/g,'n').replace(/\bn\b/g,'n').replace(/« n »/g,'n');
+  txt=txt.replace(/\[n\]/g,"n'").replace(/\bn\b/g,"n'").replace(/« n »/g,"n'");
   // Prononciation lettres arabes dans textes non-arabes
   if(lang&&!lang.startsWith('ar')){
     txt=txt.replace(/:\s*ع\s*et\s*غ\.?/g,'.').replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
@@ -1282,18 +1282,19 @@ window.onload=()=>{
 
 };
 </script>
-<!-- TAWK.TO LIVE CHAT -->
+<!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 (function(){
-  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-  s1.async=true;
-  s1.src='https://embed.tawk.to/69e1eca6e1417a1c35f83c20/1i1qjvvmr';
-  s1.charset='UTF-8';
-  s1.setAttribute('crossorigin','*');
-  s0.parentNode.insertBefore(s1,s0);
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/69e1eca6e1417a1c35f83c20/1jmd88r52';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
 })();
 </script>
+<!--End of Tawk.to Script-->
 
 </body>
-  </html>
+</html>
