@@ -461,15 +461,15 @@ const T={
     letter_tip2:'Lorsque la lettre est au milieu d\'un mot, elle s\'écrit de la même façon qu\'en début de mot, en y ajoutant un — avant la lettre (à sa droite)',
     letter_tip3:'Si la lettre est en fin de mot, elle s\'écrit exactement comme la lettre isolée (seule), en y ajoutant un — avant la lettre',
     letter_tip4:'<em>Remarque : Ces points ne sont pas respectés pour ces deux lettres : ع et غ.</em>',
-    letter_tip5a:'<em>Conclusion : Lettre du milieu = Lettre du début + "—"</em>',
-    letter_tip5b:'<em>Lettre de fin = Lettre isolée + "—"</em>',
+    letter_tip5a:'<em>Conclusion : Lettre du milieu = Lettre du début + "—".</em>',
+    letter_tip5b:'<em>Lettre de fin = Lettre isolée + "—".</em>',
     letter_tip_master:'Il est primordial de maîtriser parfaitement la façon d\'écrire la lettre lorsqu\'elle est isolée (seule) et lorsqu\'elle est en début de mot.',
     ta_marbuta1:'Cette lettre sera TOUJOURS en fin de mot.',
     ta_marbuta2:'Si elle est précédée d\'une des lettres qui ne s\'attachent pas, on l\'écrira de la façon isolée.',
     ta_marbuta3:'Dans le cas contraire, on l\'écrira de la façon "fin".',
     hamza1:'Quelque soit la lettre sur laquelle se trouve le ء, on prononce UNIQUEMENT la voyelle.',
     hamza2:'Si le ء se trouve sur un ي, on l\'écrit sans les 2 points.',
-    noattach:'Ne s\'attache jamais à la lettre suivante.',heavy:'Lettre grave مُفَخَّمَة',
+    noattach:'Ne s\'attache jamais à la lettre suivante.',ayn_ghayn_tip:'Pour cette lettre, les règles sont légèrement différentes. En effet, les lettres isolée et début s\'écrivent avec une sorte de « c », alors que les lettres milieu et fin s\'écrivent avec une sorte de triangle 🔻.',heavy:'Lettre grave مُفَخَّمَة',
     isolated:'ISOLÉE',begin:'Début',middle:'Milieu',end:'Fin',
     q_read:'Comment prononce-t-on',q_write:'Comment écrit-on le son',
     pass:'🎉 Bravo ! Tu peux passer à la leçon suivante !',
@@ -555,7 +555,7 @@ const T={
     ta_marbuta3:'Otherwise → final form.',
     hamza1:'Whatever letter the ء sits on, you pronounce ONLY the vowel.',
     hamza2:'If ء is on a ي, write it without the 2 dots.',
-    noattach:'Never attaches to the following letter.',heavy:'Heavy letter مُفَخَّمَة',
+    noattach:'Never attaches to the following letter.',ayn_ghayn_tip:'For this letter, the rules are slightly different. Indeed, the isolated and initial forms look like a « c », while the medial and final forms look like a triangle 🔻.',heavy:'Heavy letter مُفَخَّمَة',
     isolated:'ISOLATED',begin:'Start',middle:'Middle',end:'End',
     q_read:'How do you read',q_write:'How do you write the sound',
     pass:'🎉 Well done! Next session unlocked.',
@@ -871,7 +871,7 @@ function speakText(txt,lang,el){
   txt=txt.replace(/\[n\]/g,'n').replace(/\bn\b/g,'n').replace(/« n »/g,'n');
   // Prononciation lettres arabes dans textes non-arabes
   if(lang&&!lang.startsWith('ar')){
-    txt=txt.replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
+    txt=txt.replace(/:\s*ع\s*et\s*غ\.?/g,'. Conclusion.').replace(/ع/g,'ayn').replace(/غ/g,'ghayn')
            .replace(/ء/g,'hamza').replace(/ي(?!\w)/g,'ya')
            .replace(/ب/g,'ba').replace(/ا/g,'alif')
            .replace(/و/g,'waw').replace(/sukun\s*\(\s*ْ\s*\)/g,'sukun').replace(/sukun\s*\(°\)/g,'soukoun').replace(/ْ/g,'soukoun')
@@ -1093,7 +1093,10 @@ function renderLLesson(ca,s,idx){
       posRowWrap.appendChild(pc);
     });
     layout.appendChild(posRowWrap);
-    const fullTip=`<div style="margin-bottom:6px">• ${t('letter_tip_master')}</div><div style="margin-bottom:6px">• ${t('letter_tip2')}</div><div style="margin-bottom:6px">• ${t('letter_tip3')}</div><div style="margin-bottom:6px">${t('letter_tip4')}</div><div style="color:var(--gold);margin-top:8px;line-height:1.9"><div>${t('letter_tip5a')}</div><div>${t('letter_tip5b')}</div></div>`;
+    const isAynGhayn=(letter.ar==='ع'||letter.ar==='غ');
+    const fullTip=isAynGhayn
+      ? `<div style="margin-bottom:6px">${t('ayn_ghayn_tip')}</div>`
+      : `<div style="margin-bottom:6px">• ${t('letter_tip_master')}</div><div style="margin-bottom:6px">• ${t('letter_tip2')}</div><div style="margin-bottom:6px">• ${t('letter_tip3')}</div><div style="margin-bottom:6px">${t('letter_tip4')}</div><div style="color:var(--gold);margin-top:8px;line-height:1.9"><div>${t('letter_tip5a')}</div><div>${t('letter_tip5b')}</div></div>`;
     const tipBox=document.createElement('div');tipBox.className='tip-box';
     if(isTaMarbuta){tipBox.innerHTML=`<div style="margin-bottom:5px">• ${t('ta_marbuta1')}</div><div style="margin-bottom:5px">• ${t('ta_marbuta2')}</div><div>• ${t('ta_marbuta3')}</div>`;tipBox.style.cursor='pointer';tipBox.title='🔊';tipBox.onclick=function(){speakText(this.textContent,getLang(),this);};layout.appendChild(tipBox);}
     else if(isSASession){tipBox.innerHTML=fullTip;tipBox.style.cursor='pointer';tipBox.title='🔊';tipBox.onclick=function(){speakText(this.textContent,getLang(),this);};layout.appendChild(tipBox);}
@@ -1127,62 +1130,75 @@ function mkFAB(s){const b=document.createElement('button');b.className='fab';b.t
 function buildQs(session){
   let qs=[];
   if(session.type==='vowels'){
-    const above=[{sym:'َ',lat:'a',ex:'بَ'},{sym:'ُ',lat:'u',ex:'بُ'},{sym:'ً',lat:'an',ex:'بً'},{sym:'ٌ',lat:'un',ex:'بٌ'},{sym:'ْ',lat:'∅',ex:'بْ'}];
-    const below=[{sym:'ِ',lat:'i',ex:'بِ'},{sym:'ٍ',lat:'in',ex:'بٍ'}];
-    const pool=[...above,...below];
-    for(let i=0;i<12;i++){const v=pool[i%pool.length];if(i%2===0){const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'rv',qDisp:v.sym,qLbl:`${t('q_read')} :`,correct:v.lat,choices:[v.lat,...wrongs.map(x=>x.lat)].sort(()=>Math.random()-.5),speak:v.ex,isVowelQ:true});}else{const wrongs=pool.filter(x=>x.lat!==v.lat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'wv',qDisp:`"${v.lat}"`,qLbl:`${t('q_write')} :`,correct:v.sym,choices:[v.sym,...wrongs.map(x=>x.sym)].sort(()=>Math.random()-.5),speak:v.ex,isArabicAns:true});}}
+    const pool=[
+      {ar:'بَ',lat:'ba'},{ar:'بُ',lat:'bu'},{ar:'بِ',lat:'bi'},
+      {ar:'بً',lat:'ban'},{ar:'بٌ',lat:'bun'},{ar:'بٍ',lat:'bin'},
+      {ar:'بَا',lat:'bā'},{ar:'بُو',lat:'bū'},{ar:'بِي',lat:'bī'},
+      {ar:'بْ',lat:'b (soukoun)'}
+    ];
+    qs=pool.sort(()=>Math.random()-.5);
   } else if(session.type==='prolong'){
-    const p=session.cards;for(let i=0;i<12;i++){const c=p[i%p.length];if(i%2===0){const wrongs=p.filter(x=>x.longLat!==c.longLat).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'rp',qDisp:c.long,qLbl:`${t('q_read')} :`,correct:c.longLat,choices:[c.longLat,...wrongs.map(x=>x.longLat)].sort(()=>Math.random()-.5),speak:c.long});}else{const wrongs=p.filter(x=>x.long!==c.long).sort(()=>Math.random()-.5).slice(0,2);qs.push({type:'wp',qDisp:`"${c.longLat}"`,qLbl:`${t('q_write')} :`,correct:c.long,choices:[c.long,...wrongs.map(x=>x.long)].sort(()=>Math.random()-.5),speak:c.long,isArabicAns:true});}}
+    session.cards.forEach(c=>{qs.push({ar:c.long,lat:c.longLat});});
+    qs=qs.sort(()=>Math.random()-.5);
   } else {
     const seenLetters=session.id===1?session.letters:LS.filter(s=>s.id<=session.id).flatMap(s=>s.letters);
-    for(let i=0;i<12;i++){const letter=seenLetters[Math.floor(Math.random()*seenLetters.length)];const hk=letter.harakat[Math.floor(Math.random()*letter.harakat.length)];const wrongs=seenLetters.filter(l=>l.ar!==letter.ar).sort(()=>Math.random()-.5).slice(0,2);const correctLat=letter.lat+(hk.lat==='∅'?'':hk.lat);const wrongChoices=wrongs.map(l=>{const wh=l.harakat[Math.floor(Math.random()*l.harakat.length)];return l.lat+(wh.lat==='∅'?'':wh.lat);});qs.push({type:'rl',qDisp:hk.ar,qLbl:`${t('q_read')} :`,correct:correctLat,choices:[correctLat,...wrongChoices].sort(()=>Math.random()-.5),speak:hk.ar});}
+    const pool=[];
+    seenLetters.forEach(letter=>{
+      letter.harakat.forEach(hk=>{
+        const lat=letter.lat+(hk.lat==='∅'?'':hk.lat);
+        pool.push({ar:hk.ar,lat:lat});
+      });
+    });
+    const shuffled=pool.sort(()=>Math.random()-.5);
+    qs=shuffled.slice(0,20);
   }
-  return qs.sort(()=>Math.random()-.5);
+  return qs;
 }
 function startExercise(session){
-  st.curLesson=session;document.getElementById('tb-title').textContent=session.emoji+' Quiz';
+  st.curLesson=session;document.getElementById('tb-title').textContent=session.emoji+' '+t('exercice').replace(' ▶','');
   document.getElementById('back-lbl').textContent=t('back_menu');st.backHistory.push({target:'sessions'});
-  st.quiz={qs:buildQs(session),idx:0,correct:0,sessionId:session.id};
-  const ca=document.getElementById('ca');transitionCA(true);ca.scrollTop=0;ca.innerHTML='';renderQuiz(ca);
+  const qs=buildQs(session);
+  const ca=document.getElementById('ca');transitionCA(true);ca.scrollTop=0;ca.innerHTML='';
+  renderAudioExercise(ca,qs,session);
 }
-function renderQuiz(ca){
-  const{qs,idx,correct}=st.quiz;const total=qs.length;
-  if(idx>=total){transitionCA(true);showResult(ca);return;}
-  const q=qs[idx];ca.innerHTML='';
-  const pg=document.createElement('div');pg.className='qz-prog';pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(idx/total)*100}%"></div></div><div class="qs-lbl">${idx}/${total}</div>`;ca.appendChild(pg);
-  const layout=document.createElement('div');layout.className='qz-layout';
-  const qp=document.createElement('div');qp.className='qz-q';const isVQ=q.isVowelQ;
-  qp.innerHTML=`<div class="q-lbl">${q.qLbl||''}</div><div class="${isVQ?'q-big-vow noclick':'q-big'}" ${isVQ?'':'onclick="speak(\''+q.speak+'\',0.78)"'}>${q.qDisp||''}</div>${!isVQ&&q.speak?`<button class="q-lbtn" onclick="speak('${q.speak}',0.78)">🔊 ${t('ex200_listen').replace('🔊 ','')}</button>`:''}<div class="rf" id="rf"></div>`;
-  layout.appendChild(qp);
-  const ap=document.createElement('div');ap.className='qz-a';
-  const mkBtn=ch=>{const b=document.createElement('div');b.className='ans-btn';if(q.isArabicAns)b.classList.add('ar-ans');b.textContent=ch;b.onclick=()=>checkAns(b,ch===q.correct,ap,q.correct,q.speak);return b;};
-  const choices=q.choices.slice(0,3);
-  if(choices.length>=2){const row=document.createElement('div');row.className='qz-a-row';row.appendChild(mkBtn(choices[0]));row.appendChild(mkBtn(choices[1]));ap.appendChild(row);}
-  if(choices.length>=3){const bot=document.createElement('div');bot.className='qz-a-center';bot.appendChild(mkBtn(choices[2]));ap.appendChild(bot);}
-  layout.appendChild(ap);ca.appendChild(layout);
-}
-function checkAns(btn,ok,panel,correctAns,spk){
-  panel.querySelectorAll('.ans-btn').forEach(b=>b.onclick=null);
-  if(ok){btn.classList.add('correct');st.quiz.correct++;if(spk)speak(spk,.75);}
-  else{btn.classList.add('wrong');panel.querySelectorAll('.ans-btn').forEach(b=>{if(b.textContent===correctAns)b.classList.add('reveal');else if(b!==btn)b.style.opacity='.35';});}
-  const rf=document.getElementById('rf');if(rf){rf.className='rf on '+(ok?'ok':'bad');rf.textContent=ok?'✅ '+t('correct_lbl'):'❌ → '+correctAns;}
-  setTimeout(()=>{st.quiz.idx++;const ca=document.getElementById('ca');animEl(ca,'tx-fade');renderQuiz(ca);},1400);
-}
-function showResult(ca){
-  const{correct,qs,sessionId}=st.quiz;const total=qs.length;const pct=Math.round((correct/total)*100);const pass=pct>=80;
-  st.scores[sessionId]=Math.max(st.scores[sessionId]||0,pct);const next=ALL_S.find(s=>s.id===sessionId+1);updateAvgScore();
-  // Check 100% completion
-  if(pass)checkCompletion();
-  ca.innerHTML='';const rw=document.createElement('div');rw.className='res-w';
-  const rc=document.createElement('div');rc.className='res-c '+(pass?'rc-p':'rc-f');rc.innerHTML=`<div>${pct}%</div><div style="font-size:1.1rem">${pass?'🎉':'❌'}</div>`;rw.appendChild(rc);
-  const sn=document.createElement('div');sn.style.cssText='font-weight:700;font-size:1.1rem;margin-top:4px';sn.textContent=`${correct}/${total}`;rw.appendChild(sn);
-  const msg=document.createElement('div');msg.style.cssText='font-size:.84rem;color:var(--txt2);max-width:300px;text-align:center;line-height:1.6;margin-top:6px';msg.textContent=pass?t('pass'):t('fail');rw.appendChild(msg);
-  const rb=document.createElement('div');rb.className='res-btns';
-  if(pass&&next){const btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.innerHTML=t('next_s');btn.onclick=()=>openLesson(next);rb.appendChild(btn);}
-  const retry=document.createElement('button');retry.className='rbtn rbtn-m';retry.innerHTML=t('retry');retry.onclick=()=>startExercise(ALL_S.find(s=>s.id===sessionId));rb.appendChild(retry);
-  const back=document.createElement('button');back.className='rbtn rbtn-s';back.textContent=t('back_s');back.onclick=()=>{st._curPage='sessions';renderPage('sessions',false);};rb.appendChild(back);
-  rw.appendChild(rb);ca.appendChild(rw);
-  if(pass){for(let i=0;i<30;i++){const c=document.createElement('div');const cols=['var(--gold)','#4caf50','#4fc3f7','#ff6ec7','#ffd700','#ff5252'];c.style.cssText=`position:fixed;top:-10px;left:${Math.random()*100}vw;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;background:${cols[i%cols.length]};border-radius:${Math.random()>.5?'50%':'2px'};animation:cfetti ${1.5+Math.random()*2}s ease-in ${Math.random()*.8}s forwards;pointer-events:none;z-index:999;`;document.body.appendChild(c);setTimeout(()=>c.remove(),4000);}}
+function renderAudioExercise(ca,qs,session){
+  const total=qs.length;
+  const ex={idx:0};
+  const hdr=document.createElement('div');
+  hdr.style.cssText='background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:16px;padding:14px 18px;margin-bottom:14px;color:#000;text-align:center;font-weight:800;font-size:1rem';
+  hdr.textContent=session.emoji+' '+t('exercice').replace(' ▶','');
+  function renderQ(){
+    ca.innerHTML='';ca.appendChild(hdr.cloneNode(true));
+    if(ex.idx>=total){
+      const rw=document.createElement('div');rw.className='res-w';
+      rw.innerHTML=`<div style="font-size:2.5rem">🎉</div><div style="font-weight:700;font-size:1.1rem;margin-top:8px">${t('ex200_finish')}</div>`;
+      const rb=document.createElement('div');rb.className='res-btns';
+      const retry=document.createElement('button');retry.className='rbtn rbtn-m';retry.textContent=t('retry');
+      retry.onclick=()=>startExercise(session);rb.appendChild(retry);
+      const back=document.createElement('button');back.className='rbtn rbtn-s';back.textContent=t('back_s');
+      back.onclick=()=>{st._curPage='sessions';renderPage('sessions',false);};rb.appendChild(back);
+      rw.appendChild(rb);ca.appendChild(rw);return;
+    }
+    const q=qs[ex.idx];
+    const pg=document.createElement('div');pg.className='qz-prog';
+    pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(ex.idx/total)*100}%"></div></div><div class="qs-lbl">${ex.idx+1}/${total}</div>`;
+    ca.appendChild(pg);
+    const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:16px;min-height:160px';
+    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;
+    ca.appendChild(qbox);
+    const audioWrap=document.createElement('div');audioWrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px';
+    const audioBtn=document.createElement('button');audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';
+    audioBtn.textContent=t('ex200_listen');
+    const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
+    audioBtn.onclick=()=>{speak(q.ar,.78);audioBtn.style.opacity='.7';nextWrap.style.display='flex';};
+    const latinLbl=document.createElement('div');latinLbl.style.cssText='font-size:1.1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';latinLbl.textContent=q.lat;
+    const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
+    nextBtn.textContent=ex.idx<total-1?t('ex200_next'):t('ex200_finish');
+    nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
+    nextWrap.appendChild(latinLbl);nextWrap.appendChild(nextBtn);
+    audioWrap.appendChild(audioBtn);audioWrap.appendChild(nextWrap);ca.appendChild(audioWrap);
+  }
+  renderQ();
 }
 
 // EXERCISE PAGE — 200 questions audio
@@ -1306,4 +1322,5 @@ Tawk_API.onLoad=function(){
 </script>
 
 </body>
-</html>
+  </html>
+
