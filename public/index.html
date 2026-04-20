@@ -847,6 +847,30 @@ function handleBack(){
 
 // INTRO
 var _lastSpeakEl=null;
+var _speakQueue=[];
+function speakQueue(items,el){
+  // items = [{txt, lang}, ...]
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  if(_lastSpeakEl)_lastSpeakEl.style.opacity='1';
+  _lastSpeakEl=el||null;
+  if(el)el.style.opacity='0.6';
+  _speakQueue=[...items];
+  function playNext(){
+    if(!_speakQueue.length){if(el)el.style.opacity='1';if(_lastSpeakEl===el)_lastSpeakEl=null;return;}
+    const item=_speakQueue.shift();
+    let txt=item.txt.replace(/💡\s*/g,'').trim();
+    if(!txt){playNext();return;}
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=item.lang;u.rate=0.82;u.pitch=1.0;
+    const vs=window.speechSynthesis.getVoices();
+    const v=vs.find(x=>x.lang===u.lang&&!x.localService)||vs.find(x=>x.lang===u.lang)||vs.find(x=>x.lang.startsWith(u.lang.split('-')[0])&&!x.localService)||vs.find(x=>x.lang.startsWith(u.lang.split('-')[0]));
+    if(v)u.voice=v;
+    u.onend=()=>setTimeout(playNext,300);
+    window.speechSynthesis.speak(u);
+  }
+  playNext();
+}
 function speakText(txt,lang,el){
   if(!window.speechSynthesis)return;
   // Enlever l'ampoule et emojis du texte
@@ -892,7 +916,7 @@ function getLang(){const m={'fr':'fr-FR','en':'en-GB','es':'es-ES','de':'de-DE',
 function renderIntro(ca){
   ca.innerHTML=`
     <div style="font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7">🔊 Cliquez sur un texte pour l'écouter</div>
-    <div class="dua-box" onclick="speakText(t('intro_dua')+' '+t('intro_dua2'),'ar-SA',this)" style="cursor:pointer" title="🔊 Cliquer pour écouter">
+    <div class="dua-box" onclick="speakQueue([{txt:t('intro_dua').replace(/اللَّه/g,'الله'),lang:'ar-SA'},{txt:t('intro_dua2'),lang:'ar-SA'},{txt:t('intro_dua_tr'),lang:getLang()},{txt:t('intro_dua_tr2'),lang:getLang()}],this)" style="cursor:pointer" title="🔊 Cliquer pour écouter">
       <div class="dua-ar">${t('intro_dua')}</div>
       <div class="dua-ar" style="font-size:1.2rem;margin-bottom:10px">${t('intro_dua2')}</div>
       <div class="dua-tr" style="border-bottom:1px dashed rgba(255,255,255,0.2)">${t('intro_dua_tr')}</div>
@@ -1184,11 +1208,10 @@ function renderAudioExercise(ca,qs,session){
     audioBtn.textContent=t('ex200_listen');
     const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
     audioBtn.onclick=()=>{speak(q.ar,.78);audioBtn.style.opacity='.7';nextWrap.style.display='flex';};
-    const latinLbl=document.createElement('div');latinLbl.style.cssText='font-size:1.1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';latinLbl.textContent=q.lat;
     const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
     nextBtn.textContent=ex.idx<total-1?t('ex200_next'):t('ex200_finish');
     nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
-    nextWrap.appendChild(latinLbl);nextWrap.appendChild(nextBtn);
+    nextWrap.appendChild(nextBtn);
     audioWrap.appendChild(audioBtn);audioWrap.appendChild(nextWrap);ca.appendChild(audioWrap);
   }
   renderQ();
@@ -1221,11 +1244,10 @@ function renderExPage(ca){
     const audioBtn=document.createElement('button');audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';audioBtn.textContent=t('ex200_listen');
     const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
     audioBtn.onclick=()=>{speak(q.ar,.78);audioBtn.style.opacity='.7';nextWrap.style.display='flex';};
-    const latinLbl=document.createElement('div');latinLbl.style.cssText='font-size:1rem;color:var(--gold);font-weight:700;letter-spacing:.5px';latinLbl.textContent=q.lat;
     const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
     nextBtn.textContent=ex.idx<199?t('ex200_next'):t('ex200_finish');
     nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
-    nextWrap.appendChild(latinLbl);nextWrap.appendChild(nextBtn);
+    nextWrap.appendChild(nextBtn);
     audioWrap.appendChild(audioBtn);audioWrap.appendChild(nextWrap);ca.appendChild(audioWrap);
   }renderQ();
 }
