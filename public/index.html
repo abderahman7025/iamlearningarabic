@@ -861,6 +861,7 @@ function speakQueue(items,el){
     const item=_speakQueue.shift();
     let txt=item.txt.replace(/💡\s*/g,'').trim();
     if(!txt){playNext();return;}
+    if(item.lang&&!item.lang.startsWith('ar'))txt=txt.replace(/Allah/g,'Alla');
     const u=new SpeechSynthesisUtterance(txt);
     u.lang=item.lang;u.rate=0.82;u.pitch=1.0;
     const vs=window.speechSynthesis.getVoices();
