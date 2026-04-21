@@ -1376,17 +1376,40 @@ async function doRegister(){
     else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
   }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
 }
-async function doForgotPassword(){
-  var em=document.getElementById('l-email').value.trim().toLowerCase();
-  var errEl=document.getElementById('l-err');
-  if(!em||!em.includes('@')){errEl.style.color='#ff6b6b';errEl.textContent=t('err_fields');return;}
-  errEl.style.color='var(--green)';errEl.textContent='Envoi...';
+function doForgotPassword(){
+  // Afficher une modale pour saisir l'email
+  var existing=document.getElementById('forgot-modal');
+  if(existing){existing.remove();return;}
+  var modal=document.createElement('div');
+  modal.id='forgot-modal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML='<div style="background:#1a1530;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.8)">'
+    +'<div style="font-weight:700;font-size:1rem;color:var(--gold);margin-bottom:6px;text-align:center">Mot de passe oublie</div>'
+    +'<div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:16px;text-align:center">Entrez votre email pour recevoir un lien de reinitialisation.</div>'
+    +'<input id="forgot-email-input" type="email" placeholder="Votre email" style="width:100%;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:.9rem;margin-bottom:10px;outline:none">'
+    +'<div id="forgot-msg" style="font-size:.76rem;min-height:18px;text-align:center;margin-bottom:8px"></div>'
+    +'<button id="forgot-send-btn" style="width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),#c87a00);color:#000;font-weight:800;font-size:.9rem;cursor:pointer" onclick="sendForgotEmail()">Envoyer</button>'
+    +'<button style="width:100%;padding:10px;border-radius:50px;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;margin-top:6px" onclick="document.getElementById(this.dataset.m).remove()" data-m="forgot-modal">Annuler</button>'
+    +'</div>';
+  document.body.appendChild(modal);
+  setTimeout(function(){var inp=document.getElementById('forgot-email-input');if(inp)inp.focus();},100);
+}
+async function sendForgotEmail(){
+  var em=document.getElementById('forgot-email-input').value.trim().toLowerCase();
+  var msgEl=document.getElementById('forgot-msg');
+  var btn=document.getElementById('forgot-send-btn');
+  if(!em||!em.includes('@')){msgEl.style.color='#ff6b6b';msgEl.textContent='Entrez un email valide.';return;}
+  msgEl.style.color='rgba(255,255,255,.5)';msgEl.textContent='Envoi en cours...';
+  btn.disabled=true;
   try{
     var res=await fetch(API_URL+'/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})});
     var data=await res.json();
-    if(data.success){errEl.style.color='var(--green)';errEl.textContent=t('reset_sent');}
-    else{errEl.style.color='#ff6b6b';errEl.textContent=t('reset_err');}
-  }catch(e){errEl.style.color='#ff6b6b';errEl.textContent=t('err_connection');}
+    if(data.success){
+      msgEl.style.color='var(--green)';msgEl.textContent='Email envoye ! Verifiez votre boite mail.';
+      btn.textContent='Envoye !';
+      setTimeout(function(){var m=document.getElementById('forgot-modal');if(m)m.remove();},3000);
+    }else{msgEl.style.color='#ff6b6b';msgEl.textContent='Email introuvable.';btn.disabled=false;}
+  }catch(e){msgEl.style.color='#ff6b6b';msgEl.textContent='Erreur de connexion.';btn.disabled=false;}
 }
 async function doResetPassword(){
   var p1=document.getElementById('reset-pwd-input').value;
