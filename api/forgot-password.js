@@ -18,30 +18,32 @@ module.exports = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email requis' });
 
-  // Vérifier que l'utilisateur existe
-  const { data: user, error: userError } = await supabase
-    .from('users')
-    .select('id, email')
-    .eq('email', email.toLowerCase())
-    .single();
+  // Chercher dans Supabase Auth
+  const { data: { users }, error } = await supabase.auth.admin.listUsers();
 
-  if (userError || !user) {
+  if (error) {
+    console.error('Supabase auth error:', error);
+    return res.status(500).json({ success: false, error: 'Erreur serveur' });
+  }
+
+  const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+
+  if (!user) {
     return res.status(404).json({ success: false, error: 'Email introuvable' });
   }
 
-  // Générer un token unique
+  // Générer un token
   const token = crypto.randomBytes(32).toString('hex');
-  const expires = new Date(Date.now() + 3600000); // 1 heure
+  const expires = new Date(Date.now() + 3600000);
 
-  // Sauvegarder le token
+  // Sauvegarder dans reset_tokens
   await supabase
     .from('reset_tokens')
     .upsert({ email: email.toLowerCase(), token, expires_at: expires.toISOString() });
 
-  // Lien de reset
   const resetLink = `https://www.iamlearningarabic.com?reset=${token}&email=${encodeURIComponent(email.toLowerCase())}`;
 
-  // Envoyer l'email via Resend API (fetch natif, pas de package)
+  // Envoyer via Resend (fetch natif)
   const emailRes = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -52,25 +54,13 @@ module.exports = async (req, res) => {
       from: 'noreply@iamlearningarabic.com',
       to: email,
       subject: 'Réinitialisation de votre mot de passe',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;background:#0d0b1a;color:#f0ece4;border-radius:16px">
-          <h2 style="color:#f5c842;text-align:center">لِنَتَعَلَّمِ الْعَرَبِيَّة</h2>
-          <p>Bonjour,</p>
-          <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
-          <div style="text-align:center;margin:28px 0">
-            <a href="${resetLink}" style="background:#f5c842;color:#0a0718;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:800;font-size:1rem">
-              Réinitialiser mon mot de passe
-            </a>
-          </div>
-          <p style="color:#888;font-size:12px;text-align:center">Ce lien expire dans 1 heure.<br>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
-        </div>
-      `
+      html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;background:#0d0b1a;color:#f0ece4;border-radius:16px"><h2 style="color:#f5c842;text-align:center">لِنَتَعَلَّمِ الْعَرَبِيَّة</h2><p>Bonjour,</p><p>Vous avez demandé à réinitialiser votre mot de passe.</p><div style="text-align:center;margin:28px 0"><a href="${resetLink}" style="background:#f5c842;color:#0a0718;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:800">Réinitialiser mon mot de passe</a></div><p style="color:#888;font-size:12px;text-align:center">Ce lien expire dans 1 heure.</p></div>`
     })
   });
 
   if (!emailRes.ok) {
-    const errData = await emailRes.json();
-    console.error('Resend error:', errData);
+    const err = await emailRes.json();
+    console.error('Resend error:', err);
     return res.status(500).json({ success: false, error: 'Erreur envoi email' });
   }
 
