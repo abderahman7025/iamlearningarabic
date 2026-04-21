@@ -1,6 +1,7 @@
-// api/reset-password.js - À ajouter dans votre projet Vercel
+// api/reset-password.js
 
 const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcryptjs');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -40,16 +41,16 @@ module.exports = async (req, res) => {
   }
 
   // Hasher le nouveau mot de passe
-  const bcrypt = require('bcryptjs');
   const hashed = await bcrypt.hash(password, 10);
 
-  // Mettre à jour le mot de passe
+  // Mettre à jour password_hash (pas password)
   const { error: updateError } = await supabase
     .from('users')
-    .update({ password: hashed })
+    .update({ password_hash: hashed })
     .eq('email', email.toLowerCase());
 
   if (updateError) {
+    console.error('Update error:', updateError);
     return res.status(500).json({ success: false, error: 'Erreur lors de la mise à jour' });
   }
 
