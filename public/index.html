@@ -988,7 +988,7 @@ const LANGS=[{c:'fr',l:'Français'},{c:'en',l:'English'},{c:'es',l:'Español'},{
 
 const T={
   fr:{
-    login_btn:'Connexion',forgot_pwd:'Mot de passe oublié ?',reset_sent:'Email de réinitialisation envoyé.',reset_err:'Email introuvable.',
+    login_btn:'Connexion',forgot_pwd:'Mot de passe oublié ?',forgot_title:'Mot de passe oublié',forgot_desc:'Entrez votre email pour recevoir un lien de réinitialisation.',forgot_send:'Envoyer',forgot_cancel:'Annuler',forgot_sending:'Envoi...',forgot_ok:'Email envoyé ! Vérifiez votre boîte mail.',reset_sent:'Email de réinitialisation envoyé.',reset_err:'Email introuvable.',
     email_placeholder:'Email',
     pwd_placeholder:'Mot de passe',
     pwd_placeholder2:'Confirmer le mot de passe',
@@ -1078,7 +1078,7 @@ const T={
     correct_lbl:'Correct !',
   },
   en:{
-    login_btn:'Login',forgot_pwd:'Forgot password?',reset_sent:'Reset email sent.',reset_err:'Email not found.',
+    login_btn:'Login',forgot_pwd:'Forgot password?',forgot_title:'Forgot password',forgot_desc:'Enter your email to receive a reset link.',forgot_send:'Send',forgot_cancel:'Cancel',forgot_sending:'Sending...',forgot_ok:'Email sent! Check your inbox.',reset_sent:'Reset email sent.',reset_err:'Email not found.',
     email_placeholder:'Email',
     pwd_placeholder:'Password',
     pwd_placeholder2:'Confirm password',
@@ -1376,20 +1376,24 @@ async function doRegister(){
     else{errEl.textContent=data.error||t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
   }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent=t('create_account');}
 }
+function getDeviceId(){
+  var d=localStorage.getItem('arab_device');
+  if(!d){d='dev_'+Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('arab_device',d);}
+  return d;
+}
 function doForgotPassword(){
-  // Afficher une modale pour saisir l'email
-  var existing=document.getElementById('forgot-modal');
+  var existing=document.getElementById('forgotmodal');
   if(existing){existing.remove();return;}
   var modal=document.createElement('div');
-  modal.id='forgot-modal';
+  modal.id='forgotmodal';
   modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   modal.innerHTML='<div style="background:#1a1530;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:28px 24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.8)">'
-    +'<div style="font-weight:700;font-size:1rem;color:var(--gold);margin-bottom:6px;text-align:center">Mot de passe oublie</div>'
-    +'<div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:16px;text-align:center">Entrez votre email pour recevoir un lien de reinitialisation.</div>'
-    +'<input id="forgot-email-input" type="email" placeholder="Votre email" style="width:100%;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:.9rem;margin-bottom:10px;outline:none">'
+    +'<div style="font-weight:700;font-size:1rem;color:var(--gold);margin-bottom:6px;text-align:center">'+t('forgot_title')+'</div>'
+    +'<div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:16px;text-align:center">'+t('forgot_desc')+'</div>'
+    +'<input id="forgot-email-input" type="email" placeholder="Email" style="width:100%;padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:.9rem;margin-bottom:10px;outline:none">'
     +'<div id="forgot-msg" style="font-size:.76rem;min-height:18px;text-align:center;margin-bottom:8px"></div>'
-    +'<button id="forgot-send-btn" style="width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),#c87a00);color:#000;font-weight:800;font-size:.9rem;cursor:pointer" onclick="sendForgotEmail()">Envoyer</button>'
-    +'<button style="width:100%;padding:10px;border-radius:50px;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;margin-top:6px" onclick="document.getElementById(this.dataset.m).remove()" data-m="forgot-modal">Annuler</button>'
+    +'<button id="forgot-send-btn" style="width:100%;padding:13px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--gold),#c87a00);color:#000;font-weight:800;font-size:.9rem;cursor:pointer" onclick="sendForgotEmail()">'+t('forgot_send')+'</button>'
+    +'<button style="width:100%;padding:10px;border-radius:50px;border:none;background:transparent;color:rgba(255,255,255,.4);font-size:.8rem;cursor:pointer;margin-top:6px" onclick="(function(){var m=document.getElementById(\"forgotmodal\");if(m)m.remove();})()">'+t('forgot_cancel')+'</button>'
     +'</div>';
   document.body.appendChild(modal);
   setTimeout(function(){var inp=document.getElementById('forgot-email-input');if(inp)inp.focus();},100);
@@ -1398,17 +1402,17 @@ async function sendForgotEmail(){
   var em=document.getElementById('forgot-email-input').value.trim().toLowerCase();
   var msgEl=document.getElementById('forgot-msg');
   var btn=document.getElementById('forgot-send-btn');
-  if(!em||!em.includes('@')){msgEl.style.color='#ff6b6b';msgEl.textContent='Entrez un email valide.';return;}
-  msgEl.style.color='rgba(255,255,255,.5)';msgEl.textContent='Envoi en cours...';
+  if(!em||!em.includes('@')){msgEl.style.color='#ff6b6b';msgEl.textContent='Email invalide.';return;}
+  msgEl.style.color='rgba(255,255,255,.5)';msgEl.textContent=t('forgot_sending');
   btn.disabled=true;
   try{
     var res=await fetch(API_URL+'/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em})});
     var data=await res.json();
     if(data.success){
-      msgEl.style.color='var(--green)';msgEl.textContent='Email envoye ! Verifiez votre boite mail.';
-      btn.textContent='Envoye !';
-      setTimeout(function(){var m=document.getElementById('forgot-modal');if(m)m.remove();},3000);
-    }else{msgEl.style.color='#ff6b6b';msgEl.textContent='Email introuvable.';btn.disabled=false;}
+      msgEl.style.color='var(--green)';msgEl.textContent=t('forgot_ok');
+      btn.textContent='Envoyé !';
+      setTimeout(function(){var m=document.getElementById('forgotmodal');if(m)m.remove();},3000);
+    }else{msgEl.style.color='#ff6b6b';msgEl.textContent=t('reset_err');btn.disabled=false;}
   }catch(e){msgEl.style.color='#ff6b6b';msgEl.textContent='Erreur de connexion.';btn.disabled=false;}
 }
 async function doResetPassword(){
@@ -1425,7 +1429,7 @@ async function doResetPassword(){
     var res=await fetch(API_URL+'/api/reset-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:token,email:email,password:p1})});
     var data=await res.json();
     if(data.success){
-      document.getElementById('reset-form-inner').innerHTML='<div style="text-align:center;color:var(--green);padding:20px;line-height:2">Mot de passe modifie !<br><button class="lbtn" style="width:auto;padding:12px 28px;margin-top:10px" onclick="showS(this.getAttribute(\'data-s\'),true)" data-s="s-login">Se connecter</button></div>';
+      document.getElementById('reset-form-inner').innerHTML="<div style='text-align:center;color:var(--green);padding:20px;line-height:2'>Mot de passe modifie !<br><button class='lbtn' style='width:auto;padding:12px 28px;margin-top:10px' onclick='showS(String.fromCharCode(115,45,108,111,103,105,110),true)'>Se connecter</button></div>";
     }else{errEl.textContent=data.error||'Lien expire.';btn.disabled=false;btn.textContent='Modifier';}
   }catch(e){errEl.textContent='Erreur.';btn.disabled=false;btn.textContent='Modifier';}
 }
@@ -1436,7 +1440,7 @@ async function doLogin(){
   if(!em){errEl.textContent=t('err_fields');return;}
   btn.disabled=true;btn.textContent=t('connecting');errEl.textContent='';
   try{
-    const res=await fetch(`${API_URL}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw||'__check_pending__'})});
+    const res=await fetch(`${API_URL}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw||'__check_pending__',device_id:getDeviceId()})});
     const data=await res.json();
     if(data.success){st.user={email:data.email,name:data.email.split('@')[0]};localStorage.setItem('arab_token',data.token);localStorage.setItem('arab_email',data.email);showS('s-welcome',true);}
     else if(data.error&&data.error.includes('non activé')){document.getElementById('reg-email').value=em;const rt=document.getElementById('reg-title');rt.textContent=t('payment_ok');rt.dataset.set='1';const rs=document.getElementById('reg-sub');rs.textContent=t('payment_sub');rs.dataset.set='1';document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);}
@@ -1558,6 +1562,29 @@ function _playFromIdx(idx){
   next();
 }
 
+function speakQueue(items,el){
+  // items = [{txt, lang}, ...]
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  if(_lastSpeakEl)_lastSpeakEl.style.opacity='1';
+  _lastSpeakEl=el||null;
+  if(el)el.style.opacity='0.6';
+  _speakQueue=[...items];
+  function playNext(){
+    if(!_speakQueue.length){if(el)el.style.opacity='1';if(_lastSpeakEl===el)_lastSpeakEl=null;return;}
+    const item=_speakQueue.shift();
+    let txt=_cleanTxt(item.txt,item.lang);
+    if(!txt){playNext();return;}
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang=item.lang;u.rate=0.82;u.pitch=1.0;
+    const vs=window.speechSynthesis.getVoices();
+    const v=vs.find(x=>x.lang===u.lang&&!x.localService)||vs.find(x=>x.lang===u.lang)||vs.find(x=>x.lang.startsWith(u.lang.split('-')[0])&&!x.localService)||vs.find(x=>x.lang.startsWith(u.lang.split('-')[0]));
+    if(v)u.voice=v;
+    u.onend=()=>setTimeout(playNext,300);
+    window.speechSynthesis.speak(u);
+  }
+  playNext();
+}
 function speakText(txt,lang,el){
   if(!window.speechSynthesis)return;
   var now=Date.now();
@@ -1590,6 +1617,20 @@ function stopSpeech(){
   _spkEl=null;_spkPaused=false;_spkChunks=[];_spkIdx=0;
 }
 
+
+function renderIntro(ca){
+  ca.innerHTML=`
+    <div style="font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7">🔊 Cliquez sur un texte pour l'écouter</div>
+    <div class="dua-box" onclick="speakQueue([{txt:t('intro_dua').replace(/اللَّه/g,'الله'),lang:'ar-SA'},{txt:t('intro_dua2'),lang:'ar-SA'},{txt:t('intro_dua_tr'),lang:getLang()},{txt:t('intro_dua_tr2'),lang:getLang()}],this)" style="cursor:pointer" title="🔊 Cliquer pour écouter">
+      <div class="dua-ar">${t('intro_dua')}</div>
+      <div class="dua-ar" style="font-size:1.2rem;margin-bottom:10px">${t('intro_dua2')}</div>
+      <div class="dua-tr" style="border-bottom:1px dashed rgba(255,255,255,0.2)">${t('intro_dua_tr')}</div>
+      <div class="dua-tr" style="margin-top:4px;border-bottom:1px dashed rgba(255,255,255,0.2)">${t('intro_dua_tr2')}</div>
+    </div>
+    <div class="p-section" onclick="speakText(t('intro_s1_title')+'. '+t('intro_s1'),getLang(),this)" style="cursor:pointer" title="🔊 Cliquer pour écouter"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s1').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section" onclick="speakText(t('intro_s2_title')+'. '+t('intro_s2'),getLang(),this)" style="cursor:pointer" title="🔊 Cliquer pour écouter"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s2').replace(/\n\n/g,'<br><br>')}</div></div>
+    <div class="p-section" onclick="speakText(t('intro_s3_title')+'. '+t('intro_s3'),getLang(),this)" style="cursor:pointer" title="🔊 Cliquer pour écouter"><div class="p-sec-title">${t('intro_s3_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s3').replace(/\n\n/g,'<br><br>')}</div></div>`;
+}
 
 // CONTACT
 function renderContact(ca){
@@ -1988,4 +2029,4 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
 
 </body>
-</html>
+  </html>
