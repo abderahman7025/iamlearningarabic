@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>لنتعلم العربية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -19,7 +19,7 @@
   --txt:#f0ece4;--txt2:rgba(240,236,228,0.5);--txt3:rgba(240,236,228,0.28);
   --green:#22d3a0;--red:#ff4d6d;--blue:#38bdf8;--orange:#fb923c;--vowel:#f97316;
   --r:20px;--r2:16px;
-  --ff:'Outfit',sans-serif;--fa:'Tajawal',sans-serif;
+  --ff:'Outfit',sans-serif;--fa:'Scheherazade New',serif;
   --shadow-gold:0 0 40px rgba(245,200,66,.2);
   --shadow-card:0 8px 32px rgba(0,0,0,.4);
 }
@@ -190,7 +190,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   animation:morphIn .5s cubic-bezier(.34,1.2,.64,1);
 }
 .login-ar{
-  font-family:var(--fa);font-size:1.9rem;
+  font-family:'Tajawal',sans-serif;font-size:1.9rem;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   text-align:center;line-height:1.5;margin-bottom:24px;
@@ -261,7 +261,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 /* ── WELCOME ── */
 #s-welcome{align-items:center;justify-content:center;gap:0;padding:30px 24px}
 .w-ar{
-  font-family:var(--fa);font-size:2.6rem;
+  font-family:'Tajawal',sans-serif;font-size:2.6rem;
   background:linear-gradient(135deg,var(--gold),var(--gold2),#fff8dc);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   text-align:center;line-height:1.4;margin-bottom:10px;
@@ -316,7 +316,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;
 }
 .menu-logo-ar{
-  font-family:var(--fa);font-size:1.5rem;
+  font-family:'Tajawal',sans-serif;font-size:1.5rem;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   filter:drop-shadow(0 0 12px rgba(245,200,66,.4));
@@ -443,7 +443,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   transform:translateY(-2px);
 }
 .dua-ar{
-  font-family:var(--fa);font-size:1.5rem;
+  font-family:'Tajawal',sans-serif;font-size:1.5rem;
   background:linear-gradient(135deg,var(--gold),var(--gold2),#fff8dc);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   line-height:2;margin-bottom:10px;
@@ -1540,25 +1540,31 @@ function _playFromIdx(idx){
   _spkIdx=idx;
   _spkPaused=false;
   if(_spkEl)_spkEl.style.opacity='0.6';
-  function next(){
+  function doSpeak(){
     if(_spkPaused||_spkIdx>=_spkChunks.length){
       if(!_spkPaused&&_spkEl){_spkEl.style.opacity='1';_spkEl=null;}
       return;
     }
     var chunk=_spkChunks[_spkIdx++];
-    if(!chunk.trim()){next();return;}
+    if(!chunk.trim()){doSpeak();return;}
     var u=new SpeechSynthesisUtterance(chunk);
     u.lang=_spkLang;u.rate=0.88;u.pitch=1.0;
     var vs=window.speechSynthesis.getVoices();
-    var v=vs.find(function(x){return x.lang===u.lang&&!x.localService;})||
-          vs.find(function(x){return x.lang===u.lang;})||
-          vs.find(function(x){return x.lang.startsWith(u.lang.split('-')[0])&&!x.localService;})||
-          vs.find(function(x){return x.lang.startsWith(u.lang.split('-')[0]);});
-    if(v)u.voice=v;
-    u.onend=function(){setTimeout(next,100);};
+    if(vs&&vs.length){
+      var v=vs.find(function(x){return x.lang===u.lang&&!x.localService;})||
+            vs.find(function(x){return x.lang===u.lang;})||
+            vs.find(function(x){return x.lang.startsWith(u.lang.split('-')[0])&&!x.localService;})||
+            vs.find(function(x){return x.lang.startsWith(u.lang.split('-')[0]);});
+      if(v)u.voice=v;
+    }
+    u.onend=function(){setTimeout(doSpeak,80);};
+    u.onerror=function(){setTimeout(doSpeak,80);};
     window.speechSynthesis.speak(u);
   }
-  next();
+  // Sur Android, les voix se chargent parfois après un délai
+  var vs=window.speechSynthesis.getVoices();
+  if(vs&&vs.length){doSpeak();}
+  else{window.speechSynthesis.onvoiceschanged=function(){doSpeak();window.speechSynthesis.onvoiceschanged=null;};setTimeout(doSpeak,500);}
 }
 
 function speakQueue(items,el){
@@ -2031,4 +2037,4 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
 
 </body>
-  </html>
+                                                                                                                 </html>
