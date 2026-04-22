@@ -117,9 +117,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   letter-spacing:.5px;
 }
 .tb-back{
-  display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--txt);
+  display:flex;align-items:center;gap:6px;font-size:.82rem;color:#b0b0b0;
   cursor:pointer;padding:8px 14px;border-radius:50px;
-  background:rgba(10,7,24,.85);border:1px solid rgba(255,255,255,.25);
+  background:var(--glass2);border:1px solid var(--border);
   backdrop-filter:blur(16px);
   transition:all .25s cubic-bezier(.34,1.56,.64,1);
   position:relative;overflow:hidden;
@@ -519,9 +519,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 }
 .ltab:active{transform:scale(.9);}
 .ltab.on{
-  background:rgba(10,7,24,.92);color:var(--gold);
-  border-color:var(--gold);transform:scale(1.12);
-  box-shadow:0 4px 20px rgba(0,0,0,.5),0 0 0 2px var(--gold),inset 0 1px 0 rgba(245,200,66,.2);
+  background:rgba(245,200,66,.15);color:#b0b0b0;
+  border-color:rgba(245,200,66,.4);transform:scale(1.12);
+  box-shadow:0 4px 20px rgba(245,200,66,.25),inset 0 1px 0 rgba(245,200,66,.2);
 }
 .ltab.t-o{border-color:var(--orange)}
 .ltab.t-b{border-color:var(--blue)}
@@ -1684,10 +1684,8 @@ function renderIntro(ca){
     <div class="dua-box" onclick="speakQueue([{txt:t('intro_dua').replace(/اللَّه/g,'الله'),lang:'ar-SA'},{txt:t('intro_dua2'),lang:'ar-SA'},{txt:t('intro_dua_tr'),lang:getLang()},{txt:t('intro_dua_tr2'),lang:getLang()}],this)" style="cursor:pointer" title="🔊 Cliquer pour écouter">
       <div class="dua-ar">${t('intro_dua')}</div>
       <div class="dua-ar" style="font-size:1.2rem;margin-bottom:10px">${t('intro_dua2')}</div>
-      <div style="background:rgba(10,7,24,.75);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 14px;margin-top:4px">
-        <div class="dua-tr" style="border-bottom:1px dashed rgba(255,255,255,0.15);padding-bottom:6px">${t('intro_dua_tr')}</div>
-        <div class="dua-tr" style="margin-top:6px">${t('intro_dua_tr2')}</div>
-      </div>
+      <div class="dua-tr" style="border-bottom:1px dashed rgba(255,255,255,0.2);color:#b0b0b0">${t('intro_dua_tr')}</div>
+      <div class="dua-tr" style="margin-top:4px;border-bottom:1px dashed rgba(255,255,255,0.2);color:#b0b0b0">${t('intro_dua_tr2')}</div>
     </div>
     <div class="p-section" onclick="speakText(t('intro_s1_title')+'. '+t('intro_s1'),getLang(),this)" style="cursor:pointer" title="🔊 Cliquer pour écouter"><div class="p-sec-title">${t('intro_s1_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s1').replace(/\n\n/g,'<br><br>')}</div></div>
     <div class="p-section" onclick="speakText(t('intro_s2_title')+'. '+t('intro_s2'),getLang(),this)" style="cursor:pointer" title="🔊 Cliquer pour écouter"><div class="p-sec-title">${t('intro_s2_title')}</div><div class="p-sec-body" style="margin-top:8px">${t('intro_s2').replace(/\n\n/g,'<br><br>')}</div></div>
@@ -1830,13 +1828,13 @@ function renderPLesson(ca,s){
   ib.innerHTML=`<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:8px">${t('prolong_name')}</strong><em>${t('prolong_note')}</em>`;ca.appendChild(ib);
   s.cards.forEach(c=>{
     const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;justify-content:center;gap:12px;margin:10px 0;direction:rtl;flex-wrap:wrap;';
-    const mkC=(txt,big,clk)=>{const d=document.createElement('div');d.style.cssText=`width:${big?72:64}px;height:${big?72:64}px;border-radius:50%;border:${big?'2px solid var(--border2)':'1px solid rgba(255,255,255,.25)'};background:rgba(10,7,24,.85);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Scheherazade New',serif;font-size:${big?2.1:1.9}rem;color:var(--txt);`;d.textContent=txt;d.onclick=clk;return d;};
+    const mkC=(txt,big,clk)=>{const d=document.createElement('div');d.style.cssText=`width:${big?72:64}px;height:${big?72:64}px;border-radius:50%;border:${big?'2px solid var(--border2)':'1px solid var(--border)'};background:var(--glass);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Scheherazade New',serif;font-size:${big?2.1:1.9}rem;color:#b0b0b0;`;d.textContent=txt;d.onclick=clk;return d;};
     const baseC=mkC(c.short,false,()=>speak(c.short,.75));const prolongC=mkC(c.let,false,()=>speak(c.let,.75));
     const resultC=mkC(c.long,true,()=>{speak(c.long,.75);resultC.style.boxShadow='0 0 20px rgba(212,168,67,.5)';setTimeout(()=>resultC.style.boxShadow='',700);});
     const lbl=document.createElement('div');lbl.style.cssText='font-size:.68rem;color:var(--txt2);text-align:center;margin-top:3px';lbl.textContent=c.longLat;
     const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center';wrap.appendChild(resultC);wrap.appendChild(lbl);
-    const plus=document.createElement('span');plus.style.cssText='color:var(--txt);font-size:1.4rem;font-weight:bold';plus.textContent='+';
-    const eq=document.createElement('span');eq.style.cssText='color:var(--txt);font-size:1.4rem;font-weight:bold';eq.textContent='=';
+    const plus=document.createElement('span');plus.style.cssText='color:#b0b0b0;font-size:1.2rem;font-weight:bold';plus.textContent='+';
+    const eq=document.createElement('span');eq.style.cssText='color:#b0b0b0;font-size:1.2rem;font-weight:bold';eq.textContent='=';
     row.appendChild(baseC);row.appendChild(plus);row.appendChild(prolongC);row.appendChild(eq);row.appendChild(wrap);ca.appendChild(row);
   });
   const tip=document.createElement('div');tip.className='tip-box';tip.style.marginTop='10px';tip.style.cursor='pointer';tip.title='🔊';tip.onclick=function(){speakText(this.textContent,getLang(),this);};
@@ -2107,4 +2105,4 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
 
 </body>
-        </html>
+  </html>
