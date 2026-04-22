@@ -459,14 +459,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 .info-box strong{color:var(--gold)}
 
 .tip-box{
-  background:rgba(245,200,66,.05);
-  border:1px solid rgba(245,200,66,.15);
+  background:rgba(10,7,24,.75);
+  border:1px solid rgba(255,255,255,.18);
   border-radius:var(--r2);padding:14px 16px;
   font-size:.78rem;color:var(--txt2);line-height:1.7;
   backdrop-filter:blur(12px);
   transition:all .25s;
 }
-.tip-box:hover{border-color:rgba(245,200,66,.3);background:rgba(245,200,66,.08);}
+.tip-box:hover{border-color:rgba(255,255,255,.25);background:rgba(10,7,24,.85);}
 
 /* ── SESSIONS ── */
 .sess-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1741,7 +1741,7 @@ function renderSessions(ca){
     else cardTitle=t('lesson_num')+' '+(idx+1);
     var prev='';
     if(s.type==='vowels'){
-      prev='<div style="font-family:var(--fa);font-size:1.4rem;color:var(--gold);margin:6px 0;direction:rtl;display:flex;gap:6px;justify-content:center">'
+      prev='<div style="font-family:var(--fa);font-size:1.5rem;color:var(--gold);margin:8px 0;direction:rtl;display:flex;justify-content:space-around;align-items:center;width:100%;padding:0 4px">'
         +'<span>َ</span><span>ُ</span><span>ِ</span>'
         +'<span style="opacity:.6">ً</span><span style="opacity:.6">ٌ</span><span style="opacity:.6">ٍ</span>'
         +'<span style="opacity:.5">ْ</span>'
