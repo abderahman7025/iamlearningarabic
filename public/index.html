@@ -628,7 +628,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 
 .q-lbl{font-size:.8rem;color:var(--txt2);margin-bottom:10px}
 .q-big{
-  font-family:var(--fa);font-size:3.5rem;
+  font-family:var(--fa);font-size:clamp(1.6rem,7vw,3.5rem);
   background:linear-gradient(135deg,var(--gold),var(--gold2));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   line-height:1;cursor:pointer;
@@ -1515,18 +1515,24 @@ var _spkIdx=0;
 var _spkLang='fr-FR';
 var _spkEl=null;
 var _spkLastClick=0;
+var _spkCurrentChunkIdx=0;
 
 function _cleanTxt(txt,lang){
   if(!txt)return '';
-  txt=txt.trim();
+  // Supprimer ampoule, triangle rouge, tous emoji
+  // Supprimer emoji ampoule et triangle
+  txt=txt.replace(/💡/g,'').replace(/🔻/g,'').trim();
   if(!txt)return '';
   if(lang&&!lang.startsWith('ar')){
     txt=txt.replace(/Allah/g,'Alla');
-    txt=txt.replace(/ع/g,'ayn').replace(/غ/g,'ghayn');
+    // ع et غ : supprimer completement
+    txt=txt.replace(/:\s*ع\s*et\s*غ[^.]*/g,'.');
+    txt=txt.replace(/ع/g,'').replace(/غ/g,'');
     txt=txt.replace(/ء/g,'hamza').replace(/ب/g,'ba');
     txt=txt.replace(/ا/g,'alif').replace(/و/g,'waw');
     txt=txt.replace(/ي/g,'ya').replace(/ْ/g,'soukoun');
-    txt=txt.replace(/—/g,' ').replace(/«/g,'').replace(/»/g,'');
+    // tiret
+    txt=txt.replace(/—/g,'tiret').replace(/«/g,'').replace(/»/g,'');
     txt=txt.replace('[n]','n');
   }
   if(lang&&lang.startsWith('ar')){
@@ -1535,7 +1541,6 @@ function _cleanTxt(txt,lang){
   }
   return txt;
 }
-
 function _playFromIdx(idx){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
@@ -1547,6 +1552,7 @@ function _playFromIdx(idx){
       if(!_spkPaused&&_spkEl){_spkEl.style.opacity='1';_spkEl=null;}
       return;
     }
+    var currentIdx=_spkIdx;
     var chunk=_spkChunks[_spkIdx++];
     if(!chunk.trim()){doSpeak();return;}
     var u=new SpeechSynthesisUtterance(chunk);
@@ -1559,6 +1565,7 @@ function _playFromIdx(idx){
             vs.find(function(x){return x.lang.startsWith(u.lang.split('-')[0]);});
       if(v)u.voice=v;
     }
+    u.onstart=function(){_spkCurrentChunkIdx=currentIdx;};
     u.onend=function(){setTimeout(doSpeak,80);};
     u.onerror=function(){setTimeout(doSpeak,80);};
     window.speechSynthesis.speak(u);
@@ -1610,7 +1617,7 @@ function speakText(txt,lang,el){
       if(el)el.style.opacity='0.8';
       return;
     }
-    if(_spkPaused){_playFromIdx(_spkIdx);return;}
+    if(_spkPaused){_playFromIdx(_spkCurrentChunkIdx);return;}
   }
   window.speechSynthesis.cancel();
   if(_spkEl&&_spkEl!==el)_spkEl.style.opacity='1';
@@ -1678,38 +1685,48 @@ function showContactSuccess(){
 
 // SESSIONS — FIXED: numéro aligné à gauche, pas de cercle, titre centré
 function renderSessions(ca){
-  ca.innerHTML='';const g=document.createElement('div');g.className='sess-grid';
-  ALL_S.forEach((s,idx)=>{
-    const sc=st.scores[s.id];const c=document.createElement('div');c.className='sess-card';
-    if(s.type==='letter'&&s.id!==1){
-      const hasH=s.letters?.some(l=>l.type==='heavy');const hasNA=s.letters?.some(l=>!l.attaches&&l.ar!=='ة'&&l.ar!=='ء');
-      if(hasH&&hasNA)c.classList.add('c-both');else if(hasH&&!hasNA)c.classList.add('c-blue');else if(hasNA&&!hasH)c.classList.add('c-orange');
-    }
-    let prev='';
-    if(s.type==='vowels'){
-      prev=`<div class="sess-ar">${['َ','ُ','ِ','ً','ٌ','ٍ','ْ'].map(v=>`<span>${v}</span>`).join('')}</div>`;
-    } else if(s.type==='prolong'){
-      prev=`<div class="sess-ar"><span>ا</span><span>و</span><span>ي</span></div>`;
-    } else {
-      prev=`<div class="sess-ar">${s.letters.map(l=>`<span>${l.ar}</span>`).join('')}</div>`;
-    }
-    let bads='';if(s.type==='letter'){if(s.letters?.some(l=>l.type==='heavy'))bads+=`<span class="sess-badge bd-b">مُفَخَّمَة</span>`;}
-    let cardTitle='';
-    if(s.type==='vowels')cardTitle=t('vowels_name');
-    else if(s.type==='prolong')cardTitle=t('prolong_name');
+  ca.innerHTML='';
+  var g=document.createElement('div');
+  g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px;';
+  ALL_S.forEach(function(s,idx){
+    var sc=st.scores[s.id];
+    var c=document.createElement('div');
+    var cardTitle='';
+    if(s.type==='vowels')cardTitle=t('vowels_name').split('·')[0].trim();
+    else if(s.type==='prolong')cardTitle=t('prolong_name').split('·')[0].trim();
     else if(s.id===1)cardTitle=t('lesson_num')+' 2';
     else cardTitle=t('lesson_num')+' '+(idx+1);
-
-    // FIXED layout: numéro à gauche (petit, discret), titre centré, score à droite
-    c.innerHTML=`
-      <div style="display:flex;align-items:center;margin-bottom:4px">
-        <span class="sess-num">${idx+1}</span>
-        <div style="flex:1;text-align:center;font-size:.82rem;font-weight:700">${cardTitle}</div>
-        <div style="font-size:.68rem;color:var(--gold);min-width:32px;text-align:right">${sc!==undefined?'✅ '+sc+'%':''}</div>
-      </div>
-      ${prev}
-      <div style="margin-top:4px">${bads}</div>`;
-    c.onclick=()=>openLesson(s);g.appendChild(c);
+    var prev='';
+    if(s.type==='vowels'){
+      prev='<div style="font-family:var(--fa);font-size:1.3rem;color:var(--vowel);margin:6px 0">َ ُ ِ</div>';
+    } else if(s.type==='prolong'){
+      prev='<div style="font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin:6px 0">ا و ي</div>';
+    } else {
+      var letters=s.letters.slice(0,3).map(function(l){return l.ar;}).join(' ');
+      prev='<div style="font-family:var(--fa);font-size:1.3rem;color:var(--gold);margin:6px 0">'+letters+'</div>';
+    }
+    c.style.cssText='background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:14px 10px;cursor:pointer;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;backdrop-filter:blur(16px);transition:all .35s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+    if(sc!==undefined) c.style.borderColor='rgba(34,211,160,.3)';
+    c.innerHTML='<div style="font-size:.72rem;font-weight:700;color:var(--txt);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px">'+cardTitle+'</div>'+prev+(sc!==undefined?'<div style="font-size:.6rem;color:var(--green);margin-top:2px">✅ '+sc+'%</div>':'');
+    c.onclick=function(){
+      var rect=c.getBoundingClientRect();
+      var clone=c.cloneNode(true);
+      clone.style.cssText=c.style.cssText+'position:fixed;top:'+rect.top+'px;left:'+rect.left+'px;width:'+rect.width+'px;height:'+rect.height+'px;z-index:500;margin:0;transition:all .38s cubic-bezier(.34,1.2,.64,1);';
+      document.body.appendChild(clone);
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          clone.style.top='0px';clone.style.left='0px';
+          clone.style.width='100vw';clone.style.height='100vh';
+          clone.style.borderRadius='0';
+          clone.style.background='var(--glass)';
+          setTimeout(function(){
+            document.body.removeChild(clone);
+            openLesson(s);
+          },360);
+        });
+      });
+    };
+    g.appendChild(c);
   });
   ca.appendChild(g);
 }
@@ -1916,7 +1933,7 @@ function renderAudioExercise(ca,qs,session){
     pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(ex.idx/total)*100}%"></div></div><div class="qs-lbl">${ex.idx+1}/${total}</div>`;
     ca.appendChild(pg);
     const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:16px;min-height:160px';
-    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;
+    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:clamp(1.6rem,7vw,3.5rem);margin:12px 0;direction:rtl">${q.ar}</div>`;
     ca.appendChild(qbox);
     const audioWrap=document.createElement('div');audioWrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px';
     const audioBtn=document.createElement('button');audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';
@@ -1954,7 +1971,7 @@ function renderExPage(ca){
     const q=qs[ex.idx];
     const pg=document.createElement('div');pg.className='qz-prog';pg.innerHTML=`<div class="qpb"><div class="qpf" style="width:${(ex.idx/200)*100}%"></div></div><div class="qs-lbl">${ex.idx}/200</div>`;ca.appendChild(pg);
     const qbox=document.createElement('div');qbox.className='qz-q';qbox.style.cssText='margin-bottom:16px;min-height:160px';
-    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:3.5rem;margin:12px 0">${q.ar}</div>`;ca.appendChild(qbox);
+    qbox.innerHTML=`<div class="q-lbl">${t('ex200_desc')}</div><div class="q-big" style="font-size:clamp(1.6rem,7vw,3.5rem);margin:12px 0;direction:rtl">${q.ar}</div>`;ca.appendChild(qbox);
     const audioWrap=document.createElement('div');audioWrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:8px';
     const audioBtn=document.createElement('button');audioBtn.className='fab';audioBtn.style.cssText='font-size:1rem;padding:14px 36px;';audioBtn.textContent=t('ex200_listen');
     const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
@@ -2039,4 +2056,4 @@ s0.parentNode.insertBefore(s1,s0);
 <!--End of Tawk.to Script-->
 
 </body>
-</html>
+  </html>
