@@ -1,0 +1,21 @@
+{
+  "name": "I Am Learning Arabic",
+  "short_name": "Arabic",
+  "description": "Apprends l'arabe facilement",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0718",
+  "theme_color": "#0a0718",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230a0718'/><text x='256' y='340' text-anchor='middle' font-size='280' font-family='serif' fill='%23f5c842'>ع</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"],
+  "screenshots": []
+}
