@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   const urls = {};
   if (data) {
     data.forEach(file => {
-      const ar = decodeURIComponent(file.name.replace('.webm', ''));
+      const ar = Buffer.from(file.name.replace('.webm', ''), 'hex').toString('utf8');
       const { data: urlData } = supabase.storage
         .from('audio')
         .getPublicUrl(file.name);
