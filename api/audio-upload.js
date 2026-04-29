@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
 
   const base64Data = audioBase64.replace(/^data:audio\/\w+;base64,/, '');
   const buffer = Buffer.from(base64Data, 'base64');
-  const fileName = encodeURIComponent(ar) + '.webm';
+  const fileName = Buffer.from(ar).toString('hex') + '.webm';
 
   const { error } = await supabase.storage
     .from('audio')
