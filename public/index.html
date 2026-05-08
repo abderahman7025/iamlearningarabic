@@ -1166,6 +1166,10 @@ body {
   background:rgba(255,80,80,.15);
   color:#ff6060;
 }
+.bonus-title-ar{font-size:.92rem;}
+@media(min-width:601px){.bonus-title-ar{font-size:1.08rem!important;}}
+.bonus-title-lat{font-size:.92rem;}
+@media(max-width:600px){.bonus-title-lat{font-size:.77rem!important;}}
 
 </style>
 
@@ -2818,7 +2822,9 @@ function renderBonus(ca){
     c.className='sess-card';
     c.style.cssText='min-height:116px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;padding:10px 6px;';
     var isEmoji=(lesson.preview==='🌙');
-    c.innerHTML='<div style="font-size:.92rem;font-weight:700;color:var(--txt);margin-bottom:6px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">'+lesson.title()+'</div>'
+    var titleClass=isEmoji?'bonus-title-lat':'bonus-title-ar';
+    var titleMb=(idx===0)?'16px':'6px';
+    c.innerHTML='<div class="'+titleClass+'" style="font-weight:700;color:var(--txt);margin-bottom:'+titleMb+';line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">'+lesson.title()+'</div>'
       +'<div style="font-family:\'Scheherazade New\',serif;font-size:'+(isEmoji?'2.5rem':'3rem')+';color:'+pcHex+';direction:rtl;margin:4px 0;line-height:1.1">'+lesson.preview+'</div>';
     c.onclick=(function(l){return function(){
       // Animation zoom comme sessions
@@ -2895,8 +2901,10 @@ function renderBonusSoukoune(ca, pc, pcHex){
   box.appendChild(img1);
   [{c:'rgba(168,85,247,.4)',key:'bonus_s1_violet'},{c:'rgba(234,179,8,.4)',key:'bonus_s1_jaune'},{c:'rgba(244,114,182,.4)',key:'bonus_s1_rose'}].forEach(function(item){
     var d=document.createElement('div');
-    d.style.cssText='background:'+item.c+';border-radius:10px;padding:10px 12px;font-size:.88rem;margin:5px 0;';
+    d.style.cssText='background:'+item.c+';border-radius:10px;padding:10px 12px;font-size:.88rem;margin:5px 0;cursor:pointer;';
     d.textContent=t(item.key);
+    d.title='🔊';
+    d.onclick=(function(k,el){return function(){speakText(t(k),getLang(),el);};})(item.key,d);
     box.appendChild(d);
   });
 }
