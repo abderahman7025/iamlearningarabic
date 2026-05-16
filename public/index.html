@@ -2196,26 +2196,26 @@ body.profile-adult, #root.profile-adult {
   100% { transform: translate(-20vw, 4vh) rotate(520deg); opacity:0; }
 }
 
-/* 🦄 Licorne : vient de droite, s'envole en arc vers la gauche (retournée) */
+/* 🦄 Licorne : vient de droite, vole vers la gauche (emoji déjà orienté gauche) */
 @keyframes unicornFly {
-  0%   { transform: translate(118vw,  6vh) scaleX(-1) rotate( 5deg) scale(0.7); opacity:0; }
+  0%   { transform: translate(118vw,  6vh) rotate( 5deg) scale(0.7); opacity:0; }
   7%   { opacity:1; }
-  25%  { transform: translate(80vw,  -2vh) scaleX(-1) rotate( 3deg) scale(1);   opacity:1; }
-  50%  { transform: translate(50vw,  -7vh) scaleX(-1) rotate( 0deg) scale(1.1); opacity:1; }
-  75%  { transform: translate(20vw,  -2vh) scaleX(-1) rotate(-3deg) scale(1);   opacity:1; }
+  25%  { transform: translate(80vw,  -2vh) rotate( 3deg) scale(1);   opacity:1; }
+  50%  { transform: translate(50vw,  -7vh) rotate( 0deg) scale(1.1); opacity:1; }
+  75%  { transform: translate(20vw,  -2vh) rotate(-3deg) scale(1);   opacity:1; }
   93%  { opacity:1; }
-  100% { transform: translate(-20vw,  5vh) scaleX(-1) rotate(-6deg) scale(0.7); opacity:0; }
+  100% { transform: translate(-20vw,  5vh) rotate(-6deg) scale(0.7); opacity:0; }
 }
 
-/* 🚀 Fusée : droite vers le haut, taille normale jusqu'au milieu puis rétrécit */
+/* 🚀 Fusée : monte droit vers le haut, rétrécit à partir du milieu */
 @keyframes rocketLaunch {
-  0%   { transform: translateY(110vh) rotate(-45deg) scale(1.4); opacity:0; }
+  0%   { transform: translateY(110vh) scale(1.4); opacity:0; }
   6%   { opacity:1; }
-  48%  { transform: translateY(5vh)   rotate(-45deg) scale(1.3); opacity:1; }
-  52%  { transform: translateY(-5vh)  rotate(-45deg) scale(1.1); opacity:1; }
-  75%  { transform: translateY(-55vh) rotate(-45deg) scale(0.5); opacity:1; }
+  48%  { transform: translateY(5vh)   scale(1.3); opacity:1; }
+  52%  { transform: translateY(-5vh)  scale(1.1); opacity:1; }
+  75%  { transform: translateY(-55vh) scale(0.5); opacity:1; }
   92%  { opacity:0.5; }
-  100% { transform: translateY(-115vh) rotate(-45deg) scale(0.05); opacity:0; }
+  100% { transform: translateY(-115vh) scale(0.05); opacity:0; }
 }
 
 /* ⚡ Éclair : flash vertical intense, disparaît */
@@ -2262,7 +2262,8 @@ body.profile-boy #boy-bg-anim {
 }
 #boy-bg-anim .bg-rocket {
   position:fixed;font-size:2.6rem;opacity:.5;
-  transform-origin:center bottom;
+  transform-origin:center center;
+  rotate: -45deg;
   animation:rocketLaunch 7s linear infinite;
   animation-delay:var(--del,0s);
 }
