@@ -2173,67 +2173,64 @@ body.profile-adult, #root.profile-adult {
 
 /* C. Fond animé étoiles/papillons fille, fusées/éclairs garçon */
 /* Papillon : vol en zigzag ondulant */
+/* 🦋 Papillon : vient de gauche, zigzag ondulant vers la droite, se retourne */
 @keyframes butterflyFly {
-  0%   { transform: translate(0px, 0px) rotate(-10deg) scaleX(1); opacity:0; }
-  5%   { opacity: 1; }
-  20%  { transform: translate(35px, -45px) rotate(15deg) scaleX(-1); }
-  35%  { transform: translate(15px, -25px) rotate(-8deg) scaleX(1); }
-  50%  { transform: translate(55px, -75px) rotate(20deg) scaleX(-1); }
-  65%  { transform: translate(30px, -55px) rotate(-12deg) scaleX(1); }
-  80%  { transform: translate(70px, -100px) rotate(18deg) scaleX(-1); }
-  95%  { opacity: 0.8; }
-  100% { transform: translate(45px, -130px) rotate(5deg) scaleX(1); opacity:0; }
+  0%   { transform: translate(-15vw, 0px) scaleX(1);   opacity:0; }
+  5%   { opacity:1; }
+  15%  { transform: translate(8vw,  -5vh) scaleX(-1);  opacity:1; }
+  30%  { transform: translate(25vw,  3vh) scaleX(1);   opacity:1; }
+  45%  { transform: translate(45vw, -6vh) scaleX(-1);  opacity:1; }
+  60%  { transform: translate(63vw,  4vh) scaleX(1);   opacity:1; }
+  75%  { transform: translate(82vw, -4vh) scaleX(-1);  opacity:1; }
+  92%  { opacity:1; }
+  100% { transform: translate(115vw, 2vh) scaleX(1);   opacity:0; }
 }
 
-/* Ballon de foot : trajectoire parabolique + rotation (comme un tir) */
+/* ⚽ Ballon : vient de droite, sort à gauche, trajectoire en arc léger + rotation */
 @keyframes footballKick {
-  0%   { transform: translate(0px, 60px) rotate(0deg); opacity:0; }
-  5%   { opacity: 1; }
-  25%  { transform: translate(50px, -60px) rotate(150deg); }
-  50%  { transform: translate(110px, -20px) rotate(300deg); }
-  65%  { transform: translate(130px, 40px) rotate(380deg); }
-  75%  { transform: translate(125px, 10px) rotate(400deg); }
-  85%  { transform: translate(135px, 35px) rotate(420deg); }
-  100% { transform: translate(140px, 50px) rotate(450deg); opacity:0; }
+  0%   { transform: translate(110vw, 0px) rotate(0deg);   opacity:0; }
+  4%   { opacity:1; }
+  30%  { transform: translate(70vw, -6vh) rotate(200deg); opacity:1; }
+  60%  { transform: translate(30vw,  2vh) rotate(380deg); opacity:1; }
+  92%  { opacity:1; }
+  100% { transform: translate(-20vw, 4vh) rotate(520deg); opacity:0; }
 }
 
-/* Licorne : envol gracieux en arc montant */
+/* 🦄 Licorne : vient de gauche, s'envole en arc vers la droite */
 @keyframes unicornFly {
-  0%   { transform: translate(-20px, 80px) rotate(-15deg) scale(0.6); opacity:0; }
-  10%  { opacity: 1; }
-  30%  { transform: translate(20px, 20px) rotate(-8deg) scale(1); }
-  55%  { transform: translate(50px, -30px) rotate(0deg) scale(1.1); }
-  75%  { transform: translate(80px, -15px) rotate(5deg) scale(1); }
-  90%  { opacity: 0.8; }
-  100% { transform: translate(110px, -60px) rotate(10deg) scale(0.8); opacity:0; }
+  0%   { transform: translate(-20vw,  6vh) rotate(-5deg) scale(0.7); opacity:0; }
+  7%   { opacity:1; }
+  25%  { transform: translate(20vw,  -2vh) rotate(-3deg) scale(1);   opacity:1; }
+  50%  { transform: translate(50vw,  -7vh) rotate( 0deg) scale(1.1); opacity:1; }
+  75%  { transform: translate(80vw,  -2vh) rotate( 3deg) scale(1);   opacity:1; }
+  93%  { opacity:1; }
+  100% { transform: translate(118vw,  5vh) rotate( 6deg) scale(0.7); opacity:0; }
 }
 
-/* Fusée : décollage diagonal rapide */
+/* 🚀 Fusée : vient du bas, monte en haut en rétrécissant (perspective), trajectoire droite */
 @keyframes rocketLaunch {
-  0%   { transform: translate(0px, 120px) rotate(-45deg) scale(0.4); opacity:0; }
-  8%   { opacity: 1; transform: translate(10px, 80px) rotate(-45deg) scale(0.7); }
-  30%  { transform: translate(40px, 20px) rotate(-45deg) scale(1); }
-  70%  { transform: translate(80px, -80px) rotate(-50deg) scale(1); }
-  90%  { opacity: 0.6; }
-  100% { transform: translate(110px, -160px) rotate(-55deg) scale(0.8); opacity:0; }
+  0%   { transform: translateY(110vh) scale(1.5); opacity:0; }
+  6%   { opacity:1; }
+  90%  { opacity:1; }
+  100% { transform: translateY(-115vh) scale(0.1); opacity:0; }
 }
 
-/* Éclair : flash brutal et disparition */
+/* ⚡ Éclair : flash vertical intense, disparaît */
 @keyframes lightningStrike {
-  0%,100% { opacity:0; transform: scaleY(0.2) skewX(10deg); }
-  3%  { opacity:1; transform: scaleY(1.3) skewX(-5deg); }
-  6%  { opacity:0.2; }
-  9%  { opacity:1; transform: scaleY(1) skewX(8deg); }
-  15% { opacity:0; }
+  0%,100%  { opacity:0; transform:scaleY(0.3) skewX(15deg); }
+  3%  { opacity:1; transform:scaleY(1.4) skewX(-8deg); }
+  6%  { opacity:0.1; }
+  9%  { opacity:1; transform:scaleY(1)  skewX(10deg); }
+  14% { opacity:0; }
 }
 
-/* Étoile rose : scintillement + rotation douce */
+/* ⭐ Étoile : scintille et dérive lentement vers le haut */
 @keyframes starTwinkle {
-  0%   { transform: translateY(0px) rotate(0deg) scale(1); opacity:0.6; }
-  25%  { transform: translateY(-15px) rotate(45deg) scale(1.3); opacity:1; }
-  50%  { transform: translateY(-8px) rotate(90deg) scale(0.9); opacity:0.7; }
-  75%  { transform: translateY(-20px) rotate(135deg) scale(1.2); opacity:1; }
-  100% { transform: translateY(0px) rotate(180deg) scale(1); opacity:0.6; }
+  0%   { transform: translateY(0px)   rotate(0deg)   scale(1);   opacity:0.5; }
+  25%  { transform: translateY(-12px) rotate(45deg)  scale(1.3); opacity:1;   }
+  50%  { transform: translateY(-5px)  rotate(90deg)  scale(0.85);opacity:0.6; }
+  75%  { transform: translateY(-18px) rotate(135deg) scale(1.2); opacity:1;   }
+  100% { transform: translateY(0px)   rotate(180deg) scale(1);   opacity:0.5; }
 }
 
 #girl-bg-anim, #boy-bg-anim {
@@ -2247,32 +2244,33 @@ body.profile-boy #boy-bg-anim {
 }
 #girl-bg-anim .bg-star {
   position:absolute;font-size:2.8rem;opacity:.6;
-  animation:starTwinkle 3s ease-in-out infinite;
+  animation:starTwinkle 4s ease-in-out infinite;
   animation-delay:var(--del,0s);
 }
 #girl-bg-anim .bg-butterfly {
-  position:absolute;font-size:2.5rem;opacity:.5;
-  animation:butterflyFly 5s ease-in-out infinite;
+  position:fixed;font-size:2.5rem;opacity:.5;
+  animation:butterflyFly 12s linear infinite;
   animation-delay:var(--del,0s);
 }
 #girl-bg-anim .bg-unicorn {
-  position:absolute;font-size:3.5rem;opacity:.5;
-  animation:unicornFly 6s ease-in-out infinite;
+  position:fixed;font-size:3.5rem;opacity:.5;
+  animation:unicornFly 14s linear infinite;
   animation-delay:var(--del,0s);
 }
 #boy-bg-anim .bg-rocket {
-  position:absolute;font-size:2.6rem;opacity:.5;
-  animation:rocketLaunch 3.5s ease-in infinite;
+  position:fixed;font-size:2.6rem;opacity:.5;
+  transform-origin:center bottom;
+  animation:rocketLaunch 7s linear infinite;
   animation-delay:var(--del,0s);
 }
 #boy-bg-anim .bg-lightning {
   position:absolute;font-size:2.8rem;opacity:0;
-  animation:lightningStrike 4s linear infinite;
+  animation:lightningStrike 5s linear infinite;
   animation-delay:var(--del,0s);
 }
 #boy-bg-anim .bg-football {
-  position:absolute;font-size:3.2rem;opacity:.5;
-  animation:footballKick 4s ease-in-out infinite;
+  position:fixed;font-size:3.2rem;opacity:.5;
+  animation:footballKick 10s linear infinite;
   animation-delay:var(--del,0s);
 }
 
@@ -5927,102 +5925,89 @@ function getEncouragementMsg(profile) {
 
 /* C. Fond animé — génération des éléments flottants */
 function initChildBgAnim() {
-  // Helper : position X distribuée uniformément avec offset aléatoire ±8%
-  function spreadX(basePositions) {
-    return basePositions.map(function(base) {
-      return Math.min(90, Math.max(2, base + (Math.random() * 16 - 8)));
-    });
-  }
-
-  // Fille : étoiles + papillons + licornes
+  // Fille : étoiles (fixes) + papillons (traversée gauche→droite) + licornes (traversée gauche→droite)
   var girlBg = document.getElementById('girl-bg-anim');
   if (girlBg && girlBg.children.length === 0) {
+    // 6 étoiles : position fixe, animation sur place
     var stars = ['⭐','🌸','✨','💫','🌟','⭐'];
-    // 6 étoiles : positions de base ~5,22,45,62,80,92 — bien espacées
-    var starBaseX = [5, 22, 45, 62, 80, 92];
-    var starX = spreadX(starBaseX);
+    var starPosX = [5, 22, 45, 62, 80, 92];
     var starDelays = [0, 0.5, 1.0, 1.5, 2.0, 2.5];
     for (var i = 0; i < 6; i++) {
       var s = document.createElement('span');
       s.className = 'bg-star';
       s.textContent = stars[i % stars.length];
-      s.style.left = starX[i] + '%';
+      s.style.left = starPosX[i] + '%';
       s.style.top = (10 + Math.random() * 70) + '%';
       s.style.setProperty('--del', starDelays[i] + 's');
       girlBg.appendChild(s);
     }
 
-    // 3 papillons : positions de base ~10,40,70
+    // 3 papillons : traversée gauche→droite, top distribué, delay échelonné (12s/3 = 4s)
     var butterflies = ['🦋','🌺','🌷'];
-    var bfBaseX = [10, 40, 70];
-    var bfX = spreadX(bfBaseX);
-    var bfDelays = [0, 1.5, 3.0];
+    var bfTops = [15, 45, 72];
+    var bfDelays = [0, 4, 8];
     for (var j = 0; j < 3; j++) {
       var b = document.createElement('span');
       b.className = 'bg-butterfly';
       b.textContent = butterflies[j % butterflies.length];
-      b.style.left = bfX[j] + '%';
-      b.style.top = (20 + Math.random() * 50) + '%';
+      b.style.left = '0';
+      b.style.top = bfTops[j] + '%';
       b.style.setProperty('--del', bfDelays[j] + 's');
       girlBg.appendChild(b);
     }
 
-    // 3 licornes : positions de base ~15,50,82
-    var unicornBaseX = [15, 50, 82];
-    var unicornX = spreadX(unicornBaseX);
-    var unicornDelays = [0, 1.5, 3.0];
-    for (var u = 0; u < 3; u++) {
+    // 2 licornes : traversée gauche→droite, top distribué, delay échelonné (14s/2 = 7s)
+    var unicornTops = [25, 62];
+    var unicornDelays = [0, 7];
+    for (var u = 0; u < 2; u++) {
       var un = document.createElement('span');
       un.className = 'bg-unicorn';
       un.textContent = '🦄';
-      un.style.left = unicornX[u] + '%';
-      un.style.top = (15 + Math.random() * 60) + '%';
+      un.style.left = '0';
+      un.style.top = unicornTops[u] + '%';
       un.style.setProperty('--del', unicornDelays[u] + 's');
       girlBg.appendChild(un);
     }
   }
 
-  // Garçon : fusées + éclairs + ballons de foot
+  // Garçon : fusées (traversée bas→haut) + éclairs (fixes) + ballons (traversée droite→gauche)
   var boyBg = document.getElementById('boy-bg-anim');
   if (boyBg && boyBg.children.length === 0) {
-    // 4 fusées : positions de base ~8,35,62,88
-    var rocketBaseX = [8, 35, 62, 88];
-    var rocketX = spreadX(rocketBaseX);
-    var rocketDelays = [0, 1.0, 2.0, 3.0];
-    for (var k = 0; k < 4; k++) {
+    // 2 fusées : traversée bas→haut, left distribué, delay échelonné (7s/2 = 3.5s)
+    var rocketLefts = [28, 68];
+    var rocketDelays = [0, 3.5];
+    for (var k = 0; k < 2; k++) {
       var r = document.createElement('span');
       r.className = 'bg-rocket';
       r.textContent = '🚀';
-      r.style.left = rocketX[k] + '%';
-      r.style.top = (20 + Math.random() * 50) + '%';
+      r.style.left = rocketLefts[k] + '%';
+      r.style.top = '0';
       r.style.setProperty('--del', rocketDelays[k] + 's');
       boyBg.appendChild(r);
     }
 
-    // 4 éclairs : positions de base ~10,35,60,85
-    var lightBaseX = [10, 35, 60, 85];
-    var lightX = spreadX(lightBaseX);
-    var lightDelays = [0, 1.0, 2.0, 3.0];
+    // 4 éclairs : position fixe, animation sur place
+    var lightLefts = [10, 35, 60, 85];
+    var lightDelays = [0, 1.25, 2.5, 3.75];
     for (var m = 0; m < 4; m++) {
       var l = document.createElement('span');
       l.className = 'bg-lightning';
       l.textContent = '⚡';
-      l.style.left = lightX[m] + '%';
+      l.style.left = lightLefts[m] + '%';
       l.style.top = (10 + Math.random() * 70) + '%';
       l.style.setProperty('--del', lightDelays[m] + 's');
       boyBg.appendChild(l);
     }
 
-    // 3 ballons de foot : positions de base ~5,38,68
-    var fbBaseX = [5, 38, 68];
-    var fbX = spreadX(fbBaseX);
-    var fbDelays = [0, 1.5, 3.0];
+    // 3 ballons de foot : traversée droite→gauche, top distribué, delay échelonné (10s/3 ≈ 3.3s)
+    var fbTops = [20, 55, 78];
+    var fbDelays = [0, 3.3, 6.7];
     for (var f = 0; f < 3; f++) {
       var fb = document.createElement('span');
       fb.className = 'bg-football';
       fb.textContent = '⚽';
-      fb.style.left = fbX[f] + '%';
-      fb.style.top = (15 + Math.random() * 60) + '%';
+      fb.style.left = '0';
+      fb.style.top = fbTops[f] + '%';
       fb.style.setProperty('--del', fbDelays[f] + 's');
       boyBg.appendChild(fb);
     }
