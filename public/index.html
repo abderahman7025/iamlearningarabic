@@ -2318,6 +2318,55 @@ body.profile-boy #boy-bg-anim {
   width:10px;height:10px;border-radius:2px;
   animation:confettiFall var(--cdur,1.5s) ease-in forwards;
 }
+
+/* ══════════════════════════════════════════════
+   GAMIFICATION ENFANT (girl / boy uniquement)
+   ══════════════════════════════════════════════ */
+
+/* Étoiles par leçon */
+@keyframes starRewardAnim {
+  0% { transform:translateX(-50%) scale(0) rotate(-10deg); opacity:0; }
+  50% { transform:translateX(-50%) scale(1.3) rotate(5deg); opacity:1; }
+  100% { transform:translateX(-50%) scale(1) rotate(0); opacity:1; }
+}
+.child-stars { font-size:.9rem; margin-top:2px; letter-spacing:1px; min-height:1rem; }
+
+/* Barre de vies */
+#child-hearts-bar {
+  position:fixed; top:56px; right:12px; z-index:1000;
+  font-size:1.3rem; letter-spacing:2px;
+  display:none;
+}
+body.profile-girl #child-hearts-bar,
+body.profile-boy #child-hearts-bar { display:block; }
+
+/* Lettres arabes colorées et animées pour enfants */
+@keyframes letterPop {
+  0%,100% { transform:scale(1) rotate(0deg); }
+  50% { transform:scale(1.08) rotate(2deg); }
+}
+@keyframes letterGlow {
+  0%,100% { text-shadow: 0 0 8px currentColor; }
+  50% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
+}
+body.profile-girl .ar,
+body.profile-girl .ar-letter,
+body.profile-girl [lang="ar"] {
+  animation: letterPop 2s ease-in-out infinite, letterGlow 2s ease-in-out infinite !important;
+  background: linear-gradient(135deg, #ff4da6, #a855f7, #ec4899) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+body.profile-boy .ar,
+body.profile-boy .ar-letter,
+body.profile-boy [lang="ar"] {
+  animation: letterPop 2s ease-in-out infinite, letterGlow 2s ease-in-out infinite !important;
+  background: linear-gradient(135deg, #00aaff, #22d3ee, #0077dd) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
 </style>
 
 
@@ -2715,6 +2764,7 @@ body.profile-boy #boy-bg-anim {
     <div class="tb-title" id="tb-title"></div>
     <div class="sound-dot" id="sound-dot2" onclick="toggleSound()"></div>
   </div>
+  <div id="child-hearts-bar"></div>
   <div class="ca" id="ca"></div>
 </div>
 
@@ -4405,7 +4455,14 @@ function renderSessions(ca){
     c.className='sess-card';
     c.style.cssText='min-height:116px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:1;transform:scale(1);transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,border-color .4s;will-change:transform;';
     if(sc!==undefined) c.style.borderColor='rgba(34,211,160,.3)';
-    c.innerHTML='<div style="font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px">'+cardTitle+'</div>'+prev+(sc!==undefined?'<div style="font-size:.65rem;color:var(--green);margin-top:3px">\u2705 '+sc+'%</div>':'');
+    // \u00c9toiles enfant (girl/boy uniquement)
+    var starsHtml = '';
+    if((st.profile==='girl'||st.profile==='boy') && s.id!==undefined){
+      var csn=getChildStars(s.id);
+      if(csn>0){ starsHtml='<div class="child-stars">'+'\u2b50'.repeat(csn)+'</div>'; }
+      else { starsHtml='<div class="child-stars"></div>'; }
+    }
+    c.innerHTML='<div style="font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px">'+cardTitle+'</div>'+prev+(sc!==undefined?'<div style="font-size:.65rem;color:var(--green);margin-top:3px">\u2705 '+sc+'%</div>':'')+starsHtml;
 
     // Séquentiel strict — seulement si pas déjà joué
     if(!alreadyAnimated){
@@ -5026,6 +5083,7 @@ function startExercise(session){
   st.curLesson=session;st._curPage='exercise';
   document.getElementById('tb-title').textContent=session.emoji+' '+t('exercice').replace(' ▶','');
   document.getElementById('back-lbl').textContent=t('back_s');st.backHistory.push({target:'sessions'});
+  initChildHearts(); // Réinitialise les vies enfant
   const qs=buildQs(session);
   const ca=document.getElementById('ca');transitionCA(true);ca.scrollTop=0;ca.innerHTML='';
   renderAudioExercise(ca,qs,session);
@@ -5170,14 +5228,24 @@ function renderAudioExercise(ca,qs,session){
       function handleSelfReport(correct) {
         selfReportBtns.style.opacity='.4';
         yesBtn.disabled=true; noBtn.disabled=true;
+        // Sons enfant
+        if(correct){ playChildSound('win'); } else { playChildSound('lose'); }
+        // Système de vies : perte sur mauvaise réponse
+        if(!correct){ var go=loseHeart(); if(go) return; }
         // Comptabiliser dans les scores de la session
         if (session && session.id) {
           var cur = st.scores[session.id] || 0;
           // Ajuster légèrement le score : +5 si juste, -3 si faux (min 0, max 100)
           var delta = correct ? 5 : -3;
-          st.scores[session.id] = Math.max(0, Math.min(100, cur + delta));
+          var newScore = Math.max(0, Math.min(100, cur + delta));
+          st.scores[session.id] = newScore;
           try{localStorage.setItem('arab_scores', JSON.stringify(st.scores));}catch(e){}
           renderGlobalProgress();
+          // Étoiles enfant à chaque mise à jour de score
+          setChildStars(session.id, newScore);
+          // Badges enfant
+          var lessonsDone = Object.keys(st.scores).length;
+          checkChildBadges(lessonsDone, newScore);
         }
         markPracticeToday();
         nextWrap.style.display='flex';
@@ -6828,6 +6896,144 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.appendChild(hint);
   });
 })();
+
+// ══════════════════════════════════════════════
+//  GAMIFICATION ENFANT — girl / boy uniquement
+// ══════════════════════════════════════════════
+
+// ── FONCTIONNALITÉ 1 : ÉTOILES PAR LEÇON ─────────────────────
+function getChildStars(lessonId) {
+  try { return parseInt(localStorage.getItem('child_stars_'+lessonId)||'0'); } catch(e){return 0;}
+}
+function setChildStars(lessonId, score100) {
+  if(st.profile!=='girl'&&st.profile!=='boy') return;
+  var stars = score100>=80?3:score100>=50?2:1;
+  var existing = getChildStars(lessonId);
+  if(stars > existing) {
+    try { localStorage.setItem('child_stars_'+lessonId, stars); } catch(e){}
+    showStarReward(stars);
+  }
+}
+function showStarReward(n) {
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:30%;left:50%;transform:translateX(-50%);font-size:3rem;z-index:9999;animation:starRewardAnim .8s ease-out forwards;pointer-events:none;';
+  el.textContent = '⭐'.repeat(n);
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);}, 1500);
+}
+
+// ── FONCTIONNALITÉ 2 : SYSTÈME DE VIES ───────────────────────
+var childHearts = 3;
+function initChildHearts() {
+  if(st.profile!=='girl'&&st.profile!=='boy') return;
+  childHearts = 3;
+  updateHeartsDisplay();
+}
+function loseHeart() {
+  if(st.profile!=='girl'&&st.profile!=='boy') return false;
+  childHearts = Math.max(0, childHearts-1);
+  updateHeartsDisplay();
+  if(childHearts===0) {
+    setTimeout(function(){
+      showChildAlert(st.profile==='girl'?'💔 Plus de vies ! Tu réessaieras demain 💪':'💔 Game over ! Tu réessaieras demain 💪');
+      setTimeout(function(){showS('s-menu',false);}, 2500);
+    }, 500);
+    return true; // game over
+  }
+  if(navigator.vibrate) navigator.vibrate(100);
+  return false;
+}
+function updateHeartsDisplay() {
+  var el = document.getElementById('child-hearts-bar');
+  if(!el) return;
+  el.textContent = '❤️'.repeat(childHearts) + '🖤'.repeat(3-childHearts);
+}
+function showChildAlert(msg) {
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:#fff;padding:20px 32px;border-radius:20px;font-size:1.2rem;z-index:99999;text-align:center;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);}, 2500);
+}
+
+// ── FONCTIONNALITÉ 3 : SONS RIGOLOS (Web Audio API) ──────────
+var _childAudioCtx = null;
+function getChildAudioCtx() {
+  if(!_childAudioCtx) try { _childAudioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+  return _childAudioCtx;
+}
+function playChildSound(type) {
+  if(!st.soundOn) return;
+  if(st.profile!=='girl'&&st.profile!=='boy') return;
+  var ctx = getChildAudioCtx(); if(!ctx) return;
+  var osc = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  if(type==='win') {
+    var notes=[523,659,784,1047]; var t0=ctx.currentTime;
+    osc.type='sine';
+    notes.forEach(function(freq,i){ osc.frequency.setValueAtTime(freq, t0+i*0.12); });
+    gain.gain.setValueAtTime(0.3, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+0.6);
+    osc.start(t0); osc.stop(t0+0.6);
+  } else if(type==='lose') {
+    osc.type='sawtooth';
+    var t0=ctx.currentTime;
+    osc.frequency.setValueAtTime(400, t0);
+    osc.frequency.exponentialRampToValueAtTime(150, t0+0.4);
+    gain.gain.setValueAtTime(0.2, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+0.4);
+    osc.start(t0); osc.stop(t0+0.4);
+  } else if(type==='star') {
+    osc.type='triangle';
+    var t0=ctx.currentTime;
+    osc.frequency.setValueAtTime(1047, t0);
+    osc.frequency.setValueAtTime(1319, t0+0.1);
+    gain.gain.setValueAtTime(0.25, t0);
+    gain.gain.exponentialRampToValueAtTime(0.001, t0+0.35);
+    osc.start(t0); osc.stop(t0+0.35);
+  }
+}
+
+// ── FONCTIONNALITÉ 4 : BADGES / TROPHÉES ─────────────────────
+var CHILD_BADGES = {
+  first_letter: { emoji:'🔤', label:{fr:'Première lettre !', en:'First letter!', es:'¡Primera letra!', de:'Erster Buchstabe!', nl:'Eerste letter!', it:'Prima lettera!', pt:'Primeira letra!', ru:'Первая буква!', tr:'İlk harf!', zh:'第一个字母！', id:'Huruf pertama!', ur:'پہلا حرف!', hi:'पहला अक्षर!'} },
+  lesson_5:     { emoji:'📚', label:{fr:'5 leçons !',        en:'5 lessons!',    es:'¡5 lecciones!',  de:'5 Lektionen!',   nl:'5 lessen!',     it:'5 lezioni!',    pt:'5 lições!',     ru:'5 уроков!',      tr:'5 ders!',      zh:'5课！',          id:'5 pelajaran!',  ur:'5 اسباق!',    hi:'5 पाठ!'} },
+  lesson_10:    { emoji:'🎓', label:{fr:'10 leçons !',       en:'10 lessons!',   es:'¡10 lecciones!', de:'10 Lektionen!',  nl:'10 lessen!',    it:'10 lezioni!',   pt:'10 lições!',    ru:'10 уроков!',     tr:'10 ders!',     zh:'10课！',         id:'10 pelajaran!', ur:'10 اسباق!',   hi:'10 पाठ!'} },
+  perfect:      { emoji:'💯', label:{fr:'Parfait !',         en:'Perfect!',      es:'¡Perfecto!',     de:'Perfekt!',       nl:'Perfect!',      it:'Perfetto!',     pt:'Perfeito!',     ru:'Отлично!',       tr:'Mükemmel!',    zh:'完美！',         id:'Sempurna!',     ur:'کامل!',       hi:'परफेक्ट!'} },
+  streak_3:     { emoji:'🔥', label:{fr:'3 jours !',         en:'3 days!',       es:'¡3 días!',       de:'3 Tage!',        nl:'3 dagen!',      it:'3 giorni!',     pt:'3 dias!',       ru:'3 дня!',         tr:'3 gün!',       zh:'3天！',          id:'3 hari!',       ur:'3 دن!',       hi:'3 दिन!'} }
+};
+function hasChildBadge(id){ try{return!!localStorage.getItem('child_badge_'+id);}catch(e){return false;} }
+function grantChildBadge(id) {
+  if(st.profile!=='girl'&&st.profile!=='boy') return;
+  if(hasChildBadge(id)) return;
+  try{localStorage.setItem('child_badge_'+id,'1');}catch(e){}
+  var b = CHILD_BADGES[id]; if(!b) return;
+  var lang = st.lang||'fr';
+  var label = b.label[lang]||b.label.fr;
+  showBadgePopup(b.emoji, label);
+  playChildSound('star');
+}
+function showBadgePopup(emoji, label) {
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:20%;left:50%;transform:translateX(-50%) scale(0);background:linear-gradient(135deg,#fff9,#fff);border:3px solid gold;border-radius:24px;padding:18px 28px;font-size:1.1rem;z-index:99999;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.2);transition:transform .4s cubic-bezier(.34,1.4,.64,1);';
+  el.innerHTML = '<div style="font-size:2.5rem">'+emoji+'</div><div style="font-weight:700;margin-top:4px">'+label+'</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function(){ el.style.transform='translateX(-50%) scale(1)'; });
+  setTimeout(function(){
+    el.style.transform='translateX(-50%) scale(0)';
+    setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);}, 400);
+  }, 2500);
+}
+function checkChildBadges(lessonsDone, score100) {
+  if(lessonsDone===1) grantChildBadge('first_letter');
+  if(lessonsDone>=5) grantChildBadge('lesson_5');
+  if(lessonsDone>=10) grantChildBadge('lesson_10');
+  if(score100===100) grantChildBadge('perfect');
+  // Streak badge
+  var streakData = getStreakData ? getStreakData() : {count:0};
+  if((st.streak||streakData.count)>=3) grantChildBadge('streak_3');
+}
 
 // ── PWA : enregistrement du Service Worker ──
 if ('serviceWorker' in navigator) {
