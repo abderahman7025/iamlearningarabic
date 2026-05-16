@@ -6960,7 +6960,8 @@ function loseHeart() {
   updateHeartsDisplay();
   if(childHearts===0) {
     setTimeout(function(){
-      showChildAlert(st.profile==='girl'?'💔 Plus de vies ! Revois la leçon ! 📖':'💔 Plus de vies ! Revois la leçon ! 📖');
+      var _noLifeMsg={fr:'💔 Plus de vie ! Revois la leçon ! 📖',en:'💔 No more lives! Review the lesson! 📖',es:'💔 ¡Sin vida! ¡Repasa la lección! 📖',de:'💔 Kein Leben mehr! Wiederhole die Lektion! 📖',nl:'💔 Geen levens meer! Bekijk de les opnieuw! 📖',it:'💔 Nessuna vita! Ripassa la lezione! 📖',pt:'💔 Sem vida! Revê a lição! 📖',ru:'💔 Нет жизней! Повтори урок! 📖',tr:'💔 Canın kalmadı! Dersi tekrar et! 📖',zh:'💔 没有生命了！复习课程！📖',id:'💔 Tidak ada nyawa! Ulangi pelajaran! 📖',ur:'💔 کوئی زندگی نہیں! سبق دوبارہ دیکھو! 📖',hi:'💔 कोई जीवन नहीं! पाठ दोबारा देखो! 📖'};
+      showChildAlert(_noLifeMsg[st.lang]||_noLifeMsg.fr);
       setTimeout(function(){showS('s-menu',false);}, 2500);
     }, 500);
     return true; // game over
