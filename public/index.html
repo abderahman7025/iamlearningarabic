@@ -18,7 +18,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://iamlearningarabic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -2085,6 +2085,157 @@ body.profile-adult, #root.profile-adult {
   33%{transform:translateY(-18px) rotate(calc(var(--ar,0deg) + 4deg)) scale(1.05)}
   66%{transform:translateY(8px) rotate(calc(var(--ar,0deg) - 3deg)) scale(.97)}
 }
+
+/* ══════════════════════════════════════════════════════════
+   AMÉLIORATIONS ENFANTS — Police Nunito, couleurs vives, animations
+══════════════════════════════════════════════════════════ */
+
+/* B. Police Nunito pour profils enfants */
+#root.profile-girl .nav-title,
+#root.profile-boy .nav-title,
+#root.profile-girl .tb-title,
+#root.profile-boy .tb-title,
+#root.profile-girl .lbtn,
+#root.profile-boy .lbtn,
+#root.profile-girl .rbtn-m,
+#root.profile-boy .rbtn-m,
+#root.profile-girl .pg-title,
+#root.profile-boy .pg-title {
+  font-family: 'Nunito', sans-serif !important;
+}
+
+/* A. Couleurs plus vives — girl : rose vif, boy : bleu vif */
+#root.profile-girl .lbtn {
+  background: linear-gradient(135deg,#ff1a8c 0%,#ff4da6 50%,#ff1a8c 100%) !important;
+  background-size: 200% auto !important;
+  box-shadow: 0 8px 28px rgba(255,26,140,.5) !important;
+}
+#root.profile-girl .lbtn:hover { box-shadow: 0 12px 40px rgba(255,26,140,.65) !important; }
+#root.profile-girl .rbtn-m { background: linear-gradient(135deg,#ff1a8c,#ff4da6) !important; box-shadow: 0 8px 24px rgba(255,26,140,.45) !important; }
+#root.profile-girl .rbtn-m:hover { box-shadow: 0 14px 32px rgba(255,26,140,.55) !important; }
+#root.profile-girl .nav-title {
+  background: linear-gradient(135deg,#ff1a8c,#ff4da6) !important;
+  -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important;
+}
+#root.profile-girl .tb-title {
+  background: linear-gradient(135deg,#ff1a8c,#ff4da6) !important;
+  -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important;
+}
+#root.profile-girl .sound-dot { background: #ff1a8c !important; box-shadow: 0 0 12px rgba(255,26,140,.7) !important; }
+#root.profile-girl .streak-count { color: #ff1a8c !important; }
+#root.profile-girl .p-sec-title { background: linear-gradient(135deg,#ff1a8c,#ff4da6) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }
+#root.profile-girl .global-prog-fill { background: linear-gradient(90deg,#ff1a8c,#ff4da6) !important; }
+
+#root.profile-boy .lbtn {
+  background: linear-gradient(135deg,#0077dd 0%,#00aaff 50%,#0077dd 100%) !important;
+  background-size: 200% auto !important;
+  box-shadow: 0 8px 28px rgba(0,119,221,.5) !important;
+}
+#root.profile-boy .lbtn:hover { box-shadow: 0 12px 40px rgba(0,119,221,.65) !important; }
+#root.profile-boy .rbtn-m { background: linear-gradient(135deg,#0077dd,#00aaff) !important; box-shadow: 0 8px 24px rgba(0,119,221,.45) !important; }
+#root.profile-boy .rbtn-m:hover { box-shadow: 0 14px 32px rgba(0,119,221,.55) !important; }
+#root.profile-boy .nav-title {
+  background: linear-gradient(135deg,#0077dd,#00aaff) !important;
+  -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important;
+}
+#root.profile-boy .tb-title {
+  background: linear-gradient(135deg,#0077dd,#00aaff) !important;
+  -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important;
+}
+#root.profile-boy .sound-dot { background: #00aaff !important; box-shadow: 0 0 12px rgba(0,170,255,.7) !important; }
+#root.profile-boy .streak-count { color: #0077dd !important; }
+#root.profile-boy .p-sec-title { background: linear-gradient(135deg,#0077dd,#00aaff) !important; -webkit-background-clip: text !important; -webkit-text-fill-color: transparent !important; background-clip: text !important; }
+#root.profile-boy .global-prog-fill { background: linear-gradient(90deg,#0077dd,#00aaff) !important; }
+
+/* C. Fond animé étoiles/papillons fille, fusées/éclairs garçon */
+@keyframes floatStar {
+  0%,100%{transform:translateY(0) rotate(0deg) scale(1)}
+  50%{transform:translateY(-30px) rotate(180deg) scale(1.2)}
+}
+@keyframes floatButterfly {
+  0%{transform:translateX(0) translateY(0) rotate(0deg)}
+  25%{transform:translateX(40px) translateY(-20px) rotate(15deg)}
+  50%{transform:translateX(80px) translateY(0) rotate(0deg)}
+  75%{transform:translateX(40px) translateY(20px) rotate(-15deg)}
+  100%{transform:translateX(0) translateY(0) rotate(0deg)}
+}
+@keyframes rocketFly {
+  0%{transform:translateY(100vh) rotate(-45deg) scale(0)}
+  100%{transform:translateY(-20vh) rotate(-45deg) scale(1)}
+}
+@keyframes lightning {
+  0%,90%,100%{opacity:0}
+  95%{opacity:1}
+}
+
+#girl-bg-anim, #boy-bg-anim {
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;overflow:hidden;
+  display:none;
+}
+#girl-bg-anim .bg-star {
+  position:absolute;font-size:1.2rem;opacity:.35;
+  animation:floatStar var(--dur,8s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+#girl-bg-anim .bg-butterfly {
+  position:absolute;font-size:1rem;opacity:.3;
+  animation:floatButterfly var(--dur,12s) linear infinite;
+  animation-delay:var(--del,0s);
+}
+#boy-bg-anim .bg-rocket {
+  position:absolute;font-size:1.1rem;opacity:.3;
+  animation:rocketFly var(--dur,7s) linear infinite;
+  animation-delay:var(--del,0s);
+}
+#boy-bg-anim .bg-lightning {
+  position:absolute;font-size:1.3rem;opacity:0;
+  animation:lightning var(--dur,5s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+
+/* F. Boutons plus grands et arrondis pour enfants */
+#root.profile-girl .lbtn,
+#root.profile-boy .lbtn {
+  border-radius: 50px !important;
+  padding: 16px 32px !important;
+  font-size: 1.1rem !important;
+}
+
+/* G. Effet bounce sur boutons enfants */
+@keyframes btnBounce {
+  0%{transform:scale(1)}
+  30%{transform:scale(.92)}
+  60%{transform:scale(1.08)}
+  80%{transform:scale(.97)}
+  100%{transform:scale(1)}
+}
+#root.profile-girl .lbtn:active,
+#root.profile-boy .lbtn:active {
+  animation: btnBounce .4s ease !important;
+}
+
+/* H. Étoiles burst sur bonne réponse */
+@keyframes starBurst {
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--tx,0px),var(--ty,0px)) scale(0);opacity:0}
+}
+.star-burst-el {
+  position:fixed;pointer-events:none;z-index:9999;
+  font-size:1.2rem;
+  animation:starBurst .7s ease-out forwards;
+}
+
+/* D. Confettis sur bonne réponse */
+@keyframes confettiFall {
+  0%{transform:translateY(-20px) rotate(0deg) translateX(0);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg) translateX(var(--cx,0px));opacity:0}
+}
+.confetti-el {
+  position:fixed;top:-10px;pointer-events:none;z-index:9998;
+  width:10px;height:10px;border-radius:2px;
+  animation:confettiFall var(--cdur,1.5s) ease-in forwards;
+}
 </style>
 
 
@@ -2133,6 +2284,9 @@ body.profile-adult, #root.profile-adult {
 <body>
 
 <div id="root">
+<!-- Fonds animés enfants -->
+<div id="girl-bg-anim"></div>
+<div id="boy-bg-anim"></div>
 <canvas id="starfield" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.85"></canvas>
 <div class="particle" style="width:180px;height:180px;background:radial-gradient(circle,rgba(120,40,200,.12),transparent);top:5%;left:-5%;--dur:14s;--dx1:30px;--dy1:-20px;--dx2:-20px;--dy2:30px"></div>
 <div class="particle" style="width:120px;height:120px;background:radial-gradient(circle,rgba(56,189,248,.1),transparent);bottom:15%;right:-3%;--dur:11s;--op:.2;--dx1:-25px;--dy1:15px;--dx2:20px;--dy2:-25px"></div>
@@ -3499,6 +3653,12 @@ function chooseProfile(p){
     root.classList.add('profile-adult');
     document.body.classList.add('profile-adult');
   }
+  // Fond animé enfants
+  var girlBg=document.getElementById('girl-bg-anim');
+  var boyBg=document.getElementById('boy-bg-anim');
+  if(girlBg) girlBg.style.display=(p==='girl'?'block':'none');
+  if(boyBg)  boyBg.style.display=(p==='boy'?'block':'none');
+  if(p==='girl'||p==='boy') setTimeout(initChildBgAnim, 200);
   document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
   buildMenu();showS('s-menu',true);
   window._mhLastScroll=0;var _mh=document.querySelector('.menu-header');if(_mh){_mh.style.top='0';_mh.style.opacity='1';_mh.style.pointerEvents='';}
@@ -5515,6 +5675,179 @@ window.onload=()=>{
     tryAutoLogin();
   }
 };
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AMÉLIORATIONS ENFANTS — Confettis, messages, fond animé
+═══════════════════════════════════════════════════════════ -->
+<script>
+/* D. Confettis sur bonne réponse */
+function launchConfetti(profile) {
+  var colors;
+  if (profile === 'girl') {
+    colors = ['#ff4da6','#ff1a8c','#c2185b','#f06292','#ce93d8','#ff80ab'];
+  } else if (profile === 'boy') {
+    colors = ['#00aaff','#0077dd','#29b6f6','#00e5ff','#69f0ae','#40c4ff'];
+  } else {
+    colors = ['#f5c842','#ffd700','#ffa000','#ffecb3','#fff176','#ffca28'];
+  }
+  for (var i = 0; i < 40; i++) {
+    (function(i) {
+      var el = document.createElement('div');
+      el.className = 'confetti-el';
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      el.style.setProperty('--cx', (Math.random() * 120 - 60) + 'px');
+      el.style.setProperty('--cdur', (1 + Math.random() * 1.2) + 's');
+      el.style.width = (6 + Math.random() * 8) + 'px';
+      el.style.height = (6 + Math.random() * 8) + 'px';
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      el.style.animationDelay = (Math.random() * 0.5) + 's';
+      document.body.appendChild(el);
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 2500);
+    })(i);
+  }
+}
+
+/* H. Étoiles explosives sur bonne réponse */
+function showStarBurst(x, y, profile) {
+  var star = profile === 'girl' ? '⭐' : profile === 'boy' ? '💫' : '✨';
+  var count = 5 + Math.floor(Math.random() * 3);
+  for (var i = 0; i < count; i++) {
+    (function(i) {
+      var el = document.createElement('div');
+      el.className = 'star-burst-el';
+      el.textContent = star;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      var angle = (i / count) * 2 * Math.PI;
+      var dist = 60 + Math.random() * 60;
+      el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+      el.style.animationDelay = (Math.random() * 0.15) + 's';
+      document.body.appendChild(el);
+      setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
+    })(i);
+  }
+}
+
+/* E. Messages d'encouragement pour enfants */
+var GIRL_MSGS = [
+  '🌟 Waouh, tu es une championne !',
+  '🦋 Magnifique ! Continue comme ça !',
+  '⭐ Tu brilles comme une étoile !',
+  '🌸 Incroyable ! Tu es trop forte !'
+];
+var BOY_MSGS = [
+  '🚀 Trop fort, champion !',
+  '⚡ Excellent ! Tu déchires !',
+  '🏆 Super héros de l\'arabe !',
+  '🎯 Dans le mille ! Bravo !'
+];
+function getEncouragementMsg(profile) {
+  if (profile === 'girl') {
+    return GIRL_MSGS[Math.floor(Math.random() * GIRL_MSGS.length)];
+  } else if (profile === 'boy') {
+    return BOY_MSGS[Math.floor(Math.random() * BOY_MSGS.length)];
+  }
+  return null;
+}
+
+/* Déclencher effets sur bonne réponse (yesBtn click) */
+(function patchSelfReport() {
+  var _origHandleSelfReport = null;
+  // Patch le yesBtn quand il est créé — on surveille les clics
+  document.addEventListener('click', function(e) {
+    var btn = e.target;
+    if (!btn) return;
+    // Détection : bouton Oui (contient ✅ et texte "Oui" / "Yes") dans profil enfant
+    var profile = (typeof st !== 'undefined') ? st.profile : null;
+    if (!profile || (profile !== 'girl' && profile !== 'boy')) return;
+    var txt = btn.textContent || '';
+    if (txt.indexOf('✅') !== -1) {
+      // C'est très probablement un clic sur "Oui" dans l'exercice
+      var rect = btn.getBoundingClientRect();
+      var cx = rect.left + rect.width / 2;
+      var cy = rect.top + rect.height / 2;
+      launchConfetti(profile);
+      showStarBurst(cx, cy, profile);
+      // Afficher message toast enfant
+      var msg = getEncouragementMsg(profile);
+      if (msg) {
+        var toast = document.createElement('div');
+        toast.textContent = msg;
+        toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);'
+          + 'background:' + (profile === 'girl' ? 'linear-gradient(135deg,#ff1a8c,#ff4da6)' : 'linear-gradient(135deg,#0077dd,#00aaff)') + ';'
+          + 'color:white;padding:12px 24px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;'
+          + 'font-size:1rem;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,.25);'
+          + 'animation:slideInStagger .4s ease;pointer-events:none;text-align:center;max-width:90vw;';
+        document.body.appendChild(toast);
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2500);
+      }
+    }
+  }, true);
+})();
+
+/* C. Fond animé — génération des éléments flottants */
+function initChildBgAnim() {
+  // Fille : étoiles + papillons
+  var girlBg = document.getElementById('girl-bg-anim');
+  if (girlBg && girlBg.children.length === 0) {
+    var stars = ['⭐','🌸','✨','💫','🌟'];
+    var butterflies = ['🦋','🌺','🌷'];
+    for (var i = 0; i < 8; i++) {
+      var s = document.createElement('span');
+      s.className = 'bg-star';
+      s.textContent = stars[i % stars.length];
+      s.style.left = (5 + i * 12) + '%';
+      s.style.top = (10 + Math.random() * 70) + '%';
+      s.style.setProperty('--dur', (7 + Math.random() * 6) + 's');
+      s.style.setProperty('--del', (Math.random() * 4) + 's');
+      girlBg.appendChild(s);
+    }
+    for (var j = 0; j < 4; j++) {
+      var b = document.createElement('span');
+      b.className = 'bg-butterfly';
+      b.textContent = butterflies[j % butterflies.length];
+      b.style.left = (5 + j * 22) + '%';
+      b.style.top = (20 + Math.random() * 50) + '%';
+      b.style.setProperty('--dur', (10 + Math.random() * 6) + 's');
+      b.style.setProperty('--del', (Math.random() * 5) + 's');
+      girlBg.appendChild(b);
+    }
+  }
+  // Garçon : fusées + éclairs
+  var boyBg = document.getElementById('boy-bg-anim');
+  if (boyBg && boyBg.children.length === 0) {
+    var rockets = ['🚀','⚡','🌊','💥'];
+    for (var k = 0; k < 5; k++) {
+      var r = document.createElement('span');
+      r.className = 'bg-rocket';
+      r.textContent = rockets[k % rockets.length];
+      r.style.left = (8 + k * 18) + '%';
+      r.style.setProperty('--dur', (5 + Math.random() * 5) + 's');
+      r.style.setProperty('--del', (Math.random() * 4) + 's');
+      boyBg.appendChild(r);
+    }
+    for (var m = 0; m < 4; m++) {
+      var l = document.createElement('span');
+      l.className = 'bg-lightning';
+      l.textContent = '⚡';
+      l.style.left = (10 + m * 25) + '%';
+      l.style.top = (10 + Math.random() * 70) + '%';
+      l.style.setProperty('--dur', (4 + Math.random() * 4) + 's');
+      l.style.setProperty('--del', (Math.random() * 3) + 's');
+      boyBg.appendChild(l);
+    }
+  }
+}
+
+// Appeler init quand le DOM est prêt
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChildBgAnim);
+} else {
+  setTimeout(initChildBgAnim, 100);
+}
 </script>
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
