@@ -2207,15 +2207,15 @@ body.profile-adult, #root.profile-adult {
   100% { transform: translate(-20vw,  5vh) rotate(-6deg) scale(0.7); opacity:0; }
 }
 
-/* 🚀 Fusée : monte droit vers le haut, rétrécit à partir du milieu */
+/* 🚀 Fusée : bas → haut en ligne droite, rétrécit à mi-écran */
 @keyframes rocketLaunch {
-  0%   { transform: translateY(110vh) scale(1.4); opacity:0; }
-  6%   { opacity:1; }
-  48%  { transform: translateY(5vh)   scale(1.3); opacity:1; }
-  52%  { transform: translateY(-5vh)  scale(1.1); opacity:1; }
-  75%  { transform: translateY(-55vh) scale(0.5); opacity:1; }
-  92%  { opacity:0.5; }
-  100% { transform: translateY(-115vh) scale(0.05); opacity:0; }
+  0%   { transform: translateY(110vh) rotate(-45deg) scale(1.4); opacity:0; }
+  6%   { transform: translateY(85vh)  rotate(-45deg) scale(1.4); opacity:1; }
+  48%  { transform: translateY(5vh)   rotate(-45deg) scale(1.3); opacity:1; }
+  52%  { transform: translateY(-5vh)  rotate(-45deg) scale(1.1); opacity:1; }
+  75%  { transform: translateY(-55vh) rotate(-45deg) scale(0.5); opacity:1; }
+  92%  { transform: translateY(-95vh) rotate(-45deg) scale(0.1); opacity:0.4; }
+  100% { transform: translateY(-115vh) rotate(-45deg) scale(0.05); opacity:0; }
 }
 
 /* ⚡ Éclair : flash vertical intense, disparaît */
@@ -2262,8 +2262,6 @@ body.profile-boy #boy-bg-anim {
 }
 #boy-bg-anim .bg-rocket {
   position:fixed;font-size:2.6rem;opacity:.5;
-  transform-origin:center center;
-  rotate: -45deg;
   animation:rocketLaunch 7s linear infinite;
   animation-delay:var(--del,0s);
 }
