@@ -946,6 +946,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 }
 
 
+/* ── MASCOT BOB ANIMATION ── */
+@keyframes mascotBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+@keyframes mascotSpin {
+  0% { transform: translateY(-20px) scale(1.2) rotate(0deg); }
+  100% { transform: translateY(-20px) scale(1.2) rotate(360deg); }
+}
+
 /* ── BOY MASCOT THUMBNAIL ── */
 #boy-mascot{
   position:fixed;bottom:16px;left:16px;
@@ -953,10 +963,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   overflow:visible;z-index:50;
   box-shadow:none;border:none;
   display:none;
-  transition:all .3s cubic-bezier(.34,1.56,.64,1);
   cursor:pointer;
+  animation: mascotBob 2s ease-in-out infinite !important;
 }
-#boy-mascot:hover{transform:scale(1.15);}
+#boy-mascot:hover{
+  animation: none !important;
+  transform: translateY(-20px) scale(1.2) rotate(5deg) !important;
+  transition: transform 0.3s ease !important;
+}
+#boy-mascot.mascot-spin {
+  animation: mascotSpin 0.5s ease-in-out !important;
+}
 #boy-mascot img{width:100%;height:100%;object-fit:contain;}
 
 /* ── GIRL MASCOT THUMBNAIL ── */
@@ -967,10 +984,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   box-shadow:none;
   border:none;
   display:none;
-  transition:all .3s cubic-bezier(.34,1.56,.64,1);
   cursor:pointer;
+  animation: mascotBob 2s ease-in-out infinite !important;
 }
-#girl-mascot:hover{transform:scale(1.15);}
+#girl-mascot:hover{
+  animation: none !important;
+  transform: translateY(-20px) scale(1.2) rotate(5deg) !important;
+  transition: transform 0.3s ease !important;
+}
+#girl-mascot.mascot-spin {
+  animation: mascotSpin 0.5s ease-in-out !important;
+}
 #girl-mascot img{width:100%;height:100%;object-fit:cover;}
 
 /* ── SCHEHERAZADE NEW POUR TOUT TEXTE ARABE ── */
@@ -2169,28 +2193,42 @@ body.profile-adult, #root.profile-adult {
 }
 
 #girl-bg-anim, #boy-bg-anim {
-  position:fixed;top:0;left:0;width:100%;height:100%;
+  position:fixed;inset:0;
   pointer-events:none;z-index:0;overflow:hidden;
   display:none;
 }
+body.profile-girl #girl-bg-anim,
+body.profile-boy #boy-bg-anim {
+  display:block !important;
+}
 #girl-bg-anim .bg-star {
-  position:absolute;font-size:1.2rem;opacity:.35;
+  position:absolute;font-size:2.8rem;opacity:.35;
   animation:floatStar var(--dur,8s) ease-in-out infinite;
   animation-delay:var(--del,0s);
 }
 #girl-bg-anim .bg-butterfly {
-  position:absolute;font-size:1rem;opacity:.3;
+  position:absolute;font-size:2.5rem;opacity:.3;
   animation:floatButterfly var(--dur,12s) linear infinite;
   animation-delay:var(--del,0s);
 }
+#girl-bg-anim .bg-unicorn {
+  position:absolute;font-size:3.5rem;opacity:.4;
+  animation:floatStar var(--dur,10s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
 #boy-bg-anim .bg-rocket {
-  position:absolute;font-size:1.1rem;opacity:.3;
+  position:absolute;font-size:2.6rem;opacity:.3;
   animation:rocketFly var(--dur,7s) linear infinite;
   animation-delay:var(--del,0s);
 }
 #boy-bg-anim .bg-lightning {
-  position:absolute;font-size:1.3rem;opacity:0;
+  position:absolute;font-size:2.8rem;opacity:0;
   animation:lightning var(--dur,5s) ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+#boy-bg-anim .bg-football {
+  position:absolute;font-size:3.2rem;opacity:.35;
+  animation:floatStar var(--dur,9s) ease-in-out infinite;
   animation-delay:var(--del,0s);
 }
 
@@ -5282,6 +5320,32 @@ function updateGirlMascot(){
   if(mb)mb.style.display=(st.profile==='boy'&&show)?'block':'none';
 }
 
+/* Clic mascotte : rotation 360deg */
+(function setupMascotClick() {
+  function spinMascot(el) {
+    if (!el) return;
+    el.classList.remove('mascot-spin');
+    void el.offsetWidth; // force reflow
+    el.classList.add('mascot-spin');
+    setTimeout(function() { el.classList.remove('mascot-spin'); }, 520);
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    var mg = document.getElementById('girl-mascot');
+    var mb = document.getElementById('boy-mascot');
+    if (mg) mg.addEventListener('click', function() { spinMascot(mg); });
+    if (mb) mb.addEventListener('click', function() { spinMascot(mb); });
+  });
+  // Fallback si DOM déjà prêt
+  if (document.readyState !== 'loading') {
+    setTimeout(function() {
+      var mg = document.getElementById('girl-mascot');
+      var mb = document.getElementById('boy-mascot');
+      if (mg && !mg._spinBound) { mg._spinBound = true; mg.addEventListener('click', function() { spinMascot(mg); }); }
+      if (mb && !mb._spinBound) { mb._spinBound = true; mb.addEventListener('click', function() { spinMascot(mb); }); }
+    }, 500);
+  }
+})();
+
 
 // ── CUSTOM MENU ICONS ──
 var MENU_ICONS = {
@@ -5776,10 +5840,10 @@ function getEncouragementMsg(profile) {
       if (msg) {
         var toast = document.createElement('div');
         toast.textContent = msg;
-        toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);'
+        toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);'
           + 'background:' + (profile === 'girl' ? 'linear-gradient(135deg,#ff1a8c,#ff4da6)' : 'linear-gradient(135deg,#0077dd,#00aaff)') + ';'
           + 'color:white;padding:12px 24px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;'
-          + 'font-size:1rem;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,.25);'
+          + 'font-size:1rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);'
           + 'animation:slideInStagger .4s ease;pointer-events:none;text-align:center;max-width:90vw;';
         document.body.appendChild(toast);
         setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 2500);
@@ -5815,11 +5879,23 @@ function initChildBgAnim() {
       b.style.setProperty('--del', (Math.random() * 5) + 's');
       girlBg.appendChild(b);
     }
+    // Licornes 🦄
+    var unicornPositions = [15, 50, 82];
+    for (var u = 0; u < 3; u++) {
+      var un = document.createElement('span');
+      un.className = 'bg-unicorn';
+      un.textContent = '🦄';
+      un.style.left = unicornPositions[u] + '%';
+      un.style.top = (15 + Math.random() * 60) + '%';
+      un.style.setProperty('--dur', (9 + Math.random() * 5) + 's');
+      un.style.setProperty('--del', (Math.random() * 4) + 's');
+      girlBg.appendChild(un);
+    }
   }
-  // Garçon : fusées + éclairs
+  // Garçon : fusées + éclairs + ballons de foot
   var boyBg = document.getElementById('boy-bg-anim');
   if (boyBg && boyBg.children.length === 0) {
-    var rockets = ['🚀','⚡','🌊','💥'];
+    var rockets = ['🚀','🌊','💥'];
     for (var k = 0; k < 5; k++) {
       var r = document.createElement('span');
       r.className = 'bg-rocket';
@@ -5838,6 +5914,18 @@ function initChildBgAnim() {
       l.style.setProperty('--dur', (4 + Math.random() * 4) + 's');
       l.style.setProperty('--del', (Math.random() * 3) + 's');
       boyBg.appendChild(l);
+    }
+    // Ballons de foot ⚽
+    var footballPositions = [20, 55, 85];
+    for (var f = 0; f < 3; f++) {
+      var fb = document.createElement('span');
+      fb.className = 'bg-football';
+      fb.textContent = '⚽';
+      fb.style.left = footballPositions[f] + '%';
+      fb.style.top = (15 + Math.random() * 60) + '%';
+      fb.style.setProperty('--dur', (8 + Math.random() * 5) + 's');
+      fb.style.setProperty('--del', (Math.random() * 4) + 's');
+      boyBg.appendChild(fb);
     }
   }
 }
