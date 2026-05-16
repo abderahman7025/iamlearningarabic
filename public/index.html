@@ -5795,26 +5795,45 @@ function showStarBurst(x, y, profile) {
   }
 }
 
-/* E. Messages d'encouragement pour enfants */
-var GIRL_MSGS = [
-  '🌟 Waouh, tu es une championne !',
-  '🦋 Magnifique ! Continue comme ça !',
-  '⭐ Tu brilles comme une étoile !',
-  '🌸 Incroyable ! Tu es trop forte !'
-];
-var BOY_MSGS = [
-  '🚀 Trop fort, champion !',
-  '⚡ Excellent ! Tu déchires !',
-  '🏆 Super héros de l\'arabe !',
-  '🎯 Dans le mille ! Bravo !'
-];
-function getEncouragementMsg(profile) {
-  if (profile === 'girl') {
-    return GIRL_MSGS[Math.floor(Math.random() * GIRL_MSGS.length)];
-  } else if (profile === 'boy') {
-    return BOY_MSGS[Math.floor(Math.random() * BOY_MSGS.length)];
+/* E. Messages d'encouragement pour enfants — multilingue */
+var CHILD_MSGS = {
+  girl: {
+    fr:['🌟 Waouh, tu es une championne !','🦋 Magnifique ! Continue comme ça !','⭐ Tu brilles comme une étoile !','🌸 Incroyable ! Tu es trop forte !'],
+    en:['🌟 Wow, you are a champion!','🦋 Amazing! Keep it up!','⭐ You shine like a star!','🌸 Incredible! You are so strong!'],
+    es:['🌟 ¡Vaya, eres una campeona!','🦋 ¡Magnífico! ¡Sigue así!','⭐ ¡Brillas como una estrella!','🌸 ¡Increíble! ¡Eres muy buena!'],
+    de:['🌟 Wow, du bist eine Championin!','🦋 Wunderbar! Mach weiter so!','⭐ Du strahlst wie ein Stern!','🌸 Unglaublich! Du bist so stark!'],
+    nl:['🌟 Wauw, jij bent een kampioene!','🦋 Geweldig! Ga zo door!','⭐ Je schijnt als een ster!','🌸 Ongelooflijk! Je bent zo sterk!'],
+    it:['🌟 Wow, sei una campionessa!','🦋 Magnifico! Continua così!','⭐ Brilli come una stella!','🌸 Incredibile! Sei fortissima!'],
+    pt:['🌟 Uau, és uma campeã!','🦋 Magnífico! Continua assim!','⭐ Brilhas como uma estrela!','🌸 Incrível! És muito forte!'],
+    ru:['🌟 Вау, ты чемпионка!','🦋 Великолепно! Продолжай так!','⭐ Ты сияешь как звезда!','🌸 Невероятно! Ты такая сильная!'],
+    tr:['🌟 Vay, şampiyonsun!','🦋 Muhteşem! Böyle devam et!','⭐ Bir yıldız gibi parlıyorsun!','🌸 İnanılmaz! Çok güçlüsün!'],
+    zh:['🌟 哇，你真是冠军！','🦋 太棒了！继续加油！','⭐ 你像星星一样闪耀！','🌸 难以置信！你太厉害了！'],
+    id:['🌟 Wow, kamu juaranya!','🦋 Luar biasa! Terus begini!','⭐ Kamu bersinar seperti bintang!','🌸 Luar biasa! Kamu sangat hebat!'],
+    ur:['🌟 واہ، تم چیمپیئن ہو!','🦋 شاندار! ایسے ہی چلتے رہو!','⭐ تم ستارے کی طرح چمکتی ہو!','🌸 ناقابل یقین! تم بہت مضبوط ہو!'],
+    hi:['🌟 वाह, तुम चैंपियन हो!','🦋 शानदार! ऐसे ही चलते रहो!','⭐ तुम एक तारे की तरह चमकती हो!','🌸 अविश्वसनीय! तुम बहुत मजबूत हो!']
+  },
+  boy: {
+    fr:['🚀 Trop fort, champion !','⚡ Excellent ! Tu déchires !','🏆 Super héros de l\'arabe !','🎯 Dans le mille ! Bravo !'],
+    en:['🚀 Too strong, champion!','⚡ Excellent! You rock!','🏆 Arabic superhero!','🎯 Bullseye! Well done!'],
+    es:['🚀 ¡Demasiado fuerte, campeón!','⚡ ¡Excelente! ¡Lo estás rompiendo!','🏆 ¡Superhéroe del árabe!','🎯 ¡En el blanco! ¡Bravo!'],
+    de:['🚀 Zu stark, Champion!','⚡ Ausgezeichnet! Du rockst!','🏆 Arabisch-Superheld!','🎯 Volltreffer! Bravo!'],
+    nl:['🚀 Te sterk, kampioen!','⚡ Uitstekend! Je rockt!','🏆 Arabische superheld!','🎯 Schot in de roos! Bravo!'],
+    it:['🚀 Troppo forte, campione!','⚡ Eccellente! Sei il migliore!','🏆 Supereroe dell\'arabo!','🎯 Nel segno! Bravo!'],
+    pt:['🚀 Demasiado forte, campeão!','⚡ Excelente! Arrasas!','🏆 Super-herói do árabe!','🎯 Na mouche! Bravo!'],
+    ru:['🚀 Слишком силён, чемпион!','⚡ Отлично! Ты крутой!','🏆 Супергерой арабского!','🎯 В яблочко! Молодец!'],
+    tr:['🚀 Çok güçlüsün, şampiyon!','⚡ Mükemmel! Harikasın!','🏆 Arapça süper kahramanı!','🎯 Tam isabetle! Bravo!'],
+    zh:['🚀 太厉害了，冠军！','⚡ 出色！你太棒了！','🏆 阿拉伯语超级英雄！','🎯 正中靶心！好样的！'],
+    id:['🚀 Terlalu kuat, juara!','⚡ Luar biasa! Kamu hebat!','🏆 Superhero bahasa Arab!','🎯 Tepat sasaran! Bravo!'],
+    ur:['🚀 بہت مضبوط، چیمپیئن!','⚡ بہترین! تم شاندار ہو!','🏆 عربی کے سپر ہیرو!','🎯 بالکل صحیح! شاباش!'],
+    hi:['🚀 बहुत मजबूत, चैंपियन!','⚡ उत्कृष्ट! तुम शानदार हो!','🏆 अरबी के सुपर हीरो!','🎯 एकदम सही! शाबाश!']
   }
-  return null;
+};
+function getEncouragementMsg(profile) {
+  var lang = (typeof st !== 'undefined' && st.lang) ? st.lang : 'fr';
+  var msgs = CHILD_MSGS[profile];
+  if (!msgs) return null;
+  var arr = msgs[lang] || msgs['fr'];
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 /* Déclencher effets sur bonne réponse (yesBtn click) */
