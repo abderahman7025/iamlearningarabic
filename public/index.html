@@ -5347,11 +5347,36 @@ function renderExPage(ca){
       var showBtn=document.createElement('button');showBtn.className='rbtn rbtn-m';
       showBtn.style.cssText='margin-top:8px;background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3)';
       showBtn.textContent=t('ex_show_answer')||'Voir la réponse';
-      showBtn.onclick=function(){
-        ansBox.style.display='block';showBtn.style.display='none';nextWrap.style.display='flex';
+      // Self-report Oui/Non pour comptabiliser les réponses écriture
+      var srWrap=document.createElement('div');srWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:8px;width:100%;margin-top:6px';
+      var srLbl=document.createElement('div');srLbl.style.cssText='font-size:.85rem;color:var(--text-sec);text-align:center';srLbl.textContent=t('self_report_q')||'As-tu répondu juste ?';
+      var srBtns=document.createElement('div');srBtns.style.cssText='display:flex;gap:10px;width:100%';
+      var srYes=document.createElement('button');srYes.className='rbtn rbtn-m';srYes.style.cssText='flex:1;background:rgba(34,211,160,.15);border-color:rgba(34,211,160,.4);color:#22d3a0;';srYes.innerHTML='✅ '+(t('self_yes')||'Oui');
+      var srNo=document.createElement('button');srNo.className='rbtn rbtn-m';srNo.style.cssText='flex:1;background:rgba(255,77,109,.15);border-color:rgba(255,77,109,.4);color:#ff4d6d;';srNo.innerHTML='❌ '+(t('self_no')||'Non');
+      function handleWriteSR(correct){
+        srYes.disabled=true;srNo.disabled=true;srWrap.style.opacity='.4';
+        if(correct){playChildSound('win');}else{playChildSound('lose');}
+        if(!correct){var go=loseHeart();if(go)return;}
+        if(session&&session.id){
+          var cur=st.scores[session.id]||0;
+          st.scores[session.id]=correct?Math.min(100,cur+Math.round(100/total)):Math.max(0,cur-Math.round(50/total));
+          try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}
+        }
+        if(correct){launchConfetti(st.profile);showStarBurst(window.innerWidth/2,window.innerHeight/2,st.profile);}
+        var msg=getEncouragementMsg(st.profile);
+        if(msg){var tst=document.createElement('div');tst.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:.95rem;z-index:9999;white-space:nowrap;pointer-events:none';tst.textContent=msg;document.body.appendChild(tst);setTimeout(function(){if(tst.parentNode)tst.parentNode.removeChild(tst);},2500);}
+        nextWrap.style.display='flex';
         setTimeout(function(){var nb=nextWrap.querySelector('button,.rbtn');if(nb)nb.scrollIntoView({behavior:'smooth',block:'center'});},100);
+      }
+      srYes.onclick=function(){handleWriteSR(true);};
+      srNo.onclick=function(){handleWriteSR(false);};
+      srBtns.appendChild(srYes);srBtns.appendChild(srNo);
+      srWrap.appendChild(srLbl);srWrap.appendChild(srBtns);
+      showBtn.onclick=function(){
+        ansBox.style.display='block';showBtn.style.display='none';srWrap.style.display='flex';
+        setTimeout(function(){srLbl.scrollIntoView({behavior:'smooth',block:'center'});},100);
       };
-      audioWrap.appendChild(audioBtn);audioWrap.appendChild(mcWrap);audioWrap.appendChild(clrBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(ansBox);audioWrap.appendChild(nextWrap);
+      audioWrap.appendChild(audioBtn);audioWrap.appendChild(mcWrap);audioWrap.appendChild(clrBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(ansBox);audioWrap.appendChild(srWrap);audioWrap.appendChild(nextWrap);
       qbox.appendChild(audioWrap);
       ca.appendChild(qbox);
       setTimeout(function(){
@@ -6935,7 +6960,7 @@ function loseHeart() {
   updateHeartsDisplay();
   if(childHearts===0) {
     setTimeout(function(){
-      showChildAlert(st.profile==='girl'?'💔 Plus de vies ! Tu réessaieras demain 💪':'💔 Game over ! Tu réessaieras demain 💪');
+      showChildAlert(st.profile==='girl'?'💔 Plus de vies ! Revois la leçon ! 📖':'💔 Plus de vies ! Revois la leçon ! 📖');
       setTimeout(function(){showS('s-menu',false);}, 2500);
     }, 500);
     return true; // game over
