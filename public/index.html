@@ -2346,17 +2346,7 @@ body.profile-boy #boy-bg-anim {
 .sess-island.desert{background:linear-gradient(135deg,rgba(239,68,68,.5),rgba(185,28,28,.4));border-color:rgba(239,68,68,.85);box-shadow:0 4px 22px rgba(239,68,68,.25)}
 .sess-island.palace{background:linear-gradient(135deg,rgba(168,85,247,.5),rgba(124,58,237,.4));border-color:rgba(168,85,247,.85);box-shadow:0 4px 22px rgba(168,85,247,.25)}
 .sess-island.boss-isle{background:linear-gradient(135deg,rgba(245,200,66,.55),rgba(251,191,36,.45));border-color:rgba(245,200,66,.9);box-shadow:0 4px 30px rgba(245,200,66,.35)}
-/* ---- Desktop game-map layout ---- */
-@media(min-width:580px){
-  .sess-map-wrap{max-width:720px}
-  .isle-globe{position:relative}
-  .isle-globe>.sess-island[data-pos="left"]{align-self:flex-start;width:53%;margin-right:auto}
-  .isle-globe>.sess-island[data-pos="right"]{align-self:flex-end;width:53%;margin-left:auto}
-  .isle-globe>.sess-island.boss-isle{align-self:center;width:60%}
-  .isle-connector{display:none}
-  .isle-mg-card{max-width:60%;align-self:center}
-}
-.isle-char{position:absolute;font-size:2.6rem;z-index:20;pointer-events:none;transition:left .55s cubic-bezier(.34,1.56,.64,1),top .55s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 3px 8px rgba(0,0,0,.6));user-select:none}
+
 .isle-ico{font-size:3rem;line-height:1;margin-bottom:10px;display:block}
 .isle-name{font-size:1rem;font-weight:800;margin:4px 0 4px}
 .isle-sub{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:2px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em}
@@ -4720,80 +4710,152 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(boss);
 
 
-  // ---- Desktop game-map: zigzag + SVG paths + character ----
+  
+  // ═══════════════════════════════════════════════
+  //  DESKTOP MAP — zigzag + courbes SVG + personnage
+  // ═══════════════════════════════════════════════
   setTimeout(function(){
-    if(window.innerWidth < 580) return;
+    var DW=window.innerWidth;
+    if(DW<580)return;
 
-    // Reload scores from localStorage (unlock fix)
-    try{var sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=sv[k];});}catch(e){}
+    // Zigzag: styles inline sur les îles (pas de CSS selector)
+    var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
+    var ISLE_W=Math.min(Math.round(DW*0.38),320)+'px';
+    isleCards.forEach(function(el,i){
+      el.style.width=ISLE_W;
+      el.style.flexShrink='0';
+      el.style.marginBottom='8px';
+      if(i%2===0){el.style.marginRight='auto';el.style.marginLeft='0';}
+      else{el.style.marginLeft='auto';el.style.marginRight='0';}
+    });
+    // Centre le boss
+    var boss=globeDiv.querySelector('.boss-isle');
+    if(boss){boss.style.width=ISLE_W;boss.style.margin='8px auto';}
+    // Cache les connecteurs texte
+    Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(c){c.style.display='none';});
 
     globeDiv.style.position='relative';
 
-    // Zigzag: assign data-pos to islands
-    var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-    isleCards.forEach(function(el,i){el.setAttribute('data-pos',i%2===0?'left':'right');});
-
+    // Dessine les chemins SVG courbés après relayout
     setTimeout(function(){
-      var gRect=globeDiv.getBoundingClientRect();
-
-      // SVG curved paths between islands
+      var gR=globeDiv.getBoundingClientRect();
+      var H=globeDiv.offsetHeight;
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.style.cssText='position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:1;overflow:visible';
-      svg.style.height=globeDiv.scrollHeight+'px';
-      var pathColor='rgba(255,255,255,0.22)';
+      svg.setAttribute('width','100%');
+      svg.setAttribute('height',H);
+      svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:0;overflow:visible';
 
       for(var i=0;i<isleCards.length-1;i++){
         var r1=isleCards[i].getBoundingClientRect();
         var r2=isleCards[i+1].getBoundingClientRect();
-        var x1=r1.left+r1.width/2-gRect.left;
-        var y1=r1.bottom-gRect.top+6;
-        var x2=r2.left+r2.width/2-gRect.left;
-        var y2=r2.top-gRect.top-6;
-        var cx1=x1; var cy1=(y1+y2)/2;
-        var cx2=x2; var cy2=(y1+y2)/2;
-        var p=document.createElementNS('http://www.w3.org/2000/svg','path');
-        p.setAttribute('d','M'+x1+','+y1+' C'+cx1+','+cy1+' '+cx2+','+cy2+' '+x2+','+y2);
-        p.setAttribute('fill','none');
-        p.setAttribute('stroke',pathColor);
-        p.setAttribute('stroke-width','5');
-        p.setAttribute('stroke-dasharray','12,8');
-        p.setAttribute('stroke-linecap','round');
-        svg.appendChild(p);
+        var x1=r1.left+r1.width/2-gR.left;
+        var y1=r1.bottom-gR.top+4;
+        var x2=r2.left+r2.width/2-gR.left;
+        var y2=r2.top-gR.top-4;
+        var my=(y1+y2)/2;
+        var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+        path.setAttribute('d','M'+x1.toFixed(1)+','+y1.toFixed(1)+
+          ' C'+x1.toFixed(1)+','+my.toFixed(1)+
+          ' '+x2.toFixed(1)+','+my.toFixed(1)+
+          ' '+x2.toFixed(1)+','+y2.toFixed(1));
+        path.setAttribute('fill','none');
+        path.setAttribute('stroke','rgba(255,255,255,0.35)');
+        path.setAttribute('stroke-width','5');
+        path.setAttribute('stroke-dasharray','12,9');
+        path.setAttribute('stroke-linecap','round');
+        svg.appendChild(path);
+        // Petits cercles décoratifs sur le chemin
+        var dots=[0.25,0.5,0.75];
+        dots.forEach(function(t){
+          var px=x1+(x2-x1)*t; var py=y1+(y2-y1)*t;
+          var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+          c.setAttribute('cx',px.toFixed(1));c.setAttribute('cy',py.toFixed(1));
+          c.setAttribute('r','3');c.setAttribute('fill','rgba(255,255,255,0.2)');
+          svg.appendChild(c);
+        });
       }
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
-      // Determine current island index
-      var charIdx=0;
-      var pDone=true;
-      for(var i=0;i<islandDefs.length;i++){
-        var sids=islandDefs[i].sids;
-        var done=sids.every(function(sid){return st.scores[sid]!==undefined;});
-        if(pDone&&!done){charIdx=i;break;}
-        if(i===islandDefs.length-1)charIdx=i;
-        pDone=done;
-      }
+      // Personnage SVG (vue du dessus, corps complet)
+      var isGirl=(st.profile==='girl');
+      var charSVG=isGirl?
+        '<svg viewBox="0 0 44 56" width="52" height="66" xmlns="http://www.w3.org/2000/svg">'+
+          '<ellipse cx="22" cy="52" rx="13" ry="4" fill="rgba(0,0,0,0.25)"/>'+
+          // Jambes
+          '<ellipse cx="16" cy="43" rx="4" ry="7" fill="#f9a8d4"/>'+
+          '<ellipse cx="28" cy="43" rx="4" ry="7" fill="#f9a8d4"/>'+
+          // Robe
+          '<ellipse cx="22" cy="33" rx="13" ry="10" fill="#ec4899"/>'+
+          // Bras
+          '<ellipse cx="8"  cy="29" rx="3.5" ry="7" fill="#fde68a" transform="rotate(-15,8,29)"/>'+
+          '<ellipse cx="36" cy="29" rx="3.5" ry="7" fill="#fde68a" transform="rotate(15,36,29)"/>'+
+          // Tête
+          '<circle cx="22" cy="18" r="13" fill="#fde68a"/>'+
+          // Cheveux
+          '<ellipse cx="22" cy="9"  rx="12" ry="7"  fill="#92400e"/>'+
+          '<ellipse cx="10" cy="19" rx="4"  ry="9"  fill="#92400e"/>'+
+          '<ellipse cx="34" cy="19" rx="4"  ry="9"  fill="#92400e"/>'+
+          // Yeux
+          '<circle cx="18" cy="17" r="2.2" fill="#1e1b4b"/>'+
+          '<circle cx="26" cy="17" r="2.2" fill="#1e1b4b"/>'+
+          '<circle cx="18.7" cy="16.3" r=".7" fill="white"/>'+
+          '<circle cx="26.7" cy="16.3" r=".7" fill="white"/>'+
+          // Bouche
+          '<path d="M18,22 Q22,26 26,22" stroke="#be185d" stroke-width="1.5" fill="none" stroke-linecap="round"/>'+
+        '</svg>':
+        '<svg viewBox="0 0 44 56" width="52" height="66" xmlns="http://www.w3.org/2000/svg">'+
+          '<ellipse cx="22" cy="52" rx="13" ry="4" fill="rgba(0,0,0,0.25)"/>'+
+          // Jambes
+          '<ellipse cx="16" cy="44" rx="4" ry="6" fill="#7c5230"/>'+
+          '<ellipse cx="28" cy="44" rx="4" ry="6" fill="#7c5230"/>'+
+          // Corps
+          '<ellipse cx="22" cy="33" rx="12" ry="9" fill="#38bdf8"/>'+
+          // Bras
+          '<ellipse cx="8"  cy="29" rx="3.5" ry="7" fill="#fde68a" transform="rotate(-15,8,29)"/>'+
+          '<ellipse cx="36" cy="29" rx="3.5" ry="7" fill="#fde68a" transform="rotate(15,36,29)"/>'+
+          // Tête
+          '<circle cx="22" cy="18" r="13" fill="#fde68a"/>'+
+          // Cheveux courts
+          '<ellipse cx="22" cy="9"  rx="12" ry="6"  fill="#7c5230"/>'+
+          '<ellipse cx="11" cy="13" rx="5"  ry="7"  fill="#7c5230"/>'+
+          '<ellipse cx="33" cy="13" rx="5"  ry="7"  fill="#7c5230"/>'+
+          // Yeux
+          '<circle cx="18" cy="17" r="2.2" fill="#1e1b4b"/>'+
+          '<circle cx="26" cy="17" r="2.2" fill="#1e1b4b"/>'+
+          '<circle cx="18.7" cy="16.3" r=".7" fill="white"/>'+
+          '<circle cx="26.7" cy="16.3" r=".7" fill="white"/>'+
+          // Bouche
+          '<path d="M18,22 Q22,26 26,22" stroke="#b45309" stroke-width="1.5" fill="none" stroke-linecap="round"/>'+
+        '</svg>';
 
-      // Character element
       var charEl=document.createElement('div');
-      charEl.className='isle-char';
-      charEl.textContent=st.profile==='girl'?'👧':'👦';
+      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;'+
+        'transition:left .7s cubic-bezier(.34,1.56,.64,1),top .7s cubic-bezier(.34,1.56,.64,1);'+
+        'filter:drop-shadow(0 5px 10px rgba(0,0,0,0.5))';
+      charEl.innerHTML=charSVG;
       globeDiv.appendChild(charEl);
+
+      // Île courante = première non-complétée
+      var charIdx=0;
+      for(var i=0;i<islandDefs.length;i++){
+        var done=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
+        if(!done){charIdx=i;break;}
+        if(i===islandDefs.length-1)charIdx=i;
+      }
 
       function placeChar(idx){
         if(idx>=isleCards.length)return;
         var cr=globeDiv.getBoundingClientRect();
         var r=isleCards[idx].getBoundingClientRect();
-        charEl.style.left=(r.left-cr.left+r.width/2-22)+'px';
-        charEl.style.top=(r.top-cr.top-52)+'px';
+        charEl.style.left=(r.left-cr.left+r.width/2-26)+'px';
+        charEl.style.top=(r.top-cr.top-68)+'px';
       }
       placeChar(charIdx);
-
-      // Move character on island click
       isleCards.forEach(function(card,idx){
         card.addEventListener('click',function(){placeChar(idx);});
       });
 
-    },200);
+    },250);
   },0);
   wrap.appendChild(globeDiv);
   ca.appendChild(wrap);
