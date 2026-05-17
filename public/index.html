@@ -4721,44 +4721,63 @@ function renderSessionsMap(ca){
       if(_bm)_bm.style.visibility='hidden';
     }
     if(DW<580){
-      // MOBILE MAP : chemins SVG entre les iles (mise en page verticale conservee)
+      // MOBILE MAP v2 : 50% largeur, alternance gauche/droite
+      Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
       var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-      isleCardsMob.forEach(function(el){el.style.position='relative';el.style.zIndex='5';});
       var bossElMob=globeDiv.querySelector('.boss-isle');
-      if(bossElMob)bossElMob.style.zIndex='5';
-      // Cacher les fleches texte entre les iles
-      Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.visibility='hidden';});
+      // Layout : 50% largeur, alternance flex-start / flex-end
+      globeDiv.style.paddingTop='100px';
+      globeDiv.style.position='relative';
+      globeDiv.style.gap='44px';
+      var IWmob=Math.floor(DW*0.50);
+      isleCardsMob.forEach(function(el,i){
+        el.style.width=IWmob+'px';
+        el.style.flexShrink='0';
+        el.style.position='relative';
+        el.style.zIndex='5';
+        el.style.alignSelf=(i%2===0)?'flex-start':'flex-end';
+      });
+      if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
+      // Avatar en haut au centre
+      var isGirlMob=(st.profile==='girl');
+      var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
+      var charElMob=document.createElement('div');
+      charElMob.style.cssText='position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
+      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
+      globeDiv.appendChild(charElMob);
       setTimeout(function(){
-        globeDiv.style.position='relative';
         var gW=globeDiv.offsetWidth;
         var gH=globeDiv.scrollHeight;
         var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
         svg.setAttribute('width',gW);svg.setAttribute('height',gH);
         svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
         globeDiv.insertBefore(svg,globeDiv.firstChild);
-        var centersMob=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
-        var hHmob=isleCardsMob.map(function(el){return el.offsetHeight/2;});
-        var MG=8;
         function drawMobPath(d){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.18)');sh.setAttribute('stroke-width','26');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.18)');sh.setAttribute('stroke-width','22');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,245,195,0.85)');mp.setAttribute('stroke-width','18');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,245,195,0.85)');mp.setAttribute('stroke-width','14');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');dp.setAttribute('stroke-width','3');dp.setAttribute('stroke-dasharray','12,11');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');dp.setAttribute('stroke-width','3');dp.setAttribute('stroke-dasharray','10,9');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
-        for(var i=0;i<centersMob.length-1;i++){
-          var c0m=centersMob[i],c1m=centersMob[i+1];
-          var sy=c0m.y+hHmob[i]+MG,ey=c1m.y-hHmob[i+1]-MG;
-          var midY=(sy+ey)/2;
-          var sw=i%2===0?gW*0.18:gW*0.82;
-          var dm='M '+gW/2+','+sy+' C '+sw+','+(midY-10)+' '+sw+','+(midY+10)+' '+gW/2+','+ey;
-          drawMobPath(dm);
+        // Avatar (centre haut) -> premiere ile (gauche)
+        if(isleCardsMob.length>0){
+          var el0=isleCardsMob[0];
+          var ix0=el0.offsetLeft+el0.offsetWidth/2,iy0=el0.offsetTop;
+          var avX=gW/2,avY=80;
+          drawMobPath('M '+avX+','+avY+' C '+avX+','+(avY+50)+' '+ix0+','+(iy0-40)+' '+ix0+','+iy0);
         }
-      },250);
+        // Chemin ile -> ile suivante
+        for(var i=0;i<isleCardsMob.length-1;i++){
+          var eA=isleCardsMob[i],eB=isleCardsMob[i+1];
+          var axC=eA.offsetLeft+eA.offsetWidth/2,ayB=eA.offsetTop+eA.offsetHeight;
+          var bxC=eB.offsetLeft+eB.offsetWidth/2,byT=eB.offsetTop;
+          var midY=(ayB+byT)/2;
+          drawMobPath('M '+axC+','+ayB+' C '+axC+','+midY+' '+bxC+','+midY+' '+bxC+','+byT);
+        }
+      },300);
       return;
     }
-
     wrap.style.maxWidth='none';
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
