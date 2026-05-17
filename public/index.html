@@ -2342,30 +2342,36 @@ body.profile-boy #child-hearts-bar { display:block; }
 
 /* Lettres arabes colorées et animées pour enfants */
 @keyframes letterPop {
-  0%,100% { transform:scale(1) rotate(0deg); }
-  50% { transform:scale(1.08) rotate(2deg); }
+  0%,100% { transform:scale(1) rotate(0deg); filter:brightness(1); }
+  50% { transform:scale(1.1) rotate(2deg); filter:brightness(1.3) drop-shadow(0 0 8px currentColor); }
 }
-@keyframes letterGlow {
-  0%,100% { text-shadow: 0 0 8px currentColor; }
-  50% { text-shadow: 0 0 20px currentColor, 0 0 40px currentColor; }
-}
-body.profile-girl .ar,
-body.profile-girl .ar-letter,
-body.profile-girl [lang="ar"] {
-  animation: letterPop 2s ease-in-out infinite, letterGlow 2s ease-in-out infinite !important;
+body.profile-girl .sess-ar,
+body.profile-girl .ltab,
+body.profile-girl .pos-ar,
+body.profile-girl .q-big,
+body.profile-girl .orb-ar,
+body.profile-girl .ans-btn.ar-ans,
+body.profile-girl [style*="font-family:var(--fa)"] {
+  animation: letterPop 2.2s ease-in-out infinite !important;
   background: linear-gradient(135deg, #ff4da6, #a855f7, #ec4899) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  color: transparent !important;
 }
-body.profile-boy .ar,
-body.profile-boy .ar-letter,
-body.profile-boy [lang="ar"] {
-  animation: letterPop 2s ease-in-out infinite, letterGlow 2s ease-in-out infinite !important;
+body.profile-boy .sess-ar,
+body.profile-boy .ltab,
+body.profile-boy .pos-ar,
+body.profile-boy .q-big,
+body.profile-boy .orb-ar,
+body.profile-boy .ans-btn.ar-ans,
+body.profile-boy [style*="font-family:var(--fa)"] {
+  animation: letterPop 2.2s ease-in-out infinite !important;
   background: linear-gradient(135deg, #00aaff, #22d3ee, #0077dd) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+  color: transparent !important;
 }
 </style>
 
