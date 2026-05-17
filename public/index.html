@@ -4584,8 +4584,6 @@ function renderSessionsMap(ca){
   var domContainer=ca;
 
   function openSession(s){
-    // Marquer comme visité dès l'ouverture pour débloquer l'île suivante
-    if(st.scores[s.id]===undefined){st.scores[s.id]=1;try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}}
     if(s.type==='vowels')renderVLesson(domContainer,s);
     else if(s.type==='prolong')renderPLesson(domContainer,s);
     else renderLLesson(domContainer,s,0);
@@ -4630,7 +4628,7 @@ function renderSessionsMap(ca){
     var isleSessions=isle.sids.map(function(sid){
       return ALL_S.find(function(s){return s.id===sid;})||null;
     }).filter(Boolean);
-    var doneCount=isleSessions.filter(function(s){return st.scores[s.id]!==undefined;}).length;
+    var doneCount=isleSessions.filter(function(s){return (st.scores[s.id]||0)>=80;}).length;
     var isLocked=!prevIslandDone;
     var isComplete=doneCount===isleSessions.length;
 
@@ -4710,7 +4708,7 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(boss);
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  //  DESKTOP MAP v5
+  //  DESKTOP MAP v6
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
@@ -4735,11 +4733,9 @@ function renderSessionsMap(ca){
     var IW=Math.min(Math.round(DW*0.44),580);
     globeDiv.style.gap='70px';
 
-    // Sauvegarder les onclick AVANT de les nullifier
-    // (ils seront appelÃ©s APRÃˆS l'animation)
     isleCards.forEach(function(el,i){
-      el._desktopOrigClick=el.onclick; // sauvegarder openSession(...)
-      el.onclick=null;                 // empÃªcher ouverture immÃ©diate
+      el._desktopOrigClick=el.onclick;
+      el.onclick=null;
 
       el.style.width=IW+'px';
       el.style.flexShrink='0';
@@ -4756,22 +4752,24 @@ function renderSessionsMap(ca){
 
     setTimeout(function(){
       globeDiv.style.position='relative';
-      var gR=globeDiv.getBoundingClientRect();
-      var gW=gR.width;
+
+      // Dimensions via offsetWidth (espace SVG = espace globeDiv)
+      var gW=globeDiv.offsetWidth;
       var gH=globeDiv.scrollHeight;
 
-      // SVG (z-index infÃ©rieur aux Ã®les)
+      // SVG en dessous des Ã®les (z-index 0)
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);
       svg.setAttribute('height',gH);
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
-      // Centres et demi-dimensions
-      var rects=isleCards.map(function(el){return el.getBoundingClientRect();});
-      var centers=rects.map(function(r){return{x:r.left-gR.left+r.width/2,y:r.top-gR.top+r.height/2};});
-      var hW=rects.map(function(r){return r.width/2;});
-      var hH=rects.map(function(r){return r.height/2;});
+      // Positions via offsetLeft/offsetTop : coordonnÃ©es DIRECTEMENT dans l'espace SVG
+      var centers=isleCards.map(function(el){
+        return{x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight/2};
+      });
+      var hW=isleCards.map(function(el){return el.offsetWidth/2;});
+      var hH=isleCards.map(function(el){return el.offsetHeight/2;});
 
       var segments=[];
 
@@ -4780,7 +4778,7 @@ function renderSessionsMap(ca){
         var hw0=hW[i],hh0=hH[i],hw1=hW[i+1],hh1=hH[i+1];
         var segT=i%4;
         var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
-        var MARGIN=6; // petite marge pour que le cap rond ne rentre pas dans l'Ã®le
+        var MARGIN=6;
 
         if(segT===0){
           // Câ†’R : sort DROITE, entre HAUT
@@ -4790,10 +4788,10 @@ function renderSessionsMap(ca){
           cp2x=gW*0.95; cp2y=c1.y-hh1-30;
         } else if(segT===1){
           // Râ†’C : sort BAS, entre DROITE
-          sx=c0.x;          sy=c0.y+hh0+MARGIN;
+          sx=c0.x;            sy=c0.y+hh0+MARGIN;
           ex=c1.x+hw1+MARGIN; ey=c1.y;
-          cp1x=c0.x;        cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.92;     cp2y=c1.y;
+          cp1x=c0.x;          cp1y=(c0.y+c1.y)/2;
+          cp2x=gW*0.92;       cp2y=c1.y;
         } else if(segT===2){
           // Câ†’L : sort GAUCHE, entre HAUT
           sx=c0.x-hw0-MARGIN; sy=c0.y;
@@ -4808,14 +4806,8 @@ function renderSessionsMap(ca){
           cp2x=gW*0.08;        cp2y=c1.y;
         }
 
-        // Segment animation centre-Ã -centre
-        var acpx=(segT===0||segT===3)?gW*0.92:gW*0.08;
-        segments.push({
-          x0:c0.x,y0:c0.y,
-          cpx1:acpx,cpy1:c0.y+(c1.y-c0.y)*0.25,
-          cpx2:acpx,cpy2:c0.y+(c1.y-c0.y)*0.75,
-          x3:c1.x,y3:c1.y
-        });
+        // Segment animation = EXACTEMENT les mÃªmes paramÃ¨tres bezier que le SVG visuel
+        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
 
         var d='M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey;
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -4847,10 +4839,10 @@ function renderSessionsMap(ca){
       }
       globeDiv.appendChild(charEl);
 
-      // ÃŽle de dÃ©part = derniÃ¨re Ã®le terminÃ©e
+      // ÃŽle de dÃ©part = derniÃ¨re Ã®le avec score >= 80%
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
-        var done=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
+        var done=islandDefs[i].sids.every(function(sid){return (st.scores[sid]||0)>=80;});
         if(done){charIdx=i;}else{break;}
       }
 
@@ -4870,7 +4862,9 @@ function renderSessionsMap(ca){
       function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
         if(currentIdx===targetIdx){
-          var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);
+          var cc=segments[Math.min(currentIdx,segments.length-1)];
+          placeCharAt(currentIdx<segments.length?segments[currentIdx].x0:segments[segments.length-1].x3,
+                      currentIdx<segments.length?segments[currentIdx].y0:segments[segments.length-1].y3);
           if(onDone)onDone();
           return;
         }
@@ -4880,12 +4874,15 @@ function renderSessionsMap(ca){
           if(step>0)queue.push({seg:segments[i],dir:1});
           else queue.push({seg:segments[i-1],dir:-1});
         }
-        var qi=0,prog=0,SPEED=0.022;
+        var qi=0,prog=0,SPEED=0.025;
         function tick(){
           if(qi>=queue.length){
             currentIdx=targetIdx;
-            var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);
-            if(onDone)onDone(); // â† ouvre le cours APRÃˆS l'animation
+            // Placer Ã  l'extrÃ©mitÃ© exacte du dernier segment
+            var lastSeg=queue[queue.length-1];
+            var finalPt=bezierPt(lastSeg.dir>0?1:0,lastSeg.seg);
+            placeCharAt(finalPt.x,finalPt.y);
+            if(onDone)onDone();
             return;
           }
           var item=queue[qi];
@@ -4893,28 +4890,35 @@ function renderSessionsMap(ca){
           var pt=bezierPt(t,item.seg);
           placeCharAt(pt.x,pt.y);
           prog+=SPEED;
-          if(prog>=1){prog=0;qi++;currentIdx+=step;}
+          if(prog>=1){
+            // Sauter exactement Ã  l'extrÃ©mitÃ© du segment terminÃ©
+            var endPt=bezierPt(item.dir>0?1:0,item.seg);
+            placeCharAt(endPt.x,endPt.y);
+            prog=0;qi++;
+            if(step>0)currentIdx++;else currentIdx--;
+          }
           animFrame=requestAnimationFrame(tick);
         }
         tick();
       }
 
-      // Position initiale
-      var cc0=centers[charIdx];
-      placeCharAt(cc0.x,cc0.y);
+      // Position initiale : dÃ©but du premier segment (bord de l'Ã®le de dÃ©part)
+      if(charIdx<segments.length){
+        placeCharAt(segments[charIdx].x0, segments[charIdx].y0);
+      }
 
       // Clic : animer D'ABORD, puis ouvrir le cours
       isleCards.forEach(function(card,idx){
-        var origFn=card._desktopOrigClick; // openSession(session) sauvegardÃ©
-        if(card.classList.contains('locked-isle'))return; // Ã®le verrouillÃ©e : rien
+        var origFn=card._desktopOrigClick;
+        if(card.classList.contains('locked-isle'))return;
         card.addEventListener('click',function(){
           animateTo(idx,function(){
-            if(origFn)origFn.call(card); // ouvre le cours quand le personnage arrive
+            if(origFn)origFn.call(card);
           });
         });
       });
 
-    },250);
+    },300);
   },0);
 wrap.appendChild(globeDiv);
   ca.appendChild(wrap);
