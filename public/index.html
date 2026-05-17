@@ -4521,6 +4521,7 @@ function renderSessionsMap(ca){
   ca.style.cssText='';
   // Charger les scores depuis localStorage
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
+  try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
   var wrap=document.createElement('div');
   wrap.className='sess-map-wrap';
 
@@ -4689,7 +4690,7 @@ function renderSessionsMap(ca){
       globeDiv.appendChild(conn);
     }
 
-    prevIslandDone=isleSessions.every(function(s){return (st.scores[s.id]||0)>0;});
+    prevIslandDone=isleSessions.every(function(s){var _a=(st.accuracy||{})[s.id];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
   });
 
   // Boss final — Grand Quiz
@@ -4852,7 +4853,7 @@ function renderSessionsMap(ca){
       // charIdx : 0=home, i+1=Ã®le i engagÃ©e (score>0)
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
-        var done=islandDefs[i].sids.every(function(sid){return (st.scores[sid]||0)>0;});
+        var done=islandDefs[i].sids.every(function(sid){var _a=(st.accuracy||{})[sid];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
         if(done){charIdx=i+1;}else{break;}
       }
 
@@ -6083,6 +6084,7 @@ function renderAudioExercise(ca,qs,session){
           var cur=st.scores[session.id]||0;
           if(correct){st.scores[session.id]=Math.min(100,cur+Math.round(100/total));}
           else{st.scores[session.id]=Math.max(0,cur-Math.round(50/total));}
+          var _ac=st.accuracy||(st.accuracy={});var _a=_ac[session.id]||{c:0,t:0};_a.t++;if(correct)_a.c++;_ac[session.id]=_a;try{localStorage.setItem('arab_acc',JSON.stringify(_ac));}catch(e){}
           try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}
           setChildStars(session.id,st.scores[session.id]);
           var done=Object.keys(st.scores).length;checkChildBadges(done,st.scores[session.id]);
@@ -6166,6 +6168,7 @@ function renderAudioExercise(ca,qs,session){
           var delta = correct ? 5 : -3;
           var newScore = Math.max(0, Math.min(100, cur + delta));
           st.scores[session.id] = newScore;
+          var _ac=st.accuracy||(st.accuracy={});var _a=_ac[session.id]||{c:0,t:0};_a.t++;if(correct)_a.c++;_ac[session.id]=_a;try{localStorage.setItem('arab_acc',JSON.stringify(_ac));}catch(e){}
           try{localStorage.setItem('arab_scores', JSON.stringify(st.scores));}catch(e){}
           renderGlobalProgress();
           // Étoiles enfant à chaque mise à jour de score
@@ -6287,6 +6290,7 @@ function renderExPage(ca){
         if(session&&session.id){
           var cur=st.scores[session.id]||0;
           st.scores[session.id]=correct?Math.min(100,cur+Math.round(100/total)):Math.max(0,cur-Math.round(50/total));
+          var _ac=st.accuracy||(st.accuracy={});var _a=_ac[session.id]||{c:0,t:0};_a.t++;if(correct)_a.c++;_ac[session.id]=_a;try{localStorage.setItem('arab_acc',JSON.stringify(_ac));}catch(e){}
           try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}
         }
         if(correct){launchConfetti(st.profile);showStarBurst(window.innerWidth/2,window.innerHeight/2,st.profile);}
