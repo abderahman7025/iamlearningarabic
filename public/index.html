@@ -4710,12 +4710,12 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(boss);
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  //  DESKTOP MAP v4 â€” chemins bord-Ã -bord
+  //  DESKTOP MAP v5
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
 
-    // Cache les mascottes fixes sur la carte
+    // Cache les mascottes fixes
     if(DW>=580){
       var _gm=document.getElementById('girl-mascot');
       var _bm=document.getElementById('boy-mascot');
@@ -4729,16 +4729,22 @@ function renderSessionsMap(ca){
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
 
-    // Disposition : Centre â†’ Droite â†’ Centre â†’ Gauche (cycle 4)
+    // Disposition Centre/Droite/Centre/Gauche
     var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.44),580);
     globeDiv.style.gap='70px';
+
+    // Sauvegarder les onclick AVANT de les nullifier
+    // (ils seront appelÃ©s APRÃˆS l'animation)
     isleCards.forEach(function(el,i){
+      el._desktopOrigClick=el.onclick; // sauvegarder openSession(...)
+      el.onclick=null;                 // empÃªcher ouverture immÃ©diate
+
       el.style.width=IW+'px';
       el.style.flexShrink='0';
       el.style.position='relative';
-      el.style.zIndex='5';   // au-dessus du SVG (z-index:0)
+      el.style.zIndex='5';
       var pos=posPattern[i%4];
       if(pos==='center'){el.style.marginLeft='auto';el.style.marginRight='auto';}
       else if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
@@ -4754,62 +4760,55 @@ function renderSessionsMap(ca){
       var gW=gR.width;
       var gH=globeDiv.scrollHeight;
 
-      // SVG derriÃ¨re les Ã®les
+      // SVG (z-index infÃ©rieur aux Ã®les)
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);
       svg.setAttribute('height',gH);
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
-      // Centres et demi-dimensions de chaque Ã®le
+      // Centres et demi-dimensions
       var rects=isleCards.map(function(el){return el.getBoundingClientRect();});
       var centers=rects.map(function(r){return{x:r.left-gR.left+r.width/2,y:r.top-gR.top+r.height/2};});
       var hW=rects.map(function(r){return r.width/2;});
       var hH=rects.map(function(r){return r.height/2;});
 
-      // segments = courbes centre-Ã -centre pour l'animation du personnage
       var segments=[];
 
       for(var i=0;i<centers.length-1;i++){
-        var c0=centers[i], c1=centers[i+1];
-        var hw0=hW[i], hh0=hH[i], hw1=hW[i+1], hh1=hH[i+1];
-        var segT=i%4; // type: 0=Câ†’R  1=Râ†’C  2=Câ†’L  3=Lâ†’C
-
-        // â”€â”€ Points de dÃ©part/arrivÃ©e bord-Ã -bord â”€â”€
-        // Pattern : droiteâ†’haut | basâ†’droite | gaucheâ†’haut | basâ†’gauche
+        var c0=centers[i],c1=centers[i+1];
+        var hw0=hW[i],hh0=hH[i],hw1=hW[i+1],hh1=hH[i+1];
+        var segT=i%4;
         var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
+        var MARGIN=6; // petite marge pour que le cap rond ne rentre pas dans l'Ã®le
 
         if(segT===0){
-          // Câ†’R : sort du bord DROIT du centre, entre par le bord HAUT de la droite
-          sx=c0.x+hw0;    sy=c0.y;
-          ex=c1.x;        ey=c1.y-hh1;
-          // courbe vers la droite puis descend
-          cp1x=gW*0.95;   cp1y=c0.y;
-          cp2x=gW*0.95;   cp2y=c1.y-hh1-30;
+          // Câ†’R : sort DROITE, entre HAUT
+          sx=c0.x+hw0+MARGIN; sy=c0.y;
+          ex=c1.x;            ey=c1.y-hh1-MARGIN;
+          cp1x=gW*0.95; cp1y=c0.y;
+          cp2x=gW*0.95; cp2y=c1.y-hh1-30;
         } else if(segT===1){
-          // Râ†’C : sort du bord BAS de la droite, entre par le bord DROIT du centre
-          sx=c0.x;        sy=c0.y+hh0;
-          ex=c1.x+hw1;   ey=c1.y;
-          // descend puis revient vers la droite du centre
-          cp1x=c0.x;      cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.92;   cp2y=c1.y;
+          // Râ†’C : sort BAS, entre DROITE
+          sx=c0.x;          sy=c0.y+hh0+MARGIN;
+          ex=c1.x+hw1+MARGIN; ey=c1.y;
+          cp1x=c0.x;        cp1y=(c0.y+c1.y)/2;
+          cp2x=gW*0.92;     cp2y=c1.y;
         } else if(segT===2){
-          // Câ†’L : sort du bord GAUCHE du centre, entre par le bord HAUT de la gauche
-          sx=c0.x-hw0;   sy=c0.y;
-          ex=c1.x;       ey=c1.y-hh1;
-          // courbe vers la gauche puis descend
-          cp1x=gW*0.05;  cp1y=c0.y;
-          cp2x=gW*0.05;  cp2y=c1.y-hh1-30;
+          // Câ†’L : sort GAUCHE, entre HAUT
+          sx=c0.x-hw0-MARGIN; sy=c0.y;
+          ex=c1.x;             ey=c1.y-hh1-MARGIN;
+          cp1x=gW*0.05; cp1y=c0.y;
+          cp2x=gW*0.05; cp2y=c1.y-hh1-30;
         } else {
-          // Lâ†’C : sort du bord BAS de la gauche, entre par le bord GAUCHE du centre
-          sx=c0.x;       sy=c0.y+hh0;
-          ex=c1.x-hw1;  ey=c1.y;
-          // descend puis revient vers la gauche du centre
-          cp1x=c0.x;     cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.08;  cp2y=c1.y;
+          // Lâ†’C : sort BAS, entre GAUCHE
+          sx=c0.x;             sy=c0.y+hh0+MARGIN;
+          ex=c1.x-hw1-MARGIN;  ey=c1.y;
+          cp1x=c0.x;           cp1y=(c0.y+c1.y)/2;
+          cp2x=gW*0.08;        cp2y=c1.y;
         }
 
-        // Segment animation (centre Ã  centre)
+        // Segment animation centre-Ã -centre
         var acpx=(segT===0||segT===3)?gW*0.92:gW*0.08;
         segments.push({
           x0:c0.x,y0:c0.y,
@@ -4818,22 +4817,15 @@ function renderSessionsMap(ca){
           x3:c1.x,y3:c1.y
         });
 
-        // Chemin SVG bord-Ã -bord
         var d='M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey;
-
-        // Ombre
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
         sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.20)');
-        sh.setAttribute('stroke-width','32');sh.setAttribute('fill','none');
-        sh.setAttribute('stroke-linecap','round');
+        sh.setAttribute('stroke-width','32');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
         svg.appendChild(sh);
-        // Route principale (crÃ¨me)
         var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
         mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,245,195,0.85)');
-        mp.setAttribute('stroke-width','22');mp.setAttribute('fill','none');
-        mp.setAttribute('stroke-linecap','round');
+        mp.setAttribute('stroke-width','22');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
         svg.appendChild(mp);
-        // PointillÃ©s dorÃ©s centraux
         var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
         dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');
         dp.setAttribute('stroke-width','4');dp.setAttribute('stroke-dasharray','16,14');
@@ -4841,7 +4833,7 @@ function renderSessionsMap(ca){
         svg.appendChild(dp);
       }
 
-      // Avatar mascotte
+      // Avatar
       var isGirl=(st.profile==='girl');
       var srcEl=document.querySelector('#'+(isGirl?'girl':'boy')+'-mascot img');
       var charEl=document.createElement('div');
@@ -4855,8 +4847,7 @@ function renderSessionsMap(ca){
       }
       globeDiv.appendChild(charEl);
 
-      // ÃŽle de dÃ©part
-      // Avatar sur la derniÃ¨re Ã®le terminÃ©e (avant la 1Ã¨re non terminÃ©e)
+      // ÃŽle de dÃ©part = derniÃ¨re Ã®le terminÃ©e
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
         var done=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
@@ -4874,18 +4865,29 @@ function renderSessionsMap(ca){
       }
 
       var animFrame=null,currentIdx=charIdx;
-      function animateTo(targetIdx){
+
+      // animateTo(targetIdx, onDone) : anime le personnage puis appelle onDone
+      function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
-        if(currentIdx===targetIdx){var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);return;}
+        if(currentIdx===targetIdx){
+          var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);
+          if(onDone)onDone();
+          return;
+        }
         var step=currentIdx<targetIdx?1:-1;
         var queue=[];
         for(var i=currentIdx;i!==targetIdx;i+=step){
           if(step>0)queue.push({seg:segments[i],dir:1});
           else queue.push({seg:segments[i-1],dir:-1});
         }
-        var qi=0,prog=0,SPEED=0.020;
+        var qi=0,prog=0,SPEED=0.022;
         function tick(){
-          if(qi>=queue.length){currentIdx=targetIdx;var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);return;}
+          if(qi>=queue.length){
+            currentIdx=targetIdx;
+            var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);
+            if(onDone)onDone(); // â† ouvre le cours APRÃˆS l'animation
+            return;
+          }
           var item=queue[qi];
           var t=item.dir>0?prog:1-prog;
           var pt=bezierPt(t,item.seg);
@@ -4897,10 +4899,19 @@ function renderSessionsMap(ca){
         tick();
       }
 
+      // Position initiale
       var cc0=centers[charIdx];
       placeCharAt(cc0.x,cc0.y);
+
+      // Clic : animer D'ABORD, puis ouvrir le cours
       isleCards.forEach(function(card,idx){
-        card.addEventListener('click',function(){animateTo(idx);});
+        var origFn=card._desktopOrigClick; // openSession(session) sauvegardÃ©
+        if(card.classList.contains('locked-isle'))return; // Ã®le verrouillÃ©e : rien
+        card.addEventListener('click',function(){
+          animateTo(idx,function(){
+            if(origFn)origFn.call(card); // ouvre le cours quand le personnage arrive
+          });
+        });
       });
 
     },250);
