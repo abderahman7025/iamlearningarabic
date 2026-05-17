@@ -6080,7 +6080,7 @@ function renderAudioExercise(ca,qs,session){
         srYesW.disabled=true;srNoW.disabled=true;srWrapW.style.opacity='.4';
         if(correct){playChildSound('win');}else{playChildSound('lose');}
         if(!correct){var go=loseHeart();if(go)return;}
-        if(session&&session.id){
+        if(session&&session.id!==undefined){
           var cur=st.scores[session.id]||0;
           if(correct){st.scores[session.id]=Math.min(100,cur+Math.round(100/total));}
           else{st.scores[session.id]=Math.max(0,cur-Math.round(50/total));}
@@ -6162,7 +6162,7 @@ function renderAudioExercise(ca,qs,session){
         // Système de vies : perte sur mauvaise réponse
         if(!correct){ var go=loseHeart(); if(go) return; }
         // Comptabiliser dans les scores de la session
-        if (session && session.id) {
+        if (session && session.id !== undefined) {
           var cur = st.scores[session.id] || 0;
           // Ajuster légèrement le score : +5 si juste, -3 si faux (min 0, max 100)
           var delta = correct ? 5 : -3;
@@ -6287,7 +6287,7 @@ function renderExPage(ca){
         srYes.disabled=true;srNo.disabled=true;srWrap.style.opacity='.4';
         if(correct){playChildSound('win');}else{playChildSound('lose');}
         if(!correct){var go=loseHeart();if(go)return;}
-        if(session&&session.id){
+        if(session&&session.id!==undefined){
           var cur=st.scores[session.id]||0;
           st.scores[session.id]=correct?Math.min(100,cur+Math.round(100/total)):Math.max(0,cur-Math.round(50/total));
           var _ac=st.accuracy||(st.accuracy={});var _a=_ac[session.id]||{c:0,t:0};_a.t++;if(correct)_a.c++;_ac[session.id]=_a;try{localStorage.setItem('arab_acc',JSON.stringify(_ac));}catch(e){}
