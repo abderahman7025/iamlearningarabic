@@ -4710,18 +4710,28 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(boss);
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  //  DESKTOP MAP: Ã®les pleine largeur + chemins Ã©pais
+  //  DESKTOP MAP v3
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
+
+    // Masquer les mascottes fixes en bas Ã  gauche sur la carte des Ã®les
+    if(DW>=580){
+      var _gm=document.getElementById('girl-mascot');
+      var _bm=document.getElementById('boy-mascot');
+      if(_gm)_gm.style.visibility='hidden';
+      if(_bm)_bm.style.visibility='hidden';
+    }
+
     if(DW<580)return;
 
-    // 1. Override max-width du conteneur pour occuper toute la largeur
+    // Override max-width â†’ pleine largeur
     wrap.style.maxWidth='none';
-    wrap.style.padding='12px 0 80px';
-    globeDiv.style.alignItems='flex-start'; // nÃ©cessaire pour les marges auto
+    wrap.style.padding='0 0 80px';
+    globeDiv.style.alignItems='flex-start';
 
-    // 2. Zigzag pleine largeur
+    // Disposition : Centre â†’ Droite â†’ Centre â†’ Gauche (cycle de 4)
+    var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.44),580);
     globeDiv.style.gap='70px';
@@ -4729,14 +4739,14 @@ function renderSessionsMap(ca){
       el.style.width=IW+'px';
       el.style.flexShrink='0';
       el.style.position='relative';
-      el.style.zIndex='4'; // Ã®les au-dessus des chemins SVG
-      if(i%2===0){el.style.marginLeft='0';el.style.marginRight='auto';}
-      else{el.style.marginLeft='auto';el.style.marginRight='0';}
+      el.style.zIndex='4';
+      var pos=posPattern[i%4];
+      if(pos==='center'){el.style.marginLeft='auto';el.style.marginRight='auto';}
+      else if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
+      else{el.style.marginLeft='0';el.style.marginRight='auto';}
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
     if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='4';}
-
-    // Cache les connecteurs texte
     Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     setTimeout(function(){
@@ -4745,11 +4755,9 @@ function renderSessionsMap(ca){
       var gW=gR.width;
       var gH=globeDiv.scrollHeight;
 
-      // 3. SVG chemins Ã©pais
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);
       svg.setAttribute('height',gH);
-      // z-index:1 â†’ derriÃ¨re les Ã®les (z-index:4)
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:1;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
@@ -4759,15 +4767,42 @@ function renderSessionsMap(ca){
         return{x:r.left-gR.left+r.width/2,y:r.top-gR.top+r.height/2};
       });
 
+      // â”€â”€ clipPath even-odd : chemin visible SEULEMENT en dehors des Ã®les â”€â”€
+      var defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+      var clipId='iclip'+Math.floor(Math.random()*99999);
+      var clipPath=document.createElementNS('http://www.w3.org/2000/svg','clipPath');
+      clipPath.setAttribute('id',clipId);
+      // Grand rectangle couvrant tout le SVG
+      var pd='M-400,-400 L'+(gW+400)+',-400 L'+(gW+400)+','+(gH+400)+' L-400,'+(gH+400)+' Z ';
+      // Trous correspondant aux Ã®les (avec petit padding)
+      isleCards.forEach(function(el){
+        var r=el.getBoundingClientRect();
+        var x=Math.round(r.left-gR.left)-4;
+        var y=Math.round(r.top-gR.top)-4;
+        var w=Math.round(r.width)+8;
+        var h=Math.round(r.height)+8;
+        pd+='M'+x+','+y+' L'+(x+w)+','+y+' L'+(x+w)+','+(y+h)+' L'+x+','+(y+h)+' Z ';
+      });
+      var cpEl=document.createElementNS('http://www.w3.org/2000/svg','path');
+      cpEl.setAttribute('d',pd);
+      cpEl.setAttribute('clip-rule','evenodd');
+      clipPath.appendChild(cpEl);
+      defs.appendChild(clipPath);
+      svg.appendChild(defs);
+
+      // Groupe de chemins clippÃ©
+      var g=document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('clip-path','url(#'+clipId+')');
+      svg.appendChild(g);
+
+      // Construire les segments et dessiner les chemins
       var segments=[];
+      // Direction des points de contrÃ´le : [D,G,G,D] (selon le pattern de positions)
+      // centreâ†’droite(i%4=0): D  droiteâ†’centre(i%4=1): G  centreâ†’gauche(i%4=2): G  gaucheâ†’centre(i%4=3): D
       for(var i=0;i<centers.length-1;i++){
         var p0=centers[i];
         var p1=centers[i+1];
-        // Ã®le paire=gauche, Ã®le impaire=droite
-        // chemin part vers le bord opposÃ©, trÃ¨s loin
-        var cpx;
-        if(i%2===0){cpx=gW*0.95;} // gaucheâ†’droite: courbe Ã  droite
-        else{cpx=gW*0.05;}         // droiteâ†’gauche: courbe Ã  gauche
+        var cpx=(i%4===0||i%4===3)?gW*0.92:gW*0.08;
         var seg={
           x0:p0.x,y0:p0.y,
           cpx1:cpx,cpy1:p0.y+(p1.y-p0.y)*0.25,
@@ -4775,54 +4810,40 @@ function renderSessionsMap(ca){
           x3:p1.x,y3:p1.y
         };
         segments.push(seg);
-
         var d='M '+seg.x0+','+seg.y0+' C '+seg.cpx1+','+seg.cpy1+' '+seg.cpx2+','+seg.cpy2+' '+seg.x3+','+seg.y3;
-
-        // Ombre portÃ©e du chemin
-        var shadow=document.createElementNS('http://www.w3.org/2000/svg','path');
-        shadow.setAttribute('d',d);
-        shadow.setAttribute('stroke','rgba(0,0,0,0.25)');
-        shadow.setAttribute('stroke-width','30');
-        shadow.setAttribute('fill','none');
-        shadow.setAttribute('stroke-linecap','round');
-        svg.appendChild(shadow);
-
-        // Chemin principal Ã©pais (couleur crÃ¨me/dorÃ©e)
-        var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d',d);
-        path.setAttribute('stroke','rgba(255,245,200,0.75)');
-        path.setAttribute('stroke-width','22');
-        path.setAttribute('fill','none');
-        path.setAttribute('stroke-linecap','round');
-        svg.appendChild(path);
-
-        // Ligne centrale pointillÃ©e (pour l'effet "route")
-        var dashes=document.createElementNS('http://www.w3.org/2000/svg','path');
-        dashes.setAttribute('d',d);
-        dashes.setAttribute('stroke','rgba(255,200,80,0.6)');
-        dashes.setAttribute('stroke-width','4');
-        dashes.setAttribute('stroke-dasharray','16,14');
-        dashes.setAttribute('fill','none');
-        dashes.setAttribute('stroke-linecap','round');
-        svg.appendChild(dashes);
+        // Ombre
+        var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
+        sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.22)');
+        sh.setAttribute('stroke-width','30');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
+        g.appendChild(sh);
+        // Chemin Ã©pais crÃ¨me
+        var pt=document.createElementNS('http://www.w3.org/2000/svg','path');
+        pt.setAttribute('d',d);pt.setAttribute('stroke','rgba(255,245,200,0.82)');
+        pt.setAttribute('stroke-width','22');pt.setAttribute('fill','none');pt.setAttribute('stroke-linecap','round');
+        g.appendChild(pt);
+        // Ligne pointillÃ©e centrale dorÃ©e
+        var dt=document.createElementNS('http://www.w3.org/2000/svg','path');
+        dt.setAttribute('d',d);dt.setAttribute('stroke','rgba(255,195,60,0.65)');
+        dt.setAttribute('stroke-width','4');dt.setAttribute('stroke-dasharray','16,14');
+        dt.setAttribute('fill','none');dt.setAttribute('stroke-linecap','round');
+        g.appendChild(dt);
       }
 
-      // 4. Avatar: utilise les images mascotte existantes (#girl-mascot / #boy-mascot)
+      // Avatar : utilise les images mascottes dÃ©jÃ  intÃ©grÃ©es
       var isGirl=(st.profile==='girl');
       var srcEl=document.querySelector('#'+(isGirl?'girl':'boy')+'-mascot img');
-
       var charEl=document.createElement('div');
       charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;'+
         'filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55))';
       if(srcEl){
-        var img=document.createElement('img');
-        img.src=srcEl.src;
-        img.style.cssText='width:100%;height:100%;object-fit:contain';
-        charEl.appendChild(img);
+        var avatarImg=document.createElement('img');
+        avatarImg.src=srcEl.src;
+        avatarImg.style.cssText='width:100%;height:100%;object-fit:contain';
+        charEl.appendChild(avatarImg);
       }
       globeDiv.appendChild(charEl);
 
-      // 5. ÃŽle de dÃ©part (premiÃ¨re non terminÃ©e)
+      // ÃŽle de dÃ©part (premiÃ¨re non terminÃ©e)
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
         var allDone=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
@@ -4830,13 +4851,11 @@ function renderSessionsMap(ca){
         if(i===islandDefs.length-1)charIdx=i;
       }
 
-      // 6. Placement du personnage
       function placeCharAt(x,y){
         charEl.style.left=(x-40)+'px';
         charEl.style.top=(y-90)+'px';
       }
 
-      // 7. Interpolation sur courbe de BÃ©zier cubique
       function bezierPt(t,s){
         var mt=1-t;
         return{
@@ -4845,14 +4864,13 @@ function renderSessionsMap(ca){
         };
       }
 
-      // 8. Animation le long du chemin
       var animFrame=null;
       var currentIdx=charIdx;
 
       function animateTo(targetIdx){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
         if(currentIdx===targetIdx){
-          var c=centers[currentIdx];placeCharAt(c.x,c.y);return;
+          var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);return;
         }
         var step=currentIdx<targetIdx?1:-1;
         var queue=[];
@@ -4864,7 +4882,7 @@ function renderSessionsMap(ca){
         function tick(){
           if(qi>=queue.length){
             currentIdx=targetIdx;
-            var c=centers[currentIdx];placeCharAt(c.x,c.y);
+            var cc=centers[currentIdx];placeCharAt(cc.x,cc.y);
             return;
           }
           var item=queue[qi];
@@ -4878,11 +4896,9 @@ function renderSessionsMap(ca){
         tick();
       }
 
-      // Positionner au dÃ©part
       var c0=centers[charIdx];
       placeCharAt(c0.x,c0.y);
 
-      // Clic sur une Ã®le â†’ animation
       isleCards.forEach(function(card,idx){
         card.addEventListener('click',function(){animateTo(idx);});
       });
