@@ -2336,7 +2336,7 @@ body.profile-boy #boy-bg-anim {
    CARTE DE PROGRESSION — ÎLES
    ============================================================ */
 .sess-map-wrap{padding:12px 14px 80px;max-width:480px;margin:0 auto}
-.sess-map-title{text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.72);padding:6px 0 20px;text-shadow:0 0 12px rgba(255,255,255,.25)}
+.sess-map-title{text-align:center;font-size:1.15rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:8px 0 22px;text-shadow:0 2px 10px rgba(0,0,0,.55),0 0 24px rgba(255,220,50,.25)}
 .sess-island{border-radius:22px;padding:22px 16px 18px;border:1.5px solid;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center}
 .sess-island:active{transform:scale(.98)}
 .sess-island.locked-isle{opacity:.5;filter:grayscale(.7);cursor:default}
@@ -4604,7 +4604,7 @@ function renderSessionsMap(ca){
   var gpWrap=document.createElement('div');
   gpWrap.style.cssText='margin-bottom:18px;padding:0 4px';
   var gpLbl=document.createElement('div');
-  gpLbl.style.cssText='display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.4);margin-bottom:5px;font-weight:600';
+  gpLbl.style.cssText='display:flex;justify-content:space-between;font-size:1rem;color:rgba(255,255,255,.92);margin-bottom:6px;font-weight:700';
   var progPct=Math.round(doneSessions/totalSessions*100);
   gpLbl.innerHTML='<span>'+(({'fr':'Progression globale','en':'Global progress','es':'Progreso global','de':'Gesamtfortschritt','nl':'Totale voortgang','it':'Progresso globale','pt':'Progresso global','ru':'Общий прогресс','tr':'Genel ilerleme','zh':'总体进度','id':'Kemajuan global','ur':'مجموعی ترقی','hi':'समग्र प्रगति'}[st.lang]||'Progression globale'))+'</span><span>'+doneSessions+'/'+totalSessions+'</span>';
   var gpBar=document.createElement('div');
@@ -4689,7 +4689,7 @@ function renderSessionsMap(ca){
       globeDiv.appendChild(conn);
     }
 
-    prevIslandDone=isComplete;
+    prevIslandDone=isleSessions.every(function(s){return (st.scores[s.id]||0)>0;});
   });
 
   // Boss final — Grand Quiz
@@ -4708,12 +4708,11 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(boss);
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  //  DESKTOP MAP v6
+  //  DESKTOP MAP v7
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
 
-    // Cache les mascottes fixes
     if(DW>=580){
       var _gm=document.getElementById('girl-mascot');
       var _bm=document.getElementById('boy-mascot');
@@ -4722,12 +4721,10 @@ function renderSessionsMap(ca){
     }
     if(DW<580)return;
 
-    // Pleine largeur
     wrap.style.maxWidth='none';
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
 
-    // Disposition Centre/Droite/Centre/Gauche
     var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.44),580);
@@ -4736,7 +4733,6 @@ function renderSessionsMap(ca){
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
       el.onclick=null;
-
       el.style.width=IW+'px';
       el.style.flexShrink='0';
       el.style.position='relative';
@@ -4752,64 +4748,27 @@ function renderSessionsMap(ca){
 
     setTimeout(function(){
       globeDiv.style.position='relative';
-
-      // Dimensions via offsetWidth (espace SVG = espace globeDiv)
       var gW=globeDiv.offsetWidth;
       var gH=globeDiv.scrollHeight;
 
-      // SVG en dessous des Ã®les (z-index 0)
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);
       svg.setAttribute('height',gH);
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
-      // Positions via offsetLeft/offsetTop : coordonnÃ©es DIRECTEMENT dans l'espace SVG
+      // Positions rÃ©elles dans l'espace SVG via offsetLeft/offsetTop
       var centers=isleCards.map(function(el){
         return{x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight/2};
       });
       var hW=isleCards.map(function(el){return el.offsetWidth/2;});
       var hH=isleCards.map(function(el){return el.offsetHeight/2;});
 
+      var MARGIN=6;
       var segments=[];
 
-      for(var i=0;i<centers.length-1;i++){
-        var c0=centers[i],c1=centers[i+1];
-        var hw0=hW[i],hh0=hH[i],hw1=hW[i+1],hh1=hH[i+1];
-        var segT=i%4;
-        var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
-        var MARGIN=6;
-
-        if(segT===0){
-          // Câ†’R : sort DROITE, entre HAUT
-          sx=c0.x+hw0+MARGIN; sy=c0.y;
-          ex=c1.x;            ey=c1.y-hh1-MARGIN;
-          cp1x=gW*0.95; cp1y=c0.y;
-          cp2x=gW*0.95; cp2y=c1.y-hh1-30;
-        } else if(segT===1){
-          // Râ†’C : sort BAS, entre DROITE
-          sx=c0.x;            sy=c0.y+hh0+MARGIN;
-          ex=c1.x+hw1+MARGIN; ey=c1.y;
-          cp1x=c0.x;          cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.92;       cp2y=c1.y;
-        } else if(segT===2){
-          // Câ†’L : sort GAUCHE, entre HAUT
-          sx=c0.x-hw0-MARGIN; sy=c0.y;
-          ex=c1.x;             ey=c1.y-hh1-MARGIN;
-          cp1x=gW*0.05; cp1y=c0.y;
-          cp2x=gW*0.05; cp2y=c1.y-hh1-30;
-        } else {
-          // Lâ†’C : sort BAS, entre GAUCHE
-          sx=c0.x;             sy=c0.y+hh0+MARGIN;
-          ex=c1.x-hw1-MARGIN;  ey=c1.y;
-          cp1x=c0.x;           cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.08;        cp2y=c1.y;
-        }
-
-        // Segment animation = EXACTEMENT les mÃªmes paramÃ¨tres bezier que le SVG visuel
-        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
-
-        var d='M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey;
+      // Dessine un chemin SVG triple (ombre + crÃ¨me + tirets dorÃ©s)
+      function drawPath(d){
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
         sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.20)');
         sh.setAttribute('stroke-width','32');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
@@ -4823,6 +4782,57 @@ function renderSessionsMap(ca){
         dp.setAttribute('stroke-width','4');dp.setAttribute('stroke-dasharray','16,14');
         dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');
         svg.appendChild(dp);
+      }
+
+      // â”€â”€ Segment HOME : bord gauche Ã©cran â†’ bord gauche de l'Ã®le 0 â”€â”€
+      var homeX=30, homeY=centers[0].y;
+      var homeEndX=centers[0].x-hW[0]-MARGIN, homeEndY=centers[0].y;
+      var homeMidX=(homeX+homeEndX)/2;
+      var homeSeg={x0:homeX,y0:homeY,
+                   cpx1:homeMidX,cpy1:homeY+30,
+                   cpx2:homeMidX,cpy2:homeY-30,
+                   x3:homeEndX,y3:homeEndY};
+      var homeD='M '+homeX+','+homeY+' C '+homeMidX+','+(homeY+30)+' '+homeMidX+','+(homeY-30)+' '+homeEndX+','+homeEndY;
+      drawPath(homeD);
+      segments.push(homeSeg); // segments[0] = HOME â†’ Ã®le 0
+
+      // â”€â”€ Segments Ã®le-Ã -Ã®le â”€â”€
+      for(var i=0;i<centers.length-1;i++){
+        var c0=centers[i],c1=centers[i+1];
+        var hw0=hW[i],hh0=hH[i],hw1=hW[i+1],hh1=hH[i+1];
+        var segT=i%4;
+        var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
+
+        if(segT===0){
+          // Centreâ†’Droite : sort DROITE, entre HAUT
+          sx=c0.x+hw0+MARGIN; sy=c0.y;
+          ex=c1.x;            ey=c1.y-hh1-MARGIN;
+          cp1x=gW*0.95; cp1y=c0.y;
+          cp2x=gW*0.95; cp2y=c1.y-hh1-30;
+        } else if(segT===1){
+          // Droiteâ†’Centre : sort BAS, entre DROITE
+          sx=c0.x;            sy=c0.y+hh0+MARGIN;
+          ex=c1.x+hw1+MARGIN; ey=c1.y;
+          cp1x=c0.x;          cp1y=(c0.y+c1.y)/2;
+          cp2x=gW*0.92;       cp2y=c1.y;
+        } else if(segT===2){
+          // Centreâ†’Gauche : sort GAUCHE, entre HAUT
+          sx=c0.x-hw0-MARGIN; sy=c0.y;
+          ex=c1.x;             ey=c1.y-hh1-MARGIN;
+          cp1x=gW*0.05; cp1y=c0.y;
+          cp2x=gW*0.05; cp2y=c1.y-hh1-30;
+        } else {
+          // Gaucheâ†’Centre : sort BAS, entre GAUCHE
+          sx=c0.x;             sy=c0.y+hh0+MARGIN;
+          ex=c1.x-hw1-MARGIN;  ey=c1.y;
+          cp1x=c0.x;           cp1y=(c0.y+c1.y)/2;
+          cp2x=gW*0.08;        cp2y=c1.y;
+        }
+
+        // segments[1..N] = Ã®le 0â†’1, Ã®le 1â†’2, ...
+        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
+        var d='M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey;
+        drawPath(d);
       }
 
       // Avatar
@@ -4839,11 +4849,11 @@ function renderSessionsMap(ca){
       }
       globeDiv.appendChild(charEl);
 
-      // ÃŽle de dÃ©part = derniÃ¨re Ã®le avec score >= 80%
+      // charIdx : 0=home, i+1=Ã®le i engagÃ©e (score>0)
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
-        var done=islandDefs[i].sids.every(function(sid){return (st.scores[sid]||0)>=80;});
-        if(done){charIdx=i;}else{break;}
+        var done=islandDefs[i].sids.every(function(sid){return (st.scores[sid]||0)>0;});
+        if(done){charIdx=i+1;}else{break;}
       }
 
       function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
@@ -4856,18 +4866,22 @@ function renderSessionsMap(ca){
         };
       }
 
+      // Placement initial
+      var initX,initY;
+      if(charIdx>=segments.length){
+        initX=segments[segments.length-1].x3;
+        initY=segments[segments.length-1].y3;
+      } else {
+        initX=segments[charIdx].x0;
+        initY=segments[charIdx].y0;
+      }
+      placeCharAt(initX,initY);
+
       var animFrame=null,currentIdx=charIdx;
 
-      // animateTo(targetIdx, onDone) : anime le personnage puis appelle onDone
       function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
-        if(currentIdx===targetIdx){
-          var cc=segments[Math.min(currentIdx,segments.length-1)];
-          placeCharAt(currentIdx<segments.length?segments[currentIdx].x0:segments[segments.length-1].x3,
-                      currentIdx<segments.length?segments[currentIdx].y0:segments[segments.length-1].y3);
-          if(onDone)onDone();
-          return;
-        }
+        if(currentIdx===targetIdx){if(onDone)onDone();return;}
         var step=currentIdx<targetIdx?1:-1;
         var queue=[];
         for(var i=currentIdx;i!==targetIdx;i+=step){
@@ -4878,7 +4892,6 @@ function renderSessionsMap(ca){
         function tick(){
           if(qi>=queue.length){
             currentIdx=targetIdx;
-            // Placer Ã  l'extrÃ©mitÃ© exacte du dernier segment
             var lastSeg=queue[queue.length-1];
             var finalPt=bezierPt(lastSeg.dir>0?1:0,lastSeg.seg);
             placeCharAt(finalPt.x,finalPt.y);
@@ -4891,7 +4904,6 @@ function renderSessionsMap(ca){
           placeCharAt(pt.x,pt.y);
           prog+=SPEED;
           if(prog>=1){
-            // Sauter exactement Ã  l'extrÃ©mitÃ© du segment terminÃ©
             var endPt=bezierPt(item.dir>0?1:0,item.seg);
             placeCharAt(endPt.x,endPt.y);
             prog=0;qi++;
@@ -4902,17 +4914,13 @@ function renderSessionsMap(ca){
         tick();
       }
 
-      // Position initiale : dÃ©but du premier segment (bord de l'Ã®le de dÃ©part)
-      if(charIdx<segments.length){
-        placeCharAt(segments[charIdx].x0, segments[charIdx].y0);
-      }
-
-      // Clic : animer D'ABORD, puis ouvrir le cours
+      // Clic : animer PUIS ouvrir le cours
+      // idx+1 car segments[0]=home, segments[1]=Ã®le 0â†’1, etc.
       isleCards.forEach(function(card,idx){
         var origFn=card._desktopOrigClick;
         if(card.classList.contains('locked-isle'))return;
         card.addEventListener('click',function(){
-          animateTo(idx,function(){
+          animateTo(idx+1,function(){
             if(origFn)origFn.call(card);
           });
         });
