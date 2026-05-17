@@ -5162,26 +5162,50 @@ function renderAudioExercise(ca,qs,session){
       const showBtn=document.createElement('button');showBtn.className='rbtn rbtn-m';showBtn.style.cssText='margin-top:8px;background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.3)';
       showBtn.textContent=t('ex_show_answer')||'Voir la réponse';
       const nextWrap=document.createElement('div');nextWrap.style.cssText='display:none;flex-direction:column;align-items:center;gap:10px;width:100%';
-      showBtn.onclick=()=>{
-        answerBox.style.display='block';
-        showBtn.style.display='none';
-        nextWrap.style.display='flex';
-        // Scroll vers le bouton suivant
-        setTimeout(()=>{
-          var nextBtn=nextWrap.querySelector('button,.rbtn');
-          if(nextBtn) nextBtn.scrollIntoView({behavior:'smooth',block:'center'});
-        },100);
-      };
       const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
       nextBtn.textContent=ex.idx<total-1?t('ex200_next'):t('ex200_finish');
       nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
       nextWrap.appendChild(nextBtn);
+      // Self-report Oui/Non après "Voir la réponse"
+      const srWrapW=document.createElement('div');srWrapW.style.cssText='display:none;flex-direction:column;align-items:center;gap:8px;width:100%;margin-top:6px';
+      const srLblW=document.createElement('div');srLblW.style.cssText='font-size:.85rem;color:var(--text-sec);text-align:center';srLblW.textContent=t('self_report_q')||'As-tu répondu juste ?';
+      const srBtnsW=document.createElement('div');srBtnsW.style.cssText='display:flex;gap:10px;width:100%';
+      const srYesW=document.createElement('button');srYesW.className='rbtn rbtn-m';srYesW.style.cssText='flex:1;background:rgba(34,211,160,.15);border-color:rgba(34,211,160,.4);color:#22d3a0;';srYesW.innerHTML='✅ '+(t('self_yes')||'Oui');
+      const srNoW=document.createElement('button');srNoW.className='rbtn rbtn-m';srNoW.style.cssText='flex:1;background:rgba(255,77,109,.15);border-color:rgba(255,77,109,.4);color:#ff4d6d;';srNoW.innerHTML='❌ '+(t('self_no')||'Non');
+      function handleWriteReport(correct){
+        srYesW.disabled=true;srNoW.disabled=true;srWrapW.style.opacity='.4';
+        if(correct){playChildSound('win');}else{playChildSound('lose');}
+        if(!correct){var go=loseHeart();if(go)return;}
+        if(session&&session.id){
+          var cur=st.scores[session.id]||0;
+          if(correct){st.scores[session.id]=Math.min(100,cur+Math.round(100/total));}
+          else{st.scores[session.id]=Math.max(0,cur-Math.round(50/total));}
+          try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}
+          setChildStars(session.id,st.scores[session.id]);
+          var done=Object.keys(st.scores).length;checkChildBadges(done,st.scores[session.id]);
+        }
+        if(correct){launchConfetti(st.profile);showStarBurst(window.innerWidth/2,window.innerHeight/2,st.profile);}
+        var msg=getEncouragementMsg(st.profile);
+        if(msg){var tst=document.createElement('div');tst.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:.95rem;z-index:9999;white-space:nowrap;pointer-events:none';tst.textContent=msg;document.body.appendChild(tst);setTimeout(function(){if(tst.parentNode)tst.parentNode.removeChild(tst);},2500);}
+        nextWrap.style.display='flex';
+        setTimeout(()=>{nextBtn.scrollIntoView({behavior:'smooth',block:'center'});},100);
+      }
+      srYesW.onclick=()=>handleWriteReport(true);
+      srNoW.onclick=()=>handleWriteReport(false);
+      srBtnsW.appendChild(srYesW);srBtnsW.appendChild(srNoW);
+      srWrapW.appendChild(srLblW);srWrapW.appendChild(srBtnsW);
+      showBtn.onclick=()=>{
+        answerBox.style.display='block';
+        showBtn.style.display='none';
+        srWrapW.style.display='flex';
+        setTimeout(()=>srLblW.scrollIntoView({behavior:'smooth',block:'center'}),100);
+      };
       const miniClearBtn=document.createElement('button');
       miniClearBtn.className='writing-action-btn danger';
       miniClearBtn.style.cssText='width:100%;margin-top:4px;text-align:center';
       miniClearBtn.textContent=t('clear_canvas')||t('writing_reset')||'↺';
       miniClearBtn.onclick=()=>{ if(miniCanvasWrap._clear) miniCanvasWrap._clear(); };
-      audioWrap.appendChild(audioBtn);audioWrap.appendChild(miniCanvasWrap);audioWrap.appendChild(miniClearBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(nextWrap);
+      audioWrap.appendChild(audioBtn);audioWrap.appendChild(miniCanvasWrap);audioWrap.appendChild(miniClearBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(srWrapW);audioWrap.appendChild(nextWrap);
       qbox.appendChild(audioWrap);
     } else {
       // Question "comment lit-on" — avec boutons Oui/Non pour comptabiliser
