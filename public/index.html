@@ -4709,27 +4709,35 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(conn2);
   globeDiv.appendChild(boss);
 
-  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  //  DESKTOP MAP: zigzag + chemins SVG + personnage
-  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  //  DESKTOP MAP: Ã®les pleine largeur + chemins Ã©pais
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
     if(DW<580)return;
 
-    // --- Zigzag layout ---
+    // 1. Override max-width du conteneur pour occuper toute la largeur
+    wrap.style.maxWidth='none';
+    wrap.style.padding='12px 0 80px';
+    globeDiv.style.alignItems='flex-start'; // nÃ©cessaire pour les marges auto
+
+    // 2. Zigzag pleine largeur
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-    var IW=Math.min(Math.round(DW*0.42),340)+'px';
-    globeDiv.style.gap='90px';
+    var IW=Math.min(Math.round(DW*0.44),580);
+    globeDiv.style.gap='70px';
     isleCards.forEach(function(el,i){
-      el.style.width=IW;
+      el.style.width=IW+'px';
       el.style.flexShrink='0';
-      if(i%2===0){el.style.marginRight='auto';el.style.marginLeft='0';}
+      el.style.position='relative';
+      el.style.zIndex='4'; // Ã®les au-dessus des chemins SVG
+      if(i%2===0){el.style.marginLeft='0';el.style.marginRight='auto';}
       else{el.style.marginLeft='auto';el.style.marginRight='0';}
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
-    if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';}
+    if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='4';}
+
     // Cache les connecteurs texte
-    Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(conn){conn.style.display='none';});
+    Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     setTimeout(function(){
       globeDiv.style.position='relative';
@@ -4737,11 +4745,12 @@ function renderSessionsMap(ca){
       var gW=gR.width;
       var gH=globeDiv.scrollHeight;
 
-      // --- SVG paths ---
+      // 3. SVG chemins Ã©pais
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);
       svg.setAttribute('height',gH);
-      svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:2;overflow:visible';
+      // z-index:1 â†’ derriÃ¨re les Ã®les (z-index:4)
+      svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:1;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
       // Centres de chaque Ã®le
@@ -4755,110 +4764,65 @@ function renderSessionsMap(ca){
         var p0=centers[i];
         var p1=centers[i+1];
         // Ã®le paire=gauche, Ã®le impaire=droite
-        // chemin part vers le bord opposÃ©
+        // chemin part vers le bord opposÃ©, trÃ¨s loin
         var cpx;
-        if(i%2===0){cpx=gW*0.93;}// gaucheâ†’droite: courbe Ã  droite
-        else{cpx=gW*0.07;}        // droiteâ†’gauche: courbe Ã  gauche
+        if(i%2===0){cpx=gW*0.95;} // gaucheâ†’droite: courbe Ã  droite
+        else{cpx=gW*0.05;}         // droiteâ†’gauche: courbe Ã  gauche
         var seg={
           x0:p0.x,y0:p0.y,
-          cpx1:cpx,cpy1:p0.y+(p1.y-p0.y)*0.28,
-          cpx2:cpx,cpy2:p0.y+(p1.y-p0.y)*0.72,
+          cpx1:cpx,cpy1:p0.y+(p1.y-p0.y)*0.25,
+          cpx2:cpx,cpy2:p0.y+(p1.y-p0.y)*0.75,
           x3:p1.x,y3:p1.y
         };
         segments.push(seg);
+
         var d='M '+seg.x0+','+seg.y0+' C '+seg.cpx1+','+seg.cpy1+' '+seg.cpx2+','+seg.cpy2+' '+seg.x3+','+seg.y3;
-        // Halo
-        var halo=document.createElementNS('http://www.w3.org/2000/svg','path');
-        halo.setAttribute('d',d);halo.setAttribute('stroke','rgba(255,255,255,0.10)');
-        halo.setAttribute('stroke-width','12');halo.setAttribute('fill','none');
-        svg.appendChild(halo);
-        // Chemin principal pointillÃ©
+
+        // Ombre portÃ©e du chemin
+        var shadow=document.createElementNS('http://www.w3.org/2000/svg','path');
+        shadow.setAttribute('d',d);
+        shadow.setAttribute('stroke','rgba(0,0,0,0.25)');
+        shadow.setAttribute('stroke-width','30');
+        shadow.setAttribute('fill','none');
+        shadow.setAttribute('stroke-linecap','round');
+        svg.appendChild(shadow);
+
+        // Chemin principal Ã©pais (couleur crÃ¨me/dorÃ©e)
         var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-        path.setAttribute('d',d);path.setAttribute('stroke','rgba(255,255,255,0.45)');
-        path.setAttribute('stroke-width','4');path.setAttribute('stroke-dasharray','10,7');
-        path.setAttribute('fill','none');path.setAttribute('stroke-linecap','round');
+        path.setAttribute('d',d);
+        path.setAttribute('stroke','rgba(255,245,200,0.75)');
+        path.setAttribute('stroke-width','22');
+        path.setAttribute('fill','none');
+        path.setAttribute('stroke-linecap','round');
         svg.appendChild(path);
-        // Points dÃ©co aux extrÃ©mitÃ©s
-        [p0,p1].forEach(function(pt){
-          var dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
-          dot.setAttribute('cx',pt.x);dot.setAttribute('cy',pt.y);dot.setAttribute('r','5');
-          dot.setAttribute('fill','rgba(255,255,255,0.5)');
-          svg.appendChild(dot);
-        });
+
+        // Ligne centrale pointillÃ©e (pour l'effet "route")
+        var dashes=document.createElementNS('http://www.w3.org/2000/svg','path');
+        dashes.setAttribute('d',d);
+        dashes.setAttribute('stroke','rgba(255,200,80,0.6)');
+        dashes.setAttribute('stroke-width','4');
+        dashes.setAttribute('stroke-dasharray','16,14');
+        dashes.setAttribute('fill','none');
+        dashes.setAttribute('stroke-linecap','round');
+        svg.appendChild(dashes);
       }
 
-      // --- Avatar musulman ---
+      // 4. Avatar: utilise les images mascotte existantes (#girl-mascot / #boy-mascot)
       var isGirl=(st.profile==='girl');
-      var charSVG;
-      if(isGirl){
-        // Fille voilÃ©e: hijab vert foncÃ©, abaya verte, visage ovale, vue du dessus
-        charSVG='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="64" viewBox="0 0 54 64">'+
-          // Abaya (corps - vue du dessus)
-          '<ellipse cx="27" cy="45" rx="19" ry="19" fill="#1a5c4a"/>'+
-          // Bras gauche
-          '<ellipse cx="8" cy="40" rx="5.5" ry="10" fill="#1a5c4a" transform="rotate(-18,8,40)"/>'+
-          // Bras droit
-          '<ellipse cx="46" cy="40" rx="5.5" ry="10" fill="#1a5c4a" transform="rotate(18,46,40)"/>'+
-          // Hijab (voile): grand arc couvrant tÃªte et cÃ´tÃ©s
-          '<ellipse cx="27" cy="18" rx="19" ry="17" fill="#2d7a5f"/>'+
-          // CÃ´tÃ©s du hijab (tombant sur les Ã©paules)
-          '<ellipse cx="12" cy="24" rx="9" ry="12" fill="#2d7a5f"/>'+
-          '<ellipse cx="42" cy="24" rx="9" ry="12" fill="#2d7a5f"/>'+
-          // Visage (peau)
-          '<ellipse cx="27" cy="19" rx="11" ry="12" fill="#f5c9a0"/>'+
-          // Partie haute du hijab
-          '<ellipse cx="27" cy="8"  rx="17" ry="10" fill="#2d7a5f"/>'+
-          // Yeux
-          '<circle cx="22.5" cy="17" r="2.3" fill="#2c1810"/>'+
-          '<circle cx="31.5" cy="17" r="2.3" fill="#2c1810"/>'+
-          '<circle cx="23.2" cy="16.3" r=".8" fill="white"/>'+
-          '<circle cx="32.2" cy="16.3" r=".8" fill="white"/>'+
-          // Nez
-          '<ellipse cx="27" cy="21" rx="1.5" ry="1" fill="#e5b48a"/>'+
-          // Sourire
-          '<path d="M24,24 Q27,27.5 30,24" stroke="#c0836a" stroke-width="1.3" fill="none" stroke-linecap="round"/>'+
-        '</svg>';
-      }else{
-        // GarÃ§on musulman: kufi blanc (calotte), thobe blanc, barbe lÃ©gÃ¨re, vue du dessus
-        charSVG='<svg xmlns="http://www.w3.org/2000/svg" width="54" height="64" viewBox="0 0 54 64">'+
-          // Thobe (robe blanche - vue du dessus)
-          '<ellipse cx="27" cy="45" rx="19" ry="19" fill="#f2efe0"/>'+
-          // Bras gauche
-          '<ellipse cx="8" cy="40" rx="5.5" ry="10" fill="#f2efe0" transform="rotate(-18,8,40)"/>'+
-          // Bras droit
-          '<ellipse cx="46" cy="40" rx="5.5" ry="10" fill="#f2efe0" transform="rotate(18,46,40)"/>'+
-          // Cou
-          '<rect x="23" y="28" width="8" height="8" rx="3" fill="#c8905a"/>'+
-          // TÃªte (peau)
-          '<circle cx="27" cy="18" r="14" fill="#c8905a"/>'+
-          // Kufi (calotte blanche)
-          '<ellipse cx="27" cy="9"  rx="13" ry="8"  fill="#ffffff"/>'+
-          '<ellipse cx="27" cy="13" rx="13" ry="6"  fill="#f5f5f5"/>'+
-          // Bord du kufi
-          '<path d="M14,14 Q27,9 40,14" stroke="#e0ddd0" stroke-width="1.5" fill="none"/>'+
-          // Motif dÃ©co kufi
-          '<path d="M18,11 Q27,7 36,11" stroke="#e8e5d5" stroke-width="0.8" fill="none"/>'+
-          // Yeux
-          '<circle cx="22" cy="18" r="2.3" fill="#2c1810"/>'+
-          '<circle cx="32" cy="18" r="2.3" fill="#2c1810"/>'+
-          '<circle cx="22.8" cy="17.3" r=".8" fill="white"/>'+
-          '<circle cx="32.8" cy="17.3" r=".8" fill="white"/>'+
-          // Nez
-          '<ellipse cx="27" cy="22" rx="1.8" ry="1.2" fill="#b07840"/>'+
-          // Bouche
-          '<path d="M23,25.5 Q27,28.5 31,25.5" stroke="#a06438" stroke-width="1.3" fill="none" stroke-linecap="round"/>'+
-          // Barbe (lÃ©gÃ¨re)
-          '<path d="M16,25 Q27,31 38,25" stroke="#8b6020" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.6"/>'+
-        '</svg>';
-      }
+      var srcEl=document.querySelector('#'+(isGirl?'girl':'boy')+'-mascot img');
 
       var charEl=document.createElement('div');
-      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:54px;height:64px;'+
-        'filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
-      charEl.innerHTML=charSVG;
+      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;'+
+        'filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55))';
+      if(srcEl){
+        var img=document.createElement('img');
+        img.src=srcEl.src;
+        img.style.cssText='width:100%;height:100%;object-fit:contain';
+        charEl.appendChild(img);
+      }
       globeDiv.appendChild(charEl);
 
-      // --- ÃŽle de dÃ©part (premiÃ¨re non terminÃ©e) ---
+      // 5. ÃŽle de dÃ©part (premiÃ¨re non terminÃ©e)
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
         var allDone=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
@@ -4866,13 +4830,13 @@ function renderSessionsMap(ca){
         if(i===islandDefs.length-1)charIdx=i;
       }
 
-      // --- Placement (x,y = centre Ã®le) ---
+      // 6. Placement du personnage
       function placeCharAt(x,y){
-        charEl.style.left=(x-27)+'px';
-        charEl.style.top=(y-72)+'px';
+        charEl.style.left=(x-40)+'px';
+        charEl.style.top=(y-90)+'px';
       }
 
-      // --- Interpolation sur courbe de BÃ©zier cubique ---
+      // 7. Interpolation sur courbe de BÃ©zier cubique
       function bezierPt(t,s){
         var mt=1-t;
         return{
@@ -4881,7 +4845,7 @@ function renderSessionsMap(ca){
         };
       }
 
-      // --- Animation le long du chemin ---
+      // 8. Animation le long du chemin
       var animFrame=null;
       var currentIdx=charIdx;
 
@@ -4896,8 +4860,7 @@ function renderSessionsMap(ca){
           if(step>0)queue.push({seg:segments[i],dir:1});
           else queue.push({seg:segments[i-1],dir:-1});
         }
-        var qi=0,prog=0;
-        var SPEED=0.022;
+        var qi=0,prog=0,SPEED=0.020;
         function tick(){
           if(qi>=queue.length){
             currentIdx=targetIdx;
