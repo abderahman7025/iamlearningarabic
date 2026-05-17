@@ -2346,6 +2346,17 @@ body.profile-boy #boy-bg-anim {
 .sess-island.desert{background:linear-gradient(135deg,rgba(239,68,68,.5),rgba(185,28,28,.4));border-color:rgba(239,68,68,.85);box-shadow:0 4px 22px rgba(239,68,68,.25)}
 .sess-island.palace{background:linear-gradient(135deg,rgba(168,85,247,.5),rgba(124,58,237,.4));border-color:rgba(168,85,247,.85);box-shadow:0 4px 22px rgba(168,85,247,.25)}
 .sess-island.boss-isle{background:linear-gradient(135deg,rgba(245,200,66,.55),rgba(251,191,36,.45));border-color:rgba(245,200,66,.9);box-shadow:0 4px 30px rgba(245,200,66,.35)}
+/* ---- Desktop game-map layout ---- */
+@media(min-width:580px){
+  .sess-map-wrap{max-width:720px}
+  .isle-globe{position:relative}
+  .isle-globe>.sess-island[data-pos="left"]{align-self:flex-start;width:53%;margin-right:auto}
+  .isle-globe>.sess-island[data-pos="right"]{align-self:flex-end;width:53%;margin-left:auto}
+  .isle-globe>.sess-island.boss-isle{align-self:center;width:60%}
+  .isle-connector{display:none}
+  .isle-mg-card{max-width:60%;align-self:center}
+}
+.isle-char{position:absolute;font-size:2.6rem;z-index:20;pointer-events:none;transition:left .55s cubic-bezier(.34,1.56,.64,1),top .55s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 3px 8px rgba(0,0,0,.6));user-select:none}
 .isle-ico{font-size:3rem;line-height:1;margin-bottom:10px;display:block}
 .isle-name{font-size:1rem;font-weight:800;margin:4px 0 4px}
 .isle-sub{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:2px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em}
@@ -4518,6 +4529,8 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
+  // Charger les scores depuis localStorage
+  try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   var wrap=document.createElement('div');
   wrap.className='sess-map-wrap';
 
@@ -4618,7 +4631,7 @@ function renderSessionsMap(ca){
 
   // ── Parcours des îles ──
   var globeDiv=document.createElement('div');
-  globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px';
+  globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch';
 
   var prevIslandDone=true; // première île toujours débloquée
 
@@ -4706,6 +4719,82 @@ function renderSessionsMap(ca){
   globeDiv.appendChild(conn2);
   globeDiv.appendChild(boss);
 
+
+  // ---- Desktop game-map: zigzag + SVG paths + character ----
+  setTimeout(function(){
+    if(window.innerWidth < 580) return;
+
+    // Reload scores from localStorage (unlock fix)
+    try{var sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=sv[k];});}catch(e){}
+
+    globeDiv.style.position='relative';
+
+    // Zigzag: assign data-pos to islands
+    var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
+    isleCards.forEach(function(el,i){el.setAttribute('data-pos',i%2===0?'left':'right');});
+
+    setTimeout(function(){
+      var gRect=globeDiv.getBoundingClientRect();
+
+      // SVG curved paths between islands
+      var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.style.cssText='position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:1;overflow:visible';
+      svg.style.height=globeDiv.scrollHeight+'px';
+      var pathColor='rgba(255,255,255,0.22)';
+
+      for(var i=0;i<isleCards.length-1;i++){
+        var r1=isleCards[i].getBoundingClientRect();
+        var r2=isleCards[i+1].getBoundingClientRect();
+        var x1=r1.left+r1.width/2-gRect.left;
+        var y1=r1.bottom-gRect.top+6;
+        var x2=r2.left+r2.width/2-gRect.left;
+        var y2=r2.top-gRect.top-6;
+        var cx1=x1; var cy1=(y1+y2)/2;
+        var cx2=x2; var cy2=(y1+y2)/2;
+        var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d','M'+x1+','+y1+' C'+cx1+','+cy1+' '+cx2+','+cy2+' '+x2+','+y2);
+        p.setAttribute('fill','none');
+        p.setAttribute('stroke',pathColor);
+        p.setAttribute('stroke-width','5');
+        p.setAttribute('stroke-dasharray','12,8');
+        p.setAttribute('stroke-linecap','round');
+        svg.appendChild(p);
+      }
+      globeDiv.insertBefore(svg,globeDiv.firstChild);
+
+      // Determine current island index
+      var charIdx=0;
+      var pDone=true;
+      for(var i=0;i<islandDefs.length;i++){
+        var sids=islandDefs[i].sids;
+        var done=sids.every(function(sid){return st.scores[sid]!==undefined;});
+        if(pDone&&!done){charIdx=i;break;}
+        if(i===islandDefs.length-1)charIdx=i;
+        pDone=done;
+      }
+
+      // Character element
+      var charEl=document.createElement('div');
+      charEl.className='isle-char';
+      charEl.textContent=st.profile==='girl'?'👧':'👦';
+      globeDiv.appendChild(charEl);
+
+      function placeChar(idx){
+        if(idx>=isleCards.length)return;
+        var cr=globeDiv.getBoundingClientRect();
+        var r=isleCards[idx].getBoundingClientRect();
+        charEl.style.left=(r.left-cr.left+r.width/2-22)+'px';
+        charEl.style.top=(r.top-cr.top-52)+'px';
+      }
+      placeChar(charIdx);
+
+      // Move character on island click
+      isleCards.forEach(function(card,idx){
+        card.addEventListener('click',function(){placeChar(idx);});
+      });
+
+    },200);
+  },0);
   wrap.appendChild(globeDiv);
   ca.appendChild(wrap);
 }
