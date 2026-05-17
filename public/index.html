@@ -4654,11 +4654,11 @@ function renderSessionsMap(ca){
     if(isLocked){
       badge.textContent='🔒';
     } else if(isComplete){
-      badge.textContent='✅ '+(t('completed')||'Complété');
+      badge.textContent='✅ '+(({'fr':'Terminé','en':'Completed','es':'Completado','de':'Abgeschlossen','nl':'Voltooid','it':'Completato','pt':'Concluído','ar':'مكتمل','tr':'Tamamlandı','id':'Selesai','ru':'Завершено','ur':'مکمل','hi':'पूर्ण'}[st.lang]||'Terminé'));
       badge.style.color='#4ade80';
       badge.style.borderColor='rgba(34,197,94,.3)';
     } else {
-      badge.textContent='▶ '+(t('start')||'Commencer');
+      badge.textContent='▶ '+(({'fr':'Commencer','en':'Start','es':'Empezar','de':'Starten','nl':'Starten','it':'Inizia','pt':'Começar','ar':'ابدأ','tr':'Başla','id':'Mulai','ru':'Начать','ur':'شروع','hi':'शुरू'}[st.lang]||'Commencer'));
     }
 
     card.appendChild(ico);
@@ -4856,11 +4856,11 @@ function renderSessionsMap(ca){
       globeDiv.appendChild(charEl);
 
       // ÃŽle de dÃ©part
+      // Avatar sur la derniÃ¨re Ã®le terminÃ©e (avant la 1Ã¨re non terminÃ©e)
       var charIdx=0;
       for(var i=0;i<islandDefs.length;i++){
         var done=islandDefs[i].sids.every(function(sid){return st.scores[sid]!==undefined;});
-        if(!done){charIdx=i;break;}
-        if(i===islandDefs.length-1)charIdx=i;
+        if(done){charIdx=i;}else{break;}
       }
 
       function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
