@@ -4721,16 +4721,15 @@ function renderSessionsMap(ca){
       if(_bm)_bm.style.visibility='hidden';
     }
     if(DW<580){
-      // MOBILE MAP v2 : 50% largeur, alternance gauche/droite
+      // MOBILE MAP v3 : 50%, alternance G/D, chemins bord->haut, avatar anime
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
       var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
       var bossElMob=globeDiv.querySelector('.boss-isle');
-      // Layout : 50% largeur, alternance flex-start / flex-end
-      globeDiv.style.paddingTop='100px';
-      globeDiv.style.position='relative';
-      globeDiv.style.gap='44px';
       var IWmob=Math.floor(DW*0.50);
+      // Sauvegarde clics + layout 50% G/D
       isleCardsMob.forEach(function(el,i){
+        el._mobOrigClick=el.onclick;
+        el.onclick=null;
         el.style.width=IWmob+'px';
         el.style.flexShrink='0';
         el.style.position='relative';
@@ -4738,6 +4737,9 @@ function renderSessionsMap(ca){
         el.style.alignSelf=(i%2===0)?'flex-start':'flex-end';
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
+      globeDiv.style.paddingTop='100px';
+      globeDiv.style.position='relative';
+      globeDiv.style.gap='44px';
       // Avatar en haut au centre
       var isGirlMob=(st.profile==='girl');
       var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
@@ -4760,21 +4762,78 @@ function renderSessionsMap(ca){
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
           dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');dp.setAttribute('stroke-width','3');dp.setAttribute('stroke-dasharray','10,9');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
-        // Avatar (centre haut) -> premiere ile (gauche)
+        var MG=8;
+        var segsMob=[];
+        var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
+        var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
+        var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
+        // Segment 0 : avatar (centre haut) --> haut ile 0 (gauche)
         if(isleCardsMob.length>0){
-          var el0=isleCardsMob[0];
-          var ix0=el0.offsetLeft+el0.offsetWidth/2,iy0=el0.offsetTop;
           var avX=gW/2,avY=80;
-          drawMobPath('M '+avX+','+avY+' C '+avX+','+(avY+50)+' '+ix0+','+(iy0-40)+' '+ix0+','+iy0);
+          var t0x=centersM[0].x,t0y=centersM[0].y-hHM[0]-MG;
+          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY+50,cpx2:t0x,cpy2:t0y-40,x3:t0x,y3:t0y});
+          drawMobPath('M '+avX+','+avY+' C '+avX+','+(avY+50)+' '+t0x+','+(t0y-40)+' '+t0x+','+t0y);
         }
-        // Chemin ile -> ile suivante
+        // Segments ile -> ile : bord droit/gauche -> haut suivante
         for(var i=0;i<isleCardsMob.length-1;i++){
-          var eA=isleCardsMob[i],eB=isleCardsMob[i+1];
-          var axC=eA.offsetLeft+eA.offsetWidth/2,ayB=eA.offsetTop+eA.offsetHeight;
-          var bxC=eB.offsetLeft+eB.offsetWidth/2,byT=eB.offsetTop;
-          var midY=(ayB+byT)/2;
-          drawMobPath('M '+axC+','+ayB+' C '+axC+','+midY+' '+bxC+','+midY+' '+bxC+','+byT);
+          var c0m=centersM[i],c1m=centersM[i+1];
+          var hw0=hWM[i],hh0=hHM[i],hh1=hHM[i+1];
+          var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
+          if(i%2===0){
+            // Ile gauche : sort par le bord DROIT, entre par le HAUT de l'ile droite
+            sx=c0m.x+hw0+MG; sy=c0m.y;
+            ex=c1m.x;         ey=c1m.y-hh1-MG;
+            cp1x=gW*0.96; cp1y=c0m.y;
+            cp2x=gW*0.96; cp2y=ey-30;
+          } else {
+            // Ile droite : sort par le bord GAUCHE, entre par le HAUT de l'ile gauche
+            sx=c0m.x-hw0-MG; sy=c0m.y;
+            ex=c1m.x;         ey=c1m.y-hh1-MG;
+            cp1x=gW*0.04; cp1y=c0m.y;
+            cp2x=gW*0.04; cp2y=ey-30;
+          }
+          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
+          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey);
         }
+        // charIdx : 0=home, i+1=ile i validee (>=80%)
+        var charIdxM=0;
+        for(var i=0;i<islandDefs.length;i++){
+          var doneM=islandDefs[i].sids.every(function(sid){var _a=(st.accuracy||{})[sid];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
+          if(doneM){charIdxM=i+1;}else{break;}
+        }
+        function placeCharMob(x,y){charElMob.style.transform='none';charElMob.style.left=(x-34)+'px';charElMob.style.top=(y-80)+'px';}
+        function bezierPtM(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
+        // Placement initial
+        if(segsMob.length>0){
+          if(charIdxM>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
+          else{var ip=bezierPtM(0,segsMob[charIdxM]);placeCharMob(ip.x,ip.y);}
+        }
+        var animFrameM=null,currentIdxM=charIdxM;
+        function animateToM(targetIdx,onDone){
+          if(animFrameM){cancelAnimationFrame(animFrameM);animFrameM=null;}
+          if(currentIdxM===targetIdx){if(onDone)onDone();return;}
+          var step=currentIdxM<targetIdx?1:-1;
+          var queue=[];
+          for(var i=currentIdxM;i!==targetIdx;i+=step){
+            if(step>0)queue.push({seg:segsMob[i],dir:1});
+            else queue.push({seg:segsMob[i-1],dir:-1});
+          }
+          var qi=0,prog=0,SPEED=0.028;
+          function tickM(){
+            if(qi>=queue.length){currentIdxM=targetIdx;var fp=bezierPtM(queue[queue.length-1].dir>0?1:0,queue[queue.length-1].seg);placeCharMob(fp.x,fp.y);if(onDone)onDone();return;}
+            var item=queue[qi];var pt=bezierPtM(item.dir>0?prog:1-prog,item.seg);placeCharMob(pt.x,pt.y);
+            prog+=SPEED;
+            if(prog>=1){var ep=bezierPtM(item.dir>0?1:0,item.seg);placeCharMob(ep.x,ep.y);prog=0;qi++;if(step>0)currentIdxM++;else currentIdxM--;}
+            animFrameM=requestAnimationFrame(tickM);
+          }
+          tickM();
+        }
+        // Clic : animer puis ouvrir le cours
+        isleCardsMob.forEach(function(card,idx){
+          var origFnM=card._mobOrigClick;
+          if(card.classList.contains('locked-isle'))return;
+          card.addEventListener('click',function(){animateToM(idx+1,function(){if(origFnM)origFnM.call(card);});});
+        });
       },300);
       return;
     }
