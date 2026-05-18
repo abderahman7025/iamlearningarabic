@@ -2346,7 +2346,7 @@ body.profile-boy #boy-bg-anim {
 .sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:transparent;border:none;box-shadow:none}
 .sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:bossFloat 3s ease-in-out infinite}
 @keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.isle-img{width:100%;max-width:220px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45)) drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.isle-img{width:100%;max-width:220px;height:auto;display:block;margin:0 auto;object-fit:contain}
 .isle-ico{display:none}
 .isle-name{font-size:1.2rem;font-weight:900;margin:10px 4px 0;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.95),0 0 30px rgba(0,0,0,.8);text-align:center;letter-spacing:.02em}
 .isle-sub{display:none}
@@ -8435,5 +8435,44 @@ function markPracticeToday() {
 })();
 </script>
 
+<script>
+(function(){
+  function rmBg(img){
+    if(img._bgDone)return;img._bgDone=true;
+    var S=300,cv=document.createElement('canvas');
+    cv.width=S;cv.height=S;
+    var ctx=cv.getContext('2d');
+    try{
+      ctx.drawImage(img,0,0,S,S);
+      var d=ctx.getImageData(0,0,S,S),px=d.data;
+      function isBg(i){return px[i]>185&&px[i+1]>185&&px[i+2]>185;}
+      var vis=new Uint8Array(S*S),stk=[];
+      for(var x=0;x<S;x++){stk.push(x);stk.push(x+(S-1)*S);}
+      for(var y=1;y<S-1;y++){stk.push(y*S);stk.push(S-1+y*S);}
+      while(stk.length){
+        var p=stk.pop();
+        if(p<0||p>=S*S||vis[p])continue;
+        vis[p]=1;
+        if(!isBg(p*4))continue;
+        px[p*4+3]=0;
+        var x2=p%S,y2=p/S|0;
+        if(x2>0)stk.push(p-1);if(x2<S-1)stk.push(p+1);
+        if(y2>0)stk.push(p-S);if(y2<S-1)stk.push(p+S);
+      }
+      ctx.putImageData(d,0,0);
+      img.src=cv.toDataURL('image/png');
+    }catch(e){}
+  }
+  function scan(){
+    document.querySelectorAll('.isle-img').forEach(function(img){
+      if(img.complete&&img.naturalWidth>0){rmBg(img);}
+      else{img.addEventListener('load',function(){rmBg(img);},{ once:true });}
+    });
+  }
+  setTimeout(scan,400);
+  setTimeout(scan,1100);
+  setTimeout(scan,2500);
+})();
+</script>
 </body>
 </html>
