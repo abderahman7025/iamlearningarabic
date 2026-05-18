@@ -2335,24 +2335,23 @@ body.profile-boy #boy-bg-anim {
 /* ============================================================
    CARTE DE PROGRESSION — ÎLES
    ============================================================ */
-.sess-map-wrap{padding:16px 14px 100px;max-width:520px;margin:0 auto}
+.sess-map-wrap{padding:16px 14px 100px;max-width:560px;margin:0 auto}
 .sess-map-title{text-align:center;font-size:1.35rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;padding:10px 0 28px;text-shadow:0 0 28px rgba(255,210,40,.7),0 2px 10px rgba(0,0,0,.9)}
-.sess-island{border-radius:20px;border:none;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center;background:#12100a;box-shadow:0 10px 40px rgba(0,0,0,.7),0 2px 8px rgba(0,0,0,.5);padding:0}
+.sess-island{border-radius:0;border:none;background:transparent;box-shadow:none;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .2s;position:relative;overflow:visible;margin-bottom:0;text-align:center;padding:0}
 .sess-island::before{display:none}
-.sess-island>*{position:relative;z-index:2}
-.sess-island:hover:not(.locked-isle){transform:translateY(-7px) scale(1.025);box-shadow:0 18px 56px rgba(0,0,0,.75),0 4px 12px rgba(0,0,0,.5)}
-.sess-island:active:not(.locked-isle){transform:scale(.97)}
-.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.85) brightness(.4)}
-.sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:#12100a;border:none;box-shadow:0 10px 40px rgba(0,0,0,.7)}
-.sess-island.boss-isle{background:#1e1404;border:2.5px solid rgba(245,200,66,.7);box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25);animation:bossPulse 3s ease-in-out infinite;padding:0}
-@keyframes bossPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25)}50%{box-shadow:0 0 0 9px rgba(245,200,66,.28),0 14px 62px rgba(245,200,66,.85),0 32px 100px rgba(245,170,10,.45)}}
-.isle-img{width:100%;height:155px;object-fit:cover;object-position:center top;display:block;border-radius:0}
+.sess-island:hover:not(.locked-isle){transform:translateY(-8px) scale(1.07)}
+.sess-island:active:not(.locked-isle){transform:scale(.95)}
+.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.9) brightness(.45) opacity(.5)}
+.sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace,.sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:none}
+.isle-img{width:100%;max-width:200px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.45)) drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.sess-island.boss-isle .isle-img{filter:drop-shadow(0 0 16px rgba(245,200,66,.7)) drop-shadow(0 8px 20px rgba(0,0,0,.5));animation:bossFloat 3s ease-in-out infinite}
+@keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .isle-ico{display:none}
-.isle-name{font-size:1.05rem;font-weight:900;margin:10px 14px 4px;letter-spacing:.02em;text-shadow:0 2px 8px rgba(0,0,0,.8);text-align:left}
-.isle-sub{font-size:.82rem;color:rgba(255,255,255,.65);margin:0 14px 6px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em;text-align:right}
-.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);white-space:nowrap;margin:4px 14px 14px;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em}
-.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:14px}
-.isle-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;border:2.5px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s,box-shadow .2s;flex-shrink:0}
+.isle-name{font-size:.95rem;font-weight:900;margin:8px 4px 2px;letter-spacing:.01em;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 24px rgba(0,0,0,.7);text-align:center}
+.isle-sub{font-size:.8rem;color:rgba(255,255,255,.85);margin:0 4px 4px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.isle-badge{display:inline-block;font-size:.66rem;font-weight:800;padding:4px 12px;border-radius:20px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);white-space:nowrap;margin:4px 0 0;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em;backdrop-filter:blur(4px)}
+.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:8px}
+.isle-dot{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;border:2.5px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s,box-shadow .2s;flex-shrink:0}
 .isle-dot:hover:not(.lock){transform:scale(1.1)}
 .isle-dot:active{transform:scale(.9)}
 .isle-dot.done{background:linear-gradient(135deg,rgba(34,197,94,.32),rgba(21,128,61,.22));border-color:#22c55e;color:#4ade80;box-shadow:0 0 18px rgba(34,197,94,.6),0 4px 14px rgba(0,0,0,.5)}
@@ -4777,7 +4776,7 @@ var islandDefs=[
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
           mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','28');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(195,140,65,0.88)');dp.setAttribute('stroke-width','18');dp.setAttribute('stroke-dasharray','none');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(165,110,40,0.7)');dp.setAttribute('stroke-width','8');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
         var MG=8;
         var segsMob=[];
