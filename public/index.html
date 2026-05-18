@@ -2346,7 +2346,7 @@ body.profile-boy #boy-bg-anim {
 .sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:transparent;border:none;box-shadow:none}
 .sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:bossFloat 3s ease-in-out infinite}
 @keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.isle-img{width:100%;max-width:220px;height:auto;display:block;margin:0 auto;object-fit:contain}
+.isle-img{width:100%;height:220px;display:block;margin:0 auto;object-fit:contain}
 .isle-ico{display:none}
 .isle-name{font-size:1.2rem;font-weight:900;margin:10px 4px 0;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.95),0 0 30px rgba(0,0,0,.8);text-align:center;letter-spacing:.02em}
 .isle-sub{display:none}
@@ -4845,7 +4845,7 @@ var islandDefs=[
           if(card.classList.contains('locked-isle'))return;
           card.addEventListener('click',function(){animateToM(idx+1,function(){if(origFnM)origFnM.call(card);});});
         });
-      },300);
+      },1500);
       return;
     }
     wrap.style.maxWidth='none';
@@ -4854,7 +4854,7 @@ var islandDefs=[
 
     var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-    var IW=Math.min(Math.round(DW*0.44),580);
+    var IW=Math.min(Math.round(DW*0.28),260);
     globeDiv.style.gap='70px';
 
     isleCards.forEach(function(el,i){
@@ -5053,7 +5053,7 @@ var islandDefs=[
         });
       });
 
-    },300);
+    },1500);
   },0);
 wrap.appendChild(globeDiv);
   ca.appendChild(wrap);
