@@ -2337,32 +2337,22 @@ body.profile-boy #boy-bg-anim {
    ============================================================ */
 .sess-map-wrap{padding:16px 14px 100px;max-width:520px;margin:0 auto}
 .sess-map-title{text-align:center;font-size:1.35rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;padding:10px 0 28px;text-shadow:0 0 28px rgba(255,210,40,.7),0 2px 10px rgba(0,0,0,.9)}
-.sess-island{border-radius:20px;border:2px solid rgba(255,255,255,.2);cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center;background:#1a1008;box-shadow:0 10px 40px rgba(0,0,0,.7);padding:0}
+.sess-island{background:transparent;border:none;box-shadow:none;border-radius:0;overflow:visible;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .2s;position:relative;margin-bottom:0;text-align:center;padding:0 0 4px}
 .sess-island::before{display:none}
 .sess-island>*{position:relative;z-index:2}
-.sess-island:hover:not(.locked-isle){transform:translateY(-7px) scale(1.025);box-shadow:0 18px 56px rgba(0,0,0,.75)}
-.sess-island:active:not(.locked-isle){transform:scale(.97)}
-.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.85) brightness(.4)}
-.sess-island.sea{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.28),0 8px 34px rgba(14,165,233,.5),0 20px 60px rgba(6,182,212,.2)}
-.sess-island.beach{border-color:#fbbf24;box-shadow:0 0 0 1px rgba(251,191,36,.28),0 8px 34px rgba(245,158,11,.5),0 20px 60px rgba(245,200,66,.2)}
-.sess-island.forest{border-color:#4ade80;box-shadow:0 0 0 1px rgba(74,222,128,.28),0 8px 34px rgba(34,197,94,.5),0 20px 60px rgba(21,128,61,.2)}
-.sess-island.desert{border-color:#fb923c;box-shadow:0 0 0 1px rgba(251,146,60,.28),0 8px 34px rgba(239,68,68,.5),0 20px 60px rgba(185,28,28,.2)}
-.sess-island.palace{border-color:#c084fc;box-shadow:0 0 0 1px rgba(192,132,252,.28),0 8px 34px rgba(168,85,247,.5),0 20px 60px rgba(124,58,237,.2)}
-.sess-island.boss-isle{border:2.5px solid rgba(245,200,66,.7);box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25);animation:bossPulse 3s ease-in-out infinite}
-@keyframes bossPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25)}50%{box-shadow:0 0 0 9px rgba(245,200,66,.28),0 14px 62px rgba(245,200,66,.85),0 32px 100px rgba(245,170,10,.45)}}
-.isle-img{width:100%;height:155px;object-fit:cover;object-position:center top;display:block;border-radius:0}
+.sess-island:hover:not(.locked-isle){transform:translateY(-8px) scale(1.07)}
+.sess-island:active:not(.locked-isle){transform:scale(.95)}
+.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.9) brightness(.45) opacity(.5)}
+.sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:transparent;border:none;box-shadow:none}
+.sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:bossFloat 3s ease-in-out infinite}
+@keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.isle-img{width:100%;max-width:220px;height:auto;display:block;margin:0 auto;mix-blend-mode:multiply;object-fit:contain;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45)) drop-shadow(0 2px 6px rgba(0,0,0,.3))}
 .isle-ico{display:none}
-.isle-name{font-size:1.05rem;font-weight:900;margin:10px 14px 4px;letter-spacing:.02em;text-shadow:0 2px 8px rgba(0,0,0,.8);text-align:left;color:#fff}
-.isle-sub{font-size:.82rem;color:rgba(255,255,255,.65);margin:0 14px 6px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em;text-align:right}
-.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);white-space:nowrap;margin:4px 14px 14px;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em}
-.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:14px}
-.isle-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;border:2.5px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s,box-shadow .2s;flex-shrink:0}
-.isle-dot:hover:not(.lock){transform:scale(1.1)}
-.isle-dot:active{transform:scale(.9)}
-.isle-dot.done{background:linear-gradient(135deg,rgba(34,197,94,.32),rgba(21,128,61,.22));border-color:#22c55e;color:#4ade80;box-shadow:0 0 18px rgba(34,197,94,.6),0 4px 14px rgba(0,0,0,.5)}
-.isle-dot.curr{background:linear-gradient(135deg,rgba(245,200,66,.3),rgba(251,191,36,.18));border-color:#f5c842;color:#f5c842;box-shadow:0 0 24px rgba(245,200,66,.8),0 4px 14px rgba(0,0,0,.5);animation:isleGlow 1.8s ease-in-out infinite}
-.isle-dot.lock{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07);color:rgba(255,255,255,.15);cursor:default;font-family:inherit;font-size:.9rem}
-.isle-dot-stars{font-size:.5rem;letter-spacing:0;min-height:.6rem;text-align:center}
+.isle-name{font-size:1.2rem;font-weight:900;margin:10px 4px 0;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.95),0 0 30px rgba(0,0,0,.8);text-align:center;letter-spacing:.02em}
+.isle-sub{display:none}
+.isle-badge{display:none}
+.isle-dot-wrap{display:none}
+.isle-dot-stars{display:none}
 @keyframes isleGlow{0%,100%{box-shadow:0 0 24px rgba(245,200,66,.8),0 4px 14px rgba(0,0,0,.5)}50%{box-shadow:0 0 44px rgba(245,200,66,1),0 0 76px rgba(245,200,66,.48),0 4px 14px rgba(0,0,0,.5)}}
 .isle-prog{margin-top:8px}
 .isle-prog-bar{height:6px;border-radius:6px;background:rgba(0,0,0,.35);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
