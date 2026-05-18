@@ -4771,11 +4771,11 @@ var islandDefs=[
         globeDiv.insertBefore(svg,globeDiv.firstChild);
         function drawMobPath(d){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','40');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','20');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','34');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','16');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(165,110,40,0.7)');dp.setAttribute('stroke-width','8');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(195,140,65,0.85)');dp.setAttribute('stroke-width','6');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
         var MG=8;
         var segsMob=[];
@@ -4794,18 +4794,19 @@ var islandDefs=[
           var c0m=centersM[i],c1m=centersM[i+1];
           var hw0=hWM[i],hh0=hHM[i],hh1=hHM[i+1];
           var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
+          var dy=Math.abs((c1m.y-hHM[i+1]-MG)-c0m.y);
           if(i%2===0){
-            // Ile gauche : sort depuis le COTE DROIT de l'image → vers le haut de l'ile droite
+            // Ile gauche : sort depuis le COTE DROIT → grand arc vers l'ile droite
             sx=c0m.x+hWM[i]; sy=c0m.y;
             ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            cp1x=sx+40;       cp1y=sy;
-            cp2x=ex;          cp2y=ey-60;
+            cp1x=sx+dy*0.7;   cp1y=sy;
+            cp2x=ex;          cp2y=ey-dy*0.5;
           } else {
-            // Ile droite : sort depuis le COTE GAUCHE de l'image → vers le haut de l'ile gauche
+            // Ile droite : sort depuis le COTE GAUCHE → grand arc vers l'ile gauche
             sx=c0m.x-hWM[i]; sy=c0m.y;
             ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            cp1x=sx-40;       cp1y=sy;
-            cp2x=ex;          cp2y=ey-60;
+            cp1x=sx-dy*0.7;   cp1y=sy;
+            cp2x=ex;          cp2y=ey-dy*0.5;
           }
           segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey);
