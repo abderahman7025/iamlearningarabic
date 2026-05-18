@@ -4632,7 +4632,8 @@ var islandDefs=[
   var globeDiv=document.createElement('div');
   globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch';
 
-  var prevIslandDone=true; // première île toujours débloquée
+  var prevIslandDone=true;
+  var _firstActivCard=null; // première île toujours débloquée
 
   islandDefs.forEach(function(isle,isleIdx){
     // Statut des sessions de cette île
@@ -4646,6 +4647,7 @@ var islandDefs=[
     // Card île (layout centré)
     var card=document.createElement('div');
     card.className='sess-island '+isle.theme+(isLocked?' locked-isle':'');
+    if(!_firstActivCard&&!isLocked&&!isComplete){_firstActivCard=card;}
 
     var ico=document.createElement('img');
     ico.className='isle-img';
@@ -4703,6 +4705,7 @@ var islandDefs=[
 
     prevIslandDone=isleSessions.every(function(s){var _a=(st.accuracy||{})[s.id];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
   });
+  if(_firstActivCard){setTimeout(function(){_firstActivCard.scrollIntoView({behavior:'smooth',block:'center'});},700);}
 
   // Boss final — Grand Quiz
   var allDone=doneSessions===totalSessions;
@@ -4733,6 +4736,7 @@ var islandDefs=[
     }
     if(DW<580){
       // MOBILE MAP v3 : 50%, alternance G/D, chemins bord->haut, avatar anime
+      var _gmMob=document.getElementById('girl-mascot');var _bmMob=document.getElementById('boy-mascot');if(_gmMob)_gmMob.style.visibility='hidden';if(_bmMob)_bmMob.style.visibility='hidden';
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
       var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
       var bossElMob=globeDiv.querySelector('.boss-isle');
@@ -4871,7 +4875,7 @@ var islandDefs=[
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
     if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
-    Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
+      Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     setTimeout(function(){
       globeDiv.style.position='relative';
@@ -6242,15 +6246,14 @@ function renderAudioExercise(ca,qs,session){
       showBtn.onclick=()=>{
         answerBox.style.display='block';
         showBtn.style.display='none';
-        srWrapW.style.display='flex';
-        setTimeout(()=>srLblW.scrollIntoView({behavior:'smooth',block:'center'}),100);
+        handleWriteReport(true);
       };
       const miniClearBtn=document.createElement('button');
       miniClearBtn.className='writing-action-btn danger';
       miniClearBtn.style.cssText='width:100%;margin-top:4px;text-align:center';
       miniClearBtn.textContent=t('clear_canvas')||t('writing_reset')||'↺';
       miniClearBtn.onclick=()=>{ if(miniCanvasWrap._clear) miniCanvasWrap._clear(); };
-      audioWrap.appendChild(audioBtn);audioWrap.appendChild(miniCanvasWrap);audioWrap.appendChild(miniClearBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(srWrapW);audioWrap.appendChild(nextWrap);
+      audioWrap.appendChild(audioBtn);audioWrap.appendChild(miniCanvasWrap);audioWrap.appendChild(miniClearBtn);audioWrap.appendChild(showBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(nextWrap);
       qbox.appendChild(audioWrap);
     } else {
       // Question "comment lit-on" — avec boutons Oui/Non pour comptabiliser
@@ -6328,12 +6331,12 @@ function renderAudioExercise(ca,qs,session){
       noBtn.onclick=()=>{handleSelfReport(false);setTimeout(function(){if(!nextBtn.parentNode||nextWrap.style.display==='none')return;if(ex.idx>=total-1){var _a=(st.accuracy||{})[(session&&session.id!==undefined)?session.id:-999];_showFinish(_a&&_a.t>0?_a.c/_a.t:0,ca);}else{nextBtn.click();}},950);};
       selfReportBtns.appendChild(yesBtn); selfReportBtns.appendChild(noBtn);
       selfReportWrap.appendChild(selfReportLbl); selfReportWrap.appendChild(selfReportBtns);
-      audioBtn.onclick=()=>{speak(q.speak||q.ar,.78);audioBtn.style.opacity='.7';answerBox.style.display='block';selfReportWrap.style.display='flex';};
+      audioBtn.onclick=()=>{speak(q.speak||q.ar,.78);audioBtn.style.opacity='.7';answerBox.style.display='block';handleSelfReport(true);};
       const nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m';nextBtn.style.marginTop='4px';
       nextBtn.textContent=ex.idx<total-1?t('ex200_next'):t('ex200_finish');
       nextBtn.onclick=()=>{ex.idx++;animEl(ca,'tx-fade');renderQ();};
       nextWrap.appendChild(nextBtn);
-      audioWrap.appendChild(audioBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(selfReportWrap);audioWrap.appendChild(nextWrap);
+      audioWrap.appendChild(audioBtn);audioWrap.appendChild(answerBox);audioWrap.appendChild(nextWrap);
       qbox.appendChild(audioWrap);
     }
     ca.appendChild(qbox);
