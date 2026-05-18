@@ -2348,7 +2348,7 @@ body.profile-boy #boy-bg-anim {
 @keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .isle-img{width:100%;height:220px;display:block;margin:0 auto;object-fit:contain}
 .isle-ico{display:none}
-.isle-name{font-size:1.1rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95);text-align:center;letter-spacing:.02em;position:absolute;bottom:0;left:0;right:0;padding:22px 8px 10px;background:linear-gradient(transparent,rgba(0,0,0,.75));margin:0}
+.isle-name{font-size:1.1rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95);text-align:center;letter-spacing:.02em;position:absolute;bottom:0;left:0;right:0;padding:8px 8px 10px;background:none;margin:0}
 .isle-sub{display:none}
 .isle-badge{display:none}
 .isle-dot-wrap{display:none}
@@ -4536,7 +4536,7 @@ var islandImgs=[
   '/images/island-3.png?v=2',
   '/images/island-4.png?v=2',
   '/images/island-5.png?v=2',
-  '/images/island-6.png?v=2',
+  '/images/pro-EcjxfQ9H.jpeg',
   '/images/island-7.png?v=2',
   '/images/island-8.png?v=2',
   '/images/island-9.png?v=2',
@@ -4767,9 +4767,9 @@ var islandDefs=[
         globeDiv.insertBefore(svg,globeDiv.firstChild);
         function drawMobPath(d){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','40');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','40');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','34');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','34');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
           dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(165,110,40,0.7)');dp.setAttribute('stroke-width','8');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
