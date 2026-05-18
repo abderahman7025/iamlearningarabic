@@ -2337,24 +2337,21 @@ body.profile-boy #boy-bg-anim {
    ============================================================ */
 .sess-map-wrap{padding:16px 14px 100px;max-width:520px;margin:0 auto}
 .sess-map-title{text-align:center;font-size:1.35rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;padding:10px 0 28px;text-shadow:0 0 28px rgba(255,210,40,.7),0 2px 10px rgba(0,0,0,.9)}
-.sess-island{border-radius:24px;padding:26px 18px 22px;border:2px solid;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center}
-.sess-island::before{content:'';position:absolute;inset:0;background:linear-gradient(155deg,rgba(255,255,255,.13) 0%,transparent 48%);pointer-events:none;z-index:1;border-radius:inherit}
+.sess-island{border-radius:20px;border:none;cursor:pointer;transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center;background:#12100a;box-shadow:0 10px 40px rgba(0,0,0,.7),0 2px 8px rgba(0,0,0,.5);padding:0}
+.sess-island::before{display:none}
 .sess-island>*{position:relative;z-index:2}
-.sess-island:hover:not(.locked-isle){transform:translateY(-6px) scale(1.025);filter:brightness(1.14)}
+.sess-island:hover:not(.locked-isle){transform:translateY(-7px) scale(1.025);box-shadow:0 18px 56px rgba(0,0,0,.75),0 4px 12px rgba(0,0,0,.5)}
 .sess-island:active:not(.locked-isle){transform:scale(.97)}
-.sess-island.locked-isle{opacity:.28;filter:grayscale(.95) brightness(.45);cursor:default;pointer-events:none}
-.sess-island.sea{background:linear-gradient(145deg,#0e5f8a 0%,#0a4a6e 50%,#063652 100%);border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.28),0 8px 34px rgba(14,165,233,.6),0 22px 68px rgba(6,182,212,.24),inset 0 1px 0 rgba(255,255,255,.2)}
-.sess-island.beach{background:linear-gradient(145deg,#8a5a0a 0%,#6b4208 50%,#4d2f06 100%);border-color:#fbbf24;box-shadow:0 0 0 1px rgba(251,191,36,.28),0 8px 34px rgba(245,158,11,.6),0 22px 68px rgba(245,200,66,.24),inset 0 1px 0 rgba(255,255,255,.2)}
-.sess-island.forest{background:linear-gradient(145deg,#155e32 0%,#0f4724 50%,#0a3319 100%);border-color:#4ade80;box-shadow:0 0 0 1px rgba(74,222,128,.28),0 8px 34px rgba(34,197,94,.6),0 22px 68px rgba(21,128,61,.24),inset 0 1px 0 rgba(255,255,255,.15)}
-.sess-island.desert{background:linear-gradient(145deg,#8a2a0a 0%,#6b1e08 50%,#4d1506 100%);border-color:#fb923c;box-shadow:0 0 0 1px rgba(251,146,60,.28),0 8px 34px rgba(239,68,68,.6),0 22px 68px rgba(185,28,28,.24),inset 0 1px 0 rgba(255,255,255,.15)}
-.sess-island.palace{background:linear-gradient(145deg,#4c1d8a 0%,#3b166e 50%,#2a0f52 100%);border-color:#c084fc;box-shadow:0 0 0 1px rgba(192,132,252,.28),0 8px 34px rgba(168,85,247,.6),0 22px 68px rgba(124,58,237,.24),inset 0 1px 0 rgba(255,255,255,.15)}
-.sess-island.boss-isle{background:linear-gradient(145deg,#7a4f08 0%,#5c3a06 50%,#3e2804 100%);border-color:#fde68a;border-width:2.5px;box-shadow:0 0 0 4px rgba(245,200,66,.22),0 0 0 9px rgba(245,200,66,.08),0 10px 44px rgba(245,200,66,.65),0 24px 80px rgba(245,170,10,.3),inset 0 1px 0 rgba(255,255,255,.25);animation:bossPulse 3s ease-in-out infinite}
-@keyframes bossPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.22),0 0 0 9px rgba(245,200,66,.08),0 10px 44px rgba(245,200,66,.65),0 24px 80px rgba(245,170,10,.3)}50%{box-shadow:0 0 0 8px rgba(245,200,66,.38),0 0 0 20px rgba(245,200,66,.12),0 14px 62px rgba(245,200,66,.95),0 32px 100px rgba(245,170,10,.48)}}
-.isle-ico{font-size:3.8rem;line-height:1;margin-bottom:12px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.65))}
-.isle-name{font-size:1.1rem;font-weight:900;margin:6px 0 4px;letter-spacing:.02em;text-shadow:0 2px 8px rgba(0,0,0,.7)}
-.isle-sub{font-size:.82rem;color:rgba(255,255,255,.8);margin-top:2px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em}
-.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.22);white-space:nowrap;margin-top:12px;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em}
-.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.85) brightness(.4)}
+.sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:#12100a;border:none;box-shadow:0 10px 40px rgba(0,0,0,.7)}
+.sess-island.boss-isle{background:#1e1404;border:2.5px solid rgba(245,200,66,.7);box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25);animation:bossPulse 3s ease-in-out infinite;padding:0}
+@keyframes bossPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.15),0 10px 44px rgba(245,200,66,.5),0 22px 72px rgba(245,170,10,.25)}50%{box-shadow:0 0 0 9px rgba(245,200,66,.28),0 14px 62px rgba(245,200,66,.85),0 32px 100px rgba(245,170,10,.45)}}
+.isle-img{width:100%;height:155px;object-fit:cover;object-position:center top;display:block;border-radius:0}
+.isle-ico{display:none}
+.isle-name{font-size:1.05rem;font-weight:900;margin:10px 14px 4px;letter-spacing:.02em;text-shadow:0 2px 8px rgba(0,0,0,.8);text-align:left}
+.isle-sub{font-size:.82rem;color:rgba(255,255,255,.65);margin:0 14px 6px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em;text-align:right}
+.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);white-space:nowrap;margin:4px 14px 14px;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em}
+.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:14px}
 .isle-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;border:2.5px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s,box-shadow .2s;flex-shrink:0}
 .isle-dot:hover:not(.lock){transform:scale(1.1)}
 .isle-dot:active{transform:scale(.9)}
@@ -4537,7 +4534,22 @@ function renderSessionsMap(ca){
 
   // Définition des îles — 1 île = 1 cours
   var _L=st.lang;
-  var islandDefs=[
+  var // Images des iles (index = isleIdx)
+var islandImgs=[
+  '/images/pro-FQuTjeuC.jpeg',
+  '/images/pro-8iLd0nIB.jpeg',
+  '/images/pro-XUImg97Q.jpeg',
+  '/images/pro-XSmeLlK6.jpeg',
+  '/images/pro-kLWGQDQM.jpeg',
+  '/images/pro-P7dHViRJ.jpeg',
+  '/images/pro-lldw19jU.jpeg',
+  '/images/pro-7aCvwdIv.jpeg',
+  '/images/pro-UJhCRUN2.jpeg',
+  '/images/pro-syNBps59.jpeg',
+  '/images/pro-RBCEbXS2.jpeg',
+  '/images/pro-LXwnklH1.jpeg',
+];
+islandDefs=[
     {key:'sea',    icon:'💧', theme:'sea',
      label:{'fr':'La Source de l\'Humanité','en':'The Source of Humanity','es':'La Fuente de la Humanidad','de':'Die Quelle der Menschheit','nl':'De Bron van de Mensheid','it':'La Fonte dell\'Umanità','pt':'A Fonte da Humanidade','ru':'Источник Человечества','tr':'İnsanlığın Kaynağı','zh':'人类之源','id':'Sumber Kemanusiaan','ur':'انسانیت کا سرچشمہ','hi':'मानवता का स्रोत'}[_L]||'La Source de l\'Humanité',
      ar:'َ · ُ · ِ', sids:[0]},
@@ -4641,9 +4653,10 @@ function renderSessionsMap(ca){
     var card=document.createElement('div');
     card.className='sess-island '+isle.theme+(isLocked?' locked-isle':'');
 
-    var ico=document.createElement('div');
-    ico.className='isle-ico';
-    ico.textContent=isle.icon;
+    var ico=document.createElement('img');
+    ico.className='isle-img';
+    ico.src=islandImgs[isleIdx]||'';
+    ico.alt=isle.label;
 
     var nm=document.createElement('div');
     nm.className='isle-name';
@@ -4760,11 +4773,11 @@ function renderSessionsMap(ca){
         globeDiv.insertBefore(svg,globeDiv.firstChild);
         function drawMobPath(d){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.35)');sh.setAttribute('stroke-width','30');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','40');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,248,215,0.95)');mp.setAttribute('stroke-width','18');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','28');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,210,60,0.98)');dp.setAttribute('stroke-width','4');dp.setAttribute('stroke-dasharray','10,9');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(195,140,65,0.88)');dp.setAttribute('stroke-width','18');dp.setAttribute('stroke-dasharray','none');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
         var MG=8;
         var segsMob=[];
@@ -4890,12 +4903,12 @@ function renderSessionsMap(ca){
       // Dessine un chemin SVG triple (ombre + crÃ¨me + tirets dorÃ©s)
       function drawPath(d){
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-        sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.38)');
-        sh.setAttribute('stroke-width','42');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
+        sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');
+        sh.setAttribute('stroke-width','54');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
         svg.appendChild(sh);
         var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,248,215,0.96)');
-        mp.setAttribute('stroke-width','28');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
+        mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');
+        mp.setAttribute('stroke-width','40');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
         svg.appendChild(mp);
         var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
         dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,210,55,0.98)');
