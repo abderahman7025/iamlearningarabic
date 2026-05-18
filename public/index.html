@@ -2335,32 +2335,36 @@ body.profile-boy #boy-bg-anim {
 /* ============================================================
    CARTE DE PROGRESSION — ÎLES
    ============================================================ */
-.sess-map-wrap{padding:12px 14px 80px;max-width:480px;margin:0 auto}
-.sess-map-title{text-align:center;font-size:1.15rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#fff;padding:8px 0 22px;text-shadow:0 2px 10px rgba(0,0,0,.55),0 0 24px rgba(255,220,50,.25)}
-.sess-island{border-radius:22px;padding:22px 16px 18px;border:1.5px solid;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center}
-.sess-island:active{transform:scale(.98)}
-.sess-island.locked-isle{opacity:.5;filter:grayscale(.7);cursor:default}
-.sess-island.sea{background:linear-gradient(135deg,rgba(6,182,212,.5),rgba(14,165,233,.4));border-color:rgba(6,182,212,.85);box-shadow:0 4px 22px rgba(6,182,212,.3)}
-.sess-island.beach{background:linear-gradient(135deg,rgba(180,130,20,.55),rgba(200,120,10,.45));border-color:rgba(245,200,66,.85);box-shadow:0 4px 22px rgba(245,200,66,.25)}
-.sess-island.forest{background:linear-gradient(135deg,rgba(34,197,94,.5),rgba(21,128,61,.4));border-color:rgba(34,197,94,.85);box-shadow:0 4px 22px rgba(34,197,94,.25)}
-.sess-island.desert{background:linear-gradient(135deg,rgba(239,68,68,.5),rgba(185,28,28,.4));border-color:rgba(239,68,68,.85);box-shadow:0 4px 22px rgba(239,68,68,.25)}
-.sess-island.palace{background:linear-gradient(135deg,rgba(168,85,247,.5),rgba(124,58,237,.4));border-color:rgba(168,85,247,.85);box-shadow:0 4px 22px rgba(168,85,247,.25)}
-.sess-island.boss-isle{background:linear-gradient(135deg,rgba(245,200,66,.55),rgba(251,191,36,.45));border-color:rgba(245,200,66,.9);box-shadow:0 4px 30px rgba(245,200,66,.35)}
-
-.isle-ico{font-size:3rem;line-height:1;margin-bottom:10px;display:block}
-.isle-name{font-size:1rem;font-weight:800;margin:4px 0 4px}
-.isle-sub{font-size:.78rem;color:rgba(255,255,255,.7);margin-top:2px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em}
-.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.18);white-space:nowrap;margin-top:12px}
-.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
-.isle-dot{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;border:2px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s;flex-shrink:0}
+.sess-map-wrap{padding:16px 14px 100px;max-width:520px;margin:0 auto}
+.sess-map-title{text-align:center;font-size:1.35rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;padding:10px 0 28px;text-shadow:0 0 28px rgba(255,210,40,.7),0 2px 10px rgba(0,0,0,.9)}
+.sess-island{border-radius:24px;padding:26px 18px 22px;border:2px solid;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,filter .2s;position:relative;overflow:hidden;margin-bottom:0;text-align:center}
+.sess-island::before{content:'';position:absolute;inset:0;background:linear-gradient(155deg,rgba(255,255,255,.13) 0%,transparent 48%);pointer-events:none;z-index:1;border-radius:inherit}
+.sess-island>*{position:relative;z-index:2}
+.sess-island:hover:not(.locked-isle){transform:translateY(-6px) scale(1.025);filter:brightness(1.14)}
+.sess-island:active:not(.locked-isle){transform:scale(.97)}
+.sess-island.locked-isle{opacity:.28;filter:grayscale(.95) brightness(.45);cursor:default;pointer-events:none}
+.sess-island.sea{background:linear-gradient(145deg,#0e5f8a 0%,#0a4a6e 50%,#063652 100%);border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.28),0 8px 34px rgba(14,165,233,.6),0 22px 68px rgba(6,182,212,.24),inset 0 1px 0 rgba(255,255,255,.2)}
+.sess-island.beach{background:linear-gradient(145deg,#8a5a0a 0%,#6b4208 50%,#4d2f06 100%);border-color:#fbbf24;box-shadow:0 0 0 1px rgba(251,191,36,.28),0 8px 34px rgba(245,158,11,.6),0 22px 68px rgba(245,200,66,.24),inset 0 1px 0 rgba(255,255,255,.2)}
+.sess-island.forest{background:linear-gradient(145deg,#155e32 0%,#0f4724 50%,#0a3319 100%);border-color:#4ade80;box-shadow:0 0 0 1px rgba(74,222,128,.28),0 8px 34px rgba(34,197,94,.6),0 22px 68px rgba(21,128,61,.24),inset 0 1px 0 rgba(255,255,255,.15)}
+.sess-island.desert{background:linear-gradient(145deg,#8a2a0a 0%,#6b1e08 50%,#4d1506 100%);border-color:#fb923c;box-shadow:0 0 0 1px rgba(251,146,60,.28),0 8px 34px rgba(239,68,68,.6),0 22px 68px rgba(185,28,28,.24),inset 0 1px 0 rgba(255,255,255,.15)}
+.sess-island.palace{background:linear-gradient(145deg,#4c1d8a 0%,#3b166e 50%,#2a0f52 100%);border-color:#c084fc;box-shadow:0 0 0 1px rgba(192,132,252,.28),0 8px 34px rgba(168,85,247,.6),0 22px 68px rgba(124,58,237,.24),inset 0 1px 0 rgba(255,255,255,.15)}
+.sess-island.boss-isle{background:linear-gradient(145deg,#7a4f08 0%,#5c3a06 50%,#3e2804 100%);border-color:#fde68a;border-width:2.5px;box-shadow:0 0 0 4px rgba(245,200,66,.22),0 0 0 9px rgba(245,200,66,.08),0 10px 44px rgba(245,200,66,.65),0 24px 80px rgba(245,170,10,.3),inset 0 1px 0 rgba(255,255,255,.25);animation:bossPulse 3s ease-in-out infinite}
+@keyframes bossPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.22),0 0 0 9px rgba(245,200,66,.08),0 10px 44px rgba(245,200,66,.65),0 24px 80px rgba(245,170,10,.3)}50%{box-shadow:0 0 0 8px rgba(245,200,66,.38),0 0 0 20px rgba(245,200,66,.12),0 14px 62px rgba(245,200,66,.95),0 32px 100px rgba(245,170,10,.48)}}
+.isle-ico{font-size:3.8rem;line-height:1;margin-bottom:12px;display:block;filter:drop-shadow(0 4px 12px rgba(0,0,0,.65))}
+.isle-name{font-size:1.1rem;font-weight:900;margin:6px 0 4px;letter-spacing:.02em;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.isle-sub{font-size:.82rem;color:rgba(255,255,255,.8);margin-top:2px;font-family:'Scheherazade New',serif;direction:rtl;letter-spacing:.05em}
+.isle-badge{display:inline-block;font-size:.68rem;font-weight:800;padding:5px 14px;border-radius:20px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.22);white-space:nowrap;margin-top:12px;text-shadow:0 1px 4px rgba(0,0,0,.7);letter-spacing:.04em}
+.isle-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.isle-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:900;border:2.5px solid;font-family:'Scheherazade New',serif;cursor:pointer;transition:transform .15s,box-shadow .2s;flex-shrink:0}
+.isle-dot:hover:not(.lock){transform:scale(1.1)}
 .isle-dot:active{transform:scale(.9)}
-.isle-dot.done{background:rgba(34,197,94,.2);border-color:#22c55e;color:#4ade80}
-.isle-dot.curr{background:rgba(245,200,66,.18);border-color:#f5c842;color:#f5c842;animation:isleGlow 1.8s ease-in-out infinite}
-.isle-dot.lock{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.2);cursor:default;font-family:inherit;font-size:.9rem}
-.isle-dot-stars{font-size:.48rem;letter-spacing:0;min-height:.6rem;text-align:center}
-@keyframes isleGlow{0%,100%{box-shadow:0 0 0 0 rgba(245,200,66,.5)}50%{box-shadow:0 0 0 8px rgba(245,200,66,0)}}
-.isle-prog{margin-top:4px}
-.isle-prog-bar{height:5px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden}
+.isle-dot.done{background:linear-gradient(135deg,rgba(34,197,94,.32),rgba(21,128,61,.22));border-color:#22c55e;color:#4ade80;box-shadow:0 0 18px rgba(34,197,94,.6),0 4px 14px rgba(0,0,0,.5)}
+.isle-dot.curr{background:linear-gradient(135deg,rgba(245,200,66,.3),rgba(251,191,36,.18));border-color:#f5c842;color:#f5c842;box-shadow:0 0 24px rgba(245,200,66,.8),0 4px 14px rgba(0,0,0,.5);animation:isleGlow 1.8s ease-in-out infinite}
+.isle-dot.lock{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07);color:rgba(255,255,255,.15);cursor:default;font-family:inherit;font-size:.9rem}
+.isle-dot-stars{font-size:.5rem;letter-spacing:0;min-height:.6rem;text-align:center}
+@keyframes isleGlow{0%,100%{box-shadow:0 0 24px rgba(245,200,66,.8),0 4px 14px rgba(0,0,0,.5)}50%{box-shadow:0 0 44px rgba(245,200,66,1),0 0 76px rgba(245,200,66,.48),0 4px 14px rgba(0,0,0,.5)}}
+.isle-prog{margin-top:8px}
+.isle-prog-bar{height:6px;border-radius:6px;background:rgba(0,0,0,.35);overflow:hidden;box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
 .isle-prog-fill{height:100%;border-radius:5px;transition:width .6s cubic-bezier(.34,1.56,.64,1)}
 .isle-prog-lbl{display:flex;justify-content:space-between;font-size:.63rem;color:rgba(255,255,255,.35);margin-top:4px}
 .isle-connector{display:flex;align-items:center;justify-content:center;height:20px;opacity:.25;font-size:.9rem}
@@ -4756,11 +4760,11 @@ function renderSessionsMap(ca){
         globeDiv.insertBefore(svg,globeDiv.firstChild);
         function drawMobPath(d){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.18)');sh.setAttribute('stroke-width','22');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.35)');sh.setAttribute('stroke-width','30');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,245,195,0.85)');mp.setAttribute('stroke-width','14');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,248,215,0.95)');mp.setAttribute('stroke-width','18');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');dp.setAttribute('stroke-width','3');dp.setAttribute('stroke-dasharray','10,9');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,210,60,0.98)');dp.setAttribute('stroke-width','4');dp.setAttribute('stroke-dasharray','10,9');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
         var MG=8;
         var segsMob=[];
@@ -4886,16 +4890,16 @@ function renderSessionsMap(ca){
       // Dessine un chemin SVG triple (ombre + crÃ¨me + tirets dorÃ©s)
       function drawPath(d){
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-        sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.20)');
-        sh.setAttribute('stroke-width','32');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
+        sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(0,0,0,0.38)');
+        sh.setAttribute('stroke-width','42');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
         svg.appendChild(sh);
         var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,245,195,0.85)');
-        mp.setAttribute('stroke-width','22');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
+        mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(255,248,215,0.96)');
+        mp.setAttribute('stroke-width','28');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
         svg.appendChild(mp);
         var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,190,50,0.70)');
-        dp.setAttribute('stroke-width','4');dp.setAttribute('stroke-dasharray','16,14');
+        dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(255,210,55,0.98)');
+        dp.setAttribute('stroke-width','5');dp.setAttribute('stroke-dasharray','16,14');
         dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');
         svg.appendChild(dp);
       }
