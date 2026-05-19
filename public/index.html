@@ -3972,7 +3972,7 @@ function navToPage(page){
   if(_tb){_tb.style.maxHeight='200px';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.pointerEvents='';}
   var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
   document.getElementById('tb-back').style.display='flex';
-  document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');
+  document.getElementById('back-lbl').textContent=t('back_menu');
   document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:'Jeux'}[page]||'';
   st.backHistory=[{target:'menu'}];
   renderPage(page,true);
@@ -4005,7 +4005,7 @@ function handleBack(){
       mainEl.style.opacity='';mainEl.style.borderRadius='';
       // Depuis la page sessions (liste des cours) → menu principal
       if(st._curPage==='sessions'){showS('s-menu',false);}
-      else{st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');renderPage('sessions',false);}
+      else{st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent=t('back_menu');renderPage('sessions',false);}
     },350);
   } else {
     // Depuis la page sessions (liste des cours) → menu principal
@@ -4014,7 +4014,7 @@ function handleBack(){
     else if(prev.target==='sessions'){
       st._curPage='sessions';
       document.getElementById('tb-title').textContent=t('sessions');
-      document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');
+      document.getElementById('back-lbl').textContent=t('back_menu');
       renderPage('sessions',false);
     } else {
       showS('s-menu',false);
@@ -5079,10 +5079,7 @@ function renderMiniGames(ca){
   var wrap=document.createElement('div');
   wrap.className='mg-list-wrap';
 
-  var title=document.createElement('div');
-  title.className='mg-list-title';
-  title.textContent='🎮 Jeux';
-  wrap.appendChild(title);
+
 
   // Calcul sessions accomplies pour déblocage
   var done0=ALL_S.find(function(s){return s.id===0;});
@@ -5146,7 +5143,7 @@ function renderMiniGames(ca){
   var backBtn=document.createElement('button');
   backBtn.className='rbtn rbtn-m';
   backBtn.style.marginTop='8px';
-  backBtn.textContent='‹ '+(t('back_menu')||'Menu');
+  backBtn.textContent='🗺️ Carte des îles';
   backBtn.onclick=function(){st._curPage='sessions';renderPage('sessions',false);};
   wrap.appendChild(backBtn);
 
@@ -5181,11 +5178,7 @@ function renderMemoryDeckList(ca,decks){
   ca.innerHTML='';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
-  var ttl=document.createElement('div');
-  ttl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:6px 0 10px';
-  ttl.textContent='\u{1F0CF} Choisir un niveau';
-  wrap.appendChild(ttl);
-  decks.forEach(function(deck,di){
+    decks.forEach(function(deck,di){
     var card=document.createElement('div');card.className='nav-card';
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
     var best=localStorage.getItem('mg_mem_best_'+deck.idx);
@@ -5200,7 +5193,7 @@ function renderMemoryDeckList(ca,decks){
     setTimeout(function(){requestAnimationFrame(function(){card.style.transition='opacity .25s ease-out, transform .25s ease-out';card.style.opacity='1';card.style.transform='translateX(0)';});},di*120+80);
   });
   var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';backBtn.style.marginTop='8px';
-  backBtn.textContent='‹ '+(t('back_menu')||'Menu');
+  backBtn.textContent='🗺️ Carte des îles';
   backBtn.onclick=function(){renderMiniGames(ca);};
   wrap.appendChild(backBtn);ca.appendChild(wrap);
 }
@@ -5225,14 +5218,14 @@ function renderMemoryPlay(ca,deck){
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
-    {bg:'#87CEEB',sz:'50%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#87CEEB',sz:'68%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
     {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
     {flag:true,sz:'65%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
-    {bg:'#87CEEB',sz:'50%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#87CEEB',sz:'68%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
     {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
   var ds=_DS[deck.idx]||_DS[0];
-  var flagBg='linear-gradient(to bottom right,#EF0A1A 50%,transparent 50%) top left/50% 33% no-repeat,linear-gradient(to bottom left,#EF0A1A 50%,transparent 50%) top right/50% 33% no-repeat,linear-gradient(90deg,#009736 33.3%,#fff 33.3%,#fff 66.6%,#111 66.6%) 0 33%/100% 67% no-repeat';
+  var flagBg='linear-gradient(to bottom right,#EF0A1A 50%,transparent 50%) 0 0/40% 50% no-repeat,linear-gradient(to top right,#EF0A1A 50%,transparent 50%) 0 100%/40% 50% no-repeat,linear-gradient(to bottom,#000 33.3%,#fff 33.3%,#fff 66.6%,#009736 66.6%)';
   var flipped=[];var matched=[];var locked=false;
   pairs.forEach(function(p){
     var card=document.createElement('div');card.className='mem-card';
@@ -5283,7 +5276,7 @@ function renderMemoryPlay(ca,deck){
   });
   wrap.appendChild(grid);
   var qBtn=document.createElement('button');
-  qBtn.style.cssText='display:block;margin:20px auto 0;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);padding:8px 20px;border-radius:20px;cursor:pointer;font-size:.82rem';
+  qBtn.style.cssText='display:block;margin:20px auto 0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.9);padding:9px 24px;border-radius:22px;cursor:pointer;font-size:.82rem;font-weight:600';
   qBtn.textContent='‹ Retour aux Memories';
   qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
   wrap.appendChild(qBtn);ca.appendChild(wrap);
@@ -5461,7 +5454,7 @@ function renderPuzzleGame(ca){
     skipBtn.onclick=function(){qIdx++;buildQuestion();};
     wrap.appendChild(skipBtn);
     var quitPzBtn=document.createElement('button');
-    quitPzBtn.style.cssText='display:block;margin:8px auto 0;background:none;border:none;color:rgba(255,255,255,.28);padding:4px 14px;border-radius:20px;cursor:pointer;font-size:.74rem';
+    quitPzBtn.style.cssText='display:block;margin:14px auto 0;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);padding:8px 22px;border-radius:22px;cursor:pointer;font-size:.82rem;font-weight:600';
     quitPzBtn.textContent='‹ Retour aux Jeux';
     quitPzBtn.onclick=function(){renderMiniGames(ca);};
     wrap.appendChild(quitPzBtn);
