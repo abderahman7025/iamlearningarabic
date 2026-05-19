@@ -2393,7 +2393,7 @@ body.profile-boy #boy-bg-anim {
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.mem-card-front{background:#2a1608;border:2px solid rgba(255,255,255,.18);font-size:2rem}
+.mem-card-front{background:#2a1608;border:2px solid rgba(255,255,255,.1);font-size:2rem;overflow:hidden}
 .mem-card-back{background:#7c4a10;border:2px solid rgba(220,160,40,.8);transform:rotateY(180deg);font-weight:700;padding:4px;text-align:center;line-height:1.1;color:#fff8e7}
 .mem-card.matched .mem-card-front{background:#163a20}
 .mem-card.matched .mem-card-back{background:#1a5a28;border-color:#22c55e;color:#a7f3d0}
@@ -5153,9 +5153,10 @@ function renderMemoryGame(ca){
   var allLetters=[];var seen={};
   ALL_S.forEach(function(s){if(s.letters){s.letters.forEach(function(l){if(l.ar&&l.lat&&!seen[l.ar]){seen[l.ar]=1;allLetters.push({ar:l.ar,lat:l.lat});}});}});
   var DS=6;var allDecks=[];
+  var _DI=[{name:'L\'Arche de Nouh',img:'/images/island-1.png?v=2'},{name:'La Maison Sacrée',img:'/images/island-2.png?v=2'},{name:'Al-Aqsa',img:'/images/island-9.png?v=2'},{name:'Le Ventre de la Baleine',img:'/images/island-10.png?v=2'},{name:'La Cité de Médine',img:'/images/island-11.png?v=2'}];
   for(var i=0;i<allLetters.length;i+=DS){
     var chunk=allLetters.slice(i,i+DS);
-    if(chunk.length>=4) allDecks.push({name:'Niveau '+(allDecks.length+1),icon:chunk[0].ar,pairs:chunk,idx:allDecks.length});
+    if(chunk.length>=4){var _di=_DI[allDecks.length]||{name:'Niveau '+(allDecks.length+1),img:''};allDecks.push({name:_di.name,img:_di.img,icon:chunk[0].ar,pairs:chunk,idx:allDecks.length});}
     else if(allDecks.length>0){allDecks[allDecks.length-1].pairs=allDecks[allDecks.length-1].pairs.concat(chunk);}
   }
   if(!allDecks.length){
@@ -5181,7 +5182,7 @@ function renderMemoryDeckList(ca,decks){
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
     var best=localStorage.getItem('mg_mem_best_'+deck.idx);
     card.innerHTML='<div class="nav-card-shimmer"></div>'
-      +'<div class="nav-icon blue" style="font-size:1.6rem;font-family:\'Scheherazade New\',serif;width:48px;height:48px;min-width:48px">'+deck.icon+'</div>'
+      +'<div class="nav-icon" style="padding:0;overflow:hidden;width:52px;height:52px;min-width:52px;border-radius:12px"><img src="'+deck.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy"/></div>'
       +'<div class="nav-text"><div class="nav-title">'+deck.name+'</div>'
       +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' paires)</div>'
       +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 Meilleur : '+best+'</span>':'')
@@ -5219,7 +5220,7 @@ function renderMemoryPlay(ca,deck){
   pairs.forEach(function(p){
     var card=document.createElement('div');card.className='mem-card';
     var inner=document.createElement('div');inner.className='mem-card-inner';
-    var front=document.createElement('div');front.className='mem-card-front';front.textContent='؟';
+    var front=document.createElement('div');front.className='mem-card-front';front.style.backgroundImage='url('+deck.img+')';front.style.backgroundSize='cover';front.style.backgroundPosition='center';
     var back=document.createElement('div');back.className='mem-card-back';
     back.style.fontFamily=p.type==='ar'?'\'Scheherazade New\',serif':'inherit';
     back.style.fontSize=p.type==='ar'?'2.8rem':'1.7rem';
