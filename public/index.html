@@ -5115,7 +5115,7 @@ function renderMiniGames(ca){
     card.className='nav-card';
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;'+(g.locked?'opacity:0;transform:translateX(-110%);filter:grayscale(.7);':'');
     var lockedNote=g.locked?'<span style="display:inline-block;margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.38)">🔒 '+({'fr':'Continue les leçons pour débloquer','en':'Complete lessons to unlock','es':'Completa lecciones para desbloquear','de':'Lektionen abschließen','nl':'Voltooi lessen om te ontgrendelen','it':'Completa lezioni per sbloccare','pt':'Complete lições para desbloquear','ru':'Пройди уроки для разблокировки','tr':'Dersleri tamamla','zh':'完成课程以解锁','id':'Selesaikan pelajaran','ur':'سبق مکمل کریں','hi':'पाठ पूरा करें'}[st.lang]||'Continue les leçons pour débloquer')+'</span>':'';
-    var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 Meilleur : '+g.best+'</span>':'';
+    var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur')+' : '+g.best+'</span>':'';
     card.innerHTML='<div class="nav-card-shimmer"></div>'
       +'<div class="nav-icon '+gameCls[g.id]+'">'+(gameIcons[g.id]||g.icon)+'</div>'
       +'<div class="nav-text">'
@@ -5143,7 +5143,7 @@ function renderMiniGames(ca){
   var backBtn=document.createElement('button');
   backBtn.className='rbtn rbtn-m';
   backBtn.style.marginTop='8px';
-  backBtn.textContent='🗺️ Carte des îles';
+  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux');
   backBtn.onclick=function(){st._curPage='sessions';renderPage('sessions',false);};
   wrap.appendChild(backBtn);
 
@@ -5158,7 +5158,7 @@ function renderMemoryGame(ca){
   var allLetters=[];var seen={};
   ALL_S.forEach(function(s){if(s.letters){s.letters.forEach(function(l){if(l.ar&&l.lat&&!seen[l.ar]){seen[l.ar]=1;allLetters.push({ar:l.ar,lat:l.lat});}});}});
   var DS=6;var allDecks=[];
-  var _DI=[{name:'L\'Arche de Nouh',img:'/images/island-1.png?v=2'},{name:'La Maison Sacrée',img:'/images/island-2.png?v=2'},{name:'Al-Aqsa',img:'/images/island-9.png?v=2'},{name:'Le Ventre de la Baleine',img:'/images/island-10.png?v=2'},{name:'La Cité de Médine',img:'/images/island-11.png?v=2'}];
+  var _DI=[{name:({'fr':'L\'Arche de Nouh','en':'Noah\'s Ark','es':'El Arca de Noé','de':'Noahs Arche','nl':'Ark van Noach','it':'L\'Arca di Noè','pt':'A Arca de Noé','ru':'Ковчег Ноя','tr':'Nuh\'un Gemisi','zh':'诺亚方舟','id':'Bahtera Nuh','ur':'نوح کی کشتی','hi':'नूह की नाव'}[st.lang]||'L\'Arche de Nouh'),img:'/images/island-1.png?v=2'},{name:({'fr':'La Maison Sacrée','en':'The Sacred House','es':'La Casa Sagrada','de':'Das Heilige Haus','nl':'Het Heilige Huis','it':'La Casa Sacra','pt':'A Casa Sagrada','ru':'Священный Дом','tr':'Kutsal Ev','zh':'圣房','id':'Rumah Suci','ur':'بيت المقدس','hi':'पवित्र घर'}[st.lang]||'La Maison Sacrée'),img:'/images/island-2.png?v=2'},{name:'Al-Aqsa',img:'/images/island-9.png?v=2'},{name:({'fr':'Le Ventre de la Baleine','en':'Belly of the Whale','es':'El Vientre de la Ballena','de':'Bauch des Wals','nl':'Buik van de Walvis','it':'Il Ventre della Balena','pt':'O Ventre da Baleia','ru':'Чрево Кита','tr':'Balinanın Karnı','zh':'鲸鱼腹','id':'Perut Ikan Paus','ur':'مچھلی کے پیٹ میں','hi':'व्हेल का पेट'}[st.lang]||'Le Ventre de la Baleine'),img:'/images/island-10.png?v=2'},{name:({'fr':'La Cité de Médine','en':'City of Medina','es':'Ciudad de Medina','de':'Stadt Medina','nl':'Stad Medina','it':'Città di Medina','pt':'Cidade de Medina','ru':'Город Медина','tr':'Medine Şehri','zh':'麦地那城','id':'Kota Madinah','ur':'مدینہ شہر','hi':'मदीना शहर'}[st.lang]||'La Cité de Médine'),img:'/images/island-11.png?v=2'}];
   for(var i=0;i<allLetters.length;i+=DS){
     var chunk=allLetters.slice(i,i+DS);
     if(chunk.length>=4){var _di=_DI[allDecks.length]||{name:'Niveau '+(allDecks.length+1),img:''};allDecks.push({name:_di.name,img:_di.img,icon:chunk[0].ar,pairs:chunk,idx:allDecks.length});}
@@ -5185,15 +5185,15 @@ function renderMemoryDeckList(ca,decks){
     card.innerHTML='<div class="nav-card-shimmer"></div>'
       +'<div class="nav-icon" style="padding:0;overflow:hidden;width:52px;height:52px;min-width:52px;border-radius:12px"><img src="'+deck.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy"/></div>'
       +'<div class="nav-text"><div class="nav-title">'+deck.name+'</div>'
-      +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' paires)</div>'
-      +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 Meilleur : '+best+'</span>':'')
+      +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires')+')</div>'
+      +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur')+' : '+best+'</span>':'')
       +'</div><div class="nav-arrow">›</div>';
     card.onclick=(function(d){return function(){renderMemoryPlay(ca,d);};})(deck);
     wrap.appendChild(card);
     setTimeout(function(){requestAnimationFrame(function(){card.style.transition='opacity .25s ease-out, transform .25s ease-out';card.style.opacity='1';card.style.transform='translateX(0)';});},di*120+80);
   });
   var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';backBtn.style.marginTop='8px';
-  backBtn.textContent='🗺️ Carte des îles';
+  backBtn.textContent='🗺️ '+({'fr':'Carte des îles','en':'Island Map','es':'Mapa de Islas','de':'Inselkarte','nl':'Eilandenkaart','it':'Mappa delle Isole','pt':'Mapa das Ilhas','ru':'Карта островов','tr':'Adalar Haritası','zh':'岛屿地图','id':'Peta Pulau','ur':'جزیروں کا نقشہ','hi':'द्वीप मानचित्र'}[st.lang]||'Carte des îles');
   backBtn.onclick=function(){renderMiniGames(ca);};
   wrap.appendChild(backBtn);ca.appendChild(wrap);
 }
@@ -5214,14 +5214,14 @@ function renderMemoryPlay(ca,deck){
   hd.appendChild(scoreEl);hd.appendChild(timerEl);wrap.appendChild(hd);
   var titleEl=document.createElement('div');
   titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px';
-  titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' paires';
+  titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires');
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
-    {bg:'#87CEEB',sz:'68%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#0a1628',sz:'84%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
     {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
     {flag:true,sz:'65%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
-    {bg:'#87CEEB',sz:'68%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#87CEEB',sz:'84%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
     {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
   var ds=_DS[deck.idx]||_DS[0];
@@ -5231,7 +5231,7 @@ function renderMemoryPlay(ca,deck){
     var card=document.createElement('div');card.className='mem-card';
     var inner=document.createElement('div');inner.className='mem-card-inner';
     var front=document.createElement('div');front.className='mem-card-front';
-    if(ds.flag){front.style.background=flagBg+', url('+deck.img+') center/'+ds.sz+' no-repeat';}
+    if(ds.flag){front.style.background='url('+deck.img+') center/'+ds.sz+' no-repeat, '+flagBg;}
     else{front.style.backgroundColor=ds.bg;front.style.backgroundImage='url('+deck.img+')';front.style.backgroundSize=ds.sz;front.style.backgroundPosition='center';front.style.backgroundRepeat='no-repeat';}
     front.style.boxShadow=ds.inset;
     var back=document.createElement('div');back.className='mem-card-back';
@@ -5259,10 +5259,10 @@ function renderMemoryPlay(ca,deck){
                 var res=document.createElement('div');res.className='mem-result';
                 res.innerHTML='<div style="font-size:2.5rem;margin-bottom:8px">🎉</div>'
                   +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">'+(t('bravo')||'Bravo !')+'</div>'
-                  +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' tentatives · '+elapsed+'s</div>'
+                  +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' '+(({'fr':'tentatives','en':'attempts','es':'intentos','de':'Versuche','nl':'pogingen','it':'tentativi','pt':'tentativas','ru':'попыток','tr':'deneme','zh':'次尝试','id':'percobaan','ur':'کوششیں','hi':'प्रयास'}[st.lang]||'tentatives')+' · '+elapsed+'s</div>'
                   +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 Rejouer</button>'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ Niveaux</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer')+'</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ '+(({'fr':'Niveaux','en':'Levels','es':'Niveles','de':'Stufen','nl':'Niveaus','it':'Livelli','pt':'Níveis','ru':'Уровни','tr':'Seviyeler','zh':'关卡','id':'Level','ur':'مراحل','hi':'स्तर'}[st.lang]||'Niveaux')+'</button>'
                   +'</div>';
                 grid.innerHTML='';grid.style.display='none';wrap.appendChild(res);
               },600);
@@ -5276,8 +5276,8 @@ function renderMemoryPlay(ca,deck){
   });
   wrap.appendChild(grid);
   var qBtn=document.createElement('button');
-  qBtn.style.cssText='display:block;margin:20px auto 0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.9);padding:9px 24px;border-radius:22px;cursor:pointer;font-size:.82rem;font-weight:600';
-  qBtn.textContent='‹ Retour aux Memories';
+  qBtn.className='rbtn rbtn-m';qBtn.style.marginTop='20px';
+  qBtn.textContent='‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories');
   qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
   wrap.appendChild(qBtn);ca.appendChild(wrap);
 }
@@ -5327,8 +5327,8 @@ function renderPuzzleGame(ca){
         +'<div style="font-size:1.5rem;font-weight:900;color:var(--gold);margin-bottom:6px">'+score+'/'+maxScore+'</div>'
         +'<div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:24px">'+pct+'%</div>'
         +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-        +'<button class="rbtn rbtn-m" onclick="renderPuzzleGame(document.getElementById(\'ca\'))">🔄 Rejouer</button>'
-        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ Retour aux Jeux</button>'
+        +'<button class="rbtn rbtn-m" onclick="renderPuzzleGame(document.getElementById(\'ca\'))">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer')+'</button>'
+        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux')+'</button>'
         +'</div></div>';
       return;
     }
@@ -5391,16 +5391,10 @@ function renderPuzzleGame(ca){
     }
     wrap.appendChild(blanksRow);
 
-    // Bouton valider
-    var validateBtn=document.createElement('button');
-    validateBtn.className='rbtn rbtn-m';
-    validateBtn.style.cssText='display:block;margin:16px auto 0;';
-    validateBtn.textContent=t('check')||'Vérifier';
-    validateBtn.onclick=function(){
+    function doValidate(){
       var correct=true;
-      // Vérifier si tous remplis
       for(var i=0;i<letters.length;i++){
-        if(userAnswer[i]===null){return;} // pas encore rempli
+        if(userAnswer[i]===null){return;}
         var chosen=choices[userAnswer[i]];
         if(chosen===letters[i]){
           blankEls[i].classList.add('correct');
@@ -5412,10 +5406,9 @@ function renderPuzzleGame(ca){
         }
       }
       if(correct) score++;
-      // Son
       try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator();var g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=correct?523:220;g.gain.setValueAtTime(.15,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.3);o.start();o.stop(ac.currentTime+.3);}catch(e){}
       setTimeout(function(){qIdx++;buildQuestion();},correct?700:1200);
-    };
+    }
 
     // Choix de lettres
     var choicesRow=document.createElement('div');
@@ -5438,14 +5431,14 @@ function renderPuzzleGame(ca){
         blankEls[pos].classList.add('filled');
         // Auto-valider si tout rempli
         if(userAnswer.every(function(u){return u!==null;})){
-          setTimeout(function(){validateBtn.click();},300);
+          setTimeout(doValidate,300);
         }
       };
       choiceEls.push(cel);
       choicesRow.appendChild(cel);
     });
     wrap.appendChild(choicesRow);
-    wrap.appendChild(validateBtn);
+
 
     // Bouton passer
     var skipBtn=document.createElement('button');
@@ -5454,8 +5447,8 @@ function renderPuzzleGame(ca){
     skipBtn.onclick=function(){qIdx++;buildQuestion();};
     wrap.appendChild(skipBtn);
     var quitPzBtn=document.createElement('button');
-    quitPzBtn.style.cssText='display:block;margin:14px auto 0;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);padding:8px 22px;border-radius:22px;cursor:pointer;font-size:.82rem;font-weight:600';
-    quitPzBtn.textContent='‹ Retour aux Jeux';
+    quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.marginTop='14px';
+    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux');
     quitPzBtn.onclick=function(){renderMiniGames(ca);};
     wrap.appendChild(quitPzBtn);
   }
