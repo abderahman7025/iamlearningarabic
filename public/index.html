@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -2393,7 +2393,7 @@ body.profile-boy #boy-bg-anim {
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.mem-card-front{background:#2a1608;border:2px solid rgba(255,255,255,.1);font-size:2rem;overflow:hidden}
+.mem-card-front{background:transparent;font-size:2rem;overflow:hidden}
 .mem-card-back{background:#7c4a10;border:2px solid rgba(220,160,40,.8);transform:rotateY(180deg);font-weight:700;padding:4px;text-align:center;line-height:1.1;color:#fff8e7}
 .mem-card.matched .mem-card-front{background:#163a20}
 .mem-card.matched .mem-card-back{background:#1a5a28;border-color:#22c55e;color:#a7f3d0}
@@ -3916,13 +3916,21 @@ function buildMenu(){
     // Commence caché à gauche
     el.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
     // Couleur SVG selon profil
-    var svgIcons={
+    var ic=st.profile==='girl'?'#f472b6':st.profile==='boy'?'#38bdf8':'var(--gold)';
+    var isKid=st.profile==='girl'||st.profile==='boy';
+    var svgIcons=isKid?{
       intro:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="12" cy="12" r="10" fill="#3b82f6" opacity=".18"/><circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="1.8"/><circle cx="12" cy="8.5" r="1.3" fill="#f59e0b"/><rect x="11.1" y="11" width="1.8" height="6" rx=".9" fill="#f59e0b"/></svg>',
       sessions:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="4" y="3" width="12" height="16" rx="2" fill="#f97316" opacity=".18"/><rect x="4" y="3" width="12" height="16" rx="2" stroke="#f97316" stroke-width="1.8"/><path d="M8 7h8M8 11h8M8 15h5" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/><path d="M14 3v4h4" stroke="#f97316" stroke-width="1.5" stroke-linejoin="round"/></svg>',
       exercises:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M4 16.5l10-10 3 3-10 10H4v-3z" fill="#fbbf24" opacity=".35"/><path d="M4 16.5l10-10 3 3-10 10H4v-3z" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6.5l3 3" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M12 20h8" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round"/></svg>',
       contact:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="5" width="20" height="14" rx="2.5" fill="#6366f1" opacity=".18"/><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#6366f1" stroke-width="1.8"/><path d="M2 8l10 7 10-7" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/></svg>',
       bonus:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M12 3l2.09 6.26L20 9.27l-4.91 4.37 1.18 6.36L12 16.77l-4.27 3.23 1.18-6.36L4 9.27l5.91.99L12 3z" fill="#fbbf24" opacity=".35"/><path d="M12 3l2.09 6.26L20 9.27l-4.91 4.37 1.18 6.36L12 16.77l-4.27 3.23 1.18-6.36L4 9.27l5.91.99L12 3z" stroke="#f59e0b" stroke-width="1.8" stroke-linejoin="round"/></svg>',
       minigames:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="7" width="20" height="12" rx="4" fill="#8b5cf6" opacity=".2"/><rect x="2" y="7" width="20" height="12" rx="4" stroke="#8b5cf6" stroke-width="1.8"/><path d="M8 13h4M10 11v4" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="11.5" r="1.2" fill="#fbbf24"/><circle cx="14.5" cy="14" r="1.2" fill="#34d399"/></svg>'
+    }:{
+      intro:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="12" cy="12" r="10" stroke="'+ic+'" stroke-width="1.8" fill="none"/><circle cx="12" cy="8.5" r="1.2" fill="'+ic+'"/><rect x="11.1" y="11" width="1.8" height="6" rx=".9" fill="'+ic+'"/></svg>',
+      sessions:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="4" y="3" width="12" height="16" rx="2" stroke="'+ic+'" stroke-width="1.8" fill="none"/><path d="M8 7h8M8 11h8M8 15h5" stroke="'+ic+'" stroke-width="1.5" stroke-linecap="round"/><path d="M14 3v4h4" stroke="'+ic+'" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+      exercises:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M12 20h8M4 16.5l10-10 3 3-10 10H4v-3z" stroke="'+ic+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      contact:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="'+ic+'" stroke-width="1.8" fill="none"/><path d="M2 8l10 7 10-7" stroke="'+ic+'" stroke-width="1.5" stroke-linecap="round"/></svg>',
+      bonus:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M12 3l2.09 6.26L20 9.27l-4.91 4.37 1.18 6.36L12 16.77l-4.27 3.23 1.18-6.36L4 9.27l5.91.99L12 3z" stroke="'+ic+'" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg>'
     };
     var iconHtml=svgIcons[it.id]||getMenuIcon(it.id)||'<span style="font-size:1.6rem">'+it.icon+'</span>';
     el.innerHTML=
@@ -3964,8 +3972,8 @@ function navToPage(page){
   if(_tb){_tb.style.maxHeight='200px';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.pointerEvents='';}
   var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
   document.getElementById('tb-back').style.display='flex';
-  document.getElementById('back-lbl').textContent=t('back_menu');
-  document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus')}[page]||'';
+  document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');
+  document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:'Jeux'}[page]||'';
   st.backHistory=[{target:'menu'}];
   renderPage(page,true);
 }
@@ -3997,7 +4005,7 @@ function handleBack(){
       mainEl.style.opacity='';mainEl.style.borderRadius='';
       // Depuis la page sessions (liste des cours) → menu principal
       if(st._curPage==='sessions'){showS('s-menu',false);}
-      else{st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent=t('back_menu');renderPage('sessions',false);}
+      else{st._curPage='sessions';document.getElementById('tb-title').textContent=t('sessions');document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');renderPage('sessions',false);}
     },350);
   } else {
     // Depuis la page sessions (liste des cours) → menu principal
@@ -4006,7 +4014,7 @@ function handleBack(){
     else if(prev.target==='sessions'){
       st._curPage='sessions';
       document.getElementById('tb-title').textContent=t('sessions');
-      document.getElementById('back-lbl').textContent=t('back_menu');
+      document.getElementById('back-lbl').textContent=page==='minigames'?'Retour à la carte des îles':t('back_menu');
       renderPage('sessions',false);
     } else {
       showS('s-menu',false);
@@ -5216,11 +5224,23 @@ function renderMemoryPlay(ca,deck){
   titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' paires';
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
+  var _DS=[
+    {bg:'#87CEEB',sz:'50%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
+    {flag:true,sz:'65%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
+    {bg:'#87CEEB',sz:'50%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
+  ];
+  var ds=_DS[deck.idx]||_DS[0];
+  var flagBg='linear-gradient(to bottom right,#EF0A1A 50%,transparent 50%) top left/50% 33% no-repeat,linear-gradient(to bottom left,#EF0A1A 50%,transparent 50%) top right/50% 33% no-repeat,linear-gradient(90deg,#009736 33.3%,#fff 33.3%,#fff 66.6%,#111 66.6%) 0 33%/100% 67% no-repeat';
   var flipped=[];var matched=[];var locked=false;
   pairs.forEach(function(p){
     var card=document.createElement('div');card.className='mem-card';
     var inner=document.createElement('div');inner.className='mem-card-inner';
-    var front=document.createElement('div');front.className='mem-card-front';front.style.backgroundImage='url('+deck.img+')';front.style.backgroundSize='cover';front.style.backgroundPosition='center';
+    var front=document.createElement('div');front.className='mem-card-front';
+    if(ds.flag){front.style.background=flagBg+', url('+deck.img+') center/'+ds.sz+' no-repeat';}
+    else{front.style.backgroundColor=ds.bg;front.style.backgroundImage='url('+deck.img+')';front.style.backgroundSize=ds.sz;front.style.backgroundPosition='center';front.style.backgroundRepeat='no-repeat';}
+    front.style.boxShadow=ds.inset;
     var back=document.createElement('div');back.className='mem-card-back';
     back.style.fontFamily=p.type==='ar'?'\'Scheherazade New\',serif':'inherit';
     back.style.fontSize=p.type==='ar'?'2.8rem':'1.7rem';
@@ -5264,7 +5284,7 @@ function renderMemoryPlay(ca,deck){
   wrap.appendChild(grid);
   var qBtn=document.createElement('button');
   qBtn.style.cssText='display:block;margin:20px auto 0;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);padding:8px 20px;border-radius:20px;cursor:pointer;font-size:.82rem';
-  qBtn.textContent='‹ '+(t('quit')||'Quitter');
+  qBtn.textContent='‹ Retour aux Memories';
   qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
   wrap.appendChild(qBtn);ca.appendChild(wrap);
 }
@@ -5315,7 +5335,7 @@ function renderPuzzleGame(ca){
         +'<div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:24px">'+pct+'%</div>'
         +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
         +'<button class="rbtn rbtn-m" onclick="renderPuzzleGame(document.getElementById(\'ca\'))">🔄 Rejouer</button>'
-        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ Retour</button>'
+        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ Retour aux Jeux</button>'
         +'</div></div>';
       return;
     }
@@ -5440,6 +5460,11 @@ function renderPuzzleGame(ca){
     skipBtn.textContent=t('skip')||'Passer';
     skipBtn.onclick=function(){qIdx++;buildQuestion();};
     wrap.appendChild(skipBtn);
+    var quitPzBtn=document.createElement('button');
+    quitPzBtn.style.cssText='display:block;margin:8px auto 0;background:none;border:none;color:rgba(255,255,255,.28);padding:4px 14px;border-radius:20px;cursor:pointer;font-size:.74rem';
+    quitPzBtn.textContent='‹ Retour aux Jeux';
+    quitPzBtn.onclick=function(){renderMiniGames(ca);};
+    wrap.appendChild(quitPzBtn);
   }
 
   buildQuestion();
