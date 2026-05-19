@@ -2388,15 +2388,15 @@ body.profile-boy #boy-bg-anim {
 .mem-score{font-size:.85rem;font-weight:700;color:var(--gold)}
 .mem-timer{font-size:.85rem;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
 .mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.mem-card{height:68px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
-.mem-card:active{opacity:.8}
+.mem-card{height:100px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
+.mem-card:active{transform:scale(.96)}
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.mem-card-front{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);font-size:1.3rem}
-.mem-card-back{background:rgba(245,200,66,.13);border:1.5px solid rgba(245,200,66,.32);transform:rotateY(180deg);font-size:.85rem;font-weight:700;padding:4px;text-align:center;line-height:1.2;color:#fde68a}
-.mem-card.matched .mem-card-front{background:rgba(34,197,94,.12)}
-.mem-card.matched .mem-card-back{background:rgba(34,197,94,.22);border-color:#22c55e;color:#4ade80}
+.mem-card-front{background:#2a1608;border:2px solid rgba(255,255,255,.18);font-size:2rem}
+.mem-card-back{background:#7c4a10;border:2px solid rgba(220,160,40,.8);transform:rotateY(180deg);font-weight:700;padding:4px;text-align:center;line-height:1.1;color:#fff8e7}
+.mem-card.matched .mem-card-front{background:#163a20}
+.mem-card.matched .mem-card-back{background:#1a5a28;border-color:#22c55e;color:#a7f3d0}
 .mem-result{text-align:center;padding:24px 16px}
 /* Puzzle */
 .puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto}
@@ -5150,146 +5150,122 @@ function renderMiniGames(ca){
 // ════════════════════════════════════════════════════════
 function renderMemoryGame(ca){
   ca.innerHTML='';
-  // Collecter les lettres disponibles (sessions terminées + quelques sessions de base)
-  var pool=[];
-  ALL_S.forEach(function(s){
-    if(s.letters){
-      s.letters.forEach(function(l){
-        if(l.ar&&l.lat&&pool.length<16) pool.push({ar:l.ar,lat:l.lat,name:l.name});
-      });
-    }
-  });
-  // Si pas assez de lettres (pas de sessions accomplies), utiliser les 8 premières de lnum:1
-  if(pool.length<8){
-    var s1=ALL_S.find(function(s){return s.id===3;});
-    if(s1&&s1.letters) s1.letters.forEach(function(l){pool.push({ar:l.ar,lat:l.lat,name:l.name});});
+  var allLetters=[];var seen={};
+  ALL_S.forEach(function(s){if(s.letters){s.letters.forEach(function(l){if(l.ar&&l.lat&&!seen[l.ar]){seen[l.ar]=1;allLetters.push({ar:l.ar,lat:l.lat});}});}});
+  var DS=6;var allDecks=[];
+  for(var i=0;i<allLetters.length;i+=DS){
+    var chunk=allLetters.slice(i,i+DS);
+    if(chunk.length>=4) allDecks.push({name:'Niveau '+(allDecks.length+1),icon:chunk[0].ar,pairs:chunk,idx:allDecks.length});
+    else if(allDecks.length>0){allDecks[allDecks.length-1].pairs=allDecks[allDecks.length-1].pairs.concat(chunk);}
   }
-  // Garder max 8 paires uniques
-  var seen={};
-  pool=pool.filter(function(l){if(seen[l.ar])return false;seen[l.ar]=1;return true;}).slice(0,8);
-
-  // Créer les paires (arabic + latin)
-  var pairs=[];
-  pool.forEach(function(l,i){
-    pairs.push({id:i,type:'ar',text:l.ar,match:i,lat:l.lat});
-    pairs.push({id:i,type:'lat',text:l.lat,match:i,ar:l.ar});
-  });
-  // Mélanger
-  for(var i=pairs.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=pairs[i];pairs[i]=pairs[j];pairs[j]=tmp;}
-
+  if(!allDecks.length){
+    [[{ar:'أ',lat:'a'},{ar:'ب',lat:'b'},{ar:'ت',lat:'t'},{ar:'ث',lat:'th'},{ar:'ج',lat:'dj'},{ar:'ح',lat:'ḥ'}],
+     [{ar:'خ',lat:'kh'},{ar:'د',lat:'d'},{ar:'ذ',lat:'dh'},{ar:'ر',lat:'r'},{ar:'ز',lat:'z'},{ar:'س',lat:'s'}],
+     [{ar:'ش',lat:'sh'},{ar:'ص',lat:'ṣ'},{ar:'ض',lat:'ḍ'},{ar:'ط',lat:'ṭ'},{ar:'ظ',lat:'ẓ'},{ar:'ع',lat:'ʿ'}],
+     [{ar:'غ',lat:'gh'},{ar:'ف',lat:'f'},{ar:'ق',lat:'q'},{ar:'ك',lat:'k'},{ar:'ل',lat:'l'},{ar:'م',lat:'m'}]
+    ].forEach(function(p,i){allDecks.push({name:'Niveau '+(i+1),icon:p[0].ar,pairs:p,idx:i});});
+  }
+  window._memDecks=allDecks;
+  renderMemoryDeckList(ca,allDecks);
+}
+function renderMemoryDeckList(ca,decks){
+  ca.innerHTML='';
   var wrap=document.createElement('div');
-  wrap.className='mem-wrap';
-
-  // Header avec score et timer
-  var hd=document.createElement('div');
-  hd.className='mem-header';
-  var scoreEl=document.createElement('div');
-  scoreEl.className='mem-score';
-  var attempts=0;
-  var matches=0;
+  wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
+  var ttl=document.createElement('div');
+  ttl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:6px 0 10px';
+  ttl.textContent='\u{1F0CF} Choisir un niveau';
+  wrap.appendChild(ttl);
+  decks.forEach(function(deck,di){
+    var card=document.createElement('div');card.className='nav-card';
+    card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
+    var best=localStorage.getItem('mg_mem_best_'+deck.idx);
+    card.innerHTML='<div class="nav-card-shimmer"></div>'
+      +'<div class="nav-icon blue" style="font-size:1.6rem;font-family:\'Scheherazade New\',serif;width:48px;height:48px;min-width:48px">'+deck.icon+'</div>'
+      +'<div class="nav-text"><div class="nav-title">'+deck.name+'</div>'
+      +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' paires)</div>'
+      +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 Meilleur : '+best+'</span>':'')
+      +'</div><div class="nav-arrow">›</div>';
+    card.onclick=(function(d){return function(){renderMemoryPlay(ca,d);};})(deck);
+    wrap.appendChild(card);
+    setTimeout(function(){requestAnimationFrame(function(){card.style.transition='opacity .25s ease-out, transform .25s ease-out';card.style.opacity='1';card.style.transform='translateX(0)';});},di*120+80);
+  });
+  var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';backBtn.style.marginTop='8px';
+  backBtn.textContent='‹ '+(t('back_menu')||'Menu');
+  backBtn.onclick=function(){renderMiniGames(ca);};
+  wrap.appendChild(backBtn);ca.appendChild(wrap);
+}
+function renderMemoryPlay(ca,deck){
+  ca.innerHTML='';
+  var pool=deck.pairs;
+  var pairs=[];
+  pool.forEach(function(l,i){pairs.push({id:i,type:'ar',text:l.ar,match:i});pairs.push({id:i,type:'lat',text:l.lat,match:i});});
+  for(var i=pairs.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=pairs[i];pairs[i]=pairs[j];pairs[j]=tmp;}
+  var wrap=document.createElement('div');wrap.className='mem-wrap';
+  var hd=document.createElement('div');hd.className='mem-header';
+  var scoreEl=document.createElement('div');scoreEl.className='mem-score';
+  var attempts=0;var matches=0;
   scoreEl.textContent='0 '+(t('pairs')||'paires');
-  var timerEl=document.createElement('div');
-  timerEl.className='mem-timer';
-  timerEl.textContent='0s';
+  var timerEl=document.createElement('div');timerEl.className='mem-timer';timerEl.textContent='0s';
   var startTime=Date.now();
-  var timerInt=setInterval(function(){
-    timerEl.textContent=Math.floor((Date.now()-startTime)/1000)+'s';
-  },1000);
-  hd.appendChild(scoreEl);
-  hd.appendChild(timerEl);
-  wrap.appendChild(hd);
-
-  // Titre
+  var timerInt=setInterval(function(){timerEl.textContent=Math.floor((Date.now()-startTime)/1000)+'s';},1000);
+  hd.appendChild(scoreEl);hd.appendChild(timerEl);wrap.appendChild(hd);
   var titleEl=document.createElement('div');
   titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px';
-  titleEl.textContent='🃏 Memory — '+pool.length+' '+(t('pairs')||'paires');
+  titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' paires';
   wrap.appendChild(titleEl);
-
-  // Grille
-  var grid=document.createElement('div');
-  grid.className='mem-grid';
-
-  var flipped=[];
-  var matched=[];
-  var locked=false;
-
-  pairs.forEach(function(p,idx){
-    var card=document.createElement('div');
-    card.className='mem-card';
-    card.dataset.id=p.id;
-    card.dataset.idx=idx;
-    var inner=document.createElement('div');
-    inner.className='mem-card-inner';
-    var front=document.createElement('div');
-    front.className='mem-card-front';
-    front.textContent='؟';
-    var back=document.createElement('div');
-    back.className='mem-card-back';
+  var grid=document.createElement('div');grid.className='mem-grid';
+  var flipped=[];var matched=[];var locked=false;
+  pairs.forEach(function(p){
+    var card=document.createElement('div');card.className='mem-card';
+    var inner=document.createElement('div');inner.className='mem-card-inner';
+    var front=document.createElement('div');front.className='mem-card-front';front.textContent='؟';
+    var back=document.createElement('div');back.className='mem-card-back';
     back.style.fontFamily=p.type==='ar'?'\'Scheherazade New\',serif':'inherit';
-    back.style.fontSize=p.type==='ar'?'1.4rem':'.85rem';
+    back.style.fontSize=p.type==='ar'?'2.8rem':'1.7rem';
     back.textContent=p.text;
-    inner.appendChild(front);
-    inner.appendChild(back);
-    card.appendChild(inner);
-
+    inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
-      if(locked)return;
-      if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
-      this.classList.add('flipped');
-      flipped.push({card:this,p:p});
+      if(locked)return;if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
+      this.classList.add('flipped');flipped.push({card:this,p:p});
       if(flipped.length===2){
-        locked=true;
-        attempts++;
+        locked=true;attempts++;
         setTimeout(function(){
           if(flipped[0].p.match===flipped[1].p.match&&flipped[0].p.type!==flipped[1].p.type){
-            // Match !
             flipped.forEach(function(f){f.card.classList.add('matched');f.card.classList.remove('flipped');});
-            matched.push(flipped[0].p.match);
-            matches++;
+            matched.push(flipped[0].p.match);matches++;
             scoreEl.textContent=matches+' '+(t('pairs')||'paires');
-            // Son de succès
             try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator();var g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.setValueAtTime(523,ac.currentTime);o.frequency.setValueAtTime(659,ac.currentTime+.1);g.gain.setValueAtTime(.15,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.3);o.start();o.stop(ac.currentTime+.3);}catch(e){}
             if(matched.length===pool.length){
-              // Victoire !
               clearInterval(timerInt);
               var elapsed=Math.floor((Date.now()-startTime)/1000);
-              var best=localStorage.getItem('mg_mem_best');
-              if(!best||elapsed<parseInt(best)) localStorage.setItem('mg_mem_best',elapsed+'s');
+              var bestKey='mg_mem_best_'+deck.idx;var best=localStorage.getItem(bestKey);
+              if(!best||elapsed<parseInt(best)) localStorage.setItem(bestKey,elapsed+'s');
               setTimeout(function(){
-                var res=document.createElement('div');
-                res.className='mem-result';
+                var res=document.createElement('div');res.className='mem-result';
                 res.innerHTML='<div style="font-size:2.5rem;margin-bottom:8px">🎉</div>'
                   +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">'+(t('bravo')||'Bravo !')+'</div>'
                   +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' tentatives · '+elapsed+'s</div>'
                   +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryGame(this.closest(\'.scr\').querySelector(\'.mem-wrap\').parentElement||document.getElementById(\'ca\'))">🔄 Rejouer</button>'
-                  +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ Retour</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 Rejouer</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ Niveaux</button>'
                   +'</div>';
-                grid.innerHTML='';
-                grid.style.display='none';
-                wrap.appendChild(res);
+                grid.innerHTML='';grid.style.display='none';wrap.appendChild(res);
               },600);
             }
-          } else {
-            flipped.forEach(function(f){f.card.classList.remove('flipped');});
-          }
-          flipped=[];
-          locked=false;
+          } else {flipped.forEach(function(f){f.card.classList.remove('flipped');});}
+          flipped=[];locked=false;
         },900);
       }
     };
     grid.appendChild(card);
   });
-
   wrap.appendChild(grid);
-
-  // Bouton quitter
   var qBtn=document.createElement('button');
   qBtn.style.cssText='display:block;margin:20px auto 0;background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.6);padding:8px 20px;border-radius:20px;cursor:pointer;font-size:.82rem';
   qBtn.textContent='‹ '+(t('quit')||'Quitter');
-  qBtn.onclick=function(){clearInterval(timerInt);renderMiniGames(ca);};
-  wrap.appendChild(qBtn);
-  ca.appendChild(wrap);
+  qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
+  wrap.appendChild(qBtn);ca.appendChild(wrap);
 }
 
 // ════════════════════════════════════════════════════════
