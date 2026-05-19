@@ -4795,19 +4795,17 @@ var islandDefs=[
           var hw0=hWM[i],hh0=hHM[i],hh1=hHM[i+1];
           var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
           if(i%2===0){
-            // Ile gauche : sort depuis le COTE DROIT → arc très large vers l'ile droite
+            // Ile gauche : sort depuis le COTE DROIT → arc C vers bord droit écran
             sx=c0m.x+hWM[i]; sy=c0m.y;
             ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            var bowR=gW*1.6;
-            cp1x=bowR; cp1y=sy+(ey-sy)*0.25;
-            cp2x=bowR; cp2y=ey-(ey-sy)*0.25;
+            cp1x=gW-4; cp1y=sy+(ey-sy)*0.15;
+            cp2x=gW-4; cp2y=ey-(ey-sy)*0.15;
           } else {
-            // Ile droite : sort depuis le COTE GAUCHE → arc très large vers l'ile gauche
+            // Ile droite : sort depuis le COTE GAUCHE → arc C vers bord gauche écran
             sx=c0m.x-hWM[i]; sy=c0m.y;
             ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            var bowL=gW*-0.6;
-            cp1x=bowL; cp1y=sy+(ey-sy)*0.25;
-            cp2x=bowL; cp2y=ey-(ey-sy)*0.25;
+            cp1x=4; cp1y=sy+(ey-sy)*0.15;
+            cp2x=4; cp2y=ey-(ey-sy)*0.15;
           }
           segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey);
