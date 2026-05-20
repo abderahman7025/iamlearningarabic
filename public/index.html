@@ -4573,6 +4573,9 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
+  // Masquer le topbar sur la carte des îles (comme le menu principal)
+  var _stb=document.getElementById('topbar');
+  if(_stb){_stb.style.maxHeight='0';_stb.style.paddingTop='0';_stb.style.paddingBottom='0';_stb.style.opacity='0';_stb.style.pointerEvents='none';}
   // Charger les scores depuis localStorage
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
@@ -4797,8 +4800,11 @@ var islandDefs=[
       var nowLandscape=window.innerWidth>window.innerHeight;
       if(nowLandscape!==window._sessMapWasLandscape){
         window._sessMapWasLandscape=nowLandscape;
-        var _rca=document.getElementById('ca');
-        if(_rca)renderSessionsMap(_rca);
+        // Ne re-rend que si l'utilisateur est bien sur la carte
+        if(st._curPage==='sessions'){
+          var _rca=document.getElementById('ca');
+          if(_rca)renderSessionsMap(_rca);
+        }
       }
     };
     window.addEventListener('resize',window._sessMapResizeFn);
@@ -4854,7 +4860,7 @@ var islandDefs=[
         }
         var MG=8;
         var segsMob=[];
-        var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
+        var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight*0.75};});
         var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
         var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
         // Segment 0 : coin haut-gauche → île 0 — courbe douce
@@ -4940,7 +4946,7 @@ var islandDefs=[
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
       el.onclick=null;
-      var bigI=[2,6,7,8];var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);el.style.width=IWi+'px';var imgI=el.querySelector('.isle-img');if(imgI)imgI.style.height=(bigI.indexOf(i)>=0?440:330)+'px';
+      var bigI=[2,6,7,8];var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);el.style.width=IWi+'px';var imgI=el.querySelector('.isle-img');if(imgI)imgI.style.height=Math.min(bigI.indexOf(i)>=0?440:330,Math.round(DH*0.5))+'px';
       el.style.flexShrink='0';
       el.style.position='relative';
       el.style.zIndex='5';
@@ -4964,8 +4970,9 @@ var islandDefs=[
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
+      // y=75% : le chemin traverse le quart bas de chaque île
       var centers=isleCards.map(function(el){
-        return{x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight/2};
+        return{x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight*0.75};
       });
 
       var segments=[];
@@ -5003,29 +5010,15 @@ var islandDefs=[
         drawPath('M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y, lk0);
       }
 
-      // Segments île→île : grand serpentin — tangentes horizontales (pas de boucles)
-      // posPattern: center/right/center/left
+      // Segments île→île : serpentin strict alternant droite/gauche (i%2)
+      // Chaque île : arrivée et départ par des côtés OPPOSÉS
       for(var i=0;i<centers.length-1;i++){
         var c0=centers[i],c1=centers[i+1];
         var sx=c0.x,sy=c0.y,ex=c1.x,ey=c1.y;
-        var cp1x,cp2x;
-        var mod=i%4;
-        if(mod===0){
-          // center→right : arc vers droite
-          cp1x=cpRight; cp2x=cpRight;
-        } else if(mod===1){
-          // right→center : grand arc vers gauche
-          cp1x=cpLeft; cp2x=cpLeft;
-        } else if(mod===2){
-          // center→left : arc vers gauche
-          cp1x=cpLeft; cp2x=cpLeft;
-        } else {
-          // left→center : grand arc vers droite
-          cp1x=cpRight; cp2x=cpRight;
-        }
-        // Tangentes horizontales : cp1 au niveau y de départ, cp2 au niveau y d'arrivée
-        var d='M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey;
-        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
+        // Alternance stricte : pair=droite, impair=gauche
+        var cpX=(i%2===0)?cpRight:cpLeft;
+        var d='M '+sx+','+sy+' C '+cpX+','+sy+' '+cpX+','+ey+' '+ex+','+ey;
+        segments.push({x0:sx,y0:sy,cpx1:cpX,cpy1:sy,cpx2:cpX,cpy2:ey,x3:ex,y3:ey});
         var segLk=(isleCards[i]&&isleCards[i].classList.contains('locked-isle'))||(isleCards[i+1]&&isleCards[i+1].classList.contains('locked-isle'));drawPath(d,segLk);
       }
 
