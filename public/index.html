@@ -137,11 +137,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 20px 12px;flex-shrink:0;
-  background:linear-gradient(180deg,rgba(0,0,0,.25) 0%,transparent 100%);
-  backdrop-filter:blur(4px);
-  transition:transform .25s ease,opacity .25s ease;
-  position:sticky;top:0;z-index:10;overflow:hidden;max-height:200px;
-  transition:max-height .3s ease, opacity .3s ease, padding .3s ease;
+  background:transparent;
+  backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:none;
+  position:fixed;top:0;left:0;width:100%;z-index:100;overflow:hidden;max-height:200px;
+  transition:transform .3s ease, opacity .3s ease;
 }
 .tb-title{
   font-size:.95rem;font-weight:700;
@@ -2390,8 +2390,8 @@ body.profile-boy #boy-bg-anim {
 .mem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 4px}
 .mem-score{font-size:.85rem;font-weight:700;color:var(--gold)}
 .mem-timer{font-size:.85rem;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
-.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.mem-card{height:100px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mem-card{height:76px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
 .mem-card:active{transform:scale(.96)}
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
@@ -2468,8 +2468,8 @@ body.profile-boy [lang="ar"] {
 .nav-title{font-size:clamp(.9rem,2.2vw,1.1rem)}
 .nav-desc{font-size:clamp(.65rem,1.5vw,.72rem)}
 /* Memory grid responsive */
-.mem-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
-.mem-card{height:clamp(72px,12vw,100px)}
+.mem-grid{grid-template-columns:repeat(4,1fr)}
+.mem-card{height:clamp(58px,9vw,76px)}
 /* Puzzle responsive */
 .puzzle-blank{width:clamp(40px,10vw,52px);height:clamp(40px,10vw,52px)}
 .puzzle-choice{width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px)}
@@ -4019,9 +4019,8 @@ function navToPage(page){
   stopSpeech();
   st._curPage=page;showS('s-main',true);
   window._tbLastScroll=0;
-  var _mb=document.getElementById('_map-back-btn');if(_mb)_mb.remove();
   var _tb=document.getElementById('topbar');
-  if(_tb){_tb.style.position='';_tb.style.width='';_tb.style.background='';_tb.style.backdropFilter='';_tb.style.webkitBackdropFilter='';_tb.style.boxShadow='';_tb.style.maxHeight='200px';_tb.style.overflow='';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.opacity='';_tb.style.pointerEvents='';_tb.style.transform='';}
+  if(_tb){_tb.style.maxHeight='200px';_tb.style.opacity='1';_tb.style.transform='translateY(0)';_tb.style.pointerEvents='';}
   var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
@@ -4042,9 +4041,8 @@ function renderPage(page,fwd){
 }
 function handleBack(){
   stopSpeech();
-  var _mb2=document.getElementById('_map-back-btn');if(_mb2)_mb2.remove();
   var _stbR=document.getElementById('topbar');
-  if(_stbR){_stbR.style.position='';_stbR.style.width='';_stbR.style.background='';_stbR.style.backdropFilter='';_stbR.style.webkitBackdropFilter='';_stbR.style.boxShadow='';_stbR.style.maxHeight='';_stbR.style.overflow='';_stbR.style.paddingTop='';_stbR.style.paddingBottom='';_stbR.style.opacity='';_stbR.style.pointerEvents='';_stbR.style.transform='';}
+  if(_stbR){_stbR.style.maxHeight='200px';_stbR.style.opacity='1';_stbR.style.transform='translateY(0)';_stbR.style.pointerEvents='';}
   if(st._bonusSubPage){st._bonusSubPage=false;var ca=document.getElementById('ca');renderBonus(ca);return;}
   const prev=st.backHistory.pop();
   // Animation dézoom: la page actuelle rétrécit pour revenir à la taille d'un carré
@@ -4577,39 +4575,9 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
-  // Supprimer bouton flottant résiduel si présent
-  var _oldMapBack=document.getElementById('_map-back-btn');
-  if(_oldMapBack)_oldMapBack.remove();
-  // Topbar : overlay transparent (pas de fond, pas de blur) + position fixed → les îles passent dessous
+  // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
-  if(_stb){
-    _stb.style.position='fixed';
-    _stb.style.width='100%';
-    _stb.style.background='transparent';
-    _stb.style.backdropFilter='none';
-    _stb.style.webkitBackdropFilter='none';
-    _stb.style.boxShadow='none';
-    _stb.style.maxHeight='200px';
-    _stb.style.overflow='';
-    _stb.style.paddingTop='';
-    _stb.style.paddingBottom='';
-    _stb.style.opacity='1';
-    _stb.style.pointerEvents='';
-    _stb.style.transform='translateY(0)';
-    _stb.style.transition='transform .3s ease, opacity .3s ease';
-  }
-  // Scroll-hide/show du topbar comme le menu-header
-  if(window._mapScrollFn){ca.removeEventListener('scroll',window._mapScrollFn);}
-  window._mapScrollLast=0;
-  window._mapScrollFn=function(){
-    var tb=document.getElementById('topbar');if(!tb)return;
-    var sc=ca.scrollTop,delta=sc-window._mapScrollLast;
-    if(Math.abs(delta)<8){window._mapScrollLast=sc;return;}
-    if(sc>40&&delta>0){tb.style.transform='translateY(-110%)';tb.style.opacity='0';tb.style.pointerEvents='none';}
-    else{tb.style.transform='translateY(0)';tb.style.opacity='1';tb.style.pointerEvents='';}
-    window._mapScrollLast=sc;
-  };
-  ca.addEventListener('scroll',window._mapScrollFn,{passive:true});
+  if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
   // Charger les scores depuis localStorage
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
@@ -4869,7 +4837,7 @@ var islandDefs=[
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
       globeDiv.style.paddingTop='80px';
       globeDiv.style.position='relative';
-      globeDiv.style.gap='44px';
+      globeDiv.style.gap='28px';
       // Avatar en haut au centre
       var isGirlMob=(st.profile==='girl');
       var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
@@ -4975,7 +4943,7 @@ var islandDefs=[
     var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.28),260);
-    globeDiv.style.gap='70px';
+    globeDiv.style.gap='40px';
 
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
@@ -5349,7 +5317,7 @@ function renderMemoryPlay(ca,deck){
                   +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' '+(({'fr':'tentatives','en':'attempts','es':'intentos','de':'Versuche','nl':'pogingen','it':'tentativi','pt':'tentativas','ru':'попыток','tr':'deneme','zh':'次尝试','id':'percobaan','ur':'کوششیں','hi':'प्रयास'}[st.lang]||'tentatives'))+' · '+elapsed+'s</div>'
                   +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
                   +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer'))+'</button>'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ '+(({'fr':'Niveaux','en':'Levels','es':'Niveles','de':'Stufen','nl':'Niveaus','it':'Livelli','pt':'Níveis','ru':'Уровни','tr':'Seviyeler','zh':'关卡','id':'Level','ur':'مراحل','hi':'स्तर'}[st.lang]||'Niveaux'))+'</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories'))+'</button>'
                   +'</div>';
                 grid.innerHTML='';grid.style.display='none';wrap.appendChild(res);
               },600);
