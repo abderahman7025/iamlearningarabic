@@ -4573,9 +4573,9 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
-  // Masquer le topbar sur la carte des îles (comme le menu principal)
+  // Rétablir le topbar (comportement normal sticky/scroll)
   var _stb=document.getElementById('topbar');
-  if(_stb){_stb.style.maxHeight='0';_stb.style.paddingTop='0';_stb.style.paddingBottom='0';_stb.style.opacity='0';_stb.style.pointerEvents='none';}
+  if(_stb){_stb.style.maxHeight='';_stb.style.paddingTop='';_stb.style.paddingBottom='';_stb.style.opacity='';_stb.style.pointerEvents='';_stb.style.transform='';}
   // Charger les scores depuis localStorage
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
@@ -7107,6 +7107,8 @@ function getEncouragementMsg(profile) {
     // Détection : bouton Oui (contient ✅ et texte "Oui" / "Yes") dans profil enfant
     var profile = (typeof st !== 'undefined') ? st.profile : null;
     if (!profile || (profile !== 'girl' && profile !== 'boy')) return;
+    // Ne déclencher que sur les pages de leçon, pas sur la carte des îles
+    if ((typeof st !== 'undefined') && st._curPage !== 'lesson') return;
     var txt = btn.textContent || '';
     if (txt.indexOf('✅') !== -1) {
       // C'est très probablement un clic sur "Oui" dans l'exercice
