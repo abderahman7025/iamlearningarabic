@@ -2404,7 +2404,7 @@ body.profile-boy #boy-bg-anim {
 .puzzle-audio-btn:active{transform:scale(.9)}
 .puzzle-hint{text-align:center;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:16px}
 .puzzle-blanks{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px 0;min-height:54px;direction:rtl}
-.puzzle-blank{width:48px;height:48px;border-radius:12px;border:2px dashed rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-family:'Scheherazade New',serif;color:var(--gold);background:rgba(255,255,255,.03);transition:all .15s;cursor:pointer}
+.puzzle-blank{width:48px;height:48px;border-radius:12px;border:2px dashed rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-family:'Scheherazade New',serif;color:var(--gold);background:rgba(255,255,255,.12);transition:all .15s;cursor:pointer}
 .puzzle-blank.filled{border-style:solid;border-color:rgba(245,200,66,.4);background:rgba(245,200,66,.08)}
 .puzzle-blank.correct{border-color:#22c55e;background:rgba(34,197,94,.12);color:#4ade80}
 .puzzle-blank.wrong{border-color:#ef4444;background:rgba(239,68,68,.1);animation:shakeP .3s ease}
@@ -4543,8 +4543,8 @@ var islandImgs=[
   '/images/island-2.png?v=2',
   '/images/island-3.png?v=2',
   '/images/island-4.png?v=2',
+  '/images/20260518_195724_0000.png',
   '/images/island-pyramids.png',
-  '/images/pro-EcjxfQ9H.jpeg',
   '/images/island-7.png?v=2',
   '/images/island-8.png?v=2',
   '/images/island-9.png?v=2',
@@ -4571,7 +4571,7 @@ var islandDefs=[
      label:{'fr':'Le Mont Sinaï','en':'Mount Sinai','es':'El Monte Sinaí','de':'Der Berg Sinai','nl':'De Berg Sinaï','it':'Il Monte Sinai','pt':'O Monte Sinai','ru':'Гора Синай','tr':'Sina Dağı','zh':'西奈山','id':'Gunung Sinai','ur':'کوہ سینا','hi':'सिनाई पर्वत'}[_L]||'Le Mont Sinaï',
      ar:'د · ذ · ر · ز', sids:[5]},
     {key:'beach',  icon:'🌸', theme:'beach',
-     label:{'fr':'Le Jardin des Rêves','en':'The Garden of Dreams','es':'El Jardín de los Sueños','de':'Der Garten der Träume','nl':'De Tuin van de Dromen','it':'Il Giardino dei Sogni','pt':'O Jardim dos Sonhos','ru':'Сад Мечтаний','tr':'Rüyalar Bahçesi','zh':'梦幻花园','id':'Taman Mimpi','ur':'خوابوں کا باغ','hi':'सपनों का बाग़'}[_L]||'Le Jardin des Rêves',
+     label:{'fr':'Le Paysage des Rêves','en':'The Dreamscape','es':'El Paisaje de los Sueños','de':'Die Traumlandschaft','nl':'Het Droomlandschap','it':'Il Paesaggio dei Sogni','pt':'A Paisagem dos Sonhos','ru':'Пейзаж Мечтаний','tr':'Rüyaların Manzarası','zh':'梦幻风景','id':'Pemandangan Mimpi','ur':'خوابوں کا منظر','hi':'सपनों का दृश्य'}[_L]||'Le Paysage des Rêves',
      ar:'س · ش', sids:[6]},
     {key:'forest', icon:'🏔️', theme:'forest',
      label:{'fr':'La Montagne de Dawoud','en':'The Mountain of Dawud','es':'La Montaña de Dawud','de':'Der Berg Dawuds','nl':'De Berg van Dawud','it':'La Montagna di Dawud','pt':'A Montanha de Dawud','ru':'Гора Дауда','tr':'Davud\'un Dağı','zh':'达乌德之山','id':'Gunung Dawud','ur':'داؤد کا پہاڑ','hi':'दाऊद का पर्वत'}[_L]||'La Montagne de Dawoud',
@@ -4790,35 +4790,28 @@ var islandDefs=[
         var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
         var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
         var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
-        // Segment 0 : bord haut-droite --> haut ile 0 (droite)
+        // Segment 0 : coin haut-gauche --> centre île 0 (droite) — grand arc serpentin
         if(isleCardsMob.length>0){
-          var avX=gW-20,avY=50;
-          var t0x=centersM[0].x,t0y=centersM[0].y-hHM[0]-MG;
-          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:(avY+t0y)/2,cpx2:t0x,cpy2:t0y-30,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+avX+','+((avY+t0y)/2)+' '+t0x+','+(t0y-30)+' '+t0x+','+t0y);
+          var avX=gW*0.08,avY=40;
+          var t0x=centersM[0].x,t0y=centersM[0].y;
+          segsMob.push({x0:avX,y0:avY,cpx1:gW*0.08,cpy1:(avY+t0y)*0.5,cpx2:gW*0.92,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
+          drawMobPath('M '+avX+','+avY+' C '+(gW*0.08)+','+((avY+t0y)*0.5)+' '+(gW*0.92)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y);
         }
-        // Segments ile -> ile : bord gauche/droit -> haut suivante (île 0 = droite, île 1 = gauche, ...)
+        // Segments île->île : grand serpentin passant par le centre de chaque île (île 0=droite, île 1=gauche…)
         for(var i=0;i<isleCardsMob.length-1;i++){
           var c0m=centersM[i],c1m=centersM[i+1];
-          var hw0=hWM[i],hh0=hHM[i],hh1=hHM[i+1];
-          var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
+          var sx=c0m.x,sy=c0m.y,ex=c1m.x,ey=c1m.y;
+          var cp1x,cp2x;
           if(i%2===0){
-            // Ile droite : sort depuis le COTE GAUCHE → arc C vers bord gauche écran
-            sx=c0m.x-hWM[i]; sy=c0m.y;
-            ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            cp1x=4; cp1y=sy+(ey-sy)*0.15;
-            cp2x=4; cp2y=ey-(ey-sy)*0.15;
+            // Île droite → grande courbe vers bord gauche → île gauche
+            cp1x=gW*0.05; cp2x=gW*0.05;
           } else {
-            // Ile gauche : sort depuis le COTE DROIT → arc C vers bord droit écran
-            sx=c0m.x+hWM[i]; sy=c0m.y;
-            ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            cp1x=gW-4; cp1y=sy+(ey-sy)*0.15;
-            cp2x=gW-4; cp2y=ey-(ey-sy)*0.15;
+            // Île gauche → grande courbe vers bord droit → île droite
+            cp1x=gW*0.95; cp2x=gW*0.95;
           }
-          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
-          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey);
-        }
-        // charIdx : 0=home, i+1=ile i validee (>=80%)
+          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
+          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey);
+        }// charIdx : 0=home, i+1=ile i validee (>=80%)
         var charIdxM=0;
         for(var i=0;i<islandDefs.length;i++){
           var doneM=islandDefs[i].sids.every(function(sid){var _a=(st.accuracy||{})[sid];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
@@ -5196,7 +5189,7 @@ function renderMemoryDeckList(ca,decks){
     setTimeout(function(){requestAnimationFrame(function(){card.style.transition='opacity .25s ease-out, transform .25s ease-out';card.style.opacity='1';card.style.transform='translateX(0)';});},di*120+80);
   });
   var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';backBtn.style.marginTop='8px';
-  backBtn.textContent='🗺️ '+({'fr':'Carte des îles','en':'Island Map','es':'Mapa de Islas','de':'Inselkarte','nl':'Eilandenkaart','it':'Mappa delle Isole','pt':'Mapa das Ilhas','ru':'Карта островов','tr':'Adalar Haritası','zh':'岛屿地图','id':'Peta Pulau','ur':'جزیروں کا نقشہ','hi':'द्वीप मानचित्र'}[st.lang]||'Carte des îles');
+  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
   backBtn.onclick=function(){renderMiniGames(ca);};
   wrap.appendChild(backBtn);ca.appendChild(wrap);
 }
@@ -5216,14 +5209,14 @@ function renderMemoryPlay(ca,deck){
   var timerInt=setInterval(function(){timerEl.textContent=Math.floor((Date.now()-startTime)/1000)+'s';},1000);
   hd.appendChild(scoreEl);hd.appendChild(timerEl);wrap.appendChild(hd);
   var titleEl=document.createElement('div');
-  titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px';
+  titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:12px';
   titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires'));
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
     {bg:'#0e26ba',sz:'84%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
     {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
-    {flag:true,sz:'65%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
+    {flag:true,sz:'97%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
     {bg:'#87CEEB',sz:'84%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
     {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
@@ -5279,7 +5272,7 @@ function renderMemoryPlay(ca,deck){
   });
   wrap.appendChild(grid);
   var qBtn=document.createElement('button');
-  qBtn.className='rbtn rbtn-m';qBtn.style.marginTop='20px';
+  qBtn.className='rbtn rbtn-m';qBtn.style.cssText='display:block;margin:20px auto 0';
   qBtn.textContent='‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories'));
   qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
   wrap.appendChild(qBtn);ca.appendChild(wrap);
@@ -5352,7 +5345,7 @@ function renderPuzzleGame(ca){
     // Progression
     var pgEl=document.createElement('div');
     pgEl.className='puzzle-score-row';
-    pgEl.innerHTML='<span>'+qIdx+'/'+totalQ+' '+(t('words')||'mots')+'</span><span style="color:var(--gold)">'+score+' pts</span>';
+    pgEl.innerHTML='<span>'+qIdx+'/'+totalQ+' '+(({'fr':'mots','en':'words','es':'palabras','de':'Wörter','nl':'woorden','it':'parole','pt':'palavras','ru':'слов','tr':'kelime','zh':'词','id':'kata','ur':'الفاظ','hi':'शब्द'}[st.lang]||'mots'))+'</span><span style="color:var(--gold)">'+score+' pts</span>';
     wrap.appendChild(pgEl);
 
     // Bouton audio
@@ -5361,12 +5354,6 @@ function renderPuzzleGame(ca){
     audioBtn.textContent='🔊';
     audioBtn.onclick=function(){speakText(w.ar,'ar-SA',audioBtn);};
     wrap.appendChild(audioBtn);
-
-    // Hint (latin)
-    var hint=document.createElement('div');
-    hint.className='puzzle-hint';
-    hint.textContent=w.lat;
-    wrap.appendChild(hint);
 
     // Blancs
     var blanksRow=document.createElement('div');
