@@ -5115,7 +5115,7 @@ function renderMiniGames(ca){
     card.className='nav-card';
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;'+(g.locked?'opacity:0;transform:translateX(-110%);filter:grayscale(.7);':'');
     var lockedNote=g.locked?'<span style="display:inline-block;margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.38)">🔒 '+({'fr':'Continue les leçons pour débloquer','en':'Complete lessons to unlock','es':'Completa lecciones para desbloquear','de':'Lektionen abschließen','nl':'Voltooi lessen om te ontgrendelen','it':'Completa lezioni per sbloccare','pt':'Complete lições para desbloquear','ru':'Пройди уроки для разблокировки','tr':'Dersleri tamamla','zh':'完成课程以解锁','id':'Selesaikan pelajaran','ur':'سبق مکمل کریں','hi':'पाठ पूरा करें'}[st.lang]||'Continue les leçons pour débloquer')+'</span>':'';
-    var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur')+' : '+g.best+'</span>':'';
+    var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur'))+' : '+g.best+'</span>':'';
     card.innerHTML='<div class="nav-card-shimmer"></div>'
       +'<div class="nav-icon '+gameCls[g.id]+'">'+(gameIcons[g.id]||g.icon)+'</div>'
       +'<div class="nav-text">'
@@ -5143,7 +5143,7 @@ function renderMiniGames(ca){
   var backBtn=document.createElement('button');
   backBtn.className='rbtn rbtn-m';
   backBtn.style.marginTop='8px';
-  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux');
+  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
   backBtn.onclick=function(){st._curPage='sessions';renderPage('sessions',false);};
   wrap.appendChild(backBtn);
 
@@ -5185,8 +5185,8 @@ function renderMemoryDeckList(ca,decks){
     card.innerHTML='<div class="nav-card-shimmer"></div>'
       +'<div class="nav-icon" style="padding:0;overflow:hidden;width:52px;height:52px;min-width:52px;border-radius:12px"><img src="'+deck.img+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy"/></div>'
       +'<div class="nav-text"><div class="nav-title">'+deck.name+'</div>'
-      +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires')+')</div>'
-      +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur')+' : '+best+'</span>':'')
+      +'<div class="nav-desc">'+deck.pairs.map(function(p){return p.ar;}).join(' · ')+' ('+deck.pairs.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires'))+')</div>'
+      +(best?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur'))+' : '+best+'</span>':'')
       +'</div><div class="nav-arrow">›</div>';
     card.onclick=(function(d){return function(){renderMemoryPlay(ca,d);};})(deck);
     wrap.appendChild(card);
@@ -5214,7 +5214,7 @@ function renderMemoryPlay(ca,deck){
   hd.appendChild(scoreEl);hd.appendChild(timerEl);wrap.appendChild(hd);
   var titleEl=document.createElement('div');
   titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px';
-  titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires');
+  titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires'));
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
@@ -5259,10 +5259,10 @@ function renderMemoryPlay(ca,deck){
                 var res=document.createElement('div');res.className='mem-result';
                 res.innerHTML='<div style="font-size:2.5rem;margin-bottom:8px">🎉</div>'
                   +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:6px">'+(t('bravo')||'Bravo !')+'</div>'
-                  +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' '+(({'fr':'tentatives','en':'attempts','es':'intentos','de':'Versuche','nl':'pogingen','it':'tentativi','pt':'tentativas','ru':'попыток','tr':'deneme','zh':'次尝试','id':'percobaan','ur':'کوششیں','hi':'प्रयास'}[st.lang]||'tentatives')+' · '+elapsed+'s</div>'
+                  +'<div style="font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:16px">'+attempts+' '+(({'fr':'tentatives','en':'attempts','es':'intentos','de':'Versuche','nl':'pogingen','it':'tentativi','pt':'tentativas','ru':'попыток','tr':'deneme','zh':'次尝试','id':'percobaan','ur':'کوششیں','hi':'प्रयास'}[st.lang]||'tentatives'))+' · '+elapsed+'s</div>'
                   +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer')+'</button>'
-                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ '+(({'fr':'Niveaux','en':'Levels','es':'Niveles','de':'Stufen','nl':'Niveaus','it':'Livelli','pt':'Níveis','ru':'Уровни','tr':'Seviyeler','zh':'关卡','id':'Level','ur':'مراحل','hi':'स्तर'}[st.lang]||'Niveaux')+'</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryPlay(document.getElementById(\'ca\'),window._memDecks['+deck.idx+'])">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer'))+'</button>'
+                  +'<button class="rbtn rbtn-m" onclick="renderMemoryDeckList(document.getElementById(\'ca\'),window._memDecks)">‹ '+(({'fr':'Niveaux','en':'Levels','es':'Niveles','de':'Stufen','nl':'Niveaus','it':'Livelli','pt':'Níveis','ru':'Уровни','tr':'Seviyeler','zh':'关卡','id':'Level','ur':'مراحل','hi':'स्तर'}[st.lang]||'Niveaux'))+'</button>'
                   +'</div>';
                 grid.innerHTML='';grid.style.display='none';wrap.appendChild(res);
               },600);
@@ -5277,7 +5277,7 @@ function renderMemoryPlay(ca,deck){
   wrap.appendChild(grid);
   var qBtn=document.createElement('button');
   qBtn.className='rbtn rbtn-m';qBtn.style.marginTop='20px';
-  qBtn.textContent='‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories');
+  qBtn.textContent='‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories'));
   qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
   wrap.appendChild(qBtn);ca.appendChild(wrap);
 }
@@ -5327,8 +5327,8 @@ function renderPuzzleGame(ca){
         +'<div style="font-size:1.5rem;font-weight:900;color:var(--gold);margin-bottom:6px">'+score+'/'+maxScore+'</div>'
         +'<div style="font-size:.82rem;color:rgba(255,255,255,.5);margin-bottom:24px">'+pct+'%</div>'
         +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
-        +'<button class="rbtn rbtn-m" onclick="renderPuzzleGame(document.getElementById(\'ca\'))">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer')+'</button>'
-        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux')+'</button>'
+        +'<button class="rbtn rbtn-m" onclick="renderPuzzleGame(document.getElementById(\'ca\'))">🔄 '+(({'fr':'Rejouer','en':'Play Again','es':'Jugar de nuevo','de':'Nochmal spielen','nl':'Opnieuw spelen','it':'Gioca ancora','pt':'Jogar novamente','ru':'Снова','tr':'Tekrar oyna','zh':'再玩','id':'Main lagi','ur':'دوبارہ کھیلیں','hi':'फिर खेलें'}[st.lang]||'Rejouer'))+'</button>'
+        +'<button class="rbtn rbtn-m" onclick="renderMiniGames(document.getElementById(\'ca\'))">‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'))+'</button>'
         +'</div></div>';
       return;
     }
@@ -5448,7 +5448,7 @@ function renderPuzzleGame(ca){
     wrap.appendChild(skipBtn);
     var quitPzBtn=document.createElement('button');
     quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.marginTop='14px';
-    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux');
+    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
     quitPzBtn.onclick=function(){renderMiniGames(ca);};
     wrap.appendChild(quitPzBtn);
   }
