@@ -2372,8 +2372,8 @@ body.profile-boy #boy-bg-anim {
 /* ============================================================
    MINI-JEUX — LISTE & JEUX
    ============================================================ */
-.mg-list-wrap{padding:12px 14px 80px;max-width:680px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-@media(min-width:700px){.mg-list-wrap{max-width:none;padding:20px 24px 80px;}}
+.mg-list-wrap{padding:12px 14px 80px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+@media(min-width:700px){.mg-list-wrap{padding:20px 24px 80px;}}
 .mg-list-title{font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);text-align:center;padding:6px 0 10px}
 .mg-game-card{border-radius:22px;padding:18px 16px;border:1.5px solid;cursor:pointer;transition:transform .2s;display:flex;align-items:center;gap:14px}
 .mg-game-card:active{transform:scale(.97)}
@@ -3957,11 +3957,13 @@ function buildMenu(){
     items.push({id:'contact',icon:'✉️',cls:pc,title:t('contact_title'),desc:t('contact_desc')});
   }
   var els=[];
+  // Si déjà animé, ajouter la classe AVANT d'insérer les éléments dans le DOM
+  if(window._menuAnimDone){ nav.classList.add('menu-anim-done'); }
   items.forEach(function(it){
     var el=document.createElement('div');
     el.className='nav-card';
-    // Commence caché à gauche
-    el.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
+    // Commence caché à gauche uniquement si on va animer
+    if(!window._menuAnimDone){ el.style.cssText='opacity:0;transform:translateX(-110%);transition:none;'; }
     // Couleur SVG selon profil
     var ic=st.profile==='girl'?'#f472b6':st.profile==='boy'?'#38bdf8':'var(--gold)';
     var isKid=st.profile==='girl'||st.profile==='boy';
@@ -3995,9 +3997,7 @@ function buildMenu(){
 
   // Animation d'entrée — une seule fois au chargement de page
   if(window._menuAnimDone){
-    // Déjà animé : afficher instantanément + neutralise CSS animation
-    nav.classList.add('menu-anim-done');
-    els.forEach(function(el){el.style.transition='none';el.style.opacity='1';el.style.transform='translateX(0)';});
+    // Déjà animé : classe déjà ajoutée avant insertion, rien à faire
   } else {
     function animNext(i){
       if(i>=els.length){window._menuAnimDone=true;return;}
@@ -4764,7 +4764,7 @@ var islandDefs=[
 
     prevIslandDone=isleSessions.every(function(s){var _a=(st.accuracy||{})[s.id];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
   });
-  if(_firstActivCard){setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&_firstActivCard){var top=_firstActivCard.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/4),behavior:'smooth'});}},2000);}
+  // Le scroll vers le gugus est géré directement après le placement initial (dans les setTimeout des cartes)
 
   // Boss final — Grand Quiz
   var allDone=doneSessions===totalSessions;
@@ -4841,29 +4841,33 @@ var islandDefs=[
         var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
         var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
         var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
-        // Segment 0 : coin haut-gauche --> centre île 0 (droite) — grand arc serpentin
+        // Segment 0 : coin haut-gauche → île 0 — courbe douce
+        var maxMX=centersM.length?Math.max.apply(null,centersM.map(function(c){return c.x;})):gW*0.9;
+        var minMX=centersM.length?Math.min.apply(null,centersM.map(function(c){return c.x;})):gW*0.1;
+        var cpMRight=Math.min(gW*0.95,maxMX+80);
+        var cpMLeft=Math.max(gW*0.05,minMX-80);
         if(isleCardsMob.length>0){
           var avX=gW*0.08,avY=40;
           var t0x=centersM[0].x,t0y=centersM[0].y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
-          segsMob.push({x0:avX,y0:avY,cpx1:gW*0.08,cpy1:(avY+t0y)*0.5,cpx2:gW*0.92,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+(gW*0.08)+','+((avY+t0y)*0.5)+' '+(gW*0.92)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
+          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY,cpx2:t0x,cpy2:avY,x3:t0x,y3:t0y});
+          drawMobPath('M '+avX+','+avY+' C '+avX+','+avY+' '+t0x+','+avY+' '+t0x+','+t0y, lk0);
         }
-        // Segments île->île : grand serpentin passant par le centre de chaque île (île 0=droite, île 1=gauche…)
+        // Segments île->île : serpentin tangentes horizontales (île 0=droite, île 1=gauche…)
         for(var i=0;i<isleCardsMob.length-1;i++){
           var c0m=centersM[i],c1m=centersM[i+1];
           var sx=c0m.x,sy=c0m.y,ex=c1m.x,ey=c1m.y;
           var cp1x,cp2x;
           if(i%2===0){
-            // Île droite → grande courbe vers bord gauche → île gauche
-            cp1x=gW*0.05; cp2x=gW*0.05;
+            // Île droite → arc vers gauche → île gauche
+            cp1x=cpMLeft; cp2x=cpMLeft;
           } else {
-            // Île gauche → grande courbe vers bord droit → île droite
-            cp1x=gW*0.95; cp2x=gW*0.95;
+            // Île gauche → arc vers droite → île droite
+            cp1x=cpMRight; cp2x=cpMRight;
           }
           var segLkM=(isleCardsMob[i]&&isleCardsMob[i].classList.contains('locked-isle'))||(isleCardsMob[i+1]&&isleCardsMob[i+1].classList.contains('locked-isle'));
-          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
-          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey, segLkM);
+          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
+          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey, segLkM);
         }// charIdx : 0=home, i+1=ile i validee (>=80%)
         var charIdxM=0;
         for(var i=0;i<islandDefs.length;i++){
@@ -4872,10 +4876,11 @@ var islandDefs=[
         }
         function placeCharMob(x,y){charElMob.style.transform='none';charElMob.style.left=(x-34)+'px';charElMob.style.top=(y-80)+'px';}
         function bezierPtM(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
-        // Placement initial
+        // Placement initial + scroll vers gugus
         if(segsMob.length>0){
           if(charIdxM>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
           else{var ip=bezierPtM(0,segsMob[charIdxM]);placeCharMob(ip.x,ip.y);}
+          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
         }
         var animFrameM=null,currentIdxM=charIdxM;
         function animateToM(targetIdx,onDone){
@@ -4923,9 +4928,9 @@ var islandDefs=[
       el.style.position='relative';
       el.style.zIndex='5';
       var pos=posPattern[i%4];
-      if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
-      else if(pos==='left'){el.style.marginLeft='0';el.style.marginRight='auto';}
-      else{el.style.marginLeft='auto';el.style.marginRight='auto';}
+      if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';el.style.alignSelf='';}
+      else if(pos==='left'){el.style.marginLeft='0';el.style.marginRight='auto';el.style.alignSelf='';}
+      else{el.style.marginLeft='';el.style.marginRight='';el.style.alignSelf='center';}
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
     if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
@@ -4971,17 +4976,18 @@ var islandDefs=[
         svg.appendChild(dp);
       }
 
-      // Segment 0 : coin haut-gauche → centre île 0 (centre)
+      // Segment 0 : coin haut-gauche → île 0 — courbe douce vers le bas
       if(centers.length>0){
         var avX=gW*0.05,avY=60;
         var t0x=centers[0].x,t0y=centers[0].y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
-        segments.push({x0:avX,y0:avY,cpx1:cpLeft,cpy1:(avY+t0y)*0.5,cpx2:cpRight,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
-        drawPath('M '+avX+','+avY+' C '+cpLeft+','+((avY+t0y)*0.5)+' '+cpRight+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
+        // Tangente horizontale : cp1 reste en haut-gauche, cp2 arrive horizontalement sur l'île
+        segments.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY,cpx2:t0x,cpy2:avY,x3:t0x,y3:t0y});
+        drawPath('M '+avX+','+avY+' C '+avX+','+avY+' '+t0x+','+avY+' '+t0x+','+t0y, lk0);
       }
 
-      // Segments île→île : grand serpentin passant par les centres
-      // posPattern: center/right/center/left → i=0(ctr→right), i=1(right→ctr), i=2(ctr→left), i=3(left→ctr)
+      // Segments île→île : grand serpentin — tangentes horizontales (pas de boucles)
+      // posPattern: center/right/center/left
       for(var i=0;i<centers.length-1;i++){
         var c0=centers[i],c1=centers[i+1];
         var sx=c0.x,sy=c0.y,ex=c1.x,ey=c1.y;
@@ -4991,17 +4997,18 @@ var islandDefs=[
           // center→right : arc vers droite
           cp1x=cpRight; cp2x=cpRight;
         } else if(mod===1){
-          // right→center : arc vers gauche
+          // right→center : grand arc vers gauche
           cp1x=cpLeft; cp2x=cpLeft;
         } else if(mod===2){
           // center→left : arc vers gauche
           cp1x=cpLeft; cp2x=cpLeft;
         } else {
-          // left→center : arc vers droite
+          // left→center : grand arc vers droite
           cp1x=cpRight; cp2x=cpRight;
         }
-        var d='M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey;
-        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
+        // Tangentes horizontales : cp1 au niveau y de départ, cp2 au niveau y d'arrivée
+        var d='M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey;
+        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
         var segLk=(isleCards[i]&&isleCards[i].classList.contains('locked-isle'))||(isleCards[i+1]&&isleCards[i+1].classList.contains('locked-isle'));drawPath(d,segLk);
       }
 
@@ -5046,6 +5053,8 @@ var islandDefs=[
         initY=segments[charIdx].y0;
       }
       placeCharAt(initX,initY);
+      // Scroll vers le gugus
+      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
 
       var animFrame=null,currentIdx=charIdx;
 
