@@ -1849,6 +1849,8 @@ body.profile-adult, #root.profile-adult {
 .nav-card:nth-child(4) { animation: waveIn .5s 1.55s both cubic-bezier(.34,1.4,.64,1); }
 .nav-card:nth-child(5) { animation: waveIn .5s 2.05s both cubic-bezier(.34,1.4,.64,1); }
 .nav-card:nth-child(6) { animation: waveIn .5s 2.55s both cubic-bezier(.34,1.4,.64,1); }
+/* Menu déjà animé — neutralise les animations CSS */
+.menu-anim-done .nav-card { animation: none !important; opacity: 1 !important; transform: translateX(0) !important; }
 
 /* Appliquer 3D sur les sess-cards */
 .sess-card {
@@ -2371,6 +2373,7 @@ body.profile-boy #boy-bg-anim {
    MINI-JEUX — LISTE & JEUX
    ============================================================ */
 .mg-list-wrap{padding:12px 14px 80px;max-width:680px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+@media(min-width:700px){.mg-list-wrap{max-width:none;padding:20px 24px 80px;}}
 .mg-list-title{font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);text-align:center;padding:6px 0 10px}
 .mg-game-card{border-radius:22px;padding:18px 16px;border:1.5px solid;cursor:pointer;transition:transform .2s;display:flex;align-items:center;gap:14px}
 .mg-game-card:active{transform:scale(.97)}
@@ -3992,7 +3995,8 @@ function buildMenu(){
 
   // Animation d'entrée — une seule fois au chargement de page
   if(window._menuAnimDone){
-    // Déjà animé : afficher instantanément
+    // Déjà animé : afficher instantanément + neutralise CSS animation
+    nav.classList.add('menu-anim-done');
     els.forEach(function(el){el.style.transition='none';el.style.opacity='1';el.style.transform='translateX(0)';});
   } else {
     function animNext(i){
@@ -4760,7 +4764,7 @@ var islandDefs=[
 
     prevIslandDone=isleSessions.every(function(s){var _a=(st.accuracy||{})[s.id];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
   });
-  if(_firstActivCard){setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&_firstActivCard){var top=_firstActivCard.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/4),behavior:'smooth'});}},800);}
+  if(_firstActivCard){setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&_firstActivCard){var top=_firstActivCard.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/4),behavior:'smooth'});}},2000);}
 
   // Boss final — Grand Quiz
   var allDone=doneSessions===totalSessions;
@@ -4883,7 +4887,7 @@ var islandDefs=[
             if(step>0)queue.push({seg:segsMob[i],dir:1});
             else queue.push({seg:segsMob[i-1],dir:-1});
           }
-          var qi=0,prog=0,SPEED=0.028;
+          var qi=0,prog=0,SPEED=0.014;
           function tickM(){
             if(qi>=queue.length){currentIdxM=targetIdx;var fp=bezierPtM(queue[queue.length-1].dir>0?1:0,queue[queue.length-1].seg);placeCharMob(fp.x,fp.y);if(onDone)onDone();return;}
             var item=queue[qi];var pt=bezierPtM(item.dir>0?prog:1-prog,item.seg);placeCharMob(pt.x,pt.y);
@@ -4906,7 +4910,7 @@ var islandDefs=[
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
 
-    var posPattern=['right','left','right','left'];
+    var posPattern=['center','right','center','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.28),260);
     globeDiv.style.gap='70px';
@@ -4920,7 +4924,8 @@ var islandDefs=[
       el.style.zIndex='5';
       var pos=posPattern[i%4];
       if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
-      else{el.style.marginLeft='0';el.style.marginRight='auto';}
+      else if(pos==='left'){el.style.marginLeft='0';el.style.marginRight='auto';}
+      else{el.style.marginLeft='auto';el.style.marginRight='auto';}
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
     if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
@@ -4943,6 +4948,12 @@ var islandDefs=[
 
       var segments=[];
 
+      // Calcul bornes réelles des îles pour éviter débordement des points de contrôle
+      var maxCenterX=centers.length?Math.max.apply(null,centers.map(function(c){return c.x;})):gW*0.9;
+      var minCenterX=centers.length?Math.min.apply(null,centers.map(function(c){return c.x;})):gW*0.1;
+      var cpRight=Math.min(gW*0.95,maxCenterX+120);
+      var cpLeft=Math.max(gW*0.05,minCenterX-120);
+
       // Grand serpentin desktop — épaisseur réduite de moitié
       function drawPath(d,lk){
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -4960,26 +4971,34 @@ var islandDefs=[
         svg.appendChild(dp);
       }
 
-      // Segment 0 : coin haut-gauche → centre île 0 (droite)
+      // Segment 0 : coin haut-gauche → centre île 0 (centre)
       if(centers.length>0){
         var avX=gW*0.05,avY=60;
         var t0x=centers[0].x,t0y=centers[0].y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
-        segments.push({x0:avX,y0:avY,cpx1:gW*0.05,cpy1:(avY+t0y)*0.5,cpx2:gW*0.95,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
-        drawPath('M '+avX+','+avY+' C '+(gW*0.05)+','+((avY+t0y)*0.5)+' '+(gW*0.95)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
+        segments.push({x0:avX,y0:avY,cpx1:cpLeft,cpy1:(avY+t0y)*0.5,cpx2:cpRight,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
+        drawPath('M '+avX+','+avY+' C '+cpLeft+','+((avY+t0y)*0.5)+' '+cpRight+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
       }
 
       // Segments île→île : grand serpentin passant par les centres
+      // posPattern: center/right/center/left → i=0(ctr→right), i=1(right→ctr), i=2(ctr→left), i=3(left→ctr)
       for(var i=0;i<centers.length-1;i++){
         var c0=centers[i],c1=centers[i+1];
         var sx=c0.x,sy=c0.y,ex=c1.x,ey=c1.y;
         var cp1x,cp2x;
-        if(i%2===0){
-          // Île droite → grande courbe vers bord gauche → île gauche
-          cp1x=gW*0.05; cp2x=gW*0.05;
+        var mod=i%4;
+        if(mod===0){
+          // center→right : arc vers droite
+          cp1x=cpRight; cp2x=cpRight;
+        } else if(mod===1){
+          // right→center : arc vers gauche
+          cp1x=cpLeft; cp2x=cpLeft;
+        } else if(mod===2){
+          // center→left : arc vers gauche
+          cp1x=cpLeft; cp2x=cpLeft;
         } else {
-          // Île gauche → grande courbe vers bord droit → île droite
-          cp1x=gW*0.95; cp2x=gW*0.95;
+          // left→center : arc vers droite
+          cp1x=cpRight; cp2x=cpRight;
         }
         var d='M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey;
         segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
@@ -5039,7 +5058,7 @@ var islandDefs=[
           if(step>0)queue.push({seg:segments[i],dir:1});
           else queue.push({seg:segments[i-1],dir:-1});
         }
-        var qi=0,prog=0,SPEED=0.025;
+        var qi=0,prog=0,SPEED=0.0125;
         function tick(){
           if(qi>=queue.length){
             currentIdx=targetIdx;
@@ -6253,6 +6272,7 @@ function renderAudioExercise(ca,qs,session){
         answerBox.style.display='block';
         showBtn.style.display='none';
         srWrapW.style.display='flex';
+        setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&srWrapW){var top=srWrapW.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-60),behavior:'smooth'});}},80);
       };
       const miniClearBtn=document.createElement('button');
       miniClearBtn.className='writing-action-btn danger';
