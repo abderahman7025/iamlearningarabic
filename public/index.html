@@ -4021,7 +4021,7 @@ function navToPage(page){
   window._tbLastScroll=0;
   var _mb=document.getElementById('_map-back-btn');if(_mb)_mb.remove();
   var _tb=document.getElementById('topbar');
-  if(_tb){_tb.style.position='';_tb.style.background='';_tb.style.backdropFilter='';_tb.style.webkitBackdropFilter='';_tb.style.boxShadow='';_tb.style.maxHeight='200px';_tb.style.overflow='';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.opacity='';_tb.style.pointerEvents='';_tb.style.transform='';}
+  if(_tb){_tb.style.position='';_tb.style.width='';_tb.style.background='';_tb.style.backdropFilter='';_tb.style.webkitBackdropFilter='';_tb.style.boxShadow='';_tb.style.maxHeight='200px';_tb.style.overflow='';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.opacity='';_tb.style.pointerEvents='';_tb.style.transform='';}
   var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
@@ -4044,7 +4044,7 @@ function handleBack(){
   stopSpeech();
   var _mb2=document.getElementById('_map-back-btn');if(_mb2)_mb2.remove();
   var _stbR=document.getElementById('topbar');
-  if(_stbR){_stbR.style.position='';_stbR.style.background='';_stbR.style.backdropFilter='';_stbR.style.webkitBackdropFilter='';_stbR.style.boxShadow='';_stbR.style.maxHeight='';_stbR.style.overflow='';_stbR.style.paddingTop='';_stbR.style.paddingBottom='';_stbR.style.opacity='';_stbR.style.pointerEvents='';_stbR.style.transform='';}
+  if(_stbR){_stbR.style.position='';_stbR.style.width='';_stbR.style.background='';_stbR.style.backdropFilter='';_stbR.style.webkitBackdropFilter='';_stbR.style.boxShadow='';_stbR.style.maxHeight='';_stbR.style.overflow='';_stbR.style.paddingTop='';_stbR.style.paddingBottom='';_stbR.style.opacity='';_stbR.style.pointerEvents='';_stbR.style.transform='';}
   if(st._bonusSubPage){st._bonusSubPage=false;var ca=document.getElementById('ca');renderBonus(ca);return;}
   const prev=st.backHistory.pop();
   // Animation dézoom: la page actuelle rétrécit pour revenir à la taille d'un carré
@@ -4584,6 +4584,7 @@ function renderSessionsMap(ca){
   var _stb=document.getElementById('topbar');
   if(_stb){
     _stb.style.position='fixed';
+    _stb.style.width='100%';
     _stb.style.background='transparent';
     _stb.style.backdropFilter='none';
     _stb.style.webkitBackdropFilter='none';
