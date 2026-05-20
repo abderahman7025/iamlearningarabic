@@ -2342,7 +2342,7 @@ body.profile-boy #boy-bg-anim {
 .sess-island>*{position:relative;z-index:2}
 .sess-island:hover:not(.locked-isle){transform:translateY(-8px) scale(1.07)}
 .sess-island:active:not(.locked-isle){transform:scale(.95)}
-.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.9) brightness(.45) opacity(.5)}
+.sess-island.locked-isle{cursor:default;pointer-events:none;filter:grayscale(.9) brightness(.45) opacity(.5);position:relative;z-index:6}
 .sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:transparent;border:none;box-shadow:none}
 .sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:bossFloat 3s ease-in-out infinite}
 @keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -2370,7 +2370,7 @@ body.profile-boy #boy-bg-anim {
 /* ============================================================
    MINI-JEUX — LISTE & JEUX
    ============================================================ */
-.mg-list-wrap{padding:12px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.mg-list-wrap{padding:12px 14px 80px;max-width:680px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 .mg-list-title{font-size:.75rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);text-align:center;padding:6px 0 10px}
 .mg-game-card{border-radius:22px;padding:18px 16px;border:1.5px solid;cursor:pointer;transition:transform .2s;display:flex;align-items:center;gap:14px}
 .mg-game-card:active{transform:scale(.97)}
@@ -2404,7 +2404,7 @@ body.profile-boy #boy-bg-anim {
 .puzzle-audio-btn:active{transform:scale(.9)}
 .puzzle-hint{text-align:center;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:16px}
 .puzzle-blanks{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px 0;min-height:54px;direction:rtl}
-.puzzle-blank{width:48px;height:48px;border-radius:12px;border:2px dashed rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-family:'Scheherazade New',serif;color:var(--gold);background:rgba(255,255,255,.12);transition:all .15s;cursor:pointer}
+.puzzle-blank{width:48px;height:48px;border-radius:12px;border:2px dashed rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-family:'Scheherazade New',serif;color:var(--gold);background:rgba(255,255,255,.42);transition:all .15s;cursor:pointer}
 .puzzle-blank.filled{border-style:solid;border-color:rgba(245,200,66,.4);background:rgba(245,200,66,.08)}
 .puzzle-blank.correct{border-color:#22c55e;background:rgba(34,197,94,.12);color:#4ade80}
 .puzzle-blank.wrong{border-color:#ef4444;background:rgba(239,68,68,.1);animation:shakeP .3s ease}
@@ -2450,6 +2450,50 @@ body.profile-boy [lang="ar"] {
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
+}
+
+/* ============================================================
+   RESPONSIVE — adapte toutes les pages à la largeur d'écran
+   ============================================================ */
+*{box-sizing:border-box}
+.ca{overflow-x:hidden}
+/* Conteneurs principaux fluides */
+.sess-map-wrap,.mg-list-wrap,.mem-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
+/* Nav-cards fluides */
+.nav-card{min-height:72px;height:auto}
+.nav-title{font-size:clamp(.9rem,2.2vw,1.1rem)}
+.nav-desc{font-size:clamp(.65rem,1.5vw,.72rem)}
+/* Memory grid responsive */
+.mem-grid{grid-template-columns:repeat(auto-fill,minmax(90px,1fr))}
+.mem-card{height:clamp(72px,12vw,100px)}
+/* Puzzle responsive */
+.puzzle-blank{width:clamp(40px,10vw,52px);height:clamp(40px,10vw,52px)}
+.puzzle-choice{width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px)}
+/* Boutons */
+.rbtn{white-space:normal;word-break:break-word}
+/* Island map */
+.isle-img{height:clamp(140px,28vw,220px)}
+/* Breakpoint medium (tablette landscape / petit desktop) */
+@media(max-width:900px){
+  .mg-list-wrap{max-width:100%}
+  .mem-wrap,.puzzle-wrap{max-width:100%}
+  .sess-map-wrap{max-width:100%}
+}
+/* Breakpoint petit (mobile landscape) */
+@media(max-width:600px){
+  .mem-grid{grid-template-columns:repeat(3,1fr)}
+  .nav-icon{width:48px;height:72px}
+  .nav-card{height:auto;min-height:64px}
+}
+@media(max-width:420px){
+  .mem-grid{grid-template-columns:repeat(2,1fr)}
+  .puzzle-blank{width:40px;height:40px;font-size:1.3rem}
+  .puzzle-choice{width:44px;height:44px;font-size:1.4rem}
+}
+/* Redimensionnement desktop : empêche le débordement horizontal */
+@media(min-width:580px){
+  .scr{overflow-x:hidden}
+  #ca{overflow-x:hidden}
 }
 </style>
 
@@ -3946,21 +3990,23 @@ function buildMenu(){
     els.push(el);
   });
 
-  // Lancer les animations strictement séquentielles via JS
-  function animNext(i){
-    if(i>=els.length)return;
-    var el=els[i];
-    // Activer la transition puis déplacer
-    requestAnimationFrame(function(){
-      el.style.transition='opacity .25s ease-out, transform .25s ease-out';
-      el.style.opacity='1';
-      el.style.transform='translateX(0)';
-      // Quand cette animation est finie, lancer la suivante
-      setTimeout(function(){animNext(i+1);}, 350);
-    });
+  // Animation d'entrée — une seule fois au chargement de page
+  if(window._menuAnimDone){
+    // Déjà animé : afficher instantanément
+    els.forEach(function(el){el.style.transition='none';el.style.opacity='1';el.style.transform='translateX(0)';});
+  } else {
+    function animNext(i){
+      if(i>=els.length){window._menuAnimDone=true;return;}
+      var el=els[i];
+      requestAnimationFrame(function(){
+        el.style.transition='opacity .25s ease-out, transform .25s ease-out';
+        el.style.opacity='1';
+        el.style.transform='translateX(0)';
+        setTimeout(function(){animNext(i+1);}, 350);
+      });
+    }
+    setTimeout(function(){animNext(0);}, 80);
   }
-  // Petit délai initial pour que le DOM soit en place
-  setTimeout(function(){animNext(0);}, 80);
   updateAvgScore();
 }
 
@@ -4593,7 +4639,7 @@ var islandDefs=[
   // Mini-jeux entre les îles
   var mgDefs=[
     {after:3, game:'memory', icon:'🃏',
-     label:{'fr':'Memory des voyelles','en':'Vowel Memory','es':'Memoria de vocales','de':'Vokal-Memory','nl':'Klinker Memory','it':'Memory delle vocali','pt':'Memória das vogais','ru':'Игра памяти — гласные','tr':'Sesli Harf Memory','zh':'元音记忆','id':'Memory Vokal','ur':'حروف علت کا میموری','hi':'स्वर मेमोरी'}[st.lang]||'Memory des voyelles',
+     label:{'fr':'Mémoires des lettres','en':'Letter Memory','es':'Memoria de letras','de':'Buchstaben-Memory','nl':'Letter Memory','it':'Memory delle lettere','pt':'Memória das letras','ru':'Игра памяти — буквы','tr':'Harf Memory','zh':'字母记忆','id':'Memory Huruf','ur':'حروف کا میموری','hi':'अक्षर मेमोरी'}[st.lang]||'Mémoires des lettres',
      sub:{'fr':'Associe les lettres à leurs sons','en':'Match letters to their sounds','es':'Asocia letras con sonidos','de':'Buchstaben zu Lauten zuordnen','nl':'Koppel letters aan klanken','it':'Abbina lettere ai loro suoni','pt':'Associe letras a sons','ru':'Сопоставь буквы звукам','tr':'Harfleri sesleriyle eşleştir','zh':'将字母与读音匹配','id':'Cocokkan huruf dengan bunyinya','ur':'حروف کو آوازوں سے ملاؤ','hi':'अक्षरों को उनकी ध्वनियों से मिलाएँ'}[st.lang]||'Associe les lettres à leurs sons'},
     {after:7, game:'puzzle', icon:'🔤',
      label:{'fr':'Puzzle des mots','en':'Word Puzzle','es':'Puzzle de palabras','de':'Wörter-Puzzle','nl':'Woord Puzzel','it':'Puzzle delle parole','pt':'Puzzle de palavras','ru':'Слово-пазл','tr':'Kelime Bulmacası','zh':'单词拼图','id':'Puzzle Kata','ur':'الفاظ کا پزل','hi':'शब्द पहेली'}[st.lang]||'Puzzle des mots',
@@ -4696,6 +4742,7 @@ var islandDefs=[
       var mgUnlocked=isComplete;
       var mgCard=document.createElement('div');
       mgCard.className='isle-mg'+(mgUnlocked?'':' locked-mg');
+      mgCard.style.position='relative';mgCard.style.zIndex='5';
       mgCard.innerHTML='<div class="isle-mg-icon">'+mg.icon+'</div><div><div class="isle-mg-text">'+mg.label+'</div><div class="isle-mg-sub">'+(mgUnlocked?mg.sub:(t('finish_island')||'Termine l\'île pour débloquer'))+'</div></div><div class="isle-mg-arrow">›</div>';
       if(mgUnlocked){
         mgCard.onclick=function(){renderMiniGames(domContainer);};
@@ -4777,13 +4824,13 @@ var islandDefs=[
         svg.setAttribute('width',gW);svg.setAttribute('height',gH);
         svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
         globeDiv.insertBefore(svg,globeDiv.firstChild);
-        function drawMobPath(d){
+        function drawMobPath(d,lk){
           var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke','rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','14');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
+          sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','14');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
           var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke','rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','10');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
+          mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','10');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
           var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke','rgba(195,140,65,0.85)');dp.setAttribute('stroke-width','4');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
+          dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(195,140,65,0.85)');dp.setAttribute('stroke-width','4');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
         }
         var MG=8;
         var segsMob=[];
@@ -4794,8 +4841,9 @@ var islandDefs=[
         if(isleCardsMob.length>0){
           var avX=gW*0.08,avY=40;
           var t0x=centersM[0].x,t0y=centersM[0].y;
+          var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           segsMob.push({x0:avX,y0:avY,cpx1:gW*0.08,cpy1:(avY+t0y)*0.5,cpx2:gW*0.92,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+(gW*0.08)+','+((avY+t0y)*0.5)+' '+(gW*0.92)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y);
+          drawMobPath('M '+avX+','+avY+' C '+(gW*0.08)+','+((avY+t0y)*0.5)+' '+(gW*0.92)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
         }
         // Segments île->île : grand serpentin passant par le centre de chaque île (île 0=droite, île 1=gauche…)
         for(var i=0;i<isleCardsMob.length-1;i++){
@@ -4809,8 +4857,9 @@ var islandDefs=[
             // Île gauche → grande courbe vers bord droit → île droite
             cp1x=gW*0.95; cp2x=gW*0.95;
           }
+          var segLkM=(isleCardsMob[i]&&isleCardsMob[i].classList.contains('locked-isle'))||(isleCardsMob[i+1]&&isleCardsMob[i+1].classList.contains('locked-isle'));
           segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
-          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey);
+          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey, segLkM);
         }// charIdx : 0=home, i+1=ile i validee (>=80%)
         var charIdxM=0;
         for(var i=0;i<islandDefs.length;i++){
@@ -4857,7 +4906,7 @@ var islandDefs=[
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
 
-    var posPattern=['center','right','center','left'];
+    var posPattern=['right','left','right','left'];
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
     var IW=Math.min(Math.round(DW*0.28),260);
     globeDiv.style.gap='70px';
@@ -4870,8 +4919,7 @@ var islandDefs=[
       el.style.position='relative';
       el.style.zIndex='5';
       var pos=posPattern[i%4];
-      if(pos==='center'){el.style.marginLeft='auto';el.style.marginRight='auto';}
-      else if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
+      if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
       else{el.style.marginLeft='0';el.style.marginRight='auto';}
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
@@ -4889,82 +4937,53 @@ var islandDefs=[
       svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
       globeDiv.insertBefore(svg,globeDiv.firstChild);
 
-      // Positions rÃ©elles dans l'espace SVG via offsetLeft/offsetTop
       var centers=isleCards.map(function(el){
         return{x:el.offsetLeft+el.offsetWidth/2, y:el.offsetTop+el.offsetHeight/2};
       });
-      var hW=isleCards.map(function(el){return el.offsetWidth/2;});
-      var hH=isleCards.map(function(el){return el.offsetHeight/2;});
 
-      var MARGIN=6;
       var segments=[];
 
-      // Dessine un chemin SVG triple (ombre + crÃ¨me + tirets dorÃ©s)
+      // Grand serpentin desktop — épaisseur réduite de moitié
       function drawPath(d,lk){
         var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
         sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');
-        sh.setAttribute('stroke-width','54');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
+        sh.setAttribute('stroke-width','27');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
         svg.appendChild(sh);
         var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
         mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');
-        mp.setAttribute('stroke-width','40');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
+        mp.setAttribute('stroke-width','20');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
         svg.appendChild(mp);
         var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
         dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(155,95,32,0.7)');
-        dp.setAttribute('stroke-width','16');dp.removeAttribute('stroke-dasharray');
+        dp.setAttribute('stroke-width','8');dp.removeAttribute('stroke-dasharray');
         dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');
         svg.appendChild(dp);
       }
 
-      // â”€â”€ Segment HOME : bord gauche Ã©cran â†’ bord gauche de l'Ã®le 0 â”€â”€
-      var homeX=30, homeY=centers[0].y;
-      var homeEndX=centers[0].x-hW[0]-MARGIN, homeEndY=centers[0].y;
-      var homeMidX=(homeX+homeEndX)/2;
-      var homeSeg={x0:homeX,y0:homeY,
-                   cpx1:homeMidX,cpy1:homeY+30,
-                   cpx2:homeMidX,cpy2:homeY-30,
-                   x3:homeEndX,y3:homeEndY};
-      var homeD='M '+homeX+','+homeY+' C '+homeMidX+','+(homeY+30)+' '+homeMidX+','+(homeY-30)+' '+homeEndX+','+homeEndY;
-      drawPath(homeD,false);
-      segments.push(homeSeg); // segments[0] = HOME â†’ Ã®le 0
+      // Segment 0 : coin haut-gauche → centre île 0 (droite)
+      if(centers.length>0){
+        var avX=gW*0.05,avY=60;
+        var t0x=centers[0].x,t0y=centers[0].y;
+        var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
+        segments.push({x0:avX,y0:avY,cpx1:gW*0.05,cpy1:(avY+t0y)*0.5,cpx2:gW*0.95,cpy2:(avY+t0y)*0.5,x3:t0x,y3:t0y});
+        drawPath('M '+avX+','+avY+' C '+(gW*0.05)+','+((avY+t0y)*0.5)+' '+(gW*0.95)+','+((avY+t0y)*0.5)+' '+t0x+','+t0y, lk0);
+      }
 
-      // â”€â”€ Segments Ã®le-Ã -Ã®le â”€â”€
+      // Segments île→île : grand serpentin passant par les centres
       for(var i=0;i<centers.length-1;i++){
         var c0=centers[i],c1=centers[i+1];
-        var hw0=hW[i],hh0=hH[i],hw1=hW[i+1],hh1=hH[i+1];
-        var segT=i%4;
-        var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
-
-        if(segT===0){
-          // Centreâ†’Droite : sort DROITE, entre HAUT
-          sx=c0.x+hw0+MARGIN; sy=c0.y;
-          ex=c1.x;            ey=c1.y-hh1-MARGIN;
-          cp1x=gW*0.95; cp1y=c0.y;
-          cp2x=gW*0.95; cp2y=c1.y-hh1-30;
-        } else if(segT===1){
-          // Droiteâ†’Centre : sort BAS, entre DROITE
-          sx=c0.x;            sy=c0.y+hh0+MARGIN;
-          ex=c1.x+hw1+MARGIN; ey=c1.y;
-          cp1x=c0.x;          cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.92;       cp2y=c1.y;
-        } else if(segT===2){
-          // Centreâ†’Gauche : sort GAUCHE, entre HAUT
-          sx=c0.x-hw0-MARGIN; sy=c0.y;
-          ex=c1.x;             ey=c1.y-hh1-MARGIN;
-          cp1x=gW*0.05; cp1y=c0.y;
-          cp2x=gW*0.05; cp2y=c1.y-hh1-30;
+        var sx=c0.x,sy=c0.y,ex=c1.x,ey=c1.y;
+        var cp1x,cp2x;
+        if(i%2===0){
+          // Île droite → grande courbe vers bord gauche → île gauche
+          cp1x=gW*0.05; cp2x=gW*0.05;
         } else {
-          // Gaucheâ†’Centre : sort BAS, entre GAUCHE
-          sx=c0.x;             sy=c0.y+hh0+MARGIN;
-          ex=c1.x-hw1-MARGIN;  ey=c1.y;
-          cp1x=c0.x;           cp1y=(c0.y+c1.y)/2;
-          cp2x=gW*0.08;        cp2y=c1.y;
+          // Île gauche → grande courbe vers bord droit → île droite
+          cp1x=gW*0.95; cp2x=gW*0.95;
         }
-
-        // segments[1..N] = Ã®le 0â†’1, Ã®le 1â†’2, ...
-        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
-        var d='M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey;
-        var segLk=isleCards[i+1]?isleCards[i+1].classList.contains('locked-isle'):false;drawPath(d,segLk);
+        var d='M '+sx+','+sy+' C '+cp1x+','+(sy+(ey-sy)*0.35)+' '+cp2x+','+(ey-(ey-sy)*0.35)+' '+ex+','+ey;
+        segments.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy+(ey-sy)*0.35,cpx2:cp2x,cpy2:ey-(ey-sy)*0.35,x3:ex,y3:ey});
+        var segLk=(isleCards[i]&&isleCards[i].classList.contains('locked-isle'))||(isleCards[i+1]&&isleCards[i+1].classList.contains('locked-isle'));drawPath(d,segLk);
       }
 
       // Avatar
