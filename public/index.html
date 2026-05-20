@@ -2461,7 +2461,8 @@ body.profile-boy [lang="ar"] {
 *{box-sizing:border-box}
 .ca{overflow-x:hidden}
 /* Conteneurs principaux fluides */
-.sess-map-wrap,.mg-list-wrap,.mem-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
+.sess-map-wrap,.mem-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
+.mg-list-wrap{padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
 /* Nav-cards fluides */
 .nav-card{min-height:72px;height:auto}
 .nav-title{font-size:clamp(.9rem,2.2vw,1.1rem)}
@@ -4786,15 +4787,30 @@ var islandDefs=[
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
   setTimeout(function(){
     var DW=window.innerWidth;
+    var DH=window.innerHeight;
+    var isLandscape=DW>DH;
 
-    if(DW>=580){
+    // Listener resize/orientation — relance la carte si le mode change
+    if(window._sessMapResizeFn){window.removeEventListener('resize',window._sessMapResizeFn);}
+    window._sessMapWasLandscape=isLandscape;
+    window._sessMapResizeFn=function(){
+      var nowLandscape=window.innerWidth>window.innerHeight;
+      if(nowLandscape!==window._sessMapWasLandscape){
+        window._sessMapWasLandscape=nowLandscape;
+        var _rca=document.getElementById('ca');
+        if(_rca)renderSessionsMap(_rca);
+      }
+    };
+    window.addEventListener('resize',window._sessMapResizeFn);
+
+    if(isLandscape){
       var _gm=document.getElementById('girl-mascot');
       var _bm=document.getElementById('boy-mascot');
       if(_gm)_gm.style.visibility='hidden';
       if(_bm)_bm.style.visibility='hidden';
     }
-    if(DW<580){
-      // MOBILE MAP v3 : 50%, alternance G/D, chemins bord->haut, avatar anime
+    if(!isLandscape){
+      // PORTRAIT (mobile) MAP : 50%, alternance G/D, chemins, avatar animé
       var _gmMob=document.getElementById('girl-mascot');var _bmMob=document.getElementById('boy-mascot');if(_gmMob)_gmMob.style.visibility='hidden';if(_bmMob)_bmMob.style.visibility='hidden';
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
       var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
@@ -4850,8 +4866,9 @@ var islandDefs=[
           var avX=gW*0.08,avY=40;
           var t0x=centersM[0].x,t0y=centersM[0].y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
-          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY,cpx2:t0x,cpy2:avY,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+avX+','+avY+' '+t0x+','+avY+' '+t0x+','+t0y, lk0);
+          var mid0mx=(avX+t0x)*0.5;
+          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
+          drawMobPath('M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y, lk0);
         }
         // Segments île->île : serpentin tangentes horizontales (île 0=droite, île 1=gauche…)
         for(var i=0;i<isleCardsMob.length-1;i++){
@@ -4976,14 +4993,14 @@ var islandDefs=[
         svg.appendChild(dp);
       }
 
-      // Segment 0 : coin haut-gauche → île 0 — courbe douce vers le bas
+      // Segment 0 : coin haut-gauche → île 0 — arc doux (pas de ligne horizontale)
       if(centers.length>0){
         var avX=gW*0.05,avY=60;
         var t0x=centers[0].x,t0y=centers[0].y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
-        // Tangente horizontale : cp1 reste en haut-gauche, cp2 arrive horizontalement sur l'île
-        segments.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY,cpx2:t0x,cpy2:avY,x3:t0x,y3:t0y});
-        drawPath('M '+avX+','+avY+' C '+avX+','+avY+' '+t0x+','+avY+' '+t0x+','+t0y, lk0);
+        var mid0x=(avX+t0x)*0.5,mid0y=(avY+t0y)*0.5;
+        segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
+        drawPath('M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y, lk0);
       }
 
       // Segments île→île : grand serpentin — tangentes horizontales (pas de boucles)
