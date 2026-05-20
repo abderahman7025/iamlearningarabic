@@ -4019,10 +4019,9 @@ function navToPage(page){
   stopSpeech();
   st._curPage=page;showS('s-main',true);
   window._tbLastScroll=0;
-  // Supprimer le bouton retour flottant de la carte si présent
   var _mb=document.getElementById('_map-back-btn');if(_mb)_mb.remove();
   var _tb=document.getElementById('topbar');
-  if(_tb){_tb.style.maxHeight='200px';_tb.style.overflow='';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.opacity='';_tb.style.pointerEvents='';_tb.style.transform='';}
+  if(_tb){_tb.style.position='';_tb.style.background='';_tb.style.backdropFilter='';_tb.style.webkitBackdropFilter='';_tb.style.boxShadow='';_tb.style.maxHeight='200px';_tb.style.overflow='';_tb.style.paddingTop='';_tb.style.paddingBottom='';_tb.style.opacity='';_tb.style.pointerEvents='';_tb.style.transform='';}
   var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
@@ -4045,7 +4044,7 @@ function handleBack(){
   stopSpeech();
   var _mb2=document.getElementById('_map-back-btn');if(_mb2)_mb2.remove();
   var _stbR=document.getElementById('topbar');
-  if(_stbR){_stbR.style.maxHeight='';_stbR.style.overflow='';_stbR.style.paddingTop='';_stbR.style.paddingBottom='';_stbR.style.opacity='';_stbR.style.pointerEvents='';_stbR.style.transform='';}
+  if(_stbR){_stbR.style.position='';_stbR.style.background='';_stbR.style.backdropFilter='';_stbR.style.webkitBackdropFilter='';_stbR.style.boxShadow='';_stbR.style.maxHeight='';_stbR.style.overflow='';_stbR.style.paddingTop='';_stbR.style.paddingBottom='';_stbR.style.opacity='';_stbR.style.pointerEvents='';_stbR.style.transform='';}
   if(st._bonusSubPage){st._bonusSubPage=false;var ca=document.getElementById('ca');renderBonus(ca);return;}
   const prev=st.backHistory.pop();
   // Animation dézoom: la page actuelle rétrécit pour revenir à la taille d'un carré
@@ -4578,21 +4577,38 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
-  // Cacher complètement la topbar → les îles remplissent tout l'écran (comme le menu)
-  var _stb=document.getElementById('topbar');
-  if(_stb){_stb.style.maxHeight='0';_stb.style.overflow='hidden';_stb.style.paddingTop='0';_stb.style.paddingBottom='0';_stb.style.opacity='0';_stb.style.pointerEvents='none';}
-  // Bouton Retour flottant (remplace la topbar sur la carte)
+  // Supprimer bouton flottant résiduel si présent
   var _oldMapBack=document.getElementById('_map-back-btn');
   if(_oldMapBack)_oldMapBack.remove();
-  var mapBackBtn=document.createElement('button');
-  mapBackBtn.id='_map-back-btn';
-  mapBackBtn.textContent='‹ Menu';
-  mapBackBtn.style.cssText='position:fixed;top:12px;left:12px;z-index:200;background:rgba(0,0,0,.32);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.18);color:#fff;padding:7px 16px;border-radius:50px;font-size:.8rem;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:opacity .25s';
-  mapBackBtn.onclick=function(){
-    var b=document.getElementById('_map-back-btn');if(b)b.remove();
-    handleBack();
+  // Topbar : overlay transparent (pas de fond, pas de blur) + position fixed → les îles passent dessous
+  var _stb=document.getElementById('topbar');
+  if(_stb){
+    _stb.style.position='fixed';
+    _stb.style.background='transparent';
+    _stb.style.backdropFilter='none';
+    _stb.style.webkitBackdropFilter='none';
+    _stb.style.boxShadow='none';
+    _stb.style.maxHeight='200px';
+    _stb.style.overflow='';
+    _stb.style.paddingTop='';
+    _stb.style.paddingBottom='';
+    _stb.style.opacity='1';
+    _stb.style.pointerEvents='';
+    _stb.style.transform='translateY(0)';
+    _stb.style.transition='transform .3s ease, opacity .3s ease';
+  }
+  // Scroll-hide/show du topbar comme le menu-header
+  if(window._mapScrollFn){ca.removeEventListener('scroll',window._mapScrollFn);}
+  window._mapScrollLast=0;
+  window._mapScrollFn=function(){
+    var tb=document.getElementById('topbar');if(!tb)return;
+    var sc=ca.scrollTop,delta=sc-window._mapScrollLast;
+    if(Math.abs(delta)<8){window._mapScrollLast=sc;return;}
+    if(sc>40&&delta>0){tb.style.transform='translateY(-110%)';tb.style.opacity='0';tb.style.pointerEvents='none';}
+    else{tb.style.transform='translateY(0)';tb.style.opacity='1';tb.style.pointerEvents='';}
+    window._mapScrollLast=sc;
   };
-  document.body.appendChild(mapBackBtn);
+  ca.addEventListener('scroll',window._mapScrollFn,{passive:true});
   // Charger les scores depuis localStorage
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
