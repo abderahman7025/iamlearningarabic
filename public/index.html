@@ -2391,7 +2391,7 @@ body.profile-boy #boy-bg-anim {
 .mem-score{font-size:.85rem;font-weight:700;color:var(--gold)}
 .mem-timer{font-size:.85rem;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
 .mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.mem-card{height:76px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
+.mem-card{height:100px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
 .mem-card:active{transform:scale(.96)}
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
@@ -2469,7 +2469,7 @@ body.profile-boy [lang="ar"] {
 .nav-desc{font-size:clamp(.65rem,1.5vw,.72rem)}
 /* Memory grid responsive */
 .mem-grid{grid-template-columns:repeat(4,1fr)}
-.mem-card{height:clamp(58px,9vw,76px)}
+.mem-card{height:clamp(72px,12vw,100px)}
 /* Puzzle responsive */
 .puzzle-blank{width:clamp(40px,10vw,52px);height:clamp(40px,10vw,52px)}
 .puzzle-choice{width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px)}
@@ -4021,7 +4021,7 @@ function navToPage(page){
   window._tbLastScroll=0;
   var _tb=document.getElementById('topbar');
   if(_tb){_tb.style.maxHeight='200px';_tb.style.opacity='1';_tb.style.transform='translateY(0)';_tb.style.pointerEvents='';}
-  var _ca=document.getElementById('ca');if(_ca)_ca.scrollTop=0;
+  var _ca=document.getElementById('ca');if(_ca){_ca.scrollTop=0;_ca.style.paddingTop='62px';}
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
   document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:'Jeux'}[page]||'';
@@ -4575,6 +4575,7 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
+  ca.style.paddingTop='0'; // Carte des îles : pas de padding, les îles passent derrière la topbar
   // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
@@ -5273,11 +5274,11 @@ function renderMemoryPlay(ca,deck){
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
-    {bg:'#0e26ba',sz:'84%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
-    {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
-    {flag:true,sz:'97%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
-    {bg:'#87CEEB',sz:'84%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
-    {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
+    {bg:'#0e26ba',sz:'60%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
+    {bg:'#2a1608',sz:'60%',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
+    {flag:true,sz:'70%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
+    {bg:'#87CEEB',sz:'60%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
+    {bg:'#1a4020',sz:'60%',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
   var ds=_DS[deck.idx]||_DS[0];
   var flagBg="url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 0,100 40,50' fill='%23EF0A1A'/%3E%3C/svg%3E\") 0 0/100% 100% no-repeat,linear-gradient(to bottom,#000 33.3%,#fff 33.3%,#fff 66.6%,#009736 66.6%)";
@@ -5291,7 +5292,7 @@ function renderMemoryPlay(ca,deck){
     front.style.boxShadow=ds.inset;
     var back=document.createElement('div');back.className='mem-card-back';
     back.style.fontFamily=p.type==='ar'?'\'Scheherazade New\',serif':'inherit';
-    back.style.fontSize=p.type==='ar'?'2.8rem':'1.7rem';
+    back.style.fontSize=p.type==='ar'?'2.2rem':'1.3rem';
     back.textContent=p.text;
     inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
@@ -6956,12 +6957,12 @@ window.onload=()=>{
     var caEl=document.getElementById('ca');
     var scrolled=caEl?caEl.scrollTop:0;
     var delta=scrolled-window._tbLastScroll;
-    if(Math.abs(delta)<10){window._tbLastScroll=scrolled;return;}
-    if(scrolled>80&&delta>0){
+    if(Math.abs(delta)<2){window._tbLastScroll=scrolled;return;}
+    if(scrolled>5&&delta>0){
       tb.style.transform='translateY(-110%)';
       tb.style.opacity='0';
       tb.style.pointerEvents='none';
-    } else if(delta<-5||scrolled<30){
+    } else if(delta<-2||scrolled<5){
       tb.style.transform='translateY(0)';
       tb.style.opacity='1';
       tb.style.pointerEvents='';
