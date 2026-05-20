@@ -4757,17 +4757,17 @@ var islandDefs=[
         el.style.flexShrink='0';
         el.style.position='relative';
         el.style.zIndex='5';
-        el.style.alignSelf=(i%2===0)?'flex-start':'flex-end';
+        el.style.alignSelf=(i%2===0)?'flex-end':'flex-start';
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
-      globeDiv.style.paddingTop='100px';
+      globeDiv.style.paddingTop='80px';
       globeDiv.style.position='relative';
       globeDiv.style.gap='44px';
       // Avatar en haut au centre
       var isGirlMob=(st.profile==='girl');
       var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
       var charElMob=document.createElement('div');
-      charElMob.style.cssText='position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
+      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
       if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
       globeDiv.appendChild(charElMob);
       setTimeout(function(){
@@ -4790,30 +4790,30 @@ var islandDefs=[
         var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight/2};});
         var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
         var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
-        // Segment 0 : avatar (centre haut) --> haut ile 0 (gauche)
+        // Segment 0 : bord haut-droite --> haut ile 0 (droite)
         if(isleCardsMob.length>0){
-          var avX=gW/2,avY=80;
+          var avX=gW-20,avY=50;
           var t0x=centersM[0].x,t0y=centersM[0].y-hHM[0]-MG;
-          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:avY+50,cpx2:t0x,cpy2:t0y-40,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+avX+','+(avY+50)+' '+t0x+','+(t0y-40)+' '+t0x+','+t0y);
+          segsMob.push({x0:avX,y0:avY,cpx1:avX,cpy1:(avY+t0y)/2,cpx2:t0x,cpy2:t0y-30,x3:t0x,y3:t0y});
+          drawMobPath('M '+avX+','+avY+' C '+avX+','+((avY+t0y)/2)+' '+t0x+','+(t0y-30)+' '+t0x+','+t0y);
         }
-        // Segments ile -> ile : bord droit/gauche -> haut suivante
+        // Segments ile -> ile : bord gauche/droit -> haut suivante (île 0 = droite, île 1 = gauche, ...)
         for(var i=0;i<isleCardsMob.length-1;i++){
           var c0m=centersM[i],c1m=centersM[i+1];
           var hw0=hWM[i],hh0=hHM[i],hh1=hHM[i+1];
           var sx,sy,ex,ey,cp1x,cp1y,cp2x,cp2y;
           if(i%2===0){
-            // Ile gauche : sort depuis le COTE DROIT → arc C vers bord droit écran
-            sx=c0m.x+hWM[i]; sy=c0m.y;
-            ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
-            cp1x=gW-4; cp1y=sy+(ey-sy)*0.15;
-            cp2x=gW-4; cp2y=ey-(ey-sy)*0.15;
-          } else {
             // Ile droite : sort depuis le COTE GAUCHE → arc C vers bord gauche écran
             sx=c0m.x-hWM[i]; sy=c0m.y;
             ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
             cp1x=4; cp1y=sy+(ey-sy)*0.15;
             cp2x=4; cp2y=ey-(ey-sy)*0.15;
+          } else {
+            // Ile gauche : sort depuis le COTE DROIT → arc C vers bord droit écran
+            sx=c0m.x+hWM[i]; sy=c0m.y;
+            ex=c1m.x;         ey=c1m.y-hHM[i+1]-MG;
+            cp1x=gW-4; cp1y=sy+(ey-sy)*0.15;
+            cp2x=gW-4; cp2y=ey-(ey-sy)*0.15;
           }
           segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey);
@@ -5076,6 +5076,9 @@ wrap.appendChild(globeDiv);
 // ════════════════════════════════════════════════════════
 function renderMiniGames(ca){
   ca.innerHTML='';
+  // Charge les scores depuis localStorage si pas encore fait (accès direct sans passer par la carte)
+  try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
+  try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy={};Object.keys(_av).forEach(function(k){if(st.accuracy[k]===undefined)st.accuracy[k]=_av[k];});}catch(e){}
   var wrap=document.createElement('div');
   wrap.className='mg-list-wrap';
 
@@ -5143,7 +5146,7 @@ function renderMiniGames(ca){
   var backBtn=document.createElement('button');
   backBtn.className='rbtn rbtn-m';
   backBtn.style.marginTop='8px';
-  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
+  backBtn.textContent='🗺️ '+(({'fr':'Carte des îles','en':'Island Map','es':'Mapa de Islas','de':'Inselkarte','nl':'Eilandenkaart','it':'Mappa delle Isole','pt':'Mapa das Ilhas','ru':'Карта островов','tr':'Adalar Haritası','zh':'岛屿地图','id':'Peta Pulau','ur':'جزیروں کا نقشہ','hi':'द्वीप मानचित्र'}[st.lang]||'Carte des îles'));
   backBtn.onclick=function(){st._curPage='sessions';renderPage('sessions',false);};
   wrap.appendChild(backBtn);
 
@@ -5218,14 +5221,14 @@ function renderMemoryPlay(ca,deck){
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
   var _DS=[
-    {bg:'#0a1628',sz:'84%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
+    {bg:'#0e26ba',sz:'84%',inset:'inset 0 0 0 3px rgba(20,60,160,.65)'},
     {bg:'#2a1608',sz:'cover',inset:'inset 0 0 0 3px rgba(200,150,40,.55)'},
     {flag:true,sz:'65%',inset:'inset 0 0 0 3px rgba(0,151,54,.65)'},
     {bg:'#87CEEB',sz:'84%',inset:'inset 0 0 0 3px rgba(0,80,180,.55)'},
     {bg:'#1a4020',sz:'cover',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
   var ds=_DS[deck.idx]||_DS[0];
-  var flagBg='linear-gradient(to bottom right,#EF0A1A 50%,transparent 50%) 0 0/40% 50% no-repeat,linear-gradient(to top right,#EF0A1A 50%,transparent 50%) 0 100%/40% 50% no-repeat,linear-gradient(to bottom,#000 33.3%,#fff 33.3%,#fff 66.6%,#009736 66.6%)';
+  var flagBg="url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 0,100 40,50' fill='%23EF0A1A'/%3E%3C/svg%3E\") 0 0/100% 100% no-repeat,linear-gradient(to bottom,#000 33.3%,#fff 33.3%,#fff 66.6%,#009736 66.6%)";
   var flipped=[];var matched=[];var locked=false;
   pairs.forEach(function(p){
     var card=document.createElement('div');card.className='mem-card';
@@ -5441,13 +5444,8 @@ function renderPuzzleGame(ca){
 
 
     // Bouton passer
-    var skipBtn=document.createElement('button');
-    skipBtn.style.cssText='display:block;margin:12px auto 0;background:rgba(255,255,255,.06);border:none;color:rgba(255,255,255,.4);padding:6px 18px;border-radius:20px;cursor:pointer;font-size:.78rem';
-    skipBtn.textContent=t('skip')||'Passer';
-    skipBtn.onclick=function(){qIdx++;buildQuestion();};
-    wrap.appendChild(skipBtn);
     var quitPzBtn=document.createElement('button');
-    quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.marginTop='14px';
+    quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.cssText='display:block;margin:14px auto 0';
     quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
     quitPzBtn.onclick=function(){renderMiniGames(ca);};
     wrap.appendChild(quitPzBtn);
