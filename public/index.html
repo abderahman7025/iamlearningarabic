@@ -4085,7 +4085,7 @@ function navToPage(page){
 function renderPage(page,fwd){
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
-  else if(page==='sessions'){if(st.profile==='girl')renderChildWarmup(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
+  else if(page==='sessions'){if(st.profile==='girl')renderChildIslandMap(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
   else if(page==='exercises')renderExPage(ca);
   else if(page==='contact')renderContact(ca);
   else if(page==='bonus')renderBonus(ca);
@@ -5609,38 +5609,238 @@ var _AF={
   'ء':{i:'ء',       m:'ء',         f:'ء'},
   'ة':{i:'ة',       m:Z+'ة',       f:Z+'ة'}
 };
+/* Ordre calqué sur ALL_S : SV→SA(ا و ي)→SP→LS id3(ب ت ث)→…→LS id11(ه ء ة) */
 var CHILD_LETTERS=[
-  {ar:'ا',name:'alif',   emoji:'🦁',wordAr:'أَسَد',   wordLat:'asad'},
-  {ar:'ب',name:'bā',    emoji:'🐄',wordAr:'بَقَرَة',  wordLat:'baqara'},
-  {ar:'ت',name:'tā',    emoji:'🐊',wordAr:'تِمْسَاح', wordLat:'timsāh'},
-  {ar:'ث',name:'thā',   emoji:'🐍',wordAr:'ثُعْبَان', wordLat:"thu'bān"},
-  {ar:'ج',name:'djīm',  emoji:'🐪',wordAr:'جَمَل',   wordLat:'jamal'},
-  {ar:'ح',name:'Hā',    emoji:'🐴',wordAr:'حِصَان',   wordLat:'Hisān'},
-  {ar:'خ',name:'khā',   emoji:'🐑',wordAr:'خَرُوف',   wordLat:'kharūf'},
-  {ar:'د',name:'dāl',   emoji:'🐻',wordAr:'دُبّ',     wordLat:'dubb'},
-  {ar:'ذ',name:'dhāl',  emoji:'🐺',wordAr:'ذِئْب',   wordLat:"dhi'b"},
-  {ar:'ر',name:'rā',    emoji:'🌹',wordAr:'رَوْضَة',  wordLat:'rawDa'},
-  {ar:'ز',name:'zāy',   emoji:'🦒',wordAr:'زَرَافَة', wordLat:'zarāfa'},
-  {ar:'س',name:'sīn',   emoji:'🐟',wordAr:'سَمَكَة',  wordLat:'samaka'},
-  {ar:'ش',name:'chīn',  emoji:'🌳',wordAr:'شَجَرَة',  wordLat:'shajara'},
-  {ar:'ص',name:'Sād',   emoji:'🦅',wordAr:'صَقْر',    wordLat:'Saqr'},
-  {ar:'ض',name:'Dād',   emoji:'🐸',wordAr:'ضِفْدَع',  wordLat:"Difda'"},
-  {ar:'ط',name:'Tā',    emoji:'🦚',wordAr:'طَاوُوس',  wordLat:'Tāwūs'},
-  {ar:'ظ',name:'DHā',   emoji:'🦌',wordAr:'ظَبْي',    wordLat:'DHaby'},
-  {ar:'ع',name:"'ayn",  emoji:'🐦',wordAr:'عُصْفُور', wordLat:"'uSfūr"},
-  {ar:'غ',name:'ghayn', emoji:'🦍',wordAr:'غُورِيلَا',wordLat:'ghurīlā'},
-  {ar:'ف',name:'fā',    emoji:'🦋',wordAr:'فَرَاشَة', wordLat:'farāsha'},
-  {ar:'ق',name:'qāf',   emoji:'🐱',wordAr:'قِطَّة',   wordLat:'qiTTa'},
-  {ar:'ك',name:'kāf',   emoji:'🐶',wordAr:'كَلْب',    wordLat:'kalb'},
-  {ar:'ل',name:'lām',   emoji:'🦩',wordAr:'لَقْلَق',  wordLat:'laqlaq'},
-  {ar:'م',name:'mīm',   emoji:'🍌',wordAr:'مَوْز',    wordLat:'mawz'},
-  {ar:'ن',name:'nūn',   emoji:'🐯',wordAr:'نَمِر',    wordLat:'namir'},
-  {ar:'ه',name:'hā',    emoji:'🐈',wordAr:'هِرَّة',   wordLat:'hirra'},
-  {ar:'و',name:'wāw',   emoji:'🌹',wordAr:'وَرْدَة',  wordLat:'warda'},
-  {ar:'ي',name:'yā',    emoji:'🕊️',wordAr:'يَمَامَة', wordLat:'yamāma'},
-  {ar:'ء',name:'hamzah',emoji:'🦁',wordAr:'أَفْعَى',  wordLat:"af'ā"},
-  {ar:'ة',name:'tā',    emoji:'🍎',wordAr:'تُفَّاحَة',wordLat:'tuffāHa'}
+  /* SA — lettres longues */
+  {ar:'ا',name:'alif',   emoji:'🦁',wordAr:'أَسَد',    wordLat:'asad'},
+  {ar:'و',name:'wāw',   emoji:'🌹',wordAr:'وَرْدَة',   wordLat:'warda'},
+  {ar:'ي',name:'yā',    emoji:'🕊️',wordAr:'يَمَامَة',  wordLat:'yamāma'},
+  /* LS id:3 */
+  {ar:'ب',name:'bā',    emoji:'🐄',wordAr:'بَقَرَة',   wordLat:'baqara'},
+  {ar:'ت',name:'tā',    emoji:'🐊',wordAr:'تِمْسَاح',  wordLat:'timsāh'},
+  {ar:'ث',name:'thā',   emoji:'🐍',wordAr:'ثُعْبَان',  wordLat:"thu'bān"},
+  /* LS id:4 */
+  {ar:'ج',name:'djīm',  emoji:'🐪',wordAr:'جَمَل',    wordLat:'jamal'},
+  {ar:'ح',name:'Hā',    emoji:'🐴',wordAr:'حِصَان',    wordLat:'Hisān'},
+  {ar:'خ',name:'khā',   emoji:'🐑',wordAr:'خَرُوف',    wordLat:'kharūf'},
+  /* LS id:5 */
+  {ar:'د',name:'dāl',   emoji:'🐻',wordAr:'دُبّ',      wordLat:'dubb'},
+  {ar:'ذ',name:'dhāl',  emoji:'🐺',wordAr:'ذِئْب',    wordLat:"dhi'b"},
+  {ar:'ر',name:'rā',    emoji:'🌷',wordAr:'رَوْضَة',   wordLat:'rawDa'},
+  {ar:'ز',name:'zāy',   emoji:'🦒',wordAr:'زَرَافَة',  wordLat:'zarāfa'},
+  /* LS id:6 */
+  {ar:'س',name:'sīn',   emoji:'🐟',wordAr:'سَمَكَة',   wordLat:'samaka'},
+  {ar:'ش',name:'chīn',  emoji:'🌳',wordAr:'شَجَرَة',   wordLat:'shajara'},
+  /* LS id:7 */
+  {ar:'ص',name:'Sād',   emoji:'🦅',wordAr:'صَقْر',     wordLat:'Saqr'},
+  {ar:'ض',name:'Dād',   emoji:'🐸',wordAr:'ضِفْدَع',   wordLat:"Difda'"},
+  {ar:'ط',name:'Tā',    emoji:'🦚',wordAr:'طَاوُوس',   wordLat:'Tāwūs'},
+  {ar:'ظ',name:'DHā',   emoji:'🦌',wordAr:'ظَبْي',     wordLat:'DHaby'},
+  /* LS id:8 */
+  {ar:'ع',name:"'ayn",  emoji:'🐦',wordAr:'عُصْفُور',  wordLat:"'uSfūr"},
+  {ar:'غ',name:'ghayn', emoji:'🦍',wordAr:'غُورِيلَا', wordLat:'ghurīlā'},
+  /* LS id:9 */
+  {ar:'ف',name:'fā',    emoji:'🦋',wordAr:'فَرَاشَة',  wordLat:'farāsha'},
+  {ar:'ق',name:'qāf',   emoji:'🐱',wordAr:'قِطَّة',    wordLat:'qiTTa'},
+  {ar:'ك',name:'kāf',   emoji:'🐶',wordAr:'كَلْب',     wordLat:'kalb'},
+  /* LS id:10 */
+  {ar:'ل',name:'lām',   emoji:'🦩',wordAr:'لَقْلَق',   wordLat:'laqlaq'},
+  {ar:'م',name:'mīm',   emoji:'🍌',wordAr:'مَوْز',     wordLat:'mawz'},
+  {ar:'ن',name:'nūn',   emoji:'🐯',wordAr:'نَمِر',     wordLat:'namir'},
+  /* LS id:11 */
+  {ar:'ه',name:'hā',    emoji:'🐈',wordAr:'هِرَّة',    wordLat:'hirra'},
+  {ar:'ء',name:'hamzah',emoji:'🦁',wordAr:'أَفْعَى',   wordLat:"af'ā"},
+  {ar:'ة',name:'tā',    emoji:'🍎',wordAr:'تُفَّاحَة', wordLat:'tuffāHa'}
 ];
+
+/* Correspondance île → indices dans CHILD_LETTERS */
+var CHILD_ISLAND_LETTERS=[
+  [],              // 0: SV  — voyelles (pas de lettres)
+  [0,1,2],         // 1: SA  — ا و ي
+  [],              // 2: SP  — prolongation (pas de lettres)
+  [3,4,5],         // 3: LS id:3 — ب ت ث
+  [6,7,8],         // 4: LS id:4 — ج ح خ
+  [9,10,11,12],    // 5: LS id:5 — د ذ ر ز
+  [13,14],         // 6: LS id:6 — س ش
+  [15,16,17,18],   // 7: LS id:7 — ص ض ط ظ
+  [19,20],         // 8: LS id:8 — ع غ
+  [21,22,23],      // 9: LS id:9 — ف ق ك
+  [24,25,26],      // 10: LS id:10 — ل م ن
+  [27,28,29],      // 11: LS id:11 — ه ء ة
+];
+
+/* Renvoie l'index d'île pour une lettre donnée (ou -1) */
+function getChildIsland(letterIdx){
+  for(var _ii=0;_ii<CHILD_ISLAND_LETTERS.length;_ii++){
+    if(CHILD_ISLAND_LETTERS[_ii].indexOf(letterIdx)>=0)return _ii;
+  }
+  return -1;
+}
+
+// ════════════════════════════════════════════════════════
+//  CARTE DES ÎLES — profil fille
+// ════════════════════════════════════════════════════════
+function renderChildIslandMap(ca){
+  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
+  st._curPage='sessions-map';
+  if(typeof updateGirlMascot==='function')updateGirlMascot();
+  var _stb=document.getElementById('topbar');
+  if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
+
+  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length);
+
+  var wrap=document.createElement('div');wrap.className='sess-map-wrap';
+
+  /* ── Titre ── */
+  var titleDiv=document.createElement('div');titleDiv.className='sess-map-title';
+  titleDiv.textContent='🗺️ Ma carte des lettres';
+  wrap.appendChild(titleDiv);
+
+  /* ── Barre de progression globale ── */
+  var progPct=Math.round(dayIdx/CHILD_LETTERS.length*100);
+  var gpWrap=document.createElement('div');gpWrap.style.cssText='margin-bottom:18px;padding:0 4px';
+  var gpLbl=document.createElement('div');
+  gpLbl.style.cssText='display:flex;justify-content:space-between;font-size:1rem;color:rgba(255,255,255,.92);margin-bottom:6px;font-weight:700';
+  gpLbl.innerHTML='<span>Lettres apprises</span><span>'+dayIdx+' / '+CHILD_LETTERS.length+'</span>';
+  var gpBar=document.createElement('div');
+  gpBar.style.cssText='height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden';
+  var gpFill=document.createElement('div');
+  gpFill.style.cssText='height:100%;border-radius:6px;background:linear-gradient(90deg,#f9a8d4,#ec4899);width:0%;transition:width .8s cubic-bezier(.34,1.56,.64,1)';
+  gpBar.appendChild(gpFill);gpWrap.appendChild(gpLbl);gpWrap.appendChild(gpBar);
+  wrap.appendChild(gpWrap);
+  setTimeout(function(){gpFill.style.width=progPct+'%';},80);
+
+  /* ── Définitions des îles ── */
+  var islandImgs=[
+    '/images/island-0.png?v=2','/images/island-1.png?v=2','/images/island-2.png?v=2',
+    '/images/island-3.png?v=2','/images/island-4.png?v=2','/images/20260518_195724_0000.png',
+    '/images/island-pyramids.png','/images/island-7.png?v=2','/images/island-8.png?v=2',
+    '/images/island-9.png?v=2','/images/island-10.png?v=2','/images/island-11.png?v=2',
+  ];
+  var childIslandDefs=[
+    {label:'La Source de l\'Humanité', ar:'َ · ُ · ِ',       type:'vowels',  letters:[]},
+    {label:'L\'Arche de Nouh',          ar:'ا · و · ي',       type:'letters', letters:CHILD_ISLAND_LETTERS[1]},
+    {label:'La Maison Sacrée',          ar:'بَا · بُو · بِي', type:'prolong', letters:[]},
+    {label:'Le Puits de Zamzam',        ar:'ب · ت · ث',       type:'letters', letters:CHILD_ISLAND_LETTERS[3]},
+    {label:'La Terre de la Patience',   ar:'ج · ح · خ',       type:'letters', letters:CHILD_ISLAND_LETTERS[4]},
+    {label:'Le Mont Sinaï',             ar:'د · ذ · ر · ز',   type:'letters', letters:CHILD_ISLAND_LETTERS[5]},
+    {label:'Le Paysage des Rêves',      ar:'س · ش',            type:'letters', letters:CHILD_ISLAND_LETTERS[6]},
+    {label:'La Montagne de Dawoud',     ar:'ص · ض · ط · ظ',   type:'letters', letters:CHILD_ISLAND_LETTERS[7]},
+    {label:'Le Royaume de Saba',        ar:'ع · غ',            type:'letters', letters:CHILD_ISLAND_LETTERS[8]},
+    {label:'La Mosquée d\'Al-Aqsa',     ar:'ف · ق · ك',        type:'letters', letters:CHILD_ISLAND_LETTERS[9]},
+    {label:'Le Ventre de la Baleine',   ar:'ل · م · ن',        type:'letters', letters:CHILD_ISLAND_LETTERS[10]},
+    {label:'La Cité de Médine',         ar:'ه · ء · ة',        type:'letters', letters:CHILD_ISLAND_LETTERS[11]},
+  ];
+
+  var globeDiv=document.createElement('div');
+  globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch';
+
+  var _lastActiveCard=null;
+
+  childIslandDefs.forEach(function(isle,isleIdx){
+    var isLocked=false,isComplete=false;
+    if(isle.type==='vowels'){
+      isLocked=false;isComplete=false;
+    } else if(isle.type==='prolong'){
+      isLocked=(dayIdx<3);isComplete=false;
+    } else {
+      var firstL=isle.letters[0];
+      var lastL=isle.letters[isle.letters.length-1];
+      isLocked=(dayIdx<firstL);
+      isComplete=(dayIdx>lastL);
+    }
+
+    var card=document.createElement('div');
+    card.className='sess-island'+(isLocked?' locked-isle':'');
+
+    var ico=document.createElement('img');ico.className='isle-img';
+    ico.src=islandImgs[isleIdx]||'';ico.alt=isle.label;
+
+    var nm=document.createElement('div');nm.className='isle-name';nm.textContent=isle.label;
+    var sub=document.createElement('div');sub.className='isle-sub';sub.textContent=isle.ar;
+
+    var badge=document.createElement('div');badge.className='isle-badge';
+    if(isLocked){
+      badge.textContent='🔒';
+    } else if(isComplete){
+      badge.textContent='✅ Terminé';
+      badge.style.color='#4ade80';badge.style.borderColor='rgba(34,197,94,.3)';
+    } else if(isle.type==='vowels'||isle.type==='prolong'){
+      badge.textContent='▶ Découvrir';
+    } else {
+      badge.textContent='▶ Commencer';
+    }
+
+    card.appendChild(ico);card.appendChild(nm);card.appendChild(sub);card.appendChild(badge);
+
+    if(!isLocked){
+      if(!isComplete)_lastActiveCard=card;
+      card.onclick=(function(isle2,isComplete2){return function(){
+        if(isle2.type==='vowels'){renderVLesson(ca,ALL_S[0]);}
+        else if(isle2.type==='prolong'){renderPLesson(ca,ALL_S[2]);}
+        else if(isComplete2){
+          /* Révision rapide de l'île terminée */
+          _renderChildIslandRecap(ca,isle2.letters);
+        } else {
+          /* Île courante : warmup puis lettre suivante */
+          renderChildWarmup(ca);
+        }
+      };})(isle,isComplete);
+    }
+
+    globeDiv.appendChild(card);
+
+    if(isleIdx<childIslandDefs.length-1){
+      var conn=document.createElement('div');conn.className='isle-connector';conn.textContent='↓';
+      globeDiv.appendChild(conn);
+    }
+  });
+
+  /* ── Boss final ── */
+  var allDone=(dayIdx>=CHILD_LETTERS.length);
+  var conn2=document.createElement('div');conn2.className='isle-connector';conn2.textContent='↓';
+  globeDiv.appendChild(conn2);
+  var boss=document.createElement('div');
+  boss.className='sess-island boss-isle'+(allDone?'':' locked-isle');
+  boss.innerHTML='<div class="isle-hd"><div class="isle-ico">🏆</div>'
+    +'<div class="isle-info"><div class="isle-name" style="font-size:1rem">Le Grand Quiz Final</div>'
+    +'<div class="isle-sub" style="font-family:inherit;font-size:.72rem">'+(allDone?'Tu as appris toutes les lettres !':'Termine toutes les îles')+'</div></div>'
+    +'<div class="isle-badge" style="color:'+(allDone?'#f5c842':'rgba(255,255,255,.3)')+'">'+(allDone?'⚡ START':'🔒')+'</div></div>';
+  globeDiv.appendChild(boss);
+
+  wrap.appendChild(globeDiv);
+  ca.appendChild(wrap);
+
+  /* Scroll vers la carte active */
+  setTimeout(function(){if(_lastActiveCard)_lastActiveCard.scrollIntoView({behavior:'smooth',block:'center'});},350);
+}
+
+/* Récapitulatif d'une île déjà terminée (clic sur île complète) */
+function _renderChildIslandRecap(ca,letterIndices){
+  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+  var titleEl=document.createElement('div');titleEl.className='child-reward-title';titleEl.style.marginBottom='16px';
+  titleEl.textContent='✅ Île terminée !';wrap.appendChild(titleEl);
+
+  letterIndices.forEach(function(li){
+    var letter=CHILD_LETTERS[li];
+    var row=document.createElement('div');row.className='child-card';
+    row.style.cssText='display:flex;align-items:center;gap:14px;padding:12px 18px;margin-bottom:10px;cursor:pointer';
+    row.innerHTML='<span style="font-size:2rem">'+letter.emoji+'</span>'
+      +'<span style="font-family:var(--fa);font-size:2.4rem;color:#c2185b">'+letter.ar+'</span>'
+      +'<span style="font-family:var(--fa);font-size:1.2rem;color:#888">'+letter.wordAr+'</span>';
+    row.onclick=function(){speakText(letter.ar,'ar-SA',null);};
+    wrap.appendChild(row);
+  });
+
+  var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';
+  backBtn.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:8px';
+  backBtn.textContent='‹ Carte des îles';
+  backBtn.onclick=function(){renderChildIslandMap(ca);};
+  wrap.appendChild(backBtn);
+  ca.appendChild(wrap);
+}
 
 // ════════════════════════════════════════════════════════
 //  QUIZ DE RÉCHAUFFEMENT — lettres déjà apprises
@@ -5935,20 +6135,33 @@ function renderChildReward(ca,dayIdx){
     +'<div class="child-word-ar">'+letter.wordAr+'</div>';
   wrap.appendChild(recap);
 
-  if(newDay<CHILD_LETTERS.length){
-    var nextEl=document.createElement('div');nextEl.className='child-word-lat';nextEl.style.marginBottom='16px';
-    nextEl.textContent='Reviens demain pour apprendre '+CHILD_LETTERS[newDay].emoji+' !';
-    wrap.appendChild(nextEl);
-  } else {
+  /* Détection : changement d'île ou fin de toutes les lettres ? */
+  var islandDone=(newDay>=CHILD_LETTERS.length)||
+    (getChildIsland(dayIdx)!==getChildIsland(newDay)&&getChildIsland(newDay)>=0);
+
+  if(newDay>=CHILD_LETTERS.length){
     var doneEl=document.createElement('div');doneEl.className='child-letter-name';doneEl.style.marginBottom='16px';
     doneEl.textContent='🏆 Tu as appris toutes les lettres !';
     wrap.appendChild(doneEl);
+  } else if(islandDone){
+    var nextIsleEl=document.createElement('div');nextIsleEl.className='child-word-lat';nextIsleEl.style.marginBottom='16px';
+    nextIsleEl.textContent='🎉 Île terminée ! Retourne sur la carte pour la suite !';
+    wrap.appendChild(nextIsleEl);
+  } else {
+    var nextEl=document.createElement('div');nextEl.className='child-word-lat';nextEl.style.marginBottom='16px';
+    nextEl.textContent='Continue avec '+CHILD_LETTERS[newDay].emoji+' !';
+    wrap.appendChild(nextEl);
   }
 
   var homeBtn=document.createElement('button');homeBtn.className='rbtn rbtn-m';
   homeBtn.style.cssText='width:100%;padding:14px;font-size:1rem';
-  homeBtn.textContent='Continuer →';
-  homeBtn.onclick=function(){renderChildWarmup(ca);};
+  if(islandDone||newDay>=CHILD_LETTERS.length){
+    homeBtn.textContent='🗺️ Carte des îles';
+    homeBtn.onclick=function(){renderChildIslandMap(ca);};
+  } else {
+    homeBtn.textContent='Continuer →';
+    homeBtn.onclick=function(){renderChildWarmup(ca);};
+  }
   wrap.appendChild(homeBtn);
 
   ca.appendChild(wrap);
