@@ -5696,6 +5696,7 @@ function renderChildWarmup(ca){
       btn.textContent=CHILD_LETTERS[li].ar;
       btn.onclick=function(){
         if(answered)return;answered=true;
+        speakText(CHILD_LETTERS[li].ar,'ar-SA',null);
         if(li===correctIdx){
           btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
           score++;
