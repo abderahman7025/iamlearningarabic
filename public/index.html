@@ -2386,12 +2386,12 @@ body.profile-boy #boy-bg-anim {
 .mg-game-desc{font-size:.73rem;color:rgba(255,255,255,.45);margin-top:3px}
 .mg-game-best{font-size:.72rem;color:var(--gold);margin-top:4px}
 /* Memory */
-.mem-wrap{padding:12px 10px 80px;max-width:480px;margin:0 auto}
-.mem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 4px}
+.mem-wrap{padding:6px 6px 4px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;height:100%;box-sizing:border-box;overflow:hidden}
+.mem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding:0 4px;flex-shrink:0}
 .mem-score{font-size:.85rem;font-weight:700;color:var(--gold)}
 .mem-timer{font-size:.85rem;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
-.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.mem-card{height:100px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;flex:1;align-content:stretch;min-height:0}
+.mem-card{border-radius:13px;cursor:pointer;position:relative;perspective:600px;min-height:0}
 .mem-card:active{transform:scale(.96)}
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
@@ -2500,15 +2500,31 @@ body.profile-boy [lang="ar"] {
 *{box-sizing:border-box}
 .ca{overflow-x:hidden}
 /* Conteneurs principaux fluides */
-.sess-map-wrap,.mem-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
+.sess-map-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
 .mg-list-wrap{padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
 /* Nav-cards fluides */
 .nav-card{min-height:72px;height:auto}
 .nav-title{font-size:clamp(.9rem,2.2vw,1.1rem)}
 .nav-desc{font-size:clamp(.65rem,1.5vw,.72rem)}
-/* Memory grid responsive */
+/* Memory grid responsive — toutes les cartes tiennent en une seule page */
+/* Portrait : 3 colonnes × 4 rangées */
 .mem-grid{grid-template-columns:repeat(3,1fr)}
-.mem-card{height:clamp(72px,12vw,100px)}
+/* Landscape petit (téléphone) : 6 colonnes × 2 rangées */
+@media(orientation:landscape) and (max-height:500px){
+  .mem-grid{grid-template-columns:repeat(6,1fr)}
+  .mem-ar{font-size:min(2rem,4.5vmin)}
+  .mem-lat{font-size:min(.7rem,1.6vmin)}
+  .mem-sep{font-size:min(.8rem,1.8vmin)}
+  .mem-header{margin-bottom:2px}
+}
+/* Landscape moyen (tablette) : 4 colonnes × 3 rangées */
+@media(orientation:landscape) and (min-height:500px) and (max-height:780px){
+  .mem-grid{grid-template-columns:repeat(4,1fr)}
+}
+/* Portrait tablette/desktop large : 4 colonnes × 3 rangées */
+@media(min-width:680px) and (orientation:portrait){
+  .mem-grid{grid-template-columns:repeat(4,1fr)}
+}
 /* Puzzle responsive */
 .puzzle-blank{width:clamp(40px,10vw,52px);height:clamp(40px,10vw,52px)}
 .puzzle-choice{width:clamp(44px,11vw,56px);height:clamp(44px,11vw,56px)}
@@ -2519,17 +2535,15 @@ body.profile-boy [lang="ar"] {
 /* Breakpoint medium (tablette landscape / petit desktop) */
 @media(max-width:900px){
   .mg-list-wrap{max-width:100%}
-  .mem-wrap,.puzzle-wrap{max-width:100%}
+  .puzzle-wrap{max-width:100%}
   .sess-map-wrap{max-width:100%}
 }
-/* Breakpoint petit (mobile landscape) */
+/* Breakpoint petit */
 @media(max-width:600px){
-  .mem-grid{grid-template-columns:repeat(2,1fr)}
   .nav-icon{width:48px;height:72px}
   .nav-card{height:auto;min-height:64px}
 }
 @media(max-width:420px){
-  .mem-grid{grid-template-columns:repeat(2,1fr)}
   .puzzle-blank{width:40px;height:40px;font-size:1.3rem}
   .puzzle-choice{width:44px;height:44px;font-size:1.4rem}
 }
@@ -5167,7 +5181,7 @@ wrap.appendChild(globeDiv);
 //  MINI-JEUX — LISTE
 // ════════════════════════════════════════════════════════
 function renderMiniGames(ca){
-  ca.innerHTML='';
+  ca.innerHTML='';ca.style.padding='';ca.style.overflowY='';
   // Charge les scores depuis localStorage si pas encore fait (accès direct sans passer par la carte)
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy={};Object.keys(_av).forEach(function(k){if(st.accuracy[k]===undefined)st.accuracy[k]=_av[k];});}catch(e){}
@@ -5268,7 +5282,7 @@ function renderMemoryGame(ca){
   renderMemoryDeckList(ca,allDecks);
 }
 function renderMemoryDeckList(ca,decks){
-  ca.innerHTML='';
+  ca.innerHTML='';ca.style.padding='';ca.style.overflowY='';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
     decks.forEach(function(deck,di){
@@ -5292,6 +5306,8 @@ function renderMemoryDeckList(ca,decks){
 }
 function renderMemoryPlay(ca,deck){
   ca.innerHTML='';
+  /* ── Mode plein-écran pour la grille ── */
+  ca.style.padding='0';ca.style.overflowY='hidden';
   var pool=deck.pairs;
   var pairs=[];
   pool.forEach(function(l,i){pairs.push({id:i*2,ar:l.ar,lat:l.lat,match:i,pairIdx:i});pairs.push({id:i*2+1,ar:l.ar,lat:l.lat,match:i,pairIdx:i});});
@@ -5306,7 +5322,7 @@ function renderMemoryPlay(ca,deck){
   var timerInt=setInterval(function(){timerEl.textContent=Math.floor((Date.now()-startTime)/1000)+'s';},1000);
   hd.appendChild(scoreEl);hd.appendChild(timerEl);wrap.appendChild(hd);
   var titleEl=document.createElement('div');
-  titleEl.style.cssText='text-align:center;font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:12px';
+  titleEl.style.cssText='text-align:center;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:4px;flex-shrink:0';
   titleEl.textContent='\u{1F0CF} '+deck.name+' — '+pool.length+' '+(({'fr':'paires','en':'pairs','es':'pares','de':'Paare','nl':'paren','it':'coppie','pt':'pares','ru':'пар','tr':'çift','zh':'对','id':'pasangan','ur':'جوڑے','hi':'जोड़े'}[st.lang]||'paires'));
   wrap.appendChild(titleEl);
   var grid=document.createElement('div');grid.className='mem-grid';
@@ -5631,10 +5647,10 @@ function renderChildWarmup(ca){
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   if(dayIdx<1){renderChildLetterDay(ca);return;}
 
-  /* Sélection de 3 lettres déjà apprises comme questions */
+  /* Sélection de 5 lettres déjà apprises comme questions */
   var pool=[];for(var pi=0;pi<dayIdx;pi++)pool.push(pi);
   pool.sort(function(){return Math.random()-.5;});
-  var questions=pool.slice(0,Math.min(3,pool.length));
+  var questions=pool.slice(0,Math.min(5,pool.length));
   var qIdx=0,score=0;
 
   function showQ(){
@@ -5642,6 +5658,10 @@ function renderChildWarmup(ca){
     if(qIdx>=questions.length){renderChildLetterDay(ca);return;}
 
     var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+    /* ── Carte opaque derrière le quiz ── */
+    var card=document.createElement('div');card.className='child-card';
+    card.style.cssText='padding:20px 18px 16px;margin-bottom:12px';
 
     /* Barre de progression quiz */
     var qprog=document.createElement('div');
@@ -5651,34 +5671,34 @@ function renderChildWarmup(ca){
       qd.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(qi<qIdx?'#22c55e':qi===qIdx?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
       qprog.appendChild(qd);
     }
-    wrap.appendChild(qprog);
+    card.appendChild(qprog);
 
     /* Label réchauffement */
     var wlbl=document.createElement('div');
     wlbl.style.cssText='font-size:.7rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px';
     wlbl.textContent='Révision rapide ✦ Question '+(qIdx+1)+' / '+questions.length;
-    wrap.appendChild(wlbl);
+    card.appendChild(wlbl);
 
     var correctIdx=questions[qIdx];
     var correctLetter=CHILD_LETTERS[correctIdx];
 
     /* Grand emoji = indice */
     var emojiEl=document.createElement('div');
-    emojiEl.style.cssText='font-size:5.5rem;margin:0 0 8px';
+    emojiEl.style.cssText='font-size:5rem;margin:0 0 8px';
     emojiEl.textContent=correctLetter.emoji;
-    wrap.appendChild(emojiEl);
+    card.appendChild(emojiEl);
 
     /* Mot arabe */
     var wordEl=document.createElement('div');
-    wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:1.8rem;color:#7b1fa2;margin-bottom:18px;line-height:1.2';
+    wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:1.8rem;color:#7b1fa2;margin-bottom:16px;line-height:1.2';
     wordEl.textContent=correctLetter.wordAr;
-    wrap.appendChild(wordEl);
+    card.appendChild(wordEl);
 
     /* Question */
     var qel=document.createElement('div');
-    qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:18px';
-    qel.textContent='Quelle lettre commence ce mot ?';
-    wrap.appendChild(qel);
+    qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:16px';
+    qel.textContent='Par quelle lettre commence ce mot ?';
+    card.appendChild(qel);
 
     /* Choix : 3 grandes lettres arabes */
     var wrong=[];
@@ -5688,7 +5708,7 @@ function renderChildWarmup(ca){
     choices.sort(function(){return Math.random()-.5;});
 
     var choicesEl=document.createElement('div');
-    choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:20px';
+    choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:16px';
     var answered=false,failed=false;
     choices.forEach(function(li){
       var btn=document.createElement('div');
@@ -5710,17 +5730,19 @@ function renderChildWarmup(ca){
       };
       choicesEl.appendChild(btn);
     });
-    wrap.appendChild(choicesEl);
+    card.appendChild(choicesEl);
 
     /* Étoiles gagnées */
     var srow=document.createElement('div');
-    srow.style.cssText='font-size:1.4rem;min-height:1.8rem;margin-bottom:14px';
+    srow.style.cssText='font-size:1.4rem;min-height:1.8rem';
     for(var sk=0;sk<score;sk++)srow.textContent+='⭐';
-    wrap.appendChild(srow);
+    card.appendChild(srow);
 
-    /* Bouton passer */
+    wrap.appendChild(card);
+
+    /* Bouton passer (en dehors de la carte) */
     var skipBtn=document.createElement('button');skipBtn.className='rbtn rbtn-s';
-    skipBtn.style.cssText='display:block;margin:0 auto;font-size:.78rem;opacity:.65';
+    skipBtn.style.cssText='display:block;margin:10px auto 0;font-size:.78rem;opacity:.65';
     skipBtn.textContent='Passer →';
     skipBtn.onclick=function(){renderChildLetterDay(ca);};
     wrap.appendChild(skipBtn);
