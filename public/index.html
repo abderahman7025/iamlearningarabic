@@ -2408,6 +2408,7 @@ body.profile-boy #boy-bg-anim {
 /* Puzzle */
 .puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 62px)}
 .puzzle-card{background:rgba(10,18,65,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.18);border-radius:22px;padding:22px 22px 18px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+body.profile-girl .puzzle-card{background:rgba(255,255,255,.93);border:1.5px solid rgba(233,30,140,.15);box-shadow:0 8px 32px rgba(233,30,140,.13)}
 .puzzle-audio-btn{width:70px;height:70px;border-radius:50%;background:rgba(245,200,66,.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;margin:0 auto 14px;transition:all .2s}
 .puzzle-audio-btn:active{transform:scale(.9)}
 .puzzle-hint{text-align:center;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:16px}
@@ -2482,7 +2483,7 @@ body.profile-boy [lang="ar"] {
 .child-rev-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .child-rev-card{background:rgba(255,255,255,.8);border-radius:14px;padding:8px 12px;text-align:center;border:1.5px solid rgba(233,30,140,.12);cursor:pointer;min-width:64px;transition:transform .15s}
 .child-rev-card:active{transform:scale(.92)}
-.child-rev-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.1}
+.child-rev-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.3;padding-bottom:4px;display:block}
 .child-rev-name{font-size:.7rem;color:rgba(100,0,80,.55);font-weight:700}
 .child-game-instr{background:rgba(255,255,255,.88);border-radius:18px;padding:14px;text-align:center;box-shadow:0 4px 16px rgba(233,30,140,.08);margin-bottom:14px}
 .child-game-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
@@ -4629,6 +4630,7 @@ function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
   ca.style.paddingTop='0'; // Carte des îles : pas de padding, les îles passent derrière la topbar
+  st._curPage='sessions-map';
   // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
@@ -5181,7 +5183,7 @@ wrap.appendChild(globeDiv);
 //  MINI-JEUX — LISTE
 // ════════════════════════════════════════════════════════
 function renderMiniGames(ca){
-  ca.innerHTML='';ca.style.padding='';ca.style.overflowY='';
+  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='62px';ca.style.overflowY='';
   // Charge les scores depuis localStorage si pas encore fait (accès direct sans passer par la carte)
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy={};Object.keys(_av).forEach(function(k){if(st.accuracy[k]===undefined)st.accuracy[k]=_av[k];});}catch(e){}
@@ -5282,7 +5284,7 @@ function renderMemoryGame(ca){
   renderMemoryDeckList(ca,allDecks);
 }
 function renderMemoryDeckList(ca,decks){
-  ca.innerHTML='';ca.style.padding='';ca.style.overflowY='';
+  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='62px';ca.style.overflowY='';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
     decks.forEach(function(deck,di){
@@ -5775,13 +5777,7 @@ function renderChildLetterDay(ca){
   var bigLetter=document.createElement('div');bigLetter.className='child-letter-big';
   bigLetter.textContent=letter.ar;card.appendChild(bigLetter);
 
-  var emojiEl=document.createElement('div');emojiEl.className='child-emoji';
-  emojiEl.textContent=letter.emoji;card.appendChild(emojiEl);
-
-  var wordAr=document.createElement('div');wordAr.className='child-word-ar';
-  wordAr.textContent=letter.wordAr;card.appendChild(wordAr);
-
-  /* ─ Variantes : début | milieu | fin (RTL) ─ */
+  /* ─ Variantes : juste sous la lettre isolée ─ */
   var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
   var varRow=document.createElement('div');varRow.className='child-variants';
   [['début',af.i],['milieu',af.m],['fin',af.f]].forEach(function(v){
@@ -5790,6 +5786,12 @@ function renderChildLetterDay(ca){
     varRow.appendChild(box);
   });
   card.appendChild(varRow);
+
+  var emojiEl=document.createElement('div');emojiEl.className='child-emoji';
+  emojiEl.textContent=letter.emoji;card.appendChild(emojiEl);
+
+  var wordAr=document.createElement('div');wordAr.className='child-word-ar';
+  wordAr.textContent=letter.wordAr;card.appendChild(wordAr);
 
   /* Son auto + bouton écoute */
   var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-m';
@@ -5831,30 +5833,25 @@ function renderChildGame(ca,dayIdx,round){
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
   var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
-  var rounds=[
-    {form:letter.ar, lbl:'seule',   subtitle:'la lettre isolée'},
-    {form:af.i,      lbl:'début',   subtitle:'en début de mot'},
-    {form:af.m,      lbl:'milieu',  subtitle:'au milieu du mot'},
-    {form:af.f,      lbl:'fin',     subtitle:'à la fin du mot'}
-  ];
-  var R=rounds[round];
 
-  /* Distracteurs de la même catégorie de forme */
+  /* Les 4 formes de la lettre sont les 4 cibles à trouver dans la grille */
+  var targetForms=[letter.ar, af.i, af.m, af.f];
+
+  /* Distracteurs : formes d'autres lettres */
   var allAr='ابتثجحخدذرزسشصضطظعغفقكلمنهوية';
-  var distForms=[];
+  var distPool=[];
   for(var ci=0;ci<allAr.length;ci++){
     var c=allAr[ci];if(c===letter.ar)continue;
     var caf=_AF[c]||{i:c,m:c,f:c};
-    var cf=[caf.i,caf.m,caf.f][round===0?Math.floor(Math.random()*3):round-1];
-    distForms.push(cf);
+    distPool.push(c,caf.i,caf.m,caf.f);
   }
-  distForms.sort(function(){return Math.random()-.5;});
+  distPool.sort(function(){return Math.random()-.5;});
 
   var wrap=document.createElement('div');wrap.className='child-wrap';
 
-  /* ─ Indicateur de round ─ */
+  /* ─ Indicateur de round (4 parties avec distracteurs différents) ─ */
   var roundBar=document.createElement('div');
-  roundBar.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:12px';
+  roundBar.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:10px';
   for(var ri=0;ri<4;ri++){
     var dot=document.createElement('div');
     dot.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(ri<=round?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
@@ -5862,17 +5859,17 @@ function renderChildGame(ca,dayIdx,round){
   }
   wrap.appendChild(roundBar);
 
-  /* ─ Instruction ─ */
+  /* ─ Instruction : "Choisis toutes les lettres : [lettre en grand]" ─ */
   var instrEl=document.createElement('div');instrEl.className='child-game-instr';
-  instrEl.innerHTML='<div style="font-size:.9rem;font-weight:800;color:#ad1457;margin-bottom:6px">Touche tous les — <span style="color:rgba(194,24,91,.55);font-weight:600">'+R.subtitle+'</span></div>'
-    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.2;direction:rtl;unicode-bidi:isolate">'+R.form+'</div>';
+  instrEl.innerHTML='<div style="font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:4px">Choisis toutes les lettres :</div>'
+    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.2;direction:rtl;unicode-bidi:isolate">'+letter.ar+'</div>';
   wrap.appendChild(instrEl);
 
-  /* ─ Grille ─ */
+  /* ─ Grille : 4 formes cibles + 8 distracteurs (nouveaux distracteurs à chaque round) ─ */
   var TARGET=4,TOTAL=12;
   var grid=[];
-  for(var t=0;t<TARGET;t++)grid.push({ar:R.form,ok:true});
-  for(var di=0;di<TOTAL-TARGET;di++)grid.push({ar:distForms[di%distForms.length],ok:false});
+  targetForms.forEach(function(f){grid.push({ar:f,ok:true});});
+  for(var di=0;di<TOTAL-TARGET;di++)grid.push({ar:distPool[(round*8+di)%distPool.length],ok:false});
   grid.sort(function(){return Math.random()-.5;});
 
   var found=0;
@@ -7034,7 +7031,8 @@ function updateGirlMascot(){
   var mb=document.getElementById('boy-mascot');
   var mainOn=document.getElementById('s-main')&&document.getElementById('s-main').classList.contains('on');
   var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
-  var show=(mainOn||menuOn);
+  /* Mascotte uniquement sur la carte des îles */
+  var show=(mainOn||menuOn)&&(st._curPage==='sessions-map');
   if(mg)mg.style.display=(st.profile==='girl'&&show)?'block':'none';
   if(mb)mb.style.display=(st.profile==='boy'&&show)?'block':'none';
 }
