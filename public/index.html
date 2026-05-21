@@ -5689,25 +5689,24 @@ function renderChildWarmup(ca){
 
     var choicesEl=document.createElement('div');
     choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:20px';
-    var answered=false;
+    var answered=false,failed=false;
     choices.forEach(function(li){
       var btn=document.createElement('div');
       btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:rtl';
       btn.textContent=CHILD_LETTERS[li].ar;
       btn.onclick=function(){
-        if(answered)return;answered=true;
+        if(answered||btn._used)return;
         speakText(CHILD_LETTERS[li].ar,'ar-SA',null);
         if(li===correctIdx){
           btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
-          score++;
+          if(!failed)score++;
+          answered=true;
+          setTimeout(function(){qIdx++;showQ();},700);
         } else {
-          btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626';
-          /* Montrer la bonne réponse */
-          choicesEl.childNodes.forEach(function(b,bi){
-            if(choices[bi]===correctIdx)b.style.cssText=b.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
-          });
+          btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626;cursor:default';
+          btn._used=true;/* désactiver ce bouton, laisser les autres cliquables */
+          failed=true;  /* question perdue, pas d'étoile même si on trouve ensuite */
         }
-        setTimeout(function(){qIdx++;showQ();},700);
       };
       choicesEl.appendChild(btn);
     });
