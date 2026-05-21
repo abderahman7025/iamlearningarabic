@@ -2390,16 +2390,20 @@ body.profile-boy #boy-bg-anim {
 .mem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 4px}
 .mem-score{font-size:.85rem;font-weight:700;color:var(--gold)}
 .mem-timer{font-size:.85rem;font-weight:700;background:rgba(255,255,255,.08);border-radius:20px;padding:4px 12px}
-.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.mem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .mem-card{height:100px;border-radius:13px;cursor:pointer;position:relative;perspective:600px}
 .mem-card:active{transform:scale(.96)}
 .mem-card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.4,0,.2,1);border-radius:13px}
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .mem-card-front{background:transparent;font-size:2rem;overflow:hidden}
-.mem-card-back{background:#7c4a10;border:2px solid rgba(220,160,40,.8);transform:rotateY(180deg);font-weight:700;padding:4px;text-align:center;line-height:1.1;color:#fff8e7}
+.mem-card-back{transform:rotateY(180deg);font-weight:700;padding:2px;text-align:center;line-height:1;font-size:1.5rem}
+.mem-back-content{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;max-width:98%}
+.mem-ar{font-family:'Scheherazade New',serif;font-size:2em;line-height:1}
+.mem-sep{font-size:.8em;padding:0 1px;opacity:.85}
+.mem-lat{font-size:.8em;font-weight:800;letter-spacing:.01em}
 .mem-card.matched .mem-card-front{background:#163a20}
-.mem-card.matched .mem-card-back{background:#1a5a28;border-color:#22c55e;color:#a7f3d0}
+.mem-card.matched .mem-card-back{background:#1a5a28!important;border:2px solid #22c55e!important;color:#a7f3d0!important}
 .mem-result{text-align:center;padding:24px 16px}
 /* Puzzle */
 .puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto}
@@ -2468,7 +2472,7 @@ body.profile-boy [lang="ar"] {
 .nav-title{font-size:clamp(.9rem,2.2vw,1.1rem)}
 .nav-desc{font-size:clamp(.65rem,1.5vw,.72rem)}
 /* Memory grid responsive */
-.mem-grid{grid-template-columns:repeat(4,1fr)}
+.mem-grid{grid-template-columns:repeat(3,1fr)}
 .mem-card{height:clamp(72px,12vw,100px)}
 /* Puzzle responsive */
 .puzzle-blank{width:clamp(40px,10vw,52px);height:clamp(40px,10vw,52px)}
@@ -2485,7 +2489,7 @@ body.profile-boy [lang="ar"] {
 }
 /* Breakpoint petit (mobile landscape) */
 @media(max-width:600px){
-  .mem-grid{grid-template-columns:repeat(3,1fr)}
+  .mem-grid{grid-template-columns:repeat(2,1fr)}
   .nav-icon{width:48px;height:72px}
   .nav-card{height:auto;min-height:64px}
 }
@@ -5211,21 +5215,19 @@ function renderMiniGames(ca){
 // ════════════════════════════════════════════════════════
 function renderMemoryGame(ca){
   ca.innerHTML='';
-  var allLetters=[];var seen={};
-  ALL_S.forEach(function(s){if(s.letters){s.letters.forEach(function(l){if(l.ar&&l.lat&&!seen[l.ar]){seen[l.ar]=1;allLetters.push({ar:l.ar,lat:l.lat});}});}});
-  var DS=6;var allDecks=[];
-  var _DI=[{name:({'fr':'L\'Arche de Nouh','en':'Noah\'s Ark','es':'El Arca de Noé','de':'Noahs Arche','nl':'Ark van Noach','it':'L\'Arca di Noè','pt':'A Arca de Noé','ru':'Ковчег Ноя','tr':'Nuh\'un Gemisi','zh':'诺亚方舟','id':'Bahtera Nuh','ur':'نوح کی کشتی','hi':'नूह की नाव'}[st.lang]||'L\'Arche de Nouh'),img:'/images/island-1.png?v=2'},{name:({'fr':'La Maison Sacrée','en':'The Sacred House','es':'La Casa Sagrada','de':'Das Heilige Haus','nl':'Het Heilige Huis','it':'La Casa Sacra','pt':'A Casa Sagrada','ru':'Священный Дом','tr':'Kutsal Ev','zh':'圣房','id':'Rumah Suci','ur':'بيت المقدس','hi':'पवित्र घर'}[st.lang]||'La Maison Sacrée'),img:'/images/island-2.png?v=2'},{name:'Al-Aqsa',img:'/images/island-9.png?v=2'},{name:({'fr':'Le Ventre de la Baleine','en':'Belly of the Whale','es':'El Vientre de la Ballena','de':'Bauch des Wals','nl':'Buik van de Walvis','it':'Il Ventre della Balena','pt':'O Ventre da Baleia','ru':'Чрево Кита','tr':'Balinanın Karnı','zh':'鲸鱼腹','id':'Perut Ikan Paus','ur':'مچھلی کے پیٹ میں','hi':'व्हेल का पेट'}[st.lang]||'Le Ventre de la Baleine'),img:'/images/island-10.png?v=2'},{name:({'fr':'La Cité de Médine','en':'City of Medina','es':'Ciudad de Medina','de':'Stadt Medina','nl':'Stad Medina','it':'Città di Medina','pt':'Cidade de Medina','ru':'Город Медина','tr':'Medine Şehri','zh':'麦地那城','id':'Kota Madinah','ur':'مدینہ شہر','hi':'मदीना शहर'}[st.lang]||'La Cité de Médine'),img:'/images/island-11.png?v=2'}];
-  for(var i=0;i<allLetters.length;i+=DS){
-    var chunk=allLetters.slice(i,i+DS);
-    if(chunk.length>=4){var _di=_DI[allDecks.length]||{name:'Niveau '+(allDecks.length+1),img:''};allDecks.push({name:_di.name,img:_di.img,icon:chunk[0].ar,pairs:chunk,idx:allDecks.length});}
-    else if(allDecks.length>0){allDecks[allDecks.length-1].pairs=allDecks[allDecks.length-1].pairs.concat(chunk);}
-  }
-  if(!allDecks.length){
-    [[{ar:'أ',lat:'a'},{ar:'ب',lat:'b'},{ar:'ت',lat:'t'},{ar:'ث',lat:'th'},{ar:'ج',lat:'dj'},{ar:'ح',lat:'ḥ'}],
-     [{ar:'خ',lat:'kh'},{ar:'د',lat:'d'},{ar:'ذ',lat:'dh'},{ar:'ر',lat:'r'},{ar:'ز',lat:'z'},{ar:'س',lat:'s'}],
-     [{ar:'ش',lat:'sh'},{ar:'ص',lat:'ṣ'},{ar:'ض',lat:'ḍ'},{ar:'ط',lat:'ṭ'},{ar:'ظ',lat:'ẓ'},{ar:'ع',lat:'ʿ'}],
-     [{ar:'غ',lat:'gh'},{ar:'ف',lat:'f'},{ar:'ق',lat:'q'},{ar:'ك',lat:'k'},{ar:'ل',lat:'l'},{ar:'م',lat:'m'}]
-    ].forEach(function(p,i){allDecks.push({name:'Niveau '+(i+1),icon:p[0].ar,pairs:p,idx:i});});
+  var ALL_MEM_LETTERS=[
+    {ar:'ا',lat:'alif'},{ar:'ب',lat:'bā'},{ar:'ت',lat:'tā'},{ar:'ث',lat:'thā'},{ar:'ج',lat:'djīm'},{ar:'ح',lat:'Hā'},
+    {ar:'خ',lat:'khā'},{ar:'د',lat:'dāl'},{ar:'ذ',lat:'dhāl'},{ar:'ر',lat:'rā'},{ar:'ز',lat:'zāy'},{ar:'س',lat:'sīn'},
+    {ar:'ش',lat:'chīn'},{ar:'ص',lat:'Sād'},{ar:'ض',lat:'Dād'},{ar:'ط',lat:'Tā'},{ar:'ظ',lat:'DHā'},{ar:'ع',lat:"'ayn"},
+    {ar:'غ',lat:'ghayn'},{ar:'ف',lat:'fā'},{ar:'ق',lat:'qāf'},{ar:'ك',lat:'kāf'},{ar:'ل',lat:'lām'},{ar:'م',lat:'mīm'},
+    {ar:'ن',lat:'nūn'},{ar:'ه',lat:'hā'},{ar:'و',lat:'wāw'},{ar:'ي',lat:'yā'},{ar:'ء',lat:'hamzah'},{ar:'ة',lat:'tā'}
+  ];
+  var allDecks=[];
+  var _DI=[{name:({'fr':'L\'Arche de Nouh','en':'Noah\'s Ark','es':'El Arca de Noé','de':'Noahs Arche','nl':'Ark van Noach','it':'L\'Arca di Noè','pt':'A Arca de Noé','ru':'Ковчег Ноя','tr':'Nuh\'un Gemisi','zh':'诺亚方舟','id':'Bahtera Nuh','ur':'نوح کی کشتی','hi':'नूह की नाव'}[st.lang]||'L\'Arche de Nouh'),img:'/images/island-1.png?v=2'},{name:({'fr':'La Maison Sacrée','en':'The Sacred House','es':'La Casa Sagrada','de':'Das Heilige Haus','nl':'Het Heilige Huis','it':'La Casa Sacra','pt':'A Casa Sagrada','ru':'Священный Дом','tr':'Kutsal Ev','zh':'圣房','id':'Rumah Suci','ur':'بيت المقدس','hi':'पवित्र घर'}[st.lang]||'La Maison Sacrée'),img:'/images/island-2.png?v=2'},{name:'Al-Aqsa',img:'/images/island-9.png?v=2'},{name:({'fr':'Le Ventre de la Baleine','en':'Belly of the Whale','es':'El Vientre de la Ballena','de':'Bauch des Wals','nl':'Buik van de Walvis','it':'Il Ventre della Balena','pt':'O Ventre da Baleia','ru':'Чрево Кита','tr':'Balinanın Karnı','zh':'鲸鱼腹','id':'Perut Ikan Paus','ur':'مچھلی کے پیٹ میں','hi':'व्हेल का पेट'}[st.lang]||'Le Ventre de la Baleine'),img:'/images/island-10.png?v=2'},{name:({'fr':'La Cité de Médine','en':'City of Medina','es':'Ciudad de Medina','de':'Stadt Medina','nl':'Stad Medina','it':'Città di Medina','pt':'Cidade de Medina','ru':'Город Медина','tr':'Medine Şehri','zh':'麦地那城','id':'Kota Madinah','ur':'مدینہ شہر','hi':'مدینہ شہر'}[st.lang]||'La Cité de Médine'),img:'/images/island-11.png?v=2'}];
+  for(var i=0;i<5;i++){
+    var chunk=ALL_MEM_LETTERS.slice(i*6,(i+1)*6);
+    var _di=_DI[i]||{name:'Niveau '+(i+1),img:''};
+    allDecks.push({name:_di.name,img:_di.img,icon:chunk[0].ar,pairs:chunk,idx:i});
   }
   window._memDecks=allDecks;
   renderMemoryDeckList(ca,allDecks);
@@ -5257,7 +5259,7 @@ function renderMemoryPlay(ca,deck){
   ca.innerHTML='';
   var pool=deck.pairs;
   var pairs=[];
-  pool.forEach(function(l,i){pairs.push({id:i,type:'ar',text:l.ar,match:i});pairs.push({id:i,type:'lat',text:l.lat,match:i});});
+  pool.forEach(function(l,i){pairs.push({id:i*2,ar:l.ar,lat:l.lat,match:i,pairIdx:i});pairs.push({id:i*2+1,ar:l.ar,lat:l.lat,match:i,pairIdx:i});});
   for(var i=pairs.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=pairs[i];pairs[i]=pairs[j];pairs[j]=tmp;}
   var wrap=document.createElement('div');wrap.className='mem-wrap';
   var hd=document.createElement('div');hd.className='mem-header';
@@ -5281,6 +5283,15 @@ function renderMemoryPlay(ca,deck){
     {bg:'#1a4020',sz:'60%',inset:'inset 0 0 0 3px rgba(60,180,80,.55)'}
   ];
   var ds=_DS[deck.idx]||_DS[0];
+  /* Styles du verso : 5 ambiances, 6 couleurs par deck */
+  var _BACK_STYLES=[
+    {colors:['#ffb3c6','#ffc8a2','#fdffb6','#caffbf','#bde0fe','#ddbdff'],text:'#3d2b1f'},
+    {colors:['#e63946','#f4a261','#2a9d8f','#457b9d','#7b2d8b','#e9c46a'],text:'#fff'},
+    {colors:['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#43e97b,#38f9d7)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#a18cd1,#fbc2eb)'],text:'#fff'},
+    {colors:['#1a1a2e','#16213e','#0f3460','#1b4332','#370617','#3d0066'],text:'#f8f9fa'},
+    {colors:['#c1440e','#c4762a','#9a6b4b','#6b3d2e','#8b4513','#d4a056'],text:'#fff8e7'}
+  ];
+  var bStyle=_BACK_STYLES[deck.idx]||_BACK_STYLES[0];
   var flagBg="url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpolygon points='0,0 0,100 40,50' fill='%23EF0A1A'/%3E%3C/svg%3E\") 0 0/100% 100% no-repeat,linear-gradient(to bottom,#000 33.3%,#fff 33.3%,#fff 66.6%,#009736 66.6%)";
   var flipped=[];var matched=[];var locked=false;
   pairs.forEach(function(p){
@@ -5291,9 +5302,14 @@ function renderMemoryPlay(ca,deck){
     else{front.style.backgroundColor=ds.bg;front.style.backgroundImage='url('+deck.img+')';front.style.backgroundSize=ds.sz;front.style.backgroundPosition='center';front.style.backgroundRepeat='no-repeat';}
     front.style.boxShadow=ds.inset;
     var back=document.createElement('div');back.className='mem-card-back';
-    back.style.fontFamily=p.type==='ar'?'\'Scheherazade New\',serif':'inherit';
-    back.style.fontSize=p.type==='ar'?'2.2rem':'1.3rem';
-    back.textContent=p.text;
+    back.style.background=bStyle.colors[p.pairIdx%6];
+    back.style.color=bStyle.text;
+    back.style.border='2px solid rgba(255,255,255,0.22)';
+    var _bc=document.createElement('div');_bc.className='mem-back-content';
+    var _ba=document.createElement('span');_ba.className='mem-ar';_ba.textContent=p.ar;
+    var _bs=document.createElement('span');_bs.className='mem-sep';_bs.textContent=' — ';
+    var _bl=document.createElement('span');_bl.className='mem-lat';_bl.textContent=p.lat;
+    _bc.appendChild(_ba);_bc.appendChild(_bs);_bc.appendChild(_bl);back.appendChild(_bc);
     inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
       if(locked)return;if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
@@ -5301,7 +5317,7 @@ function renderMemoryPlay(ca,deck){
       if(flipped.length===2){
         locked=true;attempts++;
         setTimeout(function(){
-          if(flipped[0].p.match===flipped[1].p.match&&flipped[0].p.type!==flipped[1].p.type){
+          if(flipped[0].p.match===flipped[1].p.match&&flipped[0].p.id!==flipped[1].p.id){
             flipped.forEach(function(f){f.card.classList.add('matched');f.card.classList.remove('flipped');});
             matched.push(flipped[0].p.match);matches++;
             scoreEl.textContent=matches+' '+(t('pairs')||'paires');
@@ -5330,12 +5346,7 @@ function renderMemoryPlay(ca,deck){
     };
     grid.appendChild(card);
   });
-  wrap.appendChild(grid);
-  var qBtn=document.createElement('button');
-  qBtn.className='rbtn rbtn-m';qBtn.style.cssText='display:block;margin:20px auto 0';
-  qBtn.textContent='‹ '+(({'fr':'Retour aux Mémories','en':'Back to Memory','es':'Volver al Memory','de':'Zurück zum Memory','nl':'Terug naar Memory','it':'Torna al Memory','pt':'Voltar ao Memory','ru':'К Memory','tr':'Oyunlara Dön','zh':'返回记忆游戏','id':'Kembali ke Memory','ur':'میموری پر واپس','hi':'मेमोरी पर वापस'}[st.lang]||'Retour aux Mémories'));
-  qBtn.onclick=function(){clearInterval(timerInt);renderMemoryDeckList(ca,window._memDecks);};
-  wrap.appendChild(qBtn);ca.appendChild(wrap);
+  wrap.appendChild(grid);ca.appendChild(wrap);
 }
 
 // ════════════════════════════════════════════════════════
