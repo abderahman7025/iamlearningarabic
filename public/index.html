@@ -2398,9 +2398,10 @@ body.profile-boy #boy-bg-anim {
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .mem-card-front{background:transparent;font-size:2rem;overflow:hidden}
 .mem-card-back{transform:rotateY(180deg);font-weight:700;padding:0;text-align:center;line-height:1;font-size:1.5rem}
-.mem-back-content{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:3px}
-.mem-ar{font-family:'Scheherazade New',serif;font-size:2.8rem;line-height:1.25;text-align:center}
-.mem-lat{font-size:.85rem;font-weight:800;letter-spacing:.03em;text-align:center}
+.mem-back-content{display:flex;flex-direction:row;align-items:center;justify-content:center;width:100%;white-space:nowrap}
+.mem-ar{font-family:'Scheherazade New',serif;font-size:2.6rem;line-height:1.35}
+.mem-sep{font-size:1rem;padding:0 3px;opacity:.8}
+.mem-lat{font-size:.88rem;font-weight:800;letter-spacing:.03em;line-height:1}
 .mem-card.matched .mem-card-front{opacity:.7}
 .mem-card.matched .mem-card-back{opacity:.85;cursor:default}
 .mem-result{text-align:center;padding:24px 16px}
@@ -5306,9 +5307,10 @@ function renderMemoryPlay(ca,deck){
     back.style.color=bStyle.text;
     back.style.border='2px solid rgba(255,255,255,0.22)';
     var _bc=document.createElement('div');_bc.className='mem-back-content';
-    var _ba=document.createElement('div');_ba.className='mem-ar';_ba.textContent=p.ar;
-    var _bl=document.createElement('div');_bl.className='mem-lat';_bl.textContent=p.lat;
-    _bc.appendChild(_ba);_bc.appendChild(_bl);back.appendChild(_bc);
+    var _ba=document.createElement('span');_ba.className='mem-ar';_ba.textContent=p.ar;
+    var _bs=document.createElement('span');_bs.className='mem-sep';_bs.textContent=' — ';
+    var _bl=document.createElement('span');_bl.className='mem-lat';_bl.textContent=p.lat;
+    _bc.appendChild(_ba);_bc.appendChild(_bs);_bc.appendChild(_bl);back.appendChild(_bc);
     inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
       if(locked)return;if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
