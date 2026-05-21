@@ -2459,6 +2459,36 @@ body.profile-boy [lang="ar"] {
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
+/* ── Interface Lettre du Jour (profil fille uniquement) ── */
+@keyframes starPop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
+.child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
+.child-letter-big{font-family:'Scheherazade New',serif;font-size:7rem;line-height:1.1;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite}
+.child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
+.child-card-float{animation:floatCard 3s ease-in-out infinite}
+.child-stars{font-size:1.5rem;letter-spacing:3px;text-align:center;margin-bottom:6px;min-height:2rem}
+.child-prog{font-size:.78rem;font-weight:800;color:rgba(194,24,91,.5);text-align:center;margin-bottom:18px;text-transform:uppercase;letter-spacing:.1em}
+.child-emoji{font-size:3.2rem;margin:6px 0}
+.child-word-ar{font-family:'Scheherazade New',serif;font-size:2.2rem;color:#7b1fa2;line-height:1.2;margin:4px 0}
+.child-word-lat{font-size:.88rem;color:rgba(100,0,80,.55);margin-bottom:10px}
+.child-letter-name{font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:6px}
+.child-btn-play{width:100%;font-size:1.1rem;padding:16px;border-radius:18px;animation:pulse-pink 2.5s infinite}
+.child-rev-title{font-size:.75rem;font-weight:800;color:rgba(194,24,91,.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
+.child-rev-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.child-rev-card{background:rgba(255,255,255,.8);border-radius:14px;padding:8px 12px;text-align:center;border:1.5px solid rgba(233,30,140,.12);cursor:pointer;min-width:64px;transition:transform .15s}
+.child-rev-card:active{transform:scale(.92)}
+.child-rev-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.1}
+.child-rev-name{font-size:.7rem;color:rgba(100,0,80,.55);font-weight:700}
+.child-game-instr{background:rgba(255,255,255,.88);border-radius:18px;padding:14px;text-align:center;box-shadow:0 4px 16px rgba(233,30,140,.08);margin-bottom:14px}
+.child-game-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.child-game-cell{background:rgba(255,255,255,.88);border-radius:16px;height:68px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.1rem;color:#c2185b;cursor:pointer;border:2px solid rgba(233,30,140,.12);transition:all .18s;-webkit-tap-highlight-color:transparent}
+.child-game-cell.hit{background:rgba(34,197,94,.2)!important;border-color:#22c55e!important;color:#15803d!important;cursor:default}
+.child-game-cell.miss{background:rgba(239,68,68,.12)!important;border-color:#ef4444!important;animation:shakeP .35s ease}
+.child-score-row{text-align:center;font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:10px}
+.child-reward-star{font-size:5rem;text-align:center;display:block;animation:starPop .55s cubic-bezier(.175,.885,.32,1.275) forwards}
+.child-reward-title{font-size:1.7rem;font-weight:900;color:#c2185b;text-align:center;margin:8px 0 4px}
+.child-reward-sub{font-size:.95rem;color:rgba(100,0,80,.55);text-align:center;margin-bottom:20px}
 
 /* ============================================================
    RESPONSIVE — adapte toutes les pages à la largeur d'écran
@@ -4036,7 +4066,7 @@ function navToPage(page){
 function renderPage(page,fwd){
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
-  else if(page==='sessions'){if(st.profile==='girl'||st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
+  else if(page==='sessions'){if(st.profile==='girl')renderChildLetterDay(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
   else if(page==='exercises')renderExPage(ca);
   else if(page==='contact')renderContact(ca);
   else if(page==='bonus')renderBonus(ca);
@@ -5515,6 +5545,212 @@ function renderPuzzleGame(ca){
   }
 
   buildQuestion();
+  ca.appendChild(wrap);
+}
+
+// ════════════════════════════════════════════════════════
+//  INTERFACE ENFANT FILLE — LETTRE DU JOUR
+// ════════════════════════════════════════════════════════
+var CHILD_LETTERS=[
+  {ar:'ا',name:'alif',   emoji:'🦁',wordAr:'أَسَد',   wordLat:'asad'},
+  {ar:'ب',name:'bā',    emoji:'🐄',wordAr:'بَقَرَة',  wordLat:'baqara'},
+  {ar:'ت',name:'tā',    emoji:'🐊',wordAr:'تِمْسَاح', wordLat:'timsāh'},
+  {ar:'ث',name:'thā',   emoji:'🐍',wordAr:'ثُعْبَان', wordLat:"thu'bān"},
+  {ar:'ج',name:'djīm',  emoji:'🐪',wordAr:'جَمَل',   wordLat:'jamal'},
+  {ar:'ح',name:'Hā',    emoji:'🐴',wordAr:'حِصَان',   wordLat:'Hisān'},
+  {ar:'خ',name:'khā',   emoji:'🐑',wordAr:'خَرُوف',   wordLat:'kharūf'},
+  {ar:'د',name:'dāl',   emoji:'🐻',wordAr:'دُبّ',     wordLat:'dubb'},
+  {ar:'ذ',name:'dhāl',  emoji:'🐺',wordAr:'ذِئْب',   wordLat:"dhi'b"},
+  {ar:'ر',name:'rā',    emoji:'🌹',wordAr:'رَوْضَة',  wordLat:'rawDa'},
+  {ar:'ز',name:'zāy',   emoji:'🦒',wordAr:'زَرَافَة', wordLat:'zarāfa'},
+  {ar:'س',name:'sīn',   emoji:'🐟',wordAr:'سَمَكَة',  wordLat:'samaka'},
+  {ar:'ش',name:'chīn',  emoji:'🌳',wordAr:'شَجَرَة',  wordLat:'shajara'},
+  {ar:'ص',name:'Sād',   emoji:'🦅',wordAr:'صَقْر',    wordLat:'Saqr'},
+  {ar:'ض',name:'Dād',   emoji:'🐸',wordAr:'ضِفْدَع',  wordLat:"Difda'"},
+  {ar:'ط',name:'Tā',    emoji:'🦚',wordAr:'طَاوُوس',  wordLat:'Tāwūs'},
+  {ar:'ظ',name:'DHā',   emoji:'🦌',wordAr:'ظَبْي',    wordLat:'DHaby'},
+  {ar:'ع',name:"'ayn",  emoji:'🐦',wordAr:'عُصْفُور', wordLat:"'uSfūr"},
+  {ar:'غ',name:'ghayn', emoji:'🦍',wordAr:'غُورِيلَا',wordLat:'ghurīlā'},
+  {ar:'ف',name:'fā',    emoji:'🦋',wordAr:'فَرَاشَة', wordLat:'farāsha'},
+  {ar:'ق',name:'qāf',   emoji:'🐱',wordAr:'قِطَّة',   wordLat:'qiTTa'},
+  {ar:'ك',name:'kāf',   emoji:'🐶',wordAr:'كَلْب',    wordLat:'kalb'},
+  {ar:'ل',name:'lām',   emoji:'🦩',wordAr:'لَقْلَق',  wordLat:'laqlaq'},
+  {ar:'م',name:'mīm',   emoji:'🍌',wordAr:'مَوْز',    wordLat:'mawz'},
+  {ar:'ن',name:'nūn',   emoji:'🐯',wordAr:'نَمِر',    wordLat:'namir'},
+  {ar:'ه',name:'hā',    emoji:'🐈',wordAr:'هِرَّة',   wordLat:'hirra'},
+  {ar:'و',name:'wāw',   emoji:'🌹',wordAr:'وَرْدَة',  wordLat:'warda'},
+  {ar:'ي',name:'yā',    emoji:'🕊️',wordAr:'يَمَامَة', wordLat:'yamāma'},
+  {ar:'ء',name:'hamzah',emoji:'🦁',wordAr:'أَفْعَى',  wordLat:"af'ā"},
+  {ar:'ة',name:'tā',    emoji:'🍎',wordAr:'تُفَّاحَة',wordLat:'tuffāHa'}
+];
+
+function renderChildLetterDay(ca){
+  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
+  var letter=CHILD_LETTERS[dayIdx];
+
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+
+  /* ─ Étoiles ─ */
+  var starsEl=document.createElement('div');starsEl.className='child-stars';
+  var starsStr='';for(var si=0;si<Math.min(dayIdx,8);si++)starsStr+='⭐';
+  if(dayIdx>8)starsStr+=' +'+(dayIdx-8);
+  starsEl.textContent=starsStr||'☆ ☆ ☆';wrap.appendChild(starsEl);
+
+  /* ─ Progression ─ */
+  var progEl=document.createElement('div');progEl.className='child-prog';
+  progEl.textContent='Lettre '+(dayIdx+1)+' / 30';wrap.appendChild(progEl);
+
+  /* ─ Carte principale ─ */
+  var card=document.createElement('div');card.className='child-card child-card-float';
+
+  var bigLetter=document.createElement('div');bigLetter.className='child-letter-big';
+  bigLetter.textContent=letter.ar;card.appendChild(bigLetter);
+
+  var nameLbl=document.createElement('div');nameLbl.className='child-letter-name';
+  nameLbl.textContent=letter.name;card.appendChild(nameLbl);
+
+  var emojiEl=document.createElement('div');emojiEl.className='child-emoji';
+  emojiEl.textContent=letter.emoji;card.appendChild(emojiEl);
+
+  var wordAr=document.createElement('div');wordAr.className='child-word-ar';
+  wordAr.textContent=letter.wordAr;card.appendChild(wordAr);
+
+  var wordLat=document.createElement('div');wordLat.className='child-word-lat';
+  wordLat.textContent=letter.wordLat;card.appendChild(wordLat);
+
+  /* Son auto + bouton écoute */
+  var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-m';
+  sndBtn.style.cssText='margin:12px auto 0;display:block';
+  sndBtn.textContent='🔊 Écoute !';
+  sndBtn.onclick=function(){speakText(letter.ar,'ar-SA',null);};
+  card.appendChild(sndBtn);
+  wrap.appendChild(card);
+  setTimeout(function(){speakText(letter.ar,'ar-SA',null);},600);
+
+  /* ─ Bouton Jouer ─ */
+  var playBtn=document.createElement('button');playBtn.className='rbtn rbtn-m child-btn-play';
+  playBtn.textContent='Je joue ! 🎮';
+  playBtn.onclick=function(){renderChildGame(ca,dayIdx);};
+  wrap.appendChild(playBtn);
+
+  /* ─ Révision (lettres précédentes) ─ */
+  if(dayIdx>0){
+    var revTitle=document.createElement('div');revTitle.className='child-rev-title';
+    revTitle.textContent='Révision rapide';wrap.appendChild(revTitle);
+
+    var revGrid=document.createElement('div');revGrid.className='child-rev-grid';
+    var pool=[];for(var ri=0;ri<dayIdx;ri++)pool.push(ri);
+    pool.sort(function(){return Math.random()-.5;}).slice(0,Math.min(5,pool.length)).forEach(function(ri){
+      var rl=CHILD_LETTERS[ri];
+      var rc=document.createElement('div');rc.className='child-rev-card';
+      rc.innerHTML='<div class="child-rev-ar">'+rl.ar+'</div><div class="child-rev-name">'+rl.name+'</div>';
+      rc.onclick=(function(l){return function(){speakText(l.ar,'ar-SA',null);};})(rl);
+      revGrid.appendChild(rc);
+    });
+    wrap.appendChild(revGrid);
+  }
+
+  ca.appendChild(wrap);
+}
+
+function renderChildGame(ca,dayIdx){
+  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  var letter=CHILD_LETTERS[dayIdx];
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+
+  /* ─ Instruction ─ */
+  var instrEl=document.createElement('div');instrEl.className='child-game-instr';
+  instrEl.innerHTML='<div style="font-size:.95rem;font-weight:800;color:#ad1457;margin-bottom:6px">Touche tous les</div>'
+    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.5rem;color:#c2185b;line-height:1.05">'+letter.ar+'</div>'
+    +'<div style="font-size:.82rem;color:rgba(194,24,91,.5);margin-top:2px">— '+letter.name+' —</div>';
+  wrap.appendChild(instrEl);
+
+  /* ─ Grille ─ */
+  var allAr='ابتثجحخدذرزسشصضطظعغفقكلمنهوية';
+  var TARGET=4,TOTAL=12;
+  var grid=[];
+  for(var t=0;t<TARGET;t++)grid.push({ar:letter.ar,ok:true});
+  var dist=[];for(var ci=0;ci<allAr.length;ci++){if(allAr[ci]!==letter.ar)dist.push(allAr[ci]);}
+  dist.sort(function(){return Math.random()-.5;});
+  for(var di=0;di<TOTAL-TARGET;di++)grid.push({ar:dist[di%dist.length],ok:false});
+  grid.sort(function(){return Math.random()-.5;});
+
+  var found=0;
+  var scoreEl=document.createElement('div');scoreEl.className='child-score-row';
+  scoreEl.textContent='0 / '+TARGET;wrap.appendChild(scoreEl);
+
+  var gridEl=document.createElement('div');gridEl.className='child-game-grid';
+  grid.forEach(function(item){
+    var cell=document.createElement('div');cell.className='child-game-cell';
+    cell.textContent=item.ar;
+    cell.onclick=function(){
+      if(cell.classList.contains('hit'))return;
+      if(item.ok){
+        cell.classList.add('hit');found++;
+        scoreEl.textContent=found+' / '+TARGET;
+        if(found===TARGET)setTimeout(function(){renderChildReward(ca,dayIdx);},700);
+      } else {
+        cell.classList.add('miss');
+        setTimeout(function(){cell.classList.remove('miss');},500);
+      }
+    };
+    gridEl.appendChild(cell);
+  });
+  wrap.appendChild(gridEl);
+
+  /* ─ Bouton retour ─ */
+  var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-s';
+  backBtn.style.cssText='display:block;margin:0 auto';
+  backBtn.textContent='← Retour';
+  backBtn.onclick=function(){renderChildLetterDay(ca);};
+  wrap.appendChild(backBtn);
+
+  ca.appendChild(wrap);
+}
+
+function renderChildReward(ca,dayIdx){
+  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  var letter=CHILD_LETTERS[dayIdx];
+  var newDay=Math.min(dayIdx+1,CHILD_LETTERS.length-1);
+  try{localStorage.setItem('child_girl_day',''+newDay);}catch(e){}
+  launchConfetti('girl');
+
+  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+  var starEl=document.createElement('span');starEl.className='child-reward-star';starEl.textContent='⭐';
+  wrap.appendChild(starEl);
+
+  var titleEl=document.createElement('div');titleEl.className='child-reward-title';titleEl.textContent='Bravo !';
+  wrap.appendChild(titleEl);
+
+  var subEl=document.createElement('div');subEl.className='child-reward-sub';
+  subEl.textContent='Tu as appris la lettre '+letter.name+' !';wrap.appendChild(subEl);
+
+  /* Récap lettre */
+  var recap=document.createElement('div');recap.className='child-card';recap.style.marginBottom='16px';
+  recap.innerHTML='<div class="child-emoji">'+letter.emoji+'</div>'
+    +'<div class="child-letter-big">'+letter.ar+'</div>'
+    +'<div class="child-word-ar">'+letter.wordAr+'</div>'
+    +'<div class="child-word-lat">'+letter.wordLat+'</div>';
+  wrap.appendChild(recap);
+
+  if(newDay<CHILD_LETTERS.length){
+    var nextEl=document.createElement('div');nextEl.className='child-word-lat';nextEl.style.marginBottom='16px';
+    nextEl.textContent='Reviens demain pour apprendre le '+CHILD_LETTERS[newDay].name+' !';
+    wrap.appendChild(nextEl);
+  } else {
+    var doneEl=document.createElement('div');doneEl.className='child-letter-name';doneEl.style.marginBottom='16px';
+    doneEl.textContent='🏆 Tu as appris toutes les lettres !';
+    wrap.appendChild(doneEl);
+  }
+
+  var homeBtn=document.createElement('button');homeBtn.className='rbtn rbtn-m';
+  homeBtn.style.cssText='width:100%;padding:14px;font-size:1rem';
+  homeBtn.textContent='← Retour';
+  homeBtn.onclick=function(){renderChildLetterDay(ca);};
+  wrap.appendChild(homeBtn);
+
   ca.appendChild(wrap);
 }
 
