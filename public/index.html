@@ -2464,7 +2464,7 @@ body.profile-boy [lang="ar"] {
 @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
 .child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
-.child-letter-big{font-family:'Scheherazade New',serif;font-size:7rem;line-height:1.1;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite}
+.child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
 .child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
 .child-card-float{animation:floatCard 3s ease-in-out infinite}
 .child-stars{font-size:1.5rem;letter-spacing:3px;text-align:center;margin-bottom:6px;min-height:2rem}
@@ -2475,7 +2475,7 @@ body.profile-boy [lang="ar"] {
 .child-letter-name{font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:6px}
 .child-variants{display:flex;justify-content:center;gap:8px;direction:rtl;margin:10px 0 6px}
 .child-var-box{background:rgba(233,30,140,.07);border-radius:14px;padding:6px 10px;text-align:center;border:1.5px solid rgba(233,30,140,.12);min-width:66px}
-.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.15}
+.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.15;direction:rtl;unicode-bidi:isolate}
 .child-var-lbl{font-size:.6rem;font-weight:800;color:rgba(194,24,91,.45);text-transform:uppercase;letter-spacing:.06em}
 .child-btn-play{width:100%;font-size:1.1rem;padding:16px;border-radius:18px;animation:pulse-pink 2.5s infinite}
 .child-rev-title{font-size:.75rem;font-weight:800;color:rgba(194,24,91,.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
@@ -4070,7 +4070,7 @@ function navToPage(page){
 function renderPage(page,fwd){
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
-  else if(page==='sessions'){if(st.profile==='girl')renderChildLetterDay(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
+  else if(page==='sessions'){if(st.profile==='girl')renderChildWarmup(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
   else if(page==='exercises')renderExPage(ca);
   else if(page==='contact')renderContact(ca);
   else if(page==='bonus')renderBonus(ca);
@@ -5556,37 +5556,40 @@ function renderPuzzleGame(ca){
 //  INTERFACE ENFANT FILLE — LETTRE DU JOUR
 // ════════════════════════════════════════════════════════
 /* Formes des lettres arabes : i=initiale, m=médiane, f=finale */
+/* ZWJ (‍) forces contextual shaping: letter+ZWJ=initial, ZWJ+letter=final, ZWJ+letter+ZWJ=medial */
+/* Non-dual letters (ا و د ذ ر ز) can only connect rightward → medial = final */
+var Z=String.fromCharCode(0x200D);/* Zero Width Joiner — forces contextual Arabic letter shaping */
 var _AF={
-  'ا':{i:'ا',   m:'ﺎ',f:'ﺎ'},
-  'ب':{i:'ﺑ',m:'ﺒ',f:'ﺐ'},
-  'ت':{i:'ﺗ',m:'ﺘ',f:'ﺖ'},
-  'ث':{i:'ﺛ',m:'ﺜ',f:'ﺚ'},
-  'ج':{i:'ﺟ',m:'ﺠ',f:'ﺞ'},
-  'ح':{i:'ﺣ',m:'ﺤ',f:'ﺢ'},
-  'خ':{i:'ﺧ',m:'ﺨ',f:'ﺦ'},
-  'د':{i:'د',   m:'ﺪ',f:'ﺪ'},
-  'ذ':{i:'ذ',   m:'ﺬ',f:'ﺬ'},
-  'ر':{i:'ر',   m:'ﺮ',f:'ﺮ'},
-  'ز':{i:'ز',   m:'ﺰ',f:'ﺰ'},
-  'س':{i:'ﺳ',m:'ﺴ',f:'ﺲ'},
-  'ش':{i:'ﺷ',m:'ﺸ',f:'ﺶ'},
-  'ص':{i:'ﺻ',m:'ﺼ',f:'ﺺ'},
-  'ض':{i:'ﺿ',m:'ﻀ',f:'ﺾ'},
-  'ط':{i:'ﻃ',m:'ﻄ',f:'ﻂ'},
-  'ظ':{i:'ﻇ',m:'ﻈ',f:'ﻆ'},
-  'ع':{i:'ﻋ',m:'ﻌ',f:'ﻊ'},
-  'غ':{i:'ﻏ',m:'ﻐ',f:'ﻎ'},
-  'ف':{i:'ﻓ',m:'ﻔ',f:'ﻒ'},
-  'ق':{i:'ﻗ',m:'ﻘ',f:'ﻖ'},
-  'ك':{i:'ﻛ',m:'ﻜ',f:'ﻚ'},
-  'ل':{i:'ﻟ',m:'ﻠ',f:'ﻞ'},
-  'م':{i:'ﻣ',m:'ﻤ',f:'ﻢ'},
-  'ن':{i:'ﻧ',m:'ﻨ',f:'ﻦ'},
-  'ه':{i:'ﻫ',m:'ﻬ',f:'ﻪ'},
-  'و':{i:'و',   m:'ﻮ',f:'ﻮ'},
-  'ي':{i:'ﻳ',m:'ﻴ',f:'ﻲ'},
-  'ء':{i:'ء',   m:'ء',   f:'ء'},
-  'ة':{i:'ة',   m:'ة',   f:'ﺔ'}
+  'ا':{i:'ا',       m:Z+'ا',       f:Z+'ا'},
+  'ب':{i:'ب'+Z,     m:Z+'ب'+Z,     f:Z+'ب'},
+  'ت':{i:'ت'+Z,     m:Z+'ت'+Z,     f:Z+'ت'},
+  'ث':{i:'ث'+Z,     m:Z+'ث'+Z,     f:Z+'ث'},
+  'ج':{i:'ج'+Z,     m:Z+'ج'+Z,     f:Z+'ج'},
+  'ح':{i:'ح'+Z,     m:Z+'ح'+Z,     f:Z+'ح'},
+  'خ':{i:'خ'+Z,     m:Z+'خ'+Z,     f:Z+'خ'},
+  'د':{i:'د',       m:Z+'د',       f:Z+'د'},
+  'ذ':{i:'ذ',       m:Z+'ذ',       f:Z+'ذ'},
+  'ر':{i:'ر',       m:Z+'ر',       f:Z+'ر'},
+  'ز':{i:'ز',       m:Z+'ز',       f:Z+'ز'},
+  'س':{i:'س'+Z,     m:Z+'س'+Z,     f:Z+'س'},
+  'ش':{i:'ش'+Z,     m:Z+'ش'+Z,     f:Z+'ش'},
+  'ص':{i:'ص'+Z,     m:Z+'ص'+Z,     f:Z+'ص'},
+  'ض':{i:'ض'+Z,     m:Z+'ض'+Z,     f:Z+'ض'},
+  'ط':{i:'ط'+Z,     m:Z+'ط'+Z,     f:Z+'ط'},
+  'ظ':{i:'ظ'+Z,     m:Z+'ظ'+Z,     f:Z+'ظ'},
+  'ع':{i:'ع'+Z,     m:Z+'ع'+Z,     f:Z+'ع'},
+  'غ':{i:'غ'+Z,     m:Z+'غ'+Z,     f:Z+'غ'},
+  'ف':{i:'ف'+Z,     m:Z+'ف'+Z,     f:Z+'ف'},
+  'ق':{i:'ق'+Z,     m:Z+'ق'+Z,     f:Z+'ق'},
+  'ك':{i:'ك'+Z,     m:Z+'ك'+Z,     f:Z+'ك'},
+  'ل':{i:'ل'+Z,     m:Z+'ل'+Z,     f:Z+'ل'},
+  'م':{i:'م'+Z,     m:Z+'م'+Z,     f:Z+'م'},
+  'ن':{i:'ن'+Z,     m:Z+'ن'+Z,     f:Z+'ن'},
+  'ه':{i:'ه'+Z,     m:Z+'ه'+Z,     f:Z+'ه'},
+  'و':{i:'و',       m:Z+'و',       f:Z+'و'},
+  'ي':{i:'ي'+Z,     m:Z+'ي'+Z,     f:Z+'ي'},
+  'ء':{i:'ء',       m:'ء',         f:'ء'},
+  'ة':{i:'ة',       m:Z+'ة',       f:Z+'ة'}
 };
 var CHILD_LETTERS=[
   {ar:'ا',name:'alif',   emoji:'🦁',wordAr:'أَسَد',   wordLat:'asad'},
@@ -5620,6 +5623,112 @@ var CHILD_LETTERS=[
   {ar:'ء',name:'hamzah',emoji:'🦁',wordAr:'أَفْعَى',  wordLat:"af'ā"},
   {ar:'ة',name:'tā',    emoji:'🍎',wordAr:'تُفَّاحَة',wordLat:'tuffāHa'}
 ];
+
+// ════════════════════════════════════════════════════════
+//  QUIZ DE RÉCHAUFFEMENT — lettres déjà apprises
+// ════════════════════════════════════════════════════════
+function renderChildWarmup(ca){
+  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
+  if(dayIdx<1){renderChildLetterDay(ca);return;}
+
+  /* Sélection de 3 lettres déjà apprises comme questions */
+  var pool=[];for(var pi=0;pi<dayIdx;pi++)pool.push(pi);
+  pool.sort(function(){return Math.random()-.5;});
+  var questions=pool.slice(0,Math.min(3,pool.length));
+  var qIdx=0,score=0;
+
+  function showQ(){
+    ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+    if(qIdx>=questions.length){renderChildLetterDay(ca);return;}
+
+    var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+    /* Barre de progression quiz */
+    var qprog=document.createElement('div');
+    qprog.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:14px';
+    for(var qi=0;qi<questions.length;qi++){
+      var qd=document.createElement('div');
+      qd.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(qi<qIdx?'#22c55e':qi===qIdx?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
+      qprog.appendChild(qd);
+    }
+    wrap.appendChild(qprog);
+
+    /* Label réchauffement */
+    var wlbl=document.createElement('div');
+    wlbl.style.cssText='font-size:.7rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px';
+    wlbl.textContent='Révision rapide ✦ Question '+(qIdx+1)+' / '+questions.length;
+    wrap.appendChild(wlbl);
+
+    var correctIdx=questions[qIdx];
+    var correctLetter=CHILD_LETTERS[correctIdx];
+
+    /* Grand emoji = indice */
+    var emojiEl=document.createElement('div');
+    emojiEl.style.cssText='font-size:5.5rem;margin:0 0 8px';
+    emojiEl.textContent=correctLetter.emoji;
+    wrap.appendChild(emojiEl);
+
+    /* Mot arabe */
+    var wordEl=document.createElement('div');
+    wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:1.8rem;color:#7b1fa2;margin-bottom:18px;line-height:1.2';
+    wordEl.textContent=correctLetter.wordAr;
+    wrap.appendChild(wordEl);
+
+    /* Question */
+    var qel=document.createElement('div');
+    qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:18px';
+    qel.textContent='Quelle lettre commence ce mot ?';
+    wrap.appendChild(qel);
+
+    /* Choix : 3 grandes lettres arabes */
+    var wrong=[];
+    for(var wj=0;wj<CHILD_LETTERS.length;wj++){if(wj!==correctIdx)wrong.push(wj);}
+    wrong.sort(function(){return Math.random()-.5;});
+    var choices=[correctIdx,wrong[0],wrong[1]];
+    choices.sort(function(){return Math.random()-.5;});
+
+    var choicesEl=document.createElement('div');
+    choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:20px';
+    var answered=false;
+    choices.forEach(function(li){
+      var btn=document.createElement('div');
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:rtl';
+      btn.textContent=CHILD_LETTERS[li].ar;
+      btn.onclick=function(){
+        if(answered)return;answered=true;
+        if(li===correctIdx){
+          btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
+          score++;
+        } else {
+          btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626';
+          /* Montrer la bonne réponse */
+          choicesEl.childNodes.forEach(function(b,bi){
+            if(choices[bi]===correctIdx)b.style.cssText=b.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
+          });
+        }
+        setTimeout(function(){qIdx++;showQ();},700);
+      };
+      choicesEl.appendChild(btn);
+    });
+    wrap.appendChild(choicesEl);
+
+    /* Étoiles gagnées */
+    var srow=document.createElement('div');
+    srow.style.cssText='font-size:1.4rem;min-height:1.8rem;margin-bottom:14px';
+    for(var sk=0;sk<score;sk++)srow.textContent+='⭐';
+    wrap.appendChild(srow);
+
+    /* Bouton passer */
+    var skipBtn=document.createElement('button');skipBtn.className='rbtn rbtn-s';
+    skipBtn.style.cssText='display:block;margin:0 auto;font-size:.78rem;opacity:.65';
+    skipBtn.textContent='Passer →';
+    skipBtn.onclick=function(){renderChildLetterDay(ca);};
+    wrap.appendChild(skipBtn);
+
+    ca.appendChild(wrap);
+  }
+  showQ();
+}
 
 function renderChildLetterDay(ca){
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
@@ -5734,7 +5843,7 @@ function renderChildGame(ca,dayIdx,round){
   /* ─ Instruction ─ */
   var instrEl=document.createElement('div');instrEl.className='child-game-instr';
   instrEl.innerHTML='<div style="font-size:.9rem;font-weight:800;color:#ad1457;margin-bottom:6px">Touche tous les — <span style="color:rgba(194,24,91,.55);font-weight:600">'+R.subtitle+'</span></div>'
-    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.05">'+R.form+'</div>';
+    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.2;direction:rtl;unicode-bidi:isolate">'+R.form+'</div>';
   wrap.appendChild(instrEl);
 
   /* ─ Grille ─ */
@@ -5798,19 +5907,18 @@ function renderChildReward(ca,dayIdx){
   wrap.appendChild(titleEl);
 
   var subEl=document.createElement('div');subEl.className='child-reward-sub';
-  subEl.textContent='Tu as appris la lettre '+letter.name+' !';wrap.appendChild(subEl);
+  subEl.textContent='Tu as appris cette lettre !';wrap.appendChild(subEl);
 
   /* Récap lettre */
   var recap=document.createElement('div');recap.className='child-card';recap.style.marginBottom='16px';
   recap.innerHTML='<div class="child-emoji">'+letter.emoji+'</div>'
     +'<div class="child-letter-big">'+letter.ar+'</div>'
-    +'<div class="child-word-ar">'+letter.wordAr+'</div>'
-    +'<div class="child-word-lat">'+letter.wordLat+'</div>';
+    +'<div class="child-word-ar">'+letter.wordAr+'</div>';
   wrap.appendChild(recap);
 
   if(newDay<CHILD_LETTERS.length){
     var nextEl=document.createElement('div');nextEl.className='child-word-lat';nextEl.style.marginBottom='16px';
-    nextEl.textContent='Reviens demain pour apprendre le '+CHILD_LETTERS[newDay].name+' !';
+    nextEl.textContent='Reviens demain pour apprendre '+CHILD_LETTERS[newDay].emoji+' !';
     wrap.appendChild(nextEl);
   } else {
     var doneEl=document.createElement('div');doneEl.className='child-letter-name';doneEl.style.marginBottom='16px';
