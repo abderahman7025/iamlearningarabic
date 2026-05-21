@@ -2473,6 +2473,10 @@ body.profile-boy [lang="ar"] {
 .child-word-ar{font-family:'Scheherazade New',serif;font-size:2.2rem;color:#7b1fa2;line-height:1.2;margin:4px 0}
 .child-word-lat{font-size:.88rem;color:rgba(100,0,80,.55);margin-bottom:10px}
 .child-letter-name{font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:6px}
+.child-variants{display:flex;justify-content:center;gap:8px;direction:rtl;margin:10px 0 6px}
+.child-var-box{background:rgba(233,30,140,.07);border-radius:14px;padding:6px 10px;text-align:center;border:1.5px solid rgba(233,30,140,.12);min-width:66px}
+.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.15}
+.child-var-lbl{font-size:.6rem;font-weight:800;color:rgba(194,24,91,.45);text-transform:uppercase;letter-spacing:.06em}
 .child-btn-play{width:100%;font-size:1.1rem;padding:16px;border-radius:18px;animation:pulse-pink 2.5s infinite}
 .child-rev-title{font-size:.75rem;font-weight:800;color:rgba(194,24,91,.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
 .child-rev-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -5551,6 +5555,39 @@ function renderPuzzleGame(ca){
 // ════════════════════════════════════════════════════════
 //  INTERFACE ENFANT FILLE — LETTRE DU JOUR
 // ════════════════════════════════════════════════════════
+/* Formes des lettres arabes : i=initiale, m=médiane, f=finale */
+var _AF={
+  'ا':{i:'ا',   m:'ﺎ',f:'ﺎ'},
+  'ب':{i:'ﺑ',m:'ﺒ',f:'ﺐ'},
+  'ت':{i:'ﺗ',m:'ﺘ',f:'ﺖ'},
+  'ث':{i:'ﺛ',m:'ﺜ',f:'ﺚ'},
+  'ج':{i:'ﺟ',m:'ﺠ',f:'ﺞ'},
+  'ح':{i:'ﺣ',m:'ﺤ',f:'ﺢ'},
+  'خ':{i:'ﺧ',m:'ﺨ',f:'ﺦ'},
+  'د':{i:'د',   m:'ﺪ',f:'ﺪ'},
+  'ذ':{i:'ذ',   m:'ﺬ',f:'ﺬ'},
+  'ر':{i:'ر',   m:'ﺮ',f:'ﺮ'},
+  'ز':{i:'ز',   m:'ﺰ',f:'ﺰ'},
+  'س':{i:'ﺳ',m:'ﺴ',f:'ﺲ'},
+  'ش':{i:'ﺷ',m:'ﺸ',f:'ﺶ'},
+  'ص':{i:'ﺻ',m:'ﺼ',f:'ﺺ'},
+  'ض':{i:'ﺿ',m:'ﻀ',f:'ﺾ'},
+  'ط':{i:'ﻃ',m:'ﻄ',f:'ﻂ'},
+  'ظ':{i:'ﻇ',m:'ﻈ',f:'ﻆ'},
+  'ع':{i:'ﻋ',m:'ﻌ',f:'ﻊ'},
+  'غ':{i:'ﻏ',m:'ﻐ',f:'ﻎ'},
+  'ف':{i:'ﻓ',m:'ﻔ',f:'ﻒ'},
+  'ق':{i:'ﻗ',m:'ﻘ',f:'ﻖ'},
+  'ك':{i:'ﻛ',m:'ﻜ',f:'ﻚ'},
+  'ل':{i:'ﻟ',m:'ﻠ',f:'ﻞ'},
+  'م':{i:'ﻣ',m:'ﻤ',f:'ﻢ'},
+  'ن':{i:'ﻧ',m:'ﻨ',f:'ﻦ'},
+  'ه':{i:'ﻫ',m:'ﻬ',f:'ﻪ'},
+  'و':{i:'و',   m:'ﻮ',f:'ﻮ'},
+  'ي':{i:'ﻳ',m:'ﻴ',f:'ﻲ'},
+  'ء':{i:'ء',   m:'ء',   f:'ء'},
+  'ة':{i:'ة',   m:'ة',   f:'ﺔ'}
+};
 var CHILD_LETTERS=[
   {ar:'ا',name:'alif',   emoji:'🦁',wordAr:'أَسَد',   wordLat:'asad'},
   {ar:'ب',name:'bā',    emoji:'🐄',wordAr:'بَقَرَة',  wordLat:'baqara'},
@@ -5607,17 +5644,21 @@ function renderChildLetterDay(ca){
   var bigLetter=document.createElement('div');bigLetter.className='child-letter-big';
   bigLetter.textContent=letter.ar;card.appendChild(bigLetter);
 
-  var nameLbl=document.createElement('div');nameLbl.className='child-letter-name';
-  nameLbl.textContent=letter.name;card.appendChild(nameLbl);
-
   var emojiEl=document.createElement('div');emojiEl.className='child-emoji';
   emojiEl.textContent=letter.emoji;card.appendChild(emojiEl);
 
   var wordAr=document.createElement('div');wordAr.className='child-word-ar';
   wordAr.textContent=letter.wordAr;card.appendChild(wordAr);
 
-  var wordLat=document.createElement('div');wordLat.className='child-word-lat';
-  wordLat.textContent=letter.wordLat;card.appendChild(wordLat);
+  /* ─ Variantes : début | milieu | fin (RTL) ─ */
+  var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
+  var varRow=document.createElement('div');varRow.className='child-variants';
+  [['début',af.i],['milieu',af.m],['fin',af.f]].forEach(function(v){
+    var box=document.createElement('div');box.className='child-var-box';
+    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    varRow.appendChild(box);
+  });
+  card.appendChild(varRow);
 
   /* Son auto + bouton écoute */
   var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-m';
@@ -5654,26 +5695,53 @@ function renderChildLetterDay(ca){
   ca.appendChild(wrap);
 }
 
-function renderChildGame(ca,dayIdx){
+function renderChildGame(ca,dayIdx,round){
+  round=round||0;
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
+  var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
+  var rounds=[
+    {form:letter.ar, lbl:'seule',   subtitle:'la lettre isolée'},
+    {form:af.i,      lbl:'début',   subtitle:'en début de mot'},
+    {form:af.m,      lbl:'milieu',  subtitle:'au milieu du mot'},
+    {form:af.f,      lbl:'fin',     subtitle:'à la fin du mot'}
+  ];
+  var R=rounds[round];
+
+  /* Distracteurs de la même catégorie de forme */
+  var allAr='ابتثجحخدذرزسشصضطظعغفقكلمنهوية';
+  var distForms=[];
+  for(var ci=0;ci<allAr.length;ci++){
+    var c=allAr[ci];if(c===letter.ar)continue;
+    var caf=_AF[c]||{i:c,m:c,f:c};
+    var cf=[caf.i,caf.m,caf.f][round===0?Math.floor(Math.random()*3):round-1];
+    distForms.push(cf);
+  }
+  distForms.sort(function(){return Math.random()-.5;});
+
   var wrap=document.createElement('div');wrap.className='child-wrap';
+
+  /* ─ Indicateur de round ─ */
+  var roundBar=document.createElement('div');
+  roundBar.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:12px';
+  for(var ri=0;ri<4;ri++){
+    var dot=document.createElement('div');
+    dot.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(ri<=round?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
+    roundBar.appendChild(dot);
+  }
+  wrap.appendChild(roundBar);
 
   /* ─ Instruction ─ */
   var instrEl=document.createElement('div');instrEl.className='child-game-instr';
-  instrEl.innerHTML='<div style="font-size:.95rem;font-weight:800;color:#ad1457;margin-bottom:6px">Touche tous les</div>'
-    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.5rem;color:#c2185b;line-height:1.05">'+letter.ar+'</div>'
-    +'<div style="font-size:.82rem;color:rgba(194,24,91,.5);margin-top:2px">— '+letter.name+' —</div>';
+  instrEl.innerHTML='<div style="font-size:.9rem;font-weight:800;color:#ad1457;margin-bottom:6px">Touche tous les — <span style="color:rgba(194,24,91,.55);font-weight:600">'+R.subtitle+'</span></div>'
+    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.05">'+R.form+'</div>';
   wrap.appendChild(instrEl);
 
   /* ─ Grille ─ */
-  var allAr='ابتثجحخدذرزسشصضطظعغفقكلمنهوية';
   var TARGET=4,TOTAL=12;
   var grid=[];
-  for(var t=0;t<TARGET;t++)grid.push({ar:letter.ar,ok:true});
-  var dist=[];for(var ci=0;ci<allAr.length;ci++){if(allAr[ci]!==letter.ar)dist.push(allAr[ci]);}
-  dist.sort(function(){return Math.random()-.5;});
-  for(var di=0;di<TOTAL-TARGET;di++)grid.push({ar:dist[di%dist.length],ok:false});
+  for(var t=0;t<TARGET;t++)grid.push({ar:R.form,ok:true});
+  for(var di=0;di<TOTAL-TARGET;di++)grid.push({ar:distForms[di%distForms.length],ok:false});
   grid.sort(function(){return Math.random()-.5;});
 
   var found=0;
@@ -5689,7 +5757,12 @@ function renderChildGame(ca,dayIdx){
       if(item.ok){
         cell.classList.add('hit');found++;
         scoreEl.textContent=found+' / '+TARGET;
-        if(found===TARGET)setTimeout(function(){renderChildReward(ca,dayIdx);},700);
+        if(found===TARGET){
+          setTimeout(function(){
+            if(round<3) renderChildGame(ca,dayIdx,round+1);
+            else renderChildReward(ca,dayIdx);
+          },700);
+        }
       } else {
         cell.classList.add('miss');
         setTimeout(function(){cell.classList.remove('miss');},500);
@@ -5701,7 +5774,7 @@ function renderChildGame(ca,dayIdx){
 
   /* ─ Bouton retour ─ */
   var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-s';
-  backBtn.style.cssText='display:block;margin:0 auto';
+  backBtn.style.cssText='display:block;margin:8px auto 0';
   backBtn.textContent='← Retour';
   backBtn.onclick=function(){renderChildLetterDay(ca);};
   wrap.appendChild(backBtn);
