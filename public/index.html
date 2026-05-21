@@ -2398,16 +2398,15 @@ body.profile-boy #boy-bg-anim {
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .mem-card-front{background:transparent;font-size:2rem;overflow:hidden}
 .mem-card-back{transform:rotateY(180deg);font-weight:700;padding:0;text-align:center;line-height:1;font-size:1.5rem}
-.mem-back-content{display:flex;align-items:center;justify-content:center;white-space:nowrap;max-width:98%}
-.mem-ar{font-family:'Scheherazade New',serif;font-size:2em;line-height:1.15}
-.mem-sep{font-size:.8em;padding:0 1px;opacity:.85}
-.mem-lat{font-size:.8em;font-weight:800;letter-spacing:.01em}
+.mem-back-content{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:3px}
+.mem-ar{font-family:'Scheherazade New',serif;font-size:2.8rem;line-height:1.25;text-align:center}
+.mem-lat{font-size:.85rem;font-weight:800;letter-spacing:.03em;text-align:center}
 .mem-card.matched .mem-card-front{opacity:.7}
 .mem-card.matched .mem-card-back{opacity:.85;cursor:default}
 .mem-result{text-align:center;padding:24px 16px}
 /* Puzzle */
 .puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 62px)}
-.puzzle-card{background:rgba(255,255,255,.10);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.22);border-radius:22px;padding:22px 22px 18px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.22)}
+.puzzle-card{background:rgba(10,18,65,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.18);border-radius:22px;padding:22px 22px 18px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
 .puzzle-audio-btn{width:70px;height:70px;border-radius:50%;background:rgba(245,200,66,.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;margin:0 auto 14px;transition:all .2s}
 .puzzle-audio-btn:active{transform:scale(.9)}
 .puzzle-hint{text-align:center;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:16px}
@@ -5307,10 +5306,9 @@ function renderMemoryPlay(ca,deck){
     back.style.color=bStyle.text;
     back.style.border='2px solid rgba(255,255,255,0.22)';
     var _bc=document.createElement('div');_bc.className='mem-back-content';
-    var _ba=document.createElement('span');_ba.className='mem-ar';_ba.textContent=p.ar;
-    var _bs=document.createElement('span');_bs.className='mem-sep';_bs.textContent=' — ';
-    var _bl=document.createElement('span');_bl.className='mem-lat';_bl.textContent=p.lat;
-    _bc.appendChild(_ba);_bc.appendChild(_bs);_bc.appendChild(_bl);back.appendChild(_bc);
+    var _ba=document.createElement('div');_ba.className='mem-ar';_ba.textContent=p.ar;
+    var _bl=document.createElement('div');_bl.className='mem-lat';_bl.textContent=p.lat;
+    _bc.appendChild(_ba);_bc.appendChild(_bl);back.appendChild(_bc);
     inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
       if(locked)return;if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
