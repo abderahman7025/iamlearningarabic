@@ -2397,16 +2397,17 @@ body.profile-boy #boy-bg-anim {
 .mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg)}
 .mem-card-front,.mem-card-back{position:absolute;inset:0;border-radius:13px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .mem-card-front{background:transparent;font-size:2rem;overflow:hidden}
-.mem-card-back{transform:rotateY(180deg);font-weight:700;padding:2px;text-align:center;line-height:1;font-size:1.5rem}
-.mem-back-content{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;max-width:98%}
-.mem-ar{font-family:'Scheherazade New',serif;font-size:2em;line-height:1}
+.mem-card-back{transform:rotateY(180deg);font-weight:700;padding:0;text-align:center;line-height:1;font-size:1.5rem}
+.mem-back-content{display:flex;align-items:center;justify-content:center;white-space:nowrap;max-width:98%}
+.mem-ar{font-family:'Scheherazade New',serif;font-size:2em;line-height:1.15}
 .mem-sep{font-size:.8em;padding:0 1px;opacity:.85}
 .mem-lat{font-size:.8em;font-weight:800;letter-spacing:.01em}
-.mem-card.matched .mem-card-front{background:#163a20}
-.mem-card.matched .mem-card-back{background:#1a5a28!important;border:2px solid #22c55e!important;color:#a7f3d0!important}
+.mem-card.matched .mem-card-front{opacity:.7}
+.mem-card.matched .mem-card-back{opacity:.85;cursor:default}
 .mem-result{text-align:center;padding:24px 16px}
 /* Puzzle */
-.puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto}
+.puzzle-wrap{padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 62px)}
+.puzzle-card{background:rgba(255,255,255,.10);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.22);border-radius:22px;padding:22px 22px 18px;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.22)}
 .puzzle-audio-btn{width:70px;height:70px;border-radius:50%;background:rgba(245,200,66,.15);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;margin:0 auto 14px;transition:all .2s}
 .puzzle-audio-btn:active{transform:scale(.9)}
 .puzzle-hint{text-align:center;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:16px}
@@ -5388,7 +5389,7 @@ function renderPuzzleGame(ca){
       var pct=Math.round(score/maxScore*100);
       var best=localStorage.getItem('mg_puz_best');
       if(!best||pct>parseInt(best)) localStorage.setItem('mg_puz_best',pct+'%');
-      wrap.innerHTML='<div style="text-align:center;padding:30px 16px">'
+      wrap.innerHTML='<div class="puzzle-card" style="text-align:center;padding:30px 16px;max-width:360px">'
         +'<div style="font-size:2.5rem;margin-bottom:12px">'+(pct>=80?'🏆':pct>=50?'⭐':'📖')+'</div>'
         +'<div style="font-size:1.1rem;font-weight:800;margin-bottom:8px">'+(t('bravo')||'Bravo !')+'</div>'
         +'<div style="font-size:1.5rem;font-weight:900;color:var(--gold);margin-bottom:6px">'+score+'/'+maxScore+'</div>'
@@ -5413,18 +5414,22 @@ function renderPuzzleGame(ca){
     var choices=letters.concat(distractors).sort(function(){return Math.random()-.5;});
     var choiceUsed=new Array(choices.length).fill(false);
 
+    // Carte centrée
+    var gameCard=document.createElement('div');
+    gameCard.className='puzzle-card';
+
     // Progression
     var pgEl=document.createElement('div');
     pgEl.className='puzzle-score-row';
     pgEl.innerHTML='<span>'+qIdx+'/'+totalQ+' '+(({'fr':'mots','en':'words','es':'palabras','de':'Wörter','nl':'woorden','it':'parole','pt':'palavras','ru':'слов','tr':'kelime','zh':'词','id':'kata','ur':'الفاظ','hi':'शब्द'}[st.lang]||'mots'))+'</span><span style="color:var(--gold)">'+score+' pts</span>';
-    wrap.appendChild(pgEl);
+    gameCard.appendChild(pgEl);
 
     // Bouton audio
     var audioBtn=document.createElement('div');
     audioBtn.className='puzzle-audio-btn';
     audioBtn.textContent='🔊';
     audioBtn.onclick=function(){speakText(w.ar,'ar-SA',audioBtn);};
-    wrap.appendChild(audioBtn);
+    gameCard.appendChild(audioBtn);
 
     // Blancs
     var blanksRow=document.createElement('div');
@@ -5450,7 +5455,7 @@ function renderPuzzleGame(ca){
       blankEls.push(bl);
       blanksRow.appendChild(bl);
     }
-    wrap.appendChild(blanksRow);
+    gameCard.appendChild(blanksRow);
 
     function doValidate(){
       var correct=true;
@@ -5498,15 +5503,15 @@ function renderPuzzleGame(ca){
       choiceEls.push(cel);
       choicesRow.appendChild(cel);
     });
-    wrap.appendChild(choicesRow);
-
+    gameCard.appendChild(choicesRow);
 
     // Bouton passer
     var quitPzBtn=document.createElement('button');
     quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.cssText='display:block;margin:14px auto 0';
-    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
+    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेلों पर वापस'}[st.lang]||'Retour aux Jeux'));
     quitPzBtn.onclick=function(){renderMiniGames(ca);};
-    wrap.appendChild(quitPzBtn);
+    gameCard.appendChild(quitPzBtn);
+    wrap.appendChild(gameCard);
   }
 
   buildQuestion();
