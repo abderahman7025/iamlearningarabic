@@ -4007,7 +4007,7 @@ function buildMenu(){
     {id:'sessions', icon:'📚', cls:pc, title:t('sessions'),     desc:t('sessions_desc')},
     {id:'exercises',icon:'✏️', cls:pc, title:t('exercises'),    desc:t('exercises_desc')},
     ...(st.profile==='girl'||st.profile==='boy'?[{id:'minigames',icon:'🎮', cls:pc, title:'Jeux', desc:'Révise en t\'amusant'}]:[]),
-    {id:'bonus',    icon:'⭐', cls:pc, title:t('bonus'),        desc:t('bonus_desc')},
+    ...(st.profile!=='girl'&&st.profile!=='boy'?[{id:'bonus',icon:'⭐',cls:pc,title:t('bonus'),desc:t('bonus_desc')}]:[]),
   ];
   // Contact uniquement pour adulte
   if(st.profile==='adult'||!st.profile){
