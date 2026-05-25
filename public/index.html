@@ -6088,7 +6088,7 @@ function _renderChildIslandRecap(ca,letterIndices){
 function renderChildWarmup(ca){
   _navPush('sessions/lesson');
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
-  if(dayIdx<1){renderChildLetterDay(ca);return;}
+  if(dayIdx<1){renderChildLesson(ca,dayIdx);return;}
 
   /* Sélection de 5 lettres déjà apprises comme questions */
   var pool=[];for(var pi=0;pi<dayIdx;pi++)pool.push(pi);
@@ -6098,7 +6098,7 @@ function renderChildWarmup(ca){
 
   function showQ(){
     ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
-    if(qIdx>=questions.length){renderChildLetterDay(ca);return;}
+    if(qIdx>=questions.length){renderChildLesson(ca,dayIdx);return;}
 
     var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
 
@@ -6187,7 +6187,7 @@ function renderChildWarmup(ca){
     var skipBtn=document.createElement('button');skipBtn.className='rbtn rbtn-s';
     skipBtn.style.cssText='display:block;margin:10px auto 0;font-size:.78rem;opacity:.65';
     skipBtn.textContent='Passer →';
-    skipBtn.onclick=function(){renderChildLetterDay(ca);};
+    skipBtn.onclick=function(){renderChildLesson(ca,dayIdx);};
     wrap.appendChild(skipBtn);
 
     ca.appendChild(wrap);
@@ -6270,7 +6270,547 @@ function renderChildLetterDay(ca){
   ca.appendChild(wrap);
 }
 
-function renderChildGame(ca,dayIdx,round){
+// ════════════════════════════════════════════════════════
+//  COURS ENRICHI FILLE — ~30 minutes par lettre (6 étapes)
+// ════════════════════════════════════════════════════════
+function renderChildLesson(ca,dayIdx,step){
+  step=step||0;
+  var letter=CHILD_LETTERS[dayIdx];
+  var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
+  function goNext(){renderChildLesson(ca,dayIdx,step+1);}
+
+  /* Étape 3 = renderChildGame (gère son propre ca.innerHTML) */
+  if(step===3){renderChildGame(ca,dayIdx,0,goNext);return;}
+  /* Après les 6 étapes → récompense */
+  if(step>=6){renderChildReward(ca,dayIdx);return;}
+
+  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+
+  var STEP_NAMES=['✨ Découverte','🔍 Les formes','✏️ J\'écris','🎮 Je joue','📖 Le mot','🏆 Mini quiz'];
+
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+
+  /* ── Barre de progression ── */
+  var pb=document.createElement('div');
+  pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
+  for(var psi=0;psi<6;psi++){
+    var pd=document.createElement('div');
+    pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(psi<step?'#22c55e':psi===step?'#c2185b':'rgba(194,24,91,.15)');
+    pb.appendChild(pd);
+  }
+  wrap.appendChild(pb);
+
+  var stepLbl=document.createElement('div');
+  stepLbl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
+  stepLbl.textContent=STEP_NAMES[step];
+  wrap.appendChild(stepLbl);
+
+  if(step===0)_clStep0(wrap,letter,af,goNext);
+  else if(step===1)_clStep1(wrap,letter,af,goNext);
+  else if(step===2)_clStep2(wrap,letter,af,goNext);
+  else if(step===4)_clStep4(wrap,letter,af,dayIdx,goNext);
+  else if(step===5)_clStep5(wrap,letter,af,dayIdx,goNext);
+
+  ca.appendChild(wrap);
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 0 : Découverte
+   ────────────────────────────────────────────────────── */
+function _clStep0(wrap,letter,af,goNext){
+  var card=document.createElement('div');card.className='child-card child-card-float';
+  card.style.textAlign='center';
+
+  /* Lettre isolée (clic = écoute) */
+  var bigL=document.createElement('div');bigL.className='child-letter-big';
+  bigL.textContent=letter.ar;bigL.style.cursor='pointer';
+  bigL.onclick=function(){speakText(letter.ar,'ar-SA',null);};
+  card.appendChild(bigL);
+
+  /* Nom de la lettre */
+  var nameL=document.createElement('div');
+  nameL.style.cssText='font-size:1rem;font-weight:700;color:#ad1457;margin-bottom:12px;font-style:italic';
+  nameL.textContent=letter.name+(letter.wordLat?' · '+letter.wordLat:'');
+  card.appendChild(nameL);
+
+  /* 3 formes (clic = écoute chaque forme) */
+  var varRow=document.createElement('div');varRow.className='child-variants';
+  [['Début',af.i],['Milieu',af.m],['Fin',af.f]].forEach(function(v){
+    var box=document.createElement('div');box.className='child-var-box';
+    box.style.cursor='pointer';
+    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    box.onclick=(function(f){return function(){speakText(f,'ar-SA',null);};})(v[1]);
+    varRow.appendChild(box);
+  });
+  card.appendChild(varRow);
+
+  /* Emoji + mot */
+  var emojiEl=document.createElement('div');emojiEl.className='child-emoji';
+  emojiEl.textContent=letter.emoji;
+  card.appendChild(emojiEl);
+
+  var wordEl=document.createElement('div');wordEl.className='child-word-ar';
+  wordEl.textContent=letter.wordAr;wordEl.style.cursor='pointer';
+  wordEl.onclick=function(){speakText(letter.wordAr,'ar-SA',null);};
+  card.appendChild(wordEl);
+
+  var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-s';
+  sndBtn.style.cssText='margin:10px auto 0;display:block';
+  sndBtn.textContent='🔊 Écouter la lettre';
+  sndBtn.onclick=function(){speakText(letter.ar,'ar-SA',null);};
+  card.appendChild(sndBtn);
+
+  wrap.appendChild(card);
+
+  var hint=document.createElement('div');
+  hint.style.cssText='text-align:center;font-size:.78rem;color:#ad1457;margin:8px 0;opacity:.7';
+  hint.textContent='👆 Appuie sur la lettre ou les formes pour les écouter !';
+  wrap.appendChild(hint);
+
+  /* Bouton "Je la connais" (affiché après 5 s) */
+  var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
+  nextBtn.textContent='Je la connais ! →';
+  nextBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem';
+  nextBtn.onclick=goNext;
+  wrap.appendChild(nextBtn);
+  setTimeout(function(){nextBtn.style.display='block';},5000);
+
+  setTimeout(function(){speakText(letter.ar,'ar-SA',null);},600);
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 1 : Les formes
+   Phase A : 4 flashcards (une par position)
+   Phase B : 4 questions quiz
+   ────────────────────────────────────────────────────── */
+function _clStep1(wrap,letter,af,goNext){
+  var forms=[
+    {lbl:'Isolée',form:letter.ar},
+    {lbl:'Début', form:af.i},
+    {lbl:'Milieu',form:af.m},
+    {lbl:'Fin',   form:af.f}
+  ];
+  var fcIdx=0,qIdx=0,score=0;
+  var container=document.createElement('div');
+  wrap.appendChild(container);
+
+  function showPhaseA(){
+    container.innerHTML='';
+    if(fcIdx>=4){showPhaseB();return;}
+    var f=forms[fcIdx];
+
+    /* Dots */
+    var dots=document.createElement('div');
+    dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
+    for(var di=0;di<4;di++){
+      var d=document.createElement('div');
+      d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<fcIdx?'#22c55e':di===fcIdx?'#c2185b':'rgba(194,24,91,.2)');
+      dots.appendChild(d);
+    }
+    container.appendChild(dots);
+
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+
+    var intro=document.createElement('div');
+    intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';
+    intro.textContent='Forme de '+f.lbl;
+    card.appendChild(intro);
+
+    var formBig=document.createElement('div');
+    formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px";
+    formBig.textContent=f.form;
+    formBig.onclick=function(){speakText(f.form,'ar-SA',null);};
+    card.appendChild(formBig);
+
+    var lblBig=document.createElement('div');
+    lblBig.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';
+    lblBig.textContent=f.lbl.toUpperCase();
+    card.appendChild(lblBig);
+
+    var tip=document.createElement('div');
+    tip.style.cssText='font-size:.72rem;color:#ad1457;opacity:.55;margin-bottom:10px';
+    tip.textContent='👆 Appuie sur la lettre pour l\'écouter';
+    card.appendChild(tip);
+
+    container.appendChild(card);
+
+    var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
+    nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem';
+    nextBtn.textContent=fcIdx<3?'Suivant →':'📝 Quiz des formes !';
+    nextBtn.onclick=function(){fcIdx++;showPhaseA();};
+    container.appendChild(nextBtn);
+
+    speakText(f.form,'ar-SA',null);
+  }
+
+  function showPhaseB(){
+    container.innerHTML='';
+    if(qIdx>=4){
+      var doneCard=document.createElement('div');doneCard.className='child-card';
+      doneCard.style.textAlign='center';
+      doneCard.innerHTML='<div style="font-size:3rem;margin:8px 0">'+(score>=3?'🌟':'👍')+'</div>'
+        +'<div class="child-letter-name">Quiz des formes : '+score+' / 4</div>';
+      container.appendChild(doneCard);
+      var nb=document.createElement('button');nb.className='rbtn rbtn-m child-btn-play';
+      nb.style.cssText='width:100%;padding:14px;font-size:1rem';
+      nb.textContent='Continuer →';nb.onclick=goNext;
+      container.appendChild(nb);
+      return;
+    }
+    var q=forms[qIdx];
+    var shuffled=forms.slice().sort(function(){return Math.random()-.5;});
+
+    /* Dots quiz */
+    var dots=document.createElement('div');
+    dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
+    for(var di=0;di<4;di++){
+      var d=document.createElement('div');
+      d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<qIdx?'#22c55e':di===qIdx?'#7b1fa2':'rgba(194,24,91,.2)');
+      dots.appendChild(d);
+    }
+    container.appendChild(dots);
+
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+    var qlbl=document.createElement('div');
+    qlbl.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:14px';
+    qlbl.innerHTML='Montre-moi la forme <span style="color:#7b1fa2;font-size:1.15em;font-weight:900">'+q.lbl.toUpperCase()+'</span>';
+    card.appendChild(qlbl);
+
+    var cGrid=document.createElement('div');
+    cGrid.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;direction:rtl';
+    var answered=false;
+    shuffled.forEach(function(sf){
+      var btn=document.createElement('div');
+      btn.style.cssText="background:rgba(255,255,255,.9);border-radius:16px;width:68px;height:74px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.8rem;color:#c2185b;border:2px solid rgba(233,30,99,.18);cursor:pointer;transition:all .2s";
+      btn.textContent=sf.form;
+      btn.onclick=function(){
+        if(answered)return;
+        speakText(sf.form,'ar-SA',null);
+        if(sf.lbl===q.lbl){
+          btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
+          score++;answered=true;
+          setTimeout(function(){qIdx++;showPhaseB();},700);
+        }else{
+          btn.style.background='rgba(239,68,68,.12)';btn.style.borderColor='#ef4444';
+          btn.onclick=null;
+        }
+      };
+      cGrid.appendChild(btn);
+    });
+    card.appendChild(cGrid);
+    container.appendChild(card);
+  }
+
+  showPhaseA();
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 2 : J'écris (tracé libre sur canvas)
+   ────────────────────────────────────────────────────── */
+function _clStep2(wrap,letter,af,goNext){
+  var traces=0,TOTAL_TRACES=3;
+
+  var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+
+  var instr=document.createElement('div');
+  instr.style.cssText='font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:8px';
+  instr.textContent='Trace la lettre '+TOTAL_TRACES+' fois avec ton doigt !';
+  card.appendChild(instr);
+
+  /* Dots de progression */
+  var dotsEl=document.createElement('div');
+  dotsEl.style.cssText='display:flex;gap:8px;justify-content:center;margin-bottom:12px';
+  function updateDots(){
+    dotsEl.innerHTML='';
+    for(var di=0;di<TOTAL_TRACES;di++){
+      var d=document.createElement('div');
+      d.style.cssText='width:14px;height:14px;border-radius:50%;background:'+(di<traces?'#22c55e':'rgba(194,24,91,.2)')+';border:2px solid '+(di<traces?'#22c55e':'rgba(194,24,91,.3)');
+      dotsEl.appendChild(d);
+    }
+  }
+  updateDots();
+  card.appendChild(dotsEl);
+
+  /* Canvas avec lettre fantôme en fond */
+  var CW=220,CH=220;
+  var canvas=document.createElement('canvas');
+  canvas.width=CW;canvas.height=CH;
+  canvas.style.cssText='border-radius:16px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 10px';
+  var ctx=canvas.getContext('2d');
+
+  function drawGuide(){
+    ctx.clearRect(0,0,CW,CH);
+    ctx.save();
+    ctx.font="140px 'Scheherazade New',serif";
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle='rgba(194,24,91,0.07)';
+    ctx.fillText(letter.ar,CW/2,CH/2+10);
+    ctx.restore();
+  }
+  drawGuide();
+
+  var drawing=false;
+  function getPos(e){
+    var rect=canvas.getBoundingClientRect();
+    var src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};
+  }
+  canvas.addEventListener('mousedown',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();});
+  canvas.addEventListener('mousemove',function(e){
+    if(!drawing)return;
+    var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';
+    ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();
+  });
+  canvas.addEventListener('mouseup',function(){drawing=false;});
+  canvas.addEventListener('touchstart',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+  canvas.addEventListener('touchmove',function(e){
+    if(!drawing)return;
+    var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';
+    ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();
+  },{passive:false});
+  canvas.addEventListener('touchend',function(){drawing=false;});
+  card.appendChild(canvas);
+
+  var feedbackEl=document.createElement('div');
+  feedbackEl.style.cssText='font-size:1.1rem;font-weight:800;color:#22c55e;min-height:1.6rem;margin-bottom:8px';
+  card.appendChild(feedbackEl);
+
+  var traceBtn=document.createElement('button');traceBtn.className='rbtn rbtn-s';
+  traceBtn.style.cssText='display:block;margin:0 auto';
+  traceBtn.textContent="✅ J'ai tracé !";
+  traceBtn.onclick=function(){
+    traces++;updateDots();
+    if(traces>=TOTAL_TRACES){
+      feedbackEl.textContent='🌟 Bravo, tu as bien tracé !';
+      traceBtn.style.display='none';
+      nextBtn.style.display='block';
+    }else{
+      feedbackEl.textContent=['Super !','Encore mieux !'][traces-1]+' Encore '+(TOTAL_TRACES-traces)+' fois !';
+      drawGuide();
+    }
+  };
+  card.appendChild(traceBtn);
+  wrap.appendChild(card);
+
+  var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
+  nextBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem';
+  nextBtn.textContent='Continuer →';nextBtn.onclick=goNext;
+  wrap.appendChild(nextBtn);
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 4 : Le mot du jour
+   ────────────────────────────────────────────────────── */
+function _clStep4(wrap,letter,af,dayIdx,goNext){
+  var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+
+  var titleEl=document.createElement('div');
+  titleEl.style.cssText='font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:12px';
+  titleEl.textContent='Le mot du jour 📖';
+  card.appendChild(titleEl);
+
+  var emojiEl=document.createElement('div');
+  emojiEl.style.cssText='font-size:5rem;margin-bottom:8px;cursor:pointer';
+  emojiEl.textContent=letter.emoji;
+  emojiEl.onclick=function(){speakText(letter.wordAr,'ar-SA',null);};
+  card.appendChild(emojiEl);
+
+  var listenBtn=document.createElement('button');listenBtn.className='rbtn rbtn-s';
+  listenBtn.style.cssText='display:block;margin:0 auto 14px';
+  listenBtn.textContent='🔊 Écouter le mot';
+  listenBtn.onclick=function(){speakText(letter.wordAr,'ar-SA',null);};
+  card.appendChild(listenBtn);
+
+  var qel=document.createElement('div');
+  qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:14px';
+  qel.textContent='Par quelle lettre commence ce mot ?';
+  card.appendChild(qel);
+
+  /* 4 choix : lettre correcte + 3 distracteurs */
+  var wrong=[];
+  for(var wi=0;wi<CHILD_LETTERS.length;wi++){if(wi!==dayIdx)wrong.push(wi);}
+  wrong.sort(function(){return Math.random()-.5;});
+  var choiceIdxs=[dayIdx,wrong[0],wrong[1],wrong[2]];
+  choiceIdxs.sort(function(){return Math.random()-.5;});
+
+  var choiceRow=document.createElement('div');
+  choiceRow.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;direction:rtl;margin-bottom:14px';
+
+  var revealEl=document.createElement('div');
+  revealEl.style.cssText='display:none;border-top:1px solid rgba(194,24,91,.15);padding-top:12px;margin-top:4px';
+  revealEl.innerHTML="<div style=\"font-family:'Scheherazade New',serif;font-size:2.4rem;color:#7b1fa2;direction:rtl;margin-bottom:4px\">"+letter.wordAr+'</div>'
+    +'<div style="font-size:.85rem;color:#ad1457;font-style:italic">'+(letter.wordLat||letter.name)+'</div>';
+
+  var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
+  nextBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem';
+  nextBtn.textContent='Continuer →';nextBtn.onclick=goNext;
+
+  var answered=false;
+  choiceIdxs.forEach(function(ci){
+    var cl=CHILD_LETTERS[ci];
+    var btn=document.createElement('div');
+    btn.style.cssText="background:rgba(255,255,255,.9);border-radius:16px;width:72px;height:78px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:3rem;color:#c2185b;border:2px solid rgba(233,30,99,.18);cursor:pointer;transition:all .2s";
+    btn.textContent=cl.ar;
+    btn.onclick=function(){
+      if(answered)return;
+      speakText(cl.ar,'ar-SA',null);
+      if(ci===dayIdx){
+        btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
+        answered=true;
+        revealEl.style.display='block';
+        setTimeout(function(){
+          speakText(letter.wordAr,'ar-SA',null);
+          setTimeout(function(){nextBtn.style.display='block';},1200);
+        },400);
+      }else{
+        btn.style.background='rgba(239,68,68,.12)';btn.style.borderColor='#ef4444';
+        btn.style.cursor='default';btn.onclick=null;
+      }
+    };
+    choiceRow.appendChild(btn);
+  });
+  card.appendChild(choiceRow);
+  card.appendChild(revealEl);
+  wrap.appendChild(card);
+  wrap.appendChild(nextBtn);
+
+  setTimeout(function(){speakText(letter.wordAr,'ar-SA',null);},800);
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 5 : Mini quiz (5 questions mixtes)
+   3 questions sur les formes + 2 questions mot
+   ────────────────────────────────────────────────────── */
+function _clStep5(wrap,letter,af,dayIdx,goNext){
+  var forms=[
+    {lbl:'Isolée',form:letter.ar},
+    {lbl:'Début', form:af.i},
+    {lbl:'Milieu',form:af.m},
+    {lbl:'Fin',   form:af.f}
+  ];
+  /* 3 formes choisies au hasard parmi les 4 */
+  var formQs=forms.slice().sort(function(){return Math.random()-.5;}).slice(0,3);
+  /* 2 questions "mot" : variations légères (on utilise la même lettre) */
+  var TOTAL=5;var qIdx=0,score=0;
+  var container=document.createElement('div');wrap.appendChild(container);
+
+  function showQ(){
+    container.innerHTML='';
+    if(qIdx>=TOTAL){
+      /* Résultat final */
+      var stars=score>=4?'⭐⭐⭐':score>=3?'⭐⭐':'⭐';
+      var msg=score>=4?'Excellent !':score>=3?'Très bien !':'Continue les efforts !';
+      var doneCard=document.createElement('div');doneCard.className='child-card';doneCard.style.textAlign='center';
+      doneCard.innerHTML='<div style="font-size:3rem">'+stars+'</div>'
+        +'<div class="child-letter-name">Quiz final : '+score+' / '+TOTAL+'</div>'
+        +'<div style="font-size:.82rem;color:#ad1457;margin-top:8px">'+msg+'</div>';
+      container.appendChild(doneCard);
+      var nb=document.createElement('button');nb.className='rbtn rbtn-m child-btn-play';
+      nb.style.cssText='width:100%;padding:14px;font-size:1rem';
+      nb.textContent='Voir ma récompense 🎁';nb.onclick=goNext;
+      container.appendChild(nb);
+      return;
+    }
+
+    /* Dots */
+    var dots=document.createElement('div');
+    dots.style.cssText='display:flex;gap:5px;justify-content:center;margin-bottom:10px';
+    for(var di=0;di<TOTAL;di++){
+      var d=document.createElement('div');
+      d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<qIdx?'#22c55e':di===qIdx?'#c2185b':'rgba(194,24,91,.2)');
+      dots.appendChild(d);
+    }
+    container.appendChild(dots);
+
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+    var answered=false;
+
+    if(qIdx<3){
+      /* Question forme : montrer la forme, demander la position */
+      var ff=formQs[qIdx];
+      var shuffForms=forms.slice().sort(function(){return Math.random()-.5;});
+      var ql=document.createElement('div');
+      ql.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:10px';
+      ql.textContent="Cette forme s'utilise :";
+      card.appendChild(ql);
+      var formShow=document.createElement('div');
+      formShow.style.cssText="font-family:'Scheherazade New',serif;font-size:5.5rem;color:#c2185b;direction:rtl;margin-bottom:14px;cursor:pointer";
+      formShow.textContent=ff.form;
+      formShow.onclick=function(){speakText(ff.form,'ar-SA',null);};
+      card.appendChild(formShow);
+      var btnRow=document.createElement('div');
+      btnRow.style.cssText='display:flex;flex-wrap:wrap;gap:8px;justify-content:center';
+      shuffForms.forEach(function(sf){
+        var btn=document.createElement('button');
+        btn.style.cssText='background:rgba(255,255,255,.9);border:2px solid rgba(194,24,91,.2);border-radius:12px;padding:8px 16px;font-size:.85rem;font-weight:800;color:#7b1fa2;cursor:pointer;transition:all .2s';
+        btn.textContent='En '+sf.lbl.toLowerCase();
+        btn.onclick=function(){
+          if(answered)return;
+          speakText(sf.form,'ar-SA',null);
+          if(sf.lbl===ff.lbl){
+            btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';btn.style.color='#15803d';
+            score++;answered=true;
+            setTimeout(function(){qIdx++;showQ();},700);
+          }else{
+            btn.style.background='rgba(239,68,68,.12)';btn.style.borderColor='#ef4444';btn.style.color='#dc2626';
+            btn.onclick=null;
+          }
+        };
+        btnRow.appendChild(btn);
+      });
+      card.appendChild(btnRow);
+
+    }else{
+      /* Question mot : emoji → quelle lettre commence ce mot ? */
+      var wrong2=[];
+      for(var wi2=0;wi2<CHILD_LETTERS.length;wi2++){if(wi2!==dayIdx)wrong2.push(wi2);}
+      wrong2.sort(function(){return Math.random()-.5;});
+      var ci2s=[dayIdx,wrong2[0],wrong2[1],wrong2[2]];
+      ci2s.sort(function(){return Math.random()-.5;});
+
+      var ql2=document.createElement('div');
+      ql2.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:10px';
+      ql2.textContent='Par quelle lettre commence ce mot ?';
+      card.appendChild(ql2);
+      var emo=document.createElement('div');
+      emo.style.cssText='font-size:4rem;margin-bottom:6px;cursor:pointer';
+      emo.textContent=letter.emoji;
+      emo.onclick=function(){speakText(letter.wordAr,'ar-SA',null);};
+      card.appendChild(emo);
+      var wordDis=document.createElement('div');
+      wordDis.style.cssText="font-family:'Scheherazade New',serif;font-size:1.6rem;color:#7b1fa2;direction:rtl;margin-bottom:12px;cursor:pointer";
+      wordDis.textContent=letter.wordAr;
+      wordDis.onclick=function(){speakText(letter.wordAr,'ar-SA',null);};
+      card.appendChild(wordDis);
+      var br2=document.createElement('div');
+      br2.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;direction:rtl';
+      ci2s.forEach(function(ci){
+        var cl=CHILD_LETTERS[ci];
+        var btn=document.createElement('div');
+        btn.style.cssText="background:rgba(255,255,255,.9);border-radius:16px;width:68px;height:74px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.8rem;color:#c2185b;border:2px solid rgba(233,30,99,.18);cursor:pointer;transition:all .2s";
+        btn.textContent=cl.ar;
+        btn.onclick=function(){
+          if(answered)return;
+          speakText(cl.ar,'ar-SA',null);
+          if(ci===dayIdx){
+            btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
+            score++;answered=true;
+            setTimeout(function(){qIdx++;showQ();},700);
+          }else{
+            btn.style.background='rgba(239,68,68,.12)';btn.style.borderColor='#ef4444';
+            btn.onclick=null;
+          }
+        };
+        br2.appendChild(btn);
+      });
+      card.appendChild(br2);
+    }
+    container.appendChild(card);
+  }
+  showQ();
+}
+
+function renderChildGame(ca,dayIdx,round,onDone){
   round=round||0;
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
@@ -6329,8 +6869,8 @@ function renderChildGame(ca,dayIdx,round){
         scoreEl.textContent=found+' / '+TARGET;
         if(found===TARGET){
           setTimeout(function(){
-            if(round<3) renderChildGame(ca,dayIdx,round+1);
-            else renderChildReward(ca,dayIdx);
+            if(round<3) renderChildGame(ca,dayIdx,round+1,onDone);
+            else{if(onDone)onDone();else renderChildReward(ca,dayIdx);}
           },700);
         }
       } else {
