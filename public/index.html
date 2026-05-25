@@ -7281,7 +7281,6 @@ function renderAudioExercise(ca,qs,session){
           var lessonsDone = Object.keys(st.scores).length;
           checkChildBadges(lessonsDone, newScore);
         }
-        markPracticeToday();
       }
       yesBtn.onclick=()=>{handleSelfReport(true);setTimeout(function(){if(ex.idx>=total-1){var _a=(st.accuracy||{})[(session&&session.id!==undefined)?session.id:-999];_showFinish(_a&&_a.t>0?_a.c/_a.t:0,ca);}else{ex.idx++;animEl(ca,'tx-fade');renderQ();}},900);};
       noBtn.onclick=()=>{handleSelfReport(false);setTimeout(function(){if(ex.idx>=total-1){var _a=(st.accuracy||{})[(session&&session.id!==undefined)?session.id:-999];_showFinish(_a&&_a.t>0?_a.c/_a.t:0,ca);}else{ex.idx++;animEl(ca,'tx-fade');renderQ();}},900);};
@@ -7393,8 +7392,6 @@ function renderExPage(ca){
           try{localStorage.setItem('arab_scores',JSON.stringify(st.scores));}catch(e){}
         }
         if(correct){launchConfetti(st.profile);showStarBurst(window.innerWidth/2,window.innerHeight/2,st.profile);}
-        var msg=getEncouragementMsg(st.profile);
-        if(msg){var tst=document.createElement('div');tst.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:20px;font-size:.95rem;z-index:9999;white-space:nowrap;pointer-events:none';tst.textContent=msg;document.body.appendChild(tst);setTimeout(function(){if(tst.parentNode)tst.parentNode.removeChild(tst);},2500);}
         nextWrap.style.display='flex';
         setTimeout(function(){var nb=nextWrap.querySelector('button,.rbtn');if(nb)nb.scrollIntoView({behavior:'smooth',block:'center'});},100);
       }
