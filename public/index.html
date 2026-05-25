@@ -4003,7 +4003,7 @@ function buildMenu(){
   // Couleur unique selon le profil
   var pc=st.profile==='girl'?'pink':st.profile==='boy'?'blue':'gold';
   var items=[
-    {id:'intro',    icon:'ℹ️', cls:pc, title:t('intro'),        desc:t('intro_desc')},
+    ...(st.profile!=='girl'&&st.profile!=='boy'?[{id:'intro',icon:'ℹ️',cls:pc,title:t('intro'),desc:t('intro_desc')}]:[]),
     {id:'sessions', icon:'📚', cls:pc, title:t('sessions'),     desc:t('sessions_desc')},
     {id:'exercises',icon:'✏️', cls:pc, title:t('exercises'),    desc:t('exercises_desc')},
     ...(st.profile==='girl'||st.profile==='boy'?[{id:'minigames',icon:'🎮', cls:pc, title:'Jeux', desc:'Révise en t\'amusant'}]:[]),
