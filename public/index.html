@@ -3993,6 +3993,8 @@ function chooseProfile(p){
   updateStreak();
   renderGlobalProgress();
   setupPushNotifications();
+  /* ── Navigation navigateur ── remplace l'état initial pour qu'il soit identifiable */
+  history.replaceState({_appState:'root'}, '', location.pathname);
 }
 
 
@@ -4069,6 +4071,47 @@ function buildMenu(){
   updateAvgScore();
 }
 
+/* ════════════════════════════════════════════════════════
+   NAVIGATION NAVIGATEUR — bouton retour du navigateur
+   pushState à chaque navigation interne → popstate intercepté
+   ════════════════════════════════════════════════════════ */
+var _navPopping=false;
+function _navPush(hash){
+  if(_navPopping)return;
+  history.pushState({_appState:'page',hash:hash},'',location.pathname+(hash?'#'+hash:''));
+}
+window.addEventListener('popstate',function(e){
+  /* Si état non géré par l'appli (avant le premier push) → on laisse le navigateur sortir */
+  if(!e.state||!e.state._appState||e.state._appState==='root')return;
+  _navPopping=true;
+  var hash=e.state.hash||'';
+  var ca=document.getElementById('ca');
+  /* S'assurer que l'écran principal est visible */
+  function _ensureMain(){
+    var mainEl=document.getElementById('s-main');
+    if(mainEl&&!mainEl.classList.contains('on')){
+      document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
+      mainEl.classList.add('on');
+    }
+  }
+  if(!hash){
+    /* Retour au menu principal */
+    showS('s-menu',false);
+  } else if(hash.indexOf('/')>=0){
+    /* Sous-page (sessions/lesson, minigames/memory…) → page parente */
+    var parent=hash.split('/')[0];
+    st._curPage=parent;
+    _ensureMain();
+    renderPage(parent,false);
+  } else {
+    /* Page principale (sessions, exercises…) → re-rendu */
+    st._curPage=hash;
+    _ensureMain();
+    renderPage(hash,false);
+  }
+  _navPopping=false;
+});
+
 function navToPage(page){
   stopSpeech();
   st._curPage=page;showS('s-main',true);
@@ -4080,6 +4123,7 @@ function navToPage(page){
   document.getElementById('back-lbl').textContent=t('back_menu');
   document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:'Jeux'}[page]||'';
   st.backHistory=[{target:'menu'}];
+  _navPush(page); /* navigation navigateur */
   renderPage(page,true);
 }
 function renderPage(page,fwd){
@@ -5307,7 +5351,7 @@ function renderMemoryDeckList(ca,decks){
   wrap.appendChild(backBtn);ca.appendChild(wrap);
 }
 function renderMemoryPlay(ca,deck){
-  ca.innerHTML='';
+  ca.innerHTML='';_navPush('minigames/memory');
   /* ── Mode plein-écran pour la grille ── */
   ca.style.padding='0';ca.style.overflowY='hidden';
   var pool=deck.pairs;
@@ -5406,7 +5450,7 @@ function renderMemoryPlay(ca,deck){
 //  MINI-JEU — PUZZLE
 // ════════════════════════════════════════════════════════
 function renderPuzzleGame(ca){
-  ca.innerHTML='';
+  ca.innerHTML='';_navPush('minigames/puzzle');
   // Collecter les mots disponibles
   var wordPool=[];
   ALL_S.forEach(function(s){
@@ -6048,6 +6092,7 @@ function _renderChildIslandRecap(ca,letterIndices){
 //  QUIZ DE RÉCHAUFFEMENT — lettres déjà apprises
 // ════════════════════════════════════════════════════════
 function renderChildWarmup(ca){
+  _navPush('sessions/lesson');
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   if(dayIdx<1){renderChildLetterDay(ca);return;}
 
@@ -6158,6 +6203,7 @@ function renderChildWarmup(ca){
 
 function renderChildLetterDay(ca){
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  _navPush('sessions/lesson');
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   var letter=CHILD_LETTERS[dayIdx];
 
@@ -6525,7 +6571,7 @@ function _showFinish(pct,ca){
 }
 // VOWEL LESSON
 function renderVLesson(ca,s){
-  ca.innerHTML='';
+  ca.innerHTML='';_navPush('sessions/lesson');
   // Hint clique pour écouter
   var hintEl=document.createElement('div');
   hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';
@@ -6655,7 +6701,7 @@ function renderVLesson(ca,s){
 
 // PROLONG LESSON — cours unique scrollable
 function renderPLesson(ca,s){
-  ca.innerHTML='';
+  ca.innerHTML='';_navPush('sessions/lesson');
   var hintEl=document.createElement('div');hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';hintEl.textContent=t('click_to_listen');ca.appendChild(hintEl);
   function mkOrb(txt){
     var d=document.createElement('span');
@@ -6796,7 +6842,7 @@ function renderPLesson(ca,s){
 
 // LETTER LESSON
 function renderLLesson(ca,s,idx){
-  ca.innerHTML='';
+  ca.innerHTML='';_navPush('sessions/lesson');
   var hintEl=document.createElement('div');hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:4px;opacity:.7';hintEl.textContent=t('click_to_listen');ca.appendChild(hintEl);
   const letter=s.letters[idx];const isTaMarbuta=letter.ar==='ة';const isHamza=letter.ar==='ء';const isSASession=(s.id===1);
   const tabs=document.createElement('div');tabs.className='ltabs';
