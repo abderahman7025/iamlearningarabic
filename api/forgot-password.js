@@ -1,7 +1,6 @@
-// api/forgot-password.js
-
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
+const { sendEmail, resetPasswordEmail } = require('./_brevo');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -18,62 +17,36 @@ module.exports = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email requis' });
 
-  // Chercher l'utilisateur dans Supabase Auth (pas dans une table custom)
-  const { data: { users }, error } = await supabase.auth.admin.listUsers();
+  // Chercher l'utilisateur dans la table users
+  const { data: user } = await supabase
+    .from('users')
+    .select('email, paid')
+    .eq('email', email.toLowerCase())
+    .single();
 
-  if (error) {
-    console.error('Supabase auth error:', error);
-    return res.status(500).json({ success: false, error: 'Erreur serveur' });
-  }
-
-  const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
-
-  if (!user) {
-    return res.status(404).json({ success: false, error: 'Email introuvable' });
+  if (!user || !user.paid) {
+    // Réponse générique pour ne pas révéler l'existence d'un compte
+    return res.status(200).json({ success: true });
   }
 
   // Générer un token unique
   const token = crypto.randomBytes(32).toString('hex');
   const expires = new Date(Date.now() + 3600000); // 1 heure
 
-  // Sauvegarder le token dans reset_tokens
   await supabase
     .from('reset_tokens')
     .upsert({ email: email.toLowerCase(), token, expires_at: expires.toISOString() });
 
-  // Lien de reset
   const resetLink = `https://www.iamlearningarabic.com/app?reset=${token}&email=${encodeURIComponent(email.toLowerCase())}`;
 
-  // Envoyer l'email via Resend API
-  const emailRes = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: 'noreply@iamlearningarabic.com',
+  try {
+    await sendEmail({
       to: email,
-      subject: 'Réinitialisation de votre mot de passe',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:32px;background:#0d0b1a;color:#f0ece4;border-radius:16px">
-          <h2 style="color:#f5c842;text-align:center">لِنَتَعَلَّمِ الْعَرَبِيَّة</h2>
-          <p>Bonjour,</p>
-          <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
-          <div style="text-align:center;margin:28px 0">
-            <a href="${resetLink}" style="background:#f5c842;color:#0a0718;padding:14px 32px;border-radius:50px;text-decoration:none;font-weight:800;font-size:1rem">
-              Réinitialiser mon mot de passe
-            </a>
-          </div>
-          <p style="color:#888;font-size:12px;text-align:center">Ce lien expire dans 1 heure.<br>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
-        </div>
-      `
-    })
-  });
-
-  if (!emailRes.ok) {
-    const errData = await emailRes.json();
-    console.error('Resend error:', errData);
+      subject: '🔐 Réinitialisation de votre mot de passe — I Am Learning Arabic',
+      html: resetPasswordEmail(resetLink),
+    });
+  } catch (err) {
+    console.error('[Brevo] resetPasswordEmail failed:', err.message);
     return res.status(500).json({ success: false, error: 'Erreur envoi email' });
   }
 
