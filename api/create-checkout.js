@@ -17,16 +17,13 @@ module.exports = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      mode: 'subscription',           // abonnement mensuel
+      mode: 'payment',                // paiement unique - accès à vie
       customer_email: email,
       // Après paiement réussi → page inscription pour créer son mot de passe
       success_url: `${APP_URL}/inscription?email=${encodeURIComponent(email)}&payment=success`,
       // Annulation → retour accueil avec message
       cancel_url: `${APP_URL}/?payment=cancel`,
       metadata: { email },
-      subscription_data: {
-        metadata: { email },
-      },
       locale: 'fr',
     });
     res.json({ url: session.url });
