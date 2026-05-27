@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Am Learning Arabic — Apprenez l'Arabe du Coran</title>
-  <meta name="description" content="Apprenez l'arabe coranique, comprenez vos prieres et lisez le Coran. Methode interactive pour les musulmans francophones. Acces a vie pour 75 euros.">
+  <meta name="description" content="Apprenez l'arabe coranique, comprenez vos prieres et lisez le Coran. Acces a vie pour 74,99 euros au lieu de 149,99 euros. Offre de lancement limitee.">
   <link rel="icon" type="image/png" href="/images/20260518_195724_0000.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
@@ -146,7 +146,7 @@ footer a:hover{color:var(--goldc)}
   <a href="/" class="logo">&#x644;&#x650;&#x646;&#x064E;&#x062A;&#x064E;&#x639;&#x064E;&#x644;&#x064E;&#x651;&#x0645;&#x650; &#x0627;&#x0644;&#x0652;&#x0639;&#x064E;&#x0631;&#x064E;&#x0628;&#x0650;&#x064A;&#x064E;&#x651;&#x0629;</a>
   <div class="nav-r" id="nav-r">
     <a href="/connexion" class="lnk">Se connecter</a>
-    <a href="#pricing" class="ctabtn">Acc&egrave;s &agrave; vie — 75&euro;</a>
+    <a href="#pricing" class="ctabtn">Offre lancement &mdash; 74,99&euro;</a>
   </div>
 </nav>
 
@@ -161,7 +161,7 @@ footer a:hover{color:var(--goldc)}
     <input type="email" id="hero-email" class="hinput" placeholder="Votre adresse email..." required autocomplete="email">
     <button type="submit" id="hero-btn" class="hbtn">Commencer &rarr;</button>
   </form>
-  <p class="hnote">Acc&egrave;s complet &agrave; vie &middot; <b>75&euro; une seule fois</b> &middot; Sans abonnement</p>
+  <p class="hnote"><s style="opacity:.5">149,99&euro;</s> &nbsp;<b>74,99&euro; une seule fois</b> &middot; Acc&egrave;s &agrave; vie &middot; Sans abonnement</p>
   <div class="scroll-hint"><span>D&eacute;couvrir</span><div class="sarrow"></div></div>
 </section>
 
@@ -217,10 +217,19 @@ footer a:hover{color:var(--goldc)}
   <div class="cnt">
     <span class="sbadge" style="background:rgba(212,160,23,.14);color:var(--goldc)">Tarif</span>
     <h2 class="st">Simple et accessible</h2>
-    <p class="ss">75&euro; une seule fois. C&rsquo;est le prix d&rsquo;un dîner au restaurant. Les b&eacute;n&eacute;fices, eux, dureront toute votre vie &mdash; et au-del&agrave;.</p>
+    <p class="ss">74,99&euro; au lieu de 149,99&euro;. C&rsquo;est le prix d&rsquo;un dîner au restaurant. Les b&eacute;n&eacute;fices, eux, dureront toute votre vie &mdash; et au-del&agrave;.</p>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:24px auto 0;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:12px;padding:12px 20px;max-width:500px">
+      <span style="font-size:1.3rem">&#x26A1;</span>
+      <span style="font-size:.85rem;font-weight:700;color:var(--goldc);line-height:1.4">Offre de lancement exceptionnelle &mdash; 50% de r&eacute;duction.<br><span style="font-weight:500;color:rgba(255,255,255,.55)">Ce tarif est provisoire. Le prix reviendra &agrave; 149,99&euro; tr&egrave;s prochainement.</span></span>
+    </div>
+
     <div class="pcard">
-      <div class="pbadge">&#x2756; Acc&egrave;s complet &#x2756;</div>
-      <div class="pamount"><sup>&euro;</sup>75</div>
+      <div class="pbadge">&#x26A1; Offre lancement &mdash; -50% &#x26A1;</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px">
+        <div style="font-size:1.4rem;font-weight:700;color:rgba(255,255,255,.35);text-decoration:line-through">149,99&euro;</div>
+        <div class="pamount" style="margin:0"><sup>&euro;</sup>74,99</div>
+      </div>
       <div class="pper">paiement unique &middot; acc&egrave;s &agrave; vie</div>
       <ul class="pfeats">
         <li>Toutes les 28 lettres de l&rsquo;alphabet arabe</li>
@@ -233,7 +242,7 @@ footer a:hover{color:var(--goldc)}
       </ul>
       <p class="errmsg" id="price-err"></p>
       <input type="email" id="price-email" class="pi" placeholder="Votre adresse email..." autocomplete="email">
-      <button class="ps" id="price-btn" onclick="startCheckout(null,'price-email','price-btn','price-err')">Acc&egrave;s &agrave; vie pour 75&euro; &rarr;</button>
+      <button class="ps" id="price-btn" onclick="startCheckout(null,'price-email','price-btn','price-err')">Profiter de l&rsquo;offre &mdash; 74,99&euro; &rarr;</button>
       <p class="pguar">&#x1F512; Paiement unique s&eacute;curis&eacute; par Stripe</p>
     </div>
   </div>
@@ -260,7 +269,7 @@ footer a:hover{color:var(--goldc)}
     <div class="bcar">&#x0641;&#x064e;&#x0625;&#x0650;&#x0646;&#x064e;&#x0651;&#x0645;&#x064e;&#x0627; &#x064a;&#x064e;&#x0633;&#x064e;&#x0651;&#x0631;&#x0652;&#x0646;&#x064e;&#x0627;&#x0647;&#x064f; &#x0628;&#x0650;&#x0644;&#x0650;&#x0633;&#x064e;&#x0627;&#x0646;&#x0650;&#x0643;&#x064e;</div>
     <h2>Commencez aujourd&rsquo;hui.<br>Chaque jour compte.</h2>
     <p>&laquo;&nbsp;Nous l&rsquo;avons rendu facile dans ta langue&nbsp;&raquo; &mdash; Coran 44:58.<br>L&rsquo;arabe n&rsquo;est pas inaccessible. Il vous attend.</p>
-    <button class="btngold" onclick="openModal()">Acc&egrave;s &agrave; vie pour 75&euro;</button>
+    <button class="btngold" onclick="openModal()">Profiter de l&rsquo;offre &mdash; 74,99&euro;</button>
   </div>
 </section>
 
