@@ -136,7 +136,7 @@ footer a:hover{color:var(--goldc)}
   .hinput{background:rgba(255,255,255,.08);border:1.5px solid rgba(212,160,23,.32);border-radius:50px;padding:14px 20px}
   .hbtn{border-radius:50px;padding:13px 20px}
   nav{padding:0 16px}
-  .nav-r a.lnk{display:none}
+  .nav-r a.lnk{font-size:.75rem;padding:6px 10px}
 }
   </style>
 </head>
@@ -158,10 +158,11 @@ footer a:hover{color:var(--goldc)}
   <div class="h-ar2">&#x625;&#x650;&#x646;&#x064e;&#x651;&#x627; &#x623;&#x064e;&#x0646;&#x0632;&#x064e;&#x0644;&#x0652;&#x0646;&#x064e;&#x0627;&#x0647;&#x064f; &#x642;&#x064f;&#x0631;&#x0652;&#x0622;&#x0646;&#x064b;&#x0627; &#x639;&#x064e;&#x0631;&#x064e;&#x0628;&#x0650;&#x064a;&#x064b;&#x0627;</div>
   <h1 class="h1">Comprenez le Coran.<br><span>Rapprochez-vous d&rsquo;Allah.</span></h1>
   <p class="hp">L&rsquo;arabe est la langue de votre Seigneur. Chaque sourate, chaque du&rsquo;&acirc; que vous murmurez &mdash; comprenez-les vraiment. Notre m&eacute;thode interactive vous guide, lettre apr&egrave;s lettre.</p>
-  <form class="hform" id="hero-form" onsubmit="startCheckout(event,'hero-email','hero-btn')">
+  <form class="hform" id="hero-form" onsubmit="startCheckout(event,'hero-email','hero-btn','hero-err')">
     <input type="email" id="hero-email" class="hinput" placeholder="Votre adresse email..." required autocomplete="email">
     <button type="submit" id="hero-btn" class="hbtn">Commencer &rarr;</button>
   </form>
+  <p id="hero-err" style="display:none;color:#ff8a8a;font-size:.78rem;margin-top:8px"></p>
   <p class="hnote"><s style="opacity:.5">149,99&euro;</s> &nbsp;<b>74,99&euro; une seule fois</b> &middot; Acc&egrave;s &agrave; vie &middot; Sans abonnement</p>
   <div class="scroll-hint"><span>D&eacute;couvrir</span><div class="sarrow"></div></div>
 </section>
@@ -257,7 +258,7 @@ footer a:hover{color:var(--goldc)}
     <div class="flist">
       <div class="fitem"><button class="fq" onclick="tfaq(this)">Faut-il d&eacute;j&agrave; conna&icirc;tre l&rsquo;arabe ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Non, aucune connaissance pr&eacute;alable n&rsquo;est requise. La m&eacute;thode commence &agrave; la toute premi&egrave;re lettre et progresse &agrave; votre rythme.</div></div></div>
       <div class="fitem"><button class="fq" onclick="tfaq(this)">L&rsquo;application fonctionne-t-elle sur t&eacute;l&eacute;phone ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Oui, c&rsquo;est une Progressive Web App (PWA). Installez-la directement depuis votre navigateur sur Android ou iPhone, sans App Store. Elle fonctionne m&ecirc;me hors connexion une fois install&eacute;e.</div></div></div>
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">L&rsquo;acc&egrave;s est-il vraiment &agrave; vie ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Oui, 75&euro; une seule fois et c&rsquo;est tout. Aucun abonnement, aucun renouvellement, aucune surprise. Vous payez une fois et vous acc&eacute;dez &agrave; l&rsquo;application pour toujours, m&ecirc;me lorsque du nouveau contenu est ajout&eacute;.</div></div></div>
+      <div class="fitem"><button class="fq" onclick="tfaq(this)">L&rsquo;acc&egrave;s est-il vraiment &agrave; vie ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Oui, 74,99&euro; une seule fois et c&rsquo;est tout. Aucun abonnement, aucun renouvellement, aucune surprise. Vous payez une fois et vous acc&eacute;dez &agrave; l&rsquo;application pour toujours, m&ecirc;me lorsque du nouveau contenu est ajout&eacute;.</div></div></div>
       <div class="fitem"><button class="fq" onclick="tfaq(this)">Combien de temps pour apprendre l&rsquo;alphabet ?<div class="arr"></div></button><div class="fanswer"><div class="fai">En pratiquant 30 minutes par jour, la plupart des apprenants ma&icirc;trisent l&rsquo;alphabet complet en 4 &agrave; 6 semaines.</div></div></div>
       <div class="fitem"><button class="fq" onclick="tfaq(this)">Y a-t-il un mode pour les enfants ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Absolument. Un mode enfant complet (d&egrave;s 5 ans) est int&eacute;gr&eacute;, avec mascotte, carte des &icirc;les &agrave; d&eacute;bloquer, r&eacute;compenses et activit&eacute;s adapt&eacute;es. Parfait pour apprendre en famille.</div></div></div>
     </div>
@@ -301,13 +302,13 @@ footer a:hover{color:var(--goldc)}
 </div>
 
 <script>
-/* Redirect si deja connecte */
+/* Nav selon état connexion */
 (function(){
   var tok = localStorage.getItem('arab_token');
   var em  = localStorage.getItem('arab_email');
-  if(tok && em){
-    var nr = document.getElementById('nav-r');
-    if(nr) nr.innerHTML = '<a href="/app" class="ctabtn">Accéder à l\'app →</a>';
+  var nr  = document.getElementById('nav-r');
+  if(tok && em && nr){
+    nr.innerHTML = '<a href="/connexion" class="lnk">Mon espace</a><a href="/app" class="ctabtn">Accéder à l\'app →</a>';
   }
   var p = new URLSearchParams(location.search);
   if(p.get('payment')==='cancel'){
