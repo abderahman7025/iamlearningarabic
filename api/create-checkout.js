@@ -8,25 +8,39 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const { email } = req.body;
+  const { email, embedded } = req.body;
   if (!email) return res.status(400).json({ error: 'Email requis.' });
 
   const APP_URL = process.env.APP_URL || 'https://www.iamlearningarabic.com';
 
   try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      mode: 'payment',                // paiement unique - accès à vie
-      customer_email: email,
-      // Après paiement réussi → page inscription pour créer son mot de passe
-      success_url: `${APP_URL}/inscription?email=${encodeURIComponent(email)}&payment=success`,
-      // Annulation → retour accueil avec message
-      cancel_url: `${APP_URL}/?payment=cancel`,
-      metadata: { email },
-      locale: 'fr',
-    });
-    res.json({ url: session.url });
+    if (embedded) {
+      // Mode intégré : formulaire reste sur le site
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+        mode: 'payment',
+        customer_email: email,
+        ui_mode: 'embedded',
+        return_url: `${APP_URL}/inscription?email=${encodeURIComponent(email)}&session_id={CHECKOUT_SESSION_ID}`,
+        metadata: { email },
+        locale: 'fr',
+      });
+      res.json({ clientSecret: session.client_secret });
+    } else {
+      // Mode redirect (fallback)
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
+        mode: 'payment',
+        customer_email: email,
+        success_url: `${APP_URL}/inscription?email=${encodeURIComponent(email)}&payment=success`,
+        cancel_url: `${APP_URL}/?payment=cancel`,
+        metadata: { email },
+        locale: 'fr',
+      });
+      res.json({ url: session.url });
+    }
   } catch (err) {
     console.error('Stripe error:', err.message);
     res.status(500).json({ error: err.message });

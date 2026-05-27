@@ -118,7 +118,19 @@ footer{background:#050814;border-top:1px solid rgba(255,255,255,.05);padding:28p
 footer a{color:rgba(255,255,255,.4);text-decoration:none}
 footer a:hover{color:var(--goldc)}
 .flinks{display:flex;gap:18px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
-/* MODAL */
+/* PAYMENT OVERLAY */
+.povl{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.povl.open{opacity:1;pointer-events:all}
+.pbox{background:#0d1124;border:1.5px solid rgba(212,160,23,.22);border-radius:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.pbox-head{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between}
+.pbox-head h2{font-size:1.1rem;font-weight:800;color:#fff}
+.pbox-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.pbox-close:hover{background:rgba(255,255,255,.15);color:#fff}
+#checkout-container{padding:16px 4px 20px;min-height:200px}
+.pbox-loading{padding:60px 24px;text-align:center;color:rgba(255,255,255,.4);font-size:.88rem;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pspinner{width:36px;height:36px;border:3px solid rgba(212,160,23,.2);border-top-color:var(--goldc);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* EMAIL MODAL (fallback) */
 .movl{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
 .movl.open{opacity:1;pointer-events:all}
 .modal{background:#0d1124;border:1.5px solid rgba(212,160,23,.28);border-radius:22px;padding:38px 30px;max-width:420px;width:100%;text-align:center}
@@ -289,6 +301,21 @@ footer a:hover{color:var(--goldc)}
   <p>&copy; 2025 I Am Learning Arabic &middot; <a href="#">Mentions l&eacute;gales</a> &middot; <a href="#">CGV</a></p>
 </footer>
 
+<!-- PAYMENT OVERLAY (embedded Stripe) -->
+<div class="povl" id="povl" onclick="if(event.target===this)closePayment()">
+  <div class="pbox">
+    <div class="pbox-head">
+      <h2>&#x1F512; Paiement s&eacute;curis&eacute;</h2>
+      <button class="pbox-close" onclick="closePayment()" title="Fermer">&times;</button>
+    </div>
+    <div id="checkout-loading" class="pbox-loading">
+      <div class="pspinner"></div>
+      <span>Chargement du formulaire de paiement&hellip;</span>
+    </div>
+    <div id="checkout-container" style="display:none"></div>
+  </div>
+</div>
+
 <!-- MODAL EMAIL -->
 <div class="movl" id="movl" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -301,15 +328,21 @@ footer a:hover{color:var(--goldc)}
   </div>
 </div>
 
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-/* Nav selon état connexion */
-(function(){
+/* ===== INIT ===== */
+var _stripe = null;
+var _checkout = null;
+
+(function init(){
+  /* Nav selon état connexion */
   var tok = localStorage.getItem('arab_token');
   var em  = localStorage.getItem('arab_email');
   var nr  = document.getElementById('nav-r');
   if(tok && em && nr){
     nr.innerHTML = '<a href="/connexion" class="lnk">Mon espace</a><a href="/app" class="ctabtn">Accéder à l\'app →</a>';
   }
+  /* Annulation de paiement */
   var p = new URLSearchParams(location.search);
   if(p.get('payment')==='cancel'){
     var h = document.querySelector('.hp');
@@ -321,8 +354,13 @@ footer a:hover{color:var(--goldc)}
     }
     history.replaceState({},'','/');
   }
+  /* Charger la clé Stripe */
+  fetch('/api/config').then(function(r){return r.json();}).then(function(d){
+    if(d.pk) _stripe = Stripe(d.pk);
+  }).catch(function(){});
 })();
 
+/* ===== PAIEMENT EMBARQUÉ ===== */
 async function startCheckout(e, emailId, btnId, errId){
   if(e) e.preventDefault();
   var emailEl = document.getElementById(emailId);
@@ -333,29 +371,75 @@ async function startCheckout(e, emailId, btnId, errId){
     if(errEl){errEl.textContent='Veuillez entrer un email valide.';errEl.style.display='block';}
     return;
   }
-  btn.disabled = true;
-  btn.textContent = 'Redirection...';
-  if(errEl) errEl.style.display = 'none';
+  if(errEl) errEl.style.display='none';
+  btn.disabled=true;
+  btn.textContent='Chargement…';
+
   try{
-    var r = await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+    var r = await fetch('/api/create-checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email, embedded:true})
+    });
     var d = await r.json();
-    if(d.url){ window.location.href = d.url; }
-    else{
+
+    if(d.clientSecret && _stripe){
+      /* Ouvrir l'overlay de paiement */
+      openPayment();
+      /* Détruire un ancien checkout si existant */
+      if(_checkout){ _checkout.destroy(); _checkout=null; }
+      var clientSecret = d.clientSecret;
+      _checkout = await _stripe.initEmbeddedCheckout({
+        fetchClientSecret: function(){ return Promise.resolve(clientSecret); }
+      });
+      document.getElementById('checkout-loading').style.display='none';
+      var container = document.getElementById('checkout-container');
+      container.style.display='block';
+      _checkout.mount('#checkout-container');
+    } else if(d.url){
+      /* Fallback redirect si embedded non dispo */
+      window.location.href = d.url;
+    } else {
       if(errEl){errEl.textContent=d.error||'Erreur. Réessayez.';errEl.style.display='block';}
-      btn.disabled=false; btn.textContent='Continuer vers le paiement →';
+      btn.disabled=false;
+      btn.textContent='Continuer vers le paiement →';
     }
   }catch(err){
     if(errEl){errEl.textContent='Erreur réseau. Réessayez.';errEl.style.display='block';}
-    btn.disabled=false; btn.textContent='Continuer vers le paiement →';
+    btn.disabled=false;
+    btn.textContent='Continuer vers le paiement →';
   }
 }
 
+function openPayment(){
+  /* Reset l'état du container */
+  document.getElementById('checkout-loading').style.display='flex';
+  document.getElementById('checkout-container').style.display='none';
+  document.getElementById('checkout-container').innerHTML='';
+  document.getElementById('povl').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closePayment(){
+  document.getElementById('povl').classList.remove('open');
+  document.body.style.overflow='';
+  if(_checkout){ _checkout.destroy(); _checkout=null; }
+  /* Réactiver les boutons */
+  document.querySelectorAll('.hbtn,.ps,.btngold').forEach(function(b){
+    b.disabled=false;
+    if(b.classList.contains('hbtn')) b.textContent='Commencer →';
+    if(b.classList.contains('ps'))   b.textContent='Continuer vers le paiement →';
+    if(b.classList.contains('btngold')) b.textContent='Profiter de l\'offre — 74,99€';
+  });
+}
+
+/* ===== ANCIEN MODAL EMAIL (pour le bouton CTA bas de page) ===== */
 function openModal(){
   document.getElementById('movl').classList.add('open');
   setTimeout(function(){document.getElementById('modal-email').focus();},100);
 }
 function closeModal(){ document.getElementById('movl').classList.remove('open'); }
 
+/* ===== FAQ ===== */
 function tfaq(btn){
   var item = btn.closest('.fitem');
   var isOpen = item.classList.contains('open');

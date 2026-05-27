@@ -74,6 +74,8 @@ input[readonly]{opacity:.6;cursor:default}
   }
   /* If already logged in, go to app */
   if(localStorage.getItem('arab_token')) window.location.replace('/app');
+  /* session_id param = retour depuis embedded checkout Stripe (paiement ok) */
+  /* Le webhook Stripe a déjà enregistré le user, on peut juste créer le mot de passe */
 })();
 
 async function doRegister(){
