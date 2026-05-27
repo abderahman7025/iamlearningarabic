@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
     .upsert({ email: email.toLowerCase(), token, expires_at: expires.toISOString() });
 
   // Lien de reset
-  const resetLink = `https://www.iamlearningarabic.com?reset=${token}&email=${encodeURIComponent(email.toLowerCase())}`;
+  const resetLink = `https://www.iamlearningarabic.com/app?reset=${token}&email=${encodeURIComponent(email.toLowerCase())}`;
 
   // Envoyer l'email via Resend API
   const emailRes = await fetch('https://api.resend.com/emails', {

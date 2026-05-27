@@ -12,5 +12,10 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
     }
+  ],
+  "rewrites": [
+    { "source": "/app",         "destination": "/app.html" },
+    { "source": "/connexion",   "destination": "/connexion.html" },
+    { "source": "/inscription", "destination": "/inscription.html" }
   ]
 }

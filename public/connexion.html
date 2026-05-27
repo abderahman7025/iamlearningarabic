@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion &mdash; I Am Learning Arabic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gd:#0a2e1e;--g:#0f3d28;--gm:#1a5c44;--gold:#d4a017;--goldc:#f5c842;--r:16px}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(155deg,var(--gd) 0%,#103d25 60%,#0d4a2f 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:#fff}
+.card{background:rgba(255,255,255,.05);border:1.5px solid rgba(212,160,23,.22);border-radius:22px;padding:44px 36px;max-width:420px;width:100%}
+.logo{font-family:'Scheherazade New',serif;font-size:1.6rem;color:var(--goldc);text-align:center;display:block;margin-bottom:6px;text-decoration:none}
+.sub{text-align:center;font-size:.85rem;color:rgba(255,255,255,.5);margin-bottom:32px}
+/* Tabs */
+.tabs{display:flex;gap:0;margin-bottom:28px;background:rgba(255,255,255,.06);border-radius:12px;padding:4px}
+.tab{flex:1;padding:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.85rem;font-weight:700;background:transparent;border:none;color:rgba(255,255,255,.5);cursor:pointer;border-radius:9px;transition:background .2s,color .2s}
+.tab.active{background:var(--gold);color:var(--gd)}
+/* Form */
+label{display:block;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.55);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+input[type=email],input[type=password]{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(212,160,23,.25);border-radius:12px;padding:13px 18px;font-size:.93rem;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s}
+input::placeholder{color:rgba(255,255,255,.3)}
+input:focus{border-color:var(--gold)}
+.submit{width:100%;background:var(--gold);color:var(--gd);border:none;border-radius:12px;padding:14px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s}
+.submit:hover{background:var(--goldc)}
+.submit:disabled{opacity:.5;cursor:default}
+.errmsg{color:#ff8a8a;font-size:.8rem;margin:-10px 0 14px;display:none}
+.link{color:var(--goldc);text-decoration:none;font-size:.82rem;font-weight:600}
+.link:hover{text-decoration:underline}
+.bottom{text-align:center;margin-top:20px;font-size:.82rem;color:rgba(255,255,255,.4)}
+.forgot{display:block;text-align:right;font-size:.78rem;margin-top:-12px;margin-bottom:18px}
+.panel{display:none}
+.panel.active{display:block}
+.success-box{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:14px 16px;font-size:.88rem;color:#86efac;margin-bottom:14px;display:none}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <a href="/" class="logo">&#x644;&#x650;&#x646;&#x064E;&#x062A;&#x064E;&#x639;&#x064E;&#x644;&#x064E;&#x651;&#x0645;&#x650; &#x0627;&#x0644;&#x0652;&#x0639;&#x064E;&#x0631;&#x064E;&#x0628;&#x0650;&#x064A;&#x064E;&#x651;&#x0629;</a>
+  <p class="sub">Votre espace d&rsquo;apprentissage</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('login')">Se connecter</button>
+    <button class="tab" onclick="showTab('forgot')">Mot de passe oubli&eacute;</button>
+  </div>
+
+  <!-- LOGIN PANEL -->
+  <div class="panel active" id="panel-login">
+    <p class="success-box" id="login-success"></p>
+    <p class="errmsg" id="login-err"></p>
+    <label>Email</label>
+    <input type="email" id="login-email" placeholder="votre@email.com" autocomplete="email">
+    <label>Mot de passe</label>
+    <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password">
+    <a href="#" class="link forgot" onclick="showTab('forgot');return false">Mot de passe oubli&eacute; ?</a>
+    <button class="submit" id="login-btn" onclick="doLogin()">Se connecter</button>
+    <div class="bottom">
+      Pas encore de compte ?
+      <a href="/#pricing" class="link">S&rsquo;abonner pour 75&euro;/mois</a>
+    </div>
+  </div>
+
+  <!-- FORGOT PANEL -->
+  <div class="panel" id="panel-forgot">
+    <p class="success-box" id="forgot-success"></p>
+    <p class="errmsg" id="forgot-err"></p>
+    <label>Votre email</label>
+    <input type="email" id="forgot-email" placeholder="votre@email.com" autocomplete="email">
+    <button class="submit" id="forgot-btn" onclick="doForgot()">Envoyer le lien de r&eacute;initialisation</button>
+    <div class="bottom" style="margin-top:14px">
+      <a href="#" class="link" onclick="showTab('login');return false">&larr; Retour &agrave; la connexion</a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Redirect si deja connecte */
+(function(){
+  var tok = localStorage.getItem('arab_token');
+  var em  = localStorage.getItem('arab_email');
+  if(tok && em){ window.location.replace('/app'); }
+})();
+
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('panel-'+name).classList.add('active');
+  var tabs = document.querySelectorAll('.tab');
+  if(name==='login') tabs[0].classList.add('active');
+  else tabs[1].classList.add('active');
+}
+
+async function doLogin(){
+  var email = document.getElementById('login-email').value.trim();
+  var pw    = document.getElementById('login-pw').value;
+  var errEl = document.getElementById('login-err');
+  var btn   = document.getElementById('login-btn');
+  errEl.style.display='none';
+  if(!email||!pw){ errEl.textContent='Remplissez tous les champs.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Connexion...';
+  try{
+    var device_id = localStorage.getItem('arab_device_id') || (function(){
+      var id = 'dev_'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+      try{localStorage.setItem('arab_device_id',id);}catch(e){}
+      return id;
+    })();
+    var r = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pw,device_id:device_id})});
+    var d = await r.json();
+    if(d.success){
+      localStorage.setItem('arab_token',d.token);
+      localStorage.setItem('arab_email',d.email);
+      window.location.replace('/app');
+    }else{
+      if(d.error && d.error.includes('non activ')){
+        window.location.href='/inscription?email='+encodeURIComponent(email);
+      } else {
+        errEl.textContent = d.error || 'Email ou mot de passe incorrect.';
+        errEl.style.display='block';
+        btn.disabled=false; btn.textContent='Se connecter';
+      }
+    }
+  }catch(err){
+    errEl.textContent='Erreur réseau. Réessayez.'; errEl.style.display='block';
+    btn.disabled=false; btn.textContent='Se connecter';
+  }
+}
+
+async function doForgot(){
+  var email = document.getElementById('forgot-email').value.trim();
+  var errEl = document.getElementById('forgot-err');
+  var sucEl = document.getElementById('forgot-success');
+  var btn   = document.getElementById('forgot-btn');
+  errEl.style.display='none'; sucEl.style.display='none';
+  if(!email){ errEl.textContent='Entrez votre email.'; errEl.style.display='block'; return; }
+  btn.disabled=true; btn.textContent='Envoi...';
+  try{
+    var r = await fetch('/api/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+    var d = await r.json();
+    if(d.success){
+      sucEl.textContent='Un email vous a été envoyé avec le lien de réinitialisation.';
+      sucEl.style.display='block';
+      btn.textContent='Email envoyé';
+    }else{
+      errEl.textContent=d.error||'Erreur. Vérifiez votre email.'; errEl.style.display='block';
+      btn.disabled=false; btn.textContent='Envoyer le lien de réinitialisation';
+    }
+  }catch(err){
+    errEl.textContent='Erreur réseau.'; errEl.style.display='block';
+    btn.disabled=false; btn.textContent='Envoyer le lien de réinitialisation';
+  }
+}
+
+/* Enter key */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  var ap = document.querySelector('.panel.active');
+  if(!ap)return;
+  if(ap.id==='panel-login') doLogin();
+  else if(ap.id==='panel-forgot') doForgot();
+});
+</script>
+</body>
+</html>
