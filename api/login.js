@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
   if (!valid) return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
 
   // Comptes admin — jamais bloqués par la vérification d'appareil
-  const ADMIN_EMAILS = ['abder.jah@gmail.com', 'contact@iamlearningarabic.com'];
+  const ADMIN_EMAILS = ['abder.jah@gmail.com', 'abder.jah@hotmail.com', 'contact@iamlearningarabic.com'];
   const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
 
   // Vérification appareil unique
