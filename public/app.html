@@ -6435,8 +6435,41 @@ function _clStep1(wrap,letter,af,goNext){
 
     container.appendChild(card);
 
+    /* ── Mini canvas : écrire la forme après la flashcard ── */
+    var cCard=document.createElement('div');cCard.className='child-card';
+    cCard.style.cssText='text-align:center;padding:10px 12px';
+    var cHint=document.createElement('div');
+    cHint.style.cssText='font-size:.72rem;font-weight:700;color:#ad1457;opacity:.7;margin-bottom:6px';
+    cHint.textContent='✏️ '+t('writing_hint');
+    cCard.appendChild(cHint);
+    var CWc=200,CHc=200;
+    var cvs=document.createElement('canvas');cvs.width=CWc;cvs.height=CHc;
+    cvs.style.cssText='border-radius:14px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px';
+    var cc=cvs.getContext('2d');
+    function drawFormGuide(){
+      cc.clearRect(0,0,CWc,CHc);
+      cc.save();cc.font="120px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='middle';
+      cc.fillStyle='rgba(194,24,91,0.08)';cc.fillText(f.form,CWc/2,CHc/2+8);cc.restore();
+    }
+    drawFormGuide();
+    var _drawing=false;
+    function _getP(e){var r=cvs.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CWc/r.width),y:(s.clientY-r.top)*(CHc/r.height)};}
+    cvs.addEventListener('mousedown',function(e){_drawing=true;var p=_getP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();});
+    cvs.addEventListener('mousemove',function(e){if(!_drawing)return;var p=_getP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();});
+    cvs.addEventListener('mouseup',function(){_drawing=false;});
+    cvs.addEventListener('touchstart',function(e){_drawing=true;var p=_getP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+    cvs.addEventListener('touchmove',function(e){if(!_drawing)return;var p=_getP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();},{passive:false});
+    cvs.addEventListener('touchend',function(){_drawing=false;});
+    cCard.appendChild(cvs);
+    var clearBtn=document.createElement('button');clearBtn.className='rbtn rbtn-s';
+    clearBtn.style.cssText='display:inline-block;margin:0 auto';
+    clearBtn.textContent='↺ '+t('writing_clear');
+    clearBtn.onclick=function(){drawFormGuide();};
+    cCard.appendChild(clearBtn);
+    container.appendChild(cCard);
+
     var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
-    nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem';
+    nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:8px';
     nextBtn.textContent=fcIdx<3?'Suivant →':'📝 Quiz des formes !';
     nextBtn.onclick=function(){fcIdx++;showPhaseA();};
     container.appendChild(nextBtn);
@@ -6459,7 +6492,11 @@ function _clStep1(wrap,letter,af,goNext){
       return;
     }
     var q=forms[qIdx];
-    var shuffled=forms.slice().sort(function(){return Math.random()-.5;});
+    /* Dédoublonnage : si deux formes ont le même texte arabe, n'afficher qu'un seul bouton */
+    var _seen={};
+    var shuffled=forms.slice().sort(function(){return Math.random()-.5;}).filter(function(f){
+      if(_seen[f.form])return false;_seen[f.form]=true;return true;
+    });
 
     /* Dots quiz */
     var dots=document.createElement('div');
@@ -6487,7 +6524,7 @@ function _clStep1(wrap,letter,af,goNext){
       btn.onclick=function(){
         if(answered)return;
         speakText(sf.form,'ar-SA',null);
-        if(sf.lbl===q.lbl){
+        if(sf.form===q.form){
           btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
           score++;answered=true;
           setTimeout(function(){qIdx++;showPhaseB();},700);
