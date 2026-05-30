@@ -26,8 +26,12 @@ module.exports = async (req, res) => {
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
 
+  // Comptes admin — jamais bloqués par la vérification d'appareil
+  const ADMIN_EMAILS = ['abder.jah@gmail.com', 'contact@iamlearningarabic.com'];
+  const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
+
   // Vérification appareil unique
-  if (device_id) {
+  if (device_id && !isAdmin) {
     if (user.device_id && user.device_id !== device_id) {
       // Un autre appareil est déjà enregistré
       return res.status(403).json({ 
