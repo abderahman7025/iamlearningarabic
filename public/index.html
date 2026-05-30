@@ -119,14 +119,34 @@ footer a{color:rgba(255,255,255,.4);text-decoration:none}
 footer a:hover{color:var(--goldc)}
 .flinks{display:flex;gap:18px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
 /* PAYMENT OVERLAY */
-.povl{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px)}
+.povl{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px)}
 .povl.open{opacity:1;pointer-events:all}
-.pbox{background:#0d1124;border:1.5px solid rgba(212,160,23,.22);border-radius:22px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.6)}
-.pbox-head{padding:22px 24px 0;display:flex;align-items:center;justify-content:space-between}
-.pbox-head h2{font-size:1.1rem;font-weight:800;color:#fff}
-.pbox-close{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s}
-.pbox-close:hover{background:rgba(255,255,255,.15);color:#fff}
-#checkout-container{padding:16px 4px 20px;min-height:200px}
+.pbox{background:#0b0f1e;border:1.5px solid rgba(212,160,23,.2);border-radius:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7)}
+/* Header */
+.pbox-head{padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between}
+.pbox-head h2{font-size:1rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:7px}
+.pbox-close{background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.4);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.pbox-close:hover{background:rgba(255,255,255,.14);color:#fff}
+/* Résumé commande */
+.pay-summary{margin:18px 28px 0;background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.16);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+.pay-product{font-size:.88rem;font-weight:700;color:#fff}
+.pay-product span{display:block;font-size:.73rem;font-weight:400;color:rgba(255,255,255,.4);margin-top:2px}
+.pay-prices{text-align:right}
+.pay-old{font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:line-through}
+.pay-new{font-size:1.35rem;font-weight:800;color:var(--goldc)}
+/* Formulaire */
+.pay-form{padding:20px 28px 28px}
+.pay-label{display:block;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
+.pay-input{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(212,160,23,.2);border-radius:11px;padding:12px 16px;font-size:.93rem;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s}
+.pay-input:focus{border-color:var(--gold)}
+.pay-divider{font-size:.72rem;color:rgba(255,255,255,.3);text-align:center;margin-bottom:16px;letter-spacing:.04em;text-transform:uppercase}
+#payment-element{margin-bottom:20px}
+.pay-submit{width:100%;background:var(--gold);color:#0a0e1a;border:none;border-radius:12px;padding:15px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.pay-submit:hover{background:var(--goldc)}
+.pay-submit:disabled{opacity:.5;cursor:default}
+.pay-secure{margin-top:12px;text-align:center;font-size:.72rem;color:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;gap:5px}
+.pay-error{color:#ff8a8a;font-size:.8rem;margin-bottom:12px;display:none;padding:10px 14px;background:rgba(255,80,80,.08);border-radius:8px;border:1px solid rgba(255,80,80,.18)}
+/* Spinner */
 .pbox-loading{padding:60px 24px;text-align:center;color:rgba(255,255,255,.4);font-size:.88rem;display:flex;flex-direction:column;align-items:center;gap:14px}
 .pspinner{width:36px;height:36px;border:3px solid rgba(212,160,23,.2);border-top-color:var(--goldc);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -301,18 +321,42 @@ footer a:hover{color:var(--goldc)}
   <p>&copy; 2025 I Am Learning Arabic &middot; <a href="#">Mentions l&eacute;gales</a> &middot; <a href="#">CGV</a></p>
 </footer>
 
-<!-- PAYMENT OVERLAY (embedded Stripe) -->
+<!-- PAYMENT OVERLAY (custom Payment Element) -->
 <div class="povl" id="povl" onclick="if(event.target===this)closePayment()">
   <div class="pbox">
     <div class="pbox-head">
       <h2>&#x1F512; Paiement s&eacute;curis&eacute;</h2>
       <button class="pbox-close" onclick="closePayment()" title="Fermer">&times;</button>
     </div>
+    <!-- Spinner -->
     <div id="checkout-loading" class="pbox-loading">
       <div class="pspinner"></div>
-      <span>Chargement du formulaire de paiement&hellip;</span>
+      <span>Pr&eacute;paration du paiement&hellip;</span>
     </div>
-    <div id="checkout-container" style="display:none"></div>
+    <!-- Formulaire custom -->
+    <div id="pay-content" style="display:none">
+      <div class="pay-summary">
+        <div class="pay-product">
+          I Am Learning Arabic
+          <span>Acc&egrave;s &agrave; vie &middot; 28 lettres &middot; PWA</span>
+        </div>
+        <div class="pay-prices">
+          <div class="pay-old">149,99&euro;</div>
+          <div class="pay-new">74,99&euro;</div>
+        </div>
+      </div>
+      <div class="pay-form">
+        <label class="pay-label">Adresse email</label>
+        <input type="email" id="pay-email" class="pay-input" placeholder="votre@email.com" autocomplete="email">
+        <div class="pay-divider">Informations de paiement</div>
+        <p class="pay-error" id="pay-error"></p>
+        <div id="payment-element"></div>
+        <button class="pay-submit" id="pay-submit" onclick="submitPayment()">
+          <span>Payer 74,99&euro;</span> <span>&rarr;</span>
+        </button>
+        <p class="pay-secure">&#x1F512; Paiement s&eacute;curis&eacute; par Stripe &middot; Chiffrement SSL</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -330,121 +374,180 @@ footer a:hover{color:var(--goldc)}
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-/* ===== INIT ===== */
 var _stripe = null;
-var _checkout = null;
+var _elements = null;
+var _pendingEmail = '';
 
+/* ===== INIT ===== */
 (function init(){
-  /* Nav selon état connexion */
   var tok = localStorage.getItem('arab_token');
   var em  = localStorage.getItem('arab_email');
   var nr  = document.getElementById('nav-r');
   if(tok && em && nr){
     nr.innerHTML = '<a href="/connexion" class="lnk">Mon espace</a><a href="/app" class="ctabtn">Accéder à l\'app →</a>';
   }
-  /* Annulation de paiement */
-  var p = new URLSearchParams(location.search);
-  if(p.get('payment')==='cancel'){
-    var h = document.querySelector('.hp');
-    if(h){
-      var n=document.createElement('div');
-      n.style.cssText='background:rgba(255,100,100,.14);border:1px solid rgba(255,100,100,.28);border-radius:10px;padding:10px 16px;font-size:.82rem;color:#ff8a8a;margin-bottom:14px';
-      n.textContent='Le paiement a été annulé. Réessayez quand vous voulez.';
-      h.parentNode.insertBefore(n,h);
-    }
-    history.replaceState({},'','/');
-  }
-  /* Charger la clé Stripe */
-  fetch('/api/config').then(function(r){return r.json();}).then(function(d){
+  /* Charger Stripe */
+  fetch('/api/config').then(r=>r.json()).then(d=>{
     if(d.pk) _stripe = Stripe(d.pk);
-  }).catch(function(){});
+  }).catch(()=>{});
 })();
 
-/* ===== PAIEMENT EMBARQUÉ ===== */
+/* ===== OUVRIR LE PAIEMENT ===== */
 async function startCheckout(e, emailId, btnId, errId){
   if(e) e.preventDefault();
-  var emailEl = document.getElementById(emailId);
-  var btn     = document.getElementById(btnId);
-  var errEl   = errId ? document.getElementById(errId) : null;
-  var email   = emailEl ? emailEl.value.trim() : '';
+  var email = (document.getElementById(emailId)||{}).value?.trim()||'';
+  var btn   = document.getElementById(btnId);
+  var errEl = errId ? document.getElementById(errId) : null;
+
   if(!email || !email.includes('@')){
     if(errEl){errEl.textContent='Veuillez entrer un email valide.';errEl.style.display='block';}
     return;
   }
   if(errEl) errEl.style.display='none';
-  btn.disabled=true;
-  btn.textContent='Chargement…';
+  btn.disabled=true; btn.textContent='Chargement…';
+  _pendingEmail = email;
 
   try{
-    var r = await fetch('/api/create-checkout',{
+    /* Créer le PaymentIntent */
+    var r = await fetch('/api/create-payment-intent',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:email, embedded:true})
+      body:JSON.stringify({email})
     });
     var d = await r.json();
+    if(!d.clientSecret){ throw new Error(d.error||'Erreur serveur'); }
 
-    if(d.clientSecret && _stripe){
-      /* Ouvrir l'overlay de paiement */
-      openPayment();
-      /* Détruire un ancien checkout si existant */
-      if(_checkout){ _checkout.destroy(); _checkout=null; }
-      var clientSecret = d.clientSecret;
-      _checkout = await _stripe.initEmbeddedCheckout({
-        fetchClientSecret: function(){ return Promise.resolve(clientSecret); }
-      });
+    /* Apparence sombre aux couleurs du site */
+    var appearance = {
+      theme: 'night',
+      variables:{
+        colorPrimary:       '#d4a017',
+        colorBackground:    '#0f1428',
+        colorText:          '#ffffff',
+        colorTextSecondary: 'rgba(255,255,255,.55)',
+        colorDanger:        '#ff8a8a',
+        fontFamily:         '"Plus Jakarta Sans", Arial, sans-serif',
+        borderRadius:       '11px',
+        spacingUnit:        '4px',
+      },
+      rules:{
+        '.Input':{
+          backgroundColor:'rgba(255,255,255,.06)',
+          border:'1.5px solid rgba(212,160,23,.22)',
+          boxShadow:'none',
+          color:'#fff',
+          padding:'12px 14px',
+        },
+        '.Input:focus':{
+          border:'1.5px solid #d4a017',
+          boxShadow:'0 0 0 3px rgba(212,160,23,.15)',
+        },
+        '.Label':{
+          color:'rgba(255,255,255,.45)',
+          fontSize:'.72rem',
+          fontWeight:'700',
+          textTransform:'uppercase',
+          letterSpacing:'.05em',
+        },
+        '.Tab':{
+          backgroundColor:'rgba(255,255,255,.05)',
+          border:'1.5px solid rgba(255,255,255,.08)',
+          color:'rgba(255,255,255,.6)',
+        },
+        '.Tab--selected':{
+          backgroundColor:'rgba(212,160,23,.12)',
+          border:'1.5px solid rgba(212,160,23,.35)',
+          color:'#f5c842',
+        },
+        '.TabIcon--selected':{ fill:'#f5c842' },
+      }
+    };
+
+    _elements = _stripe.elements({clientSecret: d.clientSecret, appearance, locale:'fr'});
+    var pe = _elements.create('payment');
+
+    /* Afficher le modal */
+    document.getElementById('checkout-loading').style.display='flex';
+    document.getElementById('pay-content').style.display='none';
+    document.getElementById('pay-email').value = email;
+    document.getElementById('pay-error').style.display='none';
+    document.getElementById('povl').classList.add('open');
+    document.body.style.overflow='hidden';
+
+    /* Monter l'élément une fois prêt */
+    pe.mount('#payment-element');
+    pe.on('ready', function(){
       document.getElementById('checkout-loading').style.display='none';
-      var container = document.getElementById('checkout-container');
-      container.style.display='block';
-      _checkout.mount('#checkout-container');
-    } else if(d.url){
-      /* Fallback redirect si embedded non dispo */
-      window.location.href = d.url;
-    } else {
-      if(errEl){errEl.textContent=d.error||'Erreur. Réessayez.';errEl.style.display='block';}
-      btn.disabled=false;
-      btn.textContent='Continuer vers le paiement →';
-    }
+      document.getElementById('pay-content').style.display='block';
+    });
+
   }catch(err){
-    if(errEl){errEl.textContent='Erreur réseau. Réessayez.';errEl.style.display='block';}
-    btn.disabled=false;
-    btn.textContent='Continuer vers le paiement →';
+    if(errEl){errEl.textContent=err.message||'Erreur. Réessayez.';errEl.style.display='block';}
+    btn.disabled=false; btn.textContent='Commencer →';
   }
 }
 
-function openPayment(){
-  /* Reset l'état du container */
-  document.getElementById('checkout-loading').style.display='flex';
-  document.getElementById('checkout-container').style.display='none';
-  document.getElementById('checkout-container').innerHTML='';
-  document.getElementById('povl').classList.add('open');
-  document.body.style.overflow='hidden';
+/* ===== SOUMETTRE LE PAIEMENT ===== */
+async function submitPayment(){
+  var btn = document.getElementById('pay-submit');
+  var errEl = document.getElementById('pay-error');
+  var email = document.getElementById('pay-email').value.trim() || _pendingEmail;
+
+  if(!email||!email.includes('@')){
+    errEl.textContent='Veuillez vérifier votre email.';
+    errEl.style.display='block'; return;
+  }
+  btn.disabled=true;
+  btn.innerHTML='<div class="pspinner" style="width:20px;height:20px;border-width:2px;margin:0"></div>';
+  errEl.style.display='none';
+
+  var {error, paymentIntent} = await _stripe.confirmPayment({
+    elements: _elements,
+    confirmParams:{
+      return_url: window.location.origin+'/inscription?email='+encodeURIComponent(email),
+      receipt_email: email,
+    },
+    redirect:'if_required',
+  });
+
+  if(error){
+    errEl.textContent = error.message || 'Erreur de paiement. Réessayez.';
+    errEl.style.display='block';
+    btn.disabled=false;
+    btn.innerHTML='<span>Payer 74,99€</span><span>→</span>';
+  } else if(paymentIntent && paymentIntent.status==='succeeded'){
+    btn.innerHTML='✅ Paiement validé !';
+    setTimeout(()=>{
+      window.location.href='/inscription?email='+encodeURIComponent(email);
+    }, 800);
+  }
 }
+
+/* ===== FERMER ===== */
 function closePayment(){
   document.getElementById('povl').classList.remove('open');
   document.body.style.overflow='';
-  if(_checkout){ _checkout.destroy(); _checkout=null; }
-  /* Réactiver les boutons */
-  document.querySelectorAll('.hbtn,.ps,.btngold').forEach(function(b){
+  _elements=null;
+  document.getElementById('payment-element').innerHTML='';
+  document.querySelectorAll('.hbtn,.ps').forEach(b=>{
     b.disabled=false;
-    if(b.classList.contains('hbtn')) b.textContent='Commencer →';
-    if(b.classList.contains('ps'))   b.textContent='Continuer vers le paiement →';
-    if(b.classList.contains('btngold')) b.textContent='Profiter de l\'offre — 74,99€';
+    b.textContent = b.classList.contains('hbtn') ? 'Commencer →' : 'Continuer vers le paiement →';
   });
 }
 
-/* ===== ANCIEN MODAL EMAIL (pour le bouton CTA bas de page) ===== */
+/* ===== MODAL CTA BAS DE PAGE ===== */
 function openModal(){
   document.getElementById('movl').classList.add('open');
-  setTimeout(function(){document.getElementById('modal-email').focus();},100);
+  setTimeout(()=>document.getElementById('modal-email').focus(),100);
 }
 function closeModal(){ document.getElementById('movl').classList.remove('open'); }
 
 /* ===== FAQ ===== */
 function tfaq(btn){
-  var item = btn.closest('.fitem');
-  var isOpen = item.classList.contains('open');
-  document.querySelectorAll('.fitem.open').forEach(function(i){i.classList.remove('open');});
-  if(!isOpen) item.classList.add('open');
+  var item=btn.closest('.fitem');
+  var isOpen=item.classList.contains('open');
+  document.querySelectorAll('.fitem.open').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
 }
 </script>
 </body>
