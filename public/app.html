@@ -2470,6 +2470,8 @@ body.profile-boy [lang="ar"] {
   15% {opacity:1}
   100%{clip-path:inset(0 0 0 0%)}
 }
+/* Ligne de base positionnée sur la baseline alphabétique arabe */
+.letter-baseline-line{position:absolute;bottom:14%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
 /* Ligne de base de la lettre */
 .letter-baseline-wrap{position:relative;display:inline-block;direction:rtl}
 .letter-baseline-line{position:absolute;bottom:18%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
@@ -5732,6 +5734,9 @@ function getChildIsland(letterIdx){
 function renderChildIslandMap(ca){
   ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
   st._curPage='sessions-map';
+  /* Masquer DÉFINITIVEMENT la mascotte fixe sur la carte des îles */
+  var _gmFix=document.getElementById('girl-mascot');var _bmFix=document.getElementById('boy-mascot');
+  if(_gmFix)_gmFix.style.display='none';if(_bmFix)_bmFix.style.display='none';
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
 
@@ -6424,10 +6429,11 @@ function _clStep1(wrap,letter,af,goNext){
     var cc=cvs.getContext('2d');
     function guide(){
       cc.clearRect(0,0,CWc,CHc);
-      cc.save();cc.strokeStyle='rgba(194,24,91,.18)';cc.lineWidth=1.5;cc.setLineDash([5,5]);
-      cc.beginPath();cc.moveTo(12,CHc*0.72);cc.lineTo(CWc-12,CHc*0.72);cc.stroke();cc.setLineDash([]);cc.restore();
-      cc.save();cc.font="110px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='middle';
-      cc.fillStyle='rgba(194,24,91,.08)';cc.fillText(formText,CWc/2,CHc*0.47);cc.restore();
+      var _bY=CHc*0.58; /* baseline alphabétique arabe ≈ 58% */
+      cc.save();cc.strokeStyle='rgba(194,24,91,.2)';cc.lineWidth=1.5;cc.setLineDash([5,5]);
+      cc.beginPath();cc.moveTo(12,_bY);cc.lineTo(CWc-12,_bY);cc.stroke();cc.setLineDash([]);cc.restore();
+      cc.save();cc.font="110px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='alphabetic';
+      cc.fillStyle='rgba(194,24,91,.08)';cc.fillText(formText,CWc/2,_bY);cc.restore();
     }
     guide();
     var _d=false;
@@ -6456,7 +6462,7 @@ function _clStep1(wrap,letter,af,goNext){
       card.appendChild(intro);
       var formWrap=document.createElement('div');formWrap.className='letter-baseline-wrap';
       var formBig=document.createElement('div');
-      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px;animation:letterStrokeReveal 1.6s cubic-bezier(.2,.6,.4,1) forwards";
+      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px;animation:letterStrokeReveal 3.2s cubic-bezier(.2,.6,.4,1) forwards";
       formBig.textContent=f.form;
       formBig.onclick=function(){speakText(f.form,'ar-SA',null);};
       var baselineDiv=document.createElement('div');baselineDiv.className='letter-baseline-line';
@@ -6604,7 +6610,7 @@ function _clStep2(wrap,letter,af,goNext){
 
     /* Mini rappel de la forme */
     var fRemind=document.createElement('div');
-    fRemind.style.cssText="font-family:'Scheherazade New',serif;font-size:3rem;color:#c2185b;direction:rtl;margin-bottom:6px;animation:letterStrokeReveal 1.2s cubic-bezier(.2,.6,.4,1) forwards";
+    fRemind.style.cssText="font-family:'Scheherazade New',serif;font-size:3rem;color:#c2185b;direction:rtl;margin-bottom:6px;animation:letterStrokeReveal 2.4s cubic-bezier(.2,.6,.4,1) forwards";
     fRemind.textContent=f.form;
     card.appendChild(fRemind);
 
@@ -6631,11 +6637,12 @@ function _clStep2(wrap,letter,af,goNext){
 
     function drawGuide(){
       ctx.clearRect(0,0,CW,CH);
-      /* ligne de base */
-      ctx.save();ctx.strokeStyle='rgba(194,24,91,.15)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
-      ctx.beginPath();ctx.moveTo(12,CH*0.72);ctx.lineTo(CW-12,CH*0.72);ctx.stroke();ctx.setLineDash([]);ctx.restore();
-      ctx.save();ctx.font="120px 'Scheherazade New',serif";ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillStyle='rgba(194,24,91,0.07)';ctx.fillText(f.form,CW/2,CH*0.46);ctx.restore();
+      /* ligne de base — baseline alphabétique arabe */
+      var _bYs=CH*0.58;
+      ctx.save();ctx.strokeStyle='rgba(194,24,91,.18)';ctx.lineWidth=1.5;ctx.setLineDash([5,5]);
+      ctx.beginPath();ctx.moveTo(12,_bYs);ctx.lineTo(CW-12,_bYs);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+      ctx.save();ctx.font="120px 'Scheherazade New',serif";ctx.textAlign='center';ctx.textBaseline='alphabetic';
+      ctx.fillStyle='rgba(194,24,91,0.07)';ctx.fillText(f.form,CW/2,_bYs);ctx.restore();
     }
     drawGuide();
 
