@@ -1,5 +1,5 @@
-// iamlearningarabic — Service Worker v4
-const CACHE = 'arab-v4';
+// iamlearningarabic — Service Worker v5
+const CACHE = 'arab-v5';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -35,8 +35,8 @@ self.addEventListener('fetch', function(e) {
       url.hostname.includes('anthropic') ||
       url.pathname.includes('/api/')) return;
 
-  // index.html → TOUJOURS réseau en premier
-  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '') {
+  // index.html + app.html → TOUJOURS réseau en premier (jamais de cache)
+  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '' || url.pathname === '/app.html' || url.pathname === '/app') {
     e.respondWith(
       fetch(e.request, {cache: 'no-store'}).then(function(response) {
         if (response && response.status === 200) {

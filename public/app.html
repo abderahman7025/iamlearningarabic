@@ -2464,6 +2464,16 @@ body.profile-boy [lang="ar"] {
 @keyframes starPop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
+/* Animation : révèle la lettre de droite à gauche (sens d'écriture arabe) */
+@keyframes letterStrokeReveal{
+  0%  {clip-path:inset(0 0 0 100%);opacity:.4}
+  15% {opacity:1}
+  100%{clip-path:inset(0 0 0 0%)}
+}
+/* Ligne de base de la lettre */
+.letter-baseline-wrap{position:relative;display:inline-block;direction:rtl}
+.letter-baseline-line{position:absolute;bottom:18%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
+
 .child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
 .child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
 .child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
@@ -5889,10 +5899,9 @@ function renderChildIslandMap(ca){
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
       globeDiv.style.paddingTop='80px';globeDiv.style.position='relative';globeDiv.style.gap='28px';
-      var srcElMob=document.querySelector('#girl-mascot img');
+      /* Mascotte supprimée de la carte des îles */
       var charElMob=document.createElement('div');
-      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
-      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
+      charElMob.style.display='none'; /* invisible */
       globeDiv.appendChild(charElMob);
       setTimeout(function(){
         var gW=globeDiv.offsetWidth,gH=globeDiv.scrollHeight;
@@ -6070,8 +6079,9 @@ function _renderChildIslandRecap(ca,letterIndices){
     row.style.cssText='display:flex;align-items:center;gap:14px;padding:12px 18px;margin-bottom:10px;cursor:pointer';
     row.innerHTML='<span style="font-size:2rem">'+letter.emoji+'</span>'
       +'<span style="font-family:var(--fa);font-size:2.4rem;color:#c2185b">'+letter.ar+'</span>'
-      +'<span style="font-family:var(--fa);font-size:1.2rem;color:#888">'+letter.wordAr+'</span>';
-    row.onclick=function(){speakText(letter.ar,'ar-SA',null);};
+      +'<span style="font-family:var(--fa);font-size:1.2rem;color:#888">'+letter.wordAr+'</span>'
+      +'<span style="margin-left:auto;font-size:.72rem;color:#c2185b;opacity:.7">▶ Rejouer</span>';
+    row.onclick=(function(idx){return function(){renderChildLesson(ca,idx);};})(li);
     wrap.appendChild(row);
   });
 
@@ -6417,14 +6427,18 @@ function _clStep1(wrap,letter,af,goNext){
     intro.textContent='Forme de '+f.lbl;
     card.appendChild(intro);
 
+    /* Lettre avec animation écriture (révèle de droite à gauche) + ligne de base */
+    var formWrap=document.createElement('div');formWrap.className='letter-baseline-wrap';
     var formBig=document.createElement('div');
-    formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px";
+    formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px;animation:letterStrokeReveal 1.6s cubic-bezier(.2,.6,.4,1) forwards";
     formBig.textContent=f.form;
     formBig.onclick=function(){speakText(f.form,'ar-SA',null);};
-    card.appendChild(formBig);
+    var baselineDiv=document.createElement('div');baselineDiv.className='letter-baseline-line';
+    formWrap.appendChild(formBig);formWrap.appendChild(baselineDiv);
+    card.appendChild(formWrap);
 
     var lblBig=document.createElement('div');
-    lblBig.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';
+    lblBig.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:8px';
     lblBig.textContent=f.lbl.toUpperCase();
     card.appendChild(lblBig);
 
@@ -6433,23 +6447,23 @@ function _clStep1(wrap,letter,af,goNext){
     tip.textContent='👆 Appuie sur la lettre pour l\'écouter';
     card.appendChild(tip);
 
-    container.appendChild(card);
-
-    /* ── Mini canvas : écrire la forme après la flashcard ── */
-    var cCard=document.createElement('div');cCard.className='child-card';
-    cCard.style.cssText='text-align:center;padding:10px 12px';
+    /* ── Canvas intégré dans la carte (évite le overflow caché) ── */
     var cHint=document.createElement('div');
-    cHint.style.cssText='font-size:.72rem;font-weight:700;color:#ad1457;opacity:.7;margin-bottom:6px';
-    cHint.textContent='✏️ '+t('writing_hint');
-    cCard.appendChild(cHint);
-    var CWc=200,CHc=200;
+    cHint.style.cssText='font-size:.7rem;font-weight:700;color:#ad1457;opacity:.7;margin-bottom:5px';
+    cHint.textContent='✏️ Entraîne-toi à l\'écrire';
+    card.appendChild(cHint);
+    var CWc=190,CHc=170;
     var cvs=document.createElement('canvas');cvs.width=CWc;cvs.height=CHc;
-    cvs.style.cssText='border-radius:14px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px';
+    cvs.style.cssText='border-radius:12px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px';
     var cc=cvs.getContext('2d');
     function drawFormGuide(){
       cc.clearRect(0,0,CWc,CHc);
-      cc.save();cc.font="120px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='middle';
-      cc.fillStyle='rgba(194,24,91,0.08)';cc.fillText(f.form,CWc/2,CHc/2+8);cc.restore();
+      /* ligne de base */
+      cc.save();cc.strokeStyle='rgba(194,24,91,.15)';cc.lineWidth=1.5;cc.setLineDash([4,4]);
+      cc.beginPath();cc.moveTo(10,CHc*0.72);cc.lineTo(CWc-10,CHc*0.72);cc.stroke();cc.setLineDash([]);cc.restore();
+      /* lettre fantôme */
+      cc.save();cc.font="100px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='middle';
+      cc.fillStyle='rgba(194,24,91,0.08)';cc.fillText(f.form,CWc/2,CHc*0.47);cc.restore();
     }
     drawFormGuide();
     var _drawing=false;
@@ -6460,13 +6474,13 @@ function _clStep1(wrap,letter,af,goNext){
     cvs.addEventListener('touchstart',function(e){_drawing=true;var p=_getP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
     cvs.addEventListener('touchmove',function(e){if(!_drawing)return;var p=_getP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();},{passive:false});
     cvs.addEventListener('touchend',function(){_drawing=false;});
-    cCard.appendChild(cvs);
+    card.appendChild(cvs);
     var clearBtn=document.createElement('button');clearBtn.className='rbtn rbtn-s';
     clearBtn.style.cssText='display:inline-block;margin:0 auto';
     clearBtn.textContent='↺ '+t('writing_clear');
     clearBtn.onclick=function(){drawFormGuide();};
-    cCard.appendChild(clearBtn);
-    container.appendChild(cCard);
+    card.appendChild(clearBtn);
+    container.appendChild(card);
 
     var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';
     nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:8px';
