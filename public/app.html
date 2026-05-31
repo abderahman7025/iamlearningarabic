@@ -6160,9 +6160,10 @@ function renderChildWarmup(ca){
     qTxt.style.cssText='font-size:.9rem;font-weight:800;color:#ad1457';
     qTxt.textContent='🔊 Touche la lettre :';
     var qLetterBig=document.createElement('div');
-    qLetterBig.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;direction:rtl;cursor:pointer;background:rgba(194,24,91,.08);border-radius:12px;padding:4px 14px;animation:heartbeat 1.5s ease-in-out infinite";
-    qLetterBig.textContent=correctLetter.ar;
-    qLetterBig.onclick=function(){speakText(correctLetter.ar,'ar-SA',null);};
+    qLetterBig.style.cssText='width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(233,30,140,.15),rgba(194,24,91,.07));border:2.5px dashed rgba(194,24,91,.4);display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;transition:transform .15s;animation:heartbeat 1.5s ease-in-out infinite';
+    qLetterBig.textContent='🔊';
+    qLetterBig.onclick=function(){speakText(correctLetter.ar,'ar-SA',null);qLetterBig.style.transform='scale(.88)';setTimeout(function(){qLetterBig.style.transform='';},150);};
+    setTimeout(function(){speakText(correctLetter.ar,'ar-SA',null);},300);
     qRow.appendChild(qTxt);qRow.appendChild(qLetterBig);
     card.appendChild(qRow);
 
@@ -6341,11 +6342,10 @@ function _clStep0(wrap,letter,af,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';
   card.style.textAlign='center';
 
-  /* Case son — lettre masquée, clic = écoute */
-  var bigL=document.createElement('div');
-  bigL.style.cssText='width:110px;height:110px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 14px;transition:transform .15s';
-  bigL.textContent='🔊';
-  bigL.onclick=function(){speakText(letter.ar,'ar-SA',null);bigL.style.transform='scale(.9)';setTimeout(function(){bigL.style.transform='';},150);};
+  /* Lettre isolée (clic = écoute) */
+  var bigL=document.createElement('div');bigL.className='child-letter-big';
+  bigL.textContent=letter.ar;bigL.style.cursor='pointer';
+  bigL.onclick=function(){speakText(letter.ar,'ar-SA',null);};
   card.appendChild(bigL);
 
   /* Nom de la lettre */
@@ -6441,27 +6441,34 @@ function _clStep1(wrap,letter,af,goNext){
     var ghost=document.createElement('div');ghost.className='canvas-ghost-letter';
     ghost.textContent=formText;
     /* Ligne de base */
-    /* Baseline adaptive via measureText */
-    var _tc=document.createElement('canvas').getContext('2d');
-    _tc.font="95px 'Scheherazade New',serif";
-    var _mm=_tc.measureText(formText);
-    var _masc=_mm.actualBoundingBoxAscent||60;var _mdesc=_mm.actualBoundingBoxDescent||15;
-    var _centerY=(CHc-10)/2+10;
-    var _bY=_centerY+(_masc-_mdesc)/2;
-    var _bBot=((CHc-_bY)/CHc*100).toFixed(1);
-    var bLine=document.createElement('div');bLine.className='canvas-ghost-baseline';
-    bLine.style.bottom=_bBot+'%';
-    /* Canvas transparent */
+    /* Canvas unique : fantôme + ligne de base + dessin utilisateur */
     var cvs=document.createElement('canvas');cvs.width=CWc;cvs.height=CHc;
+    cvs.style.cssText='display:block;touch-action:none;cursor:crosshair;border-radius:12px';
+    wrap.style.cssText='position:relative;width:'+CWc+'px;height:'+CHc+'px;margin:0 auto 10px;border-radius:14px;border:2px dashed rgba(194,24,91,.3);background:rgba(255,255,255,.9);overflow:hidden';
+    wrap.innerHTML='';wrap.appendChild(cvs);
     var cc=cvs.getContext('2d');
-    wrap.appendChild(ghost);wrap.appendChild(bLine);wrap.appendChild(cvs);
-    function guide(){cc.clearRect(0,0,CWc,CHc);}
+    function guide(){
+      cc.clearRect(0,0,CWc,CHc);
+      cc.save();
+      cc.font="95px 'Scheherazade New',serif";
+      cc.textBaseline='alphabetic';cc.textAlign='center';
+      var _m=cc.measureText(formText);
+      var _a=_m.actualBoundingBoxAscent||60;var _d2=_m.actualBoundingBoxDescent||15;
+      var _bY=(CHc+_a-_d2)/2;
+      cc.fillStyle='rgba(194,24,91,0.07)';
+      cc.fillText(formText,CWc/2,_bY);
+      cc.restore();
+      cc.save();
+      cc.strokeStyle='rgba(194,24,91,.30)';cc.lineWidth=1.5;cc.setLineDash([6,4]);
+      cc.beginPath();cc.moveTo(12,_bY);cc.lineTo(CWc-12,_bY);cc.stroke();
+      cc.restore();
+    }
     guide();
     var _d=false,_started=false;
     function gP(e){var r=cvs.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CWc/r.width),y:(s.clientY-r.top)*(CHc/r.height)};}
     function onStart(e){
       _d=true;var p=gP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();
-      if(!_started&&nextBtnRef){_started=true;nextBtnRef.classList.add('child-btn-play');}
+      if(!_started){_started=true;if(typeof nextBtnRef==='function')nextBtnRef();else if(nextBtnRef)nextBtnRef.classList.add('child-btn-play');}
     }
     function onMove(e){if(!_d)return;var p=gP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();}
     function onEnd(){_d=false;}
@@ -6520,7 +6527,7 @@ function _clStep1(wrap,letter,af,goNext){
       cFormMini.style.cssText="font-family:'Scheherazade New',serif;font-size:2.6rem;color:#c2185b;direction:rtl;margin-bottom:6px";
       cFormMini.textContent=f.form;
       cCard.appendChild(cFormMini);
-      var cv=_mkCanvas(f.form, nextBtn2);
+      var cv=_mkCanvas(f.form, function(){if(nextBtn2)nextBtn2.classList.add('child-btn-play');});
       cCard.appendChild(cv.wrap);
       var clrBtn=document.createElement('button');clrBtn.className='rbtn rbtn-s';
       clrBtn.style.cssText='display:inline-block;margin:0 auto';
@@ -6669,22 +6676,29 @@ function _clStep2(wrap,letter,af,goNext){
       ctx.fillStyle='rgba(194,24,91,0.07)';ctx.fillText(f.form,CW/2,_bYs);ctx.restore();
     }
     /* Remplacer canvas par wrapper HTML (fantôme correct + baseline) */
-    /* Baseline adaptive pour Step 2 */
-    var _tc2=document.createElement('canvas').getContext('2d');
-    _tc2.font="95px 'Scheherazade New',serif";
-    var _mm2=_tc2.measureText(f.form);
-    var _masc2=_mm2.actualBoundingBoxAscent||60;var _mdesc2=_mm2.actualBoundingBoxDescent||15;
-    var _cY2=(CH-10)/2+10;var _bY2=_cY2+(_masc2-_mdesc2)/2;
-    var _bBot2=((CH-_bY2)/CH*100).toFixed(1);
-    var cWrap2=document.createElement('div');cWrap2.className='canvas-ghost-wrap';
-    cWrap2.style.width=CW+'px';cWrap2.style.height=CH+'px';
-    var ghost2=document.createElement('div');ghost2.className='canvas-ghost-letter';ghost2.textContent=f.form;
-    var bLine2=document.createElement('div');bLine2.className='canvas-ghost-baseline';
-    bLine2.style.bottom=_bBot2+'%';
+    /* Canvas unique step 2 : fantôme + ligne adaptive + dessin */
+    var cWrap2=document.createElement('div');
+    cWrap2.style.cssText='position:relative;width:'+CW+'px;height:'+CH+'px;margin:0 auto 8px;border-radius:14px;border:2px dashed rgba(194,24,91,.3);background:rgba(255,255,255,.9);overflow:hidden';
     var cvs2=document.createElement('canvas');cvs2.width=CW;cvs2.height=CH;
+    cvs2.style.cssText='display:block;touch-action:none;cursor:crosshair;border-radius:12px';
+    cWrap2.appendChild(cvs2);
     var ctx2=cvs2.getContext('2d');
-    function drawGuide(){ctx2.clearRect(0,0,CW,CH);}
-    cWrap2.appendChild(ghost2);cWrap2.appendChild(bLine2);cWrap2.appendChild(cvs2);
+    function drawGuide(){
+      ctx2.clearRect(0,0,CW,CH);
+      ctx2.save();
+      ctx2.font="120px 'Scheherazade New',serif";
+      ctx2.textBaseline='alphabetic';ctx2.textAlign='center';
+      var _mg=ctx2.measureText(f.form);
+      var _ag=_mg.actualBoundingBoxAscent||80;var _dg=_mg.actualBoundingBoxDescent||20;
+      var _bYg=(CH+_ag-_dg)/2;
+      ctx2.fillStyle='rgba(194,24,91,0.07)';
+      ctx2.fillText(f.form,CW/2,_bYg);
+      ctx2.restore();
+      ctx2.save();
+      ctx2.strokeStyle='rgba(194,24,91,.30)';ctx2.lineWidth=1.5;ctx2.setLineDash([6,4]);
+      ctx2.beginPath();ctx2.moveTo(12,_bYg);ctx2.lineTo(CW-12,_bYg);ctx2.stroke();
+      ctx2.restore();
+    }
     drawGuide();
     var drawing=false,_drawnS=false;
     function getPos(e){var rect=cvs2.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};}
@@ -6998,19 +7012,11 @@ function renderChildGame(ca,dayIdx,round,onDone){
   }
   wrap.appendChild(roundBar);
 
-  /* ─ Instruction : "Touche la lettre : [bouton son]" ─ */
+  /* ─ Instruction : "Choisis toutes les lettres : [lettre en grand]" ─ */
   var instrEl=document.createElement('div');instrEl.className='child-game-instr';
-  var _iLbl=document.createElement('div');
-  _iLbl.style.cssText='font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:8px';
-  _iLbl.textContent='Touche la lettre :';
-  instrEl.appendChild(_iLbl);
-  var _sBox=document.createElement('div');
-  _sBox.style.cssText='width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:2.4rem;cursor:pointer;margin:0 auto 4px;transition:transform .15s';
-  _sBox.textContent='🔊';
-  _sBox.onclick=function(){speakText(letter.ar,'ar-SA',null);_sBox.style.transform='scale(.88)';setTimeout(function(){_sBox.style.transform='';},150);};
-  instrEl.appendChild(_sBox);
+  instrEl.innerHTML='<div style="font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:4px">Choisis toutes les lettres :</div>'
+    +'<div style="font-family:\'Scheherazade New\',serif;font-size:4.8rem;color:#c2185b;line-height:1.5;padding-bottom:8px;direction:rtl;unicode-bidi:isolate;overflow:visible">'+letter.ar+'</div>';
   wrap.appendChild(instrEl);
-  setTimeout(function(){speakText(letter.ar,'ar-SA',null);},400);
 
   /* ─ Grille : 4 formes cibles + 8 distracteurs (nouveaux distracteurs à chaque round) ─ */
   var TARGET=4,TOTAL=12;
