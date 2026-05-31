@@ -8142,16 +8142,12 @@ function showCompletionModal(){
 }
 
 
-// Show/hide girl mascot
+// Show/hide girl mascot — désactivé : le personnage fixe bas-gauche est retiré
 function updateGirlMascot(){
   var mg=document.getElementById('girl-mascot');
   var mb=document.getElementById('boy-mascot');
-  var mainOn=document.getElementById('s-main')&&document.getElementById('s-main').classList.contains('on');
-  var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
-  /* Mascotte uniquement sur la carte des îles */
-  var show=(mainOn||menuOn)&&(st._curPage==='sessions-map');
-  if(mg)mg.style.display=(st.profile==='girl'&&show)?'block':'none';
-  if(mb)mb.style.display=(st.profile==='boy'&&show)?'block':'none';
+  if(mg)mg.style.display='none';
+  if(mb)mb.style.display='none';
 }
 
 /* Clic mascotte : rotation 360deg */
