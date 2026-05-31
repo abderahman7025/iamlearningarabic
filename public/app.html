@@ -5904,9 +5904,10 @@ function renderChildIslandMap(ca){
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
       globeDiv.style.paddingTop='80px';globeDiv.style.position='relative';globeDiv.style.gap='28px';
-      /* Mascotte supprimée de la carte des îles */
+      var srcElMob=document.querySelector('#girl-mascot img');
       var charElMob=document.createElement('div');
-      charElMob.style.display='none'; /* invisible */
+      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
+      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
       globeDiv.appendChild(charElMob);
       setTimeout(function(){
         var gW=globeDiv.offsetWidth,gH=globeDiv.scrollHeight;
@@ -6032,9 +6033,10 @@ function renderChildIslandMap(ca){
         var segLk=(isleCards[i]&&isleCards[i].classList.contains('locked-isle'))||(isleCards[i+1]&&isleCards[i+1].classList.contains('locked-isle'));
         drawPath(d,segLk);
       }
-      /* Avatar supprimé de la carte des îles */
+      var srcEl=document.querySelector('#girl-mascot img');
       var charEl=document.createElement('div');
-      charEl.style.display='none';
+      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55))';
+      if(srcEl){var aImg=document.createElement('img');aImg.src=srcEl.src;aImg.style.cssText='width:100%;height:100%;object-fit:contain';charEl.appendChild(aImg);}
       globeDiv.appendChild(charEl);
       function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
       function bezierPt(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
