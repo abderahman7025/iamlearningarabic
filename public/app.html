@@ -2471,7 +2471,17 @@ body.profile-boy [lang="ar"] {
   100%{clip-path:inset(0 0 0 0%)}
 }
 /* Ligne de base positionnée sur la baseline alphabétique arabe */
-.letter-baseline-line{position:absolute;bottom:14%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
+.letter-baseline-line{position:absolute;bottom:26%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
+
+/* Heartbeat button quand l'enfant commence à dessiner */
+@keyframes heartbeat{0%,100%{transform:scale(1);}14%{transform:scale(1.1);}28%{transform:scale(1);}42%{transform:scale(1.06);}70%{transform:scale(1);}}
+.btn-heartbeat{animation:heartbeat 1.2s ease-in-out infinite;box-shadow:0 0 22px rgba(194,24,91,.45);}
+
+/* Canvas wrapper avec fantôme HTML (formes arabes correctement rendues) */
+.canvas-ghost-wrap{position:relative;display:block;margin:0 auto 10px;border-radius:14px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);overflow:hidden;width:220px;height:190px;}
+.canvas-ghost-letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:95px;color:rgba(194,24,91,.08);direction:rtl;pointer-events:none;z-index:0;padding-top:10px;}
+.canvas-ghost-baseline{position:absolute;left:5%;right:5%;height:1.5px;background:repeating-linear-gradient(90deg,rgba(194,24,91,.22) 0,rgba(194,24,91,.22) 6px,transparent 6px,transparent 10px);pointer-events:none;z-index:0;bottom:42%;}
+.canvas-ghost-wrap canvas{position:absolute;inset:0;z-index:1;background:transparent;touch-action:none;}
 /* Ligne de base de la lettre */
 .letter-baseline-wrap{position:relative;display:inline-block;direction:rtl}
 .letter-baseline-line{position:absolute;bottom:18%;left:5%;right:5%;height:2px;background:rgba(194,24,91,.22);border-radius:2px;pointer-events:none}
@@ -6106,10 +6116,12 @@ function renderChildWarmup(ca){
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   if(dayIdx<1){renderChildLesson(ca,dayIdx);return;}
 
-  /* Sélection de 5 lettres déjà apprises comme questions */
+  /* Sélection de 10 questions (toutes les lettres apprises, répétition si besoin) */
   var pool=[];for(var pi=0;pi<dayIdx;pi++)pool.push(pi);
   pool.sort(function(){return Math.random()-.5;});
-  var questions=pool.slice(0,Math.min(5,pool.length));
+  var NQ=Math.min(10,pool.length*2);
+  /* Répéter le pool si moins de 10 lettres apprises */
+  var questions=[];while(questions.length<NQ){var tmp=pool.slice().sort(function(){return Math.random()-.5;});for(var ti=0;ti<tmp.length&&questions.length<NQ;ti++)questions.push(tmp[ti]);}
   var qIdx=0,score=0;
 
   function showQ(){
@@ -6118,95 +6130,87 @@ function renderChildWarmup(ca){
 
     var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
 
-    /* ── Carte opaque derrière le quiz ── */
-    var card=document.createElement('div');card.className='child-card';
-    card.style.cssText='padding:20px 18px 16px;margin-bottom:12px';
+    var correctIdx=questions[qIdx];
+    var correctLetter=CHILD_LETTERS[correctIdx];
 
-    /* Barre de progression quiz */
+    /* ── Carte principale ── */
+    var card=document.createElement('div');card.className='child-card';
+    card.style.cssText='padding:16px 12px;margin-bottom:10px';
+
+    /* Barre de progression */
     var qprog=document.createElement('div');
-    qprog.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:14px';
+    qprog.style.cssText='display:flex;justify-content:center;gap:5px;margin-bottom:10px';
     for(var qi=0;qi<questions.length;qi++){
       var qd=document.createElement('div');
-      qd.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(qi<qIdx?'#22c55e':qi===qIdx?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
+      qd.style.cssText='width:8px;height:8px;border-radius:50%;background:'+(qi<qIdx?'#22c55e':qi===qIdx?'#c2185b':'rgba(194,24,91,.15)')+';transition:all .3s';
       qprog.appendChild(qd);
     }
     card.appendChild(qprog);
 
-    /* Label réchauffement */
+    /* Label + son */
     var wlbl=document.createElement('div');
-    wlbl.style.cssText='font-size:.7rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px';
-    wlbl.textContent='Révision rapide ✦ Question '+(qIdx+1)+' / '+questions.length;
+    wlbl.style.cssText='font-size:.7rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px';
+    wlbl.textContent='Révision · Question '+(qIdx+1)+' / '+questions.length;
     card.appendChild(wlbl);
 
-    var correctIdx=questions[qIdx];
-    var correctLetter=CHILD_LETTERS[correctIdx];
+    /* Question : "Touche la lettre + son" */
+    var qRow=document.createElement('div');
+    qRow.style.cssText='display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px';
+    var qTxt=document.createElement('div');
+    qTxt.style.cssText='font-size:.9rem;font-weight:800;color:#ad1457';
+    qTxt.textContent='🔊 Touche la lettre :';
+    var qLetterBig=document.createElement('div');
+    qLetterBig.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;direction:rtl;cursor:pointer;background:rgba(194,24,91,.08);border-radius:12px;padding:4px 14px;animation:heartbeat 1.5s ease-in-out infinite";
+    qLetterBig.textContent=correctLetter.ar;
+    qLetterBig.onclick=function(){speakText(correctLetter.ar,'ar-SA',null);};
+    qRow.appendChild(qTxt);qRow.appendChild(qLetterBig);
+    card.appendChild(qRow);
 
-    /* Grand emoji = indice */
-    var emojiEl=document.createElement('div');
-    emojiEl.style.cssText='font-size:5rem;margin:0 0 8px';
-    emojiEl.textContent=correctLetter.emoji;
-    card.appendChild(emojiEl);
-
-    /* Mot arabe */
-    var wordEl=document.createElement('div');
-    wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:1.8rem;color:#7b1fa2;margin-bottom:16px;line-height:1.2';
-    wordEl.textContent=correctLetter.wordAr;
-    card.appendChild(wordEl);
-
-    /* Question */
-    var qel=document.createElement('div');
-    qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:16px';
-    qel.textContent='Par quelle lettre commence ce mot ?';
-    card.appendChild(qel);
-
-    /* Choix : 3 grandes lettres arabes */
+    /* Grand tableau de lettres — 4 colonnes */
+    var GRID_SIZE=12;
     var wrong=[];
     for(var wj=0;wj<CHILD_LETTERS.length;wj++){if(wj!==correctIdx)wrong.push(wj);}
     wrong.sort(function(){return Math.random()-.5;});
-    var choices=[correctIdx,wrong[0],wrong[1]];
-    choices.sort(function(){return Math.random()-.5;});
+    var gridIdxs=[correctIdx];
+    for(var wi=0;wi<wrong.length&&gridIdxs.length<GRID_SIZE;wi++)gridIdxs.push(wrong[wi]);
+    gridIdxs.sort(function(){return Math.random()-.5;});
 
-    var choicesEl=document.createElement('div');
-    choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:16px';
-    var answered=false,failed=false;
-    choices.forEach(function(li){
-      var btn=document.createElement('div');
-      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:rtl';
-      btn.textContent=CHILD_LETTERS[li].ar;
-      btn.onclick=function(){
-        if(answered||btn._used)return;
-        speakText(CHILD_LETTERS[li].ar,'ar-SA',null);
+    var grid=document.createElement('div');
+    grid.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:7px;direction:rtl';
+    var answered=false;
+    gridIdxs.forEach(function(li){
+      var cl=CHILD_LETTERS[li];
+      var cell=document.createElement('div');
+      cell.style.cssText="background:rgba(255,255,255,.92);border-radius:12px;height:60px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.15);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(233,30,140,.07)";
+      cell.textContent=cl.ar;
+      cell.onclick=function(){
+        if(answered)return;
+        speakText(cl.ar,'ar-SA',null);
         if(li===correctIdx){
-          btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
-          if(!failed)score++;
-          answered=true;
+          cell.style.background='rgba(34,197,94,.2)';cell.style.borderColor='#22c55e';
+          cell.style.transform='scale(1.15)';
+          if(!failed)score++;answered=true;
           setTimeout(function(){qIdx++;showQ();},700);
-        } else {
-          btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626;cursor:default';
-          btn._used=true;/* désactiver ce bouton, laisser les autres cliquables */
-          failed=true;  /* question perdue, pas d'étoile même si on trouve ensuite */
+        }else{
+          cell.style.background='rgba(239,68,68,.1)';cell.style.borderColor='#ef4444';
+          cell.style.cursor='default';cell.onclick=null;failed=true;
         }
       };
-      choicesEl.appendChild(btn);
+      grid.appendChild(cell);
     });
-    card.appendChild(choicesEl);
-
-    /* Étoiles gagnées */
+    card.appendChild(grid);
+    /* Étoiles */
     var srow=document.createElement('div');
-    srow.style.cssText='font-size:1.4rem;min-height:1.8rem';
+    srow.style.cssText='font-size:1.2rem;min-height:1.5rem;margin-top:8px';
     for(var sk=0;sk<score;sk++)srow.textContent+='⭐';
     card.appendChild(srow);
+    var answered=false,failed=false;
 
     wrap.appendChild(card);
-
-    /* Bouton passer (en dehors de la carte) */
-    var skipBtn=document.createElement('button');skipBtn.className='rbtn rbtn-s';
-    skipBtn.style.cssText='display:block;margin:10px auto 0;font-size:.78rem;opacity:.65';
-    skipBtn.textContent='Passer →';
-    skipBtn.onclick=function(){renderChildLesson(ca,dayIdx);};
-    wrap.appendChild(skipBtn);
-
     ca.appendChild(wrap);
+
+    /* Son de la lettre à trouver joue automatiquement */
+    setTimeout(function(){speakText(correctLetter.ar,'ar-SA',null);},400);
   }
   showQ();
 }
@@ -6424,29 +6428,36 @@ function _clStep1(wrap,letter,af,goNext){
     return dots;
   }
 
-  function _mkCanvas(formText){
+  /* _mkCanvas : overlay HTML pour le fantôme (forme arabe correctement rendue)
+     + canvas transparent par dessus pour le dessin.
+     Prend un nextBtn optionnel pour déclencher le heartbeat au 1er trait. */
+  function _mkCanvas(formText, nextBtnRef){
     var CWc=220,CHc=190;
+    /* Wrapper HTML */
+    var wrap=document.createElement('div');wrap.className='canvas-ghost-wrap';
+    wrap.style.width=CWc+'px';wrap.style.height=CHc+'px';
+    /* Fantôme lettre — rendu HTML = forme arabe correcte */
+    var ghost=document.createElement('div');ghost.className='canvas-ghost-letter';
+    ghost.textContent=formText;
+    /* Ligne de base */
+    var bLine=document.createElement('div');bLine.className='canvas-ghost-baseline';
+    /* Canvas transparent */
     var cvs=document.createElement('canvas');cvs.width=CWc;cvs.height=CHc;
-    cvs.style.cssText='border-radius:14px;background:rgba(255,255,255,.9);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 10px';
     var cc=cvs.getContext('2d');
-    function guide(){
-      cc.clearRect(0,0,CWc,CHc);
-      var _bY=CHc*0.58; /* baseline alphabétique arabe ≈ 58% */
-      cc.save();cc.strokeStyle='rgba(194,24,91,.2)';cc.lineWidth=1.5;cc.setLineDash([5,5]);
-      cc.beginPath();cc.moveTo(12,_bY);cc.lineTo(CWc-12,_bY);cc.stroke();cc.setLineDash([]);cc.restore();
-      cc.save();cc.font="110px 'Scheherazade New',serif";cc.textAlign='center';cc.textBaseline='alphabetic';
-      cc.fillStyle='rgba(194,24,91,.08)';cc.fillText(formText,CWc/2,_bY);cc.restore();
-    }
+    wrap.appendChild(ghost);wrap.appendChild(bLine);wrap.appendChild(cvs);
+    function guide(){cc.clearRect(0,0,CWc,CHc);}
     guide();
-    var _d=false;
+    var _d=false,_started=false;
     function gP(e){var r=cvs.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CWc/r.width),y:(s.clientY-r.top)*(CHc/r.height)};}
-    cvs.addEventListener('mousedown',function(e){_d=true;var p=gP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();});
-    cvs.addEventListener('mousemove',function(e){if(!_d)return;var p=gP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();});
-    cvs.addEventListener('mouseup',function(){_d=false;});
-    cvs.addEventListener('touchstart',function(e){_d=true;var p=gP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
-    cvs.addEventListener('touchmove',function(e){if(!_d)return;var p=gP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();},{passive:false});
-    cvs.addEventListener('touchend',function(){_d=false;});
-    return{cvs:cvs,guide:guide};
+    function onStart(e){
+      _d=true;var p=gP(e);cc.beginPath();cc.moveTo(p.x,p.y);e.preventDefault();
+      if(!_started&&nextBtnRef){_started=true;nextBtnRef.classList.add('btn-heartbeat');}
+    }
+    function onMove(e){if(!_d)return;var p=gP(e);cc.lineWidth=5;cc.strokeStyle='#c2185b';cc.lineCap='round';cc.lineTo(p.x,p.y);cc.stroke();e.preventDefault();}
+    function onEnd(){_d=false;}
+    cvs.addEventListener('mousedown',onStart);cvs.addEventListener('mousemove',onMove);cvs.addEventListener('mouseup',onEnd);
+    cvs.addEventListener('touchstart',onStart,{passive:false});cvs.addEventListener('touchmove',onMove,{passive:false});cvs.addEventListener('touchend',onEnd);
+    return{wrap:wrap,cvs:cvs,guide:guide};
   }
 
   function showPhaseA(){
@@ -6463,8 +6474,9 @@ function _clStep1(wrap,letter,af,goNext){
       intro.textContent='Forme de '+f.lbl;
       card.appendChild(intro);
       var formWrap=document.createElement('div');formWrap.className='letter-baseline-wrap';
+      formWrap.style.cssText='overflow:visible;padding-bottom:12px;display:inline-block';
       var formBig=document.createElement('div');
-      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.2;direction:rtl;cursor:pointer;margin-bottom:6px;animation:letterStrokeReveal 3.2s cubic-bezier(.2,.6,.4,1) forwards";
+      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:5rem;color:#c2185b;line-height:1.4;direction:rtl;cursor:pointer;margin-bottom:4px;animation:letterStrokeReveal 3.2s cubic-bezier(.2,.6,.4,1) forwards;overflow:visible";
       formBig.textContent=f.form;
       formBig.onclick=function(){speakText(f.form,'ar-SA',null);};
       var baselineDiv=document.createElement('div');baselineDiv.className='letter-baseline-line';
@@ -6498,8 +6510,8 @@ function _clStep1(wrap,letter,af,goNext){
       cFormMini.style.cssText="font-family:'Scheherazade New',serif;font-size:2.6rem;color:#c2185b;direction:rtl;margin-bottom:6px";
       cFormMini.textContent=f.form;
       cCard.appendChild(cFormMini);
-      var cv=_mkCanvas(f.form);
-      cCard.appendChild(cv.cvs);
+      var cv=_mkCanvas(f.form, nextBtn2);
+      cCard.appendChild(cv.wrap);
       var clrBtn=document.createElement('button');clrBtn.className='rbtn rbtn-s';
       clrBtn.style.cssText='display:inline-block;margin:0 auto';
       clrBtn.textContent='↺ '+t('writing_clear');
@@ -6510,7 +6522,7 @@ function _clStep1(wrap,letter,af,goNext){
       var nextBtn2=document.createElement('button');nextBtn2.className='rbtn rbtn-m child-btn-play';
       nextBtn2.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:8px';
       nextBtn2.textContent=isLast?'📝 Quiz des formes !':'Forme suivante →';
-      nextBtn2.onclick=function(){fcIdx++;sub=0;showPhaseA();};
+      nextBtn2.onclick=function(){nextBtn2.classList.remove('btn-heartbeat');fcIdx++;sub=0;showPhaseA();};
       container.appendChild(nextBtn2);
     }
   }
@@ -6553,11 +6565,11 @@ function _clStep1(wrap,letter,af,goNext){
     card.appendChild(qlbl);
 
     var cGrid=document.createElement('div');
-    cGrid.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;direction:rtl';
+    cGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:200px;margin:0 auto;direction:rtl';
     var answered=false;
     shuffled.forEach(function(sf){
       var btn=document.createElement('div');
-      btn.style.cssText="background:rgba(255,255,255,.9);border-radius:16px;width:68px;height:74px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.8rem;color:#c2185b;border:2px solid rgba(233,30,99,.18);cursor:pointer;transition:all .2s";
+      btn.style.cssText="background:rgba(255,255,255,.9);border-radius:16px;width:84px;height:90px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:3.2rem;color:#c2185b;border:2px solid rgba(233,30,99,.18);cursor:pointer;transition:all .2s;margin:0 auto";
       btn.textContent=sf.form;
       btn.onclick=function(){
         if(answered)return;
@@ -6646,36 +6658,25 @@ function _clStep2(wrap,letter,af,goNext){
       ctx.save();ctx.font="120px 'Scheherazade New',serif";ctx.textAlign='center';ctx.textBaseline='alphabetic';
       ctx.fillStyle='rgba(194,24,91,0.07)';ctx.fillText(f.form,CW/2,_bYs);ctx.restore();
     }
+    /* Remplacer canvas par wrapper HTML (fantôme correct + baseline) */
+    var cWrap2=document.createElement('div');cWrap2.className='canvas-ghost-wrap';
+    cWrap2.style.width=CW+'px';cWrap2.style.height=CH+'px';
+    var ghost2=document.createElement('div');ghost2.className='canvas-ghost-letter';ghost2.textContent=f.form;
+    var bLine2=document.createElement('div');bLine2.className='canvas-ghost-baseline';
+    var cvs2=document.createElement('canvas');cvs2.width=CW;cvs2.height=CH;
+    var ctx2=cvs2.getContext('2d');
+    function drawGuide(){ctx2.clearRect(0,0,CW,CH);}
+    cWrap2.appendChild(ghost2);cWrap2.appendChild(bLine2);cWrap2.appendChild(cvs2);
     drawGuide();
-
-  var drawing=false;
-  function getPos(e){
-    var rect=canvas.getBoundingClientRect();
-    var src=e.touches?e.touches[0]:e;
-    return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};
-  }
-  canvas.addEventListener('mousedown',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();});
-  canvas.addEventListener('mousemove',function(e){
-    if(!drawing)return;
-    var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';
-    ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();
-  });
-  canvas.addEventListener('mouseup',function(){drawing=false;});
-  canvas.addEventListener('touchstart',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
-  canvas.addEventListener('touchmove',function(e){
-    if(!drawing)return;
-    var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';
-    ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();
-  },{passive:false});
     var drawing=false;
-    function getPos(e){var rect=canvas.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};}
-    canvas.addEventListener('mousedown',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();});
-    canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();});
-    canvas.addEventListener('mouseup',function(){drawing=false;});
-    canvas.addEventListener('touchstart',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
-    canvas.addEventListener('touchmove',function(e){if(!drawing)return;var p=getPos(e);ctx.lineWidth=5;ctx.strokeStyle='#c2185b';ctx.lineCap='round';ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault();},{passive:false});
-    canvas.addEventListener('touchend',function(){drawing=false;});
-    card.appendChild(canvas);
+    function getPos(e){var rect=cvs2.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};}
+    cvs2.addEventListener('mousedown',function(e){drawing=true;var p=getPos(e);ctx2.beginPath();ctx2.moveTo(p.x,p.y);e.preventDefault();});
+    cvs2.addEventListener('mousemove',function(e){if(!drawing)return;var p=getPos(e);ctx2.lineWidth=5;ctx2.strokeStyle='#c2185b';ctx2.lineCap='round';ctx2.lineTo(p.x,p.y);ctx2.stroke();e.preventDefault();});
+    cvs2.addEventListener('mouseup',function(){drawing=false;});
+    cvs2.addEventListener('touchstart',function(e){drawing=true;var p=getPos(e);ctx2.beginPath();ctx2.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+    cvs2.addEventListener('touchmove',function(e){if(!drawing)return;var p=getPos(e);ctx2.lineWidth=5;ctx2.strokeStyle='#c2185b';ctx2.lineCap='round';ctx2.lineTo(p.x,p.y);ctx2.stroke();e.preventDefault();},{passive:false});
+    cvs2.addEventListener('touchend',function(){drawing=false;});
+    card.appendChild(cWrap2);
 
     /* Bouton Effacer */
     var clrBtn2=document.createElement('button');clrBtn2.className='rbtn rbtn-s';
@@ -6758,7 +6759,7 @@ function _clStep4(wrap,letter,af,dayIdx,goNext){
   choiceIdxs.sort(function(){return Math.random()-.5;});
 
   var choiceRow=document.createElement('div');
-  choiceRow.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;direction:rtl;margin-bottom:14px';
+  choiceRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:220px;margin:0 auto 14px;direction:rtl';
 
   var revealEl=document.createElement('div');
   revealEl.style.cssText='display:none;border-top:1px solid rgba(194,24,91,.15);padding-top:12px;margin-top:4px';
@@ -6784,7 +6785,10 @@ function _clStep4(wrap,letter,af,dayIdx,goNext){
         revealEl.style.display='block';
         setTimeout(function(){
           speakText(letter.wordAr,'ar-SA',null);
-          setTimeout(function(){nextBtn.style.display='block';},1200);
+          setTimeout(function(){
+            nextBtn.style.display='block';
+            setTimeout(function(){nextBtn.scrollIntoView({behavior:'smooth',block:'center'});},80);
+          },1200);
         },400);
       }else{
         btn.style.background='rgba(239,68,68,.12)';btn.style.borderColor='#ef4444';
@@ -6862,16 +6866,18 @@ function _clStep5(wrap,letter,af,dayIdx,goNext){
       formShow.textContent=ff.form;
       formShow.onclick=function(){speakText(ff.form,'ar-SA',null);};
       card.appendChild(formShow);
+      /* Grille 2×2 positions fixes : [Milieu|Début] / [Isolée|Fin] */
+      var FIXED_POS=['Milieu','Début','Isolée','Fin'];
       var btnRow=document.createElement('div');
-      btnRow.style.cssText='display:flex;flex-wrap:wrap;gap:8px;justify-content:center';
-      shuffForms.forEach(function(sf){
+      btnRow.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%';
+      FIXED_POS.forEach(function(lbl){
+        var sf=forms.find(function(x){return x.lbl===lbl;})||forms[0];
         var btn=document.createElement('button');
-        btn.style.cssText='background:rgba(255,255,255,.9);border:2px solid rgba(194,24,91,.2);border-radius:12px;padding:8px 16px;font-size:.85rem;font-weight:800;color:#7b1fa2;cursor:pointer;transition:all .2s';
-        btn.textContent='En '+sf.lbl.toLowerCase();
+        btn.style.cssText='background:rgba(255,255,255,.9);border:2px solid rgba(194,24,91,.2);border-radius:12px;padding:10px 8px;font-size:.88rem;font-weight:800;color:#7b1fa2;cursor:pointer;transition:all .2s;width:100%';
+        btn.textContent='En '+lbl.toLowerCase();
         btn.onclick=(function(sf,btn){return function(){
           if(answered)return;
           speakText(sf.form,'ar-SA',null);
-          /* Correct si même label OU même écriture arabe (variantes identiques) */
           if(sf.lbl===ff.lbl || sf.form===ff.form){
             btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';btn.style.color='#15803d';
             score++;answered=true;
