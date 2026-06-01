@@ -4,551 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Am Learning Arabic — Apprenez l'Arabe du Coran</title>
-  <meta name="description" content="Apprenez l'arabe coranique, comprenez vos prieres et lisez le Coran. Acces a vie pour 74,99 euros au lieu de 149,99 euros. Offre de lancement limitee.">
+  <meta name="description" content="Apprenez l'arabe coranique, comprenez vos prières et lisez le Coran. Accès à vie pour 74,99 euros au lieu de 149,99 euros.">
   <link rel="icon" type="image/png" href="/images/20260518_195724_0000.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--gd:#0a2e1e;--g:#0f3d28;--gm:#1a5c44;--gl:#2d8a66;--gold:#d4a017;--goldc:#f5c842;--cream:#f8f6f0;--txt:#1a1a1a;--txt2:#4a5568;--white:#fff;--r:16px}
+:root{--gold:#d4a017;--goldc:#f5c842;--pink:#e91e63;--blue:#2196F3;--yellow:#FFC107}
 html{scroll-behavior:smooth}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:#0a0e1a;color:#fff;overflow-x:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,#fce4ec 0%,#e1bee7 25%,#d1c4e9 50%,#bbdefb 75%,#c8e6c9 100%);color:#333;min-height:100vh;overflow-x:hidden}
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,8,20,.95);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:62px;border-bottom:1px solid rgba(212,160,23,.15)}
-.logo{font-family:'Scheherazade New',serif;font-size:1.4rem;color:var(--goldc);font-weight:700;text-decoration:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:transparent;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:62px}
+.logo{font-family:'Scheherazade New',serif;font-size:1.4rem;color:var(--pink);font-weight:700;text-decoration:none}
 .nav-r{display:flex;gap:10px;align-items:center}
-.nav-r a.lnk{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.8);text-decoration:none;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.2);transition:all .2s}
-.nav-r a.lnk:hover{color:var(--goldc);border-color:rgba(212,160,23,.4)}
-.nav-r a.ctabtn{background:var(--gold);color:#0a0e1a;font-size:.82rem;font-weight:800;padding:8px 20px;border-radius:50px;text-decoration:none;transition:background .2s}
+.nav-r a.lnk{font-size:.82rem;font-weight:600;color:rgba(0,0,0,.6);text-decoration:none;padding:7px 14px;border-radius:8px;border:1px solid rgba(0,0,0,.1);transition:all .2s}
+.nav-r a.lnk:hover{color:var(--pink);border-color:rgba(225,24,91,.3)}
+.nav-r a.ctabtn{background:var(--gold);color:#000;font-size:.82rem;font-weight:800;padding:8px 20px;border-radius:50px;text-decoration:none;transition:background .2s}
 .nav-r a.ctabtn:hover{background:var(--goldc)}
-/* HERO */
-.hero{background:radial-gradient(ellipse at 50% 0%,#1a2060 0%,#0a0e1a 55%,#050814 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 24px 64px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.6) 0%,transparent 100%),radial-gradient(1px 1px at 80% 15%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 60% 60%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 35% 75%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 90% 45%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 10% 65%,rgba(255,255,255,.35) 0%,transparent 100%),radial-gradient(1px 1px at 55% 20%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 75% 80%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 40% 90%,rgba(255,255,255,.35) 0%,transparent 100%),radial-gradient(1px 1px at 15% 50%,rgba(255,255,255,.45) 0%,transparent 100%);pointer-events:none}
-.hero::after{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(212,160,23,.07) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-55%);pointer-events:none}
-.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,160,23,.14);border:1px solid rgba(212,160,23,.28);border-radius:50px;padding:6px 16px;font-size:.72rem;font-weight:700;color:var(--goldc);letter-spacing:.07em;text-transform:uppercase;margin-bottom:22px}
-.h-ar{font-family:'Scheherazade New',serif;font-size:clamp(2.2rem,8vw,5.2rem);color:var(--goldc);line-height:1.25;direction:rtl;margin-bottom:12px;text-shadow:0 2px 24px rgba(245,200,66,.25)}
-.h-ar2{font-family:'Scheherazade New',serif;font-size:clamp(.95rem,3vw,1.45rem);color:rgba(255,255,255,.5);direction:rtl;margin-bottom:28px}
-.h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:800;line-height:1.2;margin-bottom:14px}
-.h1 span{color:var(--goldc)}
-.hp{font-size:clamp(.95rem,2.5vw,1.15rem);color:rgba(255,255,255,.72);max-width:540px;line-height:1.7;margin-bottom:36px}
-.hform{display:flex;max-width:480px;width:100%;background:rgba(255,255,255,.08);border:1.5px solid rgba(212,160,23,.32);border-radius:50px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
-.hform:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.18)}
-.hinput{flex:1;background:transparent;border:none;outline:none;padding:15px 22px;font-size:.95rem;color:#fff;font-family:'Plus Jakarta Sans',sans-serif}
-.hinput::placeholder{color:rgba(255,255,255,.4)}
-.hbtn{background:var(--gold);color:var(--gd);border:none;cursor:pointer;padding:0 28px;font-weight:800;font-size:.88rem;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;border-radius:0 50px 50px 0;transition:background .2s}
-.hbtn:hover{background:var(--goldc)}
-.hbtn:disabled{opacity:.55;cursor:default}
-.hnote{margin-top:12px;font-size:.73rem;color:rgba(255,255,255,.42)}
-.hnote b{color:rgba(255,255,255,.65)}
-.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;color:rgba(255,255,255,.3);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;animation:bounce2 2s infinite}
-@keyframes bounce2{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
-.sarrow{width:18px;height:18px;border-right:2px solid rgba(255,255,255,.28);border-bottom:2px solid rgba(255,255,255,.28);transform:rotate(45deg)}
-/* STATS */
-.stats{background:#080c18;display:flex;flex-wrap:wrap;justify-content:center}
-.stat{flex:1;min-width:120px;max-width:210px;text-align:center;padding:22px 14px;border-right:1px solid rgba(255,255,255,.06)}
-.stat:last-child{border-right:none}
-.sn{font-size:2.1rem;font-weight:800;color:var(--goldc);display:block;line-height:1;margin-bottom:5px}
-.sl{font-size:.7rem;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase}
-/* SECTIONS */
-section{padding:72px 24px}
-.cnt{max-width:1060px;margin:0 auto}
-.sbadge{display:inline-block;background:rgba(212,160,23,.11);color:var(--gold);font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border-radius:50px;margin-bottom:14px}
-.st{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800;line-height:1.25;margin-bottom:14px;color:#fff}
-.st span{color:var(--goldc)}
-.ss{font-size:1rem;color:rgba(255,255,255,.6);line-height:1.7;max-width:600px}
-/* WHY */
-.why{background:#0d1124}
-.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:44px}
-.wc{background:rgba(255,255,255,.04);border-radius:var(--r);padding:26px 22px;border:1.5px solid rgba(212,160,23,.12);transition:transform .2s,box-shadow .2s,border-color .2s}
-.wc:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(0,0,0,.4);border-color:rgba(212,160,23,.32)}
-.wi{font-size:2.2rem;margin-bottom:12px;display:block}
-.wc h3{font-size:1rem;font-weight:800;margin-bottom:7px;color:var(--goldc)}
-.wc p{font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.65}
-.verse{margin-top:44px;background:rgba(212,160,23,.06);border:1.5px solid rgba(212,160,23,.2);border-radius:var(--r);padding:34px 30px;text-align:center}
-.qverse{font-family:'Scheherazade New',serif;font-size:1.85rem;color:var(--goldc);direction:rtl;line-height:1.6;margin-bottom:14px}
-.qfr{font-size:.9rem;color:rgba(255,255,255,.6);font-style:italic;line-height:1.6}
-.qref{margin-top:7px;font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:.07em;text-transform:uppercase}
-/* FEATURES */
-.features{background:#0a0e1a}
-.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;margin-top:44px}
-.fc{background:rgba(255,255,255,.04);border-radius:var(--r);padding:22px 18px;border:1.5px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
-.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gm),var(--gold))}
-.fc h3{font-size:.93rem;font-weight:800;margin-bottom:5px;color:#fff}
-.fc p{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6}
-.fci{font-size:1.7rem;margin-bottom:9px;display:block}
-/* PRICING */
-.pricing{background:#080c18;text-align:center}
-.pricing .st{color:#fff}
-.pricing .ss{color:rgba(255,255,255,.58);margin:0 auto}
-.pcard{background:rgba(255,255,255,.04);border:1.5px solid rgba(212,160,23,.28);border-radius:22px;padding:46px 38px;max-width:440px;margin:44px auto 0;position:relative}
-.pbadge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--gd);font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:6px 20px;border-radius:50px;white-space:nowrap}
-.pamount{font-size:4.5rem;font-weight:800;color:var(--goldc);line-height:1;margin-bottom:3px}
-.pamount sup{font-size:1.8rem;vertical-align:top;margin-top:12px}
-.pper{font-size:.88rem;color:rgba(255,255,255,.48);margin-bottom:30px}
-.pfeats{list-style:none;text-align:left;margin-bottom:34px;display:flex;flex-direction:column;gap:11px}
-.pfeats li{display:flex;align-items:flex-start;gap:9px;font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.5}
-.pfeats li::before{content:'checkmark';font-size:0;flex-shrink:0;width:19px;height:19px;background:rgba(212,160,23,.14);border:1.5px solid var(--gold);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-top:2px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l3 3 5-6' stroke='%23f5c842' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
-.pi{width:100%;background:rgba(255,255,255,.07);border:1.5px solid rgba(212,160,23,.28);border-radius:12px;padding:13px 18px;font-size:.93rem;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:11px;transition:border-color .2s}
-.pi::placeholder{color:rgba(255,255,255,.33)}
-.pi:focus{border-color:var(--gold)}
-.ps{width:100%;background:var(--gold);color:var(--gd);border:none;border-radius:12px;padding:15px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s}
-.ps:hover{background:var(--goldc)}
-.ps:disabled{opacity:.5;cursor:default}
-.pguar{margin-top:13px;font-size:.73rem;color:rgba(255,255,255,.33);display:flex;align-items:center;justify-content:center;gap:5px}
-.errmsg{color:#ff8a8a;font-size:.78rem;margin:0 0 8px;display:none;text-align:left}
-/* FAQ */
-.faq{background:#0d1124}
-.flist{margin-top:44px;display:flex;flex-direction:column;gap:10px;max-width:700px}
-.fitem{background:rgba(255,255,255,.04);border-radius:var(--r);border:1.5px solid rgba(255,255,255,.08);overflow:hidden}
-.fq{width:100%;background:transparent;border:none;text-align:left;padding:18px 22px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.93rem;font-weight:700;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px}
-.fq .arr{width:18px;height:18px;flex-shrink:0;border-right:2px solid var(--goldc);border-bottom:2px solid var(--goldc);transform:rotate(45deg);transition:transform .25s;margin-top:-3px}
-.fitem.open .arr{transform:rotate(-135deg);margin-top:3px}
-.fanswer{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.fitem.open .fanswer{max-height:260px}
-.fai{padding:0 22px 18px;font-size:.88rem;color:rgba(255,255,255,.55);line-height:1.7}
-/* BOTTOM CTA */
-.bcta{background:radial-gradient(ellipse at 50% 0%,#1a2060 0%,#0a0e1a 60%,#050814 100%);padding:72px 24px;text-align:center;border-top:1px solid rgba(212,160,23,.1)}
-.bcta .bcar{font-family:'Scheherazade New',serif;font-size:2.3rem;color:var(--goldc);direction:rtl;margin-bottom:22px}
-.bcta h2{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:800;color:#fff;margin-bottom:12px}
-.bcta p{font-size:.97rem;color:rgba(255,255,255,.62);max-width:460px;margin:0 auto 32px;line-height:1.7}
-.btngold{display:inline-block;background:var(--gold);color:var(--gd);font-weight:800;font-size:.95rem;padding:14px 36px;border-radius:50px;text-decoration:none;transition:background .2s,transform .15s;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
-.btngold:hover{background:var(--goldc);transform:translateY(-2px)}
-/* FOOTER */
-footer{background:#050814;border-top:1px solid rgba(255,255,255,.05);padding:28px 24px;text-align:center;color:rgba(255,255,255,.32);font-size:.78rem}
-footer a{color:rgba(255,255,255,.4);text-decoration:none}
-footer a:hover{color:var(--goldc)}
-.flinks{display:flex;gap:18px;justify-content:center;margin-bottom:12px;flex-wrap:wrap}
-/* PAYMENT OVERLAY */
-.povl{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(8px)}
-.povl.open{opacity:1;pointer-events:all}
-.pbox{background:#0b0f1e;border:1.5px solid rgba(212,160,23,.2);border-radius:24px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7)}
-/* Header */
-.pbox-head{padding:24px 28px 0;display:flex;align-items:center;justify-content:space-between}
-.pbox-head h2{font-size:1rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:7px}
-.pbox-close{background:rgba(255,255,255,.07);border:none;color:rgba(255,255,255,.4);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.pbox-close:hover{background:rgba(255,255,255,.14);color:#fff}
-/* Résumé commande */
-.pay-summary{margin:18px 28px 0;background:rgba(212,160,23,.07);border:1px solid rgba(212,160,23,.16);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
-.pay-product{font-size:.88rem;font-weight:700;color:#fff}
-.pay-product span{display:block;font-size:.73rem;font-weight:400;color:rgba(255,255,255,.4);margin-top:2px}
-.pay-prices{text-align:right}
-.pay-old{font-size:.78rem;color:rgba(255,255,255,.3);text-decoration:line-through}
-.pay-new{font-size:1.35rem;font-weight:800;color:var(--goldc)}
-/* Formulaire */
-.pay-form{padding:20px 28px 28px}
-.pay-label{display:block;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
-.pay-input{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(212,160,23,.2);border-radius:11px;padding:12px 16px;font-size:.93rem;color:#fff;font-family:'Plus Jakarta Sans',sans-serif;outline:none;margin-bottom:18px;transition:border-color .2s}
-.pay-input:focus{border-color:var(--gold)}
-.pay-divider{font-size:.72rem;color:rgba(255,255,255,.3);text-align:center;margin-bottom:16px;letter-spacing:.04em;text-transform:uppercase}
-#payment-element{margin-bottom:20px}
-.pay-submit{width:100%;background:var(--gold);color:#0a0e1a;border:none;border-radius:12px;padding:15px;font-size:.97rem;font-weight:800;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.pay-submit:hover{background:var(--goldc)}
-.pay-submit:disabled{opacity:.5;cursor:default}
-.pay-secure{margin-top:12px;text-align:center;font-size:.72rem;color:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;gap:5px}
-.pay-error{color:#ff8a8a;font-size:.8rem;margin-bottom:12px;display:none;padding:10px 14px;background:rgba(255,80,80,.08);border-radius:8px;border:1px solid rgba(255,80,80,.18)}
-/* Spinner */
-.pbox-loading{padding:60px 24px;text-align:center;color:rgba(255,255,255,.4);font-size:.88rem;display:flex;flex-direction:column;align-items:center;gap:14px}
-.pspinner{width:36px;height:36px;border:3px solid rgba(212,160,23,.2);border-top-color:var(--goldc);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-/* EMAIL MODAL (fallback) */
-.movl{position:fixed;inset:0;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
-.movl.open{opacity:1;pointer-events:all}
-.modal{background:#0d1124;border:1.5px solid rgba(212,160,23,.28);border-radius:22px;padding:38px 30px;max-width:420px;width:100%;text-align:center}
-.modal h2{font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:9px}
-.modal p{font-size:.88rem;color:rgba(255,255,255,.58);margin-bottom:22px;line-height:1.6}
-.mcancel{margin-top:13px;font-size:.78rem;color:rgba(255,255,255,.32);cursor:pointer;text-decoration:underline}
-/* RESPONSIVE */
+/* MAIN */
+.container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:100px 20px 40px;position:relative}
+.container::before{content:'';position:absolute;top:-100px;left:50px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,193,7,.3) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.container::after{content:'';position:absolute;bottom:100px;right:50px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,193,7,.2) 0%,transparent 70%);border-radius:50%;pointer-events:none}
+.card{background:rgba(255,255,255,.95);border-radius:24px;padding:50px 40px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);position:relative;z-index:10;text-align:center}
+.lang-btn{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.8);border:2px solid var(--pink);border-radius:50px;padding:8px 20px;font-size:.85rem;font-weight:700;color:var(--pink);margin-bottom:30px;cursor:pointer;transition:all .2s}
+.lang-btn:hover{background:var(--pink);color:#fff}
+.title-ar{font-family:'Scheherazade New',serif;font-size:2.5rem;color:var(--gold);margin-bottom:10px;direction:rtl;line-height:1.3}
+.subtitle{font-size:1rem;color:rgba(0,0,0,.6);margin-bottom:30px;font-weight:600}
+.price-box{background:linear-gradient(135deg,rgba(255,193,7,.1),rgba(212,160,23,.08));border:2px solid rgba(212,160,23,.3);border-radius:18px;padding:24px;margin-bottom:30px}
+.label{font-size:.7rem;font-weight:800;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.old-price{font-size:.95rem;color:rgba(0,0,0,.4);text-decoration:line-through}
+.new-price{font-size:3rem;font-weight:800;color:var(--gold);margin:0 8px}
+.formation{font-size:.85rem;color:rgba(0,0,0,.5);font-weight:600}
+.features{list-style:none;text-align:left;margin-bottom:30px}
+.features li{display:flex;align-items:center;gap:10px;font-size:.9rem;color:rgba(0,0,0,.7);margin-bottom:12px}
+.features li::before{content:'✓';display:inline-block;width:20px;height:20px;background:rgba(76,175,80,.15);border:1.5px solid #4CAF50;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#4CAF50;font-weight:800}
+.email-input{width:100%;background:rgba(0,0,0,.04);border:1.5px solid rgba(0,0,0,.1);border-radius:12px;padding:14px 16px;font-size:.95rem;color:#000;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:18px;transition:border-color .2s}
+.email-input:focus{outline:none;border-color:var(--gold)}
+.email-input::placeholder{color:rgba(0,0,0,.3)}
+.buy-btn{width:100%;background:linear-gradient(135deg,var(--gold),var(--goldc));color:#000;border:none;border-radius:14px;padding:16px;font-size:.98rem;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.buy-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,160,23,.3)}
+.buy-btn:active{transform:translateY(0)}
+.login-link{margin-top:16px;font-size:.85rem;color:rgba(0,0,0,.5)}
+.login-link a{color:var(--pink);text-decoration:none;font-weight:700}
+.login-link a:hover{text-decoration:underline}
+/* EMOJI DECORATIONS */
+.emoji{position:absolute;font-size:3.5rem;opacity:.8;pointer-events:none}
 @media(max-width:600px){
-  .stats{flex-wrap:wrap}
-  .stat{min-width:45%;border-bottom:1px solid rgba(255,255,255,.06)}
-  .stat:nth-child(odd){border-right:1px solid rgba(255,255,255,.06)}
-  .stat:nth-child(even){border-right:none}
-  .pcard{padding:34px 22px}
-  .hform{flex-direction:column;background:transparent;border:none;gap:10px}
-  .hinput{background:rgba(255,255,255,.08);border:1.5px solid rgba(212,160,23,.32);border-radius:50px;padding:14px 20px}
-  .hbtn{border-radius:50px;padding:13px 20px}
-  nav{padding:0 16px}
-  .nav-r a.lnk{font-size:.75rem;padding:6px 10px}
+  .card{padding:40px 24px}
+  .title-ar{font-size:1.8rem}
+  .new-price{font-size:2.2rem}
+  .emoji{font-size:2.5rem}
 }
   </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav>
-  <a href="/" class="logo">&#x644;&#x650;&#x646;&#x064E;&#x062A;&#x064E;&#x639;&#x064E;&#x644;&#x064E;&#x651;&#x0645;&#x650; &#x0627;&#x0644;&#x0652;&#x0639;&#x064E;&#x0631;&#x064E;&#x0628;&#x0650;&#x064A;&#x064E;&#x651;&#x0629;</a>
-  <div class="nav-r" id="nav-r">
-    <a href="/app" class="lnk">Se connecter</a>
-    <a href="#pricing" class="ctabtn">Offre lancement &mdash; 74,99&euro;</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <span class="badge">&#x2756; Pour les musulmans francophones &#x2756;</span>
-  <div class="h-ar">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x0644;&#x0651;&#x064e;&#x647;&#x650; &#x627;&#x0644;&#x0631;&#x064e;&#x0651;&#x062d;&#x0652;&#x0645;&#x064e;&#x0670;&#x0646;&#x650; &#x627;&#x0644;&#x0631;&#x064e;&#x0651;&#x062d;&#x0650;&#x064a;&#x0645;&#x650;</div>
-  <div class="h-ar2">&#x625;&#x650;&#x646;&#x064e;&#x651;&#x627; &#x623;&#x064e;&#x0646;&#x0632;&#x064e;&#x0644;&#x0652;&#x0646;&#x064e;&#x0627;&#x0647;&#x064f; &#x642;&#x064f;&#x0631;&#x0652;&#x0622;&#x0646;&#x064b;&#x0627; &#x639;&#x064e;&#x0631;&#x064e;&#x0628;&#x0650;&#x064a;&#x064b;&#x0627;</div>
-  <h1 class="h1">Comprenez le Coran.<br><span>Rapprochez-vous d&rsquo;Allah.</span></h1>
-  <p class="hp">L&rsquo;arabe est la langue de votre Seigneur. Chaque sourate, chaque du&rsquo;&acirc; que vous murmurez &mdash; comprenez-les vraiment. Notre m&eacute;thode interactive vous guide, lettre apr&egrave;s lettre.</p>
-  <form class="hform" id="hero-form" onsubmit="startCheckout(event,'hero-email','hero-btn','hero-err')">
-    <input type="email" id="hero-email" class="hinput" placeholder="Votre adresse email..." required autocomplete="email">
-    <button type="submit" id="hero-btn" class="hbtn">Commencer &rarr;</button>
-  </form>
-  <p id="hero-err" style="display:none;color:#ff8a8a;font-size:.78rem;margin-top:8px"></p>
-  <p class="hnote"><s style="opacity:.5">149,99&euro;</s> &nbsp;<b>74,99&euro; une seule fois</b> &middot; Acc&egrave;s &agrave; vie &middot; Sans abonnement</p>
-  <div class="scroll-hint"><span>D&eacute;couvrir</span><div class="sarrow"></div></div>
-</section>
-
-<!-- STATS -->
-<div class="stats">
-  <div class="stat"><span class="sn">28</span><span class="sl">Lettres arabes</span></div>
-  <div class="stat"><span class="sn">6</span><span class="sl">Activit&eacute;s / lettre</span></div>
-  <div class="stat"><span class="sn">30min</span><span class="sl">Par session</span></div>
-  <div class="stat"><span class="sn">100%</span><span class="sl">Interactif</span></div>
-</div>
-
-<!-- POURQUOI L'ARABE -->
-<section class="why" id="why">
-  <div class="cnt">
-    <span class="sbadge">Pourquoi l&rsquo;arabe ?</span>
-    <h2 class="st">L&rsquo;arabe n&rsquo;est pas une langue<br><span>comme les autres</span></h2>
-    <p class="ss">Pour un musulman, apprendre l&rsquo;arabe n&rsquo;est pas un simple hobby. C&rsquo;est un acte d&rsquo;adoration. C&rsquo;est se rapprocher de la parole divine telle qu&rsquo;elle a &eacute;t&eacute; r&eacute;v&eacute;l&eacute;e.</p>
-    <div class="why-grid">
-      <div class="wc"><span class="wi">&#x1F4D6;</span><h3>Lire le Coran</h3><p>Le Coran a &eacute;t&eacute; r&eacute;v&eacute;l&eacute; en arabe. Apprendre l&rsquo;arabe, c&rsquo;est entendre la voix d&rsquo;Allah sans interm&eacute;diaire. Chaque mot compte.</p></div>
-      <div class="wc"><span class="wi">&#x1F932;</span><h3>Comprendre la pri&egrave;re</h3><p>Vous r&eacute;citez Al-Fatiha jusqu&rsquo;&agrave; 17 fois par jour. Imaginez comprendre chaque mot que vous adressez &agrave; Allah. La Salat prend une tout autre dimension.</p></div>
-      <div class="wc"><span class="wi">&#x1F319;</span><h3>Acc&eacute;der aux sources</h3><p>Hadiths, tafsir, fiqh&hellip; La majorit&eacute; des connaissances islamiques n&rsquo;ont pas &eacute;t&eacute; traduites. L&rsquo;arabe vous ouvre ces portes.</p></div>
-      <div class="wc"><span class="wi">&#x2B50;</span><h3>Une r&eacute;compense immense</h3><p>Le Proph&egrave;te &#x212C; a dit : &laquo;&nbsp;Celui qui lit une lettre du Coran obtient une bonne action, et chaque bonne action est multipli&eacute;e par dix.&nbsp;&raquo; (Tirmidhi)</p></div>
+  <nav>
+    <a href="/" class="logo">I Am Learning Arabic</a>
+    <div class="nav-r">
+      <a href="#" class="lnk">Français</a>
     </div>
-    <div class="verse">
-      <div class="qverse">&#x625;&#x650;&#x646;&#x064e;&#x651;&#x627; &#x623;&#x064e;&#x0646;&#x0632;&#x064e;&#x0644;&#x0652;&#x0646;&#x064e;&#x0627;&#x0647;&#x064f; &#x642;&#x064f;&#x0631;&#x0652;&#x0622;&#x0646;&#x064b;&#x0627; &#x639;&#x064e;&#x0631;&#x064e;&#x0628;&#x0650;&#x064a;&#x064b;&#x0627; &#x0644;&#x064e;&#x0651;&#x0639;&#x064e;&#x0644;&#x064e;&#x0651;&#x0643;&#x064f;&#x0645;&#x0652; &#x062a;&#x064e;&#x0639;&#x0652;&#x0642;&#x0650;&#x0644;&#x064f;&#x0648;&#x0646;&#x064e;</div>
-      <div class="qfr">&laquo;&nbsp;Nous l&rsquo;avons fait descendre en Coran arabe afin que vous raisonniez.&nbsp;&raquo;</div>
-      <div class="qref">Coran 12:2 &mdash; Sourate Y&ucirc;suf</div>
-    </div>
-  </div>
-</section>
+  </nav>
 
-<!-- FONCTIONNALITES -->
-<section class="features" id="features">
-  <div class="cnt">
-    <div style="text-align:center;max-width:580px;margin:0 auto">
-      <span class="sbadge">Ce qui est inclus</span>
-      <h2 class="st">Tout ce qu&rsquo;il faut pour <span>r&eacute;ussir</span></h2>
-      <p class="ss">Une m&eacute;thode compl&egrave;te, progressive et ludique. Con&ccedil;ue pour les adultes comme pour les enfants.</p>
-    </div>
-    <div class="fg">
-      <div class="fc"><span class="fci">&#x270F;&#xFE0F;</span><h3>Trac&eacute; des lettres</h3><p>Apprenez &agrave; &eacute;crire chaque lettre &agrave; la main, avec un guide interactif sur canvas.</p></div>
-      <div class="fc"><span class="fci">&#x1F50A;</span><h3>Prononciation</h3><p>Chaque lettre prononc&eacute;e avec justesse. Entra&icirc;nez votre oreille &agrave; la phon&eacute;tique arabe.</p></div>
-      <div class="fc"><span class="fci">&#x1F3AE;</span><h3>Jeux interactifs</h3><p>Memory, puzzles, quiz de formes&hellip; L&rsquo;apprentissage se fait en jouant.</p></div>
-      <div class="fc"><span class="fci">&#x1F476;</span><h3>Mode enfant</h3><p>Interface adapt&eacute;e aux plus jeunes, avec mascotte, r&eacute;compenses et progression par &icirc;les.</p></div>
-      <div class="fc"><span class="fci">&#x1F5FA;&#xFE0F;</span><h3>Carte des &icirc;les</h3><p>Progressez de lettre en lettre en d&eacute;bloquant de nouvelles &icirc;les sur une carte interactive.</p></div>
-      <div class="fc"><span class="fci">&#x1F4CA;</span><h3>Suivi de progression</h3><p>Visualisez votre avancement, vos scores et votre r&eacute;gularit&eacute; jour apr&egrave;s jour.</p></div>
-    </div>
-  </div>
-</section>
+  <div class="container">
+    <!-- Decorations -->
+    <div class="emoji" style="top:80px;left:60px">🌙</div>
+    <div class="emoji" style="top:150px;right:40px">🦄</div>
+    <div class="emoji" style="bottom:200px;left:80px">⭐</div>
+    <div class="emoji" style="bottom:150px;right:100px">🌸</div>
+    <div class="emoji" style="top:300px;left:30px;font-size:2.5rem;opacity:.5">🏺</div>
+    <div class="emoji" style="bottom:300px;right:50px;font-size:2rem;opacity:.4">✨</div>
 
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="cnt">
-    <span class="sbadge" style="background:rgba(212,160,23,.14);color:var(--goldc)">Tarif</span>
-    <h2 class="st">Simple et accessible</h2>
-    <p class="ss">74,99&euro; au lieu de 149,99&euro;. C&rsquo;est le prix d&rsquo;un dîner au restaurant. Les b&eacute;n&eacute;fices, eux, dureront toute votre vie &mdash; et au-del&agrave;.</p>
+    <div class="card">
+      <button class="lang-btn">
+        <span style="width:16px;height:16px;background:var(--pink);border-radius:50%;display:inline-block"></span>
+        Français
+      </button>
 
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:24px auto 0;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:12px;padding:12px 20px;max-width:500px">
-      <span style="font-size:1.3rem">&#x26A1;</span>
-      <span style="font-size:.85rem;font-weight:700;color:var(--goldc);line-height:1.4">Offre de lancement exceptionnelle &mdash; 50% de r&eacute;duction.<br><span style="font-weight:500;color:rgba(255,255,255,.55)">Ce tarif est provisoire. Le prix reviendra &agrave; 149,99&euro; tr&egrave;s prochainement.</span></span>
-    </div>
+      <h1 class="title-ar">لتعلّم الغربية</h1>
+      <p class="subtitle">15 jours pour lire l'arabe !</p>
 
-    <div class="pcard">
-      <div class="pbadge">&#x26A1; Offre lancement &mdash; -50% &#x26A1;</div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:4px">
-        <div style="font-size:1.4rem;font-weight:700;color:rgba(255,255,255,.35);text-decoration:line-through">149,99&euro;</div>
-        <div class="pamount" style="margin:0"><sup>&euro;</sup>74,99</div>
+      <div class="price-box">
+        <div class="label">Prix Exceptionnel</div>
+        <div style="display:flex;align-items:baseline;justify-content:center;margin-bottom:8px">
+          <span class="old-price">149.99 €</span>
+          <span class="new-price">74.99 €</span>
+        </div>
+        <div class="formation">Formation complète</div>
       </div>
-      <div class="pper">paiement unique &middot; acc&egrave;s &agrave; vie</div>
-      <ul class="pfeats">
-        <li>Toutes les 28 lettres de l&rsquo;alphabet arabe</li>
-        <li>6 activit&eacute;s interactives par lettre (~30min)</li>
-        <li>Mode adulte + mode enfant inclus</li>
-        <li>Jeux&nbsp;: memory, puzzle, quiz de formes</li>
-        <li>Prononciation audio native</li>
-        <li>Application PWA (fonctionne hors-ligne)</li>
-        <li>Acc&egrave;s &agrave; vie sur tous vos appareils</li>
+
+      <ul class="features">
+        <li>Accès à vie</li>
+        <li>12 leçons détaillées</li>
+        <li>Exercices & Quiz — 200 questions</li>
+        <li>Aide 24/7</li>
+        <li>13 langues disponibles</li>
+        <li>Mises à jour incluses</li>
       </ul>
-      <p class="errmsg" id="price-err"></p>
-      <input type="email" id="price-email" class="pi" placeholder="Votre adresse email..." autocomplete="email">
-      <button class="ps" id="price-btn" onclick="startCheckout(null,'price-email','price-btn','price-err')">Profiter de l&rsquo;offre &mdash; 74,99&euro; &rarr;</button>
-      <p class="pguar">&#x1F512; Paiement unique s&eacute;curis&eacute; par Stripe</p>
-    </div>
-  </div>
-</section>
 
-<!-- FAQ -->
-<section class="faq" id="faq">
-  <div class="cnt">
-    <span class="sbadge">Questions fr&eacute;quentes</span>
-    <h2 class="st">Vous avez des questions ?</h2>
-    <div class="flist">
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">Faut-il d&eacute;j&agrave; conna&icirc;tre l&rsquo;arabe ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Non, aucune connaissance pr&eacute;alable n&rsquo;est requise. La m&eacute;thode commence &agrave; la toute premi&egrave;re lettre et progresse &agrave; votre rythme.</div></div></div>
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">L&rsquo;application fonctionne-t-elle sur t&eacute;l&eacute;phone ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Oui, c&rsquo;est une Progressive Web App (PWA). Installez-la directement depuis votre navigateur sur Android ou iPhone, sans App Store. Elle fonctionne m&ecirc;me hors connexion une fois install&eacute;e.</div></div></div>
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">L&rsquo;acc&egrave;s est-il vraiment &agrave; vie ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Oui, 74,99&euro; une seule fois et c&rsquo;est tout. Aucun abonnement, aucun renouvellement, aucune surprise. Vous payez une fois et vous acc&eacute;dez &agrave; l&rsquo;application pour toujours, m&ecirc;me lorsque du nouveau contenu est ajout&eacute;.</div></div></div>
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">Combien de temps pour apprendre l&rsquo;alphabet ?<div class="arr"></div></button><div class="fanswer"><div class="fai">En pratiquant 30 minutes par jour, la plupart des apprenants ma&icirc;trisent l&rsquo;alphabet complet en 4 &agrave; 6 semaines.</div></div></div>
-      <div class="fitem"><button class="fq" onclick="tfaq(this)">Y a-t-il un mode pour les enfants ?<div class="arr"></div></button><div class="fanswer"><div class="fai">Absolument. Un mode enfant complet (d&egrave;s 5 ans) est int&eacute;gr&eacute;, avec mascotte, carte des &icirc;les &agrave; d&eacute;bloquer, r&eacute;compenses et activit&eacute;s adapt&eacute;es. Parfait pour apprendre en famille.</div></div></div>
-    </div>
-  </div>
-</section>
+      <input type="email" class="email-input" placeholder="Votre email" id="email">
+      <button class="buy-btn" onclick="goToPay()">Acheter l'accès — 74.99 €</button>
 
-<!-- BOTTOM CTA -->
-<section class="bcta">
-  <div class="cnt" style="text-align:center">
-    <div class="bcar">&#x0641;&#x064e;&#x0625;&#x0650;&#x0646;&#x064e;&#x0651;&#x0645;&#x064e;&#x0627; &#x064a;&#x064e;&#x0633;&#x064e;&#x0651;&#x0631;&#x0652;&#x0646;&#x064e;&#x0627;&#x0647;&#x064f; &#x0628;&#x0650;&#x0644;&#x0650;&#x0633;&#x064e;&#x0627;&#x0646;&#x0650;&#x0643;&#x064e;</div>
-    <h2>Commencez aujourd&rsquo;hui.<br>Chaque jour compte.</h2>
-    <p>&laquo;&nbsp;Nous l&rsquo;avons rendu facile dans ta langue&nbsp;&raquo; &mdash; Coran 44:58.<br>L&rsquo;arabe n&rsquo;est pas inaccessible. Il vous attend.</p>
-    <button class="btngold" onclick="openModal()">Profiter de l&rsquo;offre &mdash; 74,99&euro;</button>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="flinks">
-    <a href="/">Accueil</a>
-    <a href="#why">Pourquoi</a>
-    <a href="#features">Fonctionnalit&eacute;s</a>
-    <a href="#pricing">Tarif</a>
-    <a href="#faq">FAQ</a>
-    <a href="/connexion">Se connecter</a>
-    <a href="mailto:contact@iamlearningarabic.com">Contact</a>
-  </div>
-  <p>&copy; 2025 I Am Learning Arabic &middot; <a href="#">Mentions l&eacute;gales</a> &middot; <a href="#">CGV</a></p>
-</footer>
-
-<!-- PAYMENT OVERLAY (custom Payment Element) -->
-<div class="povl" id="povl" onclick="if(event.target===this)closePayment()">
-  <div class="pbox">
-    <div class="pbox-head">
-      <h2>&#x1F512; Paiement s&eacute;curis&eacute;</h2>
-      <button class="pbox-close" onclick="closePayment()" title="Fermer">&times;</button>
-    </div>
-    <!-- Spinner -->
-    <div id="checkout-loading" class="pbox-loading">
-      <div class="pspinner"></div>
-      <span>Pr&eacute;paration du paiement&hellip;</span>
-    </div>
-    <!-- Formulaire custom -->
-    <div id="pay-content" style="display:none">
-      <div class="pay-summary">
-        <div class="pay-product">
-          I Am Learning Arabic
-          <span>Acc&egrave;s &agrave; vie &middot; 28 lettres &middot; PWA</span>
-        </div>
-        <div class="pay-prices">
-          <div class="pay-old">149,99&euro;</div>
-          <div class="pay-new">74,99&euro;</div>
-        </div>
-      </div>
-      <div class="pay-form">
-        <label class="pay-label">Adresse email</label>
-        <input type="email" id="pay-email" class="pay-input" placeholder="votre@email.com" autocomplete="email">
-        <div class="pay-divider">Informations de paiement</div>
-        <p class="pay-error" id="pay-error"></p>
-        <div id="payment-element"></div>
-        <button class="pay-submit" id="pay-submit" onclick="submitPayment()">
-          <span>Payer 74,99&euro;</span> <span>&rarr;</span>
-        </button>
-        <p class="pay-secure">&#x1F512; Paiement s&eacute;curis&eacute; par Stripe &middot; Chiffrement SSL</p>
+      <div class="login-link">
+        Déjà un compte ? <a href="/connexion.html">Se connecter</a>
       </div>
     </div>
   </div>
-</div>
 
-<!-- MODAL EMAIL -->
-<div class="movl" id="movl" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <h2>Cr&eacute;er votre acc&egrave;s</h2>
-    <p>Entrez votre email pour continuer vers le paiement s&eacute;curis&eacute;.</p>
-    <p class="errmsg" id="modal-err"></p>
-    <input type="email" id="modal-email" class="pi" placeholder="Votre email..." autocomplete="email" style="margin-bottom:11px">
-    <button class="ps" id="modal-btn" onclick="startCheckout(null,'modal-email','modal-btn','modal-err')">Continuer vers le paiement &rarr;</button>
-    <div class="mcancel" onclick="closeModal()">Annuler</div>
-  </div>
-</div>
-
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-var _stripe = null;
-var _elements = null;
-var _pendingEmail = '';
-
-/* ===== INIT ===== */
-(function init(){
-  var tok = localStorage.getItem('arab_token');
-  var em  = localStorage.getItem('arab_email');
-  var nr  = document.getElementById('nav-r');
-  if(tok && em && nr){
-    nr.innerHTML = '<a href="/connexion" class="lnk">Mon espace</a><a href="/app" class="ctabtn">Accéder à l\'app →</a>';
-  }
-  /* Charger Stripe */
-  fetch('/api/config').then(r=>r.json()).then(d=>{
-    if(d.pk) _stripe = Stripe(d.pk);
-  }).catch(()=>{});
-})();
-
-/* ===== OUVRIR LE PAIEMENT ===== */
-async function startCheckout(e, emailId, btnId, errId){
-  if(e) e.preventDefault();
-  var email = (document.getElementById(emailId)||{}).value?.trim()||'';
-  var btn   = document.getElementById(btnId);
-  var errEl = errId ? document.getElementById(errId) : null;
-
-  if(!email || !email.includes('@')){
-    if(errEl){errEl.textContent='Veuillez entrer un email valide.';errEl.style.display='block';}
-    return;
-  }
-  if(errEl) errEl.style.display='none';
-  btn.disabled=true; btn.textContent='Chargement…';
-  _pendingEmail = email;
-
-  try{
-    /* Créer le PaymentIntent */
-    var r = await fetch('/api/create-payment-intent',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email})
-    });
-    var d = await r.json();
-    if(!d.clientSecret){ throw new Error(d.error||'Erreur serveur'); }
-
-    /* Apparence sombre aux couleurs du site */
-    var appearance = {
-      theme: 'night',
-      variables:{
-        colorPrimary:       '#d4a017',
-        colorBackground:    '#0f1428',
-        colorText:          '#ffffff',
-        colorTextSecondary: 'rgba(255,255,255,.55)',
-        colorDanger:        '#ff8a8a',
-        fontFamily:         '"Plus Jakarta Sans", Arial, sans-serif',
-        borderRadius:       '11px',
-        spacingUnit:        '4px',
-      },
-      rules:{
-        '.Input':{
-          backgroundColor:'rgba(255,255,255,.06)',
-          border:'1.5px solid rgba(212,160,23,.22)',
-          boxShadow:'none',
-          color:'#fff',
-          padding:'12px 14px',
-        },
-        '.Input:focus':{
-          border:'1.5px solid #d4a017',
-          boxShadow:'0 0 0 3px rgba(212,160,23,.15)',
-        },
-        '.Label':{
-          color:'rgba(255,255,255,.45)',
-          fontSize:'.72rem',
-          fontWeight:'700',
-          textTransform:'uppercase',
-          letterSpacing:'.05em',
-        },
-        '.Tab':{
-          backgroundColor:'rgba(255,255,255,.05)',
-          border:'1.5px solid rgba(255,255,255,.08)',
-          color:'rgba(255,255,255,.6)',
-        },
-        '.Tab--selected':{
-          backgroundColor:'rgba(212,160,23,.12)',
-          border:'1.5px solid rgba(212,160,23,.35)',
-          color:'#f5c842',
-        },
-        '.TabIcon--selected':{ fill:'#f5c842' },
-      }
-    };
-
-    _elements = _stripe.elements({clientSecret: d.clientSecret, appearance, locale:'fr'});
-    var pe = _elements.create('payment');
-
-    /* Afficher le modal */
-    document.getElementById('checkout-loading').style.display='flex';
-    document.getElementById('pay-content').style.display='none';
-    document.getElementById('pay-email').value = email;
-    document.getElementById('pay-error').style.display='none';
-    document.getElementById('povl').classList.add('open');
-    document.body.style.overflow='hidden';
-
-    /* Monter l'élément une fois prêt */
-    pe.mount('#payment-element');
-    pe.on('ready', function(){
-      document.getElementById('checkout-loading').style.display='none';
-      document.getElementById('pay-content').style.display='block';
-    });
-
-  }catch(err){
-    if(errEl){errEl.textContent=err.message||'Erreur. Réessayez.';errEl.style.display='block';}
-    btn.disabled=false; btn.textContent='Commencer →';
-  }
+  <script>
+function goToPay(){
+  var email=document.getElementById('email').value.trim();
+  if(!email){alert('Entrez votre email');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Email invalide');return;}
+  window.location.href='/app.html?email='+encodeURIComponent(email);
 }
-
-/* ===== SOUMETTRE LE PAIEMENT ===== */
-async function submitPayment(){
-  var btn = document.getElementById('pay-submit');
-  var errEl = document.getElementById('pay-error');
-  var email = document.getElementById('pay-email').value.trim() || _pendingEmail;
-
-  if(!email||!email.includes('@')){
-    errEl.textContent='Veuillez vérifier votre email.';
-    errEl.style.display='block'; return;
-  }
-  btn.disabled=true;
-  btn.innerHTML='<div class="pspinner" style="width:20px;height:20px;border-width:2px;margin:0"></div>';
-  errEl.style.display='none';
-
-  var {error, paymentIntent} = await _stripe.confirmPayment({
-    elements: _elements,
-    confirmParams:{
-      return_url: window.location.origin+'/inscription?email='+encodeURIComponent(email),
-      receipt_email: email,
-    },
-    redirect:'if_required',
-  });
-
-  if(error){
-    errEl.textContent = error.message || 'Erreur de paiement. Réessayez.';
-    errEl.style.display='block';
-    btn.disabled=false;
-    btn.innerHTML='<span>Payer 74,99€</span><span>→</span>';
-  } else if(paymentIntent && paymentIntent.status==='succeeded'){
-    btn.innerHTML='✅ Paiement validé !';
-    setTimeout(()=>{
-      window.location.href='/inscription?email='+encodeURIComponent(email);
-    }, 800);
-  }
-}
-
-/* ===== FERMER ===== */
-function closePayment(){
-  document.getElementById('povl').classList.remove('open');
-  document.body.style.overflow='';
-  _elements=null;
-  document.getElementById('payment-element').innerHTML='';
-  document.querySelectorAll('.hbtn,.ps').forEach(b=>{
-    b.disabled=false;
-    b.textContent = b.classList.contains('hbtn') ? 'Commencer →' : 'Continuer vers le paiement →';
-  });
-}
-
-/* ===== MODAL CTA BAS DE PAGE ===== */
-function openModal(){
-  document.getElementById('movl').classList.add('open');
-  setTimeout(()=>document.getElementById('modal-email').focus(),100);
-}
-function closeModal(){ document.getElementById('movl').classList.remove('open'); }
-
-/* ===== FAQ ===== */
-function tfaq(btn){
-  var item=btn.closest('.fitem');
-  var isOpen=item.classList.contains('open');
-  document.querySelectorAll('.fitem.open').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
-}
-</script>
+document.getElementById('email').addEventListener('keypress',function(e){
+  if(e.key==='Enter')goToPay();
+});
+  </script>
 </body>
 </html>
