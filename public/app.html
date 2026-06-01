@@ -6979,7 +6979,7 @@ function _xProgressBar(wrap,step,names){
 }
 
 /* Étape 0 générique — même structure exacte que _clStep0 */
-function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext){
+function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,sounds){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
 
   var bigL=document.createElement('div');
@@ -6993,13 +6993,14 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext){
 
   /* Formes (child-variants) — même CSS */
   var varRow=document.createElement('div');varRow.className='child-variants';
-  forms.forEach(function(v){
+  forms.forEach(function(v,idx){
     var box=document.createElement('div');box.className='child-var-box';box.style.cursor='pointer';
     var isProlong=(v[1].indexOf('|')>-1);
     var parts=isProlong?v[1].split('|'):[v[1]];
     var displayText=isProlong?parts[0]+' '+parts[1]:v[1];
+    var soundToPlay=sounds&&sounds[idx]?sounds[idx]:(isProlong?parts[0]:v[1]);
     box.innerHTML='<div class="child-var-ar">'+displayText+'</div><div class="child-var-lbl">'+v[0]+'</div>';
-    box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(parts[0]);
+    box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(soundToPlay);
     varRow.appendChild(box);
   });
   card.appendChild(varRow);
@@ -7100,7 +7101,7 @@ function _xStep4Quiz(wrap,items,goNext){
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:10px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
     var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
-    var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:#ad1457;margin-bottom:16px';qt.textContent='Quel signe entends-tu ?';card.appendChild(qt);
+    var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:#ad1457;margin-bottom:16px';qt.textContent='Quelle voyelle entends-tu ?';card.appendChild(qt);
     var choices=[q.correct].concat(q.wrong).sort(function(){return Math.random()-.5;});
     var choicesEl=document.createElement('div');choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:10px';
     var answered=false;
@@ -7283,7 +7284,7 @@ function _cvStep3v(wrap,goNext){
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
-    var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px';q.textContent='Quel signe correspond à ce son ?';card.appendChild(q);
+    var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px';q.textContent='Quelle voyelle correspond à ce son ?';card.appendChild(q);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:10px;justify-content:center';
     _CVOW.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
       var btn=document.createElement('button');
@@ -7359,9 +7360,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : lettre + voyelle (affichage côte à côte) */
-var _CPROL_FORMS=[['Alif · ā','ا|َ'],['Waw · ū','و|ُ'],['Yā · ī','ي|ِ']];
-var _CPROL_ITEMS=[['Alif · ā','ا|َ','🌊'],['Waw · ū','و|ُ','🎵'],['Yā · ī','ي|ِ','🌟']];
+/* Prolongations : voyelle PUIS lettre (RTL: voyelle à droite visuellement) */
+var _CPROL_FORMS=[['Alif · ā','َ|ا'],['Waw · ū','ُ|و'],['Yā · ī','ِ|ي']];
+var _CPROL_ITEMS=[['Alif · ā','آ'],['Waw · ū','وو'],['Yā · ī','يي']];/* sons: alif-long, waw-long, ya-long */
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
@@ -7381,7 +7382,7 @@ function renderChildProlongLesson(ca,step){
   var wrap=document.createElement('div');wrap.className='child-wrap';
   _xProgressBar(wrap,step);
   var goNext=function(){renderChildProlongLesson(ca,step+1);};
-  if(step===0)_xStep0(wrap,'آ','Les voyelles longues · ā · ū · ī',_CPROL_FORMS,'🎶','نُورٌ','nūrun',goNext);
+  if(step===0)_xStep0(wrap,'آ','Les voyelles longues · ā · ū · ī',_CPROL_FORMS,'🎶','نُورٌ','nūrun',goNext,['آ','وو','يي']);
   else if(step===1)_xStep1(wrap,_CPROL_FORMS,goNext);
   else if(step===2)_xStep1(wrap,_CPROL_FORMS,goNext);
   else if(step===3)_xStep4Quiz(wrap,_CPROL_ITEMS,goNext);
@@ -7459,7 +7460,7 @@ function _cpStep2p(wrap,goNext){
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
-    var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:16px';q.textContent='Quel mot correspond à ce son long ?';card.appendChild(q);
+    var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:16px';q.textContent='Quelle prolongation entends-tu ?';card.appendChild(q);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center';
     _CPROL.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
       var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=v.sym;
