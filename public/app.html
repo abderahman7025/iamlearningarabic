@@ -1963,6 +1963,20 @@ body.profile-adult, #root.profile-adult {
 #root.profile-girl .wline-lbl { color: #ad1457 !important; }
 #root.profile-girl .q-big-vow { color: #c2185b !important; filter: none !important; }
 #root.profile-girl .vow-baseline-line { background: rgba(194,24,91,.25) !important; }
+/* Île 3 — prolongations — même look rose */
+#root.profile-girl .info-box *,
+#root.profile-girl .tip-box *,
+#root.profile-girl .vline-section * {
+  --gold: #c2185b; --gold2: #e91e8c;
+  --txt: #333; --txt2: #555;
+  --border: rgba(194,24,91,.22); --border2: rgba(194,24,91,.4);
+  --glass: rgba(255,255,255,.85);
+}
+#root.profile-girl .tip-box {
+  background: rgba(255,245,250,.9) !important;
+  border-color: rgba(194,24,91,.18) !important;
+  color: #333 !important;
+}
 
 /* Enfants avec color:var(--txt) — les deux variantes (sans et avec espace) */
 #root.profile-girl  .info-box [style*="color:var(--txt)"],   #root.profile-girl  .info-box [style*="color: var(--txt)"],
@@ -6458,11 +6472,13 @@ function _clStep1(wrap,letter,af,goNext){
     var ghost=document.createElement('div');ghost.className='canvas-ghost-letter';
     ghost.textContent=formText;
     /* Ligne de base */
-    /* Baseline adaptive par measureText */
+    /* Baseline adaptive — mesure après chargement police */
     var _tc=document.createElement('canvas').getContext('2d');
     _tc.font="95px 'Scheherazade New',serif";
-    var _mm=_tc.measureText(formText);
-    var _masc=_mm.actualBoundingBoxAscent||60;var _mdesc=_mm.actualBoundingBoxDescent||15;
+    var _mm=_tc.measureText('بَيْتٌ'); /* mot test Arabic pour forcer le rendu */
+    var _mm2=_tc.measureText(formText);
+    var _masc=(_mm2.actualBoundingBoxAscent>5?_mm2.actualBoundingBoxAscent:null)||(_mm.actualBoundingBoxAscent>5?Math.round(_mm.actualBoundingBoxAscent*0.9):65);
+    var _mdesc=(_mm2.actualBoundingBoxDescent>2?_mm2.actualBoundingBoxDescent:null)||(_mm.actualBoundingBoxDescent>2?Math.round(_mm.actualBoundingBoxDescent*0.9):20);
     var _centerY=(CHc-10)/2+10;
     var _bY=_centerY+(_masc-_mdesc)/2;
     var _bBot=((CHc-_bY)/CHc*100).toFixed(1);
@@ -6689,8 +6705,10 @@ function _clStep2(wrap,letter,af,goNext){
     /* Baseline adaptive step 2 */
     var _tc2=document.createElement('canvas').getContext('2d');
     _tc2.font="95px 'Scheherazade New',serif";
-    var _mm2=_tc2.measureText(f.form);
-    var _masc2=_mm2.actualBoundingBoxAscent||60;var _mdesc2=_mm2.actualBoundingBoxDescent||15;
+    var _mref2=_tc2.measureText('بَيْتٌ');
+    var _mf2=_tc2.measureText(f.form);
+    var _masc2=(_mf2.actualBoundingBoxAscent>5?_mf2.actualBoundingBoxAscent:null)||(_mref2.actualBoundingBoxAscent>5?Math.round(_mref2.actualBoundingBoxAscent*0.9):65);
+    var _mdesc2=(_mf2.actualBoundingBoxDescent>2?_mf2.actualBoundingBoxDescent:null)||(_mref2.actualBoundingBoxDescent>2?Math.round(_mref2.actualBoundingBoxDescent*0.9):20);
     var _cY2=(CH-10)/2+10;var _bY2=_cY2+(_masc2-_mdesc2)/2;
     var _bBot2=((CH-_bY2)/CH*100).toFixed(1);
     var cWrap2=document.createElement('div');cWrap2.className='canvas-ghost-wrap';
@@ -6728,14 +6746,11 @@ function _clStep2(wrap,letter,af,goNext){
     var traceBtn=document.createElement('button');traceBtn.className='rbtn rbtn-s';
     traceBtn.style.cssText='display:block;margin:0 auto';
     traceBtn.textContent="✅ J'ai tracé !";
-    var nextFBtn=document.createElement('button');nextFBtn.className='rbtn rbtn-m child-btn-play';
-    nextFBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem;margin-top:8px';
-    nextFBtn.textContent=(fIdx<distinctForms.length-1)?'Forme suivante →':'Continuer →';
-    nextFBtn.onclick=function(){fIdx++;traces=0;showForm();};
     traceBtn.onclick=function(){
       traces++;updateDots();
       if(traces>=TOTAL_TRACES){
-        feedbackEl.textContent='🌟 Bravo !';traceBtn.style.display='none';nextFBtn.style.display='block';
+        feedbackEl.textContent='🌟 Bravo !';traceBtn.style.display='none';
+        setTimeout(function(){fIdx++;traces=0;showForm();},900);
       }else{
         feedbackEl.textContent='Super ! Continue !';drawGuide();
         traceBtn.classList.remove('child-btn-play');_drawnS=false;
@@ -6743,7 +6758,6 @@ function _clStep2(wrap,letter,af,goNext){
     };
     card.appendChild(traceBtn);
     wrap.appendChild(card);
-    wrap.appendChild(nextFBtn);
   }
 
   function showDone(){
