@@ -2466,6 +2466,7 @@ body.profile-boy [lang="ar"] {
 @keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
 @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.09)}28%{transform:scale(1)}42%{transform:scale(1.06)}70%{transform:scale(1)}}
 .child-btn-ready{animation:heartbeat 1s ease-in-out infinite,pulse-pink 1.5s infinite!important;opacity:1!important}
+.heartbeat-pulse{animation:heartbeat 1.2s ease-in-out infinite}
 .child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
 .child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
 .child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
@@ -6725,7 +6726,7 @@ function _clStep2(wrap,letter,af,goNext){
 
     var traceBtn=document.createElement('button');traceBtn.className='rbtn rbtn-s';
     traceBtn.style.cssText='display:block;margin:0 auto';
-    traceBtn.textContent="✅ J'ai tracé !";
+    traceBtn.textContent="Suivant →";
     traceBtn.onclick=function(){
       traces++;updateDots();_drawn=false;
       if(traces>=TOTAL_TRACES){
@@ -6984,6 +6985,7 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext){
   var bigL=document.createElement('div');
   bigL.style.cssText="width:110px;height:110px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 14px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 18px rgba(194,24,91,.12)";
   bigL.textContent='🔊';
+  bigL.classList.add('heartbeat-pulse');
   bigL.onclick=function(){speakText(mainSpeak,'ar-SA',null);bigL.style.transform='scale(.92)';setTimeout(function(){bigL.style.transform='';},150);};
   card.appendChild(bigL);
 
@@ -6993,8 +6995,11 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext){
   var varRow=document.createElement('div');varRow.className='child-variants';
   forms.forEach(function(v){
     var box=document.createElement('div');box.className='child-var-box';box.style.cursor='pointer';
-    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
-    box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(v[1]);
+    var isProlong=(v[1].indexOf('|')>-1);
+    var parts=isProlong?v[1].split('|'):[v[1]];
+    var displayText=isProlong?parts[0]+' '+parts[1]:v[1];
+    box.innerHTML='<div class="child-var-ar">'+displayText+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(parts[0]);
     varRow.appendChild(box);
   });
   card.appendChild(varRow);
@@ -7094,7 +7099,7 @@ function _xStep4Quiz(wrap,items,goNext){
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:10px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
-    var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
+    var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
     var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:#ad1457;margin-bottom:16px';qt.textContent='Quel signe entends-tu ?';card.appendChild(qt);
     var choices=[q.correct].concat(q.wrong).sort(function(){return Math.random()-.5;});
     var choicesEl=document.createElement('div');choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:10px';
@@ -7136,9 +7141,9 @@ function _xStep5Quiz(wrap,items,finishFn){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — VOYELLES (Île 1 : La Source de l'Humanité)
    ═══════════════════════════════════════════════════════════ */
-/* Formes voyelles : diacritiques seuls (sur tatweel pour l'affichage) */
-var _CVOW_FORMS=[['Fatḥa · a','ـَ'],['Ḍamma · ou','ـُ'],['Kasra · i','ـِ']];
-var _CVOW_ITEMS=[['Fatḥa · a','ـَ','☀️'],['Ḍamma · ou','ـُ','🌙'],['Kasra · i','ـِ','⭐']];
+/* Formes voyelles : diacritiques seuls (SANS tatweel) */
+var _CVOW_FORMS=[['Fatḥa · a','َ'],['Ḍamma · ou','ُ'],['Kasra · i','ِ']];
+var _CVOW_ITEMS=[['Fatḥa · a','َ','☀️'],['Ḍamma · ou','ُ','🌙'],['Kasra · i','ِ','⭐']];
 
 function _cvProgressBar(wrap,step){
   var SNAMES=['✨ Découverte','🔍 Formes','🎧 Écoute','🎮 Jeu','📖 Mot','🏆 Quiz'];
@@ -7274,7 +7279,7 @@ function _cvStep3v(wrap,goNext){
     var correct=_CVOW[rIdx%_CVOW.length];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
-    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:linear-gradient(135deg,rgba(194,24,91,.15),rgba(194,24,91,.08));cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';
+    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:linear-gradient(135deg,rgba(194,24,91,.15),rgba(194,24,91,.08));cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
@@ -7354,9 +7359,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : lettre + voyelle correspondante */
-var _CPROL_FORMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];
-var _CPROL_ITEMS=[['Alif · ā','اَ','🌊'],['Waw · ū','وُ','🎵'],['Yā · ī','يِ','🌟']];
+/* Prolongations : lettre + voyelle (affichage côte à côte) */
+var _CPROL_FORMS=[['Alif · ā','ا|َ'],['Waw · ū','و|ُ'],['Yā · ī','ي|ِ']];
+var _CPROL_ITEMS=[['Alif · ā','ا|َ','🌊'],['Waw · ū','و|ُ','🎵'],['Yā · ī','ي|ِ','🌟']];
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
@@ -7450,7 +7455,7 @@ function _cpStep2p(wrap,goNext){
     var correct=_CPROL[rIdx%_CPROL.length];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
-    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:rgba(194,24,91,.1);cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';
+    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:rgba(194,24,91,.1);cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
