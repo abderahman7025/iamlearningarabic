@@ -6938,13 +6938,183 @@ function _clStep5(wrap,letter,af,dayIdx,goNext){
 }
 
 /* ═══════════════════════════════════════════════════════════
+   HELPER COMMUN voyelles / prolongations
+   ═══════════════════════════════════════════════════════════ */
+
+/* Barre de progression + label — identique à renderChildLesson */
+function _xProgressBar(wrap,step,names){
+  var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
+  for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<step?'#22c55e':i===step?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+  wrap.appendChild(pb);
+  var sl=document.createElement('div');sl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
+  sl.textContent=(names||['✨ Découverte','🔍 Les signes','✏️ J\'écris','🎮 Je joue','📖 Un mot','🏆 Mini quiz'])[step];
+  wrap.appendChild(sl);
+}
+
+/* Étape 0 générique — même structure exacte que _clStep0 */
+function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext){
+  var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
+
+  var bigL=document.createElement('div');
+  bigL.style.cssText="width:110px;height:110px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 14px;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 18px rgba(194,24,91,.12)";
+  bigL.textContent='🔊';
+  bigL.onclick=function(){speakText(mainSpeak,'ar-SA',null);bigL.style.transform='scale(.92)';setTimeout(function(){bigL.style.transform='';},150);};
+  card.appendChild(bigL);
+
+  var nameL=document.createElement('div');nameL.style.cssText='font-size:1rem;font-weight:700;color:#ad1457;margin-bottom:12px;font-style:italic';nameL.textContent=mainLabel;card.appendChild(nameL);
+
+  /* Formes (child-variants) — même CSS */
+  var varRow=document.createElement('div');varRow.className='child-variants';
+  forms.forEach(function(v){
+    var box=document.createElement('div');box.className='child-var-box';box.style.cursor='pointer';
+    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(v[1]);
+    varRow.appendChild(box);
+  });
+  card.appendChild(varRow);
+
+  if(emoji){var em=document.createElement('div');em.className='child-emoji';em.textContent=emoji;card.appendChild(em);}
+  if(wordAr){
+    var wEl=document.createElement('div');wEl.className='child-word-ar';wEl.textContent=wordAr;wEl.style.cursor='pointer';
+    wEl.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(wEl);
+    if(wordLat){var wLat=document.createElement('div');wLat.className='child-word-lat';wLat.textContent=wordLat;card.appendChild(wLat);}
+    var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-s';sndBtn.style.cssText='margin:10px auto 0;display:block';sndBtn.textContent='🔊 Écouter';sndBtn.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(sndBtn);
+  }
+  wrap.appendChild(card);
+
+  var hint=document.createElement('div');hint.style.cssText='text-align:center;font-size:.78rem;color:#ad1457;margin:8px 0;opacity:.7';hint.textContent='👆 Appuie sur les signes pour les écouter !';wrap.appendChild(hint);
+
+  var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';nextBtn.textContent='Je les connais ! →';nextBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem';nextBtn.onclick=goNext;wrap.appendChild(nextBtn);
+  setTimeout(function(){nextBtn.style.display='block';},5000);
+  setTimeout(function(){speakText(mainSpeak,'ar-SA',null);},600);
+}
+
+/* Étape 1 générique — flashcards + mini-canvas, même structure que _clStep1 */
+function _xStep1(wrap,forms,goNext){
+  var fcIdx=0;
+  var container=document.createElement('div');wrap.appendChild(container);
+  function showFlash(){
+    container.innerHTML='';
+    if(fcIdx>=forms.length){goNext();return;}
+    var f=forms[fcIdx];
+
+    var dots=document.createElement('div');dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
+    for(var di=0;di<forms.length;di++){var d=document.createElement('div');d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<fcIdx?'#22c55e':di===fcIdx?'#c2185b':'rgba(194,24,91,.2)');dots.appendChild(d);}
+    container.appendChild(dots);
+
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+    var intro=document.createElement('div');intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro.textContent=f[0];card.appendChild(intro);
+    var formBig=document.createElement('div');formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.6;padding-bottom:10px;direction:rtl;cursor:pointer;margin-bottom:6px;overflow:visible";formBig.textContent=f[1];
+    formBig.onclick=function(){speakText(f[1],'ar-SA',null);};card.appendChild(formBig);
+    var lbl=document.createElement('div');lbl.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';lbl.textContent=f[0].toUpperCase();card.appendChild(lbl);
+    var tip=document.createElement('div');tip.style.cssText='font-size:.72rem;color:#ad1457;opacity:.55;margin-bottom:10px';tip.textContent='👆 Appuie pour écouter';card.appendChild(tip);
+    container.appendChild(card);
+
+    var writeBtn=document.createElement('button');writeBtn.className='rbtn rbtn-m child-btn-play';writeBtn.style.cssText='width:100%;padding:14px;font-size:1rem';writeBtn.textContent='✏️ À moi de l\'écrire !';
+    writeBtn.onclick=function(){showTrain();};container.appendChild(writeBtn);
+    speakText(f[1],'ar-SA',null);
+
+    function showTrain(){
+      container.innerHTML='';
+      var dots2=document.createElement('div');dots2.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
+      for(var di2=0;di2<forms.length;di2++){var d2=document.createElement('div');d2.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di2<fcIdx?'#22c55e':di2===fcIdx?'#c2185b':'rgba(194,24,91,.2)');dots2.appendChild(d2);}
+      container.appendChild(dots2);
+
+      var card2=document.createElement('div');card2.className='child-card';card2.style.textAlign='center';
+      var intro2=document.createElement('div');intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro2.textContent=f[0]+' — Entraîne-toi !';card2.appendChild(intro2);
+      var ghost=document.createElement('div');ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;direction:rtl;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";ghost.textContent=f[1];card2.appendChild(ghost);
+
+      var MCW=220,MCH=160,mc=document.createElement('canvas');mc.width=MCW;mc.height=MCH;
+      mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
+      var mctx=mc.getContext('2d');
+      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';mctx.fillText(f[1],MCW/2,mbY);mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY);mctx.lineTo(MCW-14,mbY);mctx.stroke();mctx.restore();}
+      drawGuide();card2.appendChild(mc);
+      var efBtn=document.createElement('button');efBtn.className='rbtn rbtn-s';efBtn.style.cssText='display:block;margin:0 auto 8px;font-size:.78rem';efBtn.textContent='↺ Effacer';efBtn.onclick=function(){drawGuide();};card2.appendChild(efBtn);
+      container.appendChild(card2);
+
+      var mDrawing=false,_mDrawn=false;
+      function mPos(e){var r=mc.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(MCW/r.width),y:(src.clientY-r.top)*(MCH/r.height)};}
+      mc.addEventListener('mousedown',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.classList.add('child-btn-play');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();});
+      mc.addEventListener('mousemove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();});
+      mc.addEventListener('mouseup',function(){mDrawing=false;});
+      mc.addEventListener('touchstart',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.classList.add('child-btn-play');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+      mc.addEventListener('touchmove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();},{passive:false});
+      mc.addEventListener('touchend',function(){mDrawing=false;});
+
+      var nb2=document.createElement('button');nb2.className='rbtn rbtn-m';nb2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:.35';nb2.textContent='Suivant →';
+      nb2.onclick=function(){fcIdx++;showFlash();};container.appendChild(nb2);
+      setTimeout(function(){nb2.style.opacity='1';nb2.classList.add('child-btn-play');},8000);
+    }
+  }
+  showFlash();
+}
+
+/* Étape 4 — Jeu quiz (même style que warmup) */
+function _xStep4Quiz(wrap,items,goNext){
+  var qIdx=0,score=0;
+  var allQ=[];
+  items.forEach(function(v){
+    allQ.push({emoji:v[2]||'🔊',speak:v[1],correct:v[1],wrong:[items.filter(function(x){return x[1]!==v[1];})[0][1],items.filter(function(x){return x[1]!==v[1];})[1][1]]});
+  });
+  allQ.sort(function(){return Math.random()-.5;});
+  allQ=allQ.concat(allQ).slice(0,5);
+
+  function showQ(){
+    wrap.innerHTML='';
+    var pb2=document.createElement('div');pb2.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<3?'#22c55e':i===3?'#c2185b':'rgba(194,24,91,.15)');pb2.appendChild(pd);}
+    wrap.appendChild(pb2);
+    var sl2=document.createElement('div');sl2.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';sl2.textContent='🎮 Je joue';wrap.appendChild(sl2);
+    if(qIdx>=allQ.length){goNext();return;}
+    var q=allQ[qIdx];
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:10px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
+    var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
+    var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:#ad1457;margin-bottom:16px';qt.textContent='Quel signe entends-tu ?';card.appendChild(qt);
+    var choices=[q.correct].concat(q.wrong).sort(function(){return Math.random()-.5;});
+    var choicesEl=document.createElement('div');choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:10px';
+    var answered=false;
+    choices.forEach(function(ch){
+      var btn=document.createElement('div');
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
+      btn.textContent=ch;
+      btn.onclick=function(){if(answered)return;speakText(ch,'ar-SA',null);var ok=(ch===q.correct);btn.style.background=ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.12)';btn.style.borderColor=ok?'#22c55e':'#ef4444';btn.style.color=ok?'#15803d':'#dc2626';if(ok){answered=true;score++;setTimeout(function(){qIdx++;showQ();},700);}else{btn.style.cursor='default';}};
+      choicesEl.appendChild(btn);
+    });
+    card.appendChild(choicesEl);
+    var srow=document.createElement('div');srow.style.cssText='font-size:1.4rem;min-height:1.8rem';for(var sk=0;sk<score;sk++)srow.textContent+='⭐';card.appendChild(srow);
+    wrap.appendChild(card);
+    setTimeout(function(){speakText(q.speak,'ar-SA',null);},400);
+  }
+  showQ();
+}
+
+/* Étape mot — même structure que _clStep4 */
+function _xWordStep(wrap,wordAr,wordLat,wordFr,tip,goNext){
+  var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
+  var tipEl=document.createElement('div');tipEl.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px';tipEl.textContent=tip;card.appendChild(tipEl);
+  var em=document.createElement('div');em.className='child-emoji';em.textContent='📖';card.appendChild(em);
+  var wEl=document.createElement('div');wEl.className='child-word-ar';wEl.textContent=wordAr;wEl.style.cursor='pointer';wEl.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(wEl);
+  var wLat=document.createElement('div');wLat.className='child-word-lat';wLat.textContent=wordLat+' · "'+wordFr+'"';card.appendChild(wLat);
+  var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-s';sndBtn.style.cssText='margin:10px auto 0;display:block';sndBtn.textContent='🔊 Écouter';sndBtn.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(sndBtn);
+  wrap.appendChild(card);
+  var hint=document.createElement('div');hint.style.cssText='text-align:center;font-size:.78rem;color:#ad1457;margin:8px 0;opacity:.7';hint.textContent='👆 Appuie sur le mot pour l\'écouter !';wrap.appendChild(hint);
+  var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';nextBtn.textContent='Suivant →';nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem';nextBtn.onclick=goNext;wrap.appendChild(nextBtn);
+  setTimeout(function(){speakText(wordAr,'ar-SA',null);},600);
+}
+
+/* Étape 5 (step 5) — mini quiz final + récompense simple */
+function _xStep5Quiz(wrap,items,finishFn){
+  _xStep4Quiz(wrap,items,finishFn);/* réutilise le même quiz */
+}
+
+/* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — VOYELLES (Île 1 : La Source de l'Humanité)
    ═══════════════════════════════════════════════════════════ */
-var _CVOW=[
-  {sym:'اَ', name:'Fatḥa', sound:'a',  emoji:'☀️', speak:'اَ'},
-  {sym:'اُ', name:'Ḍamma', sound:'ou', emoji:'🌙', speak:'اُ'},
-  {sym:'اِ', name:'Kasra', sound:'i',  emoji:'⭐', speak:'اِ'},
-];
+/* Formes : [label, symbole] */
+var _CVOW_FORMS=[['Fatḥa · a','اَ'],['Ḍamma · ou','اُ'],['Kasra · i','اِ']];
+/* Items pour le jeu : [label, symbole, emoji] */
+var _CVOW_ITEMS=[['Fatḥa · a','اَ','☀️'],['Ḍamma · ou','اُ','🌙'],['Kasra · i','اِ','⭐']];
 
 function _cvProgressBar(wrap,step){
   var SNAMES=['✨ Découverte','🔍 Formes','🎧 Écoute','🎮 Jeu','📖 Mot','🏆 Quiz'];
@@ -6972,13 +7142,14 @@ function renderChildVowelLesson(ca,step){
   }
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';
-  _cvProgressBar(wrap,step);
+  _xProgressBar(wrap,step);
   var goNext=function(){renderChildVowelLesson(ca,step+1);};
-  if(step===0)_cvStep0(wrap,ca,goNext);
-  else if(step===1)_cvStep1(wrap,goNext);
-  else if(step===2)_cvStep2v(wrap,goNext);
-  else if(step===3)_cvStep3v(wrap,goNext);
-  else if(step===4)_cvStep4v(wrap,goNext);
+  if(step===0)_xStep0(wrap,'اَ','Les voyelles · a · ou · i',_CVOW_FORMS,'🎵','بَابٌ','bābun',goNext);
+  else if(step===1)_xStep1(wrap,_CVOW_FORMS,goNext);
+  else if(step===2)_xStep1(wrap,_CVOW_FORMS,goNext); /* tracé inclus dans _xStep1 */
+  else if(step===3)_xStep4Quiz(wrap,_CVOW_ITEMS,goNext);
+  else if(step===4)_xWordStep(wrap,'بَابٌ','bābun','une porte','Les voyelles en action — écoute et répète !',goNext);
+  else if(step===5)_xStep5Quiz(wrap,_CVOW_ITEMS,goNext);
   else if(step===5)_cvStep5v(wrap,goNext);
   ca.appendChild(wrap);
 }
@@ -7159,11 +7330,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-var _CPROL=[
-  {sym:'اَا', name:'Alef', sound:'ā', emoji:'🌊', speak:'آ',  latin:'ā'},
-  {sym:'اُو', name:'Waw',  sound:'ū', emoji:'🎵', speak:'اُو', latin:'ū'},
-  {sym:'اِي', name:'Yā',   sound:'ī', emoji:'🌟', speak:'اِي', latin:'ī'},
-];
+/* Prolongations : juste la lettre de prolongation, sans l'alef de base */
+var _CPROL_FORMS=[['Alef · ā','ا'],['Waw · ū','و'],['Yā · ī','ي']];
+var _CPROL_ITEMS=[['Alef · ā','ا','🌊'],['Waw · ū','و','🎵'],['Yā · ī','ي','🌟']];
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
@@ -7180,20 +7349,15 @@ function renderChildProlongLesson(ca,step){
     card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);return;
   }
   ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
-  var SNAMES=['✨ Découverte','🔍 Formes','🎧 Écoute','🎮 Jeu','📖 Mot','🏆 Quiz'];
   var wrap=document.createElement('div');wrap.className='child-wrap';
-  var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-  for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<step?'#22c55e':i===step?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
-  wrap.appendChild(pb);
-  var sl=document.createElement('div');sl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
-  sl.textContent=SNAMES[step];wrap.appendChild(sl);
+  _xProgressBar(wrap,step);
   var goNext=function(){renderChildProlongLesson(ca,step+1);};
-  if(step===0)_cpStep0(wrap,goNext);
-  else if(step===1)_cpStep1(wrap,goNext);
-  else if(step===2)_cpStep2p(wrap,goNext);
-  else if(step===3)_cpStep3p(wrap,goNext);
-  else if(step===4)_cpStep4p(wrap,goNext);
-  else if(step===5)_cpStep5p(wrap,goNext);
+  if(step===0)_xStep0(wrap,'آ','Les voyelles longues · ā · ū · ī',_CPROL_FORMS,'🎶','نُورٌ','nūrun',goNext);
+  else if(step===1)_xStep1(wrap,_CPROL_FORMS,goNext);
+  else if(step===2)_xStep1(wrap,_CPROL_FORMS,goNext);
+  else if(step===3)_xStep4Quiz(wrap,_CPROL_ITEMS,goNext);
+  else if(step===4)_xWordStep(wrap,'نُورٌ','nūrun','une lumière','La voyelle longue ū — écoute !',goNext);
+  else if(step===5)_xStep5Quiz(wrap,_CPROL_ITEMS,goNext);
   ca.appendChild(wrap);
 }
 
