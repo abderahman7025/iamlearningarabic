@@ -6941,9 +6941,9 @@ function _clStep5(wrap,letter,af,dayIdx,goNext){
    LEÇON ENFANT — VOYELLES (Île 1 : La Source de l'Humanité)
    ═══════════════════════════════════════════════════════════ */
 var _CVOW=[
-  {sym:'َ',on:'بَ',name:'Fatḥa',sound:'a', emoji:'☀️',speak:'بَ'},
-  {sym:'ُ',on:'بُ',name:'Ḍamma',sound:'ou',emoji:'🌙',speak:'بُ'},
-  {sym:'ِ',on:'بِ',name:'Kasra',sound:'i', emoji:'⭐',speak:'بِ'},
+  {sym:'اَ', name:'Fatḥa', sound:'a',  emoji:'☀️', speak:'اَ'},
+  {sym:'اُ', name:'Ḍamma', sound:'ou', emoji:'🌙', speak:'اُ'},
+  {sym:'اِ', name:'Kasra', sound:'i',  emoji:'⭐', speak:'اِ'},
 ];
 
 function _cvProgressBar(wrap,step){
@@ -6966,7 +6966,7 @@ function renderChildVowelLesson(ca,step){
       +'<p style="color:rgba(0,0,0,.6);font-size:.9rem;margin-bottom:16px">Tu connais les 3 voyelles !</p>'
       +'<div style="font-size:2.2rem;margin-bottom:18px;display:flex;justify-content:center;gap:12px">'
         +'<span title="Fatḥa">☀️</span><span title="Ḍamma">🌙</span><span title="Kasra">⭐</span></div>';
-    var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Retour à la carte 🗺️';
+    var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Retour à la carte 🗺️';
     btn.onclick=function(){renderChildIslandMap(ca);};
     card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);return;
   }
@@ -6990,7 +6990,7 @@ function _cvStep0(wrap,ca,goNext){
   var sub=document.createElement('div');sub.style.cssText='font-size:.78rem;color:rgba(0,0,0,.45);margin-bottom:18px';sub.textContent='3 petits signes qui changent le son d\'une lettre';card.appendChild(sub);
   _CVOW.forEach(function(v){
     var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(194,24,91,.05);border:2px solid rgba(194,24,91,.15);border-radius:14px;padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s';
+    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(233,30,140,.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
     row.innerHTML='<div style="font-size:2rem">'+v.emoji+'</div>'
       +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:#ad1457;min-width:52px;text-align:center">'+v.on+'</div>'
       +'<div><div style="font-weight:800;font-size:.92rem;color:#7b1fa2">'+v.name+'</div>'
@@ -6999,7 +6999,7 @@ function _cvStep0(wrap,ca,goNext){
     card.appendChild(row);
   });
   var revealed=false;
-  var btn=document.createElement('button');btn.className='child-btn';btn.style.opacity='.35';btn.textContent='Je les connais ! →';
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.opacity='.35';btn.textContent='Je les connais ! →';
   btn.onclick=function(){if(revealed)goNext();};
   setTimeout(function(){revealed=true;btn.style.opacity='1';},5000);
   card.appendChild(btn);wrap.appendChild(card);
@@ -7022,7 +7022,7 @@ function _cvStep1(wrap,goNext){
     var choices=_CVOW.map(function(c){return c.sound;}).sort(function(){return Math.random()-.5;});
     var choiceRow=document.createElement('div');choiceRow.style.cssText='display:flex;gap:10px;justify-content:center';
     choices.forEach(function(s){
-      var c=document.createElement('button');c.className='child-btn';c.style.cssText='flex:1;font-size:1.3rem;padding:14px 8px';c.textContent=s;
+      var c=document.createElement('button');c.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';c.textContent=s;
       c.onclick=function(){
         var ok=(s===v.sound);
         c.style.background=ok?'#22c55e':'#ef4444';c.style.color='#fff';
@@ -7063,7 +7063,7 @@ function _cvStep2v(wrap,goNext){
     var dotsEl=document.createElement('div');dotsEl.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:12px';
     for(var di=0;di<2;di++){var dot=document.createElement('div');dot.className='cv-dot';dot.style.cssText='width:12px;height:12px;border-radius:50%;background:rgba(194,24,91,.2)';dotsEl.appendChild(dot);}
     card.appendChild(dotsEl);
-    var btn=document.createElement('button');btn.className='child-btn';btn.disabled=true;btn.textContent='Suivant →';
+    var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.disabled=true;btn.textContent='Suivant →';
     btn.onclick=function(){vIdx++;showTrace();};
     card.appendChild(btn);wrap.appendChild(card);
   }
@@ -7087,7 +7087,7 @@ function _cvStep3v(wrap,goNext){
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:10px;justify-content:center';
     _CVOW.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
       var btn=document.createElement('button');
-      btn.style.cssText='flex:1;padding:14px 6px;border-radius:14px;border:2px solid rgba(194,24,91,.2);background:rgba(194,24,91,.05);cursor:pointer;font-family:\'Scheherazade New\',serif;font-size:2.5rem;color:#7b1fa2;transition:all .15s';
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
       btn.textContent=v.on;
       btn.onclick=function(){
         var ok=(v.sound===correct.sound);
@@ -7115,7 +7115,7 @@ function _cvStep4v(wrap,goNext){
   var fr=document.createElement('div');fr.style.cssText='font-size:.85rem;color:rgba(0,0,0,.55);font-style:italic;margin-bottom:18px';fr.textContent='"'+wordFr+'"';card.appendChild(fr);
   var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(194,24,91,.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
   tipEl.innerHTML='<strong>بَ</strong> = ba (Fatḥa) &nbsp;·&nbsp; <strong>بٌ</strong> = bun (Ḍamma + tanwīn)<br>Clique sur le mot pour écouter !';card.appendChild(tipEl);
-  var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
 }
 
 /* Étape 5 — Mini quiz voyelles */
@@ -7133,7 +7133,7 @@ function _cvStep5v(wrap,goNext){
       card.innerHTML='<div style="font-size:3rem;margin-bottom:8px">'+stars+'</div>'
         +'<div style="font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
         +'<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px">Tu maîtrises les voyelles !</div>';
-      var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
+      var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
     }
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
@@ -7141,7 +7141,7 @@ function _cvStep5v(wrap,goNext){
     var qEl=document.createElement('div');qEl.style.cssText='font-size:.9rem;font-weight:700;color:#333;margin-bottom:16px;line-height:1.5';qEl.textContent=q.q;card.appendChild(qEl);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
     q.choices.slice().sort(function(){return Math.random()-.5;}).forEach(function(ch){
-      var btn=document.createElement('button');btn.className='child-btn';btn.style.cssText='flex:1;min-width:60px;font-family:\'Scheherazade New\',serif;font-size:1.5rem;padding:12px 8px';btn.textContent=ch;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=ch;
       btn.onclick=function(){
         var ok=(ch===q.correct);
         btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';
@@ -7160,9 +7160,9 @@ function _cvStep5v(wrap,goNext){
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
 var _CPROL=[
-  {sym:'بَا',name:'Alef',sound:'ā',emoji:'🌊',speak:'بَا',latin:'bā'},
-  {sym:'بُو',name:'Waw', sound:'ū',emoji:'🎵',speak:'بُو',latin:'bū'},
-  {sym:'بِي',name:'Yā', sound:'ī',emoji:'🌟',speak:'بِي',latin:'bī'},
+  {sym:'اَا', name:'Alef', sound:'ā', emoji:'🌊', speak:'آ',  latin:'ā'},
+  {sym:'اُو', name:'Waw',  sound:'ū', emoji:'🎵', speak:'اُو', latin:'ū'},
+  {sym:'اِي', name:'Yā',   sound:'ī', emoji:'🌟', speak:'اِي', latin:'ī'},
 ];
 
 function renderChildProlongLesson(ca,step){
@@ -7175,7 +7175,7 @@ function renderChildProlongLesson(ca,step){
       +'<h2 style="color:#ad1457;font-size:1.3rem;margin-bottom:8px">Bravo !</h2>'
       +'<p style="color:rgba(0,0,0,.6);font-size:.9rem;margin-bottom:16px">Tu connais les voyelles longues !</p>'
       +'<div style="font-size:2rem;margin-bottom:18px">🌊 🎵 🌟</div>';
-    var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Retour à la carte 🗺️';
+    var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Retour à la carte 🗺️';
     btn.onclick=function(){renderChildIslandMap(ca);};
     card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);return;
   }
@@ -7204,7 +7204,7 @@ function _cpStep0(wrap,goNext){
   var sub=document.createElement('div');sub.style.cssText='font-size:.78rem;color:rgba(0,0,0,.45);margin-bottom:18px';sub.textContent='Comme les voyelles courtes, mais on les étire !';card.appendChild(sub);
   _CPROL.forEach(function(v){
     var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(194,24,91,.05);border:2px solid rgba(194,24,91,.15);border-radius:14px;padding:12px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s';
+    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(233,30,140,.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
     row.innerHTML='<div style="font-size:2rem">'+v.emoji+'</div>'
       +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:#ad1457;min-width:64px;text-align:center">'+v.sym+'</div>'
       +'<div><div style="font-weight:800;font-size:.92rem;color:#7b1fa2">'+v.latin+' ('+v.name+')</div>'
@@ -7213,7 +7213,7 @@ function _cpStep0(wrap,goNext){
     card.appendChild(row);
   });
   var revealed=false;
-  var btn=document.createElement('button');btn.className='child-btn';btn.style.opacity='.35';btn.textContent='Je les connais ! →';
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.opacity='.35';btn.textContent='Je les connais ! →';
   btn.onclick=function(){if(revealed)goNext();};
   setTimeout(function(){revealed=true;btn.style.opacity='1';},5000);
   card.appendChild(btn);wrap.appendChild(card);
@@ -7269,7 +7269,7 @@ function _cpStep2p(wrap,goNext){
     var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:16px';q.textContent='Quel mot correspond à ce son long ?';card.appendChild(q);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center';
     _CPROL.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
-      var btn=document.createElement('button');btn.style.cssText='flex:1;padding:14px 6px;border-radius:14px;border:2px solid rgba(194,24,91,.2);background:rgba(194,24,91,.05);cursor:pointer;font-family:\'Scheherazade New\',serif;font-size:2rem;color:#7b1fa2';btn.textContent=v.sym;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=v.sym;
       btn.onclick=function(){
         var ok=(v.sound===correct.sound);btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';
         grid.querySelectorAll('button').forEach(function(b){b.disabled=true;});
@@ -7328,7 +7328,7 @@ function _cpStep4p(wrap,goNext){
   var fr=document.createElement('div');fr.style.cssText='font-size:.85rem;color:rgba(0,0,0,.55);font-style:italic;margin-bottom:18px';fr.textContent='"'+wordFr+'"';card.appendChild(fr);
   var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(194,24,91,.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
   tipEl.innerHTML='<strong>نُو</strong> contient un Waw → son long <strong>ū</strong><br>Clique sur le mot pour écouter !';card.appendChild(tipEl);
-  var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
 }
 
 /* Étape 5 — Quiz final prolongation */
@@ -7351,7 +7351,7 @@ function _cpStep5p(wrap,goNext){
       card.innerHTML='<div style="font-size:3rem;margin-bottom:8px">'+stars+'</div>'
         +'<div style="font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
         +'<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px">Tu maîtrises les voyelles longues !</div>';
-      var btn=document.createElement('button');btn.className='child-btn';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
+      var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
     }
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
@@ -7359,7 +7359,7 @@ function _cpStep5p(wrap,goNext){
     var qEl=document.createElement('div');qEl.style.cssText='font-size:.9rem;font-weight:700;color:#333;margin-bottom:16px;font-family:\'Scheherazade New\',serif;font-size:1.1rem';qEl.textContent=q.q;card.appendChild(qEl);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
     q.choices.slice().sort(function(){return Math.random()-.5;}).forEach(function(ch){
-      var btn=document.createElement('button');btn.className='child-btn';btn.style.cssText='flex:1;min-width:60px;font-family:\'Scheherazade New\',serif;font-size:1.5rem;padding:12px 8px';btn.textContent=ch;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=ch;
       btn.onclick=function(){
         var ok=(ch===q.correct);btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';if(ok)score++;
         grid.querySelectorAll('button').forEach(function(b){b.disabled=true;});
