@@ -6995,11 +6995,8 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
   var varRow=document.createElement('div');varRow.className='child-variants';
   forms.forEach(function(v,idx){
     var box=document.createElement('div');box.className='child-var-box';box.style.cursor='pointer';
-    var isProlong=(v[1].indexOf('|')>-1);
-    var parts=isProlong?v[1].split('|'):[v[1]];
-    var displayText=isProlong?parts[0]+' '+parts[1]:v[1];
-    var soundToPlay=sounds&&sounds[idx]?sounds[idx]:(isProlong?parts[0]:v[1]);
-    box.innerHTML='<div class="child-var-ar">'+displayText+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    var soundToPlay=sounds&&sounds[idx]?sounds[idx]:v[1];
+    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
     box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(soundToPlay);
     varRow.appendChild(box);
   });
@@ -7054,12 +7051,12 @@ function _xStep1(wrap,forms,goNext){
 
       var card2=document.createElement('div');card2.className='child-card';card2.style.textAlign='center';
       var intro2=document.createElement('div');intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro2.textContent=f[0]+' — Entraîne-toi !';card2.appendChild(intro2);
-      var ghost=document.createElement('div');ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;direction:rtl;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";ghost.textContent=f[1];card2.appendChild(ghost);
+      var ghost=document.createElement('div');ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;direction:rtl;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px;unicode-bidi:bidi-override";ghost.textContent=f[1];card2.appendChild(ghost);
 
       var MCW=220,MCH=160,mc=document.createElement('canvas');mc.width=MCW;mc.height=MCH;
       mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
       var mctx=mc.getContext('2d');
-      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';mctx.fillText(f[1],MCW/2,mbY);mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY);mctx.lineTo(MCW-14,mbY);mctx.stroke();mctx.restore();}
+      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';mctx.fillText(f[1],MCW/2,mbY);mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();}
       drawGuide();card2.appendChild(mc);
       var efBtn=document.createElement('button');efBtn.className='rbtn rbtn-s';efBtn.style.cssText='display:block;margin:0 auto 8px;font-size:.78rem';efBtn.textContent='↺ Effacer';efBtn.onclick=function(){drawGuide();};card2.appendChild(efBtn);
       container.appendChild(card2);
@@ -7360,9 +7357,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : voyelle PUIS lettre (RTL: voyelle à droite visuellement) */
-var _CPROL_FORMS=[['Alif · ā','َ|ا'],['Waw · ū','ُ|و'],['Yā · ī','ِ|ي']];
-var _CPROL_ITEMS=[['Alif · ā','آ'],['Waw · ū','وو'],['Yā · ī','يي']];/* sons: alif-long, waw-long, ya-long */
+/* Prolongations : lettre + voyelle (RTL correct) */
+var _CPROL_FORMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];
+var _CPROL_ITEMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];/* sons prolongés : alif-fatha, waw-damma, ya-kasra */
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
