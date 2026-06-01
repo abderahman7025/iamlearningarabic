@@ -1946,6 +1946,23 @@ body.profile-adult, #root.profile-adult {
   --gold: #f5c842;
   --gold2: #fde68a;
 }
+/* Leçon voyelles — profil fille : cartes blanches/roses comme le reste du cours */
+#root.profile-girl .info-box,
+#root.profile-girl .tip-box {
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(194,24,91,.15) !important;
+  color: #333 !important;
+  --txt: #333; --txt2: #666; --txt3: #999;
+}
+#root.profile-girl .info-box strong { color: #ad1457 !important; }
+#root.profile-girl .vline-section {
+  background: rgba(255,255,255,.88) !important;
+  border-color: rgba(194,24,91,.15) !important;
+}
+#root.profile-girl .wline { background: linear-gradient(90deg,transparent,rgba(194,24,91,.4),transparent) !important; }
+#root.profile-girl .wline-lbl { color: #ad1457 !important; }
+#root.profile-girl .q-big-vow { color: #c2185b !important; filter: none !important; }
+#root.profile-girl .vow-baseline-line { background: rgba(194,24,91,.25) !important; }
 
 /* Enfants avec color:var(--txt) — les deux variantes (sans et avec espace) */
 #root.profile-girl  .info-box [style*="color:var(--txt)"],   #root.profile-girl  .info-box [style*="color: var(--txt)"],
@@ -6441,28 +6458,25 @@ function _clStep1(wrap,letter,af,goNext){
     var ghost=document.createElement('div');ghost.className='canvas-ghost-letter';
     ghost.textContent=formText;
     /* Ligne de base */
-    /* Canvas unique : fantôme + ligne de base + dessin utilisateur */
+    /* Baseline adaptive par measureText */
+    var _tc=document.createElement('canvas').getContext('2d');
+    _tc.font="95px 'Scheherazade New',serif";
+    var _mm=_tc.measureText(formText);
+    var _masc=_mm.actualBoundingBoxAscent||60;var _mdesc=_mm.actualBoundingBoxDescent||15;
+    var _centerY=(CHc-10)/2+10;
+    var _bY=_centerY+(_masc-_mdesc)/2;
+    var _bBot=((CHc-_bY)/CHc*100).toFixed(1);
+    /* HTML ghost (rendu correct des formes arabes ZWJ) + canvas transparent */
+    wrap.className='canvas-ghost-wrap';
+    wrap.style.cssText='width:'+CWc+'px;height:'+CHc+'px';
+    var ghost=document.createElement('div');ghost.className='canvas-ghost-letter';
+    ghost.textContent=formText;
+    var bLine=document.createElement('div');bLine.className='canvas-ghost-baseline';
+    bLine.style.bottom=_bBot+'%';
     var cvs=document.createElement('canvas');cvs.width=CWc;cvs.height=CHc;
-    cvs.style.cssText='display:block;touch-action:none;cursor:crosshair;border-radius:12px';
-    wrap.style.cssText='position:relative;width:'+CWc+'px;height:'+CHc+'px;margin:0 auto 10px;border-radius:14px;border:2px dashed rgba(194,24,91,.3);background:rgba(255,255,255,.9);overflow:hidden';
-    wrap.innerHTML='';wrap.appendChild(cvs);
     var cc=cvs.getContext('2d');
-    function guide(){
-      cc.clearRect(0,0,CWc,CHc);
-      cc.save();
-      cc.font="95px 'Scheherazade New',serif";
-      cc.textBaseline='alphabetic';cc.textAlign='center';
-      var _m=cc.measureText(formText);
-      var _a=_m.actualBoundingBoxAscent||60;var _d2=_m.actualBoundingBoxDescent||15;
-      var _bY=(CHc+_a-_d2)/2;
-      cc.fillStyle='rgba(194,24,91,0.07)';
-      cc.fillText(formText,CWc/2,_bY);
-      cc.restore();
-      cc.save();
-      cc.strokeStyle='rgba(194,24,91,.30)';cc.lineWidth=1.5;cc.setLineDash([6,4]);
-      cc.beginPath();cc.moveTo(12,_bY);cc.lineTo(CWc-12,_bY);cc.stroke();
-      cc.restore();
-    }
+    wrap.appendChild(ghost);wrap.appendChild(bLine);wrap.appendChild(cvs);
+    function guide(){cc.clearRect(0,0,CWc,CHc);}
     guide();
     var _d=false,_started=false;
     function gP(e){var r=cvs.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CWc/r.width),y:(s.clientY-r.top)*(CHc/r.height)};}
@@ -6490,15 +6504,11 @@ function _clStep1(wrap,letter,af,goNext){
       intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';
       intro.textContent='Forme de '+f.lbl;
       card.appendChild(intro);
-      var formWrap=document.createElement('div');formWrap.className='letter-baseline-wrap';
-      formWrap.style.cssText='overflow:visible;padding-bottom:12px;display:inline-block';
       var formBig=document.createElement('div');
-      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:5rem;color:#c2185b;line-height:1.4;direction:rtl;cursor:pointer;margin-bottom:4px;animation:letterStrokeReveal 3.2s cubic-bezier(.2,.6,.4,1) forwards;overflow:visible";
+      formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:5rem;color:#c2185b;line-height:1.6;padding-bottom:8px;direction:rtl;cursor:pointer;margin-bottom:4px;overflow:visible;display:block;text-align:center";
       formBig.textContent=f.form;
       formBig.onclick=function(){speakText(f.form,'ar-SA',null);};
-      var baselineDiv=document.createElement('div');baselineDiv.className='letter-baseline-line';
-      formWrap.appendChild(formBig);formWrap.appendChild(baselineDiv);
-      card.appendChild(formWrap);
+      card.appendChild(formBig);
       var lblBig=document.createElement('div');
       lblBig.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:8px';
       lblBig.textContent=f.lbl.toUpperCase();
@@ -6676,29 +6686,22 @@ function _clStep2(wrap,letter,af,goNext){
       ctx.fillStyle='rgba(194,24,91,0.07)';ctx.fillText(f.form,CW/2,_bYs);ctx.restore();
     }
     /* Remplacer canvas par wrapper HTML (fantôme correct + baseline) */
-    /* Canvas unique step 2 : fantôme + ligne adaptive + dessin */
-    var cWrap2=document.createElement('div');
-    cWrap2.style.cssText='position:relative;width:'+CW+'px;height:'+CH+'px;margin:0 auto 8px;border-radius:14px;border:2px dashed rgba(194,24,91,.3);background:rgba(255,255,255,.9);overflow:hidden';
+    /* Baseline adaptive step 2 */
+    var _tc2=document.createElement('canvas').getContext('2d');
+    _tc2.font="95px 'Scheherazade New',serif";
+    var _mm2=_tc2.measureText(f.form);
+    var _masc2=_mm2.actualBoundingBoxAscent||60;var _mdesc2=_mm2.actualBoundingBoxDescent||15;
+    var _cY2=(CH-10)/2+10;var _bY2=_cY2+(_masc2-_mdesc2)/2;
+    var _bBot2=((CH-_bY2)/CH*100).toFixed(1);
+    var cWrap2=document.createElement('div');cWrap2.className='canvas-ghost-wrap';
+    cWrap2.style.cssText='width:'+CW+'px;height:'+CH+'px;margin-bottom:8px';
+    var ghost2=document.createElement('div');ghost2.className='canvas-ghost-letter';ghost2.textContent=f.form;
+    var bLine2=document.createElement('div');bLine2.className='canvas-ghost-baseline';
+    bLine2.style.bottom=_bBot2+'%';
     var cvs2=document.createElement('canvas');cvs2.width=CW;cvs2.height=CH;
-    cvs2.style.cssText='display:block;touch-action:none;cursor:crosshair;border-radius:12px';
-    cWrap2.appendChild(cvs2);
     var ctx2=cvs2.getContext('2d');
-    function drawGuide(){
-      ctx2.clearRect(0,0,CW,CH);
-      ctx2.save();
-      ctx2.font="120px 'Scheherazade New',serif";
-      ctx2.textBaseline='alphabetic';ctx2.textAlign='center';
-      var _mg=ctx2.measureText(f.form);
-      var _ag=_mg.actualBoundingBoxAscent||80;var _dg=_mg.actualBoundingBoxDescent||20;
-      var _bYg=(CH+_ag-_dg)/2;
-      ctx2.fillStyle='rgba(194,24,91,0.07)';
-      ctx2.fillText(f.form,CW/2,_bYg);
-      ctx2.restore();
-      ctx2.save();
-      ctx2.strokeStyle='rgba(194,24,91,.30)';ctx2.lineWidth=1.5;ctx2.setLineDash([6,4]);
-      ctx2.beginPath();ctx2.moveTo(12,_bYg);ctx2.lineTo(CW-12,_bYg);ctx2.stroke();
-      ctx2.restore();
-    }
+    cWrap2.appendChild(ghost2);cWrap2.appendChild(bLine2);cWrap2.appendChild(cvs2);
+    function drawGuide(){ctx2.clearRect(0,0,CW,CH);}
     drawGuide();
     var drawing=false,_drawnS=false;
     function getPos(e){var rect=cvs2.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-rect.left)*(CW/rect.width),y:(src.clientY-rect.top)*(CH/rect.height)};}
