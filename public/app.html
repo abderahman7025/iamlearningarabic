@@ -2464,6 +2464,8 @@ body.profile-boy [lang="ar"] {
 @keyframes starPop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.09)}28%{transform:scale(1)}42%{transform:scale(1.06)}70%{transform:scale(1)}}
+.child-btn-ready{animation:heartbeat 1s ease-in-out infinite,pulse-pink 1.5s infinite!important;opacity:1!important}
 .child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
 .child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
 .child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
@@ -4262,6 +4264,29 @@ function stopSpeech(){
 // - Clic 3 sur le même (en pause) → reprend depuis la phrase pausée
 // - Double-clic (< 350ms)         → restart depuis le début
 // - Clic sur un autre texte       → arrête et lit le nouveau
+function playBravo(){
+  try{
+    var ac=new(window.AudioContext||window.webkitAudioContext)();
+    [[523,.0],[659,.1],[784,.2],[1047,.3]].forEach(function(n){
+      var o=ac.createOscillator(),g=ac.createGain();
+      o.connect(g);g.connect(ac.destination);o.type='sine';o.frequency.value=n[0];
+      g.gain.setValueAtTime(.28,ac.currentTime+n[1]);
+      g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+n[1]+.45);
+      o.start(ac.currentTime+n[1]);o.stop(ac.currentTime+n[1]+.5);
+    });
+  }catch(e){}
+}
+function playError(){
+  try{
+    var ac=new(window.AudioContext||window.webkitAudioContext)();
+    var o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);o.type='square';o.frequency.value=200;
+    g.gain.setValueAtTime(.12,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.2);
+    o.start();o.stop(ac.currentTime+.2);
+  }catch(e){}
+}
+
 function speakText(txt,lang,el){
   if(!st.soundOn)return;
   var arabicChars=(txt.match(/[\u0600-\u06FF\u0750-\u077F]/g)||[]).length;
@@ -6159,13 +6184,14 @@ function renderChildWarmup(ca){
       btn.textContent=CHILD_LETTERS[li].ar;
       btn.onclick=function(){
         if(answered||btn._used)return;
-        speakText(CHILD_LETTERS[li].ar,'ar-SA',null);
         if(li===correctIdx){
+          playBravo();
           btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
           if(!failed)score++;
           answered=true;
           setTimeout(function(){qIdx++;showQ();},700);
         } else {
+          playError();
           btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626;cursor:default';
           btn._used=true;/* désactiver ce bouton, laisser les autres cliquables */
           failed=true;  /* question perdue, pas d'étoile même si on trouve ensuite */
@@ -6509,7 +6535,7 @@ function _clStep1(wrap,letter,af,goNext){
 
       var mDrawing=false,_mDrawn=false;
       function mPos(e){var r=mc.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(MCW/r.width),y:(src.clientY-r.top)*(MCH/r.height)};}
-      function _mStart(){if(!_mDrawn){_mDrawn=true;nextBtn2.classList.add('child-btn-play');}}
+      function _mStart(){if(!_mDrawn){_mDrawn=true;nextBtn2.style.opacity='1';nextBtn2.classList.add('child-btn-ready');}}
       mc.addEventListener('mousedown',function(e){mDrawing=true;_mStart();var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();});
       mc.addEventListener('mousemove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();});
       mc.addEventListener('mouseup',function(){mDrawing=false;});
@@ -6518,7 +6544,7 @@ function _clStep1(wrap,letter,af,goNext){
       mc.addEventListener('touchend',function(){mDrawing=false;});
 
       var nextBtn2=document.createElement('button');nextBtn2.className='rbtn rbtn-m';
-      nextBtn2.style.cssText='width:100%;padding:14px;font-size:1rem';
+      nextBtn2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:0;transition:opacity .3s';
       nextBtn2.textContent=fcIdx<3?'Forme suivante →':'📝 Quiz des formes !';
       nextBtn2.onclick=function(){fcIdx++;showPhaseA();};
       container.appendChild(nextBtn2);
@@ -7034,16 +7060,15 @@ function _xStep1(wrap,forms,goNext){
 
       var mDrawing=false,_mDrawn=false;
       function mPos(e){var r=mc.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(MCW/r.width),y:(src.clientY-r.top)*(MCH/r.height)};}
-      mc.addEventListener('mousedown',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.classList.add('child-btn-play');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();});
+      mc.addEventListener('mousedown',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.style.opacity='1';nb2.classList.add('child-btn-ready');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();});
       mc.addEventListener('mousemove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();});
       mc.addEventListener('mouseup',function(){mDrawing=false;});
-      mc.addEventListener('touchstart',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.classList.add('child-btn-play');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
+      mc.addEventListener('touchstart',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.style.opacity='1';nb2.classList.add('child-btn-ready');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
       mc.addEventListener('touchmove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();},{passive:false});
       mc.addEventListener('touchend',function(){mDrawing=false;});
 
-      var nb2=document.createElement('button');nb2.className='rbtn rbtn-m';nb2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:.35';nb2.textContent='Suivant →';
+      var nb2=document.createElement('button');nb2.className='rbtn rbtn-m';nb2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:0;transition:opacity .3s';nb2.textContent='Suivant →';
       nb2.onclick=function(){fcIdx++;showFlash();};container.appendChild(nb2);
-      setTimeout(function(){nb2.style.opacity='1';nb2.classList.add('child-btn-play');},8000);
     }
   }
   showFlash();
@@ -7078,7 +7103,7 @@ function _xStep4Quiz(wrap,items,goNext){
       var btn=document.createElement('div');
       btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
       btn.textContent=ch;
-      btn.onclick=function(){if(answered)return;speakText(ch,'ar-SA',null);var ok=(ch===q.correct);btn.style.background=ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.12)';btn.style.borderColor=ok?'#22c55e':'#ef4444';btn.style.color=ok?'#15803d':'#dc2626';if(ok){answered=true;score++;setTimeout(function(){qIdx++;showQ();},700);}else{btn.style.cursor='default';}};
+      btn.onclick=function(){if(answered)return;var ok=(ch===q.correct);btn.style.background=ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.12)';btn.style.borderColor=ok?'#22c55e':'#ef4444';btn.style.color=ok?'#15803d':'#dc2626';if(ok){playBravo();answered=true;score++;setTimeout(function(){qIdx++;showQ();},700);}else{playError();btn.style.cursor='default';}};
       choicesEl.appendChild(btn);
     });
     card.appendChild(choicesEl);
@@ -7111,10 +7136,9 @@ function _xStep5Quiz(wrap,items,finishFn){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — VOYELLES (Île 1 : La Source de l'Humanité)
    ═══════════════════════════════════════════════════════════ */
-/* Formes : [label, symbole] */
-var _CVOW_FORMS=[['Fatḥa · a','اَ'],['Ḍamma · ou','اُ'],['Kasra · i','اِ']];
-/* Items pour le jeu : [label, symbole, emoji] */
-var _CVOW_ITEMS=[['Fatḥa · a','اَ','☀️'],['Ḍamma · ou','اُ','🌙'],['Kasra · i','اِ','⭐']];
+/* Formes voyelles : diacritiques seuls (sur tatweel pour l'affichage) */
+var _CVOW_FORMS=[['Fatḥa · a','ـَ'],['Ḍamma · ou','ـُ'],['Kasra · i','ـِ']];
+var _CVOW_ITEMS=[['Fatḥa · a','ـَ','☀️'],['Ḍamma · ou','ـُ','🌙'],['Kasra · i','ـِ','⭐']];
 
 function _cvProgressBar(wrap,step){
   var SNAMES=['✨ Découverte','🔍 Formes','🎧 Écoute','🎮 Jeu','📖 Mot','🏆 Quiz'];
@@ -7330,9 +7354,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : juste la lettre de prolongation, sans l'alef de base */
-var _CPROL_FORMS=[['Alef · ā','ا'],['Waw · ū','و'],['Yā · ī','ي']];
-var _CPROL_ITEMS=[['Alef · ā','ا','🌊'],['Waw · ū','و','🎵'],['Yā · ī','ي','🌟']];
+/* Prolongations : lettre + voyelle correspondante */
+var _CPROL_FORMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];
+var _CPROL_ITEMS=[['Alif · ā','اَ','🌊'],['Waw · ū','وُ','🎵'],['Yā · ī','يِ','🌟']];
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
@@ -7599,6 +7623,7 @@ function renderChildGame(ca,dayIdx,round,onDone){
     cell.onclick=function(){
       if(cell.classList.contains('hit'))return;
       if(item.ok){
+        playBravo();
         cell.classList.add('hit');found++;
         scoreEl.textContent=found+' / '+TARGET;
         if(found===TARGET){
@@ -7608,6 +7633,7 @@ function renderChildGame(ca,dayIdx,round,onDone){
           },700);
         }
       } else {
+        playError();
         cell.classList.add('miss');
         setTimeout(function(){cell.classList.remove('miss');},500);
       }
