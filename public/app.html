@@ -7056,7 +7056,7 @@ function _xStep1(wrap,forms,goNext){
       var MCW=220,MCH=160,mc=document.createElement('canvas');mc.width=MCW;mc.height=MCH;
       mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
       var mctx=mc.getContext('2d');
-      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';var txt=f[1];var vowels=['َ','ُ','ِ'];var hasVowel=false;var letter='',vowel='';for(var vi=0;vi<vowels.length;vi++){if(txt.indexOf(vowels[vi])>-1){hasVowel=true;vowel=vowels[vi];letter=txt.replace(vowel,'');break;}}if(hasVowel){mctx.fillText(letter,MCW/2-35,mbY);mctx.fillText(vowel,MCW/2+35,mbY);}else{mctx.fillText(txt,MCW/2,mbY);}mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();}
+      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';mctx.fillText(f[1],MCW/2,mbY);mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();}
       drawGuide();card2.appendChild(mc);
       var efBtn=document.createElement('button');efBtn.className='rbtn rbtn-s';efBtn.style.cssText='display:block;margin:0 auto 8px;font-size:.78rem';efBtn.textContent='↺ Effacer';efBtn.onclick=function(){drawGuide();};card2.appendChild(efBtn);
       container.appendChild(card2);
@@ -7357,9 +7357,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : lettre + voyelle (RTL correct) */
-var _CPROL_FORMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];
-var _CPROL_ITEMS=[['Alif · ā','اَ'],['Waw · ū','وُ'],['Yā · ī','يِ']];/* sons prolongés : alif-fatha, waw-damma, ya-kasra */
+/* Prolongations : lettre + espace + voyelle (RTL correct) */
+var _CPROL_FORMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي ِ']];
+var _CPROL_ITEMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي ِ']];/* sons prolongés : alif-fatha, waw-damma, ya-kasra */
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
