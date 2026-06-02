@@ -3942,43 +3942,21 @@ function checkStripeReturn(){
   else if(params.get('payment')==='cancel'){showS('s-buy',false);window.history.replaceState({},'',window.location.pathname);}
 }
 async function tryAutoLogin(){
-  const token=localStorage.getItem('arab_token');const email=localStorage.getItem('arab_email');
+  const token=localStorage.getItem('arab_token');
+  const email=localStorage.getItem('arab_email');
   var path=window.location.pathname;
-
-  /* Déduire le profil depuis l'URL : /fille/... → girl, /garcon/... → boy, /adulte/... → adult */
-  var profileMatch=path.match(/^\/(fille|garcon|adulte|girl|boy|adult)/);
-  if(profileMatch){
-    var pMap={'fille':'girl','garcon':'boy','adulte':'adult','girl':'girl','boy':'boy','adult':'adult'};
-    st.profile=pMap[profileMatch[1]]||'girl';
-    var root=document.getElementById('root');
-    if(root){
-      root.classList.remove('profile-girl','profile-boy','profile-adult');
-      document.body.classList.remove('profile-girl','profile-boy','profile-adult');
-      root.classList.add('profile-'+st.profile);
-      document.body.classList.add('profile-'+st.profile);
-    }
-  }
-
-  var targetScreen=_urlToScreen(path);
 
   if(token&&email){
     st.user={email,name:email.split('@')[0]};
-    if(profileMatch){
-      /* Appliquer tout le profil (couleurs + menu) sans pousser dans l'historique */
-      window._skipProfileNav=true;
-      chooseProfile(st.profile);
-      window._skipProfileNav=false;
-    } else if(targetScreen==='s-welcome'){
-      showS('s-welcome',true,true);
-    } else if(targetScreen&&targetScreen!=='s-buy'&&targetScreen!=='s-login'&&targetScreen!=='s-register'){
-      showS(targetScreen,true,true);
-    } else {
-      showS('s-welcome',true,true);
-    }
+    /* Restaurer le profil depuis l'URL si possible */
+    var pm=path.match(/^\/(fille|garcon|adulte|girl|boy|adult)/);
+    if(pm){var pMap={'fille':'girl','garcon':'boy','adulte':'adult','girl':'girl','boy':'boy','adult':'adult'};st.profile=pMap[pm[1]]||'girl';}
+    /* Toujours montrer l'écran de choix d'interface — état sûr */
+    showS('s-welcome',true,true);
   } else {
-    if(targetScreen==='s-login'){showS('s-login',true,true);}
-    else if(targetScreen==='s-register'){showS('s-register',true,true);}
-    else{showS('s-buy',false,true);}
+    if(path==='/connexion')showS('s-login',true,true);
+    else if(path==='/inscription')showS('s-register',true,true);
+    else showS('s-buy',false,true);
   }
 }
 
@@ -4184,14 +4162,18 @@ function buildMenu(){
    pushState à chaque navigation interne → popstate intercepté
    ════════════════════════════════════════════════════════ */
 var _navPopping=false;
+var _currentIsleSlug=null; /* stocke le slug de l'île courante */
 function _navPush(hash){
   if(_navPopping)return;
   var p=_getProfile();
-  /* Convertir hash en vrai path propre */
   var path=location.pathname;
   if(hash){
-    var slug=hash.replace('sessions/lesson','lecon').replace('sessions','lecon').replace('minigames/memory','jeux/memory').replace('minigames/puzzle','jeux/puzzle').replace('exercises','exercices').replace('minigames','jeux');
-    path='/'+p+'/'+slug;
+    if((hash==='sessions/lesson')&&_currentIsleSlug){
+      path='/'+p+'/lecon/'+_currentIsleSlug;
+    } else {
+      var slug=hash.replace('sessions/lesson','lecon').replace('sessions','lecon').replace('minigames/memory','jeux/memory').replace('minigames/puzzle','jeux/puzzle').replace('exercises','exercices').replace('minigames','jeux');
+      path='/'+p+'/'+slug;
+    }
   }
   history.pushState({_appState:'page',hash:hash},'',path);
 }
@@ -4884,10 +4866,8 @@ var islandDefs=[
   var domContainer=ca;
 
   function openSession(s){
-    /* URL de la leçon */
-    var p=_getProfile();
-    var slug=_ISLE_SLUGS[s.label]||(s.label||'lecon').toLowerCase().replace(/[^a-z0-9]+/g,'-');
-    window.history.pushState({screen:'s-main',lesson:slug},'','/'+p+'/lecon/'+slug);
+    /* Stocker le slug pour que _navPush l'utilise */
+    _currentIsleSlug=_ISLE_SLUGS[s.label]||(s.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     if(s.type==='vowels')renderVLesson(domContainer,s);
     else if(s.type==='prolong')renderPLesson(domContainer,s);
     else renderLLesson(domContainer,s,0);
@@ -5907,9 +5887,7 @@ function renderChildIslandMap(ca){
   /* ── Fonction d'ouverture d'une île ── */
   var domContainer=ca;
   function openChildIsland(isle,isComplete){
-    var p=_getProfile();
-    var slug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[^a-z0-9]+/g,'-');
-    window.history.pushState({screen:'s-child',lesson:slug},'','/'+p+'/lecon/'+slug);
+    _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     if(isle.type==='vowels'){renderChildVowelLesson(domContainer,0);}
     else if(isle.type==='prolong'){renderChildProlongLesson(domContainer,0);}
     else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
