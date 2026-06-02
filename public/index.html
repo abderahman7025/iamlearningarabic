@@ -3989,6 +3989,8 @@ async function tryAutoLogin(){
       _applyProfileSafe(st.profile);
       buildMenu();
       showS('s-menu',true,true);
+      /* Aller directement à la carte des îles si l'URL contient /lecon */
+      if(/\/lecon/.test(path)){navToPage('sessions');}
       /* Si l'URL contient un slug d'île → l'ouvrir automatiquement */
       var slugM=path.match(/\/lecon\/([a-z0-9-]+)$/);
       if(slugM){
@@ -4221,6 +4223,7 @@ function buildMenu(){
    ════════════════════════════════════════════════════════ */
 var _navPopping=false;
 var _currentIsleSlug=null; /* stocke le slug de l'île courante */
+var _lessonPushed=false;   /* évite les doublons d'historique */
 function _navPush(hash){
   if(_navPopping)return;
   var p=_getProfile();
@@ -4228,7 +4231,11 @@ function _navPush(hash){
   if(hash){
     if((hash==='sessions/lesson')&&_currentIsleSlug){
       path='/'+p+'/lecon/'+_currentIsleSlug;
+      /* Remplace au lieu de pousser si déjà dans cette leçon */
+      if(_lessonPushed){history.replaceState({_appState:'page',hash:hash},'',path);return;}
+      _lessonPushed=true;
     } else {
+      _lessonPushed=false;
       var slug=hash.replace('sessions/lesson','lecon').replace('sessions','lecon').replace('minigames/memory','jeux/memory').replace('minigames/puzzle','jeux/puzzle').replace('exercises','exercices').replace('minigames','jeux');
       path='/'+p+'/'+slug;
     }
@@ -5007,7 +5014,7 @@ var islandDefs=[
     card.appendChild(nm);
     card.appendChild(sub);
     card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(ss,lbl){return function(){_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');openSession(ss[0]);};})(isleSessions,isle.label);}
+    if(!isLocked){card.onclick=(function(ss,lbl){return function(){_lessonPushed=false;_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');openSession(ss[0]);};})(isleSessions,isle.label);}
 
     globeDiv.appendChild(card);
 
@@ -5944,6 +5951,7 @@ function renderChildIslandMap(ca){
   /* ── Fonction d'ouverture d'une île ── */
   var domContainer=ca;
   function openChildIsland(isle,isComplete){
+    _lessonPushed=false;
     _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     if(isle.type==='vowels'){renderChildVowelLesson(domContainer,0);}
     else if(isle.type==='prolong'){renderChildProlongLesson(domContainer,0);}
