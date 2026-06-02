@@ -42,15 +42,19 @@
     }
   ],
   "rewrites": [
-    { "source": "/connexion", "destination": "/index.html" },
-    { "source": "/inscription", "destination": "/index.html" },
-    { "source": "/bienvenue", "destination": "/index.html" },
-    { "source": "/cours", "destination": "/index.html" },
-    { "source": "/cours/fille", "destination": "/index.html" },
+    { "source": "/connexion",    "destination": "/index.html" },
+    { "source": "/inscription",  "destination": "/index.html" },
+    { "source": "/accueil",      "destination": "/index.html" },
+    { "source": "/cours",        "destination": "/index.html" },
+    { "source": "/cours/fille",  "destination": "/index.html" },
     { "source": "/cours/garcon", "destination": "/index.html" },
     { "source": "/cours/adulte", "destination": "/index.html" },
-    { "source": "/cours/fille/:path*", "destination": "/index.html" },
-    { "source": "/cours/garcon/:path*", "destination": "/index.html" },
-    { "source": "/cours/adulte/:path*", "destination": "/index.html" }
+    { "source": "/lecon",        "destination": "/index.html" },
+    { "source": "/lecon/:path*", "destination": "/index.html" },
+    { "source": "/profil",       "destination": "/index.html" },
+    { "source": "/contact",      "destination": "/index.html" },
+    { "source": "/parametres",   "destination": "/index.html" },
+    { "source": "/sessions",     "destination": "/index.html" },
+    { "source": "/admin/:path*", "destination": "/index.html" }
   ]
 }

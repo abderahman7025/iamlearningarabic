@@ -3598,7 +3598,7 @@ let _txIdx=0;
 function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];_txIdx++;return c;}
 function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
 /* ── URL routing ── */
-var _SCREEN_URLS={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/bienvenue','s-menu':'/cours','s-main':'/cours/lecon','s-child':'/cours/enfant','s-audio-admin':'/admin/audio'};
+var _SCREEN_URLS={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/accueil','s-menu':'/cours','s-main':'/lecon','s-child':'/lecon/enfant','s-audio-admin':'/admin/audio','s-sessions':'/sessions','s-profile':'/profil','s-contact':'/contact','s-settings':'/parametres'};
 var _URL_SCREENS={};Object.keys(_SCREEN_URLS).forEach(function(k){_URL_SCREENS[_SCREEN_URLS[k]]=k;});
 function showS(id,fwd,noHistory){
   stopSpeech();
