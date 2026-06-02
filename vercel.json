@@ -44,7 +44,7 @@
   "rewrites": [
     { "source": "/connexion",      "destination": "/index.html" },
     { "source": "/inscription",    "destination": "/index.html" },
-    { "source": "/accueil",        "destination": "/index.html" },
+    { "source": "/interface",      "destination": "/index.html" },
     { "source": "/fille",          "destination": "/index.html" },
     { "source": "/garcon",         "destination": "/index.html" },
     { "source": "/adulte",         "destination": "/index.html" },
