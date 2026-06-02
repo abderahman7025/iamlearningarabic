@@ -4157,7 +4157,14 @@ function buildMenu(){
 var _navPopping=false;
 function _navPush(hash){
   if(_navPopping)return;
-  history.pushState({_appState:'page',hash:hash},'',location.pathname+(hash?'#'+hash:''));
+  var p=_getProfile();
+  /* Convertir hash en vrai path propre */
+  var path=location.pathname;
+  if(hash){
+    var slug=hash.replace('sessions/lesson','lecon').replace('sessions','lecon').replace('minigames/memory','jeux/memory').replace('minigames/puzzle','jeux/puzzle').replace('exercises','exercices').replace('minigames','jeux');
+    path='/'+p+'/'+slug;
+  }
+  history.pushState({_appState:'page',hash:hash},'',path);
 }
 window.addEventListener('popstate',function(e){
   /* État avant toute navigation dans l'appli → laisser le navigateur sortir */
