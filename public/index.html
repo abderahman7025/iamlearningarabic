@@ -4948,7 +4948,7 @@ var islandDefs=[
     card.appendChild(nm);
     card.appendChild(sub);
     card.appendChild(badge);
-    if(!isLocked){card.onclick=function(){openSession(isleSessions[0]);};}
+    if(!isLocked){card.onclick=(function(ss){return function(){openSession(ss[0]);};})(isleSessions);}
 
     globeDiv.appendChild(card);
 
@@ -5940,7 +5940,7 @@ function renderChildIslandMap(ca){
     }
 
     card.appendChild(ico);card.appendChild(nm);card.appendChild(sub);card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(i2,ic2){return function(){openChildIsland(i2,ic2);};})(isle,isComplete);}
+    if(!isLocked){card.onclick=(function(i2){return function(){openChildIsland(i2,false);};})(isle);}
 
     globeDiv.appendChild(card);
 
