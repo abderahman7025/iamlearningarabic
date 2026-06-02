@@ -3989,34 +3989,38 @@ async function tryAutoLogin(){
   if(token&&email){
     st.user={email,name:email.split('@')[0]};
     if(pm){
-      /* URL avec profil → appliquer profil + aller à la carte des îles */
-      st.profile=pMap[pm[1]]||'girl';
-      _applyProfileSafe(st.profile);
-      showS('s-menu',true,true);
-      buildMenu();
-      /* Aller directement à la carte des îles si l'URL contient /lecon */
-      if(/\/lecon/.test(path)){
-        st._curPage='sessions';
-        showS('s-main',true,true);
-        renderPage('sessions',false);
-      }
-      /* Si l'URL contient un slug d'île → l'ouvrir automatiquement */
-      var slugM=path.match(/\/lecon\/([a-z0-9-]+)$/);
-      if(slugM){
-        var targetLabel=_slugToLabel(slugM[1]);
-        if(targetLabel){
-          setTimeout(function(){
-            var cards=document.querySelectorAll('.isle-name');
-            for(var i=0;i<cards.length;i++){
-              if(cards[i].textContent===targetLabel){
-                var card=cards[i].closest('.sess-island');
-                if(card&&!card.classList.contains('locked-isle')){card.click();}
-                break;
+      /* URL avec profil : montrer s-welcome puis simuler le clic sur le bon profil */
+      var _urlProfile=pMap[pm[1]]||'girl';
+      var _urlPath=path;
+      showS('s-welcome',true,true);
+      setTimeout(function(){
+        /* Cliquer sur le bon bouton de profil */
+        var btn=document.querySelector('.prof-card.'+_urlProfile);
+        if(btn){btn.click();}
+        /* Puis naviguer vers la carte des îles */
+        setTimeout(function(){
+          if(/\/lecon/.test(_urlPath)){
+            navToPage('sessions');
+            /* Auto-ouvrir l'île si slug dans l'URL */
+            var slugM=_urlPath.match(/\/lecon\/([a-z0-9-]+)$/);
+            if(slugM){
+              var targetLabel=_slugToLabel(slugM[1]);
+              if(targetLabel){
+                setTimeout(function(){
+                  var cards=document.querySelectorAll('.isle-name');
+                  for(var i=0;i<cards.length;i++){
+                    if(cards[i].textContent===targetLabel){
+                      var card=cards[i].closest('.sess-island');
+                      if(card&&!card.classList.contains('locked-isle')){card.click();}
+                      break;
+                    }
+                  }
+                },600);
               }
             }
-          },600);
-        }
-      }
+          }
+        },300);
+      },100);
     } else {
       showS('s-welcome',true,true);
     }
