@@ -7002,7 +7002,7 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
       /* lettre à gauche, voyelle à droite — deux spans séparés */
       inner='<div class="child-var-ar" style="display:flex;flex-direction:row;justify-content:center;align-items:center;gap:6px;direction:ltr">'
         +'<span>'+parts[0]+'</span>'
-        +'<span style="font-size:1.5rem;color:#ad1457">&#x0640;'+parts[1]+'</span>'
+        +'<span style="font-size:1.5rem;color:#ad1457"> '+parts[1]+'</span>'
         +'</div>';
     }else{
       inner='<div class="child-var-ar">'+v[1]+'</div>';
@@ -7044,7 +7044,10 @@ function _xStep1(wrap,forms,goNext){
 
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var intro=document.createElement('div');intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro.textContent=f[0];card.appendChild(intro);
-    var formBig=document.createElement('div');formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.6;padding-bottom:10px;direction:rtl;cursor:pointer;margin-bottom:6px;overflow:visible";formBig.textContent=f[1];
+    var formBig=document.createElement('div');formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.6;padding-bottom:10px;cursor:pointer;margin-bottom:6px;overflow:visible;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:14px;direction:ltr";
+    var fbParts=f[1].split(' ');
+    if(fbParts.length===2){formBig.innerHTML='<span>'+fbParts[0]+'</span><span style="font-size:4.5rem"> '+fbParts[1]+'</span>';}
+    else{formBig.textContent=f[1];}
     formBig.onclick=function(){speakText(f[1],'ar-SA',null);};card.appendChild(formBig);
     var lbl=document.createElement('div');lbl.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';lbl.textContent=f[0].toUpperCase();card.appendChild(lbl);
     var tip=document.createElement('div');tip.style.cssText='font-size:.72rem;color:#ad1457;opacity:.55;margin-bottom:10px';tip.textContent='👆 Appuie pour écouter';card.appendChild(tip);
@@ -7066,7 +7069,7 @@ function _xStep1(wrap,forms,goNext){
       var ghost=document.createElement('div');
       ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:8px;direction:ltr;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";
       var gParts=f[1].split(' ');
-      if(gParts.length===2){ghost.innerHTML='<span>'+gParts[0]+'</span><span style="font-size:1.8rem">&#x0640;'+gParts[1]+'</span>';}
+      if(gParts.length===2){ghost.innerHTML='<span>'+gParts[0]+'</span><span style="font-size:1.8rem"> '+gParts[1]+'</span>';}
       else{ghost.textContent=f[1];}
       card2.appendChild(ghost);
 
@@ -7139,7 +7142,7 @@ function _xStep4Quiz(wrap,items,goNext){
       btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:ltr';
       var chParts=ch.split(' ');
       if(chParts.length===2){
-        btn.innerHTML='<span>'+chParts[0]+'</span><span style="font-size:1.4rem;color:#ad1457">&#x0640;'+chParts[1]+'</span>';
+        btn.innerHTML='<span>'+chParts[0]+'</span><span style="font-size:1.4rem;color:#ad1457"> '+chParts[1]+'</span>';
       }else{
         btn.textContent=ch;
       }
