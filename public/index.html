@@ -4876,8 +4876,7 @@ var islandDefs=[
   var domContainer=ca;
 
   function openSession(s){
-    /* Stocker le slug pour que _navPush l'utilise */
-    _currentIsleSlug=_ISLE_SLUGS[s.label]||(s.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    /* _currentIsleSlug est déjà défini par le onclick de la carte */
     if(s.type==='vowels')renderVLesson(domContainer,s);
     else if(s.type==='prolong')renderPLesson(domContainer,s);
     else renderLLesson(domContainer,s,0);
@@ -4960,7 +4959,7 @@ var islandDefs=[
     card.appendChild(nm);
     card.appendChild(sub);
     card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(ss){return function(){openSession(ss[0]);};})(isleSessions);}
+    if(!isLocked){card.onclick=(function(ss,lbl){return function(){_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');openSession(ss[0]);};})(isleSessions,isle.label);}
 
     globeDiv.appendChild(card);
 
