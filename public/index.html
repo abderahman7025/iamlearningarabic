@@ -5904,6 +5904,103 @@ function getChildIsland(letterIdx){
 // ════════════════════════════════════════════════════════
 //  CARTE DES ÎLES — profil fille
 // ════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
+   EXPLICATIONS INTERACTIVES POUR CHAQUE COURS
+   ═══════════════════════════════════════════════════════════ */
+
+function _showVowelIntro(ca,onFinish){
+  ca.innerHTML='';ca.style.paddingTop='0';
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+  var card=document.createElement('div');card.className='child-card';
+  card.style.textAlign='center';
+
+  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">🎵</div>'
+    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">Les voyelles — A, OU, I</h2>'
+    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:24px;line-height:1.5">Les voyelles sont 3 petits signes.<br>Ils se mettent SUR ou SOUS une lettre.<br>Ils changent le son de la lettre.</p>';
+
+  /* Exemple animé */
+  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:24px;margin-bottom:20px;border:3px solid #ad1457';
+  exDiv.innerHTML='<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:10px;font-weight:700">Exemple :</div>'
+    +'<div style="display:flex;flex-direction:column;gap:14px;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#ad1457;text-align:center">'
+    +'<div>بَا <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= ba (a)</span></div>'
+    +'<div>بُو <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= bu (ou)</span></div>'
+    +'<div>بِي <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= bi (i)</span></div>'
+    +'</div>';
+  card.appendChild(exDiv);
+
+  card.innerHTML+='<p style="color:rgba(0,0,0,.5);font-size:.82rem;margin-bottom:20px;line-height:1.6">La lettre est toujours la même (ب),<br>mais le signe change son son ! 🎵</p>';
+
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
+  btn.textContent='Je comprends ! →';btn.style.color='white';
+  btn.onclick=onFinish;
+  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+}
+
+function _showProlongIntro(ca,onFinish){
+  ca.innerHTML='';ca.style.paddingTop='0';
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+  var card=document.createElement('div');card.className='child-card';
+  card.style.textAlign='center';
+
+  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">📏</div>'
+    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">Les prolongations</h2>'
+    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:24px;line-height:1.5">Une prolongation allonge le son<br>d\'une voyelle.<br>Il y a 3 prolongations.</p>';
+
+  /* Explications */
+  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:16px;margin-bottom:20px;border:3px solid #ad1457';
+  exDiv.innerHTML=''
+    +'<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
+    +'<span style="font-size:1.6rem">ا</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Alif (ا) allonge le « A »<br><strong>بَا</strong> se prononce « Baaaa »</span></div>'
+    +'<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
+    +'<span style="font-size:1.6rem">و</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Waw (و) allonge le « OU »<br><strong>بُو</strong> se prononce « Boouu »</span></div>'
+    +'<div style="display:flex;gap:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
+    +'<span style="font-size:1.6rem">ي</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Ya (ي) allonge le « I »<br><strong>بِي</strong> se prononce « Biiiii »</span></div>';
+  card.appendChild(exDiv);
+
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
+  btn.textContent='Je comprends ! →';btn.style.color='white';
+  btn.onclick=onFinish;
+  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+}
+
+function _showLettersIntro(ca,isleName,onFinish){
+  ca.innerHTML='';ca.style.paddingTop='0';
+  var wrap=document.createElement('div');wrap.className='child-wrap';
+  var card=document.createElement('div');card.className='child-card';
+  card.style.textAlign='center';
+
+  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">✏️</div>'
+    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">'+isleName+'</h2>'
+    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:20px;line-height:1.5">Chaque lettre arabe change de forme<br>selon sa position dans le mot !</p>';
+
+  /* Les 4 formes */
+  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:16px;margin-bottom:20px;border:3px solid #ad1457';
+  exDiv.innerHTML=''
+    +'<div style="font-size:.82rem;color:rgba(0,0,0,.5);margin-bottom:12px;font-weight:700">Les 4 positions :</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
+    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">ISOLÉE</div>'
+    +'<div style="font-size:1.8rem;color:#ad1457">ب</div></div>'
+    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
+    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">AU DÉBUT</div>'
+    +'<div style="font-size:1.8rem;color:#ad1457">بـــ</div></div>'
+    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
+    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">AU MILIEU</div>'
+    +'<div style="font-size:1.8rem;color:#ad1457">ــبـــ</div></div>'
+    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
+    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">À LA FIN</div>'
+    +'<div style="font-size:1.8rem;color:#ad1457">ــب</div></div>'
+    +'</div>';
+  card.appendChild(exDiv);
+
+  card.innerHTML+='<p style="color:rgba(0,0,0,.5);font-size:.82rem;margin-bottom:20px;line-height:1.6">Tu vas apprendre toutes ces formes<br>en traçant et en écrivant ! 🎯</p>';
+
+  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
+  btn.textContent='Je comprends ! →';btn.style.color='white';
+  btn.onclick=onFinish;
+  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+}
+
 function renderChildIslandMap(ca){
   ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
   st._curPage='sessions-map';
@@ -5960,10 +6057,10 @@ function renderChildIslandMap(ca){
   function openChildIsland(isle,isComplete){
     _lessonPushed=false;
     _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    if(isle.type==='vowels'){renderChildVowelLesson(domContainer,0);}
-    else if(isle.type==='prolong'){renderChildProlongLesson(domContainer,0);}
+    if(isle.type==='vowels'){_showVowelIntro(domContainer,function(){renderChildVowelLesson(domContainer,0);});}
+    else if(isle.type==='prolong'){_showProlongIntro(domContainer,function(){renderChildProlongLesson(domContainer,0);});}
     else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
-    else{renderChildWarmup(domContainer);}
+    else{_showLettersIntro(domContainer,isle.label,function(){renderChildWarmup(domContainer);});}
   }
 
   var globeDiv=document.createElement('div');
