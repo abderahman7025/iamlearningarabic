@@ -42,7 +42,10 @@
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(connexion|inscription|bienvenue|cours|cours/(.*)|admin|admin/(.*))", "destination": "/index.html" }
+    { "source": "/connexion", "destination": "/index.html" },
+    { "source": "/inscription", "destination": "/index.html" },
+    { "source": "/bienvenue", "destination": "/index.html" },
+    { "source": "/cours", "destination": "/index.html" },
+    { "source": "/cours/:path*", "destination": "/index.html" }
   ]
 }
