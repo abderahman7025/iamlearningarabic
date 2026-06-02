@@ -3597,7 +3597,29 @@ const TX_BWD=['tx-zoom-out','tx-slide-l','tx-slide-down','tx-fade'];
 let _txIdx=0;
 function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];_txIdx++;return c;}
 function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
-function showS(id,fwd){stopSpeech();document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));const el=document.getElementById(id);if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}setTimeout(updateGirlMascot,50);}
+/* ── URL routing ── */
+var _SCREEN_URLS={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/bienvenue','s-menu':'/cours','s-main':'/cours/lecon','s-child':'/cours/enfant','s-audio-admin':'/admin/audio'};
+var _URL_SCREENS={};Object.keys(_SCREEN_URLS).forEach(function(k){_URL_SCREENS[_SCREEN_URLS[k]]=k;});
+function showS(id,fwd,noHistory){
+  stopSpeech();
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById(id);
+  if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}
+  setTimeout(updateGirlMascot,50);
+  if(!noHistory){
+    var url=_SCREEN_URLS[id]||'/';
+    window.history.pushState({screen:id},'',(url==='/'?url:url));
+  }
+}
+window.addEventListener('popstate',function(e){
+  if(e.state&&e.state.screen){
+    showS(e.state.screen,false,true);
+  } else {
+    var path=window.location.pathname;
+    var id=_URL_SCREENS[path]||'s-buy';
+    showS(id,false,true);
+  }
+});
 function transitionCA(fwd){stopSpeech();const ca=document.getElementById('ca');if(ca)animEl(ca,nextTx(fwd!==false));}
 
 // SPEECH
@@ -3879,7 +3901,22 @@ function checkStripeReturn(){
 }
 async function tryAutoLogin(){
   const token=localStorage.getItem('arab_token');const email=localStorage.getItem('arab_email');
-  if(token&&email){st.user={email,name:email.split('@')[0]};showS('s-welcome',true);}
+  /* Lire l'URL courante pour afficher le bon écran */
+  var path=window.location.pathname;
+  var targetScreen=_URL_SCREENS[path]||null;
+  if(token&&email){
+    st.user={email,name:email.split('@')[0]};
+    /* Si l'URL demande un écran précis et que l'user est connecté, y aller */
+    if(targetScreen&&targetScreen!=='s-buy'&&targetScreen!=='s-login'&&targetScreen!=='s-register'){
+      showS(targetScreen,true,true);
+    } else {
+      showS('s-welcome',true,true);
+    }
+  } else {
+    if(targetScreen==='s-login'){showS('s-login',true,true);}
+    else if(targetScreen==='s-register'){showS('s-register',true,true);}
+    else {showS('s-buy',false,true);}
+  }
 }
 
 // ── STREAK SYSTEM ──────────────────────────────────────────────
