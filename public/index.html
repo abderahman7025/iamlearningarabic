@@ -7080,7 +7080,7 @@ function _xStep1(wrap,forms,goNext){
         mctx.clearRect(0,0,MCW,MCH);
         var gp=f[1].split(' ');
         var letter=gp.length===2?gp[0]:f[1];
-        var vowelBase=gp.length===2?'ـ'+gp[1]:'';
+        var vowelBase=gp.length===2?' '+gp[1]:'';
         mctx.save();mctx.font="90px 'Scheherazade New',serif";mctx.textBaseline='alphabetic';
         var mm=mctx.measureText(letter);
         var masc=mm.actualBoundingBoxAscent||60;var mdesc=mm.actualBoundingBoxDescent||15;
