@@ -2479,7 +2479,7 @@ body.profile-boy [lang="ar"] {
 .child-letter-name{font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:6px}
 .child-variants{display:flex;justify-content:center;gap:8px;direction:rtl;margin:10px 0 6px}
 .child-var-box{background:rgba(233,30,140,.07);border-radius:14px;padding:6px 10px;text-align:center;border:1.5px solid rgba(233,30,140,.12);min-width:66px}
-.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.6;padding-bottom:6px;direction:rtl;unicode-bidi:isolate;overflow:visible}
+.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.6;padding-bottom:6px;direction:ltr;unicode-bidi:normal;overflow:visible}
 .child-var-lbl{font-size:.6rem;font-weight:800;color:rgba(194,24,91,.45);text-transform:uppercase;letter-spacing:.06em}
 .child-btn-play{width:100%;font-size:1.1rem;padding:16px;border-radius:18px;animation:pulse-pink 2.5s infinite}
 .child-rev-title{font-size:.75rem;font-weight:800;color:rgba(194,24,91,.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
@@ -6996,7 +6996,18 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
   forms.forEach(function(v,idx){
     var box=document.createElement('div');box.className='child-var-box';box.style.cursor='pointer';
     var soundToPlay=sounds&&sounds[idx]?sounds[idx]:v[1];
-    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
+    var parts=v[1].split(' ');
+    var inner='';
+    if(parts.length===2){
+      /* lettre à gauche, voyelle à droite — deux spans séparés */
+      inner='<div class="child-var-ar" style="display:flex;flex-direction:row;justify-content:center;align-items:center;gap:6px;direction:ltr">'
+        +'<span>'+parts[0]+'</span>'
+        +'<span style="font-size:1.5rem;color:#ad1457">&#x0640;'+parts[1]+'</span>'
+        +'</div>';
+    }else{
+      inner='<div class="child-var-ar">'+v[1]+'</div>';
+    }
+    box.innerHTML=inner+'<div class="child-var-lbl">'+v[0]+'</div>';
     box.onclick=(function(sp){return function(){speakText(sp,'ar-SA',null);};})(soundToPlay);
     varRow.appendChild(box);
   });
@@ -7051,12 +7062,33 @@ function _xStep1(wrap,forms,goNext){
 
       var card2=document.createElement('div');card2.className='child-card';card2.style.textAlign='center';
       var intro2=document.createElement('div');intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro2.textContent=f[0]+' — Entraîne-toi !';card2.appendChild(intro2);
-      var ghost=document.createElement('div');ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;direction:rtl;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px;unicode-bidi:bidi-override";ghost.textContent=f[1];card2.appendChild(ghost);
+      /* ghost : deux spans séparés lettre | voyelle */
+      var ghost=document.createElement('div');
+      ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:8px;direction:ltr;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";
+      var gParts=f[1].split(' ');
+      if(gParts.length===2){ghost.innerHTML='<span>'+gParts[0]+'</span><span style="font-size:1.8rem">&#x0640;'+gParts[1]+'</span>';}
+      else{ghost.textContent=f[1];}
+      card2.appendChild(ghost);
 
       var MCW=220,MCH=160,mc=document.createElement('canvas');mc.width=MCW;mc.height=MCH;
       mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
       var mctx=mc.getContext('2d');
-      function drawGuide(){mctx.clearRect(0,0,MCW,MCH);mctx.save();mctx.font="100px 'Scheherazade New',serif";mctx.textAlign='center';mctx.textBaseline='alphabetic';var mm=mctx.measureText(f[1]);var masc=mm.actualBoundingBoxAscent||65;var mdesc=mm.actualBoundingBoxDescent||18;var mbY=(MCH+masc-mdesc)/2;mctx.fillStyle='rgba(194,24,91,0.06)';mctx.fillText(f[1],MCW/2,mbY);mctx.restore();mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();}
+      function drawGuide(){
+        mctx.clearRect(0,0,MCW,MCH);
+        var gp=f[1].split(' ');
+        var letter=gp.length===2?gp[0]:f[1];
+        var vowelBase=gp.length===2?'ـ'+gp[1]:'';
+        mctx.save();mctx.font="90px 'Scheherazade New',serif";mctx.textBaseline='alphabetic';
+        var mm=mctx.measureText(letter);
+        var masc=mm.actualBoundingBoxAscent||60;var mdesc=mm.actualBoundingBoxDescent||15;
+        var mbY=(MCH+masc-mdesc)/2;
+        mctx.fillStyle='rgba(194,24,91,0.07)';
+        mctx.textAlign='right';mctx.fillText(letter,MCW/2-5,mbY);
+        if(vowelBase){mctx.textAlign='left';mctx.fillText(vowelBase,MCW/2+5,mbY);}
+        mctx.restore();
+        mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);
+        mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();
+      }
       drawGuide();card2.appendChild(mc);
       var efBtn=document.createElement('button');efBtn.className='rbtn rbtn-s';efBtn.style.cssText='display:block;margin:0 auto 8px;font-size:.78rem';efBtn.textContent='↺ Effacer';efBtn.onclick=function(){drawGuide();};card2.appendChild(efBtn);
       container.appendChild(card2);
@@ -7104,8 +7136,13 @@ function _xStep4Quiz(wrap,items,goNext){
     var answered=false;
     choices.forEach(function(ch){
       var btn=document.createElement('div');
-      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
-      btn.textContent=ch;
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:ltr';
+      var chParts=ch.split(' ');
+      if(chParts.length===2){
+        btn.innerHTML='<span>'+chParts[0]+'</span><span style="font-size:1.4rem;color:#ad1457">&#x0640;'+chParts[1]+'</span>';
+      }else{
+        btn.textContent=ch;
+      }
       btn.onclick=function(){if(answered)return;var ok=(ch===q.correct);btn.style.background=ok?'rgba(34,197,94,.2)':'rgba(239,68,68,.12)';btn.style.borderColor=ok?'#22c55e':'#ef4444';btn.style.color=ok?'#15803d':'#dc2626';if(ok){playBravo();answered=true;score++;setTimeout(function(){qIdx++;showQ();},700);}else{playError();btn.style.cursor='default';}};
       choicesEl.appendChild(btn);
     });
@@ -7357,9 +7394,9 @@ function _cvStep5v(wrap,goNext){
 /* ═══════════════════════════════════════════════════════════
    LEÇON ENFANT — PROLONGATION (Île 3 : La Maison Sacrée)
    ═══════════════════════════════════════════════════════════ */
-/* Prolongations : lettre + espace + voyelle (RTL correct) */
+/* Prolongations : lettres + espace + voyelles (pareil que canvas) */
 var _CPROL_FORMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي ِ']];
-var _CPROL_ITEMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي ِ']];/* sons prolongés : alif-fatha, waw-damma, ya-kasra */
+var _CPROL_ITEMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي ِ']];/* identique partout */
 
 function renderChildProlongLesson(ca,step){
   step=step||0;
