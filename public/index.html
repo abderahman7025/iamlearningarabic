@@ -3598,8 +3598,26 @@ let _txIdx=0;
 function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];_txIdx++;return c;}
 function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
 /* ── URL routing ── */
-var _SCREEN_URLS={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/accueil','s-menu':'/cours','s-main':'/lecon','s-child':'/lecon/enfant','s-audio-admin':'/admin/audio','s-sessions':'/sessions','s-profile':'/profil','s-contact':'/contact','s-settings':'/parametres'};
-var _URL_SCREENS={};Object.keys(_SCREEN_URLS).forEach(function(k){_URL_SCREENS[_SCREEN_URLS[k]]=k;});
+function _getProfile(){return (st&&st.profile)||'fille';}
+function _screenToUrl(id){
+  var p=_getProfile();
+  var fixed={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/accueil','s-audio-admin':'/admin/audio'};
+  if(fixed[id])return fixed[id];
+  var perProfile={'s-menu':'/'+p,'s-main':'/'+p+'/lecon','s-child':'/'+p+'/lecon','s-profile':'/'+p+'/profil','s-contact':'/'+p+'/contact','s-settings':'/'+p+'/parametres','s-sessions':'/'+p+'/sessions'};
+  return perProfile[id]||('/'+p);
+}
+function _urlToScreen(path){
+  if(path==='/'||path==='')return 's-buy';
+  if(path==='/connexion')return 's-login';
+  if(path==='/inscription')return 's-register';
+  if(path==='/accueil')return 's-welcome';
+  if(path==='/fille'||path==='/garcon'||path==='/adulte')return 's-menu';
+  if(/\/(fille|garcon|adulte)\/lecon/.test(path))return 's-main';
+  if(/\/(fille|garcon|adulte)\/profil/.test(path))return 's-profile';
+  if(/\/(fille|garcon|adulte)\/contact/.test(path))return 's-contact';
+  if(/\/(fille|garcon|adulte)\/parametres/.test(path))return 's-settings';
+  return 's-buy';
+}
 function showS(id,fwd,noHistory){
   stopSpeech();
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
@@ -3607,18 +3625,13 @@ function showS(id,fwd,noHistory){
   if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}
   setTimeout(updateGirlMascot,50);
   if(!noHistory){
-    var url=_SCREEN_URLS[id]||'/';
-    window.history.pushState({screen:id},'',(url==='/'?url:url));
+    var url=_screenToUrl(id);
+    window.history.pushState({screen:id},'',url);
   }
 }
 window.addEventListener('popstate',function(e){
-  if(e.state&&e.state.screen){
-    showS(e.state.screen,false,true);
-  } else {
-    var path=window.location.pathname;
-    var id=_URL_SCREENS[path]||'s-buy';
-    showS(id,false,true);
-  }
+  if(e.state&&e.state.screen){showS(e.state.screen,false,true);}
+  else{showS(_urlToScreen(window.location.pathname),false,true);}
 });
 function transitionCA(fwd){stopSpeech();const ca=document.getElementById('ca');if(ca)animEl(ca,nextTx(fwd!==false));}
 
