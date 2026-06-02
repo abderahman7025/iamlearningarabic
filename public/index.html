@@ -3602,6 +3602,32 @@ var _intendedUrl=null; /* URL demandée avant connexion */
 function _getProfile(){var p=(st&&st.profile)||'girl';return p==='girl'?'fille':p==='boy'?'garcon':'adulte';}
 /* Reverse slug lookup : 'mont-sinai' → 'Le Mont Sinaï' */
 function _slugToLabel(slug){var r={};Object.keys(_ISLE_SLUGS).forEach(function(l){r[_ISLE_SLUGS[l]]=l;});return r[slug]||null;}
+/* Applique le profil sans crasher (version légère de chooseProfile) */
+function _applyProfileSafe(p){
+  st.profile=p;
+  var root=document.getElementById('root');
+  if(!root)return;
+  root.classList.remove('profile-girl','profile-boy','profile-adult');
+  document.body.classList.remove('profile-girl','profile-boy','profile-adult');
+  if(p==='girl'){
+    root.style.setProperty('--gold','#c2185b');root.style.setProperty('--gold2','#f06292');
+    root.style.setProperty('--gold-dim','rgba(194,24,91,.18)');root.style.setProperty('--border2','rgba(194,24,91,.3)');
+    root.classList.add('profile-girl');document.body.classList.add('profile-girl');
+    var girlBg=document.getElementById('girl-bg-anim');if(girlBg)girlBg.style.display='block';
+    var boyBg=document.getElementById('boy-bg-anim');if(boyBg)boyBg.style.display='none';
+  } else if(p==='boy'){
+    root.style.setProperty('--gold','#0288d1');root.style.setProperty('--gold2','#29b6f6');
+    root.style.setProperty('--gold-dim','rgba(2,136,209,.18)');root.style.setProperty('--border2','rgba(2,136,209,.3)');
+    root.classList.add('profile-boy');document.body.classList.add('profile-boy');
+    var girlBg2=document.getElementById('girl-bg-anim');if(girlBg2)girlBg2.style.display='none';
+    var boyBg2=document.getElementById('boy-bg-anim');if(boyBg2)boyBg2.style.display='block';
+  } else {
+    ['--gold','--gold2','--gold-dim','--border2'].forEach(function(v){root.style.removeProperty(v);});
+    root.classList.add('profile-adult');document.body.classList.add('profile-adult');
+    var girlBg3=document.getElementById('girl-bg-anim');if(girlBg3)girlBg3.style.display='none';
+    var boyBg3=document.getElementById('boy-bg-anim');if(boyBg3)boyBg3.style.display='none';
+  }
+}
 var _ISLE_SLUGS={
   'La Source de l\'Humanité':'source-humanite',
   'L\'Arche de Nouh':'arche-nouh',
@@ -3960,28 +3986,26 @@ async function tryAutoLogin(){
     if(pm){
       /* URL avec profil → appliquer profil + aller à la carte des îles */
       st.profile=pMap[pm[1]]||'girl';
-      try{
-        window._skipProfileNav=true;
-        chooseProfile(st.profile);
-        window._skipProfileNav=false;
-        /* Si l'URL contient un slug d'île → l'ouvrir automatiquement */
-        var slugM=path.match(/\/lecon\/([a-z0-9-]+)$/);
-        if(slugM){
-          var targetLabel=_slugToLabel(slugM[1]);
-          if(targetLabel){
-            setTimeout(function(){
-              var cards=document.querySelectorAll('.isle-name');
-              for(var i=0;i<cards.length;i++){
-                if(cards[i].textContent===targetLabel){
-                  var card=cards[i].closest('.sess-island');
-                  if(card&&!card.classList.contains('locked-isle')){card.click();}
-                  break;
-                }
+      _applyProfileSafe(st.profile);
+      buildMenu();
+      showS('s-menu',true,true);
+      /* Si l'URL contient un slug d'île → l'ouvrir automatiquement */
+      var slugM=path.match(/\/lecon\/([a-z0-9-]+)$/);
+      if(slugM){
+        var targetLabel=_slugToLabel(slugM[1]);
+        if(targetLabel){
+          setTimeout(function(){
+            var cards=document.querySelectorAll('.isle-name');
+            for(var i=0;i<cards.length;i++){
+              if(cards[i].textContent===targetLabel){
+                var card=cards[i].closest('.sess-island');
+                if(card&&!card.classList.contains('locked-isle')){card.click();}
+                break;
               }
-            },600);
-          }
+            }
+          },600);
         }
-      }catch(err){showS('s-welcome',true,true);}
+      }
     } else {
       showS('s-welcome',true,true);
     }
