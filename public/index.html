@@ -3598,7 +3598,7 @@ let _txIdx=0;
 function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];_txIdx++;return c;}
 function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
 /* ── URL routing ── */
-function _getProfile(){return (st&&st.profile)||'fille';}
+function _getProfile(){var p=(st&&st.profile)||'girl';return p==='girl'?'fille':p==='boy'?'garcon':'adulte';}
 var _ISLE_SLUGS={
   'La Source de l\'Humanité':'source-humanite',
   'L\'Arche de Nouh':'arche-nouh',
