@@ -4028,7 +4028,10 @@ function chooseProfile(p){
   if(boyBg)  boyBg.style.display=(p==='boy'?'block':'none');
   if(p==='girl'||p==='boy') setTimeout(initChildBgAnim, 200);
   document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
-  buildMenu();showS('s-menu',true);
+  buildMenu();showS('s-menu',true,true);
+  /* URL propre selon le profil */
+  var profileUrl = p==='girl'?'/cours/fille':p==='boy'?'/cours/garcon':'/cours/adulte';
+  window.history.pushState({screen:'s-menu',profile:p},'',profileUrl);
   window._mhLastScroll=0;var _mh=document.querySelector('.menu-header');if(_mh){_mh.style.top='0';_mh.style.opacity='1';_mh.style.pointerEvents='';}
   updateStreak();
   renderGlobalProgress();

@@ -46,6 +46,11 @@
     { "source": "/inscription", "destination": "/index.html" },
     { "source": "/bienvenue", "destination": "/index.html" },
     { "source": "/cours", "destination": "/index.html" },
-    { "source": "/cours/:path*", "destination": "/index.html" }
+    { "source": "/cours/fille", "destination": "/index.html" },
+    { "source": "/cours/garcon", "destination": "/index.html" },
+    { "source": "/cours/adulte", "destination": "/index.html" },
+    { "source": "/cours/fille/:path*", "destination": "/index.html" },
+    { "source": "/cours/garcon/:path*", "destination": "/index.html" },
+    { "source": "/cours/adulte/:path*", "destination": "/index.html" }
   ]
 }
