@@ -3937,13 +3937,32 @@ function checkStripeReturn(){
 }
 async function tryAutoLogin(){
   const token=localStorage.getItem('arab_token');const email=localStorage.getItem('arab_email');
-  /* Lire l'URL courante pour afficher le bon écran */
   var path=window.location.pathname;
-  var targetScreen=_URL_SCREENS[path]||null;
+
+  /* Déduire le profil depuis l'URL : /fille/... → girl, /garcon/... → boy, /adulte/... → adult */
+  var profileMatch=path.match(/^\/(fille|garcon|adulte|girl|boy|adult)/);
+  if(profileMatch){
+    var pMap={'fille':'girl','garcon':'boy','adulte':'adult','girl':'girl','boy':'boy','adult':'adult'};
+    st.profile=pMap[profileMatch[1]]||'girl';
+    var root=document.getElementById('root');
+    if(root){
+      root.classList.remove('profile-girl','profile-boy','profile-adult');
+      document.body.classList.remove('profile-girl','profile-boy','profile-adult');
+      root.classList.add('profile-'+st.profile);
+      document.body.classList.add('profile-'+st.profile);
+    }
+  }
+
+  var targetScreen=_urlToScreen(path);
+
   if(token&&email){
     st.user={email,name:email.split('@')[0]};
-    /* Si l'URL demande un écran précis et que l'user est connecté, y aller */
-    if(targetScreen&&targetScreen!=='s-buy'&&targetScreen!=='s-login'&&targetScreen!=='s-register'){
+    /* URLs avec profil → aller au menu (carte des îles) */
+    if(profileMatch){
+      buildMenu();showS('s-menu',true,true);
+    } else if(targetScreen==='s-welcome'){
+      showS('s-welcome',true,true);
+    } else if(targetScreen&&targetScreen!=='s-buy'&&targetScreen!=='s-login'&&targetScreen!=='s-register'){
       showS(targetScreen,true,true);
     } else {
       showS('s-welcome',true,true);
@@ -3951,7 +3970,7 @@ async function tryAutoLogin(){
   } else {
     if(targetScreen==='s-login'){showS('s-login',true,true);}
     else if(targetScreen==='s-register'){showS('s-register',true,true);}
-    else {showS('s-buy',false,true);}
+    else{showS('s-buy',false,true);}
   }
 }
 
@@ -4166,14 +4185,7 @@ function _navPush(hash){
   }
   history.pushState({_appState:'page',hash:hash},'',path);
 }
-window.addEventListener('popstate',function(e){
-  /* État avant toute navigation dans l'appli → laisser le navigateur sortir */
-  if(!e.state||!e.state._appState||e.state._appState==='root')return;
-  /* Même comportement que le bouton retour de la topbar */
-  _navPopping=true;
-  handleBack();
-  _navPopping=false;
-});
+/* ancien popstate supprimé — remplacé par le routing URLs ci-dessus */
 
 function navToPage(page){
   stopSpeech();
