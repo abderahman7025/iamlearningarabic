@@ -3653,8 +3653,14 @@ function showS(id,fwd,noHistory){
   }
 }
 window.addEventListener('popstate',function(e){
-  if(e.state&&e.state.screen){showS(e.state.screen,false,true);}
-  else{showS(_urlToScreen(window.location.pathname),false,true);}
+  var path=window.location.pathname;
+  var screen=(e.state&&e.state.screen)||_urlToScreen(path);
+  /* Si on revient sur la carte des îles → reconstruire le menu */
+  if(screen==='s-menu'||/\/(fille|garcon|adulte|girl|boy|adult)\/(accueil|lecon)$/.test(path)){
+    buildMenu();showS('s-menu',false,true);
+  } else {
+    showS(screen,false,true);
+  }
 });
 function transitionCA(fwd){stopSpeech();const ca=document.getElementById('ca');if(ca)animEl(ca,nextTx(fwd!==false));}
 
@@ -3957,9 +3963,11 @@ async function tryAutoLogin(){
 
   if(token&&email){
     st.user={email,name:email.split('@')[0]};
-    /* URLs avec profil → aller au menu (carte des îles) */
     if(profileMatch){
-      buildMenu();showS('s-menu',true,true);
+      /* Appliquer tout le profil (couleurs + menu) sans pousser dans l'historique */
+      window._skipProfileNav=true;
+      chooseProfile(st.profile);
+      window._skipProfileNav=false;
     } else if(targetScreen==='s-welcome'){
       showS('s-welcome',true,true);
     } else if(targetScreen&&targetScreen!=='s-buy'&&targetScreen!=='s-login'&&targetScreen!=='s-register'){
@@ -4084,9 +4092,11 @@ function chooseProfile(p){
   if(p==='girl'||p==='boy') setTimeout(initChildBgAnim, 200);
   document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
   buildMenu();showS('s-menu',true,true);
-  /* URL propre selon le profil */
-  var profileUrl = p==='girl'?'/fille/accueil':p==='boy'?'/garcon/accueil':'/adulte/accueil';
-  window.history.pushState({screen:'s-menu',profile:p},'',profileUrl);
+  /* URL propre selon le profil — sauf si appelé depuis tryAutoLogin */
+  if(!window._skipProfileNav){
+    var profileUrl = p==='girl'?'/fille/accueil':p==='boy'?'/garcon/accueil':'/adulte/accueil';
+    window.history.pushState({screen:'s-menu',profile:p},'',profileUrl);
+  }
   window._mhLastScroll=0;var _mh=document.querySelector('.menu-header');if(_mh){_mh.style.top='0';_mh.style.opacity='1';_mh.style.pointerEvents='';}
   updateStreak();
   renderGlobalProgress();
