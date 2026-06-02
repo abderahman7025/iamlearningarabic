@@ -3683,11 +3683,16 @@ function showS(id,fwd,noHistory){
 }
 window.addEventListener('popstate',function(e){
   var path=window.location.pathname;
-  /* Retour vers le menu principal (/fille/accueil) uniquement */
+  var hash=(e.state&&e.state.hash)||'';
+  /* Retour vers le menu principal (/fille/accueil) */
   if(/\/(fille|garcon|adulte|girl|boy|adult)\/accueil$/.test(path)||(e.state&&e.state.screen==='s-menu'&&!e.state._appState)){
     buildMenu();showS('s-menu',false,true);return;
   }
-  /* Navigation interne à l'app (leçon/sessions/jeux) → handleBack gère tout */
+  /* Retour vers la carte des îles (/fille/lecon) */
+  if(hash==='sessions'||(e.state&&e.state.screen==='s-main'&&!e.state._appState)){
+    st._curPage='sessions';showS('s-main',false,true);renderPage('sessions',false);return;
+  }
+  /* Retour dans la leçon ou jeux → handleBack gère */
   if(e.state&&e.state._appState==='page'){
     _navPopping=true;handleBack();_navPopping=false;return;
   }
@@ -3987,10 +3992,14 @@ async function tryAutoLogin(){
       /* URL avec profil → appliquer profil + aller à la carte des îles */
       st.profile=pMap[pm[1]]||'girl';
       _applyProfileSafe(st.profile);
-      buildMenu();
       showS('s-menu',true,true);
+      buildMenu();
       /* Aller directement à la carte des îles si l'URL contient /lecon */
-      if(/\/lecon/.test(path)){navToPage('sessions');}
+      if(/\/lecon/.test(path)){
+        st._curPage='sessions';
+        showS('s-main',true,true);
+        renderPage('sessions',false);
+      }
       /* Si l'URL contient un slug d'île → l'ouvrir automatiquement */
       var slugM=path.match(/\/lecon\/([a-z0-9-]+)$/);
       if(slugM){
