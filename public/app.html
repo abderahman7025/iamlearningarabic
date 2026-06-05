@@ -4693,7 +4693,7 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
-  ca.style.paddingTop='0'; // Carte des îles : pas de padding, les îles passent derrière la topbar
+  ca.style.paddingTop='64px';
   st._curPage='sessions-map';
   // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
@@ -5745,7 +5745,7 @@ function getChildIsland(letterIdx){
 //  CARTE DES ÎLES — profil fille
 // ════════════════════════════════════════════════════════
 function renderChildIslandMap(ca){
-  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
+  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='64px';
   st._curPage='sessions-map';
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
