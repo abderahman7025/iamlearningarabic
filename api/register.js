@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const { sendEmail, accountCreatedEmail } = require('./_brevo');
-const { applyMiddleware, rateLimit, isValidEmail, getClientIp } = require('./_security');
+const { applyMiddleware, rateLimit, sanitizeEmail, validateUserData, logEvent, getClientIp } = require('./_security');
 
 module.exports = async (req, res) => {
   if (applyMiddleware(req, res)) return;
@@ -17,29 +17,36 @@ module.exports = async (req, res) => {
 
   const { email, password } = req.body || {};
 
-  // ── Validation ────────────────────────────────────────────────────────────
+  // ── Validation stricte ─────────────────────────────────────────────────────
   if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis.' });
-  if (!isValidEmail(email)) return res.status(400).json({ error: 'Email invalide.' });
-  if (typeof password !== 'string' || password.length < 6 || password.length > 128)
-    return res.status(400).json({ error: 'Mot de passe : 6 à 128 caractères requis.' });
 
+  const validation = validateUserData({ email, password });
+  if (!validation.valid) return res.status(400).json({ error: validation.errors[0] });
+
+  const cleanEmail = sanitizeEmail(email);
   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
   const { data: user } = await supabase
-    .from('users').select('paid, password_hash').eq('email', email.toLowerCase().trim()).single();
+    .from('users').select('paid, password_hash').eq('email', cleanEmail).single();
 
-  if (!user || !user.paid)
+  if (!user || !user.paid) {
+    logEvent('register_no_payment', { email: cleanEmail, ip });
     return res.status(403).json({ error: 'Aucun paiement validé pour cet email.' });
-  if (user.password_hash !== 'PENDING')
+  }
+  if (user.password_hash !== 'PENDING') {
+    logEvent('register_already_exists', { email: cleanEmail, ip });
     return res.status(409).json({ error: 'Un compte existe déjà pour cet email.' });
+  }
 
-  const hash = await bcrypt.hash(password, 12); // 12 rounds (plus sûr que 10)
-  await supabase.from('users').update({ password_hash: hash }).eq('email', email.toLowerCase().trim());
+  const hash = await bcrypt.hash(password, 12);
+  await supabase.from('users').update({ password_hash: hash }).eq('email', cleanEmail);
+
+  logEvent('register_success', { email: cleanEmail, ip });
 
   sendEmail({
-    to: email,
+    to: cleanEmail,
     subject: '✅ Votre compte I Am Learning Arabic est prêt',
-    html: accountCreatedEmail(email),
+    html: accountCreatedEmail(cleanEmail),
   }).catch(err => console.error('[Brevo] accountCreatedEmail failed:', err.message));
 
   res.json({ success: true });

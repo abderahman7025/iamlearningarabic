@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 const { sendEmail, resetPasswordEmail } = require('./_brevo');
-const { applyMiddleware, rateLimit, isValidEmail, getClientIp } = require('./_security');
+const { applyMiddleware, rateLimit, sanitizeEmail, validateUserData, logEvent, getClientIp } = require('./_security');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
@@ -18,31 +18,42 @@ module.exports = async (req, res) => {
   }
 
   const { email } = req.body || {};
-  if (!email || !isValidEmail(email))
-    return res.status(400).json({ error: 'Email invalide.' });
+
+  // ── Validation ─────────────────────────────────────────────────────────────
+  if (!email) return res.status(400).json({ error: 'Email requis.' });
+
+  const validation = validateUserData({ email });
+  if (!validation.valid) return res.status(400).json({ error: validation.errors[0] });
+
+  const cleanEmail = sanitizeEmail(email);
 
   const { data: user } = await supabase
-    .from('users').select('email, paid').eq('email', email.toLowerCase().trim()).single();
+    .from('users').select('email, paid').eq('email', cleanEmail).single();
 
   // Réponse générique pour ne pas révéler l'existence d'un compte
-  if (!user || !user.paid) return res.status(200).json({ success: true });
+  if (!user || !user.paid) {
+    logEvent('forgot_no_payment', { email: cleanEmail, ip });
+    return res.status(200).json({ success: true });
+  }
 
   const token = crypto.randomBytes(32).toString('hex');
   const expires = new Date(Date.now() + 3600000); // 1 heure
 
   await supabase.from('reset_tokens')
-    .upsert({ email: email.toLowerCase().trim(), token, expires_at: expires.toISOString() });
+    .upsert({ email: cleanEmail, token, expires_at: expires.toISOString() });
 
-  const resetLink = `https://www.iamlearningarabic.com/app?reset=${token}&email=${encodeURIComponent(email.toLowerCase().trim())}`;
+  const resetLink = `https://www.iamlearningarabic.com/app?reset=${token}&email=${encodeURIComponent(cleanEmail)}`;
 
   try {
     await sendEmail({
-      to: email,
+      to: cleanEmail,
       subject: '🔐 Réinitialisation de votre mot de passe — I Am Learning Arabic',
       html: resetPasswordEmail(resetLink),
     });
+    logEvent('forgot_email_sent', { email: cleanEmail, ip });
   } catch (err) {
     console.error('[Brevo] resetPasswordEmail failed:', err.message);
+    logEvent('forgot_email_failed', { email: cleanEmail, ip, error: err.message });
     return res.status(500).json({ error: 'Erreur envoi email.' });
   }
 

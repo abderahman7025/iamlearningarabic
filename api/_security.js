@@ -121,6 +121,41 @@ function isValidEmail(email) {
     /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 
+// ── Validation mot de passe ──────────────────────────────────────────────────
+function isValidPassword(password) {
+  if (typeof password !== 'string') return false;
+  if (password.length < 6 || password.length > 128) return false;
+  // Évite les caractères de contrôle et autres non-printables
+  return !/[\x00-\x1F\x7F]/.test(password);
+}
+
+// ── Sanitization email (trim, lowercase) ──────────────────────────────────────
+function sanitizeEmail(email) {
+  if (typeof email !== 'string') return '';
+  return email.toLowerCase().trim().slice(0, 254);
+}
+
+// ── Validation objet utilisateur ─────────────────────────────────────────────
+function validateUserData(data) {
+  const errors = [];
+
+  if (data.email !== undefined) {
+    if (!isValidEmail(data.email)) errors.push('Email invalide.');
+  }
+
+  if (data.password !== undefined) {
+    if (!isValidPassword(data.password)) errors.push('Mot de passe invalide.');
+  }
+
+  if (data.device_id !== undefined) {
+    if (typeof data.device_id !== 'string' || data.device_id.length < 1 || data.device_id.length > 256) {
+      errors.push('Device ID invalide.');
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
 // ── IP client (Vercel forwarde l'IP réelle) ──────────────────────────────────
 function getClientIp(req) {
   return (
@@ -158,6 +193,9 @@ module.exports = {
   verifyToken,
   logEvent,
   isValidEmail,
+  isValidPassword,
+  sanitizeEmail,
+  validateUserData,
   getClientIp,
   applyMiddleware,
   isAdminRequest,

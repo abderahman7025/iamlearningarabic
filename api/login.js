@@ -1,6 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
-const { applyMiddleware, rateLimit, checkEmailBlock, recordFailedLogin, clearEmailBlock, generateToken, logEvent, isValidEmail, getClientIp } = require('./_security');
+const { applyMiddleware, rateLimit, checkEmailBlock, recordFailedLogin, clearEmailBlock, generateToken, logEvent, sanitizeEmail, validateUserData, getClientIp } = require('./_security');
 
 module.exports = async (req, res) => {
   if (applyMiddleware(req, res)) return;
@@ -18,11 +18,11 @@ module.exports = async (req, res) => {
 
   // ── Validation ────────────────────────────────────────────────────────────
   if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis.' });
-  if (!isValidEmail(email)) return res.status(400).json({ error: 'Email invalide.' });
-  if (typeof password !== 'string' || password.length > 128)
-    return res.status(400).json({ error: 'Mot de passe invalide.' });
 
-  const cleanEmail = email.toLowerCase().trim();
+  const validation = validateUserData({ email, password, device_id });
+  if (!validation.valid) return res.status(400).json({ error: validation.errors[0] });
+
+  const cleanEmail = sanitizeEmail(email);
 
   // ── Vérifier si l'email est temporairement bloqué ──────────────────────────
   const emailBlock = checkEmailBlock(cleanEmail);

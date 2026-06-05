@@ -1,6 +1,6 @@
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
-const { applyMiddleware, rateLimit, isValidEmail, getClientIp } = require('./_security');
+const { applyMiddleware, rateLimit, sanitizeEmail, validateUserData, logEvent, getClientIp } = require('./_security');
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
@@ -19,29 +19,44 @@ module.exports = async (req, res) => {
   const { token, email, password } = req.body || {};
 
   if (!token || !email || !password) return res.status(400).json({ error: 'Données manquantes.' });
-  if (!isValidEmail(email)) return res.status(400).json({ error: 'Email invalide.' });
-  if (typeof password !== 'string' || password.length < 6 || password.length > 128)
-    return res.status(400).json({ error: 'Mot de passe : 6 à 128 caractères.' });
-  if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token))
+
+  // ── Validation stricte ─────────────────────────────────────────────────────
+  const validation = validateUserData({ email, password });
+  if (!validation.valid) return res.status(400).json({ error: validation.errors[0] });
+
+  if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) {
+    logEvent('reset_invalid_token', { ip });
     return res.status(400).json({ error: 'Token invalide.' });
+  }
+
+  const cleanEmail = sanitizeEmail(email);
 
   const { data: resetData, error: tokenError } = await supabase
     .from('reset_tokens').select('*')
-    .eq('token', token).eq('email', email.toLowerCase().trim()).single();
+    .eq('token', token).eq('email', cleanEmail).single();
 
-  if (tokenError || !resetData) return res.status(400).json({ error: 'Lien invalide ou expiré.' });
+  if (tokenError || !resetData) {
+    logEvent('reset_token_not_found', { email: cleanEmail, ip });
+    return res.status(400).json({ error: 'Lien invalide ou expiré.' });
+  }
+
   if (new Date(resetData.expires_at) < new Date()) {
     await supabase.from('reset_tokens').delete().eq('token', token);
+    logEvent('reset_token_expired', { email: cleanEmail, ip });
     return res.status(400).json({ error: 'Lien expiré. Faites une nouvelle demande.' });
   }
 
   const hashed = await bcrypt.hash(password, 12);
   const { error: updateError } = await supabase.from('users')
-    .update({ password_hash: hashed }).eq('email', email.toLowerCase().trim());
+    .update({ password_hash: hashed }).eq('email', cleanEmail);
 
-  if (updateError) return res.status(500).json({ error: 'Erreur lors de la mise à jour.' });
+  if (updateError) {
+    logEvent('reset_update_error', { email: cleanEmail, ip, error: updateError.message });
+    return res.status(500).json({ error: 'Erreur lors de la mise à jour.' });
+  }
 
   await supabase.from('reset_tokens').delete().eq('token', token);
 
+  logEvent('reset_success', { email: cleanEmail, ip });
   return res.status(200).json({ success: true });
 };
