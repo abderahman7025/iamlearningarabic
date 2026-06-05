@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
       currency: 'eur',
       receipt_email: email.toLowerCase().trim(),
       description: 'I Am Learning Arabic — Accès à vie',
-      metadata: { email: email.toLowerCase().trim() },
+      metadata: { email: email.toLowerCase().trim(), site: 'iamlearningarabic' },
     });
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
