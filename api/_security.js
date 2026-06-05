@@ -1,6 +1,7 @@
 // ── Security middleware partagé ──────────────────────────────────────────────
 'use strict';
 
+const crypto = require('crypto');
 const ALLOWED_ORIGINS = [
   'https://iamlearningarabic.com',
   'https://www.iamlearningarabic.com',
@@ -49,6 +50,70 @@ function rateLimit(ip, action, maxAttempts, windowMs) {
   return { limited: false };
 }
 
+// ── Blocage d'email après N tentatives échouées ──────────────────────────────
+const _emailBlocks = new Map(); // email -> { count, blockedUntil }
+
+function checkEmailBlock(email) {
+  const record = _emailBlocks.get(email);
+  if (!record) return { blocked: false };
+  if (Date.now() > record.blockedUntil) {
+    _emailBlocks.delete(email);
+    return { blocked: false };
+  }
+  return { blocked: true, blockedUntil: record.blockedUntil };
+}
+
+function recordFailedLogin(email) {
+  const record = _emailBlocks.get(email) || { count: 0, blockedUntil: 0 };
+  record.count++;
+  if (record.count >= 5) {
+    record.blockedUntil = Date.now() + 30 * 60 * 1000; // 30 min bloc
+  }
+  _emailBlocks.set(email, record);
+  logEvent('login_failed', { email, attempt: record.count });
+}
+
+function clearEmailBlock(email) {
+  _emailBlocks.delete(email);
+}
+
+// ── Tokens signés avec HMAC + expiration ──────────────────────────────────────
+function generateToken(email, expiresInSeconds) {
+  expiresInSeconds = expiresInSeconds || 24 * 60 * 60; // 24h par défaut
+  const payload = email + ':' + (Date.now() + expiresInSeconds * 1000);
+  const secret = process.env.TOKEN_SECRET || 'fallback-secret';
+  const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return payload + ':' + signature;
+}
+
+function verifyToken(token, email) {
+  if (typeof token !== 'string' || !token.includes(':')) return false;
+  const parts = token.split(':');
+  if (parts.length !== 3) return false;
+
+  const [tokenEmail, expiresStr, signature] = parts;
+  const secret = process.env.TOKEN_SECRET || 'fallback-secret';
+  const payload = tokenEmail + ':' + expiresStr;
+  const expectedSig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+
+  // Protection timing attack
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+    return false;
+  }
+
+  if (Date.now() > parseInt(expiresStr)) return false;
+  if (tokenEmail !== email) return false;
+
+  return true;
+}
+
+// ── Logging des événements de sécurité ────────────────────────────────────────
+function logEvent(eventType, details) {
+  const timestamp = new Date().toISOString();
+  const logEntry = { timestamp, eventType, ...details };
+  console.log('[SECURITY]', JSON.stringify(logEntry));
+}
+
 // ── Validation email ─────────────────────────────────────────────────────────
 function isValidEmail(email) {
   return typeof email === 'string' &&
@@ -86,6 +151,12 @@ module.exports = {
   setCors,
   setSecurityHeaders,
   rateLimit,
+  checkEmailBlock,
+  recordFailedLogin,
+  clearEmailBlock,
+  generateToken,
+  verifyToken,
+  logEvent,
   isValidEmail,
   getClientIp,
   applyMiddleware,
