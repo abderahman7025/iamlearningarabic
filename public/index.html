@@ -3926,7 +3926,7 @@ async function initStripePayCard(){
 async function startCheckout(){
   const email=document.getElementById('buy-email').value.trim().toLowerCase();
   const errEl=document.getElementById('buy-err');
-  if(!email||!email.includes('@')){errEl.textContent=t('err_fields');return;}
+  if(!email||!email.includes('@')){errEl.textContent='Veuillez saisir une adresse email valide.';return;}
   errEl.textContent='';
   // Pré-remplir l'email sur l'écran paiement
   document.getElementById('pay-email').value=email;
