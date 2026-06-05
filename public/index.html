@@ -9829,6 +9829,13 @@ s0.parentNode.insertBefore(s1,s0);
       <h2 style="color:#f5c842;font-size:1.2rem;margin:0">🎙 Studio d'enregistrement</h2>
     </div>
     
+    <div style="background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.2rem">🔑</span>
+      <input id="admin-secret-input" type="password" placeholder="Clé secrète admin (ADMIN_SECRET)"
+        style="flex:1;background:transparent;border:none;color:#fff;font-size:.88rem;outline:none"
+        oninput="window._adminSecret=this.value">
+    </div>
+
     <div style="background:rgba(255,255,255,.06);border-radius:16px;padding:16px;margin-bottom:16px">
       <p style="color:rgba(255,255,255,.7);font-size:.85rem;margin:0 0 8px">
         Enregistre ta voix pour chaque son. Ces enregistrements remplaceront la synthèse vocale automatique.
@@ -10290,7 +10297,7 @@ function adminStartRecord(ar, label, item, btn, info) {
         // Envoyer vers Supabase via le backend
         fetch(API_URL + '/api/audio-upload', {
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
           body: JSON.stringify({ ar: arText, audioBase64: base64 })
         }).then(function(r){ return r.json(); })
         .then(function(data){
