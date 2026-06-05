@@ -3034,6 +3034,10 @@ const T={
     buy_btn:'Acheter l\'accès — 74,99 €',
     buy_already:'Déjà un compte ?',
     buy_login:'Se connecter',
+    payment_ok:'✅ Paiement validé !',
+    payment_sub:'Créez maintenant votre mot de passe pour accéder à la formation.',
+    create_account:'Créer mon compte',
+    redirecting:'Traitement en cours...',
     // Intro
     intro_dua:'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم',
     intro_dua2:'رَبِّ زِدْنِي عِلْمًا',
@@ -3968,6 +3972,13 @@ async function doPay(){
       errEl.textContent=result.error.message;
       btn.disabled=false;btn.textContent='Payer 74,99 €';
     } else if(result.paymentIntent&&result.paymentIntent.status==='succeeded'){
+      // Activer le compte immédiatement (sans attendre le webhook)
+      try{
+        await fetch(`${API_URL}/api/activate-payment`,{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({email,paymentIntentId:result.paymentIntent.id})
+        });
+      }catch(e){/* webhook prendra le relais */}
       window.location.href=`/inscription?email=${encodeURIComponent(email)}&payment=success`;
     }
   }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent='Payer 74,99 €';}
