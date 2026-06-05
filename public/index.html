@@ -9829,13 +9829,6 @@ s0.parentNode.insertBefore(s1,s0);
       <h2 style="color:#f5c842;font-size:1.2rem;margin:0">🎙 Studio d'enregistrement</h2>
     </div>
     
-    <div style="background:rgba(255,200,0,.08);border:1px solid rgba(255,200,0,.2);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:1.2rem">🔑</span>
-      <input id="admin-secret-input" type="password" placeholder="Clé secrète admin (ADMIN_SECRET)"
-        style="flex:1;background:transparent;border:none;color:#fff;font-size:.88rem;outline:none"
-        oninput="window._adminSecret=this.value">
-    </div>
-
     <div style="background:rgba(255,255,255,.06);border-radius:16px;padding:16px;margin-bottom:16px">
       <p style="color:rgba(255,255,255,.7);font-size:.85rem;margin:0 0 8px">
         Enregistre ta voix pour chaque son. Ces enregistrements remplaceront la synthèse vocale automatique.
@@ -10438,7 +10431,8 @@ function adminClearAll() {
 
 function adminCheckPassword() {
   var pwd = prompt('🔐 Mot de passe :');
-  if (pwd === 'Bismillah25') {
+  if (pwd && pwd.length > 0) {
+    window._adminSecret = pwd; // utilisé dans Authorization header des uploads
     showS('s-audio-admin');
     adminRenderList();
   } else if (pwd !== null) {
