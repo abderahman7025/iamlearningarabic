@@ -4257,7 +4257,7 @@ function navToPage(page){
   window._tbLastScroll=0;
   var _tb=document.getElementById('topbar');
   if(_tb){_tb.style.maxHeight='200px';_tb.style.opacity='1';_tb.style.transform='translateY(0)';_tb.style.pointerEvents='';}
-  var _ca=document.getElementById('ca');if(_ca){_ca.scrollTop=0;_ca.style.paddingTop='62px';}
+  var _ca=document.getElementById('ca');if(_ca){_ca.scrollTop=0;_ca.style.paddingTop='64px';}
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
   document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:'Jeux'}[page]||'';
@@ -4852,7 +4852,7 @@ function showContactSuccess(){
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
-  ca.style.paddingTop='0'; // Carte des îles : pas de padding, les îles passent derrière la topbar
+  ca.style.paddingTop='64px';
   st._curPage='sessions-map';
   // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
@@ -5407,7 +5407,7 @@ wrap.appendChild(globeDiv);
 //  MINI-JEUX — LISTE
 // ════════════════════════════════════════════════════════
 function renderMiniGames(ca){
-  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='62px';ca.style.overflowY='';
+  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='64px';ca.style.overflowY='';
   // Charge les scores depuis localStorage si pas encore fait (accès direct sans passer par la carte)
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy={};Object.keys(_av).forEach(function(k){if(st.accuracy[k]===undefined)st.accuracy[k]=_av[k];});}catch(e){}
@@ -5508,7 +5508,7 @@ function renderMemoryGame(ca){
   renderMemoryDeckList(ca,allDecks);
 }
 function renderMemoryDeckList(ca,decks){
-  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='62px';ca.style.overflowY='';
+  ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='64px';ca.style.overflowY='';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
     decks.forEach(function(deck,di){
@@ -5909,7 +5909,7 @@ function getChildIsland(letterIdx){
    ═══════════════════════════════════════════════════════════ */
 
 function _showVowelIntro(ca,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='0';
+  ca.innerHTML='';ca.style.paddingTop='64px';
   var wrap=document.createElement('div');wrap.className='child-wrap';
   var card=document.createElement('div');card.className='child-card';
   card.style.textAlign='center';
@@ -5937,7 +5937,7 @@ function _showVowelIntro(ca,onFinish){
 }
 
 function _showProlongIntro(ca,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='0';
+  ca.innerHTML='';ca.style.paddingTop='64px';
   var wrap=document.createElement('div');wrap.className='child-wrap';
   var card=document.createElement('div');card.className='child-card';
   card.style.textAlign='center';
@@ -5964,7 +5964,7 @@ function _showProlongIntro(ca,onFinish){
 }
 
 function _showLettersIntro(ca,isleName,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='0';
+  ca.innerHTML='';ca.style.paddingTop='64px';
   var wrap=document.createElement('div');wrap.className='child-wrap';
   var card=document.createElement('div');card.className='child-card';
   card.style.textAlign='center';
@@ -6342,7 +6342,7 @@ function renderChildIslandMap(ca){
 
 /* Récapitulatif d'une île déjà terminée (clic sur île complète) */
 function _renderChildIslandRecap(ca,letterIndices){
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
 
   var titleEl=document.createElement('div');titleEl.className='child-reward-title';titleEl.style.marginBottom='16px';
@@ -6382,7 +6382,7 @@ function renderChildWarmup(ca){
   var qIdx=0,score=0;
 
   function showQ(){
-    ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+    ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
     if(qIdx>=questions.length){renderChildLesson(ca,dayIdx);return;}
 
     var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
@@ -6482,7 +6482,7 @@ function renderChildWarmup(ca){
 }
 
 function renderChildLetterDay(ca){
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   _navPush('sessions/lesson');
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   var letter=CHILD_LETTERS[dayIdx];
@@ -6570,7 +6570,7 @@ function renderChildLesson(ca,dayIdx,step){
   /* Après les 6 étapes → récompense */
   if(step>=6){renderChildReward(ca,dayIdx);return;}
 
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
 
   var STEP_NAMES=['✨ Découverte','🔍 Les formes','✏️ J\'écris','🎮 Je joue','📖 Le mot','🏆 Mini quiz'];
 
@@ -7454,7 +7454,7 @@ function _cvProgressBar(wrap,step){
 function renderChildVowelLesson(ca,step){
   step=step||0;
   if(step>=6){
-    ca.innerHTML='';ca.style.paddingTop='0';
+    ca.innerHTML='';ca.style.paddingTop='64px';
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     card.innerHTML='<div style="font-size:3.5rem;margin-bottom:10px">🎉</div>'
@@ -7466,7 +7466,7 @@ function renderChildVowelLesson(ca,step){
     btn.onclick=function(){renderChildIslandMap(ca);};
     card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);return;
   }
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';
   _xProgressBar(wrap,step);
   var goNext=function(){renderChildVowelLesson(ca,step+1);};
@@ -7663,7 +7663,7 @@ var _CPROL_ITEMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي 
 function renderChildProlongLesson(ca,step){
   step=step||0;
   if(step>=6){
-    ca.innerHTML='';ca.style.paddingTop='0';
+    ca.innerHTML='';ca.style.paddingTop='64px';
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     card.innerHTML='<div style="font-size:3.5rem;margin-bottom:10px">🎉</div>'
@@ -7674,7 +7674,7 @@ function renderChildProlongLesson(ca,step){
     btn.onclick=function(){renderChildIslandMap(ca);};
     card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);return;
   }
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';
   _xProgressBar(wrap,step);
   var goNext=function(){renderChildProlongLesson(ca,step+1);};
@@ -7864,7 +7864,7 @@ function _cpStep5p(wrap,goNext){
 
 function renderChildGame(ca,dayIdx,round,onDone){
   round=round||0;
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
   var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
 
@@ -7948,7 +7948,7 @@ function renderChildGame(ca,dayIdx,round,onDone){
 }
 
 function renderChildReward(ca,dayIdx){
-  ca.innerHTML='';ca.style.paddingTop='0';st._curPage='child';
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
   var newDay=Math.min(dayIdx+1,CHILD_LETTERS.length-1);
   try{localStorage.setItem('child_girl_day',''+newDay);}catch(e){}
