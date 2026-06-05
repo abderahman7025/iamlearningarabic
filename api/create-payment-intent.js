@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const { createClient } = require('@supabase/supabase-js');
 const { applyMiddleware, rateLimit, isValidEmail, getClientIp } = require('./_security');
 
 module.exports = async (req, res) => {
@@ -16,6 +17,19 @@ module.exports = async (req, res) => {
   const { email } = req.body || {};
   if (!email) return res.status(400).json({ error: 'Email requis.' });
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Email invalide.' });
+
+  // ── Vérifier si l'email a déjà un accès ──────────────────────────────────
+  try {
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { data: existing } = await supabase
+      .from('users')
+      .select('email, paid')
+      .eq('email', email.toLowerCase().trim())
+      .single();
+    if (existing && existing.paid) {
+      return res.status(409).json({ error: 'Cette adresse email a déjà un accès. Connectez-vous.' });
+    }
+  } catch (e) { /* ignore — on laisse passer si Supabase inaccessible */ }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const amount = parseInt(process.env.STRIPE_AMOUNT_CENTS || '7499');
