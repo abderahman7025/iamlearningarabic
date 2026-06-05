@@ -182,6 +182,21 @@ function isAdminRequest(req) {
   return token.length > 0 && token === process.env.ADMIN_SECRET;
 }
 
+// ── IP Whitelisting pour admin ───────────────────────────────────────────────
+function isAdminIpAllowed(req) {
+  const allowedIps = (process.env.ADMIN_IPS || '').split(',').map(ip => ip.trim()).filter(ip => ip);
+  if (allowedIps.length === 0) return true; // Si pas configuré, autoriser tous
+
+  const clientIp = getClientIp(req);
+  const isAllowed = allowedIps.includes(clientIp);
+
+  if (!isAllowed) {
+    logEvent('admin_ip_blocked', { ip: clientIp });
+  }
+
+  return isAllowed;
+}
+
 module.exports = {
   setCors,
   setSecurityHeaders,
@@ -199,4 +214,5 @@ module.exports = {
   getClientIp,
   applyMiddleware,
   isAdminRequest,
+  isAdminIpAllowed,
 };
