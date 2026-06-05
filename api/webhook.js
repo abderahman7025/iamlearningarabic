@@ -84,6 +84,10 @@ module.exports = async (req, res) => {
 
   if (event.type === 'payment_intent.succeeded') {
     const pi = event.data.object;
+    // Ignorer les paiements qui appartiennent à d'autres sites (ex: alyanco)
+    if (pi.metadata?.site && pi.metadata.site !== 'iamlearningabic') {
+      return res.json({ received: true });
+    }
     const email = pi.metadata?.email || pi.receipt_email;
     await handlePayment(email, { paymentIntentId: pi.id, customerId: pi.customer });
   }
