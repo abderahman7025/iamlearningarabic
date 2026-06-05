@@ -3926,9 +3926,20 @@ async function initStripePayCard(){
 async function startCheckout(){
   const email=document.getElementById('buy-email').value.trim().toLowerCase();
   const errEl=document.getElementById('buy-err');
+  const btn=document.getElementById('buy-btn');
   if(!email||!email.includes('@')){errEl.textContent='Veuillez saisir une adresse email valide.';return;}
   errEl.textContent='';
-  // Pré-remplir l'email sur l'écran paiement
+  btn.disabled=true;
+  try{
+    const r=await fetch(`${API_URL}/api/check-email`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const d=await r.json();
+    if(d.exists){
+      errEl.textContent='Cette adresse email a déjà un accès. Connectez-vous.';
+      btn.disabled=false;
+      return;
+    }
+  }catch(e){/* on laisse passer */}
+  btn.disabled=false;
   document.getElementById('pay-email').value=email;
   showS('s-payment',true);
   await initStripePayCard();
