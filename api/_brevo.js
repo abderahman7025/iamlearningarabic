@@ -172,7 +172,7 @@ function accountCreatedEmail(email) {
       </td></tr>
 
       <!-- BODY -->
-      <tr><td style="padding:36px 36px 28px">
+      <tr><td style="background:#1a1a1a;padding:36px 36px 28px">
         <p style="color:rgba(255,255,255,.9);line-height:1.75;margin:0 0 18px">Bienvenue dans la famille I Am Learning Arabic ! Votre souscription est effective !</p>
 
         <p style="color:rgba(255,255,255,.8);line-height:1.75;margin:0 0 18px">
@@ -183,7 +183,7 @@ function accountCreatedEmail(email) {
         <div style="text-align:center;margin:28px 0">
           <a href="https://www.iamlearningarabic.com/app"
              style="display:inline-block;background:#000;color:#fff;padding:14px 34px;border-radius:50px;text-decoration:none;font-weight:800;font-size:.95rem;border:1px solid rgba(255,255,255,.3)">
-            Créer mon compte →
+            Accéder à mon compte →
           </a>
         </div>
 
