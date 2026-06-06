@@ -157,26 +157,67 @@ function welcomeEmail(email) {
 }
 
 function accountCreatedEmail(email) {
-  return emailBase(`
-    <h1 style="color:#f5c842;font-size:1.35rem;margin:0 0 18px">✅ Votre compte est actif !</h1>
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:Arial,Helvetica,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px">
+  <tr><td align="center">
+    <table width="100%" style="max-width:560px;background:#1a1a1a;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.1)">
 
-    <p style="color:rgba(255,255,255,.82);line-height:1.75;margin:0 0 14px">
-      Votre compte <strong style="color:#fff">${email}</strong> est maintenant configuré.
-      Vous pouvez accéder à l'application dès maintenant.
-    </p>
+      <!-- HEADER -->
+      <tr><td style="background:linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 100%);padding:32px 36px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)">
+        <div style="font-size:2.2rem;color:#fff;direction:rtl;line-height:1.3;margin-bottom:6px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
+        <div style="color:rgba(255,255,255,.5);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase">I Am Learning Arabic</div>
+      </td></tr>
 
-    <div style="text-align:center;margin:28px 0">
-      <a href="https://www.iamlearningarabic.com/app"
-         style="display:inline-block;background:#d4a017;color:#0a0e1a;padding:14px 34px;border-radius:50px;text-decoration:none;font-weight:800;font-size:.95rem">
-        Accéder à l'application →
-      </a>
-    </div>
+      <!-- BODY -->
+      <tr><td style="padding:36px 36px 28px">
+        <p style="color:rgba(255,255,255,.9);line-height:1.75;margin:0 0 18px">Bienvenue dans la famille I Am Learning Arabic ! Votre souscription est effective !</p>
 
-    <p style="color:rgba(255,255,255,.45);font-size:.82rem;line-height:1.6;text-align:center;margin:0">
-      Gardez votre email et mot de passe en lieu sûr.<br>
-      En cas de problème, répondez directement à cet email.
-    </p>
-  `);
+        <p style="color:rgba(255,255,255,.8);line-height:1.75;margin:0 0 18px">
+          Vous avez désormais un accès à vie à notre plateforme. Il ne vous reste plus qu'à en profiter pleinement.
+          N'oubliez pas : nous sommes joignable via l'onglet "contact" de notre site, et il n'y a absolument aucune question bête !
+        </p>
+
+        <div style="text-align:center;margin:28px 0">
+          <a href="https://www.iamlearningarabic.com/app"
+             style="display:inline-block;background:#000;color:#fff;padding:14px 34px;border-radius:50px;text-decoration:none;font-weight:800;font-size:.95rem;border:1px solid rgba(255,255,255,.3)">
+            Créer mon compte →
+          </a>
+        </div>
+
+        <p style="color:rgba(255,255,255,.7);font-size:.9rem;line-height:1.8;margin:0 0 18px">Parmi ce qui vous attend :</p>
+
+        <p style="color:rgba(255,255,255,.75);font-size:.9rem;line-height:2;margin:0">
+          ✦ &nbsp;Des cours parfaitement pensés, structurés et expliqués.<br>
+          ✦ &nbsp;Mode adulte & modes enfants (dès 5 ans).<br>
+          ✦ &nbsp;Jeux, quiz, tracé interactif, prononciation audio native.<br>
+          ✦ &nbsp;Application PWA — disponible hors-ligne sur téléphone.<br>
+          ✦ &nbsp;Toutes les mises à jour futures incluses à vie.
+        </p>
+
+        <p style="color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.8;margin:24px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);text-align:center;font-style:italic">
+          إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ<br>
+          « Les actes ne valent que par leurs intentions. » — Hadith
+        </p>
+      </td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background:#0f0f0f;padding:20px 36px;text-align:center;border-top:1px solid rgba(255,255,255,.1)">
+        <p style="color:rgba(255,255,255,.4);font-size:.72rem;margin:0 0 6px">
+          © 2025 I Am Learning Arabic &nbsp;·&nbsp;
+          <a href="https://www.iamlearningarabic.com" style="color:rgba(255,255,255,.5);text-decoration:none">iamlearningarabic.com</a>
+        </p>
+        <p style="color:rgba(255,255,255,.3);font-size:.7rem;margin:0">
+          Vous recevez cet email suite à votre achat sur notre site.
+        </p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
 }
 
 function resetPasswordEmail(resetLink) {

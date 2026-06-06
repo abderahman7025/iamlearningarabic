@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
     console.log('[register] Attempting to send email to:', cleanEmail);
     await sendEmail({
       to: cleanEmail,
-      subject: '✅ Votre compte I Am Learning Arabic est prêt',
+      subject: 'Votre accès I Am Learning Arabic est actif ⭐',
       html: accountCreatedEmail(cleanEmail),
     });
     console.log('[Brevo] Email sent successfully to:', cleanEmail);
