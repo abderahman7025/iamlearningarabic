@@ -43,17 +43,18 @@ module.exports = async (req, res) => {
 
   logEvent('register_success', { email: cleanEmail, ip });
 
-  console.log('[register] Attempting to send email to:', cleanEmail);
-  sendEmail({
-    to: cleanEmail,
-    subject: '✅ Votre compte I Am Learning Arabic est prêt',
-    html: accountCreatedEmail(cleanEmail),
-  }).then(() => {
+  try {
+    console.log('[register] Attempting to send email to:', cleanEmail);
+    await sendEmail({
+      to: cleanEmail,
+      subject: '✅ Votre compte I Am Learning Arabic est prêt',
+      html: accountCreatedEmail(cleanEmail),
+    });
     console.log('[Brevo] Email sent successfully to:', cleanEmail);
-  }).catch(err => {
-    console.error('[Brevo] accountCreatedEmail failed:', err.message);
+  } catch (err) {
+    console.error('[Brevo] Email failed:', err.message);
     console.error('[Brevo] Full error:', JSON.stringify(err));
-  });
+  }
 
   res.json({ success: true });
 };
