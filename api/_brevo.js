@@ -166,9 +166,9 @@ function accountCreatedEmail(email) {
     <table width="100%" style="max-width:560px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid rgba(178,128,83,.15)">
 
       <!-- HEADER -->
-      <tr><td style="background:linear-gradient(135deg,#2d1f1a 0%,#3d2b24 100%);padding:40px 36px;text-align:center">
-        <div style="font-size:2.2rem;color:#f5dbc8;direction:rtl;line-height:1.3;margin-bottom:8px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
-        <div style="color:rgba(255,222,196,.6);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase">I Am Learning Arabic</div>
+      <tr><td style="background:linear-gradient(135deg,#2d1f1a 0%,#3d2b24 100%);padding:40px 36px;text-align:center;border-bottom:2px solid #d4af37">
+        <div style="font-size:2.2rem;color:#d4af37;direction:rtl;line-height:1.3;margin-bottom:8px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
+        <div style="color:rgba(212,175,55,.7);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase">I Am Learning Arabic</div>
       </td></tr>
 
       <!-- BODY -->
@@ -182,12 +182,12 @@ function accountCreatedEmail(email) {
 
         <div style="text-align:center;margin:32px 0">
           <a href="https://www.iamlearningarabic.com/app"
-             style="display:inline-block;background:#b28053;color:#fff;padding:14px 36px;border-radius:6px;text-decoration:none;font-weight:600;font-size:.95rem">
+             style="display:inline-block;background:#d4af37;color:#2d1f1a;padding:14px 36px;border-radius:6px;text-decoration:none;font-weight:600;font-size:.95rem">
             Accéder à mon compte →
           </a>
         </div>
 
-        <p style="color:#5a4a42;font-size:.9rem;line-height:1.8;margin:0 0 16px;font-weight:500">Parmi ce qui vous attend :</p>
+        <p style="color:#d4af37;font-size:.9rem;line-height:1.8;margin:0 0 16px;font-weight:600">✨ Parmi ce qui vous attend :</p>
 
         <p style="color:#4a3a32;font-size:.9rem;line-height:2;margin:0 0 24px">
           ✦ &nbsp;Des cours parfaitement pensés, structurés et expliqués.<br>
