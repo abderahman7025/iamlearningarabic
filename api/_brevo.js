@@ -117,7 +117,7 @@ function emailBase(content) {
 function welcomeEmail(email) {
   return emailBase(`
     <h1 style="color:#f5c842;font-size:1.45rem;margin:0 0 6px">جَزَاكَ اللهُ خَيْرًا 🌟</h1>
-    <p style="color:rgba(255,255,255,.5);font-size:.8rem;margin:0 0 20px;font-style:italic">Que Allah vous récompense du bien</p>
+    <p style="color:#666;font-size:.8rem;margin:0 0 20px;font-style:italic">Que Allah vous récompense du bien</p>
 
     <p style="color:rgba(255,255,255,.82);line-height:1.75;margin:0 0 14px">
       Votre paiement a été confirmé. Bienvenue dans la famille <strong style="color:#f5c842">I Am Learning Arabic</strong> !
@@ -138,11 +138,11 @@ function welcomeEmail(email) {
       <tr><td style="padding:20px 24px">
         <p style="color:#f5c842;font-weight:700;font-size:.88rem;margin:0 0 14px">Ce qui vous attend :</p>
         <table cellpadding="0" cellspacing="0">
-          <tr><td style="padding:4px 0;color:rgba(255,255,255,.75);font-size:.85rem">✦&nbsp; 28 lettres arabes avec 6 activités chacune (~30 min / lettre)</td></tr>
-          <tr><td style="padding:4px 0;color:rgba(255,255,255,.75);font-size:.85rem">✦&nbsp; Mode adulte &amp; mode enfant (dès 5 ans) inclus</td></tr>
-          <tr><td style="padding:4px 0;color:rgba(255,255,255,.75);font-size:.85rem">✦&nbsp; Jeux, quiz, tracé interactif, prononciation audio native</td></tr>
-          <tr><td style="padding:4px 0;color:rgba(255,255,255,.75);font-size:.85rem">✦&nbsp; Application PWA — disponible hors-ligne sur téléphone</td></tr>
-          <tr><td style="padding:4px 0;color:rgba(255,255,255,.75);font-size:.85rem">✦&nbsp; Toutes les mises à jour futures incluses à vie</td></tr>
+          <tr><td style="padding:4px 0;color:#222;font-size:.85rem">✦&nbsp; 28 lettres arabes avec 6 activités chacune (~30 min / lettre)</td></tr>
+          <tr><td style="padding:4px 0;color:#222;font-size:.85rem">✦&nbsp; Mode adulte &amp; mode enfant (dès 5 ans) inclus</td></tr>
+          <tr><td style="padding:4px 0;color:#222;font-size:.85rem">✦&nbsp; Jeux, quiz, tracé interactif, prononciation audio native</td></tr>
+          <tr><td style="padding:4px 0;color:#222;font-size:.85rem">✦&nbsp; Application PWA — disponible hors-ligne sur téléphone</td></tr>
+          <tr><td style="padding:4px 0;color:#222;font-size:.85rem">✦&nbsp; Toutes les mises à jour futures incluses à vie</td></tr>
         </table>
       </td></tr>
     </table>
@@ -168,14 +168,14 @@ function accountCreatedEmail(email) {
       <!-- HEADER -->
       <tr><td style="background:linear-gradient(135deg,#1a1a1a 0%,#2a2a2a 100%);padding:32px 36px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)">
         <div style="font-size:2.2rem;color:#fff;direction:rtl;line-height:1.3;margin-bottom:6px">لِنَتَعَلَّمِ الْعَرَبِيَّة</div>
-        <div style="color:rgba(255,255,255,.5);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase">I Am Learning Arabic</div>
+        <div style="color:#666;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase">I Am Learning Arabic</div>
       </td></tr>
 
       <!-- BODY -->
-      <tr><td style="background:#1a1a1a;padding:36px 36px 28px">
-        <p style="color:rgba(255,255,255,.9);line-height:1.75;margin:0 0 18px">Bienvenue dans la famille I Am Learning Arabic ! Votre souscription est effective !</p>
+      <tr><td style="background:#f5f5f5;padding:36px 36px 28px">
+        <p style="color:#000;line-height:1.75;margin:0 0 18px">Bienvenue dans la famille I Am Learning Arabic ! Votre souscription est effective !</p>
 
-        <p style="color:rgba(255,255,255,.8);line-height:1.75;margin:0 0 18px">
+        <p style="color:#333;line-height:1.75;margin:0 0 18px">
           Vous avez désormais un accès à vie à notre plateforme. Il ne vous reste plus qu'à en profiter pleinement.
           N'oubliez pas : nous sommes joignable via l'onglet "contact" de notre site, et il n'y a absolument aucune question bête !
         </p>
@@ -187,9 +187,9 @@ function accountCreatedEmail(email) {
           </a>
         </div>
 
-        <p style="color:rgba(255,255,255,.7);font-size:.9rem;line-height:1.8;margin:0 0 18px">Parmi ce qui vous attend :</p>
+        <p style="color:#333;font-size:.9rem;line-height:1.8;margin:0 0 18px">Parmi ce qui vous attend :</p>
 
-        <p style="color:rgba(255,255,255,.75);font-size:.9rem;line-height:2;margin:0">
+        <p style="color:#222;font-size:.9rem;line-height:2;margin:0">
           ✦ &nbsp;Des cours parfaitement pensés, structurés et expliqués.<br>
           ✦ &nbsp;Mode adulte & modes enfants (dès 5 ans).<br>
           ✦ &nbsp;Jeux, quiz, tracé interactif, prononciation audio native.<br>
@@ -197,7 +197,7 @@ function accountCreatedEmail(email) {
           ✦ &nbsp;Toutes les mises à jour futures incluses à vie.
         </p>
 
-        <p style="color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.8;margin:24px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);text-align:center;font-style:italic">
+        <p style="color:#666;font-size:.85rem;line-height:1.8;margin:24px 0 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);text-align:center;font-style:italic">
           إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ<br>
           « Les actes ne valent que par leurs intentions. » — Hadith
         </p>
@@ -207,7 +207,7 @@ function accountCreatedEmail(email) {
       <tr><td style="background:#0f0f0f;padding:20px 36px;text-align:center;border-top:1px solid rgba(255,255,255,.1)">
         <p style="color:rgba(255,255,255,.4);font-size:.72rem;margin:0 0 6px">
           © 2025 I Am Learning Arabic &nbsp;·&nbsp;
-          <a href="https://www.iamlearningarabic.com" style="color:rgba(255,255,255,.5);text-decoration:none">iamlearningarabic.com</a>
+          <a href="https://www.iamlearningarabic.com" style="color:#666;text-decoration:none">iamlearningarabic.com</a>
         </p>
         <p style="color:rgba(255,255,255,.3);font-size:.7rem;margin:0">
           Vous recevez cet email suite à votre achat sur notre site.
@@ -236,7 +236,7 @@ function resetPasswordEmail(resetLink) {
     </div>
 
     <p style="color:rgba(255,255,255,.32);font-size:.78rem;text-align:center;margin:0">
-      Ce lien expire dans <strong style="color:rgba(255,255,255,.5)">1 heure</strong>.<br>
+      Ce lien expire dans <strong style="color:#666">1 heure</strong>.<br>
       Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
     </p>
   `);
