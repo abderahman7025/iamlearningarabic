@@ -41,6 +41,8 @@
     }
   ],
   "rewrites": [
+    { "source": "/app",          "destination": "/index.html" },
+    { "source": "/app/:path*",   "destination": "/index.html" },
     { "source": "/connexion",    "destination": "/index.html" },
     { "source": "/inscription",  "destination": "/index.html" },
     { "source": "/interface",    "destination": "/index.html" },
