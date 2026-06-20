@@ -6006,59 +6006,161 @@ function getChildIsland(letterIdx){
    EXPLICATIONS INTERACTIVES POUR CHAQUE COURS
    ═══════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════
+   INTROS COURS ENFANT — mini-cours illustrés & paginés
+   Reprend tout le contenu du cours adulte, version enfant.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Pastille arabe cliquable (joue le son au clic) */
+function _introSay(ar,lat,big){
+  return "<span data-say='"+ar+"' style='display:inline-flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:2px solid #f9a8d4;border-radius:14px;padding:8px 14px;margin:4px;cursor:pointer;vertical-align:middle'>"
+    +"<span style='font-family:var(--fa);font-size:"+(big||2.4)+"rem;color:#ad1457;line-height:1.1'>"+ar+"</span>"
+    +(lat?"<span style='font-size:.8rem;color:#7b1fa2;font-weight:700'>"+lat+"</span>":"")
+    +"<span style='font-size:.65rem'>🔊</span></span>";
+}
+
+/* Ligne illustrée : emoji + arabe + nom + détail + badge */
+function _vRow(emoji,ar,name,detail,badge){
+  return "<div data-say='"+ar+"' style='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.9);border:2px solid rgba(233,30,140,.14);border-radius:16px;padding:12px 14px;margin-bottom:10px;cursor:pointer;text-align:left'>"
+    +"<div style='font-size:1.8rem'>"+emoji+"</div>"
+    +"<div style='font-family:var(--fa);font-size:2.4rem;color:#ad1457;min-width:48px;text-align:center'>"+ar+"</div>"
+    +"<div style='flex:1'>"
+      +"<div style='font-weight:800;font-size:.9rem;color:#7b1fa2'>"+name+"</div>"
+      +"<div style='font-size:.8rem;color:rgba(0,0,0,.55)'>"+detail+"</div>"
+      +"<div style='display:inline-block;margin-top:3px;font-size:.66rem;font-weight:700;color:#c2185b;background:rgba(233,30,140,.1);border-radius:20px;padding:2px 8px'>"+badge+"</div>"
+    +"</div>"
+    +"<div style='font-size:.8rem'>🔊</div>"
+  +"</div>";
+}
+
+/* Moteur de pagination : affiche les pages une par une avec points de progression */
+function _introPager(ca,onFinish,pages){
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  var idx=0;
+  var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
+  function render(){
+    wrap.innerHTML='';
+    var dots=document.createElement('div');dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:14px';
+    pages.forEach(function(_,i){
+      var d=document.createElement('div');
+      d.style.cssText='height:8px;border-radius:6px;transition:all .3s;width:'+(i===idx?'22px':'8px')+';background:'+(i===idx?'#ec4899':(i<idx?'#f9a8d4':'rgba(173,20,87,.18)'));
+      dots.appendChild(d);
+    });
+    wrap.appendChild(dots);
+    var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
+    card.innerHTML=pages[idx];
+    wrap.appendChild(card);
+    card.querySelectorAll('[data-say]').forEach(function(el){
+      el.onclick=function(){var s=el.getAttribute('data-say');speakText(s,'ar-SA',null);el.style.transition='transform .15s';el.style.transform='scale(.92)';setTimeout(function(){el.style.transform='';},150);};
+    });
+    var btn=document.createElement('button');btn.className='rbtn rbtn-m';
+    btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';btn.style.color='#fff';btn.style.marginTop='6px';
+    btn.textContent=(idx>=pages.length-1)?'Je comprends ! →':'Suivant →';
+    btn.onclick=function(){if(idx>=pages.length-1){onFinish();}else{idx++;render();ca.scrollTop=0;}};
+    card.appendChild(btn);
+  }
+  render();
+}
+
 function _showVowelIntro(ca,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='64px';
-  var wrap=document.createElement('div');wrap.className='child-wrap';
-  var card=document.createElement('div');card.className='child-card';
-  card.style.textAlign='center';
-
-  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">🎵</div>'
-    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">Les voyelles — A, OU, I</h2>'
-    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:24px;line-height:1.5">Les voyelles sont 3 petits signes.<br>Ils se mettent SUR ou SOUS une lettre.<br>Ils changent le son de la lettre.</p>';
-
-  /* Exemple animé */
-  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:24px;margin-bottom:20px;border:3px solid #ad1457';
-  exDiv.innerHTML='<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:10px;font-weight:700">Exemple :</div>'
-    +'<div style="display:flex;flex-direction:column;gap:14px;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#ad1457;text-align:center">'
-    +'<div>بَا <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= ba (a)</span></div>'
-    +'<div>بُو <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= bu (ou)</span></div>'
-    +'<div>بِي <span style="font-family:inherit;font-size:1rem;color:rgba(0,0,0,.5)">= bi (i)</span></div>'
-    +'</div>';
-  card.appendChild(exDiv);
-
-  card.innerHTML+='<p style="color:rgba(0,0,0,.5);font-size:.82rem;margin-bottom:20px;line-height:1.6">La lettre est toujours la même (ب),<br>mais le signe change son son ! 🎵</p>';
-
-  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
-  btn.textContent='Je comprends ! →';btn.style.color='white';
-  btn.onclick=onFinish;
-  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+  var box="background:rgba(255,255,255,.9);border-radius:18px;padding:14px;border:3px solid #f9a8d4";
+  var pages=[
+    /* 1 — c'est quoi une voyelle */
+    "<div style='font-size:3rem;margin-bottom:6px'>🎵</div>"
+    +"<h2 style='color:#ad1457;font-size:1.2rem;font-weight:800;margin-bottom:10px'>C'est quoi une voyelle ?</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.9rem;line-height:1.6;margin-bottom:16px'>C'est un petit signe magique ✨<br>Il se pose <b>sur</b> ou <b>sous</b> une lettre<br>et il change son son !</p>"
+    +"<div style='"+box+"'>"
+      +"<div style='font-size:.78rem;color:rgba(0,0,0,.5);margin-bottom:10px;font-weight:700'>La lettre reste la même… écoute le son changer ! 👂</div>"
+      +"<div>"+_introSay('بَ','ba')+_introSay('بُ','bou')+_introSay('بِ','bi')+"</div>"
+    +"</div>",
+    /* 2 — il y en a 3 */
+    "<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:6px'>Il y en a 3 ! ✋</h2>"
+    +"<p style='color:rgba(0,0,0,.55);font-size:.84rem;margin-bottom:16px'>Clique sur chaque signe pour l'écouter 🔊</p>"
+    +_vRow('☀️','بَ','Fatḥa','son « a »','au-dessus ⬆️')
+    +_vRow('🌙','بُ','Ḍamma','son « ou »','au-dessus ⬆️')
+    +_vRow('⭐','بِ','Kasra','son « i »','en-dessous ⬇️'),
+    /* 3 — on peut les doubler (tanwin) */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>➕</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>On peut les doubler !</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.88rem;line-height:1.6;margin-bottom:16px'>Quand une voyelle est <b>doublée</b>,<br>on ajoute le son « <b>n</b> » 👃</p>"
+    +"<div style='"+box+"'>"
+      +"<div>"+_introSay('بً','ban')+_introSay('بٌ','boun')+_introSay('بٍ','bin')+"</div>"
+      +"<div style='font-size:.76rem;color:rgba(0,0,0,.5);margin-top:10px'>Tu entends le « n » à la fin ? 🎧</div>"
+    +"</div>",
+    /* 4 — le soukoun */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>⭕</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>Le soukoun</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.88rem;line-height:1.6;margin-bottom:16px'>Un petit rond sur une lettre 🔵<br>= on dit <b>seulement</b> la lettre,<br>sans voyelle !</p>"
+    +"<div style='"+box+"'>"
+      +"<div style='display:flex;align-items:center;justify-content:center;gap:10px'>"
+        +_introSay('بَ','ba')+"<span style='font-size:1.4rem;color:#bbb'>≠</span>"+_introSay('بْ','b')
+      +"</div>"
+      +"<div style='font-size:.76rem;color:rgba(0,0,0,.5);margin-top:10px'>Avec voyelle « ba »… avec soukoun juste « b » !</div>"
+    +"</div>"
+  ];
+  _introPager(ca,onFinish,pages);
 }
 
 function _showProlongIntro(ca,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='64px';
-  var wrap=document.createElement('div');wrap.className='child-wrap';
-  var card=document.createElement('div');card.className='child-card';
-  card.style.textAlign='center';
-
-  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">📏</div>'
-    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">Les prolongations</h2>'
-    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:24px;line-height:1.5">Une prolongation allonge le son<br>d\'une voyelle.<br>Il y a 3 prolongations.</p>';
-
-  /* Explications */
-  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:16px;margin-bottom:20px;border:3px solid #ad1457';
-  exDiv.innerHTML=''
-    +'<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
-    +'<span style="font-size:1.6rem">ا</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Alif (ا) allonge le « A »<br><strong>بَا</strong> se prononce « Baaaa »</span></div>'
-    +'<div style="display:flex;gap:12px;margin-bottom:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
-    +'<span style="font-size:1.6rem">و</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Waw (و) allonge le « OU »<br><strong>بُو</strong> se prononce « Boouu »</span></div>'
-    +'<div style="display:flex;gap:12px;align-items:center;padding:10px;background:rgba(255,192,203,.15);border-radius:10px">'
-    +'<span style="font-size:1.6rem">ي</span><span style="font-size:.85rem;color:rgba(0,0,0,.6);flex:1;text-align:left">Ya (ي) allonge le « I »<br><strong>بِي</strong> se prononce « Biiiii »</span></div>';
-  card.appendChild(exDiv);
-
-  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
-  btn.textContent='Je comprends ! →';btn.style.color='white';
-  btn.onclick=onFinish;
-  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+  var box="background:rgba(255,255,255,.9);border-radius:18px;padding:14px;border:3px solid #f9a8d4";
+  var pages=[
+    /* 1 — c'est quoi une prolongation */
+    "<div style='font-size:3rem;margin-bottom:6px'>📏</div>"
+    +"<h2 style='color:#ad1457;font-size:1.2rem;font-weight:800;margin-bottom:10px'>C'est quoi une prolongation ?</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.9rem;line-height:1.6;margin-bottom:16px'>C'est quand on <b>étire</b> le son<br>d'une voyelle, comme un élastique ! 🪢<br>On le tient plus longtemps.</p>"
+    +"<div style='"+box+"'>"
+      +"<div style='display:flex;align-items:center;justify-content:center;gap:10px'>"
+        +_introSay('بَ','ba','2.2')+"<span style='font-size:1.3rem;color:#bbb'>→</span>"+_introSay('بَا','baaa','2.2')
+      +"</div>"
+      +"<div style='font-size:.78rem;color:rgba(0,0,0,.5);margin-top:10px'>Court « ba »… étiré « baaaa » ! 🎵</div>"
+    +"</div>",
+    /* 2 — le temps change le mot */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>⏱️</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>Le temps est important !</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.88rem;line-height:1.6;margin-bottom:16px'>En arabe, si on étire le son ou non,<br>le mot peut <b>changer de sens</b> !<br>Il faut bien écouter 👂</p>"
+    +"<div style='"+box+"'>"
+      +"<div style='display:flex;align-items:center;justify-content:center;gap:10px'>"
+        +_introSay('قَلَم','court','1.9')+"<span style='font-size:1.3rem;color:#bbb'>≠</span>"+_introSay('قَلَا','étiré','1.9')
+      +"</div>"
+      +"<div style='font-size:.76rem;color:rgba(0,0,0,.5);margin-top:10px'>Le même début, mais un son étiré = un mot différent !</div>"
+    +"</div>",
+    /* 3 — les 3 prolongations */
+    "<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:6px'>Les 3 prolongations 📏</h2>"
+    +"<p style='color:rgba(0,0,0,.55);font-size:.84rem;margin-bottom:16px'>Chaque voyelle a sa lettre qui l'étire</p>"
+    +_vRow('☀️','بَا','Alif · ا','allonge le « a »','aaaa')
+    +_vRow('🌙','بُو','Waw · و','allonge le « ou »','ouuu')
+    +_vRow('⭐','بِي','Ya · ي','allonge le « i »','iiii'),
+    /* 4 — attention : seulement sans voyelle */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>⚠️</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>Attention !</h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.88rem;line-height:1.6;margin-bottom:16px'>Les lettres <span style='font-family:var(--fa);font-size:1.3em;color:#ad1457'>ا و ي</span> étirent le son<br><b>seulement</b> si elles n'ont <b>pas</b><br>de voyelle sur elles !</p>"
+    +"<div style='"+box+"'>"
+      +"<div style='display:flex;align-items:center;justify-content:center;gap:10px'>"
+        +_introSay('بَا','étire ✅','2')+"<span style='font-size:1.3rem;color:#bbb'>vs</span>"+_introSay('وَ','vraie lettre','2')
+      +"</div>"
+      +"<div style='font-size:.76rem;color:rgba(0,0,0,.5);margin-top:10px'>Si la lettre a une voyelle 👉 c'est une vraie lettre, pas une prolongation !</div>"
+    +"</div>",
+    /* 5 — la chaddah */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>🎩</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>La chaddah · <span style='font-family:var(--fa)'>الشَّدَّة</span></h2>"
+    +"<p style='color:rgba(0,0,0,.6);font-size:.88rem;line-height:1.6;margin-bottom:16px'>C'est un petit chapeau <span style='font-family:var(--fa);font-size:1.4em;color:#ad1457'>ّ</span> sur une lettre.<br>On <b>appuie 2 fois</b> sur la lettre 💪<br>(on insiste dessus)</p>"
+    +"<div style='"+box+"'>"
+      +"<div>"+_introSay('جَدّ','jad-d','2.2')+"</div>"
+      +"<div style='font-size:.76rem;color:rgba(0,0,0,.5);margin-top:10px'>On insiste sur le « d » : jad-d ! (ça veut dire grand-père 👴)</div>"
+    +"</div>",
+    /* 6 — ne pas confondre */
+    "<div style='font-size:2.6rem;margin-bottom:6px'>🧠</div>"
+    +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:14px'>Ne confonds pas !</h2>"
+    +"<div style='background:rgba(233,30,140,.1);border:2px solid #f9a8d4;border-radius:16px;padding:14px;margin-bottom:12px;text-align:left'>"
+      +"<div style='font-weight:800;color:#c2185b;font-size:.95rem;margin-bottom:4px'>🎩 La chaddah</div>"
+      +"<div style='font-size:.85rem;color:rgba(0,0,0,.6)'>on insiste sur la <b>LETTRE</b></div>"
+    +"</div>"
+    +"<div style='background:rgba(79,195,247,.12);border:2px solid #90caf9;border-radius:16px;padding:14px;text-align:left'>"
+      +"<div style='font-weight:800;color:#1976d2;font-size:.95rem;margin-bottom:4px'>📏 La prolongation</div>"
+      +"<div style='font-size:.85rem;color:rgba(0,0,0,.6)'>on étire la <b>VOYELLE</b></div>"
+    +"</div>"
+  ];
+  _introPager(ca,onFinish,pages);
 }
 
 function _showLettersIntro(ca,isleName,onFinish){
