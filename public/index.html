@@ -6266,26 +6266,27 @@ function renderChildIslandMap(ca){
   var globeDiv=document.createElement('div');
   globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch';
 
-  /* ── Position mascotte : nb d'îles franchies ── */
+  /* ── Complétion par île (déverrouillage séquentiel) ── */
+  function _isleComplete(isle){
+    /* Migration douce : si l'utilisateur a déjà appris des lettres, les îles
+       voyelles/prolongations qu'il a forcément traversées sont considérées faites. */
+    if(isle.type==='vowels')return localStorage.getItem('child_isle_vowels')==='1'||dayIdx>0;
+    if(isle.type==='prolong')return localStorage.getItem('child_isle_prolong')==='1'||dayIdx>=4;
+    if(!isle.letters.length)return false;
+    return dayIdx>isle.letters[isle.letters.length-1];
+  }
+  var _isleDone=childIslandDefs.map(_isleComplete);
+
+  /* Mascotte = première île non terminée (tout en haut du chemin si rien n'est fait) */
   var charIdxC=0;
   for(var _ci=0;_ci<childIslandDefs.length;_ci++){
-    var _isle=childIslandDefs[_ci];
-    var _done=_isle.letters.length===0?true:(dayIdx>_isle.letters[_isle.letters.length-1]);
-    if(_done){charIdxC=_ci+1;}else{break;}
+    if(_isleDone[_ci]){charIdxC=_ci+1;}else{break;}
   }
 
   childIslandDefs.forEach(function(isle,isleIdx){
-    var isLocked=false,isComplete=false;
-    if(isle.type==='vowels'){
-      isLocked=false;isComplete=false;
-    } else if(isle.type==='prolong'){
-      isLocked=(dayIdx<3);isComplete=false;
-    } else {
-      var firstL=isle.letters[0];
-      var lastL=isle.letters[isle.letters.length-1];
-      isLocked=(dayIdx<firstL);
-      isComplete=(dayIdx>lastL);
-    }
+    /* Une île est déverrouillée seulement si la précédente est terminée */
+    var isComplete=_isleDone[isleIdx];
+    var isLocked=(isleIdx>0)&&!_isleDone[isleIdx-1];
 
     var card=document.createElement('div');
     card.className='sess-island'+(isLocked?' locked-isle':'');
@@ -6865,25 +6866,67 @@ function _clStep0(wrap,letter,af,goNext){
   setTimeout(function(){speakText(letter.ar,'ar-SA',null);},600);
 }
 
-/* ──────────────────────────────────────────────────────
-   Étape 1 : Les formes
-   Phase A : 4 flashcards (une par position)
-   Phase B : 4 questions quiz
-   ────────────────────────────────────────────────────── */
-function _clStep1(wrap,letter,af,goNext){
-  var forms=[
+/* Dédoublonne les positions identiques (lettres qui ne s'attachent pas :
+   ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
+function _dedupForms(letter,af){
+  var raw=[
     {lbl:'Isolée',form:letter.ar},
     {lbl:'Début', form:af.i},
     {lbl:'Milieu',form:af.m},
     {lbl:'Fin',   form:af.f}
   ];
+  var out=[];
+  raw.forEach(function(r){
+    var ex=null;
+    for(var i=0;i<out.length;i++){if(out[i].form===r.form){ex=out[i];break;}}
+    if(ex){ex.labels.push(r.lbl);}
+    else{out.push({form:r.form,lbl:r.lbl,labels:[r.lbl]});}
+  });
+  out.forEach(function(o){o.lblText=o.labels.join(' & ');});
+  return out;
+}
+
+/* Baseline d'écriture fixe : le corps de la lettre se pose sur la ligne,
+   les hampes montent au-dessus et les jambages descendent en dessous.
+   ratio ~0.60 = la ligne est aux 3/5 bas du canvas (placement correct par lettre). */
+function _drawWritingGuide(ctx,form,CW,CH,fontPx,split){
+  ctx.clearRect(0,0,CW,CH);
+  var baseY=Math.round(CH*0.60);
+  ctx.save();
+  ctx.font=fontPx+"px 'Scheherazade New',serif";
+  ctx.textBaseline='alphabetic';
+  ctx.fillStyle='rgba(194,24,91,0.07)';
+  if(split&&split.length===2){
+    /* lettre + voyelle séparées (voyelles/prolongations) */
+    ctx.textAlign='right';ctx.fillText(split[0],CW/2-5,baseY);
+    ctx.textAlign='left';ctx.fillText(' '+split[1],CW/2+5,baseY);
+  }else{
+    ctx.textAlign='center';ctx.fillText(form,CW/2,baseY);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle='rgba(194,24,91,0.3)';
+  ctx.lineWidth=1.5;ctx.setLineDash([7,5]);
+  ctx.beginPath();ctx.moveTo(16,baseY);ctx.lineTo(CW-16,baseY);ctx.stroke();
+  ctx.restore();
+  return baseY;
+}
+
+/* ──────────────────────────────────────────────────────
+   Étape 1 : Les formes
+   Phase A : flashcards (une par forme distincte)
+   Phase B : quiz (formes distinctes)
+   ────────────────────────────────────────────────────── */
+function _clStep1(wrap,letter,af,goNext){
+  var forms=_dedupForms(letter,af);
+  var NF=forms.length;
   var fcIdx=0,qIdx=0,score=0;
   var container=document.createElement('div');
   wrap.appendChild(container);
 
   function showPhaseA(){
     container.innerHTML='';
-    if(fcIdx>=4){showPhaseB();return;}
+    if(fcIdx>=NF){showPhaseB();return;}
     var f=forms[fcIdx];
 
     /* ── Sous-phase A1 : découverte de la forme ── */
@@ -6892,7 +6935,7 @@ function _clStep1(wrap,letter,af,goNext){
       /* Dots */
       var dots=document.createElement('div');
       dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
-      for(var di=0;di<4;di++){
+      for(var di=0;di<NF;di++){
         var d=document.createElement('div');
         d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<fcIdx?'#22c55e':di===fcIdx?'#c2185b':'rgba(194,24,91,.2)');
         dots.appendChild(d);
@@ -6903,7 +6946,7 @@ function _clStep1(wrap,letter,af,goNext){
 
       var intro=document.createElement('div');
       intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';
-      intro.textContent='Forme de '+f.lbl;
+      intro.textContent='Forme '+f.lblText;
       card.appendChild(intro);
 
       var formBig=document.createElement('div');
@@ -6914,7 +6957,7 @@ function _clStep1(wrap,letter,af,goNext){
 
       var lblBig=document.createElement('div');
       lblBig.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';
-      lblBig.textContent=f.lbl.toUpperCase();
+      lblBig.textContent=f.lblText.toUpperCase();
       card.appendChild(lblBig);
 
       var tip=document.createElement('div');
@@ -6939,7 +6982,7 @@ function _clStep1(wrap,letter,af,goNext){
       /* Dots */
       var dots2=document.createElement('div');
       dots2.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
-      for(var di2=0;di2<4;di2++){
+      for(var di2=0;di2<NF;di2++){
         var d2=document.createElement('div');
         d2.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di2<fcIdx?'#22c55e':di2===fcIdx?'#c2185b':'rgba(194,24,91,.2)');
         dots2.appendChild(d2);
@@ -6950,7 +6993,7 @@ function _clStep1(wrap,letter,af,goNext){
 
       var intro2=document.createElement('div');
       intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';
-      intro2.textContent='Forme '+f.lbl+' — Entraîne-toi !';
+      intro2.textContent='Forme '+f.lblText+' — Entraîne-toi !';
       card2.appendChild(intro2);
 
       /* Lettre fantôme petit au-dessus du canvas */
@@ -6966,22 +7009,7 @@ function _clStep1(wrap,letter,af,goNext){
       var mctx=mc.getContext('2d');
 
       function drawMCGuide(){
-        mctx.clearRect(0,0,MCW,MCH);
-        mctx.save();
-        mctx.font="100px 'Scheherazade New',serif";
-        mctx.textAlign='center';mctx.textBaseline='alphabetic';
-        var mm=mctx.measureText(f.form);
-        var masc=mm.actualBoundingBoxAscent||65;
-        var mdesc=mm.actualBoundingBoxDescent||18;
-        var mbY=(MCH+masc-mdesc)/2;
-        mctx.fillStyle='rgba(194,24,91,0.06)';
-        mctx.fillText(f.form,MCW/2,mbY);
-        mctx.restore();
-        mctx.save();
-        mctx.strokeStyle='rgba(194,24,91,0.3)';
-        mctx.lineWidth=1.5;mctx.setLineDash([6,4]);
-        mctx.beginPath();mctx.moveTo(14,mbY);mctx.lineTo(MCW-14,mbY);mctx.stroke();
-        mctx.restore();
+        _drawWritingGuide(mctx,f.form,MCW,MCH,100);
       }
       drawMCGuide();
       card2.appendChild(mc);
@@ -7005,7 +7033,7 @@ function _clStep1(wrap,letter,af,goNext){
 
       var nextBtn2=document.createElement('button');nextBtn2.className='rbtn rbtn-m';
       nextBtn2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:0;transition:opacity .3s';
-      nextBtn2.textContent=fcIdx<3?'Forme suivante →':'📝 Quiz des formes !';
+      nextBtn2.textContent=fcIdx<NF-1?'Forme suivante →':'📝 Quiz des formes !';
       nextBtn2.onclick=function(){fcIdx++;showPhaseA();};
       container.appendChild(nextBtn2);
     }
@@ -7015,11 +7043,11 @@ function _clStep1(wrap,letter,af,goNext){
 
   function showPhaseB(){
     container.innerHTML='';
-    if(qIdx>=4){
+    if(qIdx>=NF){
       var doneCard=document.createElement('div');doneCard.className='child-card';
       doneCard.style.textAlign='center';
-      doneCard.innerHTML='<div style="font-size:3rem;margin:8px 0">'+(score>=3?'🌟':'👍')+'</div>'
-        +'<div class="child-letter-name">Quiz des formes : '+score+' / 4</div>';
+      doneCard.innerHTML='<div style="font-size:3rem;margin:8px 0">'+(score>=NF-1?'🌟':'👍')+'</div>'
+        +'<div class="child-letter-name">Quiz des formes : '+score+' / '+NF+'</div>';
       container.appendChild(doneCard);
       var nb=document.createElement('button');nb.className='rbtn rbtn-m child-btn-play';
       nb.style.cssText='width:100%;padding:14px;font-size:1rem';
@@ -7033,7 +7061,7 @@ function _clStep1(wrap,letter,af,goNext){
     /* Dots quiz */
     var dots=document.createElement('div');
     dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
-    for(var di=0;di<4;di++){
+    for(var di=0;di<NF;di++){
       var d=document.createElement('div');
       d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<qIdx?'#22c55e':di===qIdx?'#7b1fa2':'rgba(194,24,91,.2)');
       dots.appendChild(d);
@@ -7043,7 +7071,7 @@ function _clStep1(wrap,letter,af,goNext){
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var qlbl=document.createElement('div');
     qlbl.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:14px';
-    qlbl.innerHTML='Montre-moi la forme <span style="color:#7b1fa2;font-size:1.15em;font-weight:900">'+q.lbl.toUpperCase()+'</span>';
+    qlbl.innerHTML='Montre-moi la forme <span style="color:#7b1fa2;font-size:1.15em;font-weight:900">'+q.lblText.toUpperCase()+'</span>';
     card.appendChild(qlbl);
 
     var cGrid=document.createElement('div');
@@ -7056,7 +7084,7 @@ function _clStep1(wrap,letter,af,goNext){
       btn.onclick=function(){
         if(answered)return;
         speakText(sf.form,'ar-SA',null);
-        if(sf.lbl===q.lbl){
+        if(sf.form===q.form){
           btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
           score++;answered=true;
           setTimeout(function(){qIdx++;showPhaseB();},700);
@@ -7078,18 +7106,14 @@ function _clStep1(wrap,letter,af,goNext){
    Étape 2 : J'écris (tracé libre sur canvas)
    ────────────────────────────────────────────────────── */
 function _clStep2(wrap,letter,af,goNext){
-  var forms2=[
-    {lbl:'Isolée', form:letter.ar},
-    {lbl:'Début',  form:af.i},
-    {lbl:'Milieu', form:af.m},
-    {lbl:'Fin',    form:af.f}
-  ];
+  var forms2=_dedupForms(letter,af);
+  var NF2=forms2.length;
   var fIdx=0,TOTAL_TRACES=2;
   var container2=document.createElement('div');wrap.appendChild(container2);
 
   function showForm(){
     container2.innerHTML='';
-    if(fIdx>=4){
+    if(fIdx>=NF2){
       /* Toutes les formes tracées → continuer */
       var doneCard=document.createElement('div');doneCard.className='child-card';doneCard.style.textAlign='center';
       doneCard.innerHTML='<div style="font-size:3rem;margin:8px 0">🌟</div><div class="child-letter-name">Bravo, tu as tout tracé !</div>';
@@ -7106,7 +7130,7 @@ function _clStep2(wrap,letter,af,goNext){
     /* Barre de progression formes */
     var formBar=document.createElement('div');
     formBar.style.cssText='display:flex;gap:5px;justify-content:center;margin-bottom:8px';
-    for(var fi=0;fi<4;fi++){
+    for(var fi=0;fi<NF2;fi++){
       var fd=document.createElement('div');
       fd.style.cssText='height:5px;flex:1;border-radius:3px;background:'+(fi<fIdx?'#22c55e':fi===fIdx?'#c2185b':'rgba(194,24,91,.15)');
       formBar.appendChild(fd);
@@ -7117,7 +7141,7 @@ function _clStep2(wrap,letter,af,goNext){
 
     var instr=document.createElement('div');
     instr.style.cssText='font-size:.88rem;font-weight:800;color:#ad1457;margin-bottom:8px';
-    instr.textContent='Trace la forme '+f2.lbl+' avec ton doigt !';
+    instr.textContent='Trace la forme '+f2.lblText+' avec ton doigt !';
     card.appendChild(instr);
 
     /* Dots de traces */
@@ -7142,22 +7166,7 @@ function _clStep2(wrap,letter,af,goNext){
     var ctx=canvas.getContext('2d');
 
     function drawGuide(){
-      ctx.clearRect(0,0,CW,CH);
-      ctx.save();
-      ctx.font="140px 'Scheherazade New',serif";
-      ctx.textAlign='center';ctx.textBaseline='alphabetic';
-      var m=ctx.measureText(f2.form);
-      var asc=m.actualBoundingBoxAscent||90;
-      var desc=m.actualBoundingBoxDescent||30;
-      var baseY=(CH+asc-desc)/2;
-      ctx.fillStyle='rgba(194,24,91,0.07)';
-      ctx.fillText(f2.form,CW/2,baseY);
-      ctx.restore();
-      ctx.save();
-      ctx.strokeStyle='rgba(194,24,91,0.28)';
-      ctx.lineWidth=1.5;ctx.setLineDash([7,5]);
-      ctx.beginPath();ctx.moveTo(18,baseY);ctx.lineTo(CW-18,baseY);ctx.stroke();
-      ctx.restore();
+      _drawWritingGuide(ctx,f2.form,CW,CH,140);
     }
     drawGuide();
 
@@ -7289,15 +7298,17 @@ function _clStep4(wrap,letter,af,dayIdx,goNext){
    3 questions sur les formes + 2 questions mot
    ────────────────────────────────────────────────────── */
 function _clStep5(wrap,letter,af,dayIdx,goNext){
+  /* Les 4 positions servent de boutons-réponses (début/isolée/milieu/fin) */
   var forms=[
     {lbl:'Isolée',form:letter.ar},
     {lbl:'Début', form:af.i},
     {lbl:'Milieu',form:af.m},
     {lbl:'Fin',   form:af.f}
   ];
-  /* 3 formes choisies au hasard parmi les 4 */
-  var formQs=forms.slice().sort(function(){return Math.random()-.5;}).slice(0,3);
-  /* 2 questions "mot" : variations légères (on utilise la même lettre) */
+  /* Questions : une par forme DISTINCTE (pas de doublon de glyphe) */
+  var distinct=_dedupForms(letter,af);
+  var formQs=distinct.slice().sort(function(){return Math.random()-.5;}).slice(0,3);
+  var NFORM=formQs.length;
   var TOTAL=5;var qIdx=0,score=0;
   var container=document.createElement('div');wrap.appendChild(container);
 
@@ -7332,8 +7343,9 @@ function _clStep5(wrap,letter,af,dayIdx,goNext){
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     var answered=false;
 
-    if(qIdx<3){
-      /* Question forme : montrer la forme, demander la position */
+    if(qIdx<NFORM){
+      /* Question forme : montrer la forme, demander la position
+         (on accepte TOUTE position dont le glyphe est identique : ex. milieu OU fin) */
       var ff=formQs[qIdx];
       var shuffForms=forms.slice().sort(function(){return Math.random()-.5;});
       var ql=document.createElement('div');
@@ -7359,7 +7371,7 @@ function _clStep5(wrap,letter,af,dayIdx,goNext){
           /* Animation zoom + affiche la forme arabe */
           btn.style.transform='scale(1.25)';
           lblSpan.style.display='none';arSpan.style.display='block';
-          if(sf.lbl===ff.lbl){
+          if(sf.form===ff.form){
             btn.style.background='rgba(34,197,94,.2)';btn.style.borderColor='#22c55e';
             score++;answered=true;
             setTimeout(function(){qIdx++;showQ();},800);
@@ -7536,20 +7548,8 @@ function _xStep1(wrap,forms,goNext){
       mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
       var mctx=mc.getContext('2d');
       function drawGuide(){
-        mctx.clearRect(0,0,MCW,MCH);
         var gp=f[1].split(' ');
-        var letter=gp.length===2?gp[0]:f[1];
-        var vowelBase=gp.length===2?' '+gp[1]:'';
-        mctx.save();mctx.font="90px 'Scheherazade New',serif";mctx.textBaseline='alphabetic';
-        var mm=mctx.measureText(letter);
-        var masc=mm.actualBoundingBoxAscent||60;var mdesc=mm.actualBoundingBoxDescent||15;
-        var mbY=(MCH+masc-mdesc)/2;
-        mctx.fillStyle='rgba(194,24,91,0.07)';
-        mctx.textAlign='right';mctx.fillText(letter,MCW/2-5,mbY);
-        if(vowelBase){mctx.textAlign='left';mctx.fillText(vowelBase,MCW/2+5,mbY);}
-        mctx.restore();
-        mctx.save();mctx.strokeStyle='rgba(194,24,91,0.3)';mctx.lineWidth=1.5;mctx.setLineDash([6,4]);
-        mctx.beginPath();mctx.moveTo(14,mbY-2);mctx.lineTo(MCW-14,mbY-2);mctx.stroke();mctx.restore();
+        _drawWritingGuide(mctx,f[1],MCW,MCH,90,gp.length===2?gp:null);
       }
       drawGuide();card2.appendChild(mc);
       var efBtn=document.createElement('button');efBtn.className='rbtn rbtn-s';efBtn.style.cssText='display:block;margin:0 auto 8px;font-size:.78rem';efBtn.textContent='↺ Effacer';efBtn.onclick=function(){drawGuide();};card2.appendChild(efBtn);
@@ -7654,6 +7654,7 @@ function _cvProgressBar(wrap,step){
 function renderChildVowelLesson(ca,step){
   step=step||0;
   if(step>=6){
+    localStorage.setItem('child_isle_vowels','1');
     ca.innerHTML='';ca.style.paddingTop='64px';
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
@@ -7863,6 +7864,7 @@ var _CPROL_ITEMS=[['Alif · ā','ا َ'],['Waw · ū','و ُ'],['Yā · ī','ي 
 function renderChildProlongLesson(ca,step){
   step=step||0;
   if(step>=6){
+    localStorage.setItem('child_isle_prolong','1');
     ca.innerHTML='';ca.style.paddingTop='64px';
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
