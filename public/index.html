@@ -6078,7 +6078,8 @@ function _showVowelIntro(ca,onFinish){
     +"<p style='color:rgba(0,0,0,.55);font-size:.84rem;margin-bottom:16px'>Clique sur chaque signe pour l'écouter 🔊</p>"
     +_vRow('☀️','بَ','Fatḥa','son « a »','au-dessus ⬆️')
     +_vRow('🌙','بُ','Ḍamma','son « ou »','au-dessus ⬆️')
-    +_vRow('⭐','بِ','Kasra','son « i »','en-dessous ⬇️'),
+    +_vRow('⭐','بِ','Kasra','son « i »','en-dessous ⬇️')
+    +"<div style='background:rgba(255,236,179,.55);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.78rem;color:#8a6d00;font-weight:700'>💡 Retiens surtout le SON, pas le nom !</div>",
     /* 3 — on peut les doubler (tanwin) */
     "<div style='font-size:2.6rem;margin-bottom:6px'>➕</div>"
     +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>On peut les doubler !</h2>"
@@ -6130,6 +6131,21 @@ function _showProlongIntro(ca,onFinish){
     +_vRow('☀️','بَا','Alif · ا','allonge le « a »','aaaa')
     +_vRow('🌙','بُو','Waw · و','allonge le « ou »','ouuu')
     +_vRow('⭐','بِي','Ya · ي','allonge le « i »','iiii'),
+    /* 3bis — pourquoi ces lettres ? (même place que la voyelle) */
+    "<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:6px'>Pourquoi ces lettres ? 🤔</h2>"
+    +"<p style='color:rgba(0,0,0,.55);font-size:.82rem;margin-bottom:14px'>La lettre se place comme sa voyelle !</p>"
+    +"<div data-say='اَا' style='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);border:2px solid rgba(233,30,140,.14);border-radius:16px;padding:10px 12px;margin-bottom:8px;cursor:pointer'>"
+      +"<span style='font-size:1.5rem'>☀️</span>"
+      +"<span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>اَ</span><span style='color:#bbb'>→</span><span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>ا</span>"
+      +"<span style='flex:1;text-align:left;font-size:.74rem;color:#7b1fa2;font-weight:700'>tous les deux<br>AU-DESSUS ⬆️</span></div>"
+    +"<div data-say='اُو' style='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);border:2px solid rgba(233,30,140,.14);border-radius:16px;padding:10px 12px;margin-bottom:8px;cursor:pointer'>"
+      +"<span style='font-size:1.5rem'>🌙</span>"
+      +"<span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>اُ</span><span style='color:#bbb'>→</span><span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>و</span>"
+      +"<span style='flex:1;text-align:left;font-size:.74rem;color:#7b1fa2;font-weight:700'>elles se<br>ressemblent 👀</span></div>"
+    +"<div data-say='اِي' style='display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.9);border:2px solid rgba(233,30,140,.14);border-radius:16px;padding:10px 12px;cursor:pointer'>"
+      +"<span style='font-size:1.5rem'>⭐</span>"
+      +"<span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>اِ</span><span style='color:#bbb'>→</span><span style='font-family:var(--fa);font-size:1.9rem;color:#ad1457'>ي</span>"
+      +"<span style='flex:1;text-align:left;font-size:.74rem;color:#7b1fa2;font-weight:700'>tous les deux<br>EN-DESSOUS ⬇️</span></div>",
     /* 4 — attention : seulement sans voyelle */
     "<div style='font-size:2.6rem;margin-bottom:6px'>⚠️</div>"
     +"<h2 style='color:#ad1457;font-size:1.15rem;font-weight:800;margin-bottom:10px'>Attention !</h2>"
