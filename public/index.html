@@ -6273,7 +6273,7 @@ function renderChildIslandMap(ca){
   function openChildIsland(isle,isComplete){
     _lessonPushed=false;
     _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    if(isle.type==='vowels'){_showVowelIntro(domContainer,function(){renderChildVowelLesson(domContainer,0);});}
+    if(isle.type==='vowels'){_vowelCourse(domContainer);}
     else if(isle.type==='prolong'){_showProlongIntro(domContainer,function(){renderChildProlongLesson(domContainer,0);});}
     else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
     else{_showLettersIntro(domContainer,isle.label,function(){renderChildWarmup(domContainer);});}
@@ -7522,6 +7522,126 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
   var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';nextBtn.textContent='Je les connais ! →';nextBtn.style.cssText='display:none;width:100%;padding:14px;font-size:1rem';nextBtn.onclick=goNext;wrap.appendChild(nextBtn);
   setTimeout(function(){nextBtn.style.display='block';},5000);
   setTimeout(function(){speakText(mainSpeak,'ar-SA',null);},600);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COURS VOYELLES INTERACTIF (fille) — scènes narrées, 1 idée/écran,
+   grosses lettres animées, peu de texte, tout lu automatiquement.
+   ═══════════════════════════════════════════════════════════ */
+function _vowelCourse(ca){
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
+
+  function sayFr(t){try{speakText(t,'fr-FR',null);}catch(e){}}
+  function sayAr(t){try{speakText(t,'ar-SA',null);}catch(e){}}
+
+  /* Grosse lettre animée (pop-in), cliquable pour entendre le son */
+  function bigGlyph(glyph,sound,size){
+    var g=document.createElement('div');
+    g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:#ad1457;line-height:1.15;cursor:pointer;display:inline-block;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
+    g.textContent=glyph;
+    g.onclick=function(){sayAr(sound);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
+    setTimeout(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
+    return g;
+  }
+  /* Grande phrase animée + lue automatiquement par la voix */
+  function phrase(html,fr){
+    var p=document.createElement('div');
+    p.style.cssText='font-size:1.4rem;font-weight:800;color:#ad1457;line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
+    p.innerHTML=html;
+    setTimeout(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
+    setTimeout(function(){sayFr(fr||p.textContent);},450);
+    return p;
+  }
+  function nextBtn(label,fn){
+    var b=document.createElement('button');b.className='rbtn rbtn-m';
+    b.style.cssText='background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
+    b.textContent=label||'Suivant →';b.onclick=fn;
+    setTimeout(function(){b.style.opacity='1';},950);
+    return b;
+  }
+  function card(){var c=document.createElement('div');c.className='child-card';c.style.textAlign='center';c.style.padding='26px 20px';return c;}
+
+  var i=0,scenes;
+  function go(){wrap.innerHTML='';_progress();scenes[i]();ca.scrollTop=0;}
+  function next(){i++;if(i>=scenes.length){localStorage.setItem('child_isle_vowels','1');renderChildIslandMap(ca);return;}go();}
+  function _progress(){
+    var bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:14px';
+    for(var k=0;k<scenes.length;k++){var d=document.createElement('div');d.style.cssText='height:6px;flex:1;max-width:24px;border-radius:4px;background:'+(k<i?'#22c55e':k===i?'#ec4899':'rgba(173,20,87,.18)');bar.appendChild(d);}
+    wrap.appendChild(bar);
+  }
+
+  /* Scène « on montre » : phrase + grosse lettre cliquable + son auto */
+  function tell(glyph,sound,html,fr,hint){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      if(glyph){
+        c.appendChild(bigGlyph(glyph,sound,7));
+        if(sound)setTimeout(function(){sayAr(sound);},1500);
+        var h=document.createElement('div');h.style.cssText='font-size:.8rem;color:#ad1457;opacity:.6;margin-top:10px';h.textContent=hint||'👆 Touche pour écouter';c.appendChild(h);
+      }
+      c.appendChild(nextBtn('Suivant →',next));
+      wrap.appendChild(c);
+    };
+  }
+
+  /* Scène quiz : « Où est le son X ? » — 3 voyelles cliquables */
+  function find(targetGlyph,html){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,html.replace(/<[^>]+>/g,'')));
+      setTimeout(function(){sayAr(targetGlyph);},1200);
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:12px';
+      var answered=false;
+      [{g:'بَ'},{g:'بِ'},{g:'بُ'}].slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
+        var b=document.createElement('div');
+        b.style.cssText='font-family:var(--fa);font-size:3.4rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;width:92px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
+        b.textContent=o.g;
+        b.onclick=function(){
+          sayAr(o.g);
+          if(answered)return;
+          if(o.g===targetGlyph){answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
+          else{b.style.background='rgba(239,68,68,.12)';b.style.borderColor='#ef4444';if(typeof playError==='function')playError();}
+        };
+        row.appendChild(b);
+      });
+      c.appendChild(row);
+      wrap.appendChild(c);
+    };
+  }
+
+  scenes=[
+    tell(null,null,'On va apprendre<br>les <span style="color:#7b1fa2">voyelles</span> ! 🎵','On va apprendre les voyelles !'),
+    tell('بْ','بْ','Voici la lettre <span style="color:#7b1fa2">B</span>','Voici la lettre Bé. Touche-la !','👆 Touche : « b »'),
+    tell('بَ','بَ','Un petit trait <span style="color:#7b1fa2">au-dessus</span>…<br>ça fait <span style="color:#7b1fa2">BA</span> ! ☀️','Un petit trait au dessus, ça fait BA !','👆 Touche : « ba »'),
+    tell('بِ','بِ','Un petit trait <span style="color:#7b1fa2">en-dessous</span>…<br>ça fait <span style="color:#7b1fa2">BI</span> ! ⭐','Un petit trait en dessous, ça fait BI !','👆 Touche : « bi »'),
+    tell('بُ','بُ','Une petite boucle <span style="color:#7b1fa2">au-dessus</span>…<br>ça fait <span style="color:#7b1fa2">BOU</span> ! 🌙','Une petite boucle au dessus, ça fait BOU !','👆 Touche : « bou »'),
+    function(){
+      var c=card();
+      c.appendChild(phrase('Voici les <span style="color:#7b1fa2">3 voyelles</span> !','Voici les trois voyelles : A, I, OU'));
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:8px';
+      [['بَ','a'],['بِ','i'],['بُ','ou']].forEach(function(o){
+        var col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+        col.appendChild(bigGlyph(o[0],o[0],3.6));
+        var l=document.createElement('div');l.style.cssText='font-weight:800;color:#7b1fa2;font-size:1.1rem';l.textContent=o[1];col.appendChild(l);
+        row.appendChild(col);
+      });
+      c.appendChild(row);
+      c.appendChild(nextBtn('Je les connais ! →',next));
+      wrap.appendChild(c);
+    },
+    find('بُ','Où est le son <span style="color:#7b1fa2">OU</span> ? 👂'),
+    find('بَ','Où est le son <span style="color:#7b1fa2">A</span> ? 👂'),
+    find('بِ','Où est le son <span style="color:#7b1fa2">I</span> ? 👂'),
+    tell(null,null,'Bravo ! 🎉<br>Tu connais les 3 voyelles !','Bravo ! Tu connais les trois voyelles !'),
+    tell(null,null,'Maintenant…<br>on peut les <span style="color:#7b1fa2">DOUBLER</span> ! ➕','Maintenant, on peut les doubler !'),
+    tell('بً','بً','Deux petits traits…<br><span style="color:#7b1fa2">BA</span> devient <span style="color:#7b1fa2">BAN</span> ! 👃','Deux petits traits ! BA devient BANE. On ajoute le son N !','👆 Touche : « ban »'),
+    tell('بٍ','بٍ','<span style="color:#7b1fa2">BI</span> devient <span style="color:#7b1fa2">BIN</span> ! 👃','BI devient BINE !','👆 Touche : « bin »'),
+    tell('بٌ','بٌ','<span style="color:#7b1fa2">BOU</span> devient <span style="color:#7b1fa2">BOUN</span> ! 👃','BOU devient BOUNE !','👆 Touche : « boun »'),
+    tell(null,null,'Super ! 🌟<br>Tu as fini les voyelles !','Super ! Tu as fini les voyelles !')
+  ];
+  go();
 }
 
 /* Étape 1 générique — flashcards + mini-canvas, même structure que _clStep1 */
