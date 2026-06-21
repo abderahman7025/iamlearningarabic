@@ -6821,13 +6821,13 @@ function _clStep0(wrap,letter,af,goNext){
   nameL.textContent=letter.name+(letter.wordLat?' · '+letter.wordLat:'');
   card.appendChild(nameL);
 
-  /* 3 formes (clic = écoute chaque forme) */
+  /* Formes distinctes (clic = écoute chaque forme), tiret de liaison visible */
   var varRow=document.createElement('div');varRow.className='child-variants';
-  [['Début',af.i],['Milieu',af.m],['Fin',af.f]].forEach(function(v){
+  _dedupForms(letter,af).forEach(function(v){
     var box=document.createElement('div');box.className='child-var-box';
     box.style.cursor='pointer';
-    box.innerHTML='<div class="child-var-ar">'+v[1]+'</div><div class="child-var-lbl">'+v[0]+'</div>';
-    box.onclick=(function(f){return function(){speakText(f,'ar-SA',null);};})(v[1]);
+    box.innerHTML='<div class="child-var-ar">'+v.form+'</div><div class="child-var-lbl">'+v.lblText+'</div>';
+    box.onclick=(function(f){return function(){speakText(f,'ar-SA',null);};})(v.form);
     varRow.appendChild(box);
   });
   card.appendChild(varRow);
@@ -6868,13 +6868,20 @@ function _clStep0(wrap,letter,af,goNext){
 
 /* Dédoublonne les positions identiques (lettres qui ne s'attachent pas :
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
-function _dedupForms(letter,af){
-  var raw=[
+var _TATWEEL='ـ';
+/* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
+   pour que les formes milieu/fin montrent clairement le trait de liaison. */
+function _childForms(letter,af){
+  function vis(s){return (s||letter.ar).split(Z).join(_TATWEEL);}
+  return [
     {lbl:'Isolée',form:letter.ar},
-    {lbl:'Début', form:af.i},
-    {lbl:'Milieu',form:af.m},
-    {lbl:'Fin',   form:af.f}
+    {lbl:'Début', form:vis(af.i)},
+    {lbl:'Milieu',form:vis(af.m)},
+    {lbl:'Fin',   form:vis(af.f)}
   ];
+}
+function _dedupForms(letter,af){
+  var raw=_childForms(letter,af);
   var out=[];
   raw.forEach(function(r){
     var ex=null;
@@ -6891,10 +6898,16 @@ function _dedupForms(letter,af){
    ratio ~0.60 = la ligne est aux 3/5 bas du canvas (placement correct par lettre). */
 function _drawWritingGuide(ctx,form,CW,CH,fontPx,split){
   ctx.clearRect(0,0,CW,CH);
-  var baseY=Math.round(CH*0.60);
   ctx.save();
   ctx.font=fontPx+"px 'Scheherazade New',serif";
   ctx.textBaseline='alphabetic';
+  /* Lettres à jambage descendant (و ج ح خ ع غ م ن ق ي ر ز ...) : on remonte la ligne
+     pour que seul le corps reste au-dessus et la queue passe sous la ligne. */
+  var measureStr=(split&&split.length===2)?split[0]:form;
+  var mm=ctx.measureText(measureStr);
+  var desc=mm.actualBoundingBoxDescent||0;
+  var hasDesc=desc>fontPx*0.12;
+  var baseY=Math.round(CH*(hasDesc?0.50:0.64));
   ctx.fillStyle='rgba(194,24,91,0.07)';
   if(split&&split.length===2){
     /* lettre + voyelle séparées (voyelles/prolongations) */
@@ -7299,12 +7312,7 @@ function _clStep4(wrap,letter,af,dayIdx,goNext){
    ────────────────────────────────────────────────────── */
 function _clStep5(wrap,letter,af,dayIdx,goNext){
   /* Les 4 positions servent de boutons-réponses (début/isolée/milieu/fin) */
-  var forms=[
-    {lbl:'Isolée',form:letter.ar},
-    {lbl:'Début', form:af.i},
-    {lbl:'Milieu',form:af.m},
-    {lbl:'Fin',   form:af.f}
-  ];
+  var forms=_childForms(letter,af);
   /* Questions : une par forme DISTINCTE (pas de doublon de glyphe) */
   var distinct=_dedupForms(letter,af);
   var formQs=distinct.slice().sort(function(){return Math.random()-.5;}).slice(0,3);
