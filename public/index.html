@@ -6181,42 +6181,36 @@ function _showProlongIntro(ca,onFinish){
   _introPager(ca,onFinish,pages);
 }
 
+/* Intro d'une île de lettres — format scènes narrées (voir _kidScene) :
+   une idée par écran, grosses formes animées cliquables, tout est lu. */
 function _showLettersIntro(ca,isleName,onFinish){
-  ca.innerHTML='';ca.style.paddingTop='64px';
-  var wrap=document.createElement('div');wrap.className='child-wrap';
-  var card=document.createElement('div');card.className='child-card';
-  card.style.textAlign='center';
+  var S=_kidScene(ca);
+  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
 
-  card.innerHTML='<div style="font-size:3rem;margin-bottom:16px">✏️</div>'
-    +'<h2 style="color:#ad1457;font-size:1.2rem;margin-bottom:12px;font-weight:800">'+isleName+'</h2>'
-    +'<p style="color:rgba(0,0,0,.6);font-size:.85rem;margin-bottom:20px;line-height:1.5">Chaque lettre arabe change de forme<br>selon sa position dans le mot !</p>';
+  S.run([
+    S.tell(null,null,'Nouvelle île ! ✨<br>'+hi(isleName),
+      'Nouvelle île ! '+isleName),
+    S.tell(null,null,'En arabe, une lettre<br>'+hi('CHANGE')+' de forme ! 🔄',
+      'En arabe, une lettre change de forme !'),
+    S.tell(null,null,'Ça dépend de sa '+hi('place')+'<br>dans le mot 📍',
+      'Ça dépend de sa place dans le mot.'),
 
-  /* Les 4 formes */
-  var exDiv=document.createElement('div');exDiv.style.cssText='background:rgba(255,255,255,.92);border-radius:16px;padding:16px;margin-bottom:20px;border:3px solid #ad1457';
-  exDiv.innerHTML=''
-    +'<div style="font-size:.82rem;color:rgba(0,0,0,.5);margin-bottom:12px;font-weight:700">Les 4 positions :</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
-    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">ISOLÉE</div>'
-    +'<div style="font-size:1.8rem;color:#ad1457">ب</div></div>'
-    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
-    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">AU DÉBUT</div>'
-    +'<div style="font-size:1.8rem;color:#ad1457">بـــ</div></div>'
-    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
-    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">AU MILIEU</div>'
-    +'<div style="font-size:1.8rem;color:#ad1457">ــبـــ</div></div>'
-    +'<div style="background:rgba(255,192,203,.12);border-radius:10px;padding:10px">'
-    +'<div style="font-size:.75rem;color:rgba(0,0,0,.5);margin-bottom:4px">À LA FIN</div>'
-    +'<div style="font-size:1.8rem;color:#ad1457">ــب</div></div>'
-    +'</div>';
-  card.appendChild(exDiv);
+    /* Les 4 positions, une par écran */
+    S.tell('ب','بْ',hi('Toute seule')+',<br>elle s\'écrit comme ça',
+      'Toute seule, elle s\'écrit comme ça.','👆 Touche pour écouter'),
+    S.tell('بـ','بْ','Au '+hi('début')+' d\'un mot… 👉',
+      'Au début d\'un mot, elle s\'écrit comme ça.','👆 Touche pour écouter'),
+    S.tell('ـبـ','بْ','Au '+hi('milieu')+' d\'un mot… 👉',
+      'Au milieu d\'un mot, elle s\'écrit comme ça.','👆 Touche pour écouter'),
+    S.tell('ـب','بْ','À la '+hi('fin')+' d\'un mot… 👉',
+      'À la fin d\'un mot, elle s\'écrit comme ça.','👆 Touche pour écouter'),
 
-  card.innerHTML+='<p style="color:rgba(0,0,0,.5);font-size:.82rem;margin-bottom:20px;line-height:1.6">Tu vas apprendre toutes ces formes<br>en traçant et en écrivant ! 🎯</p>';
-
-  var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.style.background='linear-gradient(135deg,#ec4899,#ad1457)';
-  btn.textContent='Je comprends ! →';btn.style.color='white';
-  btn.onclick=onFinish;
-  card.appendChild(btn);wrap.appendChild(card);ca.appendChild(wrap);
+    S.row([['ب','seule'],['بـ','début'],['ـبـ','milieu'],['ـب','fin']],
+      'C\'est la '+hi('même')+' lettre ! 😊','Et c\'est toujours la même lettre !',
+      'J\'ai compris ! →',2.6),
+    S.tell(null,null,'On va les apprendre<br>en '+hi('écrivant')+' ! ✏️',
+      'On va les apprendre en écrivant !')
+  ],onFinish);
 }
 
 function renderChildIslandMap(ca){
@@ -6567,144 +6561,113 @@ function renderChildIslandMap(ca){
 }
 
 /* Récapitulatif d'une île déjà terminée (clic sur île complète) */
+/* Récapitulatif d'une île déjà terminée — format scènes narrées :
+   une lettre par écran, grande illustration, lettre et mot cliquables. */
 function _renderChildIslandRecap(ca,letterIndices){
-  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+  var S=_kidScene(ca);
+  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  var sc=[];
 
-  var titleEl=document.createElement('div');titleEl.className='child-reward-title';titleEl.style.marginBottom='16px';
-  titleEl.textContent='✅ Île terminée !';wrap.appendChild(titleEl);
+  sc.push(S.tell(null,null,'Île '+hi('terminée')+' ! ✅<br>On revoit tout ?',
+    'Île terminée ! On revoit tout ?'));
 
   letterIndices.forEach(function(li){
-    var letter=CHILD_LETTERS[li];
-    var row=document.createElement('div');row.className='child-card';
-    row.style.cssText='display:flex;align-items:center;gap:14px;padding:12px 18px;margin-bottom:10px;cursor:pointer';
-    row.innerHTML='<span style="font-size:2rem">'+letter.emoji+'</span>'
-      +'<span style="font-family:var(--fa);font-size:2.4rem;color:#c2185b">'+letter.ar+'</span>'
-      +'<span style="font-family:var(--fa);font-size:1.2rem;color:#888">'+letter.wordAr+'</span>';
-    row.onclick=function(){speakText(letter.ar,'ar-SA',null);};
-    wrap.appendChild(row);
+    var L=CHILD_LETTERS[li];
+    sc.push(function(){
+      var c=S.card();
+      var em=document.createElement('div');
+      em.style.cssText='font-size:4.4rem;line-height:1.1;margin-bottom:2px;transform:scale(.4);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s';
+      em.textContent=L.emoji;
+      S.later(function(){em.style.transform='scale(1)';em.style.opacity='1';},60);
+      c.appendChild(em);
+      c.appendChild(S.phrase('La lettre '+hi(L.name),'La lettre '+L.name));
+      /* display:block — sinon la lettre et le mot, en inline-block, se
+         retrouvent sur la même ligne et se collent visuellement. */
+      var g=S.bigGlyph(L.ar,L.ar+'ْ',5.4);g.style.display='block';c.appendChild(g);
+      var w=S.bigGlyph(L.wordAr,L.wordAr,2.2);w.style.color='#7b1fa2';w.style.display='block';c.appendChild(w);
+      c.appendChild(S.caption(L.wordLat));
+      c.appendChild(S.hintLine('👆 Touche la lettre ou le mot'));
+      S.later(function(){S.sayAr(L.ar+'ْ');S.sayAr(L.wordAr);},600);
+      c.appendChild(S.nextBtn('Suivant →',S.next,1800));
+      S.wrap.appendChild(c);
+    });
   });
 
-  var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';
-  backBtn.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:8px';
-  backBtn.textContent='‹ Carte des îles';
-  backBtn.onclick=function(){renderChildIslandMap(ca);};
-  wrap.appendChild(backBtn);
-  ca.appendChild(wrap);
+  sc.push(S.bravo('Tu connais<br>toute cette '+hi('île')+' ! 🌟',
+    'Tu connais toute cette île !','⭐ ⭐ ⭐'));
+
+  S.run(sc,function(){renderChildIslandMap(ca);});
 }
 
 // ════════════════════════════════════════════════════════
 //  QUIZ DE RÉCHAUFFEMENT — lettres déjà apprises
 // ════════════════════════════════════════════════════════
+/* Révision avant une nouvelle lettre — format scènes narrées :
+   une question par écran, grande illustration, énoncé lu à voix haute. */
 function renderChildWarmup(ca){
   _navPush('sessions/lesson');
   var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
   if(dayIdx<1){renderChildLesson(ca,dayIdx);return;}
 
-  /* Sélection de 5 lettres déjà apprises comme questions */
+  /* 5 lettres déjà apprises tirées au sort */
   var pool=[];for(var pi=0;pi<dayIdx;pi++)pool.push(pi);
   pool.sort(function(){return Math.random()-.5;});
   var questions=pool.slice(0,Math.min(5,pool.length));
-  var qIdx=0,score=0;
+  var score=0;
 
-  function showQ(){
-    ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-    if(qIdx>=questions.length){renderChildLesson(ca,dayIdx);return;}
+  var S=_kidScene(ca);
+  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function goLesson(){S.sayStop();renderChildLesson(ca,dayIdx);}
 
-    var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+  var sc=[];
 
-    /* ── Carte opaque derrière le quiz ── */
-    var card=document.createElement('div');card.className='child-card';
-    card.style.cssText='padding:20px 18px 16px;margin-bottom:12px';
+  /* Intro + possibilité de passer la révision */
+  sc.push(function(){
+    var c=S.card();
+    var em=document.createElement('div');em.style.cssText='font-size:4.4rem;margin-bottom:4px';em.textContent='🔄';c.appendChild(em);
+    c.appendChild(S.phrase('On '+hi('révise')+'<br>d\'abord ! 😊','On révise d\'abord !'));
+    c.appendChild(S.nextBtn('C\'est parti ! →',S.next));
+    var skip=document.createElement('button');skip.className='rbtn rbtn-s';
+    skip.style.cssText='display:block;margin:10px auto 0;font-size:.78rem;opacity:.65';
+    skip.textContent='Passer →';skip.onclick=goLesson;
+    c.appendChild(skip);
+    S.wrap.appendChild(c);
+  });
 
-    /* Barre de progression quiz */
-    var qprog=document.createElement('div');
-    qprog.style.cssText='display:flex;justify-content:center;gap:6px;margin-bottom:14px';
-    for(var qi=0;qi<questions.length;qi++){
-      var qd=document.createElement('div');
-      qd.style.cssText='width:10px;height:10px;border-radius:50%;background:'+(qi<qIdx?'#22c55e':qi===qIdx?'#c2185b':'rgba(194,24,91,.2)')+';transition:all .3s';
-      qprog.appendChild(qd);
-    }
-    card.appendChild(qprog);
-
-    /* Label réchauffement */
-    var wlbl=document.createElement('div');
-    wlbl.style.cssText='font-size:.7rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:18px';
-    wlbl.textContent='Révision rapide ✦ Question '+(qIdx+1)+' / '+questions.length;
-    card.appendChild(wlbl);
-
-    var correctIdx=questions[qIdx];
-    var correctLetter=CHILD_LETTERS[correctIdx];
-
-    /* Grand emoji = indice */
-    var emojiEl=document.createElement('div');
-    emojiEl.style.cssText='font-size:5rem;margin:0 0 8px';
-    emojiEl.textContent=correctLetter.emoji;
-    card.appendChild(emojiEl);
-
-    /* Mot arabe */
-    var wordEl=document.createElement('div');
-    wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:1.8rem;color:#7b1fa2;margin-bottom:16px;line-height:1.2';
-    wordEl.textContent=correctLetter.wordAr;
-    card.appendChild(wordEl);
-
-    /* Question */
-    var qel=document.createElement('div');
-    qel.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:16px';
-    qel.textContent='Par quelle lettre commence ce mot ?';
-    card.appendChild(qel);
-
-    /* Choix : 3 grandes lettres arabes */
+  /* Une question par écran */
+  questions.forEach(function(ci){
+    var L=CHILD_LETTERS[ci];
     var wrong=[];
-    for(var wj=0;wj<CHILD_LETTERS.length;wj++){if(wj!==correctIdx)wrong.push(wj);}
+    for(var wj=0;wj<CHILD_LETTERS.length;wj++){if(wj!==ci)wrong.push(wj);}
     wrong.sort(function(){return Math.random()-.5;});
-    var choices=[correctIdx,wrong[0],wrong[1]];
-    choices.sort(function(){return Math.random()-.5;});
+    sc.push(S.guess({
+      emoji:L.emoji, word:L.wordAr, wordSay:L.wordAr,
+      html:'Par quelle '+hi('lettre')+'<br>commence ce mot ? 👂',
+      fr:'Par quelle lettre commence ce mot ?',
+      options:[
+        [L.ar,L.ar+'ْ'],
+        [CHILD_LETTERS[wrong[0]].ar,CHILD_LETTERS[wrong[0]].ar+'ْ'],
+        [CHILD_LETTERS[wrong[1]].ar,CHILD_LETTERS[wrong[1]].ar+'ْ']
+      ],
+      answer:L.ar,
+      onAnswer:function(ok){if(ok)score++;}
+    }));
+  });
 
-    var choicesEl=document.createElement('div');
-    choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:16px';
-    var answered=false,failed=false;
-    choices.forEach(function(li){
-      var btn=document.createElement('div');
-      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:3.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:rtl';
-      btn.textContent=CHILD_LETTERS[li].ar;
-      btn.onclick=function(){
-        if(answered||btn._used)return;
-        if(li===correctIdx){
-          playBravo();
-          btn.style.cssText=btn.style.cssText+';background:rgba(34,197,94,.2);border-color:#22c55e;color:#15803d';
-          if(!failed)score++;
-          answered=true;
-          setTimeout(function(){qIdx++;showQ();},700);
-        } else {
-          playError();
-          btn.style.cssText=btn.style.cssText+';background:rgba(239,68,68,.12);border-color:#ef4444;color:#dc2626;cursor:default';
-          btn._used=true;/* désactiver ce bouton, laisser les autres cliquables */
-          failed=true;  /* question perdue, pas d'étoile même si on trouve ensuite */
-        }
-      };
-      choicesEl.appendChild(btn);
-    });
-    card.appendChild(choicesEl);
+  /* Score puis passage à la nouvelle lettre */
+  sc.push(function(){
+    var c=S.card();
+    var em=document.createElement('div');em.style.cssText='font-size:3.6rem;margin-bottom:4px';em.textContent='🎉';c.appendChild(em);
+    c.appendChild(S.phrase('Révision '+hi('finie')+' !','Révision finie !'));
+    var stars=document.createElement('div');
+    stars.style.cssText='font-size:2rem;letter-spacing:4px;min-height:2.4rem';
+    for(var k=0;k<score;k++)stars.textContent+='⭐';
+    c.appendChild(stars);
+    c.appendChild(S.nextBtn('Nouvelle lettre ! →',S.next));
+    S.wrap.appendChild(c);
+  });
 
-    /* Étoiles gagnées */
-    var srow=document.createElement('div');
-    srow.style.cssText='font-size:1.4rem;min-height:1.8rem';
-    for(var sk=0;sk<score;sk++)srow.textContent+='⭐';
-    card.appendChild(srow);
-
-    wrap.appendChild(card);
-
-    /* Bouton passer (en dehors de la carte) */
-    var skipBtn=document.createElement('button');skipBtn.className='rbtn rbtn-s';
-    skipBtn.style.cssText='display:block;margin:10px auto 0;font-size:.78rem;opacity:.65';
-    skipBtn.textContent='Passer →';
-    skipBtn.onclick=function(){renderChildLesson(ca,dayIdx);};
-    wrap.appendChild(skipBtn);
-
-    ca.appendChild(wrap);
-  }
-  showQ();
+  S.run(sc,goLesson);
 }
 
 function renderChildLetterDay(ca){
@@ -7705,6 +7668,51 @@ function _kidScene(ca){
       });
       c.appendChild(row);
       c.appendChild(hintLine('👂 Écoute bien, puis touche la bonne réponse'));
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Exercice illustré : une grande image (emoji) + un mot, puis des choix.
+     cfg = {emoji, word, wordSay, html, fr, options:[glyphe|[glyphe,son]], answer} */
+  api.guess=function(cfg){
+    return function(){
+      var opts=cfg.options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var c=card();
+      if(cfg.emoji){
+        var em=document.createElement('div');
+        em.style.cssText='font-size:4.6rem;line-height:1.1;margin-bottom:4px;transform:scale(.4);opacity:0;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s';
+        em.textContent=cfg.emoji;
+        later(function(){em.style.transform='scale(1)';em.style.opacity='1';},60);
+        c.appendChild(em);
+      }
+      if(cfg.word){
+        var w=bigGlyph(cfg.word,cfg.wordSay||cfg.word,2.4);
+        w.style.color='#7b1fa2';w.style.display='block';c.appendChild(w);
+      }
+      c.appendChild(phrase(cfg.html,cfg.fr));
+      if(cfg.word)later(function(){sayAr(cfg.wordSay||cfg.word);},600);
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:6px;flex-wrap:wrap';
+      var answered=false,failed=false;
+      opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
+        var b=document.createElement('div');
+        b.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
+        b.textContent=o.g;
+        b.onclick=function(){
+          if(answered||b._ko)return;
+          sayAr(o.s);
+          if(o.g===cfg.answer){
+            answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';
+            if(typeof playBravo==='function')playBravo();
+            if(cfg.onAnswer)cfg.onAnswer(!failed);
+            later(next,800);
+          }else{
+            failed=true;b._ko=true;b.style.background='rgba(239,68,68,.12)';b.style.borderColor='#ef4444';
+            if(typeof playError==='function')playError();
+          }
+        };
+        row.appendChild(b);
+      });
+      c.appendChild(row);
       wrap.appendChild(c);
     };
   };
