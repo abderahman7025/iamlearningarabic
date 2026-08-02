@@ -1,5 +1,5 @@
-// iamlearningarabic — Service Worker v29
-const CACHE = 'arab-v29';
+// iamlearningarabic — Service Worker v30
+const CACHE = 'arab-v30';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -35,8 +35,16 @@ self.addEventListener('fetch', function(e) {
       url.hostname.includes('anthropic') ||
       url.pathname.includes('/api/')) return;
 
-  // index.html + app.html → TOUJOURS réseau en premier (jamais de cache)
-  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '' || url.pathname === '/app.html' || url.pathname === '/app') {
+  // TOUTE navigation (page HTML) → TOUJOURS réseau en premier.
+  // Les URL /fille/..., /garcon/..., /adulte/..., /cours/... sont réécrites
+  // vers index.html côté serveur (voir vercel.json). Elles ne correspondent
+  // donc à aucun des chemins listés ci-dessous et tombaient dans le
+  // "cache first" : l'application restait bloquée sur une version périmée
+  // jusqu'à ce qu'un changement de version du cache la supprime.
+  // On teste le type de requête plutôt que le chemin : ça couvre toutes les
+  // réécritures, présentes et futures.
+  if (e.request.mode === 'navigate' || e.request.destination === 'document' ||
+      url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '') {
     e.respondWith(
       fetch(e.request, {cache: 'no-store'}).then(function(response) {
         if (response && response.status === 200) {
