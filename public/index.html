@@ -6213,6 +6213,64 @@ function _showLettersIntro(ca,isleName,onFinish){
   ],onFinish);
 }
 
+/* Choix de la lettre dans une île — équivalent des onglets du cours adulte
+   (renderLLesson). Sans cet écran, l'île n'ouvrait que la lettre en cours :
+   les autres lettres de l'île étaient invisibles et impossibles à revoir. */
+function _childLetterPicker(ca,isle){
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
+  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+  var titre=document.createElement('div');
+  titre.style.cssText='font-size:1.3rem;font-weight:900;color:#ad1457;margin-bottom:4px';
+  titre.textContent=isle.label;wrap.appendChild(titre);
+  var sous=document.createElement('div');
+  sous.style.cssText='font-size:.9rem;color:#ad1457;opacity:.7;margin-bottom:16px;font-weight:700';
+  sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
+  try{speakText('Choisis ta lettre !','fr-FR',null);}catch(e){}
+
+  isle.letters.forEach(function(li){
+    var L=CHILD_LETTERS[li];
+    var apprise=li<dayIdx, courante=li===dayIdx, bloquee=li>dayIdx;
+
+    var carte=document.createElement('div');carte.className='child-card';
+    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;text-align:left;'
+      +(bloquee?'opacity:.45;':'cursor:pointer;')
+      +(courante?'border:3px solid #ec4899;box-shadow:0 6px 22px rgba(236,72,153,.28);':'');
+
+    var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';
+    em.textContent=bloquee?'🔒':L.emoji;carte.appendChild(em);
+
+    var lettre=document.createElement('div');
+    lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;min-width:60px;text-align:center;line-height:1.1';
+    lettre.textContent=L.ar;carte.appendChild(lettre);
+
+    var infos=document.createElement('div');infos.style.cssText='flex:1';
+    infos.innerHTML='<div style="font-weight:900;color:#7b1fa2;font-size:1.05rem">'+L.name+'</div>'
+      +'<div style="font-size:.82rem;color:#ad1457;opacity:.75;font-weight:700">'
+      +(bloquee?'Pas encore ouverte':(apprise?'✅ Déjà apprise — revoir':'▶ À apprendre'))+'</div>';
+    carte.appendChild(infos);
+
+    if(!bloquee){
+      carte.onclick=function(){
+        try{stopSpeech();}catch(e){}
+        /* lettre en cours → on révise d'abord ; relecture → directement la leçon */
+        if(courante)renderChildWarmup(ca);
+        else _letterCourse(ca,li);
+      };
+    }
+    wrap.appendChild(carte);
+  });
+
+  var retour=document.createElement('button');retour.className='rbtn rbtn-m';
+  retour.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:6px';
+  retour.textContent='‹ Carte des îles';
+  retour.onclick=function(){try{stopSpeech();}catch(e){}renderChildIslandMap(ca);};
+  wrap.appendChild(retour);
+
+  ca.appendChild(wrap);
+}
+
 function renderChildIslandMap(ca){
   ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
   st._curPage='sessions-map';
@@ -6272,7 +6330,14 @@ function renderChildIslandMap(ca){
     if(isle.type==='vowels'){_vowelCourse(domContainer);}
     else if(isle.type==='prolong'){_prolongCourse(domContainer);}
     else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
-    else{_showLettersIntro(domContainer,isle.label,function(){renderChildWarmup(domContainer);});}
+    else if(localStorage.getItem('child_seen_forms_intro')==='1'){
+      /* l'explication des 4 formes n'est montrée qu'une fois */
+      _childLetterPicker(domContainer,isle);
+    }
+    else{_showLettersIntro(domContainer,isle.label,function(){
+      try{localStorage.setItem('child_seen_forms_intro','1');}catch(e){}
+      _childLetterPicker(domContainer,isle);
+    });}
   }
 
   var globeDiv=document.createElement('div');
@@ -8028,7 +8093,10 @@ function _letterCourse(ca,dayIdx){
   /* ── 3. Les formes, une par écran ── */
   forms.forEach(function(f){
     var where=f.labels.map(function(l,i){var w=_CL_POS[l]||l;return i?w.toLowerCase():w;}).join(' et ');
-    sc.push(S.tell(f.form,f.form,where+',<br>elle s\'écrit '+hi('comme ça')+' !',
+    /* On prononce la lettre seule (L+soukoun) et non la forme avec tatweel :
+       la forme liée n'est pas une chaîne enregistrable au studio, alors que
+       la lettre seule l'est déjà. */
+    sc.push(S.tell(f.form,L+'ْ',where+',<br>elle s\'écrit '+hi('comme ça')+' !',
       where+' du mot, elle s\'écrit comme ça !','👆 Touche pour écouter'));
   });
   if(!attaches){
@@ -8038,6 +8106,28 @@ function _letterCourse(ca,dayIdx){
   sc.push(S.row(forms.map(function(f){return [f.form,f.lblText];}),
     'Toutes ses '+hi('formes')+' ! 🔍','Voici toutes ses formes !','Je les connais ! →',
     forms.length>3?2.6:3.4));
+
+  /* ── Cas particuliers (équivalents du cours adulte renderLLesson) ── */
+
+  /* La hamza et ses 4 supports — côté adulte : hamzaForms (ء أ ؤ ئ) */
+  if(L==='ء'){
+    sc.push(S.tell(null,null,'La hamza a besoin<br>d\'une '+hi('chaise')+' ! 🪑',
+      'La hamza a souvent besoin d\'une chaise pour s\'asseoir !'));
+    sc.push(S.tell('أ','أَ','Assise sur le '+hi('ا')+' 🪑','Assise sur le alif !','👆 Touche pour écouter'));
+    sc.push(S.tell('ؤ','ؤُ','Assise sur le '+hi('و')+' 🪑','Assise sur le waw !','👆 Touche pour écouter'));
+    sc.push(S.tell('ئ','ئِ','Assise sur le '+hi('ي')+' 🪑','Assise sur le ya !','👆 Touche pour écouter'));
+    sc.push(S.tell('ء','ءَ','Et parfois…<br>'+hi('toute seule')+' ! 🙋','Et parfois, elle reste toute seule !','👆 Touche pour écouter'));
+    sc.push(S.row([['أ','sur ا'],['ؤ','sur و'],['ئ','sur ي'],['ء','seule']],
+      'Ses '+hi('4 chaises')+' ! 🪑','Voici ses quatre chaises !','Je les connais ! →',2.6));
+  }
+
+  /* Le tā marbūta — toujours en fin de mot, côté adulte : isTaMarbuta */
+  if(L==='ة'){
+    sc.push(S.tell('ة','ةْ','Elle se met '+hi('toujours')+'<br>à la '+hi('fin')+' du mot ! 🔚',
+      'Cette lettre se met toujours à la fin du mot !','👆 Touche pour écouter'));
+    sc.push(S.tell(null,null,'C\'est souvent la marque<br>du '+hi('féminin')+' ! 👧',
+      'C\'est souvent la marque du féminin !'));
+  }
 
   /* ── 4. Je l'écris ── */
   sc.push(S.trace(L,'À moi de l\'<br>'+hi('écrire')+' ! ✏️','À toi de l\'écrire ! Suis le modèle avec ton doigt.'));
@@ -8751,7 +8841,10 @@ function renderChildGame(ca,dayIdx,round,onDone){
 function renderChildReward(ca,dayIdx){
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
-  var newDay=Math.min(dayIdx+1,CHILD_LETTERS.length-1);
+  /* Math.max : revoir une lettre déjà apprise (via le choix des lettres de
+     l'île) ne doit jamais faire reculer la progression. */
+  var dejaFait=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
+  var newDay=Math.min(Math.max(dayIdx+1,dejaFait),CHILD_LETTERS.length-1);
   try{localStorage.setItem('child_girl_day',''+newDay);}catch(e){}
   launchConfetti('girl');
 
@@ -10987,7 +11080,51 @@ var ADMIN_SOUNDS = [
   {ar:'إِيَاكَ',label:'iyâka'},
   {ar:'إِيَّاكَ',label:'iyyâka'},
   {ar:'أَوَاهْ',label:'awāh'},
-  {ar:'أَوَّاهْ',label:'awwāh'}
+  {ar:'أَوَّاهْ',label:'awwāh'},
+
+  /* ── Interface fille : chaînes utilisées par les cours enfant ──
+     Sans enregistrement, elles passent par la synthèse vocale et sont
+     mal prononcées. Les combinaisons lettre + voyelle sont déjà
+     couvertes plus haut ; il manquait les mots et quelques exemples. */
+
+  /* Les 30 mots illustrés (un par lettre, cf. CHILD_LETTERS) */
+  {ar:'أَسَد',label:'asad — lion 🦁'},
+  {ar:'وَرْدَة',label:'warda — rose 🌹'},
+  {ar:'يَمَامَة',label:'yamāma — colombe 🕊️'},
+  {ar:'بَقَرَة',label:'baqara — vache 🐄'},
+  {ar:'تِمْسَاح',label:'timsāh — crocodile 🐊'},
+  {ar:'ثُعْبَان',label:"thu'bān — serpent 🐍"},
+  {ar:'جَمَل',label:'jamal — chameau 🐪'},
+  {ar:'حِصَان',label:'Hisān — cheval 🐴'},
+  {ar:'خَرُوف',label:'kharūf — mouton 🐑'},
+  {ar:'دُبّ',label:'dubb — ours 🐻'},
+  {ar:'ذِئْب',label:"dhi'b — loup 🐺"},
+  {ar:'رَوْضَة',label:'rawDa — jardin 🌷'},
+  {ar:'زَرَافَة',label:'zarāfa — girafe 🦒'},
+  {ar:'سَمَكَة',label:'samaka — poisson 🐟'},
+  {ar:'شَجَرَة',label:'shajara — arbre 🌳'},
+  {ar:'صَقْر',label:'Saqr — faucon 🦅'},
+  {ar:'ضِفْدَع',label:"Difda' — grenouille 🐸"},
+  {ar:'طَاوُوس',label:'Tāwūs — paon 🦚'},
+  {ar:'ظَبْي',label:'DHaby — gazelle 🦌'},
+  {ar:'عُصْفُور',label:"'uSfūr — oiseau 🐦"},
+  {ar:'غُورِيلَا',label:'ghurīlā — gorille 🦍'},
+  {ar:'فَرَاشَة',label:'farāsha — papillon 🦋'},
+  {ar:'قِطَّة',label:'qiTTa — chatte 🐱'},
+  {ar:'كَلْب',label:'kalb — chien 🐶'},
+  {ar:'لَقْلَق',label:'laqlaq — cigogne 🦩'},
+  {ar:'مَوْز',label:'mawz — banane 🍌'},
+  {ar:'نَمِر',label:'namir — tigre 🐯'},
+  {ar:'هِرَّة',label:'hirra — chatte 🐈'},
+  {ar:'أَفْعَى',label:"af'ā — vipère 🦁"},
+  {ar:'تُفَّاحَة',label:'tuffāHa — pomme 🍎'},
+
+  /* Exemples du cours des prolongations (fille) */
+  {ar:'جَدَ',label:'jada — sans chaddah'},
+  {ar:'جَدّ',label:'jad-d — grand-père 👴'},
+  {ar:'بَوَ',label:'bawa — waw vraie lettre'},
+  {ar:'بّ',label:'b-b — chaddah'},
+  {ar:'نُورٌ',label:'nūrun — une lumière'}
 ];
 
 var adminRecorder = null;
