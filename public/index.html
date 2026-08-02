@@ -6389,10 +6389,11 @@ function renderChildIslandMap(ca){
         el.style.alignSelf=(i%2===0)?'flex-end':'flex-start';
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
-      globeDiv.style.paddingTop='80px';globeDiv.style.position='relative';globeDiv.style.gap='28px';
+      /* 110px : place pour la mascotte, dessinée 80px au-dessus du point du chemin */
+      globeDiv.style.paddingTop='110px';globeDiv.style.position='relative';globeDiv.style.gap='28px';
       var srcElMob=document.querySelector('#girl-mascot img');
       var charElMob=document.createElement('div');
-      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
+      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6));animation:mascotBob 2.4s ease-in-out infinite';
       if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
       globeDiv.appendChild(charElMob);
       setTimeout(function(){
@@ -6416,7 +6417,8 @@ function renderChildIslandMap(ca){
         var cpMRight=Math.min(gW*0.95,maxMX+80);
         var cpMLeft=Math.max(gW*0.05,minMX-80);
         if(isleCardsMob.length>0){
-          var avX=gW*0.08,avY=40,t0x=centersM[0].x,t0y=centersM[0].y;
+          /* min. 42px : la mascotte est dessinée 34px à gauche du point, sinon elle déborde */
+          var avX=Math.max(gW*0.08,42),avY=100,t0x=centersM[0].x,t0y=centersM[0].y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           var mid0mx=(avX+t0x)*0.5;
           segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
@@ -6484,6 +6486,10 @@ function renderChildIslandMap(ca){
     Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
     setTimeout(function(){
       globeDiv.style.position='relative';
+      /* Marge en haut : la mascotte est dessinée 90px au-dessus du point du
+         chemin (elle se tient dessus). Sans cette place, le départ du chemin
+         la ferait déborder hors de la carte et elle deviendrait invisible. */
+      globeDiv.style.paddingTop='110px';
       var gW=globeDiv.offsetWidth,gH=globeDiv.scrollHeight;
       var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('width',gW);svg.setAttribute('height',gH);
@@ -6504,7 +6510,8 @@ function renderChildIslandMap(ca){
         dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(155,95,32,0.7)');dp.setAttribute('stroke-width','8');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
       }
       if(centers.length>0){
-        var avX=gW*0.05,avY=60,t0x=centers[0].x,t0y=centers[0].y;
+        /* min. 48px : la mascotte est dessinée 40px à gauche du point, sinon elle déborde */
+        var avX=Math.max(gW*0.05,48),avY=110,t0x=centers[0].x,t0y=centers[0].y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
         var mid0x=(avX+t0x)*0.5;
         segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
@@ -6522,7 +6529,7 @@ function renderChildIslandMap(ca){
       /* Avatar */
       var srcEl=document.querySelector('#girl-mascot img');
       var charEl=document.createElement('div');
-      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55))';
+      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55));animation:mascotBob 2.4s ease-in-out infinite';
       if(srcEl){var aImg=document.createElement('img');aImg.src=srcEl.src;aImg.style.cssText='width:100%;height:100%;object-fit:contain';charEl.appendChild(aImg);}
       globeDiv.appendChild(charEl);
       function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
