@@ -5993,6 +5993,30 @@ var CHILD_ISLAND_LETTERS=[
   [27,28,29],      // 11: LS id:11 — ه ء ة
 ];
 
+/* Libellés des îles — partagés par la carte, le choix des lettres et l'écran
+   de récompense, pour qu'un renommage n'ait à se faire qu'à un seul endroit. */
+var CHILD_ISLAND_LABELS=[
+  'La Source de l\'Humanité','L\'Arche de Nouh','La Maison Sacrée',
+  'Le Puits de Zamzam','La Terre de la Patience','Le Mont Sinaï',
+  'Le Paysage des Rêves','La Montagne de Dawoud','Le Royaume de Saba',
+  'La Mosquée d\'Al-Aqsa','Le Ventre de la Baleine','La Cité de Médine'
+];
+
+/* Île d'une lettre, sous la forme attendue par _childLetterPicker */
+function _childIsleOf(letterIdx){
+  var i=getChildIsland(letterIdx);
+  if(i<0)return null;
+  return {label:CHILD_ISLAND_LABELS[i]||'',type:'letters',letters:CHILD_ISLAND_LETTERS[i]};
+}
+
+/* Toutes les lettres de l'île de `letterIdx` sont-elles apprises ? */
+function _childIsleAllLearned(letterIdx){
+  var isle=_childIsleOf(letterIdx);
+  if(!isle||!isle.letters.length)return false;
+  var jour=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
+  return jour>isle.letters[isle.letters.length-1];
+}
+
 /* Renvoie l'index d'île pour une lettre donnée (ou -1) */
 function getChildIsland(letterIdx){
   for(var _ii=0;_ii<CHILD_ISLAND_LETTERS.length;_ii++){
@@ -6218,7 +6242,10 @@ function _showLettersIntro(ca,isleName,onFinish){
    les autres lettres de l'île étaient invisibles et impossibles à revoir. */
 function _childLetterPicker(ca,isle){
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length-1);
+  /* pas de borne haute ici : quand les 30 lettres sont faites la progression
+     vaut 30, et la 30e lettre doit apparaître comme apprise, pas comme
+     « en cours ». */
+  var dayIdx=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
   var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
 
   var titre=document.createElement('div');
@@ -6256,7 +6283,7 @@ function _childLetterPicker(ca,isle){
         try{stopSpeech();}catch(e){}
         /* lettre en cours → on révise d'abord ; relecture → directement la leçon */
         if(courante)renderChildWarmup(ca);
-        else _letterCourse(ca,li);
+        else _letterCourse(ca,li,'revoir');
       };
     }
     wrap.appendChild(carte);
@@ -6308,18 +6335,18 @@ function renderChildIslandMap(ca){
     '/images/island-9.png?v=2','/images/island-10.png?v=2','/images/island-11.png?v=2',
   ];
   var childIslandDefs=[
-    {label:'La Source de l\'Humanité', ar:'َ · ُ · ِ',       type:'vowels',  letters:[]},
-    {label:'L\'Arche de Nouh',          ar:'ا · و · ي',       type:'letters', letters:CHILD_ISLAND_LETTERS[1]},
-    {label:'La Maison Sacrée',          ar:'بَا · بُو · بِي', type:'prolong', letters:[]},
-    {label:'Le Puits de Zamzam',        ar:'ب · ت · ث',       type:'letters', letters:CHILD_ISLAND_LETTERS[3]},
-    {label:'La Terre de la Patience',   ar:'ج · ح · خ',       type:'letters', letters:CHILD_ISLAND_LETTERS[4]},
-    {label:'Le Mont Sinaï',             ar:'د · ذ · ر · ز',   type:'letters', letters:CHILD_ISLAND_LETTERS[5]},
-    {label:'Le Paysage des Rêves',      ar:'س · ش',            type:'letters', letters:CHILD_ISLAND_LETTERS[6]},
-    {label:'La Montagne de Dawoud',     ar:'ص · ض · ط · ظ',   type:'letters', letters:CHILD_ISLAND_LETTERS[7]},
-    {label:'Le Royaume de Saba',        ar:'ع · غ',            type:'letters', letters:CHILD_ISLAND_LETTERS[8]},
-    {label:'La Mosquée d\'Al-Aqsa',     ar:'ف · ق · ك',        type:'letters', letters:CHILD_ISLAND_LETTERS[9]},
-    {label:'Le Ventre de la Baleine',   ar:'ل · م · ن',        type:'letters', letters:CHILD_ISLAND_LETTERS[10]},
-    {label:'La Cité de Médine',         ar:'ه · ء · ة',        type:'letters', letters:CHILD_ISLAND_LETTERS[11]},
+    {label:CHILD_ISLAND_LABELS[0],  ar:'َ · ُ · ِ',       type:'vowels',  letters:[]},
+    {label:CHILD_ISLAND_LABELS[1],  ar:'ا · و · ي',       type:'letters', letters:CHILD_ISLAND_LETTERS[1]},
+    {label:CHILD_ISLAND_LABELS[2],  ar:'بَا · بُو · بِي', type:'prolong', letters:[]},
+    {label:CHILD_ISLAND_LABELS[3],  ar:'ب · ت · ث',       type:'letters', letters:CHILD_ISLAND_LETTERS[3]},
+    {label:CHILD_ISLAND_LABELS[4],  ar:'ج · ح · خ',       type:'letters', letters:CHILD_ISLAND_LETTERS[4]},
+    {label:CHILD_ISLAND_LABELS[5],  ar:'د · ذ · ر · ز',   type:'letters', letters:CHILD_ISLAND_LETTERS[5]},
+    {label:CHILD_ISLAND_LABELS[6],  ar:'س · ش',            type:'letters', letters:CHILD_ISLAND_LETTERS[6]},
+    {label:CHILD_ISLAND_LABELS[7],  ar:'ص · ض · ط · ظ',   type:'letters', letters:CHILD_ISLAND_LETTERS[7]},
+    {label:CHILD_ISLAND_LABELS[8],  ar:'ع · غ',            type:'letters', letters:CHILD_ISLAND_LETTERS[8]},
+    {label:CHILD_ISLAND_LABELS[9],  ar:'ف · ق · ك',        type:'letters', letters:CHILD_ISLAND_LETTERS[9]},
+    {label:CHILD_ISLAND_LABELS[10], ar:'ل · م · ن',        type:'letters', letters:CHILD_ISLAND_LETTERS[10]},
+    {label:CHILD_ISLAND_LABELS[11], ar:'ه · ء · ة',        type:'letters', letters:CHILD_ISLAND_LETTERS[11]},
   ];
 
   /* ── Fonction d'ouverture d'une île ── */
@@ -6329,14 +6356,17 @@ function renderChildIslandMap(ca){
     _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     if(isle.type==='vowels'){_vowelCourse(domContainer);}
     else if(isle.type==='prolong'){_prolongCourse(domContainer);}
-    else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
+    /* Île déjà terminée → on choisit la lettre à revoir.
+       Île en cours → on enchaîne les lettres dans l'ordre, sans rien demander :
+       la 2e arrive après la 1re, la 3e après la 2e. */
+    else if(isComplete){_childLetterPicker(domContainer,isle);}
     else if(localStorage.getItem('child_seen_forms_intro')==='1'){
-      /* l'explication des 4 formes n'est montrée qu'une fois */
-      _childLetterPicker(domContainer,isle);
+      renderChildWarmup(domContainer);
     }
     else{_showLettersIntro(domContainer,isle.label,function(){
+      /* l'explication des 4 formes n'est montrée qu'une fois */
       try{localStorage.setItem('child_seen_forms_intro','1');}catch(e){}
-      _childLetterPicker(domContainer,isle);
+      renderChildWarmup(domContainer);
     });}
   }
 
@@ -6387,7 +6417,9 @@ function renderChildIslandMap(ca){
     }
 
     card.appendChild(ico);card.appendChild(nm);card.appendChild(sub);card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(i2){return function(){openChildIsland(i2,false);};})(isle);}
+    /* isComplete était figé à false : une île terminée était donc rouverte
+       comme une île en cours, et le mode révision n'était jamais atteint. */
+    if(!isLocked){card.onclick=(function(i2,fini){return function(){openChildIsland(i2,fini);};})(isle,isComplete);}
 
     globeDiv.appendChild(card);
 
@@ -6817,7 +6849,7 @@ function renderChildLetterDay(ca){
    L'argument `step` est conservé pour compatibilité mais n'est plus utilisé :
    le déroulé des scènes est géré par le moteur _kidScene(). */
 function renderChildLesson(ca,dayIdx,step){
-  _letterCourse(ca,dayIdx);
+  _letterCourse(ca,dayIdx,'apprendre');
 }
 
 /* ──────────────────────────────────────────────────────
@@ -8061,7 +8093,9 @@ var _CL_HEAVY='خرصضطظغق';
 /* Comment nommer chaque position dans une phrase d'enfant */
 var _CL_POS={'Isolée':'Toute seule','Début':'Au début','Milieu':'Au milieu','Fin':'À la fin'};
 
-function _letterCourse(ca,dayIdx){
+/* mode : 'apprendre' (nouvelle lettre, on enchaîne sur la suivante de l'île)
+          | 'revoir'   (lettre déjà apprise, on revient au choix des lettres) */
+function _letterCourse(ca,dayIdx,mode){
   var letter=CHILD_LETTERS[dayIdx];
   var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
   var forms=_dedupForms(letter,af);
@@ -8079,8 +8113,10 @@ function _letterCourse(ca,dayIdx){
   var S=_kidScene(ca);
   var sc=[];
 
-  /* ── 1. La nouvelle lettre et son son ── */
-  sc.push(S.tell(null,null,'Une nouvelle<br>'+hi('lettre')+' ! ✨','Une nouvelle lettre !'));
+  /* ── 1. La lettre et son son ── */
+  sc.push(mode==='revoir'
+    ? S.tell(null,null,'On revoit cette<br>'+hi('lettre')+' ! 🔄','On revoit cette lettre !')
+    : S.tell(null,null,'Une nouvelle<br>'+hi('lettre')+' ! ✨','Une nouvelle lettre !'));
   sc.push(S.tell(L,L+'ْ','Voici la lettre<br>'+hi(letter.name),
     'Voici la lettre '+letter.name+'. Touche-la !','👆 Touche pour écouter'));
 
@@ -8185,7 +8221,7 @@ function _letterCourse(ca,dayIdx){
 
   /* Fin du cours → jeu de l'île puis récompense (progression sauvegardée) */
   S.run(sc,function(){
-    renderChildGame(ca,dayIdx,0,function(){renderChildReward(ca,dayIdx);});
+    renderChildGame(ca,dayIdx,0,function(){renderChildReward(ca,dayIdx,mode);});
   });
 }
 
@@ -8838,14 +8874,24 @@ function renderChildGame(ca,dayIdx,round,onDone){
   ca.appendChild(wrap);
 }
 
-function renderChildReward(ca,dayIdx){
+/* Récompense de fin de lettre.
+   mode 'apprendre' → on enchaîne automatiquement sur la lettre suivante de
+   l'île ; on ne revient à la carte que lorsque l'île est terminée.
+   mode 'revoir'    → la progression n'est pas touchée, et on propose de
+   revoir une autre lettre de l'île ou de revenir à la carte. */
+function renderChildReward(ca,dayIdx,mode){
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var letter=CHILD_LETTERS[dayIdx];
-  /* Math.max : revoir une lettre déjà apprise (via le choix des lettres de
-     l'île) ne doit jamais faire reculer la progression. */
-  var dejaFait=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
-  var newDay=Math.min(Math.max(dayIdx+1,dejaFait),CHILD_LETTERS.length-1);
-  try{localStorage.setItem('child_girl_day',''+newDay);}catch(e){}
+  var revoir=(mode==='revoir');
+  var isle=_childIsleOf(dayIdx);
+
+  /* En révision on ne touche pas à la progression (sinon revoir une vieille
+     lettre la ferait reculer). */
+  if(!revoir){
+    var dejaFait=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
+    var maj=Math.min(Math.max(dayIdx+1,dejaFait),CHILD_LETTERS.length);
+    try{localStorage.setItem('child_girl_day',''+maj);}catch(e){}
+  }
   launchConfetti('girl');
 
   var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
@@ -8857,43 +8903,59 @@ function renderChildReward(ca,dayIdx){
   wrap.appendChild(titleEl);
 
   var subEl=document.createElement('div');subEl.className='child-reward-sub';
-  subEl.textContent='Tu as appris cette lettre !';wrap.appendChild(subEl);
+  subEl.textContent=revoir?'Tu as bien revu cette lettre !':'Tu as appris cette lettre !';
+  wrap.appendChild(subEl);
 
-  /* Récap lettre */
   var recap=document.createElement('div');recap.className='child-card';recap.style.marginBottom='16px';
   recap.innerHTML='<div class="child-emoji">'+letter.emoji+'</div>'
     +'<div class="child-letter-big">'+letter.ar+'</div>'
     +'<div class="child-word-ar">'+letter.wordAr+'</div>';
   wrap.appendChild(recap);
 
-  /* Détection : changement d'île ou fin de toutes les lettres ? */
-  var islandDone=(newDay>=CHILD_LETTERS.length)||
-    (getChildIsland(dayIdx)!==getChildIsland(newDay)&&getChildIsland(newDay)>=0);
+  function msg(txt){
+    var el=document.createElement('div');el.className='child-word-lat';el.style.marginBottom='16px';
+    el.textContent=txt;wrap.appendChild(el);
+  }
+  function bouton(txt,fn,principal){
+    var b=document.createElement('button');b.className='rbtn rbtn-m';
+    b.style.cssText='width:100%;padding:14px;font-size:1rem;margin-bottom:8px'
+      +(principal?';background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff':'');
+    b.textContent=txt;b.onclick=function(){try{stopSpeech();}catch(e){}fn();};
+    wrap.appendChild(b);
+  }
 
-  if(newDay>=CHILD_LETTERS.length){
+  if(revoir){
+    /* ── Révision : proposer une autre lettre de l'île, ou la carte ── */
+    msg('Tu peux en revoir une autre 😊');
+    if(isle&&isle.letters.length>1){
+      bouton('📖 Revoir une autre lettre',function(){_childLetterPicker(ca,isle);},true);
+    }
+    bouton('🗺️ Carte des îles',function(){renderChildIslandMap(ca);});
+    ca.appendChild(wrap);return;
+  }
+
+  /* ── Apprentissage : y a-t-il une lettre suivante DANS LA MÊME ÎLE ? ── */
+  var suivante=-1;
+  if(isle){
+    for(var k=0;k<isle.letters.length;k++){
+      if(isle.letters[k]===dayIdx&&k+1<isle.letters.length){suivante=isle.letters[k+1];break;}
+    }
+  }
+  var toutFini=(dayIdx>=CHILD_LETTERS.length-1);
+
+  if(toutFini&&suivante<0){
     var doneEl=document.createElement('div');doneEl.className='child-letter-name';doneEl.style.marginBottom='16px';
     doneEl.textContent='🏆 Tu as appris toutes les lettres !';
     wrap.appendChild(doneEl);
-  } else if(islandDone){
-    var nextIsleEl=document.createElement('div');nextIsleEl.className='child-word-lat';nextIsleEl.style.marginBottom='16px';
-    nextIsleEl.textContent='🎉 Île terminée ! Retourne sur la carte pour la suite !';
-    wrap.appendChild(nextIsleEl);
+    bouton('🗺️ Carte des îles',function(){renderChildIslandMap(ca);},true);
+  } else if(suivante>=0){
+    /* on enchaîne sur la lettre suivante de l'île */
+    msg('Continue avec '+CHILD_LETTERS[suivante].emoji+' !');
+    bouton('Continuer →',function(){renderChildWarmup(ca);},true);
   } else {
-    var nextEl=document.createElement('div');nextEl.className='child-word-lat';nextEl.style.marginBottom='16px';
-    nextEl.textContent='Continue avec '+CHILD_LETTERS[newDay].emoji+' !';
-    wrap.appendChild(nextEl);
+    msg('🎉 Île terminée ! Bravo !');
+    bouton('🗺️ Carte des îles',function(){renderChildIslandMap(ca);},true);
   }
-
-  var homeBtn=document.createElement('button');homeBtn.className='rbtn rbtn-m';
-  homeBtn.style.cssText='width:100%;padding:14px;font-size:1rem';
-  if(islandDone||newDay>=CHILD_LETTERS.length){
-    homeBtn.textContent='🗺️ Carte des îles';
-    homeBtn.onclick=function(){renderChildIslandMap(ca);};
-  } else {
-    homeBtn.textContent='Continuer →';
-    homeBtn.onclick=function(){renderChildWarmup(ca);};
-  }
-  wrap.appendChild(homeBtn);
 
   ca.appendChild(wrap);
 }
