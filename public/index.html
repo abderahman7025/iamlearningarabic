@@ -6776,45 +6776,11 @@ function renderChildLetterDay(ca){
 // ════════════════════════════════════════════════════════
 //  COURS ENRICHI FILLE — ~30 minutes par lettre (6 étapes)
 // ════════════════════════════════════════════════════════
+/* La leçon d'une lettre est un cours de scènes narrées (voir _letterCourse).
+   L'argument `step` est conservé pour compatibilité mais n'est plus utilisé :
+   le déroulé des scènes est géré par le moteur _kidScene(). */
 function renderChildLesson(ca,dayIdx,step){
-  step=step||0;
-  var letter=CHILD_LETTERS[dayIdx];
-  var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
-  function goNext(){renderChildLesson(ca,dayIdx,step+1);}
-
-  /* Étape 3 = renderChildGame (gère son propre ca.innerHTML) */
-  if(step===3){renderChildGame(ca,dayIdx,0,goNext);return;}
-  /* Après les 6 étapes → récompense */
-  if(step>=6){renderChildReward(ca,dayIdx);return;}
-
-  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-
-  var STEP_NAMES=['✨ Découverte','🔍 Les formes','✏️ J\'écris','🎮 Je joue','📖 Le mot','🏆 Mini quiz'];
-
-  var wrap=document.createElement('div');wrap.className='child-wrap';
-
-  /* ── Barre de progression ── */
-  var pb=document.createElement('div');
-  pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-  for(var psi=0;psi<6;psi++){
-    var pd=document.createElement('div');
-    pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(psi<step?'#22c55e':psi===step?'#c2185b':'rgba(194,24,91,.15)');
-    pb.appendChild(pd);
-  }
-  wrap.appendChild(pb);
-
-  var stepLbl=document.createElement('div');
-  stepLbl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
-  stepLbl.textContent=STEP_NAMES[step];
-  wrap.appendChild(stepLbl);
-
-  if(step===0)_clStep0(wrap,letter,af,goNext);
-  else if(step===1)_clStep1(wrap,letter,af,goNext);
-  else if(step===2)_clStep2(wrap,letter,af,goNext);
-  else if(step===4)_clStep4(wrap,letter,af,dayIdx,goNext);
-  else if(step===5)_clStep5(wrap,letter,af,dayIdx,goNext);
-
-  ca.appendChild(wrap);
+  _letterCourse(ca,dayIdx);
 }
 
 /* ──────────────────────────────────────────────────────
@@ -7969,6 +7935,132 @@ function _prolongCourse(ca){
     S.bravo('Bravo ! 🌟<br>Tu sais <span style="color:#7b1fa2">étirer</span><br>les sons !',
       'Bravo ! Tu sais étirer les sons !','☀️ 🌙 ⭐','child_isle_prolong')
   ]);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COURS D'UNE LETTRE INTERACTIF (fille) — toutes les îles
+   Même format que les voyelles : 1 idée par écran, grosses lettres
+   animées cliquables, phrases courtes lues automatiquement,
+   exercices intercalés.
+   Reprend les notions du cours adulte renderLLesson() : le son de la
+   lettre, ses formes selon la place dans le mot, les lettres qui ne
+   s'attachent pas, les lettres épaisses (emphatiques), la lettre avec
+   les 3 voyelles, le tanwīn (son « n »), le soukoun, les prolongations,
+   puis un mot et l'écriture.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Son consonantique écrit en lettres françaises (pour les grosses phrases).
+   '' = lettre sans consonne française évidente (alif, hamzah, 'ayn) :
+   on affiche alors juste la voyelle. */
+var _CL_LAT={'ا':'','ب':'B','ت':'T','ث':'TH','ج':'DJ','ح':'H','خ':'KH','د':'D','ذ':'DH',
+  'ر':'R','ز':'Z','س':'S','ش':'CH','ص':'S','ض':'D','ط':'T','ظ':'DH','ع':'','غ':'GH',
+  'ف':'F','ق':'Q','ك':'K','ل':'L','م':'M','ن':'N','ه':'H','و':'W','ي':'Y','ء':'','ة':'T'};
+/* Lettres « épaisses » (emphatiques) — mêmes que type:'heavy' côté adulte */
+var _CL_HEAVY='خرصضطظغق';
+/* Comment nommer chaque position dans une phrase d'enfant */
+var _CL_POS={'Isolée':'Toute seule','Début':'Au début','Milieu':'Au milieu','Fin':'À la fin'};
+
+function _letterCourse(ca,dayIdx){
+  var letter=CHILD_LETTERS[dayIdx];
+  var af=_AF[letter.ar]||{i:letter.ar,m:letter.ar,f:letter.ar};
+  var forms=_dedupForms(letter,af);
+  var L=letter.ar;
+  var lat=_CL_LAT[L]!==undefined?_CL_LAT[L]:'';
+  var heavy=_CL_HEAVY.indexOf(L)>=0;
+  var attaches=forms.length>2;
+  /* Les prolongations ne sont abordées qu'après l'île 3 (lettres 0-2 = ا و ي) */
+  var withProlong=dayIdx>=3;
+
+  function syl(v){return lat+v;}                    /* B + A → « BA » (phrases en gros) */
+  function low(v){return (lat+v).toLowerCase();}    /* B + a → « ba » (indices, légendes) */
+  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+
+  var S=_kidScene(ca);
+  var sc=[];
+
+  /* ── 1. La nouvelle lettre et son son ── */
+  sc.push(S.tell(null,null,'Une nouvelle<br>'+hi('lettre')+' ! ✨','Une nouvelle lettre !'));
+  sc.push(S.tell(L,L+'ْ','Voici la lettre<br>'+hi(letter.name),
+    'Voici la lettre '+letter.name+'. Touche-la !','👆 Touche pour écouter'));
+
+  /* ── 2. Lettre épaisse (emphatique) ── */
+  if(heavy){
+    sc.push(S.tell(L,L+'َ','C\'est une<br>'+hi('grosse voix')+' ! 🦁',
+      'Attention ! Cette lettre se dit avec une grosse voix, bien épaisse !','👆 Écoute la grosse voix'));
+  }
+
+  /* ── 3. Les formes, une par écran ── */
+  forms.forEach(function(f){
+    var where=f.labels.map(function(l,i){var w=_CL_POS[l]||l;return i?w.toLowerCase():w;}).join(' et ');
+    sc.push(S.tell(f.form,f.form,where+',<br>elle s\'écrit '+hi('comme ça')+' !',
+      where+' du mot, elle s\'écrit comme ça !','👆 Touche pour écouter'));
+  });
+  if(!attaches){
+    sc.push(S.tell(L,L+'ْ','Elle n\'aime pas<br>se '+hi('coller')+' ! 🙅',
+      'Attention ! Cette lettre ne se colle jamais à la lettre suivante.','👆 Touche pour écouter'));
+  }
+  sc.push(S.row(forms.map(function(f){return [f.form,f.lblText];}),
+    'Toutes ses '+hi('formes')+' ! 🔍','Voici toutes ses formes !','Je les connais ! →',
+    forms.length>3?2.6:3.4));
+
+  /* ── 4. Je l'écris ── */
+  sc.push(S.trace(L,'À moi de l\'<br>'+hi('écrire')+' ! ✏️','À toi de l\'écrire ! Suis le modèle avec ton doigt.'));
+
+  /* ── 5. Les 3 voyelles sur cette lettre ── */
+  sc.push(S.tell(L+'َ',L+'َ','Un trait '+hi('au-dessus')+'…<br>ça fait '+hi(syl('A'))+' ! ☀️',
+    'Un trait au dessus, ça fait '+syl('A')+' !','👆 Touche : « '+low('a')+' »'));
+  sc.push(S.tell(L+'ِ',L+'ِ','Un trait '+hi('en-dessous')+'…<br>ça fait '+hi(syl('I'))+' ! ⭐',
+    'Un trait en dessous, ça fait '+syl('I')+' !','👆 Touche : « '+low('i')+' »'));
+  sc.push(S.tell(L+'ُ',L+'ُ','Une '+hi('boucle')+' au-dessus…<br>ça fait '+hi(syl('OU'))+' ! 🌙',
+    'Une petite boucle au dessus, ça fait '+syl('OU')+' !','👆 Touche : « '+low('ou')+' »'));
+  sc.push(S.row([[L+'َ',low('a')+' ☀️'],[L+'ِ',low('i')+' ⭐'],[L+'ُ',low('ou')+' 🌙']],
+    'Les '+hi('3 sons')+' ! 🎵','Voici les trois sons !'));
+
+  /* ── 6. Exercices d'écoute ── */
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ُ','Où est le son '+hi(syl('OU'))+' ? 👂','Où est le son '+syl('ou')+' ?'));
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'َ','Où est le son '+hi(syl('A'))+' ? 👂','Où est le son '+syl('a')+' ?'));
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ِ','Où est le son '+hi(syl('I'))+' ? 👂','Où est le son '+syl('i')+' ?'));
+
+  /* ── 7. Le tanwīn : la voyelle doublée ajoute le son « n » ── */
+  sc.push(S.tell(null,null,'On peut aussi les<br>'+hi('DOUBLER')+' ! ➕','On peut aussi les doubler !'));
+  sc.push(S.tell(L+'ً',L+'ً','Deux traits…<br>'+hi(syl('A'))+' devient '+hi(syl('AN'))+' ! 👃',
+    'Deux petits traits ! '+syl('A')+' devient '+syl('ANE')+'. On ajoute le son N !','👆 Touche : « '+low('an')+' »'));
+  sc.push(S.row([[L+'ً',low('an')],[L+'ٍ',low('in')],[L+'ٌ',low('oun')]],
+    'On entend un '+hi('N')+' ! 👃','Dans les trois, on entend un n à la fin !'));
+
+  /* ── 8. Le soukoun ── */
+  sc.push(S.tell(L+'ْ',L+'ْ','Un petit '+hi('rond')+' ⭕<br>= juste '+hi(lat||'la lettre')+' !',
+    'Un petit rond, ça veut dire qu\'on dit juste la lettre, sans voyelle !','👆 Touche pour écouter'));
+
+  /* ── 9. Les prolongations sur cette lettre ── */
+  if(withProlong){
+    sc.push(S.tell(null,null,'Et si on<br>'+hi('étirait')+' ? 📏','Et maintenant, si on étirait le son ?'));
+    sc.push(S.tell(L+'َا',L+'َا','Avec un '+hi('ا')+'…<br>ça fait '+hi(syl('AAA'))+' ! 🎵',
+      'Avec un alif, ça fait '+low('aaa')+' !','👆 Touche : « '+low('aaa')+' »'));
+    sc.push(S.tell(L+'ُو',L+'ُو','Avec un '+hi('و')+'…<br>ça fait '+hi(syl('OUOU'))+' ! 🌙',
+      'Avec un waw, ça fait '+low('ououou')+' !','👆 Touche : « '+low('ououou')+' »'));
+    sc.push(S.tell(L+'ِي',L+'ِي','Avec un '+hi('ي')+'…<br>ça fait '+hi(syl('III'))+' ! ⭐',
+      'Avec un ya, ça fait '+low('iii')+' !','👆 Touche : « '+low('iii')+' »'));
+    sc.push(S.pick([L+'َ',L+'َا'],L+'َا','Où est le son '+hi('étiré')+' ? 👂','Où est le son étiré ?'));
+  }
+
+  /* ── 10. Le mot de la lettre ── */
+  sc.push(function(){
+    var c=S.card();
+    c.appendChild(S.phrase('Un mot avec<br>'+hi(letter.name)+' ! 📖','Voici un mot avec cette lettre !'));
+    var em=document.createElement('div');em.style.cssText='font-size:4.5rem;line-height:1.1;margin:4px 0';em.textContent=letter.emoji;c.appendChild(em);
+    c.appendChild(S.bigGlyph(letter.wordAr,letter.wordAr,3.2));
+    c.appendChild(S.caption(letter.wordLat));
+    c.appendChild(S.hintLine('👆 Touche le mot pour l\'écouter'));
+    setTimeout(function(){S.sayAr(letter.wordAr);},1600);
+    c.appendChild(S.nextBtn('Suivant →',S.next,2200));
+    S.wrap.appendChild(c);
+  });
+
+  /* Fin du cours → jeu de l'île puis récompense (progression sauvegardée) */
+  S.run(sc,function(){
+    renderChildGame(ca,dayIdx,0,function(){renderChildReward(ca,dayIdx);});
+  });
 }
 
 /* Étape 1 générique — flashcards + mini-canvas, même structure que _clStep1 */
