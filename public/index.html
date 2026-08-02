@@ -6274,7 +6274,7 @@ function renderChildIslandMap(ca){
     _lessonPushed=false;
     _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     if(isle.type==='vowels'){_vowelCourse(domContainer);}
-    else if(isle.type==='prolong'){_showProlongIntro(domContainer,function(){renderChildProlongLesson(domContainer,0);});}
+    else if(isle.type==='prolong'){_prolongCourse(domContainer);}
     else if(isComplete){_renderChildIslandRecap(domContainer,isle.letters);}
     else{_showLettersIntro(domContainer,isle.label,function(){renderChildWarmup(domContainer);});}
   }
@@ -7525,6 +7525,230 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MOTEUR DE SCÈNES ENFANT (fille)
+   Une idée par écran · très peu de texte · grosses lettres animées
+   cliquables · chaque phrase lue automatiquement · exercices intercalés.
+   Utilisé par le cours des voyelles, des prolongations et des lettres.
+   ═══════════════════════════════════════════════════════════ */
+function _kidScene(ca){
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
+  var api={wrap:wrap};
+
+  function sayFr(t){try{speakText(t,'fr-FR',null);}catch(e){}}
+  function sayAr(t){try{speakText(t,'ar-SA',null);}catch(e){}}
+  api.sayFr=sayFr;api.sayAr=sayAr;
+  function stripTags(h){return String(h).replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'');}
+
+  /* Grosse lettre animée (pop-in), cliquable pour entendre le son */
+  function bigGlyph(glyph,sound,size){
+    var g=document.createElement('div');
+    g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:#ad1457;line-height:1.15;cursor:pointer;display:inline-block;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
+    g.textContent=glyph;
+    g.onclick=function(){sayAr(sound||glyph);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
+    setTimeout(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
+    return g;
+  }
+  /* Grande phrase animée + lue automatiquement par la voix */
+  function phrase(html,fr){
+    var p=document.createElement('div');
+    p.style.cssText='font-size:1.4rem;font-weight:800;color:#ad1457;line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
+    p.innerHTML=html;
+    setTimeout(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
+    setTimeout(function(){sayFr(fr||stripTags(html));},450);
+    return p;
+  }
+  function nextBtn(label,fn,delay){
+    var b=document.createElement('button');b.className='rbtn rbtn-m';
+    b.style.cssText='background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
+    b.textContent=label||'Suivant →';b.onclick=fn;
+    setTimeout(function(){b.style.opacity='1';},delay===undefined?950:delay);
+    return b;
+  }
+  function card(){var c=document.createElement('div');c.className='child-card';c.style.textAlign='center';c.style.padding='26px 20px';return c;}
+  /* Petite légende sous une lettre */
+  function caption(txt,color){
+    var l=document.createElement('div');
+    l.style.cssText='font-weight:800;color:'+(color||'#7b1fa2')+';font-size:1rem;margin-top:4px';
+    l.textContent=txt;return l;
+  }
+  function hintLine(txt){
+    var h=document.createElement('div');
+    h.style.cssText='font-size:.8rem;color:#ad1457;opacity:.6;margin-top:10px';
+    h.textContent=txt;return h;
+  }
+  api.bigGlyph=bigGlyph;api.phrase=phrase;api.nextBtn=nextBtn;api.card=card;
+  api.caption=caption;api.hintLine=hintLine;
+
+  /* ── Déroulé des scènes ── */
+  var i=0,scenes=[],onFinish=function(){renderChildIslandMap(ca);};
+  function progress(){
+    var bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:14px;flex-wrap:wrap';
+    for(var k=0;k<scenes.length;k++){
+      var d=document.createElement('div');
+      d.style.cssText='height:6px;flex:1;min-width:6px;max-width:24px;border-radius:4px;background:'+(k<i?'#22c55e':k===i?'#ec4899':'rgba(173,20,87,.18)');
+      bar.appendChild(d);
+    }
+    wrap.appendChild(bar);
+  }
+  function go(){wrap.innerHTML='';progress();scenes[i]();ca.scrollTop=0;}
+  function next(){i++;if(i>=scenes.length){onFinish();return;}go();}
+  api.next=next;
+  api.run=function(list,fin){scenes=list;if(fin)onFinish=fin;i=0;go();};
+
+  /* ═══ Fabriques de scènes ═══ */
+
+  /* « On montre » : phrase + grosse lettre cliquable + son auto */
+  api.tell=function(glyph,sound,html,fr,hint){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      if(glyph){
+        c.appendChild(bigGlyph(glyph,sound,7));
+        if(sound)setTimeout(function(){sayAr(sound);},1500);
+        c.appendChild(hintLine(hint||'👆 Touche pour écouter'));
+      }
+      c.appendChild(nextBtn('Suivant →',next));
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Deux glyphes côte à côte à comparer — chacun cliquable + légende */
+  api.duo=function(a,b,mid,html,fr,labA,labB,size){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:10px;justify-content:center;align-items:center;margin-top:6px;flex-wrap:wrap';
+      function col(g,lab){
+        var d=document.createElement('div');d.style.cssText='display:flex;flex-direction:column;align-items:center';
+        d.appendChild(bigGlyph(g,g,size||3.4));
+        if(lab)d.appendChild(caption(lab));
+        return d;
+      }
+      row.appendChild(col(a,labA));
+      var m=document.createElement('div');m.style.cssText='font-size:1.6rem;color:#bbb;font-weight:800';m.textContent=mid||'≠';row.appendChild(m);
+      row.appendChild(col(b,labB));
+      c.appendChild(row);
+      c.appendChild(hintLine('👆 Touche chaque mot pour écouter'));
+      setTimeout(function(){sayAr(a);},1500);
+      setTimeout(function(){sayAr(b);},3000);
+      c.appendChild(nextBtn('Suivant →',next,2600));
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Rangée de glyphes à découvrir (récapitulatif) */
+  api.row=function(items,html,fr,btnLabel,size){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      var r=document.createElement('div');r.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:8px;flex-wrap:wrap';
+      items.forEach(function(o){
+        var col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+        col.appendChild(bigGlyph(o[0],o[0],size||3.6));
+        col.appendChild(caption(o[1]));
+        r.appendChild(col);
+      });
+      c.appendChild(r);
+      c.appendChild(nextBtn(btnLabel||'Je les connais ! →',next));
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Exercice « Où est le son X ? » — glyphes cliquables, mélangés */
+  api.pick=function(options,target,html,fr){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      setTimeout(function(){sayAr(target);},1400);
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap';
+      var answered=false;
+      options.slice().sort(function(){return Math.random()-.5;}).forEach(function(g){
+        var b=document.createElement('div');
+        b.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
+        b.textContent=g;
+        b.onclick=function(){
+          sayAr(g);
+          if(answered)return;
+          if(g===target){answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
+          else{b.style.background='rgba(239,68,68,.12)';b.style.borderColor='#ef4444';if(typeof playError==='function')playError();}
+        };
+        row.appendChild(b);
+      });
+      c.appendChild(row);
+      c.appendChild(hintLine('👂 Écoute bien, puis touche la bonne réponse'));
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Exercice « Oui / Non » sur un glyphe affiché en grand */
+  api.yesNo=function(glyph,answer,html,fr,yesLabel,noLabel){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      c.appendChild(bigGlyph(glyph,glyph,5.4));
+      setTimeout(function(){sayAr(glyph);},1500);
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:16px';
+      var answered=false;
+      [[true,yesLabel||'✅ Oui'],[false,noLabel||'❌ Non']].forEach(function(o){
+        var b=document.createElement('button');b.className='rbtn rbtn-m';
+        b.style.cssText='flex:1;padding:16px 10px;font-size:1.05rem;font-weight:800';
+        b.textContent=o[1];
+        b.onclick=function(){
+          if(answered)return;
+          if(o[0]===answer){answered=true;b.style.background='#22c55e';b.style.color='#fff';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
+          else{b.style.background='#ef4444';b.style.color='#fff';if(typeof playError==='function')playError();}
+        };
+        row.appendChild(b);
+      });
+      c.appendChild(row);
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Scène « je trace » — modèle en filigrane + doigt/souris sur canvas */
+  api.trace=function(glyph,html,fr,split){
+    return function(){
+      var c=card();
+      c.appendChild(phrase(html,fr));
+      var CW=260,CH=180,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
+      cv.style.cssText='border-radius:16px;background:rgba(255,255,255,.95);border:3px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:6px auto 8px;max-width:100%';
+      var cx=cv.getContext('2d');
+      function guide(){_drawWritingGuide(cx,glyph,CW,CH,100,split||null);}
+      guide();c.appendChild(cv);
+      var er=document.createElement('button');er.className='rbtn rbtn-s';er.style.cssText='display:block;margin:0 auto;font-size:.8rem';er.textContent='↺ Effacer';er.onclick=function(){guide();};c.appendChild(er);
+      var drawing=false,drawn=false,btn;
+      function pos(e){var r=cv.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
+      function start(e){drawing=true;if(!drawn){drawn=true;btn.style.opacity='1';}var p=pos(e);cx.beginPath();cx.moveTo(p.x,p.y);e.preventDefault();}
+      function move(e){if(!drawing)return;var p=pos(e);cx.lineWidth=5;cx.strokeStyle='#c2185b';cx.lineCap='round';cx.lineTo(p.x,p.y);cx.stroke();e.preventDefault();}
+      function end(){drawing=false;}
+      cv.addEventListener('mousedown',start);cv.addEventListener('mousemove',move);cv.addEventListener('mouseup',end);
+      cv.addEventListener('touchstart',start,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
+      btn=nextBtn('Suivant →',next,0);btn.style.opacity='0';
+      c.appendChild(btn);
+      setTimeout(function(){btn.style.opacity='1';},9000);
+      wrap.appendChild(c);
+    };
+  };
+
+  /* Scène finale — étoiles + retour à la carte */
+  api.bravo=function(html,fr,emojis,storeKey){
+    return function(){
+      if(storeKey)localStorage.setItem(storeKey,'1');
+      if(typeof playBravo==='function')playBravo();
+      var c=card();
+      var party=document.createElement('div');party.style.cssText='font-size:3.4rem;margin-bottom:6px';party.textContent='🎉';c.appendChild(party);
+      c.appendChild(phrase(html,fr));
+      if(emojis){var e=document.createElement('div');e.style.cssText='font-size:2.2rem;display:flex;justify-content:center;gap:14px;margin-bottom:6px';e.textContent=emojis;c.appendChild(e);}
+      c.appendChild(nextBtn('Retour à la carte 🗺️',function(){renderChildIslandMap(ca);},600));
+      wrap.appendChild(c);
+    };
+  };
+
+  return api;
+}
+
+/* ═══════════════════════════════════════════════════════════
    COURS VOYELLES INTERACTIF (fille) — scènes narrées, 1 idée/écran,
    grosses lettres animées, peu de texte, tout lu automatiquement.
    ═══════════════════════════════════════════════════════════ */
@@ -7642,6 +7866,109 @@ function _vowelCourse(ca){
     tell(null,null,'Super ! 🌟<br>Tu as fini les voyelles !','Super ! Tu as fini les voyelles !')
   ];
   go();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COURS PROLONGATIONS INTERACTIF (fille) — île 3 « La Maison Sacrée »
+   Même format que le cours des voyelles : scènes narrées, 1 idée par
+   écran, grosses lettres cliquables, exercices intercalés.
+   Reprend toutes les notions du cours adulte renderPLesson() :
+   durée de la voyelle → sens du mot · les 3 lettres d'allongement ·
+   pourquoi ces lettres-là · la règle « pas de voyelle dessus » ·
+   la chaddah · ne pas confondre chaddah et prolongation.
+   ═══════════════════════════════════════════════════════════ */
+function _prolongCourse(ca){
+  var S=_kidScene(ca);
+
+  S.run([
+    /* ── 1. Ce qu'on va apprendre ── */
+    S.tell(null,null,'On va apprendre à<br><span style="color:#7b1fa2">ÉTIRER</span> les sons ! 📏',
+      'On va apprendre à étirer les sons !'),
+
+    /* ── 2. Le son court ── */
+    S.tell('بَ','بَ','Voici <span style="color:#7b1fa2">BA</span>.<br>C\'est <span style="color:#7b1fa2">court</span> ! ⏱️',
+      'Voici BA. C\'est court !','👆 Touche : « ba »'),
+
+    /* ── 3. On ajoute le alif → le son s\'étire ── */
+    S.tell('بَا','بَا','On ajoute un <span style="color:#7b1fa2">ا</span>…<br>ça fait <span style="color:#7b1fa2">BAAA</span> ! 🎵',
+      'On ajoute un alif, et ça fait baaaa !','👆 Touche : « baaa »'),
+
+    /* ── 4. Comparaison court / étiré ── */
+    S.duo('بَ','بَا','→','Écoute la <span style="color:#7b1fa2">différence</span> ! 👂',
+      'Écoute la différence : ba, et baaaa','court ⏱️','étiré 🪢'),
+
+    /* ── 5. Pourquoi c\'est important (notion adulte : le sens change) ── */
+    S.tell(null,null,'C\'est très <span style="color:#7b1fa2">important</span> !<br>Le mot peut <span style="color:#7b1fa2">changer</span> ! 😮',
+      'C\'est très important ! Si on étire le son, le mot peut changer de sens !'),
+    S.duo('لَأُحِبُّك','لَا أُحِبُّك','≠','Un tout petit <span style="color:#7b1fa2">étirement</span>…<br>et tout change ! 😮',
+      'Un tout petit étirement, et tout change !','je t\'aime ❤️','je ne t\'aime pas 💔',2.2),
+
+    /* ── 6. Les deux autres prolongations ── */
+    S.tell('بُو','بُو','La boucle <span style="color:#7b1fa2">OU</span> s\'étire<br>avec le <span style="color:#7b1fa2">و</span> ! 🌙',
+      'La boucle ou s\'étire avec le waw. Ça fait bououou !','👆 Touche : « bououou »'),
+    S.tell('بِي','بِي','Le trait <span style="color:#7b1fa2">I</span> s\'étire<br>avec le <span style="color:#7b1fa2">ي</span> ! ⭐',
+      'Le trait i s\'étire avec le ya. Ça fait biiii !','👆 Touche : « biiii »'),
+
+    /* ── 7. Récapitulatif des 3 ── */
+    S.row([['بَا','aaa ☀️'],['بُو','ouuu 🌙'],['بِي','iii ⭐']],
+      'Voici les <span style="color:#7b1fa2">3 étirements</span> !','Voici les trois étirements : aaa, ouuu, iii'),
+
+    /* ── 8. Pourquoi ces lettres-là ? (notion adulte) ── */
+    S.tell(null,null,'Pourquoi <span style="color:#7b1fa2">ces</span> lettres ? 🤔',
+      'Mais pourquoi ces lettres là ?'),
+    S.duo('اَ','ا','→','La <span style="color:#7b1fa2">fatḥa</span> est en haut…<br>le <span style="color:#7b1fa2">ا</span> aussi ! ⬆️',
+      'La fatha est en haut, et le alif monte en haut aussi !','en haut ⬆️','en haut ⬆️'),
+    S.duo('اُ','و','→','La <span style="color:#7b1fa2">ḍamma</span> ressemble<br>au <span style="color:#7b1fa2">و</span> ! 👀',
+      'La damma ressemble au waw ! Regarde bien.','pareil 👀','pareil 👀'),
+    S.duo('اِ','ي','→','La <span style="color:#7b1fa2">kasra</span> est en bas…<br>le <span style="color:#7b1fa2">ي</span> aussi ! ⬇️',
+      'La kasra est en bas, et le ya descend en bas aussi !','en bas ⬇️','en bas ⬇️'),
+
+    /* ── 9. Exercices d\'écoute ── */
+    S.pick(['بَ','بَا','بُو'],'بَا','Où est le son <span style="color:#7b1fa2">BAAA</span> ? 👂','Où est le son baaaa ?'),
+    S.pick(['بِ','بِي','بَا'],'بِي','Où est le son <span style="color:#7b1fa2">BIII</span> ? 👂','Où est le son biiii ?'),
+    S.pick(['بُ','بُو','بِي'],'بُو','Où est le son <span style="color:#7b1fa2">BOUOU</span> ? 👂','Où est le son bououou ?'),
+
+    /* ── 10. La règle importante : pas de voyelle sur la lettre ── */
+    S.tell(null,null,'Attention ! ⚠️<br>Une petite <span style="color:#7b1fa2">règle</span>…',
+      'Attention ! Il y a une petite règle.'),
+    S.tell(null,null,'La lettre étire<br><span style="color:#7b1fa2">seulement</span><br>si elle est <span style="color:#7b1fa2">toute nue</span> ! 🙈',
+      'La lettre étire le son seulement si elle n\'a pas de voyelle sur elle !'),
+    S.duo('بَا','بَوَ','vs','Sans voyelle → ça <span style="color:#7b1fa2">étire</span>.<br>Avec voyelle → <span style="color:#7b1fa2">vraie lettre</span> !',
+      'Sans voyelle, ça étire. Avec une voyelle, c\'est une vraie lettre !','étire ✅','vraie lettre ❌'),
+    S.yesNo('بُو',true,'Est-ce que ça <span style="color:#7b1fa2">étire</span> ? 🤔','Est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
+    S.yesNo('بَوَ',false,'Et là, ça <span style="color:#7b1fa2">étire</span> ? 🤔','Et là, est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
+
+    /* ── 11. La chaddah ── */
+    S.tell(null,null,'Maintenant…<br>le petit <span style="color:#7b1fa2">chapeau</span> ! 🎩',
+      'Maintenant, on va voir le petit chapeau !'),
+    S.tell('بّ','بّْ','Le chapeau <span style="color:#7b1fa2">ّ</span><br>= on appuie <span style="color:#7b1fa2">2 fois</span> ! 💪',
+      'Quand il y a le petit chapeau, on appuie deux fois sur la lettre !','👆 Touche pour écouter'),
+    S.duo('جَدَ','جَدّ','≠','Écoute bien<br>la <span style="color:#7b1fa2">différence</span> ! 👂',
+      'Écoute bien la différence !','jada','jad-d 👴',3),
+    S.tell(null,null,'<span style="color:#7b1fa2">جَدّ</span><br>ça veut dire<br><span style="color:#7b1fa2">grand-père</span> ! 👴',
+      'Jad-d, ça veut dire grand-père !'),
+
+    /* ── 12. Ne pas confondre (notion adulte) ── */
+    function(){
+      var c=S.card();
+      c.appendChild(S.phrase('Ne <span style="color:#7b1fa2">confonds</span> pas ! 🧠','Attention, ne confonds pas !'));
+      var b1=document.createElement('div');
+      b1.style.cssText='background:rgba(233,30,140,.1);border:3px solid #f9a8d4;border-radius:18px;padding:16px;margin-bottom:12px';
+      b1.innerHTML='<div style="font-size:2.2rem">🎩</div><div style="font-weight:900;color:#c2185b;font-size:1.15rem;margin-top:4px">On appuie sur la <span style="color:#7b1fa2">LETTRE</span></div>';
+      c.appendChild(b1);
+      var b2=document.createElement('div');
+      b2.style.cssText='background:rgba(79,195,247,.14);border:3px solid #90caf9;border-radius:18px;padding:16px';
+      b2.innerHTML='<div style="font-size:2.2rem">📏</div><div style="font-weight:900;color:#1976d2;font-size:1.15rem;margin-top:4px">On étire la <span style="color:#7b1fa2">VOYELLE</span></div>';
+      c.appendChild(b2);
+      setTimeout(function(){S.sayFr('Le chapeau, on appuie sur la lettre. La prolongation, on étire la voyelle.');},1400);
+      c.appendChild(S.nextBtn('Suivant →',S.next,2200));
+      S.wrap.appendChild(c);
+    },
+
+    /* ── 13. Bravo ── */
+    S.bravo('Bravo ! 🌟<br>Tu sais <span style="color:#7b1fa2">étirer</span><br>les sons !',
+      'Bravo ! Tu sais étirer les sons !','☀️ 🌙 ⭐','child_isle_prolong')
+  ]);
 }
 
 /* Étape 1 générique — flashcards + mini-canvas, même structure que _clStep1 */
