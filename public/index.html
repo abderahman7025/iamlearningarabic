@@ -3758,10 +3758,12 @@ function speak(txt,rate){
   if(!st.soundOn)return;
   var isArabic=/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(txt);
   // 1. Audio Supabase (arabe seulement)
-  if(isArabic&&AUDIO_URLS[txt]){new Audio(AUDIO_URLS[txt]).play();return;}
+  // window._kidAudio : permet aux cours enfant de savoir qu'un enregistrement
+  // est en cours de lecture (speechSynthesis.speaking reste faux dans ce cas).
+  if(isArabic&&AUDIO_URLS[txt]){window._kidAudio=new Audio(AUDIO_URLS[txt]);window._kidAudio.play();return;}
   // 2. Audio localStorage (arabe seulement)
   if(isArabic){
-    try{var stored=localStorage.getItem('audio_'+txt);if(stored){new Audio(stored).play();return;}}catch(e){}
+    try{var stored=localStorage.getItem('audio_'+txt);if(stored){window._kidAudio=new Audio(stored);window._kidAudio.play();return;}}catch(e){}
   }
   // 3. Synthèse vocale (fallback)
   if(isArabic) console.log('[Audio] Son non trouvé pour:', txt, '| AUDIO_URLS keys:', Object.keys(AUDIO_URLS).length);
@@ -7508,9 +7510,52 @@ function _kidScene(ca){
   var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
   var api={wrap:wrap};
 
-  function sayFr(t){try{speakText(t,'fr-FR',null);}catch(e){}}
-  function sayAr(t){try{speakText(t,'ar-SA',null);}catch(e){}}
-  api.sayFr=sayFr;api.sayAr=sayAr;
+  /* ── File d'attente vocale ──
+     speakText() et speak() appellent tous les deux speechSynthesis.cancel()
+     au démarrage. Si on lance le son arabe pendant que la phrase française
+     est encore en cours, elle est coupée au milieu. On sérialise donc :
+     rien ne démarre tant que le précédent n'est pas terminé.
+     La langue est déduite du texte par speakText (arabe pur → voix arabe). */
+  var _q=[],_qBusy=false,_qTimer=null;
+  /* Durée maximale plausible d'un énoncé (~10 caractères/seconde + amorce).
+     speechSynthesis.speaking reste parfois bloqué à true dans Chrome ; sans
+     cette borne la narration s'arrêterait net jusqu'à la fin du minuteur. */
+  function _estimateMs(t){return Math.min(9000,900+t.length*95);}
+  function _qPump(){
+    if(_qBusy||!_q.length)return;
+    _qBusy=true;
+    var txt=_q.shift(),maxMs=_estimateMs(txt);
+    try{speakText(txt,'fr-FR',null);}catch(e){}
+    var started=Date.now(),quiet=0;
+    _qTimer=setInterval(function(){
+      var ss=window.speechSynthesis;
+      var a=window._kidAudio;
+      var talking=(ss&&(ss.speaking||ss.pending))||(a&&!a.ended&&!a.paused);
+      quiet=talking?0:quiet+1;
+      /* terminé = 300ms de silence confirmé (min 500ms), ou durée max atteinte */
+      if((quiet>=3&&Date.now()-started>500)||Date.now()-started>maxMs){
+        clearInterval(_qTimer);_qTimer=null;_qBusy=false;setTimeout(_qPump,100);
+      }
+    },100);
+  }
+  /* Les emoji sont lus à voix haute (« oreille », « soleil »…) : on les retire. */
+  function _noEmoji(t){return String(t).replace(/[←-⇿⌀-➿⬀-⯿️⃣]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]/g,' ').replace(/\s+/g,' ').trim();}
+  function say(t){t=_noEmoji(t);if(!t)return;_q.push(t);_qPump();}
+
+  /* Minuteurs de la scène en cours. Les phrases sont programmées en différé
+     (le temps que l'animation apparaisse) : si l'enfant appuie sur « Suivant »
+     avant, elles se déclencheraient sur l'écran suivant et liraient le texte
+     du précédent. On les annule donc à chaque changement d'écran. */
+  var _timers=[];
+  function later(fn,ms){var id=setTimeout(fn,ms);_timers.push(id);return id;}
+  function clearTimers(){_timers.forEach(function(id){clearTimeout(id);});_timers=[];}
+  api.later=later;
+  function sayStop(){_q=[];_qBusy=false;if(_qTimer){clearInterval(_qTimer);_qTimer=null;}
+    try{stopSpeech();}catch(e){}
+    try{if(window._kidAudio){window._kidAudio.pause();window._kidAudio=null;}}catch(e){}}
+  /* sayFr / sayAr restent pour la lisibilité des appels : même file */
+  var sayFr=say,sayAr=say;
+  api.say=say;api.sayFr=say;api.sayAr=say;api.sayStop=sayStop;
   function stripTags(h){return String(h).replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'');}
 
   /* Grosse lettre animée (pop-in), cliquable pour entendre le son */
@@ -7519,7 +7564,7 @@ function _kidScene(ca){
     g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:#ad1457;line-height:1.15;cursor:pointer;display:inline-block;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
     g.textContent=glyph;
     g.onclick=function(){sayAr(sound||glyph);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
-    setTimeout(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
+    later(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
     return g;
   }
   /* Grande phrase animée + lue automatiquement par la voix */
@@ -7527,15 +7572,15 @@ function _kidScene(ca){
     var p=document.createElement('div');
     p.style.cssText='font-size:1.4rem;font-weight:800;color:#ad1457;line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
     p.innerHTML=html;
-    setTimeout(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
-    setTimeout(function(){sayFr(fr||stripTags(html));},450);
+    later(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
+    later(function(){sayFr(fr||stripTags(html));},450);
     return p;
   }
   function nextBtn(label,fn,delay){
     var b=document.createElement('button');b.className='rbtn rbtn-m';
     b.style.cssText='background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
     b.textContent=label||'Suivant →';b.onclick=fn;
-    setTimeout(function(){b.style.opacity='1';},delay===undefined?950:delay);
+    later(function(){b.style.opacity='1';},delay===undefined?950:delay);
     return b;
   }
   function card(){var c=document.createElement('div');c.className='child-card';c.style.textAlign='center';c.style.padding='26px 20px';return c;}
@@ -7564,7 +7609,9 @@ function _kidScene(ca){
     }
     wrap.appendChild(bar);
   }
-  function go(){wrap.innerHTML='';progress();scenes[i]();ca.scrollTop=0;}
+  /* On coupe la narration en cours : sinon la phrase de l'écran précédent
+     continue par-dessus le nouvel écran. */
+  function go(){clearTimers();sayStop();wrap.innerHTML='';progress();scenes[i]();ca.scrollTop=0;}
   function next(){i++;if(i>=scenes.length){onFinish();return;}go();}
   api.next=next;
   api.run=function(list,fin){scenes=list;if(fin)onFinish=fin;i=0;go();};
@@ -7578,7 +7625,8 @@ function _kidScene(ca){
       c.appendChild(phrase(html,fr));
       if(glyph){
         c.appendChild(bigGlyph(glyph,sound,7));
-        if(sound)setTimeout(function(){sayAr(sound);},1500);
+        /* mis en file juste après la phrase : il sera lu quand elle sera finie */
+        if(sound)later(function(){sayAr(sound);},600);
         c.appendChild(hintLine(hint||'👆 Touche pour écouter'));
       }
       c.appendChild(nextBtn('Suivant →',next));
@@ -7603,8 +7651,7 @@ function _kidScene(ca){
       row.appendChild(col(b,labB));
       c.appendChild(row);
       c.appendChild(hintLine('👆 Touche chaque mot pour écouter'));
-      setTimeout(function(){sayAr(a);},1500);
-      setTimeout(function(){sayAr(b);},3000);
+      later(function(){sayAr(a);sayAr(b);},600);
       c.appendChild(nextBtn('Suivant →',next,2600));
       wrap.appendChild(c);
     };
@@ -7616,9 +7663,11 @@ function _kidScene(ca){
       var c=card();
       c.appendChild(phrase(html,fr));
       var r=document.createElement('div');r.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:8px;flex-wrap:wrap';
+      /* items : [glyphe, légende] ou [glyphe, légende, son] si le glyphe
+         n'est pas prononçable tel quel (voyelle seule). */
       items.forEach(function(o){
         var col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
-        col.appendChild(bigGlyph(o[0],o[0],size||3.6));
+        col.appendChild(bigGlyph(o[0],o[2]||o[0],size||3.6));
         col.appendChild(caption(o[1]));
         r.appendChild(col);
       });
@@ -7628,22 +7677,28 @@ function _kidScene(ca){
     };
   };
 
-  /* Exercice « Où est le son X ? » — glyphes cliquables, mélangés */
+  /* Exercice « Où est le son X ? » — glyphes cliquables, mélangés.
+     Chaque option est soit un glyphe (le son lu = le glyphe), soit une paire
+     [glyphe, son] quand le glyphe n'est pas prononçable tel quel
+     (ex. une voyelle seule, dont le son se dit en français : « a », « ou »). */
   api.pick=function(options,target,html,fr){
     return function(){
+      var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var tgt=opts.filter(function(o){return o.g===target;})[0];
+      var tgtSound=tgt?tgt.s:target;
       var c=card();
       c.appendChild(phrase(html,fr));
-      setTimeout(function(){sayAr(target);},1400);
+      later(function(){sayAr(tgtSound);},600);
       var row=document.createElement('div');row.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap';
       var answered=false;
-      options.slice().sort(function(){return Math.random()-.5;}).forEach(function(g){
+      opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
         b.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
-        b.textContent=g;
+        b.textContent=o.g;
         b.onclick=function(){
-          sayAr(g);
+          sayAr(o.s);
           if(answered)return;
-          if(g===target){answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
+          if(o.g===target){answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';if(typeof playBravo==='function')playBravo();later(next,800);}
           else{b.style.background='rgba(239,68,68,.12)';b.style.borderColor='#ef4444';if(typeof playError==='function')playError();}
         };
         row.appendChild(b);
@@ -7660,7 +7715,7 @@ function _kidScene(ca){
       var c=card();
       c.appendChild(phrase(html,fr));
       c.appendChild(bigGlyph(glyph,glyph,5.4));
-      setTimeout(function(){sayAr(glyph);},1500);
+      later(function(){sayAr(glyph);},600);
       var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:16px';
       var answered=false;
       [[true,yesLabel||'✅ Oui'],[false,noLabel||'❌ Non']].forEach(function(o){
@@ -7669,7 +7724,7 @@ function _kidScene(ca){
         b.textContent=o[1];
         b.onclick=function(){
           if(answered)return;
-          if(o[0]===answer){answered=true;b.style.background='#22c55e';b.style.color='#fff';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
+          if(o[0]===answer){answered=true;b.style.background='#22c55e';b.style.color='#fff';if(typeof playBravo==='function')playBravo();later(next,800);}
           else{b.style.background='#ef4444';b.style.color='#fff';if(typeof playError==='function')playError();}
         };
         row.appendChild(b);
@@ -7699,7 +7754,7 @@ function _kidScene(ca){
       cv.addEventListener('touchstart',start,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
       btn=nextBtn('Suivant →',next,0);btn.style.opacity='0';
       c.appendChild(btn);
-      setTimeout(function(){btn.style.opacity='1';},9000);
+      later(function(){btn.style.opacity='1';},9000);
       wrap.appendChild(c);
     };
   };
@@ -7725,120 +7780,86 @@ function _kidScene(ca){
    COURS VOYELLES INTERACTIF (fille) — scènes narrées, 1 idée/écran,
    grosses lettres animées, peu de texte, tout lu automatiquement.
    ═══════════════════════════════════════════════════════════ */
+/* Support neutre pour montrer une voyelle SEULE.
+   Une voyelle est un signe combinant : affichée seule elle a une largeur de 0
+   et reste donc invisible. Le cercle pointillé ◌ (U+25CC) est le placeholder
+   typographique standard : ce n'est pas une lettre, il signifie « la lettre
+   se met ici ». Le cours des voyelles ne montre donc aucune lettre arabe. */
+var _VOW_BASE='◌';
+function _vw(mark){return _VOW_BASE+mark;}
+
 function _vowelCourse(ca){
-  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-  var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
+  var S=_kidScene(ca);
+  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
 
-  function sayFr(t){try{speakText(t,'fr-FR',null);}catch(e){}}
-  function sayAr(t){try{speakText(t,'ar-SA',null);}catch(e){}}
+  /* Les voyelles seules ne sont pas prononçables par la voix arabe :
+     leur son est dit en français (« a », « ou », « anne »…). */
+  var FATHA=_vw('َ'),KASRA=_vw('ِ'),DAMMA=_vw('ُ');
+  var T_FAT=_vw('ً'),T_KAS=_vw('ٍ'),T_DAM=_vw('ٌ');
+  var SUKUN=_vw('ْ');
 
-  /* Grosse lettre animée (pop-in), cliquable pour entendre le son */
-  function bigGlyph(glyph,sound,size){
-    var g=document.createElement('div');
-    g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:#ad1457;line-height:1.15;cursor:pointer;display:inline-block;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
-    g.textContent=glyph;
-    g.onclick=function(){sayAr(sound);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
-    setTimeout(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
-    return g;
-  }
-  /* Grande phrase animée + lue automatiquement par la voix */
-  function phrase(html,fr){
-    var p=document.createElement('div');
-    p.style.cssText='font-size:1.4rem;font-weight:800;color:#ad1457;line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
-    p.innerHTML=html;
-    setTimeout(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
-    setTimeout(function(){sayFr(fr||p.textContent);},450);
-    return p;
-  }
-  function nextBtn(label,fn){
-    var b=document.createElement('button');b.className='rbtn rbtn-m';
-    b.style.cssText='background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
-    b.textContent=label||'Suivant →';b.onclick=fn;
-    setTimeout(function(){b.style.opacity='1';},950);
-    return b;
-  }
-  function card(){var c=document.createElement('div');c.className='child-card';c.style.textAlign='center';c.style.padding='26px 20px';return c;}
+  S.run([
+    /* ── Ce qu'on va apprendre ── */
+    S.tell(null,null,'On va apprendre<br>les '+hi('voyelles')+' ! 🎵',
+      'On va apprendre les voyelles !'),
+    S.tell(null,null,'Une voyelle,<br>c\'est un petit '+hi('signe')+' ✨',
+      'Une voyelle, c\'est un petit signe magique.'),
+    S.tell(_VOW_BASE,null,'Il se pose sur<br>une '+hi('lettre')+' !',
+      'Il se pose sur une lettre. Le rond en pointillés, c\'est la place de la lettre.',
+      '⭕ Ici, c\'est la place de la lettre'),
 
-  var i=0,scenes;
-  function go(){wrap.innerHTML='';_progress();scenes[i]();ca.scrollTop=0;}
-  function next(){i++;if(i>=scenes.length){localStorage.setItem('child_isle_vowels','1');renderChildIslandMap(ca);return;}go();}
-  function _progress(){
-    var bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:14px';
-    for(var k=0;k<scenes.length;k++){var d=document.createElement('div');d.style.cssText='height:6px;flex:1;max-width:24px;border-radius:4px;background:'+(k<i?'#22c55e':k===i?'#ec4899':'rgba(173,20,87,.18)');bar.appendChild(d);}
-    wrap.appendChild(bar);
-  }
+    /* ── Les 3 voyelles, une par écran ── */
+    S.tell(FATHA,'a','Un petit trait '+hi('au-dessus')+'…<br>ça fait '+hi('A')+' ! ☀️',
+      'Un petit trait au dessus, ça fait a !','👆 Touche : « a »'),
+    S.tell(KASRA,'i','Un petit trait '+hi('en-dessous')+'…<br>ça fait '+hi('I')+' ! ⭐',
+      'Un petit trait en dessous, ça fait i !','👆 Touche : « i »'),
+    S.tell(DAMMA,'ou','Une petite '+hi('boucle')+' au-dessus…<br>ça fait '+hi('OU')+' ! 🌙',
+      'Une petite boucle au dessus, ça fait ou !','👆 Touche : « ou »'),
 
-  /* Scène « on montre » : phrase + grosse lettre cliquable + son auto */
-  function tell(glyph,sound,html,fr,hint){
-    return function(){
-      var c=card();
-      c.appendChild(phrase(html,fr));
-      if(glyph){
-        c.appendChild(bigGlyph(glyph,sound,7));
-        if(sound)setTimeout(function(){sayAr(sound);},1500);
-        var h=document.createElement('div');h.style.cssText='font-size:.8rem;color:#ad1457;opacity:.6;margin-top:10px';h.textContent=hint||'👆 Touche pour écouter';c.appendChild(h);
-      }
-      c.appendChild(nextBtn('Suivant →',next));
-      wrap.appendChild(c);
-    };
-  }
+    /* ── Récapitulatif ── */
+    S.row([[FATHA,'a ☀️','a'],[KASRA,'i ⭐','i'],[DAMMA,'ou 🌙','ou']],
+      'Voici les '+hi('3 voyelles')+' !','Voici les trois voyelles : a, i, ou'),
+    S.tell(null,null,'Il n\'y en a<br>que '+hi('3')+' ! ✋',
+      'Il n\'y en a que trois ! C\'est tout.'),
 
-  /* Scène quiz : « Où est le son X ? » — 3 voyelles cliquables */
-  function find(targetGlyph,html){
-    return function(){
-      var c=card();
-      c.appendChild(phrase(html,html.replace(/<[^>]+>/g,'')));
-      setTimeout(function(){sayAr(targetGlyph);},1200);
-      var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:12px';
-      var answered=false;
-      [{g:'بَ'},{g:'بِ'},{g:'بُ'}].slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
-        var b=document.createElement('div');
-        b.style.cssText='font-family:var(--fa);font-size:3.4rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;width:92px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
-        b.textContent=o.g;
-        b.onclick=function(){
-          sayAr(o.g);
-          if(answered)return;
-          if(o.g===targetGlyph){answered=true;b.style.background='rgba(34,197,94,.2)';b.style.borderColor='#22c55e';b.style.transform='scale(1.1)';if(typeof playBravo==='function')playBravo();setTimeout(next,800);}
-          else{b.style.background='rgba(239,68,68,.12)';b.style.borderColor='#ef4444';if(typeof playError==='function')playError();}
-        };
-        row.appendChild(b);
-      });
-      c.appendChild(row);
-      wrap.appendChild(c);
-    };
-  }
+    /* ── Exercices d'écoute ── */
+    S.pick([[FATHA,'a'],[KASRA,'i'],[DAMMA,'ou']],DAMMA,'Où est le son '+hi('OU')+' ? 👂','Où est le son ou ?'),
+    S.pick([[FATHA,'a'],[KASRA,'i'],[DAMMA,'ou']],FATHA,'Où est le son '+hi('A')+' ? 👂','Où est le son a ?'),
+    S.pick([[FATHA,'a'],[KASRA,'i'],[DAMMA,'ou']],KASRA,'Où est le son '+hi('I')+' ? 👂','Où est le son i ?'),
+    S.tell(null,null,'Bravo ! 🎉<br>Tu connais les '+hi('3 voyelles')+' !',
+      'Bravo ! Tu connais les trois voyelles !'),
 
-  scenes=[
-    tell(null,null,'On va apprendre<br>les <span style="color:#7b1fa2">voyelles</span> ! 🎵','On va apprendre les voyelles !'),
-    tell('بْ','بْ','Voici la lettre <span style="color:#7b1fa2">B</span>','Voici la lettre Bé. Touche-la !','👆 Touche : « b »'),
-    tell('بَ','بَ','Un petit trait <span style="color:#7b1fa2">au-dessus</span>…<br>ça fait <span style="color:#7b1fa2">BA</span> ! ☀️','Un petit trait au dessus, ça fait BA !','👆 Touche : « ba »'),
-    tell('بِ','بِ','Un petit trait <span style="color:#7b1fa2">en-dessous</span>…<br>ça fait <span style="color:#7b1fa2">BI</span> ! ⭐','Un petit trait en dessous, ça fait BI !','👆 Touche : « bi »'),
-    tell('بُ','بُ','Une petite boucle <span style="color:#7b1fa2">au-dessus</span>…<br>ça fait <span style="color:#7b1fa2">BOU</span> ! 🌙','Une petite boucle au dessus, ça fait BOU !','👆 Touche : « bou »'),
-    function(){
-      var c=card();
-      c.appendChild(phrase('Voici les <span style="color:#7b1fa2">3 voyelles</span> !','Voici les trois voyelles : A, I, OU'));
-      var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:8px';
-      [['بَ','a'],['بِ','i'],['بُ','ou']].forEach(function(o){
-        var col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
-        col.appendChild(bigGlyph(o[0],o[0],3.6));
-        var l=document.createElement('div');l.style.cssText='font-weight:800;color:#7b1fa2;font-size:1.1rem';l.textContent=o[1];col.appendChild(l);
-        row.appendChild(col);
-      });
-      c.appendChild(row);
-      c.appendChild(nextBtn('Je les connais ! →',next));
-      wrap.appendChild(c);
-    },
-    find('بُ','Où est le son <span style="color:#7b1fa2">OU</span> ? 👂'),
-    find('بَ','Où est le son <span style="color:#7b1fa2">A</span> ? 👂'),
-    find('بِ','Où est le son <span style="color:#7b1fa2">I</span> ? 👂'),
-    tell(null,null,'Bravo ! 🎉<br>Tu connais les 3 voyelles !','Bravo ! Tu connais les trois voyelles !'),
-    tell(null,null,'Maintenant…<br>on peut les <span style="color:#7b1fa2">DOUBLER</span> ! ➕','Maintenant, on peut les doubler !'),
-    tell('بً','بً','Deux petits traits…<br><span style="color:#7b1fa2">BA</span> devient <span style="color:#7b1fa2">BAN</span> ! 👃','Deux petits traits ! BA devient BANE. On ajoute le son N !','👆 Touche : « ban »'),
-    tell('بٍ','بٍ','<span style="color:#7b1fa2">BI</span> devient <span style="color:#7b1fa2">BIN</span> ! 👃','BI devient BINE !','👆 Touche : « bin »'),
-    tell('بٌ','بٌ','<span style="color:#7b1fa2">BOU</span> devient <span style="color:#7b1fa2">BOUN</span> ! 👃','BOU devient BOUNE !','👆 Touche : « boun »'),
-    tell(null,null,'Super ! 🌟<br>Tu as fini les voyelles !','Super ! Tu as fini les voyelles !')
-  ];
-  go();
+    /* ── Le tanwīn : la voyelle doublée ajoute le son « n » ── */
+    S.tell(null,null,'Maintenant…<br>on peut les '+hi('DOUBLER')+' ! ➕',
+      'Maintenant, on peut les doubler !'),
+    S.tell(T_FAT,'anne','Deux traits…<br>'+hi('A')+' devient '+hi('ANN')+' ! 👃',
+      'Deux petits traits ! Le a devient anne. On ajoute le son n !','👆 Touche : « anne »'),
+    S.tell(T_KAS,'inne',hi('I')+' devient '+hi('INN')+' ! 👃',
+      'Le i devient inne !','👆 Touche : « inne »'),
+    S.tell(T_DAM,'oune',hi('OU')+' devient '+hi('OUNN')+' ! 👃',
+      'Le ou devient oune !','👆 Touche : « oune »'),
+    S.row([[T_FAT,'ann ☀️','anne'],[T_KAS,'inn ⭐','inne'],[T_DAM,'ounn 🌙','oune']],
+      'On entend un '+hi('N')+' ! 👃','Dans les trois, on entend un n à la fin !'),
+    S.pick([[T_FAT,'anne'],[T_KAS,'inne'],[T_DAM,'oune']],T_DAM,
+      'Où est le son '+hi('OUNN')+' ? 👂','Où est le son oune ?'),
+
+    /* ── Le soukoun ── */
+    S.tell(null,null,'Et il y a aussi<br>le '+hi('soukoun')+' ⭕',
+      'Et il y a aussi le soukoun.'),
+    S.tell(SUKUN,null,'Un petit '+hi('rond')+' ⭕<br>= '+hi('pas')+' de voyelle !',
+      'Un petit rond, ça veut dire pas de voyelle du tout ! On dit juste la lettre.',
+      '⭕ Pas de voyelle du tout'),
+
+    /* ── Leurs noms (secondaires) ── */
+    S.row([[FATHA,'fatḥa','a'],[KASRA,'kasra','i'],[DAMMA,'ḍamma','ou']],
+      'Elles ont aussi<br>un '+hi('nom')+' 📛','Elles ont aussi un nom : fatha, kasra, damma.'),
+    S.tell(null,null,'Mais retiens surtout<br>le '+hi('SON')+' ! 💡',
+      'Mais retiens surtout le son, pas le nom !'),
+
+    /* ── Fin ── */
+    S.bravo('Super ! 🌟<br>Tu as fini<br>les '+hi('voyelles')+' !',
+      'Super ! Tu as fini les voyelles !','☀️ ⭐ 🌙','child_isle_vowels')
+  ]);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -7933,7 +7954,7 @@ function _prolongCourse(ca){
       b2.style.cssText='background:rgba(79,195,247,.14);border:3px solid #90caf9;border-radius:18px;padding:16px';
       b2.innerHTML='<div style="font-size:2.2rem">📏</div><div style="font-weight:900;color:#1976d2;font-size:1.15rem;margin-top:4px">On étire la <span style="color:#7b1fa2">VOYELLE</span></div>';
       c.appendChild(b2);
-      setTimeout(function(){S.sayFr('Le chapeau, on appuie sur la lettre. La prolongation, on étire la voyelle.');},1400);
+      S.later(function(){S.sayFr('Le chapeau, on appuie sur la lettre. La prolongation, on étire la voyelle.');},1400);
       c.appendChild(S.nextBtn('Suivant →',S.next,2200));
       S.wrap.appendChild(c);
     },
@@ -8059,7 +8080,7 @@ function _letterCourse(ca,dayIdx){
     c.appendChild(S.bigGlyph(letter.wordAr,letter.wordAr,3.2));
     c.appendChild(S.caption(letter.wordLat));
     c.appendChild(S.hintLine('👆 Touche le mot pour l\'écouter'));
-    setTimeout(function(){S.sayAr(letter.wordAr);},1600);
+    S.later(function(){S.sayAr(letter.wordAr);},1600);
     c.appendChild(S.nextBtn('Suivant →',S.next,2200));
     S.wrap.appendChild(c);
   });
