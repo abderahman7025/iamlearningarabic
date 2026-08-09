@@ -29,6 +29,18 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Erreur lors du chargement des sons.' });
     }
 
+    // list() sur un bucket INEXISTANT renvoie [] sans erreur : indiscernable
+    // d'un bucket vide. On ne lève le doute que dans ce cas (pas de requête
+    // supplémentaire quand des sons existent).
+    if (!data || data.length === 0) {
+      const { error: bucketError } = await supabase.storage.getBucket('audio');
+      if (bucketError) {
+        console.error('[Audio-Get] Bucket "audio" introuvable:', bucketError.message);
+        logEvent('audio_get_no_bucket', { ip, error: bucketError.message });
+        return res.status(500).json({ error: 'Stockage audio non configuré.' });
+      }
+    }
+
     const urls = {};
     if (data) {
       data.forEach(file => {
