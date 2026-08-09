@@ -16,9 +16,18 @@ module.exports = async (req, res) => {
   try {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-    const { data } = await supabase.storage
+    // On lit AUSSI `error` : sans ça un bucket absent ou une erreur de
+    // permission renvoyait data=null, donc {urls:{}} avec un code 200,
+    // impossible à distinguer d'un stockage réellement vide.
+    const { data, error: listError } = await supabase.storage
       .from('audio')
       .list('', { limit: 1000 });
+
+    if (listError) {
+      console.error('[Audio-Get] Storage list failed:', listError.message);
+      logEvent('audio_get_error', { ip, error: listError.message });
+      return res.status(500).json({ error: 'Erreur lors du chargement des sons.' });
+    }
 
     const urls = {};
     if (data) {
