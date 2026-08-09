@@ -6940,7 +6940,8 @@ function _dedupForms(letter,af){
     if(ex){ex.labels.push(r.lbl);}
     else{out.push({form:r.form,lbl:r.lbl,labels:[r.lbl]});}
   });
-  out.forEach(function(o){o.lblText=o.labels.join(' & ');});
+  /* « et » plutôt que « & » : plus lisible pour un enfant */
+  out.forEach(function(o){o.lblText=o.labels.join(' et ');});
   return out;
 }
 
@@ -8162,7 +8163,7 @@ function _letterCourse(ca,dayIdx,mode){
       'Attention ! Cette lettre ne se colle pas à la lettre suivante.','👆 Touche pour écouter'));
   }
   sc.push(S.row(forms.map(function(f){return [f.form,f.lblText];}),
-    'Toutes ses '+hi('formes')+' ! 🔍','Voici toutes ses formes !','Je les connais ! →',
+    'Voici toutes ses '+hi('formes')+' ! 🔍','Voici toutes ses formes !','Je les connais ! →',
     forms.length>3?2.6:3.4));
 
   /* ── Cas particuliers (équivalents du cours adulte renderLLesson) ── */
