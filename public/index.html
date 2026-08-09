@@ -7770,10 +7770,23 @@ function _kidScene(ca){
   api.pick=function(options,target,html,fr){
     return function(){
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var tgt=opts.filter(function(o){return o.g===target;})[0];
+      var tgtSound=tgt?tgt.s:target;
+      /* Vrai exercice d'écoute : on JOUE l'enregistrement de la cible au lieu
+         de la nommer. Si aucun enregistrement n'existe encore, on retombe sur
+         l'énoncé écrit (`html`, qui nomme le son) pour que l'exercice reste
+         faisable — sinon l'enfant devrait deviner au hasard. */
+      var ecoute=_hasRec(tgtSound);
       var c=card();
-      c.appendChild(phrase(html,fr));
-      /* On ne rejoue PAS le son cherché : la question le nomme déjà
-         (« Où est le son a ? »), le répéter donnait la réponse. */
+      c.appendChild(phrase(ecoute?'Écoute…<br>Où est ce <span style="color:#7b1fa2">son</span> ? 👂':html, fr));
+      if(ecoute){
+        later(function(){sayAr(tgtSound);},600);
+        var rejouer=document.createElement('button');rejouer.className='rbtn rbtn-m';
+        rejouer.style.cssText='display:block;margin:8px auto 0;padding:12px 22px;font-size:1.4rem';
+        rejouer.textContent='🔊';rejouer.title='Réécouter';
+        rejouer.onclick=function(){sayStop();sayAr(tgtSound);};
+        c.appendChild(rejouer);
+      }
       var row=document.createElement('div');row.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap';
       var answered=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
@@ -7960,9 +7973,9 @@ function _vowelCourse(ca){
       'Il n\'y en a que trois ! C\'est tout.'),
 
     /* ── Exercices d'écoute ── */
-    S.pick([FATHA,KASRA,DAMMA],DAMMA,'Où est le son '+son('ou')+' ? 👂','Où est le son ou ?'),
-    S.pick([FATHA,KASRA,DAMMA],FATHA,'Où est le son '+son('a')+' ? 👂','Où est le son a ?'),
-    S.pick([FATHA,KASRA,DAMMA],KASRA,'Où est le son '+son('i')+' ? 👂','Où est le son i ?'),
+    S.pick([FATHA,KASRA,DAMMA],DAMMA,'Où est le son '+son('ou')+' ? 👂','Où est ce son ?'),
+    S.pick([FATHA,KASRA,DAMMA],FATHA,'Où est le son '+son('a')+' ? 👂','Où est ce son ?'),
+    S.pick([FATHA,KASRA,DAMMA],KASRA,'Où est le son '+son('i')+' ? 👂','Où est ce son ?'),
     S.tell(null,null,'Bravo ! 🎉<br>Tu connais les '+hi('3 voyelles')+' !',
       'Bravo ! Tu connais les trois voyelles !'),
 
@@ -7981,11 +7994,11 @@ function _vowelCourse(ca){
     S.row([[T_FAT,'an ☀️'],[T_KAS,'in ⭐'],[T_DAM,'oun 🌙']],
       'On entend un '+son('n')+' ! 👃','Dans les trois, on entend un n à la fin !'),
     S.pick([T_FAT,T_KAS,T_DAM],T_FAT,
-      'Où est le son '+son('an')+' ? 👂','Où est le son anne ?'),
+      'Où est le son '+son('an')+' ? 👂','Où est ce son ?'),
     S.pick([T_FAT,T_KAS,T_DAM],T_KAS,
-      'Où est le son '+son('in')+' ? 👂','Où est le son inne ?'),
+      'Où est le son '+son('in')+' ? 👂','Où est ce son ?'),
     S.pick([T_FAT,T_KAS,T_DAM],T_DAM,
-      'Où est le son '+son('oun')+' ? 👂','Où est le son oune ?'),
+      'Où est le son '+son('oun')+' ? 👂','Où est ce son ?'),
 
     /* ── Le soukoun ── */
     S.tell(null,null,'Enfin,<br>il y a le '+hi('soukoun')+' ⭕',
@@ -8063,9 +8076,9 @@ function _prolongCourse(ca){
       'La kasra est en bas, et le ya descend en bas aussi !','en bas ⬇️','en bas ⬇️'),
 
     /* ── 9. Exercices d\'écoute ── */
-    S.pick(['بَ','بَا','بُو'],'بَا','Où est le son <span style="color:#7b1fa2">BAAA</span> ? 👂','Où est le son baaaa ?'),
-    S.pick(['بِ','بِي','بَا'],'بِي','Où est le son <span style="color:#7b1fa2">BIII</span> ? 👂','Où est le son biiii ?'),
-    S.pick(['بُ','بُو','بِي'],'بُو','Où est le son <span style="color:#7b1fa2">BOUOU</span> ? 👂','Où est le son bououou ?'),
+    S.pick(['بَ','بَا','بُو'],'بَا','Où est le son <span style="color:#7b1fa2">BAAA</span> ? 👂','Où est ce son ?'),
+    S.pick(['بِ','بِي','بَا'],'بِي','Où est le son <span style="color:#7b1fa2">BIII</span> ? 👂','Où est ce son ?'),
+    S.pick(['بُ','بُو','بِي'],'بُو','Où est le son <span style="color:#7b1fa2">BOUOU</span> ? 👂','Où est ce son ?'),
 
     /* ── 10. La règle importante : pas de voyelle sur la lettre ── */
     S.tell(null,null,'Attention ! ⚠️<br>Une petite <span style="color:#7b1fa2">règle</span>…',
@@ -8220,9 +8233,9 @@ function _letterCourse(ca,dayIdx,mode){
     'Les '+hi('3 sons')+' ! 🎵','Voici les trois sons !'));
 
   /* ── 6. Exercices d'écoute ── */
-  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ُ','Où est le son '+son(low('ou'))+' ? 👂','Où est le son '+low('ou')+' ?'));
-  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'َ','Où est le son '+son(low('a'))+' ? 👂','Où est le son '+low('a')+' ?'));
-  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ِ','Où est le son '+son(low('i'))+' ? 👂','Où est le son '+low('i')+' ?'));
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ُ','Où est le son '+son(low('ou'))+' ? 👂','Où est ce son ?'));
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'َ','Où est le son '+son(low('a'))+' ? 👂','Où est ce son ?'));
+  sc.push(S.pick([L+'َ',L+'ِ',L+'ُ'],L+'ِ','Où est le son '+son(low('i'))+' ? 👂','Où est ce son ?'));
 
   /* ── 7. Le tanwīn ──
      Pas de rappel « on peut doubler les voyelles » : c'est déjà expliqué
