@@ -2462,43 +2462,56 @@ body.profile-boy [lang="ar"] {
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
 }
-/* ── Interface Lettre du Jour (profil fille uniquement) ── */
+/* ── Interface enfant (profils fille ET garcon) ──
+   Le theme est pilote par des variables : rose par defaut (fille),
+   bleu quand <body> porte la classe kid-boy (garcon). */
+:root{--k1:#c2185b;--k2:#ad1457;--k3:#7b1fa2;--kA:233,30,140;--kB:194,24,91;--kC:100,0,80}
+body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155;--kC:0,60,90}
+/* Cadres en nuage : coins tres arrondis et irreguliers, qui respirent. */
+@keyframes cloudBreathe{0%,100%{border-radius:42% 58% 52% 48%/48% 44% 56% 52%;transform:scale(1)}
+  50%{border-radius:56% 44% 46% 54%/54% 56% 44% 46%;transform:scale(1.03)}}
+@keyframes kidPulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--kA),.40)}70%{box-shadow:0 0 0 14px rgba(var(--kA),0)}}
+.kid-cloud{background:rgba(255,255,255,.92);border:3px solid rgba(var(--kA),.22);
+  border-radius:42% 58% 52% 48%/48% 44% 56% 52%;
+  animation:cloudBreathe 5s ease-in-out infinite;
+  box-shadow:0 10px 30px rgba(var(--kA),.16);padding:22px 26px;display:inline-block}
+.kid-pulse{animation:kidPulse 2s infinite}
 @keyframes starPop{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.3) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
 @keyframes floatCard{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(233,30,140,.35)}70%{box-shadow:0 0 0 12px rgba(233,30,140,0)}}
+@keyframes pulse-pink{0%,100%{box-shadow:0 0 0 0 rgba(var(--kA),.35)}70%{box-shadow:0 0 0 12px rgba(var(--kA),0)}}
 @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.09)}28%{transform:scale(1)}42%{transform:scale(1.06)}70%{transform:scale(1)}}
 .child-btn-ready{animation:heartbeat 1s ease-in-out infinite,pulse-pink 1.5s infinite!important;opacity:1!important}
 .heartbeat-pulse{animation:heartbeat 1.2s ease-in-out infinite}
 .child-wrap{padding:72px 14px 60px;max-width:400px;margin:0 auto}
-.child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:#c2185b;text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
-.child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(233,30,140,.13);border:2px solid rgba(233,30,140,.12);margin-bottom:16px}
+.child-letter-big{font-family:'Scheherazade New',serif;font-size:5rem;line-height:1.2;color:var(--k1);text-align:center;animation:letterPop 3s ease-in-out infinite;display:block;margin:0 auto 6px;padding-bottom:4px}
+.child-card{background:rgba(255,255,255,.88);border-radius:24px;padding:24px 18px;text-align:center;box-shadow:0 8px 32px rgba(var(--kA),.13);border:2px solid rgba(var(--kA),.12);margin-bottom:16px}
 .child-card-float{animation:floatCard 3s ease-in-out infinite}
 .child-stars{font-size:1.5rem;letter-spacing:3px;text-align:center;margin-bottom:6px;min-height:2rem}
-.child-prog{font-size:.78rem;font-weight:800;color:rgba(194,24,91,.5);text-align:center;margin-bottom:18px;text-transform:uppercase;letter-spacing:.1em}
+.child-prog{font-size:.78rem;font-weight:800;color:rgba(var(--kB),.5);text-align:center;margin-bottom:18px;text-transform:uppercase;letter-spacing:.1em}
 .child-emoji{font-size:3.2rem;margin:6px 0}
-.child-word-ar{font-family:'Scheherazade New',serif;font-size:2.2rem;color:#7b1fa2;line-height:1.2;margin:4px 0}
-.child-word-lat{font-size:.88rem;color:rgba(100,0,80,.55);margin-bottom:10px}
-.child-letter-name{font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:6px}
+.child-word-ar{font-family:'Scheherazade New',serif;font-size:2.2rem;color:var(--k3);line-height:1.2;margin:4px 0}
+.child-word-lat{font-size:.88rem;color:rgba(var(--kC),.55);margin-bottom:10px}
+.child-letter-name{font-size:1.1rem;font-weight:900;color:var(--k2);margin-bottom:6px}
 .child-variants{display:flex;justify-content:center;gap:8px;direction:rtl;margin:10px 0 6px}
-.child-var-box{background:rgba(233,30,140,.07);border-radius:14px;padding:6px 10px;text-align:center;border:1.5px solid rgba(233,30,140,.12);min-width:66px}
-.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.6;padding-bottom:6px;direction:ltr;unicode-bidi:normal;overflow:visible}
-.child-var-lbl{font-size:.6rem;font-weight:800;color:rgba(194,24,91,.45);text-transform:uppercase;letter-spacing:.06em}
+.child-var-box{background:rgba(var(--kA),.07);border-radius:14px;padding:6px 10px;text-align:center;border:1.5px solid rgba(var(--kA),.12);min-width:66px}
+.child-var-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:var(--k1);line-height:1.6;padding-bottom:6px;direction:ltr;unicode-bidi:normal;overflow:visible}
+.child-var-lbl{font-size:.6rem;font-weight:800;color:rgba(var(--kB),.45);text-transform:uppercase;letter-spacing:.06em}
 .child-btn-play{width:100%;font-size:1.1rem;padding:16px;border-radius:18px;animation:pulse-pink 2.5s infinite}
-.child-rev-title{font-size:.75rem;font-weight:800;color:rgba(194,24,91,.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
+.child-rev-title{font-size:.75rem;font-weight:800;color:rgba(var(--kB),.45);text-align:center;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.12em}
 .child-rev-grid{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.child-rev-card{background:rgba(255,255,255,.8);border-radius:14px;padding:8px 12px;text-align:center;border:1.5px solid rgba(233,30,140,.12);cursor:pointer;min-width:64px;transition:transform .15s}
+.child-rev-card{background:rgba(255,255,255,.8);border-radius:14px;padding:8px 12px;text-align:center;border:1.5px solid rgba(var(--kA),.12);cursor:pointer;min-width:64px;transition:transform .15s}
 .child-rev-card:active{transform:scale(.92)}
-.child-rev-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:#c2185b;line-height:1.3;padding-bottom:4px;display:block}
-.child-rev-name{font-size:.7rem;color:rgba(100,0,80,.55);font-weight:700}
-.child-game-instr{background:rgba(255,255,255,.88);border-radius:18px;padding:14px;text-align:center;box-shadow:0 4px 16px rgba(233,30,140,.08);margin-bottom:14px}
+.child-rev-ar{font-family:'Scheherazade New',serif;font-size:2rem;color:var(--k1);line-height:1.3;padding-bottom:4px;display:block}
+.child-rev-name{font-size:.7rem;color:rgba(var(--kC),.55);font-weight:700}
+.child-game-instr{background:rgba(255,255,255,.88);border-radius:18px;padding:14px;text-align:center;box-shadow:0 4px 16px rgba(var(--kA),.08);margin-bottom:14px}
 .child-game-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-.child-game-cell{background:rgba(255,255,255,.88);border-radius:16px;height:68px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.1rem;color:#c2185b;cursor:pointer;border:2px solid rgba(233,30,140,.12);transition:all .18s;-webkit-tap-highlight-color:transparent}
+.child-game-cell{background:rgba(255,255,255,.88);border-radius:16px;height:68px;display:flex;align-items:center;justify-content:center;font-family:'Scheherazade New',serif;font-size:2.1rem;color:var(--k1);cursor:pointer;border:2px solid rgba(var(--kA),.12);transition:all .18s;-webkit-tap-highlight-color:transparent}
 .child-game-cell.hit{background:rgba(34,197,94,.2)!important;border-color:#22c55e!important;color:#15803d!important;cursor:default}
 .child-game-cell.miss{background:rgba(239,68,68,.12)!important;border-color:#ef4444!important;animation:shakeP .35s ease}
-.child-score-row{text-align:center;font-size:1.1rem;font-weight:900;color:#ad1457;margin-bottom:10px}
+.child-score-row{text-align:center;font-size:1.1rem;font-weight:900;color:var(--k2);margin-bottom:10px}
 .child-reward-star{font-size:5rem;text-align:center;display:block;animation:starPop .55s cubic-bezier(.175,.885,.32,1.275) forwards}
-.child-reward-title{font-size:1.7rem;font-weight:900;color:#c2185b;text-align:center;margin:8px 0 4px}
-.child-reward-sub{font-size:.95rem;color:rgba(100,0,80,.55);text-align:center;margin-bottom:20px}
+.child-reward-title{font-size:1.7rem;font-weight:900;color:var(--k1);text-align:center;margin:8px 0 4px}
+.child-reward-sub{font-size:.95rem;color:rgba(var(--kC),.55);text-align:center;margin-bottom:20px}
 
 /* ============================================================
    RESPONSIVE — adapte toutes les pages à la largeur d'écran
@@ -3760,12 +3773,20 @@ function nextTx(fwd){const arr=fwd?TX_FWD:TX_BWD;const c=arr[_txIdx%arr.length];
 function animEl(el,cls){[...el.classList].filter(c=>c.startsWith('tx-')).forEach(c=>el.classList.remove(c));void el.offsetWidth;el.classList.add(cls);}
 /* ── URL routing ── */
 var _intendedUrl=null; /* URL demandée avant connexion */
+/* Applique le theme enfant : rose pour la fille, bleu pour le garcon.
+   Toute l'interface enfant lit les variables --k1/--k2/--k3/--kA/--kB. */
+function _appliqueThemeEnfant(){
+  try{
+    document.body.classList.toggle('kid-boy', st && st.profile==='boy');
+  }catch(e){}
+}
+
 function _getProfile(){var p=(st&&st.profile)||'girl';return p==='girl'?'fille':p==='boy'?'garcon':'adulte';}
 /* Reverse slug lookup : 'mont-sinai' → 'Le Mont Sinaï' */
 function _slugToLabel(slug){var r={};Object.keys(_ISLE_SLUGS).forEach(function(l){r[_ISLE_SLUGS[l]]=l;});return r[slug]||null;}
 /* Applique le profil sans crasher (version légère de chooseProfile) */
 function _applyProfileSafe(p){
-  st.profile=p;
+  st.profile=p;_appliqueThemeEnfant();
   var root=document.getElementById('root');
   if(!root)return;
   root.classList.remove('profile-girl','profile-boy','profile-adult');
@@ -4334,7 +4355,7 @@ function showStreakToast(count) {
 
 function updateAvgScore(){const vals=Object.values(st.scores);const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;const el=document.getElementById('avg-score');if(el)el.textContent=avg;}
 function chooseProfile(p){
-  st.profile=p;setTimeout(updateGirlMascot,400);
+  st.profile=p;_appliqueThemeEnfant();setTimeout(updateGirlMascot,400);
   var root=document.getElementById('root');
   // Reset classes profil
   root.classList.remove('profile-girl','profile-boy','profile-adult');
@@ -5168,6 +5189,13 @@ var islandDefs=[
 
   function openSession(s){
     /* _currentIsleSlug est déjà défini par le onclick de la carte */
+    /* Profil garçon : mêmes cours narrés que la fille (moteur _kidScene),
+       en thème bleu. L'adulte garde les leçons détaillées d'origine. */
+    if(st.profile==='boy'){
+      if(s.type==='vowels'){_vowelCourse(domContainer);return;}
+      if(s.type==='prolong'){_prolongCourse(domContainer);return;}
+      _boyLetterPicker(domContainer,s);return;
+    }
     if(s.type==='vowels')renderVLesson(domContainer,s);
     else if(s.type==='prolong')renderPLesson(domContainer,s);
     else renderLLesson(domContainer,s,0);
@@ -6338,7 +6366,7 @@ function _showProlongIntro(ca,onFinish){
    une idée par écran, grosses formes animées cliquables, tout est lu. */
 function _showLettersIntro(ca,isleName,onFinish){
   var S=_kidScene(ca);
-  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
 
   S.run([
     S.tell(null,null,'Nouvelle île ! ✨<br>'+hi(isleName),
@@ -6366,6 +6394,59 @@ function _showLettersIntro(ca,isleName,onFinish){
   ],onFinish);
 }
 
+/* ── Profil GARÇON ──
+   Le garçon suit exactement les mêmes cours narrés que la fille (moteur
+   _kidScene), en thème bleu. Seuls l'entrée et la sortie diffèrent : il
+   part de sa propre carte de sessions, pas de la carte des îles. */
+var _boySession=null;
+
+/* Index dans CHILD_LETTERS à partir de la lettre arabe */
+function _childIdxOf(ar){
+  for(var i=0;i<CHILD_LETTERS.length;i++){if(CHILD_LETTERS[i].ar===ar)return i;}
+  return -1;
+}
+
+/* Choix de la lettre à travailler dans une session du garçon */
+function _boyLetterPicker(ca,session){
+  _boySession=session;
+  ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+
+  var titre=document.createElement('div');
+  titre.style.cssText='font-size:1.3rem;font-weight:900;color:var(--k2);margin-bottom:4px';
+  titre.textContent=session.title||'Les lettres';wrap.appendChild(titre);
+  var sous=document.createElement('div');
+  sous.style.cssText='font-size:.9rem;color:var(--k2);opacity:.75;margin-bottom:16px;font-weight:700';
+  sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
+  try{speakText('Choisis ta lettre !','fr-FR',null);}catch(e){}
+
+  (session.letters||[]).forEach(function(l){
+    var idx=_childIdxOf(l.ar);
+    if(idx<0)return; /* lettre sans équivalent enfant : on la saute */
+    var L=CHILD_LETTERS[idx];
+    var carte=document.createElement('div');carte.className='child-card';
+    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;text-align:left;cursor:pointer';
+    var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';em.textContent=L.emoji;carte.appendChild(em);
+    var lettre=document.createElement('div');
+    lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
+    lettre.textContent=L.ar;carte.appendChild(lettre);
+    var infos=document.createElement('div');infos.style.cssText='flex:1';
+    infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>'
+      +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">▶ Apprendre</div>';
+    carte.appendChild(infos);
+    carte.onclick=function(){try{stopSpeech();}catch(e){}_letterCourse(ca,idx,'apprendre');};
+    wrap.appendChild(carte);
+  });
+
+  var retour=document.createElement('button');retour.className='rbtn rbtn-m';
+  retour.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:6px';
+  retour.textContent='‹ Retour à la carte';
+  retour.onclick=function(){try{stopSpeech();}catch(e){}renderSessionsMap(ca);};
+  wrap.appendChild(retour);
+
+  ca.appendChild(wrap);
+}
+
 /* Choix de la lettre dans une île — équivalent des onglets du cours adulte
    (renderLLesson). Sans cet écran, l'île n'ouvrait que la lettre en cours :
    les autres lettres de l'île étaient invisibles et impossibles à revoir. */
@@ -6378,10 +6459,10 @@ function _childLetterPicker(ca,isle){
   var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
 
   var titre=document.createElement('div');
-  titre.style.cssText='font-size:1.3rem;font-weight:900;color:#ad1457;margin-bottom:4px';
+  titre.style.cssText='font-size:1.3rem;font-weight:900;color:var(--k2);margin-bottom:4px';
   titre.textContent=isle.label;wrap.appendChild(titre);
   var sous=document.createElement('div');
-  sous.style.cssText='font-size:.9rem;color:#ad1457;opacity:.7;margin-bottom:16px;font-weight:700';
+  sous.style.cssText='font-size:.9rem;color:var(--k2);opacity:.7;margin-bottom:16px;font-weight:700';
   sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
   try{speakText('Choisis ta lettre !','fr-FR',null);}catch(e){}
 
@@ -6392,18 +6473,18 @@ function _childLetterPicker(ca,isle){
     var carte=document.createElement('div');carte.className='child-card';
     carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;text-align:left;'
       +(bloquee?'opacity:.45;':'cursor:pointer;')
-      +(courante?'border:3px solid #ec4899;box-shadow:0 6px 22px rgba(236,72,153,.28);':'');
+      +(courante?'border:3px solid var(--k1);box-shadow:0 6px 22px rgba(236,72,153,.28);':'');
 
     var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';
     em.textContent=bloquee?'🔒':L.emoji;carte.appendChild(em);
 
     var lettre=document.createElement('div');
-    lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;min-width:60px;text-align:center;line-height:1.1';
+    lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
     lettre.textContent=L.ar;carte.appendChild(lettre);
 
     var infos=document.createElement('div');infos.style.cssText='flex:1';
-    infos.innerHTML='<div style="font-weight:900;color:#7b1fa2;font-size:1.05rem">'+L.name+'</div>'
-      +'<div style="font-size:.82rem;color:#ad1457;opacity:.75;font-weight:700">'
+    infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>'
+      +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">'
       +(bloquee?'Pas encore ouverte':(apprise?'✅ Déjà apprise — revoir':'▶ À apprendre'))+'</div>';
     carte.appendChild(infos);
 
@@ -6791,7 +6872,7 @@ function renderChildIslandMap(ca){
    une lettre par écran, grande illustration, lettre et mot cliquables. */
 function _renderChildIslandRecap(ca,letterIndices){
   var S=_kidScene(ca);
-  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
   var sc=[];
 
   sc.push(S.tell(null,null,'Île '+hi('terminée')+' ! ✅<br>On revoit tout ?',
@@ -6810,7 +6891,7 @@ function _renderChildIslandRecap(ca,letterIndices){
       /* display:block — sinon la lettre et le mot, en inline-block, se
          retrouvent sur la même ligne et se collent visuellement. */
       var g=S.bigGlyph(L.ar,L.ar+'ْ',5.4);g.style.display='block';c.appendChild(g);
-      var w=S.bigGlyph(L.wordAr,L.wordAr,2.2);w.style.color='#7b1fa2';w.style.display='block';c.appendChild(w);
+      var w=S.bigGlyph(L.wordAr,L.wordAr,2.2);w.style.color='var(--k3)';w.style.display='block';c.appendChild(w);
       c.appendChild(S.caption(L.wordLat));
       c.appendChild(S.hintLine('👆 Touche la lettre ou le mot'));
       S.later(function(){S.sayAr(L.ar+'ْ');S.sayAr(L.wordAr);},600);
@@ -6842,7 +6923,7 @@ function renderChildWarmup(ca){
   var score=0;
 
   var S=_kidScene(ca);
-  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
   function goLesson(){S.sayStop();renderChildLesson(ca,dayIdx);}
 
   var sc=[];
@@ -7699,6 +7780,11 @@ function _xStep0(wrap,mainSpeak,mainLabel,forms,emoji,wordAr,wordLat,goNext,soun
    cliquables · chaque phrase lue automatiquement · exercices intercalés.
    Utilisé par le cours des voyelles, des prolongations et des lettres.
    ═══════════════════════════════════════════════════════════ */
+/* Retour a la carte : iles pour la fille, carte des sessions pour le garcon. */
+function _retourCarteEnfant(ca){
+  if(st.profile==='boy')renderSessionsMap(ca);else renderChildIslandMap(ca);
+}
+
 function _kidScene(ca){
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
@@ -7784,7 +7870,7 @@ function _kidScene(ca){
     /* line-height 1.5 + padding-bottom : les lettres à jambage (ي ج ح خ ع غ
        م ن ق ر ز و) descendent sous la ligne de base et empiétaient sur le
        texte juste en dessous. */
-    g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:#ad1457;line-height:1.5;padding-bottom:.12em;cursor:pointer;display:inline-block;overflow:visible;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
+    g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:var(--k2);line-height:1.5;padding-bottom:.12em;cursor:pointer;display:inline-block;overflow:visible;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
     g.textContent=glyph;
     g.onclick=function(){sayAr(sound||glyph);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
     later(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
@@ -7793,7 +7879,7 @@ function _kidScene(ca){
   /* Grande phrase animée + lue automatiquement par la voix */
   function phrase(html,fr){
     var p=document.createElement('div');
-    p.style.cssText='font-size:1.4rem;font-weight:800;color:#ad1457;line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
+    p.style.cssText='font-size:1.4rem;font-weight:800;color:var(--k2);line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
     p.innerHTML=html;
     later(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
     later(function(){sayFr(fr||stripTags(html));},450);
@@ -7801,7 +7887,7 @@ function _kidScene(ca){
   }
   function nextBtn(label,fn,delay){
     var b=document.createElement('button');b.className='rbtn rbtn-m';
-    b.style.cssText='background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
+    b.style.cssText='background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff;margin-top:18px;width:100%;padding:14px;font-size:1.05rem;opacity:0;transition:opacity .3s';
     b.textContent=label||'Suivant →';b.onclick=fn;
     later(function(){b.style.opacity='1';},delay===undefined?950:delay);
     return b;
@@ -7810,24 +7896,24 @@ function _kidScene(ca){
   /* Petite légende sous une lettre */
   function caption(txt,color){
     var l=document.createElement('div');
-    l.style.cssText='font-weight:800;color:'+(color||'#7b1fa2')+';font-size:1rem;margin-top:4px';
+    l.style.cssText='font-weight:800;color:'+(color||'var(--k3)')+';font-size:1rem;margin-top:4px';
     l.textContent=txt;return l;
   }
   function hintLine(txt){
     var h=document.createElement('div');
-    h.style.cssText='font-size:.8rem;color:#ad1457;opacity:.6;margin-top:10px';
+    h.style.cssText='font-size:.8rem;color:var(--k2);opacity:.6;margin-top:10px';
     h.textContent=txt;return h;
   }
   api.bigGlyph=bigGlyph;api.phrase=phrase;api.nextBtn=nextBtn;api.card=card;
   api.caption=caption;api.hintLine=hintLine;
 
   /* ── Déroulé des scènes ── */
-  var i=0,scenes=[],onFinish=function(){renderChildIslandMap(ca);};
+  var i=0,scenes=[],onFinish=function(){_retourCarteEnfant(ca);};
   function progress(){
     var bar=document.createElement('div');bar.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:14px;flex-wrap:wrap';
     for(var k=0;k<scenes.length;k++){
       var d=document.createElement('div');
-      d.style.cssText='height:6px;flex:1;min-width:6px;max-width:24px;border-radius:4px;background:'+(k<i?'#22c55e':k===i?'#ec4899':'rgba(173,20,87,.18)');
+      d.style.cssText='height:6px;flex:1;min-width:6px;max-width:24px;border-radius:4px;background:'+(k<i?'#22c55e':k===i?'var(--k1)':'rgba(var(--kB),.18)');
       bar.appendChild(d);
     }
     wrap.appendChild(bar);
@@ -7891,9 +7977,13 @@ function _kidScene(ca){
       var r=document.createElement('div');r.style.cssText='display:flex;gap:30px;justify-content:center;margin-top:8px;flex-wrap:wrap;direction:rtl';
       /* items : [glyphe, légende] ou [glyphe, légende, son] si le glyphe
          n'est pas prononçable tel quel (voyelle seule). */
-      items.forEach(function(o){
+      items.forEach(function(o,n){
         var col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
-        col.appendChild(bigGlyph(o[0],o[2]||o[0],size||3.6));
+        /* cadre « nuage » qui respire, plutôt qu'un rectangle */
+        var nuage=document.createElement('div');nuage.className='kid-cloud';
+        nuage.style.cssText+=';padding:14px 18px;animation-delay:'+(n*0.4)+'s';
+        nuage.appendChild(bigGlyph(o[0],o[2]||o[0],size||3.6));
+        col.appendChild(nuage);
         var lg=caption(o[1]);lg.style.direction='ltr';/* la légende reste du français */
         col.appendChild(lg);
         r.appendChild(col);
@@ -7919,7 +8009,7 @@ function _kidScene(ca){
          faisable — sinon l'enfant devrait deviner au hasard. */
       var ecoute=_hasRec(tgtSound);
       var c=card();
-      c.appendChild(phrase(ecoute?'Écoute…<br>Où est ce <span style="color:#7b1fa2">son</span> ? 👂':html, fr));
+      c.appendChild(phrase(ecoute?'Écoute…<br>Où est ce <span style="color:var(--k3)">son</span> ? 👂':html, fr));
       if(ecoute){
         later(function(){sayAr(tgtSound);},600);
         var rejouer=document.createElement('button');rejouer.className='rbtn rbtn-m';
@@ -7932,7 +8022,7 @@ function _kidScene(ca){
       var answered=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
-        b.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
+        b.className='kid-cloud kid-pulse';b.style.cssText+=';font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s';
         b.textContent=o.g;
         b.onclick=function(){
           sayAr(o.s);
@@ -7963,7 +8053,7 @@ function _kidScene(ca){
       }
       if(cfg.word){
         var w=bigGlyph(cfg.word,cfg.wordSay||cfg.word,2.4);
-        w.style.color='#7b1fa2';w.style.display='block';c.appendChild(w);
+        w.style.color='var(--k3)';w.style.display='block';c.appendChild(w);
       }
       c.appendChild(phrase(cfg.html,cfg.fr));
       if(cfg.word)later(function(){sayAr(cfg.wordSay||cfg.word);},600);
@@ -7971,7 +8061,7 @@ function _kidScene(ca){
       var answered=false,failed=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
-        b.style.cssText='font-family:var(--fa);font-size:3rem;color:#c2185b;background:#fff;border:3px solid rgba(233,30,140,.2);border-radius:20px;min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(233,30,140,.1)';
+        b.className='kid-cloud kid-pulse';b.style.cssText+=';font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s';
         b.textContent=o.g;
         b.onclick=function(){
           if(answered||b._ko)return;
@@ -8024,7 +8114,7 @@ function _kidScene(ca){
       var c=card();
       c.appendChild(phrase(html,fr));
       var CW=260,CH=180,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
-      cv.style.cssText='border-radius:16px;background:rgba(255,255,255,.95);border:3px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:6px auto 8px;max-width:100%';
+      cv.style.cssText='border-radius:16px;background:rgba(255,255,255,.95);border:3px dashed rgba(var(--kB),.3);touch-action:none;display:block;margin:6px auto 8px;max-width:100%';
       var cx=cv.getContext('2d');
       /* Le cercle pointillé ◌ n'est qu'un support d'AFFICHAGE : dans le
          canvas il ferait doublon avec la ligne d'écriture en pointillés,
@@ -8039,7 +8129,7 @@ function _kidScene(ca){
       var drawing=false,drawn=false,btn;
       function pos(e){var r=cv.getBoundingClientRect();var s=e.touches?e.touches[0]:e;return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
       function start(e){drawing=true;if(!drawn){drawn=true;btn.style.opacity='1';}var p=pos(e);cx.beginPath();cx.moveTo(p.x,p.y);e.preventDefault();}
-      function move(e){if(!drawing)return;var p=pos(e);cx.lineWidth=5;cx.strokeStyle='#c2185b';cx.lineCap='round';cx.lineTo(p.x,p.y);cx.stroke();e.preventDefault();}
+      function move(e){if(!drawing)return;var p=pos(e);cx.lineWidth=5;cx.strokeStyle='var(--k1)';cx.lineCap='round';cx.lineTo(p.x,p.y);cx.stroke();e.preventDefault();}
       function end(){drawing=false;}
       cv.addEventListener('mousedown',start);cv.addEventListener('mousemove',move);cv.addEventListener('mouseup',end);
       cv.addEventListener('touchstart',start,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',end);
@@ -8053,13 +8143,14 @@ function _kidScene(ca){
   /* Scène finale — étoiles + retour à la carte */
   api.bravo=function(html,fr,emojis,storeKey){
     return function(){
-      if(storeKey)localStorage.setItem(storeKey,'1');
+      /* la progression par iles est propre au profil fille */
+      if(storeKey&&st.profile!=='boy')try{localStorage.setItem(storeKey,'1');}catch(e){}
       if(typeof playBravo==='function')playBravo();
       var c=card();
       var party=document.createElement('div');party.style.cssText='font-size:3.4rem;margin-bottom:6px';party.textContent='🎉';c.appendChild(party);
       c.appendChild(phrase(html,fr));
       if(emojis){var e=document.createElement('div');e.style.cssText='font-size:2.2rem;display:flex;justify-content:center;gap:14px;margin-bottom:6px';e.textContent=emojis;c.appendChild(e);}
-      c.appendChild(nextBtn('Retour à la carte 🗺️',function(){renderChildIslandMap(ca);},600));
+      c.appendChild(nextBtn('Retour à la carte 🗺️',function(){_retourCarteEnfant(ca);},600));
       wrap.appendChild(c);
     };
   };
@@ -8081,7 +8172,7 @@ function _vw(mark){return _VOW_BASE+mark;}
 
 function _vowelCourse(ca){
   var S=_kidScene(ca);
-  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
   /* Les sons s'écrivent en minuscules et entre guillemets : « a », « an »… */
   function son(s){return hi('« '+s+' »');}
 
@@ -8191,83 +8282,83 @@ function _prolongCourse(ca){
 
   S.run([
     /* ── 1. Ce qu'on va apprendre ── */
-    S.tell(null,null,'On va apprendre à<br><span style="color:#7b1fa2">ÉTIRER</span> les sons ! 📏',
+    S.tell(null,null,'On va apprendre à<br><span style="color:var(--k3)">ÉTIRER</span> les sons ! 📏',
       'On va apprendre à étirer les sons !'),
 
     /* ── 2. Le son court ── */
-    S.tell('بَ','بَ','Voici <span style="color:#7b1fa2">BA</span>.<br>C\'est <span style="color:#7b1fa2">court</span> ! ⏱️',
+    S.tell('بَ','بَ','Voici <span style="color:var(--k3)">BA</span>.<br>C\'est <span style="color:var(--k3)">court</span> ! ⏱️',
       'Voici BA. C\'est court !','👆 Touche : « ba »'),
 
     /* ── 3. On ajoute le alif → le son s\'étire ── */
-    S.tell('بَا','بَا','On ajoute un <span style="color:#7b1fa2">ا</span>…<br>ça fait <span style="color:#7b1fa2">BAAA</span> ! 🎵',
+    S.tell('بَا','بَا','On ajoute un <span style="color:var(--k3)">ا</span>…<br>ça fait <span style="color:var(--k3)">BAAA</span> ! 🎵',
       'On ajoute un alif, et ça fait baaaa !','👆 Touche : « baaa »'),
 
     /* ── 4. Comparaison court / étiré ── */
-    S.duo('بَ','بَا','→','Écoute la <span style="color:#7b1fa2">différence</span> ! 👂',
+    S.duo('بَ','بَا','→','Écoute la <span style="color:var(--k3)">différence</span> ! 👂',
       'Écoute la différence : ba, et baaaa','court ⏱️','étiré 🪢'),
 
     /* ── 5. Pourquoi c\'est important (notion adulte : le sens change) ── */
-    S.tell(null,null,'C\'est très <span style="color:#7b1fa2">important</span> !<br>Le mot peut <span style="color:#7b1fa2">changer</span> ! 😮',
+    S.tell(null,null,'C\'est très <span style="color:var(--k3)">important</span> !<br>Le mot peut <span style="color:var(--k3)">changer</span> ! 😮',
       'C\'est très important ! Si on étire le son, le mot peut changer de sens !'),
-    S.duo('لَأُحِبُّك','لَا أُحِبُّك','≠','Un tout petit <span style="color:#7b1fa2">étirement</span>…<br>et tout change ! 😮',
+    S.duo('لَأُحِبُّك','لَا أُحِبُّك','≠','Un tout petit <span style="color:var(--k3)">étirement</span>…<br>et tout change ! 😮',
       'Un tout petit étirement, et tout change !','je t\'aime ❤️','je ne t\'aime pas 💔',2.2),
 
     /* ── 6. Les deux autres prolongations ── */
-    S.tell('بُو','بُو','La boucle <span style="color:#7b1fa2">OU</span> s\'étire<br>avec le <span style="color:#7b1fa2">و</span> ! 🌙',
+    S.tell('بُو','بُو','La boucle <span style="color:var(--k3)">OU</span> s\'étire<br>avec le <span style="color:var(--k3)">و</span> ! 🌙',
       'La boucle ou s\'étire avec le waw. Ça fait bououou !','👆 Touche : « bououou »'),
-    S.tell('بِي','بِي','Le trait <span style="color:#7b1fa2">I</span> s\'étire<br>avec le <span style="color:#7b1fa2">ي</span> ! ⭐',
+    S.tell('بِي','بِي','Le trait <span style="color:var(--k3)">I</span> s\'étire<br>avec le <span style="color:var(--k3)">ي</span> ! ⭐',
       'Le trait i s\'étire avec le ya. Ça fait biiii !','👆 Touche : « biiii »'),
 
     /* ── 7. Récapitulatif des 3 ── */
     S.row([['بَا','aaa ☀️'],['بُو','ouuu 🌙'],['بِي','iii ⭐']],
-      'Voici les <span style="color:#7b1fa2">3 étirements</span> !','Voici les trois étirements : aaa, ouuu, iii'),
+      'Voici les <span style="color:var(--k3)">3 étirements</span> !','Voici les trois étirements : aaa, ouuu, iii'),
 
     /* ── 8. Pourquoi ces lettres-là ? (notion adulte) ── */
-    S.tell(null,null,'Pourquoi <span style="color:#7b1fa2">ces</span> lettres ? 🤔',
+    S.tell(null,null,'Pourquoi <span style="color:var(--k3)">ces</span> lettres ? 🤔',
       'Mais pourquoi ces lettres là ?'),
-    S.duo('اَ','ا','→','La <span style="color:#7b1fa2">fatḥa</span> est en haut…<br>le <span style="color:#7b1fa2">ا</span> aussi ! ⬆️',
+    S.duo('اَ','ا','→','La <span style="color:var(--k3)">fatḥa</span> est en haut…<br>le <span style="color:var(--k3)">ا</span> aussi ! ⬆️',
       'La fatha est en haut, et le alif monte en haut aussi !','en haut ⬆️','en haut ⬆️'),
-    S.duo('اُ','و','→','La <span style="color:#7b1fa2">ḍamma</span> ressemble<br>au <span style="color:#7b1fa2">و</span> ! 👀',
+    S.duo('اُ','و','→','La <span style="color:var(--k3)">ḍamma</span> ressemble<br>au <span style="color:var(--k3)">و</span> ! 👀',
       'La damma ressemble au waw ! Regarde bien.','pareil 👀','pareil 👀'),
-    S.duo('اِ','ي','→','La <span style="color:#7b1fa2">kasra</span> est en bas…<br>le <span style="color:#7b1fa2">ي</span> aussi ! ⬇️',
+    S.duo('اِ','ي','→','La <span style="color:var(--k3)">kasra</span> est en bas…<br>le <span style="color:var(--k3)">ي</span> aussi ! ⬇️',
       'La kasra est en bas, et le ya descend en bas aussi !','en bas ⬇️','en bas ⬇️'),
 
     /* ── 9. Exercices d\'écoute ── */
-    S.pick(['بَ','بَا','بُو'],'بَا','Où est le son <span style="color:#7b1fa2">BAAA</span> ? 👂','Où est ce son ?'),
-    S.pick(['بِ','بِي','بَا'],'بِي','Où est le son <span style="color:#7b1fa2">BIII</span> ? 👂','Où est ce son ?'),
-    S.pick(['بُ','بُو','بِي'],'بُو','Où est le son <span style="color:#7b1fa2">BOUOU</span> ? 👂','Où est ce son ?'),
+    S.pick(['بَ','بَا','بُو'],'بَا','Où est le son <span style="color:var(--k3)">BAAA</span> ? 👂','Où est ce son ?'),
+    S.pick(['بِ','بِي','بَا'],'بِي','Où est le son <span style="color:var(--k3)">BIII</span> ? 👂','Où est ce son ?'),
+    S.pick(['بُ','بُو','بِي'],'بُو','Où est le son <span style="color:var(--k3)">BOUOU</span> ? 👂','Où est ce son ?'),
 
     /* ── 10. La règle importante : pas de voyelle sur la lettre ── */
-    S.tell(null,null,'Attention ! ⚠️<br>Une petite <span style="color:#7b1fa2">règle</span>…',
+    S.tell(null,null,'Attention ! ⚠️<br>Une petite <span style="color:var(--k3)">règle</span>…',
       'Attention ! Il y a une petite règle.'),
-    S.tell(null,null,'La lettre étire<br><span style="color:#7b1fa2">seulement</span><br>si elle est <span style="color:#7b1fa2">toute nue</span> ! 🙈',
+    S.tell(null,null,'La lettre étire<br><span style="color:var(--k3)">seulement</span><br>si elle est <span style="color:var(--k3)">toute nue</span> ! 🙈',
       'La lettre étire le son seulement si elle n\'a pas de voyelle sur elle !'),
-    S.duo('بَا','بَوَ','vs','Sans voyelle → ça <span style="color:#7b1fa2">étire</span>.<br>Avec voyelle → <span style="color:#7b1fa2">vraie lettre</span> !',
+    S.duo('بَا','بَوَ','vs','Sans voyelle → ça <span style="color:var(--k3)">étire</span>.<br>Avec voyelle → <span style="color:var(--k3)">vraie lettre</span> !',
       'Sans voyelle, ça étire. Avec une voyelle, c\'est une vraie lettre !','étire ✅','vraie lettre ❌'),
-    S.yesNo('بُو',true,'Est-ce que ça <span style="color:#7b1fa2">étire</span> ? 🤔','Est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
-    S.yesNo('بَوَ',false,'Et là, ça <span style="color:#7b1fa2">étire</span> ? 🤔','Et là, est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
+    S.yesNo('بُو',true,'Est-ce que ça <span style="color:var(--k3)">étire</span> ? 🤔','Est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
+    S.yesNo('بَوَ',false,'Et là, ça <span style="color:var(--k3)">étire</span> ? 🤔','Et là, est-ce que ça étire ?','✅ Ça étire','❌ Vraie lettre'),
 
     /* ── 11. La chaddah ── */
-    S.tell(null,null,'Maintenant…<br>le petit <span style="color:#7b1fa2">chapeau</span> ! 🎩',
+    S.tell(null,null,'Maintenant…<br>le petit <span style="color:var(--k3)">chapeau</span> ! 🎩',
       'Maintenant, on va voir le petit chapeau !'),
-    S.tell('بّ','بّْ','Le chapeau <span style="color:#7b1fa2">ّ</span><br>= on appuie <span style="color:#7b1fa2">2 fois</span> ! 💪',
+    S.tell('بّ','بّْ','Le chapeau <span style="color:var(--k3)">ّ</span><br>= on appuie <span style="color:var(--k3)">2 fois</span> ! 💪',
       'Quand il y a le petit chapeau, on appuie deux fois sur la lettre !','👆 Touche pour écouter'),
-    S.duo('جَدَ','جَدّ','≠','Écoute bien<br>la <span style="color:#7b1fa2">différence</span> ! 👂',
+    S.duo('جَدَ','جَدّ','≠','Écoute bien<br>la <span style="color:var(--k3)">différence</span> ! 👂',
       'Écoute bien la différence !','jada','jad-d 👴',3),
-    S.tell(null,null,'<span style="color:#7b1fa2">جَدّ</span><br>ça veut dire<br><span style="color:#7b1fa2">grand-père</span> ! 👴',
+    S.tell(null,null,'<span style="color:var(--k3)">جَدّ</span><br>ça veut dire<br><span style="color:var(--k3)">grand-père</span> ! 👴',
       'Jad-d, ça veut dire grand-père !'),
 
     /* ── 12. Ne pas confondre (notion adulte) ── */
     function(){
       var c=S.card();
-      c.appendChild(S.phrase('Ne <span style="color:#7b1fa2">confonds</span> pas ! 🧠','Attention, ne confonds pas !'));
+      c.appendChild(S.phrase('Ne <span style="color:var(--k3)">confonds</span> pas ! 🧠','Attention, ne confonds pas !'));
       var b1=document.createElement('div');
-      b1.style.cssText='background:rgba(233,30,140,.1);border:3px solid #f9a8d4;border-radius:18px;padding:16px;margin-bottom:12px';
-      b1.innerHTML='<div style="font-size:2.2rem">🎩</div><div style="font-weight:900;color:#c2185b;font-size:1.15rem;margin-top:4px">On appuie sur la <span style="color:#7b1fa2">LETTRE</span></div>';
+      b1.style.cssText='background:rgba(var(--kA),.1);border:3px solid rgba(var(--kA),.45);border-radius:18px;padding:16px;margin-bottom:12px';
+      b1.innerHTML='<div style="font-size:2.2rem">🎩</div><div style="font-weight:900;color:var(--k1);font-size:1.15rem;margin-top:4px">On appuie sur la <span style="color:var(--k3)">LETTRE</span></div>';
       c.appendChild(b1);
       var b2=document.createElement('div');
       b2.style.cssText='background:rgba(79,195,247,.14);border:3px solid #90caf9;border-radius:18px;padding:16px';
-      b2.innerHTML='<div style="font-size:2.2rem">📏</div><div style="font-weight:900;color:#1976d2;font-size:1.15rem;margin-top:4px">On étire la <span style="color:#7b1fa2">VOYELLE</span></div>';
+      b2.innerHTML='<div style="font-size:2.2rem">📏</div><div style="font-weight:900;color:#1976d2;font-size:1.15rem;margin-top:4px">On étire la <span style="color:var(--k3)">VOYELLE</span></div>';
       c.appendChild(b2);
       S.later(function(){S.sayFr('Le chapeau, on appuie sur la lettre. La prolongation, on étire la voyelle.');},1400);
       c.appendChild(S.nextBtn('Suivant →',S.next,2200));
@@ -8275,7 +8366,7 @@ function _prolongCourse(ca){
     },
 
     /* ── 13. Bravo ── */
-    S.bravo('Bravo ! 🌟<br>Tu sais <span style="color:#7b1fa2">étirer</span><br>les sons !',
+    S.bravo('Bravo ! 🌟<br>Tu sais <span style="color:var(--k3)">étirer</span><br>les sons !',
       'Bravo ! Tu sais étirer les sons !','☀️ 🌙 ⭐','child_isle_prolong')
   ]);
 }
@@ -8317,7 +8408,7 @@ function _letterCourse(ca,dayIdx,mode){
   var withProlong=dayIdx>=3;
 
   function low(v){return (lat+v).toLowerCase();}    /* B + a → « ba » */
-  function hi(s){return '<span style="color:#7b1fa2">'+s+'</span>';}
+  function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
   /* Les sons s'écrivent en minuscules et entre guillemets : « ba », « ban »… */
   function son(s){return hi('« '+s+' »');}
 
@@ -8345,6 +8436,10 @@ function _letterCourse(ca,dayIdx,mode){
        la lettre seule l'est déjà. */
     sc.push(S.tell(f.form,L+'ْ',where+',<br>elle s\'écrit '+hi('comme ça')+' !',
       where+' du mot, elle s\'écrit comme ça !','👆 Touche pour écouter'));
+    /* L'enfant trace CHAQUE forme, pas seulement la lettre isolée :
+       c'est en l'écrivant qu'il la retient. */
+    sc.push(S.trace(f.form,'À toi de tracer<br>la forme '+hi(f.lblText.toLowerCase())+' ! ✏️',
+      'À toi de tracer cette forme ! Suis le modèle avec ton doigt.'));
   });
   if(!attaches){
     sc.push(S.tell(L,L+'ْ','Elle n\'aime pas se '+hi('coller')+'<br>à la lettre '+hi('suivante')+' ! 🙅',
@@ -8420,8 +8515,7 @@ function _letterCourse(ca,dayIdx,mode){
       'C\'est souvent la marque du féminin !'));
   }
 
-  /* ── 4. Je l'écris ── */
-  sc.push(S.trace(L,'À moi de l\'<br>'+hi('écrire')+' ! ✏️','À toi de l\'écrire ! Suis le modèle avec ton doigt.'));
+  /* ── 4. (le tracé se fait désormais forme par forme, plus haut) ── */
 
   /* ── 5. Les 3 voyelles sur cette lettre ── */
   sc.push(S.tell(L+'َ',L+'َ','Un trait '+hi('au-dessus')+'…<br>ça fait '+son(low('a'))+' ! ☀️',
@@ -8493,18 +8587,18 @@ function _xStep1(wrap,forms,goNext){
     var f=forms[fcIdx];
 
     var dots=document.createElement('div');dots.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
-    for(var di=0;di<forms.length;di++){var d=document.createElement('div');d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<fcIdx?'#22c55e':di===fcIdx?'#c2185b':'rgba(194,24,91,.2)');dots.appendChild(d);}
+    for(var di=0;di<forms.length;di++){var d=document.createElement('div');d.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di<fcIdx?'#22c55e':di===fcIdx?'var(--k1)':'rgba(var(--kB),.2)');dots.appendChild(d);}
     container.appendChild(dots);
 
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var intro=document.createElement('div');intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro.textContent=f[0];card.appendChild(intro);
-    var formBig=document.createElement('div');formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:#c2185b;line-height:1.6;padding-bottom:10px;cursor:pointer;margin-bottom:6px;overflow:visible;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:14px;direction:ltr";
+    var intro=document.createElement('div');intro.style.cssText='font-size:.75rem;font-weight:700;color:rgba(var(--kB),.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro.textContent=f[0];card.appendChild(intro);
+    var formBig=document.createElement('div');formBig.style.cssText="font-family:'Scheherazade New',serif;font-size:6rem;color:var(--k1);line-height:1.6;padding-bottom:10px;cursor:pointer;margin-bottom:6px;overflow:visible;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:14px;direction:ltr";
     var fbParts=f[1].split(' ');
     if(fbParts.length===2){formBig.innerHTML='<span>'+fbParts[0]+'</span><span style="font-size:4.5rem"> '+fbParts[1]+'</span>';}
     else{formBig.textContent=f[1];}
     formBig.onclick=function(){speakText(f[1],'ar-SA',null);};card.appendChild(formBig);
-    var lbl=document.createElement('div');lbl.style.cssText='font-size:1.4rem;font-weight:900;color:#7b1fa2;margin-bottom:10px';lbl.textContent=f[0].toUpperCase();card.appendChild(lbl);
-    var tip=document.createElement('div');tip.style.cssText='font-size:.72rem;color:#ad1457;opacity:.55;margin-bottom:10px';tip.textContent='👆 Appuie pour écouter';card.appendChild(tip);
+    var lbl=document.createElement('div');lbl.style.cssText='font-size:1.4rem;font-weight:900;color:var(--k3);margin-bottom:10px';lbl.textContent=f[0].toUpperCase();card.appendChild(lbl);
+    var tip=document.createElement('div');tip.style.cssText='font-size:.72rem;color:var(--k2);opacity:.55;margin-bottom:10px';tip.textContent='👆 Appuie pour écouter';card.appendChild(tip);
     container.appendChild(card);
 
     var writeBtn=document.createElement('button');writeBtn.className='rbtn rbtn-m child-btn-play';writeBtn.style.cssText='width:100%;padding:14px;font-size:1rem';writeBtn.textContent='✏️ À moi de l\'écrire !';
@@ -8514,21 +8608,21 @@ function _xStep1(wrap,forms,goNext){
     function showTrain(){
       container.innerHTML='';
       var dots2=document.createElement('div');dots2.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:10px';
-      for(var di2=0;di2<forms.length;di2++){var d2=document.createElement('div');d2.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di2<fcIdx?'#22c55e':di2===fcIdx?'#c2185b':'rgba(194,24,91,.2)');dots2.appendChild(d2);}
+      for(var di2=0;di2<forms.length;di2++){var d2=document.createElement('div');d2.style.cssText='width:9px;height:9px;border-radius:50%;background:'+(di2<fcIdx?'#22c55e':di2===fcIdx?'var(--k1)':'rgba(var(--kB),.2)');dots2.appendChild(d2);}
       container.appendChild(dots2);
 
       var card2=document.createElement('div');card2.className='child-card';card2.style.textAlign='center';
-      var intro2=document.createElement('div');intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro2.textContent=f[0]+' — Entraîne-toi !';card2.appendChild(intro2);
+      var intro2=document.createElement('div');intro2.style.cssText='font-size:.75rem;font-weight:700;color:rgba(var(--kB),.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px';intro2.textContent=f[0]+' — Entraîne-toi !';card2.appendChild(intro2);
       /* ghost : deux spans séparés lettre | voyelle */
       var ghost=document.createElement('div');
-      ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:#c2185b;opacity:.35;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:8px;direction:ltr;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";
+      ghost.style.cssText="font-family:'Scheherazade New',serif;font-size:2.4rem;color:var(--k1);opacity:.35;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:8px;direction:ltr;line-height:1.5;padding-bottom:4px;overflow:visible;margin-bottom:4px";
       var gParts=f[1].split(' ');
       if(gParts.length===2){ghost.innerHTML='<span>'+gParts[0]+'</span><span style="font-size:1.8rem"> '+gParts[1]+'</span>';}
       else{ghost.textContent=f[1];}
       card2.appendChild(ghost);
 
       var MCW=220,MCH=160,mc=document.createElement('canvas');mc.width=MCW;mc.height=MCH;
-      mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(194,24,91,.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
+      mc.style.cssText='border-radius:14px;background:rgba(255,255,255,.95);border:2px dashed rgba(var(--kB),.3);touch-action:none;display:block;margin:0 auto 8px;max-width:100%';
       var mctx=mc.getContext('2d');
       function drawGuide(){
         var gp=f[1].split(' ');
@@ -8541,10 +8635,10 @@ function _xStep1(wrap,forms,goNext){
       var mDrawing=false,_mDrawn=false;
       function mPos(e){var r=mc.getBoundingClientRect();var src=e.touches?e.touches[0]:e;return{x:(src.clientX-r.left)*(MCW/r.width),y:(src.clientY-r.top)*(MCH/r.height)};}
       mc.addEventListener('mousedown',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.style.opacity='1';nb2.classList.add('child-btn-ready');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();});
-      mc.addEventListener('mousemove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();});
+      mc.addEventListener('mousemove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='var(--k1)';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();});
       mc.addEventListener('mouseup',function(){mDrawing=false;});
       mc.addEventListener('touchstart',function(e){mDrawing=true;if(!_mDrawn){_mDrawn=true;nb2.style.opacity='1';nb2.classList.add('child-btn-ready');}var p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);e.preventDefault();},{passive:false});
-      mc.addEventListener('touchmove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='#c2185b';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();},{passive:false});
+      mc.addEventListener('touchmove',function(e){if(!mDrawing)return;var p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle='var(--k1)';mctx.lineCap='round';mctx.lineTo(p.x,p.y);mctx.stroke();e.preventDefault();},{passive:false});
       mc.addEventListener('touchend',function(){mDrawing=false;});
 
       var nb2=document.createElement('button');nb2.className='rbtn rbtn-m';nb2.style.cssText='width:100%;padding:14px;font-size:1rem;opacity:0;transition:opacity .3s';nb2.textContent='Suivant →';
@@ -8567,24 +8661,24 @@ function _xStep4Quiz(wrap,items,goNext){
   function showQ(){
     wrap.innerHTML='';
     var pb2=document.createElement('div');pb2.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<3?'#22c55e':i===3?'#c2185b':'rgba(194,24,91,.15)');pb2.appendChild(pd);}
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<3?'#22c55e':i===3?'var(--k1)':'rgba(var(--kB),.15)');pb2.appendChild(pd);}
     wrap.appendChild(pb2);
-    var sl2=document.createElement('div');sl2.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';sl2.textContent='🎮 Je joue';wrap.appendChild(sl2);
+    var sl2=document.createElement('div');sl2.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(var(--kB),.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';sl2.textContent='🎮 Je joue';wrap.appendChild(sl2);
     if(qIdx>=allQ.length){goNext();return;}
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:10px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
-    var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(233,30,140,.12),rgba(194,24,91,.06));border:3px dashed rgba(194,24,91,.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
-    var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:#ad1457;margin-bottom:16px';qt.textContent='Quelle voyelle entends-tu ?';card.appendChild(qt);
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:10px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
+    var soundBtn=document.createElement('div');soundBtn.style.cssText="width:90px;height:90px;border-radius:24px;background:linear-gradient(135deg,rgba(var(--kA),.12),rgba(var(--kB),.06));border:3px dashed rgba(var(--kB),.35);display:flex;align-items:center;justify-content:center;font-size:3.5rem;cursor:pointer;margin:0 auto 12px";soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');soundBtn.onclick=function(){speakText(q.speak,'ar-SA',null);};card.appendChild(soundBtn);
+    var qt=document.createElement('div');qt.style.cssText='font-size:.85rem;font-weight:700;color:var(--k2);margin-bottom:16px';qt.textContent='Quelle voyelle entends-tu ?';card.appendChild(qt);
     var choices=[q.correct].concat(q.wrong).sort(function(){return Math.random()-.5;});
     var choicesEl=document.createElement('div');choicesEl.style.cssText='display:flex;gap:14px;justify-content:center;margin-bottom:10px';
     var answered=false;
     choices.forEach(function(ch){
       var btn=document.createElement('div');
-      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09);direction:ltr';
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;width:82px;height:88px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09);direction:ltr';
       var chParts=ch.split(' ');
       if(chParts.length===2){
-        btn.innerHTML='<span>'+chParts[0]+'</span><span style="font-size:1.4rem;color:#ad1457"> '+chParts[1]+'</span>';
+        btn.innerHTML='<span>'+chParts[0]+'</span><span style="font-size:1.4rem;color:var(--k2)"> '+chParts[1]+'</span>';
       }else{
         btn.textContent=ch;
       }
@@ -8602,13 +8696,13 @@ function _xStep4Quiz(wrap,items,goNext){
 /* Étape mot — même structure que _clStep4 */
 function _xWordStep(wrap,wordAr,wordLat,wordFr,tip,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
-  var tipEl=document.createElement('div');tipEl.style.cssText='font-size:.75rem;font-weight:700;color:rgba(194,24,91,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px';tipEl.textContent=tip;card.appendChild(tipEl);
+  var tipEl=document.createElement('div');tipEl.style.cssText='font-size:.75rem;font-weight:700;color:rgba(var(--kB),.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px';tipEl.textContent=tip;card.appendChild(tipEl);
   var em=document.createElement('div');em.className='child-emoji';em.textContent='📖';card.appendChild(em);
   var wEl=document.createElement('div');wEl.className='child-word-ar';wEl.textContent=wordAr;wEl.style.cursor='pointer';wEl.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(wEl);
   var wLat=document.createElement('div');wLat.className='child-word-lat';wLat.textContent=wordLat+' · "'+wordFr+'"';card.appendChild(wLat);
   var sndBtn=document.createElement('button');sndBtn.className='rbtn rbtn-s';sndBtn.style.cssText='margin:10px auto 0;display:block';sndBtn.textContent='🔊 Écouter';sndBtn.onclick=function(){speakText(wordAr,'ar-SA',null);};card.appendChild(sndBtn);
   wrap.appendChild(card);
-  var hint=document.createElement('div');hint.style.cssText='text-align:center;font-size:.78rem;color:#ad1457;margin:8px 0;opacity:.7';hint.textContent='👆 Appuie sur le mot pour l\'écouter !';wrap.appendChild(hint);
+  var hint=document.createElement('div');hint.style.cssText='text-align:center;font-size:.78rem;color:var(--k2);margin:8px 0;opacity:.7';hint.textContent='👆 Appuie sur le mot pour l\'écouter !';wrap.appendChild(hint);
   var nextBtn=document.createElement('button');nextBtn.className='rbtn rbtn-m child-btn-play';nextBtn.textContent='Suivant →';nextBtn.style.cssText='width:100%;padding:14px;font-size:1rem';nextBtn.onclick=goNext;wrap.appendChild(nextBtn);
   setTimeout(function(){speakText(wordAr,'ar-SA',null);},600);
 }
@@ -8628,9 +8722,9 @@ var _CVOW_ITEMS=[['Fatḥa · a','َ','☀️'],['Ḍamma · ou','ُ','🌙'],['
 function _cvProgressBar(wrap,step){
   var SNAMES=['✨ Découverte','🔍 Formes','🎧 Écoute','🎮 Jeu','📖 Mot','🏆 Quiz'];
   var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-  for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<step?'#22c55e':i===step?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+  for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<step?'#22c55e':i===step?'var(--k1)':'rgba(var(--kB),.15)');pb.appendChild(pd);}
   wrap.appendChild(pb);
-  var sl=document.createElement('div');sl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(194,24,91,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
+  var sl=document.createElement('div');sl.style.cssText='text-align:center;font-size:.65rem;font-weight:800;color:rgba(var(--kB),.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px';
   sl.textContent=SNAMES[step];wrap.appendChild(sl);
 }
 
@@ -8642,7 +8736,7 @@ function renderChildVowelLesson(ca,step){
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     card.innerHTML='<div style="font-size:3.5rem;margin-bottom:10px">🎉</div>'
-      +'<h2 style="color:#ad1457;font-size:1.3rem;margin-bottom:8px">Bravo !</h2>'
+      +'<h2 style="color:var(--k2);font-size:1.3rem;margin-bottom:8px">Bravo !</h2>'
       +'<p style="color:rgba(0,0,0,.6);font-size:.9rem;margin-bottom:16px">Tu connais les 3 voyelles !</p>'
       +'<div style="font-size:2.2rem;margin-bottom:18px;display:flex;justify-content:center;gap:12px">'
         +'<span title="Fatḥa">☀️</span><span title="Ḍamma">🌙</span><span title="Kasra">⭐</span></div>';
@@ -8667,14 +8761,14 @@ function renderChildVowelLesson(ca,step){
 /* Étape 0 — Découverte des 3 voyelles */
 function _cvStep0(wrap,ca,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
-  var title=document.createElement('div');title.style.cssText='font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:4px';title.textContent='Les voyelles 🎵';card.appendChild(title);
+  var title=document.createElement('div');title.style.cssText='font-size:1.1rem;font-weight:800;color:var(--k2);margin-bottom:4px';title.textContent='Les voyelles 🎵';card.appendChild(title);
   var sub=document.createElement('div');sub.style.cssText='font-size:.78rem;color:rgba(0,0,0,.45);margin-bottom:18px';sub.textContent='3 petits signes qui changent le son d\'une lettre';card.appendChild(sub);
   _CVOW.forEach(function(v){
     var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(233,30,140,.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
+    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(var(--kA),.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(var(--kA),.09)';
     row.innerHTML='<div style="font-size:2rem">'+v.emoji+'</div>'
-      +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:#ad1457;min-width:52px;text-align:center">'+v.on+'</div>'
-      +'<div><div style="font-weight:800;font-size:.92rem;color:#7b1fa2">'+v.name+'</div>'
+      +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:var(--k2);min-width:52px;text-align:center">'+v.on+'</div>'
+      +'<div><div style="font-weight:800;font-size:.92rem;color:var(--k3)">'+v.name+'</div>'
       +'<div style="font-size:.82rem;color:rgba(0,0,0,.5)">Son : <strong>'+v.sound+'</strong></div></div>';
     row.onclick=function(){speakText(v.speak,'ar-SA',null);row.style.transform='scale(.96)';setTimeout(function(){row.style.transform='';},150);};
     card.appendChild(row);
@@ -8697,13 +8791,13 @@ function _cvStep1(wrap,goNext){
     if(qIdx>=questions.length){goNext();return;}
     var v=questions[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Question '+(qIdx+1)+' / '+questions.length;card.appendChild(prog);
-    var sym=document.createElement('div');sym.style.cssText='font-family:\'Scheherazade New\',serif;font-size:5rem;color:#ad1457;margin-bottom:6px;cursor:pointer';sym.textContent=v.on;sym.onclick=function(){speakText(v.speak,'ar-SA',null);};card.appendChild(sym);
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:14px';prog.textContent='Question '+(qIdx+1)+' / '+questions.length;card.appendChild(prog);
+    var sym=document.createElement('div');sym.style.cssText='font-family:\'Scheherazade New\',serif;font-size:5rem;color:var(--k2);margin-bottom:6px;cursor:pointer';sym.textContent=v.on;sym.onclick=function(){speakText(v.speak,'ar-SA',null);};card.appendChild(sym);
     var q=document.createElement('div');q.style.cssText='font-size:.88rem;color:rgba(0,0,0,.55);margin-bottom:18px';q.textContent='Quel son entends-tu ? Clique pour écouter !';card.appendChild(q);
     var choices=_CVOW.map(function(c){return c.sound;}).sort(function(){return Math.random()-.5;});
     var choiceRow=document.createElement('div');choiceRow.style.cssText='display:flex;gap:10px;justify-content:center';
     choices.forEach(function(s){
-      var c=document.createElement('button');c.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';c.textContent=s;
+      var c=document.createElement('button');c.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09)';c.textContent=s;
       c.onclick=function(){
         var ok=(s===v.sound);
         c.style.background=ok?'#22c55e':'#ef4444';c.style.color='#fff';
@@ -8726,23 +8820,23 @@ function _cvStep2v(wrap,goNext){
     if(vIdx>=_CVOW.length){goNext();return;}
     var v=_CVOW[vIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var title=document.createElement('div');title.style.cssText='font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:10px';title.textContent='Trace le signe '+v.emoji+' · '+v.name;card.appendChild(title);
+    var title=document.createElement('div');title.style.cssText='font-size:.85rem;font-weight:800;color:var(--k2);margin-bottom:10px';title.textContent='Trace le signe '+v.emoji+' · '+v.name;card.appendChild(title);
     var canvas=document.createElement('canvas');canvas.width=220;canvas.height=160;
-    canvas.style.cssText='border-radius:16px;background:rgba(194,24,91,.04);border:2px dashed rgba(194,24,91,.2);cursor:crosshair;touch-action:none;display:block;margin:0 auto 10px';
+    canvas.style.cssText='border-radius:16px;background:rgba(var(--kB),.04);border:2px dashed rgba(var(--kB),.2);cursor:crosshair;touch-action:none;display:block;margin:0 auto 10px';
     var ctx=canvas.getContext('2d');
     // Ghost letter
-    ctx.font='120px Scheherazade New, serif';ctx.fillStyle='rgba(194,24,91,.08)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v.on,110,80);
+    ctx.font='120px Scheherazade New, serif';ctx.fillStyle='rgba(var(--kB),.08)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(v.on,110,80);
     var drawing=false,strokes=0;
     function getPos(e){var r=canvas.getBoundingClientRect();var cl=e.touches?e.touches[0]:e;return{x:cl.clientX-r.left,y:cl.clientY-r.top};}
     canvas.addEventListener('mousedown',function(e){drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
     canvas.addEventListener('touchstart',function(e){e.preventDefault();drawing=true;var p=getPos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
-    canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#c2185b';ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();});
-    canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!drawing)return;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#c2185b';ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();},{passive:false});
+    canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='var(--k1)';ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();});
+    canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!drawing)return;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='var(--k1)';ctx.lineWidth=4;ctx.lineCap='round';ctx.stroke();},{passive:false});
     function endDraw(){if(!drawing)return;drawing=false;strokes++;dotsEl.querySelectorAll('.cv-dot')[strokes-1].style.background='#22c55e';if(strokes>=2){btn.disabled=false;}}
     canvas.addEventListener('mouseup',endDraw);canvas.addEventListener('touchend',endDraw);
     card.appendChild(canvas);
     var dotsEl=document.createElement('div');dotsEl.style.cssText='display:flex;gap:6px;justify-content:center;margin-bottom:12px';
-    for(var di=0;di<2;di++){var dot=document.createElement('div');dot.className='cv-dot';dot.style.cssText='width:12px;height:12px;border-radius:50%;background:rgba(194,24,91,.2)';dotsEl.appendChild(dot);}
+    for(var di=0;di<2;di++){var dot=document.createElement('div');dot.className='cv-dot';dot.style.cssText='width:12px;height:12px;border-radius:50%;background:rgba(var(--kB),.2)';dotsEl.appendChild(dot);}
     card.appendChild(dotsEl);
     var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.disabled=true;btn.textContent='Suivant →';
     btn.onclick=function(){vIdx++;showTrace();};
@@ -8759,8 +8853,8 @@ function _cvStep3v(wrap,goNext){
     if(rIdx>=rounds){goNext();return;}
     var correct=_CVOW[rIdx%_CVOW.length];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
-    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:linear-gradient(135deg,rgba(194,24,91,.15),rgba(194,24,91,.08));cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
+    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:linear-gradient(135deg,rgba(var(--kB),.15),rgba(var(--kB),.08));cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
@@ -8768,7 +8862,7 @@ function _cvStep3v(wrap,goNext){
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:10px;justify-content:center';
     _CVOW.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
       var btn=document.createElement('button');
-      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
+      btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09)';
       btn.textContent=v.on;
       btn.onclick=function(){
         var ok=(v.sound===correct.sound);
@@ -8787,14 +8881,14 @@ function _cvStep3v(wrap,goNext){
 /* Étape 4 — Mot avec voyelles */
 function _cvStep4v(wrap,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
-  card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:10px">Un mot avec des voyelles 📖</div>';
+  card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:var(--k2);margin-bottom:10px">Un mot avec des voyelles 📖</div>';
   var wordAr='بَابٌ';var wordLat='bābun';var wordFr='une porte';
-  var wordEl=document.createElement('div');wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4rem;color:#7b1fa2;margin:10px 0 4px;cursor:pointer';wordEl.textContent=wordAr;
+  var wordEl=document.createElement('div');wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4rem;color:var(--k3);margin:10px 0 4px;cursor:pointer';wordEl.textContent=wordAr;
   wordEl.onclick=function(){speakText(wordAr,'ar-SA',null);};
   card.appendChild(wordEl);
   var lat=document.createElement('div');lat.style.cssText='font-size:1rem;color:rgba(0,0,0,.45);margin-bottom:4px';lat.textContent=wordLat;card.appendChild(lat);
   var fr=document.createElement('div');fr.style.cssText='font-size:.85rem;color:rgba(0,0,0,.55);font-style:italic;margin-bottom:18px';fr.textContent='"'+wordFr+'"';card.appendChild(fr);
-  var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(194,24,91,.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
+  var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(var(--kB),.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
   tipEl.innerHTML='<strong>بَ</strong> = ba (Fatḥa) &nbsp;·&nbsp; <strong>بٌ</strong> = bun (Ḍamma + tanwīn)<br>Clique sur le mot pour écouter !';card.appendChild(tipEl);
   var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
 }
@@ -8812,17 +8906,17 @@ function _cvStep5v(wrap,goNext){
       var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
       var stars='';for(var s=0;s<3;s++)stars+=(s<Math.round(score/allQ.length*3)?'⭐':'☆');
       card.innerHTML='<div style="font-size:3rem;margin-bottom:8px">'+stars+'</div>'
-        +'<div style="font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
+        +'<div style="font-size:1.1rem;font-weight:800;color:var(--k2);margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
         +'<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px">Tu maîtrises les voyelles !</div>';
       var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
     }
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:12px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:12px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
     var qEl=document.createElement('div');qEl.style.cssText='font-size:.9rem;font-weight:700;color:#333;margin-bottom:16px;line-height:1.5';qEl.textContent=q.q;card.appendChild(qEl);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
     q.choices.slice().sort(function(){return Math.random()-.5;}).forEach(function(ch){
-      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=ch;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09)';btn.textContent=ch;
       btn.onclick=function(){
         var ok=(ch===q.correct);
         btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';
@@ -8852,7 +8946,7 @@ function renderChildProlongLesson(ca,step){
     var wrap=document.createElement('div');wrap.className='child-wrap';
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
     card.innerHTML='<div style="font-size:3.5rem;margin-bottom:10px">🎉</div>'
-      +'<h2 style="color:#ad1457;font-size:1.3rem;margin-bottom:8px">Bravo !</h2>'
+      +'<h2 style="color:var(--k2);font-size:1.3rem;margin-bottom:8px">Bravo !</h2>'
       +'<p style="color:rgba(0,0,0,.6);font-size:.9rem;margin-bottom:16px">Tu connais les voyelles longues !</p>'
       +'<div style="font-size:2rem;margin-bottom:18px">🌊 🎵 🌟</div>';
     var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Retour à la carte 🗺️';
@@ -8875,14 +8969,14 @@ function renderChildProlongLesson(ca,step){
 /* Étape 0 — Découverte des voyelles longues */
 function _cpStep0(wrap,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
-  var title=document.createElement('div');title.style.cssText='font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:4px';title.textContent='Les voyelles longues 🎶';card.appendChild(title);
+  var title=document.createElement('div');title.style.cssText='font-size:1.1rem;font-weight:800;color:var(--k2);margin-bottom:4px';title.textContent='Les voyelles longues 🎶';card.appendChild(title);
   var sub=document.createElement('div');sub.style.cssText='font-size:.78rem;color:rgba(0,0,0,.45);margin-bottom:18px';sub.textContent='Comme les voyelles courtes, mais on les étire !';card.appendChild(sub);
   _CPROL.forEach(function(v){
     var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(233,30,140,.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(233,30,140,.09)';
+    row.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.88);border:2px solid rgba(var(--kA),.12);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(var(--kA),.09)';
     row.innerHTML='<div style="font-size:2rem">'+v.emoji+'</div>'
-      +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:#ad1457;min-width:64px;text-align:center">'+v.sym+'</div>'
-      +'<div><div style="font-weight:800;font-size:.92rem;color:#7b1fa2">'+v.latin+' ('+v.name+')</div>'
+      +'<div style="font-family:\'Scheherazade New\',serif;font-size:2.8rem;color:var(--k2);min-width:64px;text-align:center">'+v.sym+'</div>'
+      +'<div><div style="font-weight:800;font-size:.92rem;color:var(--k3)">'+v.latin+' ('+v.name+')</div>'
       +'<div style="font-size:.82rem;color:rgba(0,0,0,.5)">Son long : <strong>'+v.sound+'</strong></div></div>';
     row.onclick=function(){speakText(v.speak,'ar-SA',null);row.style.transform='scale(.96)';setTimeout(function(){row.style.transform='';},150);};
     card.appendChild(row);
@@ -8901,13 +8995,13 @@ function _cpStep1(wrap,goNext){
   function showQ(){
     wrap.innerHTML='';
     var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<1?'#22c55e':i===1?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<1?'#22c55e':i===1?'var(--k1)':'rgba(var(--kB),.15)');pb.appendChild(pd);}
     wrap.appendChild(pb);
     if(qIdx>=questions.length){goNext();return;}
     var v=questions[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Question '+(qIdx+1)+' / '+questions.length;card.appendChild(prog);
-    var sym=document.createElement('div');sym.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4.5rem;color:#ad1457;margin-bottom:6px;cursor:pointer';sym.textContent=v.sym;sym.onclick=function(){speakText(v.speak,'ar-SA',null);};card.appendChild(sym);
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:14px';prog.textContent='Question '+(qIdx+1)+' / '+questions.length;card.appendChild(prog);
+    var sym=document.createElement('div');sym.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4.5rem;color:var(--k2);margin-bottom:6px;cursor:pointer';sym.textContent=v.sym;sym.onclick=function(){speakText(v.speak,'ar-SA',null);};card.appendChild(sym);
     var q=document.createElement('div');q.style.cssText='font-size:.88rem;color:rgba(0,0,0,.55);margin-bottom:18px';q.textContent='Quel son long entends-tu ? 🔊 (clique sur le mot)';card.appendChild(q);
     var choices=_CPROL.map(function(c){return c.sound;}).sort(function(){return Math.random()-.5;});
     var row=document.createElement('div');row.style.cssText='display:flex;gap:10px;justify-content:center';
@@ -8931,20 +9025,20 @@ function _cpStep2p(wrap,goNext){
   function showR(){
     wrap.innerHTML='';
     var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<2?'#22c55e':i===2?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<2?'#22c55e':i===2?'var(--k1)':'rgba(var(--kB),.15)');pb.appendChild(pd);}
     wrap.appendChild(pb);
     if(rIdx>=rounds){goNext();return;}
     var correct=_CPROL[rIdx%_CPROL.length];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
-    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:rgba(194,24,91,.1);cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:14px';prog.textContent='Manche '+(rIdx+1)+' / '+rounds;card.appendChild(prog);
+    var soundBtn=document.createElement('button');soundBtn.style.cssText='width:80px;height:80px;border-radius:20px;border:none;background:rgba(var(--kB),.1);cursor:pointer;font-size:2.5rem;display:block;margin:0 auto 10px';soundBtn.textContent='🔊';soundBtn.classList.add('heartbeat-pulse');
     soundBtn.onclick=function(){speakText(correct.speak,'ar-SA',null);};
     setTimeout(function(){speakText(correct.speak,'ar-SA',null);},400);
     card.appendChild(soundBtn);
     var q=document.createElement('div');q.style.cssText='font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:16px';q.textContent='Quelle prolongation entends-tu ?';card.appendChild(q);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center';
     _CPROL.slice().sort(function(){return Math.random()-.5;}).forEach(function(v){
-      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=v.sym;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09)';btn.textContent=v.sym;
       btn.onclick=function(){
         var ok=(v.sound===correct.sound);btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';
         grid.querySelectorAll('button').forEach(function(b){b.disabled=true;});
@@ -8968,16 +9062,16 @@ function _cpStep3p(wrap,goNext){
   function showR(){
     wrap.innerHTML='';
     var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<3?'#22c55e':i===3?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<3?'#22c55e':i===3?'var(--k1)':'rgba(var(--kB),.15)');pb.appendChild(pd);}
     wrap.appendChild(pb);
     if(rIdx>=pairs.length){goNext();return;}
     var p=pairs[rIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:14px">'+p.emoji+' Lequel est le son LONG ?</div>';
+    card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:var(--k2);margin-bottom:14px">'+p.emoji+' Lequel est le son LONG ?</div>';
     var row=document.createElement('div');row.style.cssText='display:flex;gap:14px;justify-content:center';
     [{sym:p.short,sound:p.shortS,ok:false},{sym:p.long,sound:p.longS,ok:true}].sort(function(){return Math.random()-.5;}).forEach(function(opt){
       var btn=document.createElement('button');
-      btn.style.cssText='flex:1;padding:18px 10px;border-radius:16px;border:2px solid rgba(194,24,91,.2);background:rgba(194,24,91,.05);cursor:pointer;font-family:\'Scheherazade New\',serif;font-size:2.5rem;color:#7b1fa2;transition:all .15s';
+      btn.style.cssText='flex:1;padding:18px 10px;border-radius:16px;border:2px solid rgba(var(--kB),.2);background:rgba(var(--kB),.05);cursor:pointer;font-family:\'Scheherazade New\',serif;font-size:2.5rem;color:var(--k3);transition:all .15s';
       btn.innerHTML='<div>'+opt.sym+'</div><div style="font-size:.75rem;color:rgba(0,0,0,.4);font-family:sans-serif;margin-top:4px">'+opt.sound+'</div>';
       btn.onclick=function(){
         btn.style.background=opt.ok?'#22c55e':'#ef4444';btn.style.color='#fff';
@@ -8994,14 +9088,14 @@ function _cpStep3p(wrap,goNext){
 /* Étape 4 — Mot avec voyelle longue */
 function _cpStep4p(wrap,goNext){
   var card=document.createElement('div');card.className='child-card child-card-float';card.style.textAlign='center';
-  card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:#ad1457;margin-bottom:10px">Un mot avec des voyelles longues 📖</div>';
+  card.innerHTML='<div style="font-size:.85rem;font-weight:800;color:var(--k2);margin-bottom:10px">Un mot avec des voyelles longues 📖</div>';
   var wordAr='نُورٌ';var wordLat='nūrun';var wordFr='une lumière';
-  var wordEl=document.createElement('div');wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4rem;color:#7b1fa2;margin:10px 0 4px;cursor:pointer';wordEl.textContent=wordAr;
+  var wordEl=document.createElement('div');wordEl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:4rem;color:var(--k3);margin:10px 0 4px;cursor:pointer';wordEl.textContent=wordAr;
   wordEl.onclick=function(){speakText(wordAr,'ar-SA',null);};
   card.appendChild(wordEl);
   var lat=document.createElement('div');lat.style.cssText='font-size:1rem;color:rgba(0,0,0,.45);margin-bottom:4px';lat.textContent=wordLat;card.appendChild(lat);
   var fr=document.createElement('div');fr.style.cssText='font-size:.85rem;color:rgba(0,0,0,.55);font-style:italic;margin-bottom:18px';fr.textContent='"'+wordFr+'"';card.appendChild(fr);
-  var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(194,24,91,.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
+  var tipEl=document.createElement('div');tipEl.style.cssText='background:rgba(var(--kB),.07);border-radius:12px;padding:10px 14px;font-size:.8rem;color:rgba(0,0,0,.6);margin-bottom:18px;line-height:1.6';
   tipEl.innerHTML='<strong>نُو</strong> contient un Waw → son long <strong>ū</strong><br>Clique sur le mot pour écouter !';card.appendChild(tipEl);
   var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Suivant →';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);
 }
@@ -9018,23 +9112,23 @@ function _cpStep5p(wrap,goNext){
   function showQ(){
     wrap.innerHTML='';
     var pb=document.createElement('div');pb.style.cssText='display:flex;gap:4px;justify-content:center;margin-bottom:8px';
-    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<5?'#22c55e':i===5?'#c2185b':'rgba(194,24,91,.15)');pb.appendChild(pd);}
+    for(var i=0;i<6;i++){var pd=document.createElement('div');pd.style.cssText='height:6px;flex:1;border-radius:4px;background:'+(i<5?'#22c55e':i===5?'var(--k1)':'rgba(var(--kB),.15)');pb.appendChild(pd);}
     wrap.appendChild(pb);
     if(qIdx>=allQ.length){
       var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
       var stars='';for(var s=0;s<3;s++)stars+=(s<Math.round(score/allQ.length*3)?'⭐':'☆');
       card.innerHTML='<div style="font-size:3rem;margin-bottom:8px">'+stars+'</div>'
-        +'<div style="font-size:1.1rem;font-weight:800;color:#ad1457;margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
+        +'<div style="font-size:1.1rem;font-weight:800;color:var(--k2);margin-bottom:6px">'+score+' / '+allQ.length+'</div>'
         +'<div style="font-size:.85rem;color:rgba(0,0,0,.5);margin-bottom:18px">Tu maîtrises les voyelles longues !</div>';
       var btn=document.createElement('button');btn.className='rbtn rbtn-m';btn.textContent='Terminer 🎉';btn.onclick=goNext;card.appendChild(btn);wrap.appendChild(card);return;
     }
     var q=allQ[qIdx];
     var card=document.createElement('div');card.className='child-card';card.style.textAlign='center';
-    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(194,24,91,.5);font-weight:700;margin-bottom:12px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
+    var prog=document.createElement('div');prog.style.cssText='font-size:.72rem;color:rgba(var(--kB),.5);font-weight:700;margin-bottom:12px';prog.textContent='Question '+(qIdx+1)+' / '+allQ.length;card.appendChild(prog);
     var qEl=document.createElement('div');qEl.style.cssText='font-size:.9rem;font-weight:700;color:#333;margin-bottom:16px;font-family:\'Scheherazade New\',serif;font-size:1.1rem';qEl.textContent=q.q;card.appendChild(qEl);
     var grid=document.createElement('div');grid.style.cssText='display:flex;gap:8px;justify-content:center;flex-wrap:wrap';
     q.choices.slice().sort(function(){return Math.random()-.5;}).forEach(function(ch){
-      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:#c2185b;border:2px solid rgba(233,30,140,.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(233,30,140,.09)';btn.textContent=ch;
+      var btn=document.createElement('button');btn.style.cssText='background:rgba(255,255,255,.9);border-radius:18px;flex:1;min-height:72px;display:flex;align-items:center;justify-content:center;font-family:\'Scheherazade New\',serif;font-size:2.4rem;color:var(--k1);border:2px solid rgba(var(--kA),.18);cursor:pointer;transition:all .2s;box-shadow:0 4px 12px rgba(var(--kA),.09)';btn.textContent=ch;
       btn.onclick=function(){
         var ok=(ch===q.correct);btn.style.background=ok?'#22c55e':'#ef4444';btn.style.color='#fff';if(ok)score++;
         grid.querySelectorAll('button').forEach(function(b){b.disabled=true;});
@@ -9142,10 +9236,13 @@ function renderChildReward(ca,dayIdx,mode){
   var letter=CHILD_LETTERS[dayIdx];
   var revoir=(mode==='revoir');
   var isle=_childIsleOf(dayIdx);
+  /* Le garçon a sa propre carte de sessions : sa progression ne passe pas
+     par child_girl_day et il revient à son choix de lettres, pas aux îles. */
+  var garcon=(st.profile==='boy');
 
   /* En révision on ne touche pas à la progression (sinon revoir une vieille
      lettre la ferait reculer). */
-  if(!revoir){
+  if(!revoir&&!garcon){
     var dejaFait=Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0);
     var maj=Math.min(Math.max(dayIdx+1,dejaFait),CHILD_LETTERS.length);
     try{localStorage.setItem('child_girl_day',''+maj);}catch(e){}
@@ -9183,9 +9280,16 @@ function renderChildReward(ca,dayIdx,mode){
   function bouton(txt,fn,principal){
     var b=document.createElement('button');b.className='rbtn rbtn-m';
     b.style.cssText='width:100%;padding:12px;font-size:.98rem;margin-bottom:8px'
-      +(principal?';background:linear-gradient(135deg,#ec4899,#ad1457);color:#fff':'');
+      +(principal?';background:linear-gradient(135deg,var(--k1),var(--k2));color:#fff':'');
     b.textContent=txt;b.onclick=function(){try{stopSpeech();}catch(e){}fn();};
     wrap.appendChild(b);
+  }
+
+  if(garcon){
+    msg('Tu peux en faire une autre 😎');
+    if(_boySession)bouton('📖 Une autre lettre',function(){_boyLetterPicker(ca,_boySession);},true);
+    bouton('🗺️ Retour à la carte',function(){renderSessionsMap(ca);});
+    ca.appendChild(wrap);return;
   }
 
   if(revoir){
