@@ -7077,7 +7077,10 @@ function _dedupForms(letter,af){
 /* Baseline d'écriture fixe : le corps de la lettre se pose sur la ligne,
    les hampes montent au-dessus et les jambages descendent en dessous.
    ratio ~0.60 = la ligne est aux 3/5 bas du canvas (placement correct par lettre). */
-function _drawWritingGuide(ctx,form,CW,CH,fontPx,split){
+/* dyModele : décale le modèle en filigrane vers le bas, SANS bouger la ligne
+   d'écriture. Sert aux signes qui se posent sous la ligne (kasra, tanwīn
+   kasr) : dessinés à la baseline ils collaient au pointillé. */
+function _drawWritingGuide(ctx,form,CW,CH,fontPx,split,dyModele){
   ctx.clearRect(0,0,CW,CH);
   ctx.save();
   ctx.font=fontPx+"px 'Scheherazade New',serif";
@@ -7090,12 +7093,13 @@ function _drawWritingGuide(ctx,form,CW,CH,fontPx,split){
   var hasDesc=desc>fontPx*0.12;
   var baseY=Math.round(CH*(hasDesc?0.50:0.64));
   ctx.fillStyle='rgba(194,24,91,0.07)';
+  var modY=baseY+(dyModele||0);
   if(split&&split.length===2){
     /* lettre + voyelle séparées (voyelles/prolongations) */
-    ctx.textAlign='right';ctx.fillText(split[0],CW/2-5,baseY);
-    ctx.textAlign='left';ctx.fillText(' '+split[1],CW/2+5,baseY);
+    ctx.textAlign='right';ctx.fillText(split[0],CW/2-5,modY);
+    ctx.textAlign='left';ctx.fillText(' '+split[1],CW/2+5,modY);
   }else{
-    ctx.textAlign='center';ctx.fillText(form,CW/2,baseY);
+    ctx.textAlign='center';ctx.fillText(form,CW/2,modY);
   }
   ctx.restore();
   ctx.save();
@@ -7740,8 +7744,16 @@ function _kidScene(ca){
     return false;
   }
   api.hasRec=_hasRec;
+  /* Ce qui est entre guillemets « … » est un SON, pas un mot à lire : la voix
+     ne doit jamais le prononcer, nulle part. Elle lit la phrase autour, et le
+     son lui-même est joué par l'enregistrement du studio. */
+  function _sansGuillemets(t){
+    return String(t).replace(/«[^»]*»/g,' ')
+                    .replace(/\s+([!?…,.])/g,'$1')
+                    .replace(/\s+/g,' ').trim();
+  }
   function say(t){
-    t=_noEmoji(t);if(!t)return;
+    t=_sansGuillemets(_noEmoji(t));if(!t)return;
     /* Les voyelles seules (◌َ ◌ِ ◌ُ ◌ً ◌ٍ ◌ٌ ◌ْ) ne se prononcent PAS comme
        les sons français correspondants. Aucune voix de synthèse ne doit donc
        les approximer : on ne les joue que si l'enregistrement du studio
@@ -7876,7 +7888,7 @@ function _kidScene(ca){
       /* direction:rtl — l'arabe se lit de DROITE à GAUCHE : le premier
          élément du tableau doit apparaître à droite (a, puis i, puis ou ;
          isolée, puis début, puis milieu, puis fin). */
-      var r=document.createElement('div');r.style.cssText='display:flex;gap:14px;justify-content:center;margin-top:8px;flex-wrap:wrap;direction:rtl';
+      var r=document.createElement('div');r.style.cssText='display:flex;gap:30px;justify-content:center;margin-top:8px;flex-wrap:wrap;direction:rtl';
       /* items : [glyphe, légende] ou [glyphe, légende, son] si le glyphe
          n'est pas prononçable tel quel (voyelle seule). */
       items.forEach(function(o){
@@ -7916,7 +7928,7 @@ function _kidScene(ca){
         rejouer.onclick=function(){sayStop();sayAr(tgtSound);};
         c.appendChild(rejouer);
       }
-      var row=document.createElement('div');row.style.cssText='display:flex;gap:12px;justify-content:center;margin-top:12px;flex-wrap:wrap';
+      var row=document.createElement('div');row.style.cssText='display:flex;gap:26px;justify-content:center;margin-top:12px;flex-wrap:wrap';
       var answered=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
@@ -8018,7 +8030,10 @@ function _kidScene(ca){
          canvas il ferait doublon avec la ligne d'écriture en pointillés,
          déjà présente. On ne trace donc que la voyelle elle-même. */
       var modele=(typeof _VOW_BASE!=='undefined')?glyph.split(_VOW_BASE).join(''):glyph;
-      function guide(){_drawWritingGuide(cx,modele,CW,CH,100,split||null);}
+      /* kasra (U+0650) et tanwīn kasr (U+064D) se posent SOUS la ligne :
+         on les descend pour qu'ils ne collent pas au pointillé. */
+      var dy=/[ٍِ]/.test(modele)?18:0;
+      function guide(){_drawWritingGuide(cx,modele,CW,CH,100,split||null,dy);}
       guide();c.appendChild(cv);
       var er=document.createElement('button');er.className='rbtn rbtn-s';er.style.cssText='display:block;margin:0 auto;font-size:.8rem';er.textContent='↺ Effacer';er.onclick=function(){guide();};c.appendChild(er);
       var drawing=false,drawn=false,btn;
@@ -8088,15 +8103,15 @@ function _vowelCourse(ca){
 
     /* ── Les 3 voyelles, une par écran (+ tracé) ── */
     S.tell(FATHA,FATHA,'Un petit trait '+hi('au-dessus')+'…<br>ça fait '+son('a')+' ! ☀️',
-      'Un petit trait au dessus. Écoute !','👆 Touche pour écouter'),
+      'Un petit trait au-dessus, ça fait « a » !','👆 Touche pour écouter'),
     S.trace(FATHA,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire ! Suis le modèle avec ton doigt.'),
 
     S.tell(KASRA,KASRA,'Un petit trait '+hi('en-dessous')+'…<br>ça fait '+son('i')+' ! ⭐',
-      'Un petit trait en dessous. Écoute !','👆 Touche pour écouter'),
+      'Un petit trait en-dessous, ça fait « i » !','👆 Touche pour écouter'),
     S.trace(KASRA,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
 
     S.tell(DAMMA,DAMMA,'Une petite '+hi('boucle')+' au-dessus…<br>ça fait '+son('ou')+' ! 🌙',
-      'Une petite boucle au dessus. Écoute !','👆 Touche pour écouter'),
+      'Une petite boucle au-dessus, ça fait « ou » !','👆 Touche pour écouter'),
     S.trace(DAMMA,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
 
     /* ── Récapitulatif (ordre arabe : a à droite, i au milieu, ou à gauche) ── */
@@ -8106,39 +8121,48 @@ function _vowelCourse(ca){
       'Il n\'y en a que trois ! C\'est tout.'),
 
     /* ── Exercices d'écoute ── */
-    S.pick([FATHA,KASRA,DAMMA],DAMMA,'Où est le son '+son('ou')+' ? 👂','Où est ce son ?'),
-    S.pick([FATHA,KASRA,DAMMA],FATHA,'Où est le son '+son('a')+' ? 👂','Où est ce son ?'),
-    S.pick([FATHA,KASRA,DAMMA],KASRA,'Où est le son '+son('i')+' ? 👂','Où est ce son ?'),
+    S.pick([FATHA,KASRA,DAMMA],DAMMA,'Où est le son '+son('ou')+' ? 👂','Où est le son « ou » ?'),
+    S.pick([FATHA,KASRA,DAMMA],FATHA,'Où est le son '+son('a')+' ? 👂','Où est le son « a » ?'),
+    S.pick([FATHA,KASRA,DAMMA],KASRA,'Où est le son '+son('i')+' ? 👂','Où est le son « i » ?'),
     S.tell(null,null,'Bravo ! 🎉<br>Tu connais les '+hi('3 voyelles')+' !',
       'Bravo ! Tu connais les trois voyelles !'),
 
     /* ── Le tanwīn : la voyelle doublée ajoute le son « n » ── */
-    S.tell(null,null,'Maintenant…<br>on peut les '+hi('DOUBLER')+' ! ➕',
-      'Maintenant, on peut les doubler !'),
+    function(){
+      /* pas de glyphe affiche ici : seulement le texte, et le son « n »
+         (نْ) joue juste apres — enregistrable au studio comme le reste. */
+      var c=S.card();
+      c.appendChild(S.phrase('Les trois voyelles<br>peuvent être '+hi('doublées')+' !<br>On ajoutera le son '+son('n'),
+        'Les trois voyelles peuvent être doublées ! On ajoutera le son « n »'));
+      S.later(function(){S.sayAr('نْ');},600);
+      c.appendChild(S.hintLine('👆 Touche « Suivant » quand tu as entendu'));
+      c.appendChild(S.nextBtn('Suivant →',S.next));
+      S.wrap.appendChild(c);
+    },
     S.tell(T_FAT,T_FAT,'Deux traits '+hi('au-dessus')+'…<br>'+son('a')+' devient '+son('an')+' ! 👃',
-      'Deux petits traits au dessus. On ajoute le son n. Écoute !','👆 Touche pour écouter'),
+      'Deux traits au-dessus, « a » devient « an » !','👆 Touche pour écouter'),
     S.trace(T_FAT,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
     S.tell(T_KAS,T_KAS,'Deux traits '+hi('en-dessous')+'…<br>'+son('i')+' devient '+son('in')+' ! 👃',
-      'Deux petits traits en dessous. Écoute !','👆 Touche pour écouter'),
+      'Deux traits en-dessous, « i » devient « in » !','👆 Touche pour écouter'),
     S.trace(T_KAS,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
     S.tell(T_DAM,T_DAM,'Deux '+hi('boucles')+' au-dessus…<br>'+son('ou')+' devient '+son('oun')+' ! 👃',
-      'Deux petites boucles au dessus. Écoute !','👆 Touche pour écouter'),
+      'Deux boucles au-dessus, « ou » devient « oun » !','👆 Touche pour écouter'),
     S.trace(T_DAM,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
     S.row([[T_FAT,'an ☀️'],[T_KAS,'in ⭐'],[T_DAM,'oun 🌙']],
-      'On entend un '+son('n')+' ! 👃','Dans les trois, on entend un n à la fin !'),
+      'Voici les trois<br>voyelles '+hi('doublées')+' 👃','Voici les trois voyelles doublées'),
     S.pick([T_FAT,T_KAS,T_DAM],T_FAT,
-      'Où est le son '+son('an')+' ? 👂','Où est ce son ?'),
+      'Où est le son '+son('an')+' ? 👂','Où est le son « an » ?'),
     S.pick([T_FAT,T_KAS,T_DAM],T_KAS,
-      'Où est le son '+son('in')+' ? 👂','Où est ce son ?'),
+      'Où est le son '+son('in')+' ? 👂','Où est le son « in » ?'),
     S.pick([T_FAT,T_KAS,T_DAM],T_DAM,
-      'Où est le son '+son('oun')+' ? 👂','Où est ce son ?'),
+      'Où est le son '+son('oun')+' ? 👂','Où est le son « oun » ?'),
 
     /* ── Le soukoun ── */
     S.tell(null,null,'Enfin,<br>il y a le '+hi('soukoun')+' ⭕',
       'Enfin, il y a le soukoun.'),
-    S.tell(SUKUN,null,'Un petit '+hi('rond')+' ⭕<br>= on ne prononce '+hi('rien')+' !',
-      'Un petit rond, on ne prononce rien !',
-      '⭕ On ne prononce rien'),
+    S.tell(SUKUN,null,'Un petit '+hi('rond')+' ⭕<br>= on ne prononce que<br>le '+hi('son de la lettre')+' !',
+      'Un petit rond, on ne prononce que le son de la lettre !',
+      '⭕ On ne prononce que le son de la lettre'),
     S.trace(SUKUN,'À moi de l\''+hi('écrire')+' ! ✏️','À toi de l\'écrire !'),
 
     /* ── Leurs noms (secondaires) ── */
