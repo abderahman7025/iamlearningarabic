@@ -2524,9 +2524,20 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @keyframes bScan{0%{top:-30%}100%{top:130%}}
 @keyframes bAppear{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes bBlink{0%,100%{opacity:1}50%{opacity:.25}}
-.boy-wrap{padding:70px 12px 60px;max-width:430px;margin:0 auto}
-.boy-panel{position:relative;overflow:hidden;background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%);
-  border:3px solid rgba(2,136,209,.30);border-radius:18px;padding:18px 16px;margin-bottom:14px;
+@keyframes bNuage{0%,100%{border-radius:46% 54% 52% 48%/50% 46% 54% 50%}
+  50%{border-radius:56% 44% 46% 54%/44% 56% 44% 56%}}
+/* voyelles en apesanteur dans le hublot */
+@keyframes bFlotte1{0%{transform:translate(-30px,-22px)}25%{transform:translate(26px,-8px)}
+  50%{transform:translate(12px,26px)}75%{transform:translate(-24px,14px)}100%{transform:translate(-30px,-22px)}}
+@keyframes bFlotte2{0%{transform:translate(24px,18px)}25%{transform:translate(-18px,26px)}
+  50%{transform:translate(-28px,-14px)}75%{transform:translate(14px,-26px)}100%{transform:translate(24px,18px)}}
+@keyframes bFlotte3{0%{transform:translate(-6px,28px)}25%{transform:translate(28px,6px)}
+  50%{transform:translate(6px,-28px)}75%{transform:translate(-28px,-4px)}100%{transform:translate(-6px,28px)}}
+.boy-flotte{position:absolute;font-family:'Scheherazade New',serif;font-size:2.5rem;color:#01579b;
+  cursor:pointer;line-height:1;text-shadow:0 2px 6px rgba(255,255,255,.9)}
+.boy-wrap{padding:70px 8px 60px;max-width:none;margin:0 auto}
+.boy-panel{position:relative;overflow:hidden;text-align:center;background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%);
+  border:3px solid rgba(2,136,209,.30);border-radius:22px;padding:26px 18px;margin-bottom:14px;
   box-shadow:0 10px 26px rgba(1,87,155,.16);animation:bAppear .38s ease both}
 .boy-panel::before{content:'';position:absolute;left:0;right:0;height:34%;
   background:linear-gradient(180deg,rgba(2,136,209,0),rgba(2,136,209,.10),rgba(2,136,209,0));
@@ -2534,7 +2545,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-step{display:flex;align-items:center;gap:8px;justify-content:center;font-size:.66rem;font-weight:900;
   letter-spacing:.16em;text-transform:uppercase;color:#0277bd;margin-bottom:10px}
 .boy-step i{width:7px;height:7px;border-radius:50%;background:#0277bd;animation:bBlink 1.4s infinite;font-style:normal}
-.boy-titre{font-size:1.3rem;font-weight:900;color:#01579b;line-height:1.4;margin-bottom:12px}
+.boy-titre{font-size:1.28rem;font-weight:900;color:#01579b;line-height:1.9;letter-spacing:.01em;
+  text-align:center;margin:0 auto 18px;max-width:22em}
 .boy-hublot{width:174px;height:174px;border-radius:50%;margin:6px auto;position:relative;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#ffffff,#cdeafc 58%,#9ad4f5);
@@ -2566,9 +2578,12 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   margin-top:14px;transition:transform .15s,opacity .3s}
 .boy-btn:active{transform:translateY(2px)}
 .boy-btn.sec{background:linear-gradient(135deg,#78909c,#455a64);box-shadow:0 6px 16px rgba(69,90,100,.3)}
-.boy-cible{border:3px solid rgba(2,136,209,.35);border-radius:16px;background:#fff;cursor:pointer;
-  min-width:88px;padding:12px 10px;font-family:'Scheherazade New',serif;font-size:2.6rem;color:#01579b;
-  line-height:1.5;transition:all .18s;box-shadow:0 4px 12px rgba(1,87,155,.12)}
+.boy-cible{border:3px solid rgba(2,136,209,.35);background:#fff;cursor:pointer;
+  width:104px;height:104px;display:flex;align-items:center;justify-content:center;
+  font-family:'Scheherazade New',serif;font-size:2.6rem;color:#01579b;line-height:1;
+  border-radius:46% 54% 52% 48%/50% 46% 54% 50%;
+  animation:bNuage 6s ease-in-out infinite;
+  transition:transform .18s,background .18s,border-color .18s;box-shadow:0 6px 16px rgba(1,87,155,.14)}
 .boy-cible.ok{background:rgba(38,166,154,.18);border-color:#00897b;color:#00695c;transform:scale(1.08)}
 .boy-cible.ko{background:rgba(239,83,80,.14);border-color:#e53935;color:#c62828}
 .boy-note{font-size:.82rem;color:rgba(1,87,155,.75);font-weight:700;margin-top:8px}
@@ -5252,6 +5267,7 @@ var islandDefs=[
     /* Profil garçon : mêmes cours narrés que la fille (moteur _kidScene),
        en thème bleu. L'adulte garde les leçons détaillées d'origine. */
     if(st.profile==='boy'){
+      _boySession=s;
       if(s.type==='vowels'){_boyVowelCourse(domContainer);return;}
       if(s.type==='prolong'){_boyProlongCourse(domContainer);return;}
       _boyLetterPicker(domContainer,s);return;
@@ -6467,6 +6483,36 @@ function _childIdxOf(ar){
 }
 
 /* Choix de la lettre à travailler dans une session du garçon */
+/* Le garcon debloquait l'ile suivante via st.accuracy, alimente par les
+   anciens exercices adultes. Ses missions ne passant plus par eux, plus rien
+   ne se debloquait. On enregistre donc la reussite ici. */
+function _boyValideSession(sid){
+  if(sid===undefined||sid===null)return;
+  try{
+    var ac=st.accuracy||(st.accuracy={});
+    ac[sid]={c:1,t:1};
+    localStorage.setItem('arab_acc',JSON.stringify(ac));
+    var sc=st.scores||(st.scores={});
+    if(sc[sid]===undefined)sc[sid]=100;
+    localStorage.setItem('arab_scores',JSON.stringify(sc));
+  }catch(e){}
+}
+
+/* Une session de lettres n'est acquise que lorsque TOUTES ses lettres
+   ont ete faites. On memorise les lettres terminees. */
+function _boyLettreFinie(session,idx){
+  if(!session)return;
+  var cle='boy_lettres_'+session.id;
+  var faites=[];
+  try{faites=JSON.parse(localStorage.getItem(cle)||'[]');}catch(e){}
+  if(faites.indexOf(idx)<0)faites.push(idx);
+  try{localStorage.setItem(cle,JSON.stringify(faites));}catch(e){}
+  var attendues=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
+                 .filter(function(i){return i>=0;});
+  var tout=attendues.every(function(i){return faites.indexOf(i)>=0;});
+  if(tout)_boyValideSession(session.id);
+}
+
 function _boyLetterPicker(ca,session){
   _boySession=session;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
@@ -9287,8 +9333,20 @@ function _boyScene(ca){
   /* Hublot : la lettre dans le sas du vaisseau, cliquable */
   function hublot(p,glyph,son,note){
     var h=document.createElement('div');h.className='boy-hublot';
-    h.innerHTML='<span>'+glyph+'</span>';
-    h.onclick=function(){N.stop();N.dire(son||glyph);};
+    if(Array.isArray(glyph)){
+      /* plusieurs signes qui derivent dans le hublot, en apesanteur */
+      glyph.forEach(function(o,n){
+        var f=document.createElement('span');f.className='boy-flotte';
+        f.textContent=o[0];
+        f.style.animation='bFlotte'+(n%3+1)+' '+(11+n*3)+'s ease-in-out infinite';
+        f.onclick=function(ev){ev.stopPropagation();N.stop();N.dire(o[1]||o[0]);};
+        h.appendChild(f);
+      });
+      h.onclick=function(){N.stop();};
+    }else{
+      h.innerHTML='<span>'+glyph+'</span>';
+      h.onclick=function(){N.stop();N.dire(son||glyph);};
+    }
     p.appendChild(h);
     if(note!==null){
       var n=document.createElement('div');n.className='boy-note';
@@ -9339,33 +9397,48 @@ function _boyScene(ca){
   api.brief=function(etape,html,fr,label){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
-      bouton(p,label||'MISSION SUIVANTE ▸',suivant);
+      bouton(p,label||'SUIVANT ▸',suivant);
     };
   };
   /* Observation : texte + hublot */
   api.obs=function(etape,glyph,son,html,fr,note){
     return function(){
       var p=panneau(etape);titre(p,html,fr);hublot(p,glyph,son,note);
-      bouton(p,'MISSION SUIVANTE ▸',suivant);
+      bouton(p,'SUIVANT ▸',suivant);
     };
   };
   /* Piste : texte + signes au-dessus / en-dessous de la ligne */
   api.surPiste=function(etape,html,fr,haut,bas){
     return function(){
       var p=panneau(etape);titre(p,html,fr);piste(p,haut,bas);
-      bouton(p,'MISSION SUIVANTE ▸',suivant);
+      bouton(p,'SUIVANT ▸',suivant);
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
   api.tracer=function(etape,glyph,html,fr,dy){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
-      var CW=280,CH=190,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
+      var CW=520,CH=200,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
       cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
         +'background:#fff;border:3px solid rgba(2,136,209,.30);touch-action:none';
       var cx=cv.getContext('2d');
       var modele=(typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph;
-      function guide(){_drawWritingGuide(cx,modele,CW,CH,104,null,dy||0);}
+      /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
+         page, au lieu d'un seul essai. */
+      function guide(){
+        cx.clearRect(0,0,CW,CH);
+        var baseY=Math.round(CH*0.62)+(dy||0);
+        cx.save();
+        cx.font="74px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
+        cx.fillStyle='rgba(2,136,209,0.10)';cx.textAlign='center';
+        var N=3,pas=CW/N;
+        for(var k=0;k<N;k++)cx.fillText(modele,pas*(k+0.5),baseY);
+        cx.restore();
+        cx.save();
+        cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2;cx.setLineDash([9,6]);
+        cx.beginPath();cx.moveTo(10,Math.round(CH*0.62));cx.lineTo(CW-10,Math.round(CH*0.62));cx.stroke();
+        cx.restore();
+      }
       guide();p.appendChild(cv);
       var eff=document.createElement('button');eff.className='boy-btn sec';
       eff.style.cssText+=';padding:9px;font-size:.85rem;margin-top:8px';
@@ -9378,7 +9451,7 @@ function _boyScene(ca){
       function fin(){trace=false;}
       cv.addEventListener('mousedown',deb);cv.addEventListener('mousemove',mv);cv.addEventListener('mouseup',fin);
       cv.addEventListener('touchstart',deb,{passive:false});cv.addEventListener('touchmove',mv,{passive:false});cv.addEventListener('touchend',fin);
-      btn=bouton(p,'MISSION SUIVANTE ▸',suivant);
+      btn=bouton(p,'SUIVANT ▸',suivant);
       btn.style.opacity='.45';
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
@@ -9447,28 +9520,29 @@ function _boyVowelCourse(ca){
   B.run([
     B.brief('MISSION 1 · BRIEFING','Aujourd\'hui :<br>les '+b('voyelles')+' 🎯',
       'Mission du jour : les voyelles.','▶ DÉCOLLAGE'),
-    B.obs('ÉTAPE 1 · REPÉRAGE',_VOW_BASE,null,
-      'Une voyelle, c\'est un<br>petit '+b('signe')+'.<br>Le rond, c\'est la place<br>de la lettre.',
-      'Une voyelle, c\'est un petit signe. Le rond en pointillés, c\'est la place de la lettre.',
-      '⭕ Ici viendra la lettre'),
+    B.obs('ÉTAPE 1 · REPÉRAGE',[[F,'a'],[D,'ou'],[K,'i']],null,
+      'Une voyelle,<br>c\'est un petit '+b('signe')+'.',
+      'Une voyelle, c\'est un petit signe.',null),
     B.brief('ÉTAPE 2 · POSITION','Il se place '+b('sur')+',<br>ou '+b('sous')+' la lettre.',
       'Il se place sur, ou sous la lettre.'),
     B.brief('ÉTAPE 3 · ORDRE','On dit d\'abord la '+b('lettre')+',<br>'+b('PUIS')+' la voyelle. 1️⃣2️⃣',
       'Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.'),
     B.brief('ÉTAPE 4 · INVENTAIRE','Il en existe<br>seulement '+b('3')+' ! 🖐️',
       'Il existe seulement trois voyelles.'),
-    B.surPiste('ÉTAPE 5 · LA PISTE','Deux au-'+b('dessus')+',<br>une en-'+b('dessous')+'.',
-      'Deux voyelles se posent au dessus de la ligne, une se pose en dessous.',
-      [[F,'a','a'],[D,'ou','ou']],[[K,'i','i']]),
-
     B.obs('ÉTAPE 6 · FATḤA',F,'a','Un trait au-'+b('dessus')+' :<br>ça fait '+q('a')+' ☀️',
       'Un trait au-dessus, ça fait « a »'),
+    B.surPiste('ÉTAPE 6 · SA PLACE','La '+b('fatḥa')+' se pose<br>'+b('au-dessus')+' de la ligne.',
+      'La fatha se pose au-dessus de la ligne d\'écriture.',[[F,'a','a']],[]),
     B.tracer('ÉTAPE 6 · TRACÉ',F,'À toi de tracer<br>la '+b('fatḥa')+' ✍️','À toi de tracer la fatha.'),
     B.obs('ÉTAPE 7 · ḌAMMA',D,'ou','Une boucle au-'+b('dessus')+' :<br>ça fait '+q('ou')+' 🌙',
       'Une boucle au-dessus, ça fait « ou »'),
+    B.surPiste('ÉTAPE 7 · SA PLACE','La '+b('ḍamma')+' se pose<br>'+b('au-dessus')+' de la ligne.',
+      'La damma se pose au-dessus de la ligne d\'écriture.',[[D,'ou','ou']],[]),
     B.tracer('ÉTAPE 7 · TRACÉ',D,'À toi de tracer<br>la '+b('ḍamma')+' ✍️','À toi de tracer la damma.'),
     B.obs('ÉTAPE 8 · KASRA',K,'i','Un trait en-'+b('dessous')+' :<br>ça fait '+q('i')+' ⭐',
       'Un trait en-dessous, ça fait « i »'),
+    B.surPiste('ÉTAPE 8 · SA PLACE','La '+b('kasra')+' se pose<br>'+b('en-dessous')+' de la ligne.',
+      'La kasra se pose en dessous de la ligne d\'écriture.',[],[[K,'i','i']]),
     B.tracer('ÉTAPE 8 · TRACÉ',K,'À toi de tracer<br>la '+b('kasra')+' ✍️','À toi de tracer la kasra.',18),
 
     B.controle('CONTRÔLE 1','Où est le son '+q('a')+' ?','Où est le son « a » ?',[F,K,D],F),
@@ -9481,17 +9555,20 @@ function _boyVowelCourse(ca){
 
     B.brief('ÉTAPE 10 · DOUBLEMENT','Si on '+b('double')+' une voyelle,<br>on ajoute le son '+q('n')+' 👃',
       'Si on double une voyelle, on ajoute le son « n »'),
-    B.surPiste('ÉTAPE 11 · LA PISTE','Doublées, elles gardent<br>la même '+b('place')+'.',
-      'Doublées, elles gardent la même place sur la ligne.',
-      [[TF,'an','anne'],[TD,'oun','oune']],[[TK,'in','inne']]),
     B.obs('ÉTAPE 12 · TANWĪN',TF,'anne','Deux traits au-dessus :<br>'+q('a')+' devient '+q('an'),
       'Deux traits au-dessus : « a » devient « an »'),
+    B.surPiste('ÉTAPE 12 · SA PLACE','Elle reste<br>'+b('au-dessus')+' de la ligne.',
+      'Elle reste au-dessus de la ligne d\'écriture.',[[TF,'an','anne']],[]),
     B.tracer('ÉTAPE 12 · TRACÉ',TF,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
     B.obs('ÉTAPE 13 · TANWĪN',TD,'oune','Deux boucles au-dessus :<br>'+q('ou')+' devient '+q('oun'),
       'Deux boucles au-dessus : « ou » devient « oun »'),
+    B.surPiste('ÉTAPE 13 · SA PLACE','Elle reste<br>'+b('au-dessus')+' de la ligne.',
+      'Elle reste au-dessus de la ligne d\'écriture.',[[TD,'oun','oune']],[]),
     B.tracer('ÉTAPE 13 · TRACÉ',TD,'Trace les '+b('deux boucles')+' ✍️','Trace les deux boucles.'),
     B.obs('ÉTAPE 14 · TANWĪN',TK,'inne','Deux traits en-dessous :<br>'+q('i')+' devient '+q('in'),
       'Deux traits en-dessous : « i » devient « in »'),
+    B.surPiste('ÉTAPE 14 · SA PLACE','Elle reste<br>'+b('en-dessous')+' de la ligne.',
+      'Elle reste en dessous de la ligne d\'écriture.',[],[[TK,'in','inne']]),
     B.tracer('ÉTAPE 14 · TRACÉ',TK,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.',18),
 
     B.controle('CONTRÔLE 4','Où est le son '+q('an')+' ?','Où est le son « an » ?',[TF,TK,TD],TF),
@@ -9501,7 +9578,8 @@ function _boyVowelCourse(ca){
       'Un petit rond : on ne prononce que le son de la lettre.','⭕ Pas de voyelle'),
     B.tracer('ÉTAPE 15 · TRACÉ',SK,'Trace le '+b('soukoun')+' ✍️','Trace le soukoun.'),
 
-    B.mission('Voyelles '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les voyelles.')
+    function(api){_boyValideSession(_boySession&&_boySession.id);
+      B.mission('Voyelles '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les voyelles.')(api);}
   ]);
 }
 
@@ -9543,7 +9621,8 @@ function _boyProlongCourse(ca){
     B.tracer('ÉTAPE 13 · TRACÉ','جَدّ','Trace '+b('جَدّ')+' ✍️','Trace jadd.'),
     B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on appuie sur la '+b('lettre')+'.<br>Allongement = on étire la '+b('voyelle')+'.',
       'Le chapeau fait appuyer sur la lettre. L\'allongement étire la voyelle.'),
-    B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les prolongations.')
+    function(api){_boyValideSession(_boySession&&_boySession.id);
+      B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les prolongations.')(api);}
   ]);
 }
 
@@ -9612,13 +9691,15 @@ function _boyLetterCourse(ca,idx){
       'Cette lettre se met toujours à la fin du mot.'));
   }
   /* La lettre sur la piste, avec ses voyelles */
-  sc.push(B.surPiste('ÉTAPE · SUR LA PISTE','Maintenant,<br>ses '+b('voyelles')+'.',
-    'Voyons maintenant la lettre avec ses voyelles.',
-    [[A+'َ',lat.toLowerCase()+'a',A+'َ'],[A+'ُ',lat.toLowerCase()+'ou',A+'ُ']],
-    [[A+'ِ',lat.toLowerCase()+'i',A+'ِ']]));
+  sc.push(B.brief('ÉTAPE · SUR LA PISTE','Maintenant,<br>ses '+b('voyelles')+'.',
+    'Voyons maintenant la lettre avec ses voyelles.'));
   [['َ','a','au-dessus'],['ِ','i','en-dessous'],['ُ','ou','au-dessus']].forEach(function(v,n){
     sc.push(B.obs('VOYELLE '+(n+1)+'/3',A+v[0],A+v[0],
       'Signe '+b(v[2])+' :<br>ça fait '+q(v[1]),'Signe '+v[2]+', ça fait '+(lat+v[1]).toLowerCase()));
+    sc.push(B.surPiste('VOYELLE '+(n+1)+'/3 · SA PLACE',
+      'Le signe se pose<br>'+b(v[2])+' de la ligne.','Le signe se pose '+v[2]+' de la ligne.',
+      v[0]==='ِ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
+      v[0]==='ِ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
     sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️',
       'Trace cette syllabe.',v[0]==='ِ'?18:0));
   });
@@ -9628,6 +9709,10 @@ function _boyLetterCourse(ca,idx){
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
       'Doublé, ça fait '+(lat+v[1]).toLowerCase()));
+    sc.push(B.surPiste('TANWĪN '+(n+1)+'/3 · SA PLACE',
+      'Il garde la même<br>'+b('place')+' sur la ligne.','Il garde la même place sur la ligne.',
+      v[0]==='ٍ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
+      v[0]==='ٍ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
     sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️',
       'Trace ce tanwîn.',v[0]==='ٍ'?18:0));
   });
@@ -9647,11 +9732,12 @@ function _boyLetterCourse(ca,idx){
     var e=document.createElement('div');e.style.cssText='font-size:4rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
     api.hublot(p,L.wordAr,L.wordAr,'🔊 Appuie pour écouter le mot');
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
-    api.bouton(p,'MISSION SUIVANTE ▸',api.suivant);
+    api.bouton(p,'SUIVANT ▸',api.suivant);
   });
   sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',A,'Trace une dernière fois<br>'+b(L.name)+' ✍️','Trace une dernière fois cette lettre.'));
-  sc.push(B.mission('Lettre '+b(L.name)+'<br>maîtrisée ! 🎖️','Mission accomplie !',
-    function(){if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);}));
+  sc.push(function(api){_boyLettreFinie(_boySession,idx);
+    B.mission('Lettre '+b(L.name)+'<br>maîtrisée ! 🎖️','Mission accomplie !',
+      function(){if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);})(api);});
 
   B.run(sc);
 }
