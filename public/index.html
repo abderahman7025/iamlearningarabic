@@ -6526,21 +6526,41 @@ function _boyLetterPicker(ca,session){
   sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
   try{speakText('Choisis ta lettre !','fr-FR',null);}catch(e){}
 
-  (session.letters||[]).forEach(function(l){
-    var idx=_childIdxOf(l.ar);
-    if(idx<0)return; /* lettre sans équivalent enfant : on la saute */
+  /* Deverrouillage sequentiel : au depart seule la 1re lettre est ouverte.
+     Chaque lettre terminee ouvre la suivante, et le reste ouverte a vie. */
+  var faites=[];
+  try{faites=JSON.parse(localStorage.getItem('boy_lettres_'+session.id)||'[]');}catch(e){}
+  var indices=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
+                .filter(function(i){return i>=0;});
+  var premiereOuverte=-1;
+
+  indices.forEach(function(idx,rang){
     var L=CHILD_LETTERS[idx];
+    var fait=faites.indexOf(idx)>=0;
+    /* ouverte si deja faite, si c'est la 1re, ou si la precedente est faite */
+    var ouverte=fait||rang===0||faites.indexOf(indices[rang-1])>=0;
+    var aFaire=ouverte&&!fait;
+    if(aFaire&&premiereOuverte<0)premiereOuverte=rang;
+
     var carte=document.createElement('div');carte.className='child-card';
-    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;text-align:left;cursor:pointer';
-    var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';em.textContent=L.emoji;carte.appendChild(em);
+    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;'
+      +'text-align:left;'+(ouverte?'cursor:pointer;':'opacity:.45;')
+      +(aFaire?'border:3px solid #0288d1;box-shadow:0 0 0 0 rgba(2,136,209,.5);animation:kidPulse 1.8s infinite;':'');
+    var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';
+    em.textContent=ouverte?L.emoji:'🔒';carte.appendChild(em);
     var lettre=document.createElement('div');
     lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
     lettre.textContent=L.ar;carte.appendChild(lettre);
     var infos=document.createElement('div');infos.style.cssText='flex:1';
+    var etat=fait?'✅ Déjà vue — revoir':(ouverte?'▶ À découvrir':'🔒 Termine la précédente');
     infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>'
-      +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">▶ Apprendre</div>';
+      +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">'+etat+'</div>';
     carte.appendChild(infos);
-    carte.onclick=function(){try{stopSpeech();}catch(e){}_boyLetterCourse(ca,idx);};
+    if(ouverte){
+      carte.onclick=function(){try{stopSpeech();}catch(e){}
+        /* le compte a rebours DECOLLAGE n'apparait que sur la 1re lettre */
+        _boyLetterCourse(ca,idx,rang===0);};
+    }
     wrap.appendChild(carte);
   });
 
@@ -7274,7 +7294,10 @@ function _drawWritingGuide(ctx,form,CW,CH,fontPx,split,dyModele){
   ctx.textBaseline='alphabetic';
   /* Lettres à jambage descendant (و ج ح خ ع غ م ن ق ي ر ز ...) : on remonte la ligne
      pour que seul le corps reste au-dessus et la queue passe sous la ligne. */
+  /* On mesure la lettre SANS ses voyelles : une kasra ou une fatha ne
+     doit jamais deplacer la lettre par rapport a la ligne. */
   var measureStr=(split&&split.length===2)?split[0]:form;
+  measureStr=String(measureStr).replace(/[\u064B-\u0652\u0670]/g,'')||measureStr;
   var mm=ctx.measureText(measureStr);
   var desc=mm.actualBoundingBoxDescent||0;
   var hasDesc=desc>fontPx*0.12;
@@ -9359,26 +9382,48 @@ function _boyScene(ca){
      haut[] = signes AU-DESSUS de la ligne, bas[] = signes EN-DESSOUS.
      Chaque signe est [glyphe, étiquette, son]. */
   function piste(p,haut,bas){
-    var z=document.createElement('div');z.className='boy-piste';
-    function rangee(cls,items){
-      var r=document.createElement('div');r.className=cls;
-      (items||[]).forEach(function(o){
-        var d=document.createElement('div');
-        var g=document.createElement('span');g.className='marque';g.textContent=o[0];
-        g.onclick=function(){N.stop();N.dire(o[2]||o[0]);};
-        d.appendChild(g);
-        var l=document.createElement('span');l.className='etiq';l.textContent=o[1]||'';d.appendChild(l);
-        r.appendChild(d);
+    /* Tous les signes sur UNE ligne de base commune, dessinee au canvas :
+       c'est la police qui place chaque signe, donc un signe accompagne
+       d'une kasra tombe exactement au meme endroit que sans voyelle.
+       Le cercle pointille ◌ n'a plus lieu d'etre : la ligne le remplace. */
+    var items=[].concat(haut||[],bas||[]);
+    var n=Math.max(1,items.length);
+    var CW=Math.min(520,140*n+60),CH=210,PX=78;
+    var cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
+    cv.style.cssText='display:block;margin:8px auto 2px;max-width:100%;cursor:pointer';
+    var cx=cv.getContext('2d');
+    var baseY=Math.round(CH*0.60),pas=CW/n;
+    function dessine(){
+      cx.clearRect(0,0,CW,CH);
+      cx.save();
+      cx.strokeStyle='rgba(2,136,209,.40)';cx.lineWidth=3;cx.setLineDash([10,7]);
+      cx.beginPath();cx.moveTo(12,baseY);cx.lineTo(CW-12,baseY);cx.stroke();
+      cx.restore();
+      cx.save();
+      cx.font=PX+"px 'Scheherazade New',serif";
+      cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle='#0277bd';
+      items.forEach(function(o,k){
+        var g=(typeof _VOW_BASE!=='undefined')?String(o[0]).split(_VOW_BASE).join(''):o[0];
+        cx.fillText(g,pas*(k+0.5),baseY);
       });
-      return r;
+      cx.restore();
+      cx.save();
+      cx.font='600 13px Outfit,sans-serif';cx.textAlign='center';cx.fillStyle='rgba(1,87,155,.7)';
+      items.forEach(function(o,k){if(o[1])cx.fillText(o[1],pas*(k+0.5),CH-10);});
+      cx.restore();
     }
-    z.appendChild(rangee('haut',haut));
-    var sol=document.createElement('div');sol.className='sol';z.appendChild(sol);
-    z.appendChild(rangee('bas',bas));
-    p.appendChild(z);
+    try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(dessine);}catch(e){}
+    dessine();
+    cv.onclick=function(ev){
+      var r=cv.getBoundingClientRect();
+      var k=Math.floor(((ev.clientX-r.left)/r.width)*n);
+      var o=items[Math.max(0,Math.min(n-1,k))];
+      if(o){N.stop();N.dire(o[2]||o[0]);}
+    };
+    p.appendChild(cv);
     var lbl=document.createElement('div');lbl.className='boy-note';
-    lbl.textContent='✈️ La ligne d\'écriture — appuie sur chaque signe';p.appendChild(lbl);
-    return z;
+    lbl.textContent='✈️ La ligne d\'écriture — appuie sur un signe pour l\'écouter';p.appendChild(lbl);
+    return cv;
   }
   function bouton(p,label,fn,sec){
     var b=document.createElement('button');b.className='boy-btn'+(sec?' sec':'');
@@ -9422,18 +9467,29 @@ function _boyScene(ca){
       cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
         +'background:#fff;border:3px solid rgba(2,136,209,.30);touch-action:none';
       var cx=cv.getContext('2d');
-      var modele=(typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph;
+      var modele=Array.isArray(glyph)?glyph[0]:((typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
          page, au lieu d'un seul essai. */
+      /* modele peut etre une liste : on trace alors les 4 formes */
+      var liste=Array.isArray(glyph)
+        ? glyph.map(function(g){return (typeof _VOW_BASE!=='undefined')?String(g).split(_VOW_BASE).join(''):g;})
+        : [modele,modele,modele];
       function guide(){
         cx.clearRect(0,0,CW,CH);
         var baseY=Math.round(CH*0.62)+(dy||0);
         cx.save();
         cx.font="74px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
         cx.fillStyle='rgba(2,136,209,0.10)';cx.textAlign='center';
-        var N=3,pas=CW/N;
-        for(var k=0;k<N;k++)cx.fillText(modele,pas*(k+0.5),baseY);
+        var N=liste.length,pas=CW/N;
+        for(var k=0;k<N;k++)cx.fillText(liste[k],pas*(k+0.5),baseY);
         cx.restore();
+        if(Array.isArray(glyph)){
+          cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
+          cx.fillStyle='rgba(1,87,155,.55)';
+          var noms=['isolée','début','milieu','fin'];
+          for(var j=0;j<N;j++)cx.fillText(noms[j]||'',pas*(j+0.5),CH-8);
+          cx.restore();
+        }
         cx.save();
         cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2;cx.setLineDash([9,6]);
         cx.beginPath();cx.moveTo(10,Math.round(CH*0.62));cx.lineTo(CW-10,Math.round(CH*0.62));cx.stroke();
@@ -9490,6 +9546,47 @@ function _boyScene(ca){
       n.textContent='🎯 Vise la bonne cible';p.appendChild(n);
     };
   };
+  /* Tableau des 4 positions.
+     ISOLÉE en orange, DÉBUT en violet ; la case MILIEU reprend le violet
+     du début et la case FIN reprend l'orange de l'isolée, précédés du
+     trait de liaison en gris : l'enfant voit d'où vient chaque forme. */
+  api.tableau=function(etape,html,fr,formes){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+      var ISO='#e65100',DEB='#6a1b9a',LIEN='#90a4ae';
+      var t=document.createElement('div');
+      t.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:6px;direction:rtl;'
+        +'margin:6px auto 4px;max-width:460px';
+      var noms=['ISOLÉE','DÉBUT','MILIEU','FIN'];
+      var coul=[ISO,DEB,DEB,ISO];
+      noms.forEach(function(nm,k){
+        var c=document.createElement('div');
+        c.style.cssText='font-family:Outfit,sans-serif;font-size:.62rem;font-weight:900;letter-spacing:.06em;'
+          +'color:'+coul[k]+';direction:ltr;padding-bottom:4px';
+        c.textContent=nm;t.appendChild(c);
+      });
+      formes.forEach(function(f,k){
+        var c=document.createElement('div');
+        c.style.cssText='background:#fff;border:2px solid '+coul[k]+'55;border-radius:14px;'
+          +'padding:10px 4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;line-height:1.6;cursor:pointer';
+        /* on separe le trait de liaison de la lettre pour les colorer differemment */
+        var g=String(f);
+        var lien=g.indexOf('\u0640')===0?'\u0640':'';
+        var reste=lien?g.slice(1):g;
+        c.innerHTML=(lien?'<span style="color:'+LIEN+'">'+lien+'</span>':'')
+          +'<span style="color:'+coul[k]+'">'+reste+'</span>';
+        c.onclick=function(){N.stop();N.dire(f);};
+        t.appendChild(c);
+      });
+      p.appendChild(t);
+      var leg=document.createElement('div');leg.className='boy-note';
+      leg.innerHTML='<span style="color:'+DEB+';font-weight:900">MILIEU = ـ + DÉBUT</span>'
+        +' &nbsp;·&nbsp; <span style="color:'+ISO+';font-weight:900">FIN = ـ + ISOLÉE</span>';
+      p.appendChild(leg);
+      bouton(p,'SUIVANT ▸',suivant);
+    };
+  };
+
   /* Fin de mission */
   api.mission=function(html,fr,onRetour){
     return function(){
@@ -9627,7 +9724,12 @@ function _boyProlongCourse(ca){
 }
 
 /* ── MISSION : UNE LETTRE ── (reprend renderLLesson) */
-function _boyLetterCourse(ca,idx){
+/* Les 4 formes de la lettre, chacune portant la meme voyelle. */
+function _boy4formes(L,af,signe){
+  return _childForms(L,af).map(function(f){return f.form+(signe||'');});
+}
+
+function _boyLetterCourse(ca,idx,premiere){
   var L=CHILD_LETTERS[idx];
   var af=_AF[L.ar]||{i:L.ar,m:L.ar,f:L.ar};
   var formes=_childForms(L,af);            /* [isolée, début, milieu, fin] */
@@ -9642,7 +9744,7 @@ function _boyLetterCourse(ca,idx){
   var sc=[];
 
   sc.push(B.brief('MISSION · BRIEFING','Nouvelle lettre :<br>'+b(L.name)+' 🎯',
-    'Mission du jour : la lettre '+L.name,'▶ DÉCOLLAGE'));
+    'Mission du jour : la lettre '+L.name,premiere?'▶ DÉCOLLAGE':'SUIVANT ▸'));
   sc.push(B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,'Voici '+b(L.name)+'.<br>Écoute son son.',
     'Voici la lettre '+L.name));
   if(lourde){
@@ -9666,14 +9768,15 @@ function _boyLetterCourse(ca,idx){
   if(attache){
     sc.push(B.brief('ÉTAPE · MÉMO','Deux formes à retenir :<br>'+b('isolée')+' et '+b('début')+'.',
       'Il n\'y a que deux formes à retenir : la forme isolée et la forme du début.'));
-    sc.push(B.surPiste('ÉTAPE · DÉDUCTION','Milieu = début + '+b('ـ')+'<br>Fin = isolée + '+b('ـ'),
-      'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
-      [[formes[2].form,'milieu',S],[formes[1].form,'début',S]],
-      [[formes[3].form,'fin',S],[formes[0].form,'isolée',S]]));
   }
-  if(idx<=2){
-    sc.push(B.brief('ÉTAPE · EXCEPTIONS','3 lettres échappent<br>à cette règle :<br>'+b('ع غ ء'),
-      'Trois lettres échappent à cette règle.'));
+  sc.push(B.tableau('ÉTAPE · DÉDUCTION','Milieu = début + '+b('ـ')+'<br>Fin = isolée + '+b('ـ'),
+    'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
+    [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
+  sc.push(B.brief('ÉTAPE · PORTÉE','Cette règle vaut pour<br>'+b('toutes les lettres')+',<br>sauf '+b('3')+' que l\'on verra<br>plus tard ! ⚠️',
+    'Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.'));
+  if(idx<=2&&attache){
+    sc.push(B.brief('ÉTAPE · EXCEPTIONS','Ces 3 lettres :<br>'+b('ع غ ء'),
+      'Ces trois lettres sont : ayn, ghayn et hamza.'));
   }
   if(A==='ع'||A==='غ'){
     sc.push(B.brief('ÉTAPE · EXCEPTION','En voici une ! Ses formes<br>ne se '+b('déduisent pas')+'.<br>Apprends-les une par une.',
@@ -9700,11 +9803,19 @@ function _boyLetterCourse(ca,idx){
       'Le signe se pose<br>'+b(v[2])+' de la ligne.','Le signe se pose '+v[2]+' de la ligne.',
       v[0]==='ِ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
       v[0]==='ِ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
-    sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️',
-      'Trace cette syllabe.',v[0]==='ِ'?18:0));
+    sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
+      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
+      'Trace cette syllabe dans ses quatre formes.',v[0]==='ِ'?18:0));
   });
-  sc.push(B.controle('CONTRÔLE 1','Où est '+q('a')+' ?','Où est ce son ?',[A+'َ',A+'ِ',A+'ُ'],A+'َ'));
-  sc.push(B.controle('CONTRÔLE 2','Où est '+q('ou')+' ?','Où est ce son ?',[A+'َ',A+'ِ',A+'ُ'],A+'ُ'));
+  /* Les propositions melangent les FORMES : l'enfant doit reconnaitre le
+     son quelle que soit la place de la lettre dans le mot. */
+  var f4=_childForms(L,af);
+  sc.push(B.controle('CONTRÔLE 1','Où est '+q('a')+' ?','Où est ce son ?',
+    [[f4[1].form+'َ',A+'َ'],[f4[1].form+'ِ',A+'ِ'],[f4[1].form+'ُ',A+'ُ']],f4[1].form+'َ'));
+  sc.push(B.controle('CONTRÔLE 2','Où est '+q('ou')+' ?','Où est ce son ?',
+    [[f4[3].form+'ُ',A+'ُ'],[f4[3].form+'َ',A+'َ'],[f4[3].form+'ِ',A+'ِ']],f4[3].form+'ُ'));
+  sc.push(B.controle('CONTRÔLE 3','Où est '+q('i')+' ?','Où est ce son ?',
+    [[f4[2].form+'ِ',A+'ِ'],[f4[2].form+'َ',A+'َ'],[f4[2].form+'ُ',A+'ُ']],f4[2].form+'ِ'));
   /* Tanwīn */
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
@@ -9713,8 +9824,9 @@ function _boyLetterCourse(ca,idx){
       'Il garde la même<br>'+b('place')+' sur la ligne.','Il garde la même place sur la ligne.',
       v[0]==='ٍ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
       v[0]==='ٍ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
-    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️',
-      'Trace ce tanwîn.',v[0]==='ٍ'?18:0));
+    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
+      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
+      'Trace ce tanwîn dans ses quatre formes.',v[0]==='ٍ'?18:0));
   });
   sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ','Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕',
     'Petit rond : on ne prononce que le son de la lettre.'));
