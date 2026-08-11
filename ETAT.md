@@ -110,6 +110,17 @@ page et URL propres, indexables. Elles se rangent à côté de
 ## Fait récemment (ne pas refaire)
 
 - Séparation page publique / application (chantier 1 ci-dessus).
+- **Reprise** : l'écran courant est gardé dans `localStorage.arab_reprise`
+  (page, leçon adulte et lettre affichée, ou cours enfant et numéro de
+  scène) ; `tryAutoLogin` le rejoue. L'adresse, elle, ne descend pas plus bas
+  que l'île — c'est pourquoi un rechargement retombait sur la carte.
+  Trois points de vigilance : `chooseProfile` affiche le menu et note donc un
+  écran, il faut lire l'état **avant** de l'appeler ; une adresse qui désigne
+  une île précise (`/fille/lecon/arche-nouh`) passe devant la reprise ; la
+  déconnexion efface l'état, pour qu'un élève ne reprenne pas celui d'un
+  autre. La reprise ne s'applique qu'au rechargement d'une adresse de
+  l'application, pas après le choix du profil : celui-ci mène toujours au
+  menu.
 - `verifyToken` : un jeton bricolé à la main faisait tomber la fonction en
   erreur 500 (`timingSafeEqual` exige deux tampons de même longueur). Refus
   propre désormais.

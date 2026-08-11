@@ -3929,6 +3929,7 @@ function _urlToScreen(path){
 }
 function showS(id,fwd,noHistory){
   stopSpeech();
+  if(id==='s-menu')repriseNoter({type:'menu'});
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   const el=document.getElementById(id);
   if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}
@@ -4301,6 +4302,7 @@ async function doLogin(){
 function doLogout(){
   st.user=null;
   localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');
+  repriseOublier();
   document.cookie='arab_token=; path=/; max-age=0; SameSite=Lax';
   /* le cache hors ligne contient les pages de l'application : on le vide,
      sinon elles resteraient lisibles après la déconnexion. */
@@ -4325,9 +4327,15 @@ async function tryAutoLogin(){
       /* URL avec profil : appliquer directement sans montrer s-welcome */
       var _urlProfile=pMap[pm[1]]||'girl';
       var _urlPath=path;
+      /* Lu avant chooseProfile : celui-ci affiche le menu, ce qui note à son
+         tour un écran et effacerait celui qu'on veut rouvrir. */
+      var _rep=repriseLire();
       window._skipProfileNav=true;
       chooseProfile(_urlProfile);
       window._skipProfileNav=false;
+      /* Reprise de l'écran quitté. Une adresse qui désigne une île précise
+         est un choix volontaire : elle passe devant. */
+      if(!/\/lecon\/[a-z0-9-]+$/.test(_urlPath)&&_rep&&_rep.profil===_urlProfile&&repriseRejouer(_rep))return;
       /* Naviguer vers la carte des îles si /lecon dans l'URL */
       if(/\/lecon/.test(_urlPath)){
         navToPage('sessions');
@@ -4581,6 +4589,88 @@ function _navPush(hash){
 }
 /* ancien popstate supprimé — remplacé par le routing URLs ci-dessus */
 
+/* ════════════════════════════════════════════════════════
+   REPRISE — rouvrir l'écran exact où l'élève s'est arrêté
+
+   L'adresse ne descend pas plus bas que l'île (/fille/lecon) : après un
+   rechargement, l'application retombait sur la carte. On garde donc à part
+   l'écran courant — page, leçon adulte, ou cours enfant et son numéro de
+   scène — et tryAutoLogin le rejoue au chargement.
+   ════════════════════════════════════════════════════════ */
+var _REPRISE_CLE='arab_reprise';
+/* Numéro de scène par lequel un cours doit démarrer, une seule fois. */
+function _repriseDebut(n){
+  if(_repriseDepart===null)return 0;
+  var d=Math.max(0,Math.min(_repriseDepart,n-1));_repriseDepart=null;return d;
+}
+var _repriseDepart=null;   /* scène de départ, consommée par le moteur */
+
+function repriseNoter(etat){
+  if(!etat)return;
+  try{
+    etat.profil=st.profile;etat.quand=Date.now();
+    localStorage.setItem(_REPRISE_CLE,JSON.stringify(etat));
+  }catch(e){}
+}
+/* Appelée à chaque écran d'un cours enfant : complète l'état déjà noté. */
+function repriseScene(i){
+  try{
+    var e=JSON.parse(localStorage.getItem(_REPRISE_CLE)||'null');
+    if(!e||e.type!=='cours')return;
+    e.scene=i;e.quand=Date.now();
+    localStorage.setItem(_REPRISE_CLE,JSON.stringify(e));
+  }catch(e2){}
+}
+function repriseLire(){
+  try{return JSON.parse(localStorage.getItem(_REPRISE_CLE)||'null');}catch(e){return null;}
+}
+function repriseOublier(){try{localStorage.removeItem(_REPRISE_CLE);}catch(e){}}
+
+/* Rejoue l'état. Renvoie false si rien n'a pu être rouvert : l'appelant
+   poursuit alors son chemin habituel. */
+function repriseRejouer(e){
+  _repriseDepart=null;
+  if(!e)return false;
+  var ca=document.getElementById('ca');
+  if(!ca)return false;
+  try{
+    if(e.type==='page'&&e.page&&e.page!=='sessions'){navToPage(e.page);return true;}
+    if(e.type==='lecon'){
+      var s=ALL_S.filter(function(x){return x.id===e.session;})[0];
+      if(!s)return false;
+      navToPage('sessions');                      /* « Retour » ramène à la carte */
+      if(s.type==='vowels')renderVLesson(ca,s);
+      else if(s.type==='prolong')renderPLesson(ca,s);
+      else renderLLesson(ca,s,Math.max(0,Math.min(e.lettre||0,s.letters.length-1)));
+      return true;
+    }
+    if(e.type==='cours'){
+      navToPage('sessions');
+      _repriseDepart=e.scene||0;
+      if(e.session!==undefined&&e.session!==null){
+        _boySession=ALL_S.filter(function(x){return x.id===e.session;})[0]||null;
+      }
+      if(st.profile==='boy'){
+        if(e.cours==='voyelles')_boyVowelCourse(ca);
+        else if(e.cours==='prolongation')_boyProlongCourse(ca);
+        else if(e.cours==='lettre')_boyLetterCourse(ca,e.arg||0,!!e.premiere);
+        else{_repriseDepart=null;return false;}
+      } else {
+        if(e.cours==='voyelles')_vowelCourse(ca);
+        else if(e.cours==='prolongation')_prolongCourse(ca);
+        else if(e.cours==='lettre')_letterCourse(ca,e.arg||0,e.mode||'apprendre');
+        else{_repriseDepart=null;return false;}
+      }
+      return true;
+    }
+  }catch(err){
+    console.log('[Reprise] impossible :',err&&err.message);
+    _repriseDepart=null;
+    return false;
+  }
+  return false;
+}
+
 function navToPage(page){
   stopSpeech();
   st._curPage=page;showS('s-main',true);
@@ -4596,6 +4686,7 @@ function navToPage(page){
   renderPage(page,true);
 }
 function renderPage(page,fwd){
+  repriseNoter({type:'page',page:page});
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
   else if(page==='sessions'){if(st.profile==='girl')renderChildIslandMap(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
@@ -7919,7 +8010,9 @@ function _retourCarteEnfant(ca){
   if(st.profile==='boy')renderSessionsMap(ca);else renderChildIslandMap(ca);
 }
 
-function _kidScene(ca){
+function _kidScene(ca,reprise){
+  if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,mode:reprise.mode,session:reprise.session});
+  var _repriseSuivie=!!reprise;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='child-wrap';ca.appendChild(wrap);
   var api={wrap:wrap};
@@ -8054,10 +8147,10 @@ function _kidScene(ca){
   }
   /* On coupe la narration en cours : sinon la phrase de l'écran précédent
      continue par-dessus le nouvel écran. */
-  function go(){clearTimers();sayStop();wrap.innerHTML='';progress();scenes[i]();ca.scrollTop=0;}
+  function go(){clearTimers();sayStop();wrap.innerHTML='';progress();scenes[i]();ca.scrollTop=0;if(_repriseSuivie)repriseScene(i);}
   function next(){i++;if(i>=scenes.length){onFinish();return;}go();}
   api.next=next;
-  api.run=function(list,fin){scenes=list;if(fin)onFinish=fin;i=0;go();};
+  api.run=function(list,fin){scenes=list;if(fin)onFinish=fin;i=_repriseDebut(scenes.length);go();};
 
   /* ═══ Fabriques de scènes ═══ */
 
@@ -8305,7 +8398,7 @@ var _VOW_BASE='◌';
 function _vw(mark){return _VOW_BASE+mark;}
 
 function _vowelCourse(ca){
-  var S=_kidScene(ca);
+  var S=_kidScene(ca,{cours:'voyelles'});
   function hi(s){return '<span style="color:var(--k3)">'+s+'</span>';}
   /* Les sons s'écrivent en minuscules et entre guillemets : « a », « an »… */
   function son(s){return hi('« '+s+' »');}
@@ -8412,7 +8505,7 @@ function _vowelCourse(ca){
    la chaddah · ne pas confondre chaddah et prolongation.
    ═══════════════════════════════════════════════════════════ */
 function _prolongCourse(ca){
-  var S=_kidScene(ca);
+  var S=_kidScene(ca,{cours:'prolongation'});
 
   S.run([
     /* ── 1. Ce qu'on va apprendre ── */
@@ -8546,7 +8639,7 @@ function _letterCourse(ca,dayIdx,mode){
   /* Les sons s'écrivent en minuscules et entre guillemets : « ba », « ban »… */
   function son(s){return hi('« '+s+' »');}
 
-  var S=_kidScene(ca);
+  var S=_kidScene(ca,{cours:'lettre',arg:dayIdx,mode:mode});
   var sc=[];
 
   /* ── 1. La lettre et son son ── */
@@ -9328,7 +9421,9 @@ function _boyNarration(){
 }
 
 /* Moteur d'affichage des missions */
-function _boyScene(ca){
+function _boyScene(ca,reprise){
+  if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
+  var _repriseSuivie=!!reprise;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='boy-wrap';ca.appendChild(wrap);
   var N=_boyNarration();
@@ -9436,10 +9531,10 @@ function _boyScene(ca){
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ca.scrollTop=0;}
+  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ca.scrollTop=0;if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   api.suivant=suivant;
-  api.run=function(list,f){scenes=list;if(f)fini=f;i=0;go();};
+  api.run=function(list,f){scenes=list;if(f)fini=f;i=_repriseDebut(scenes.length);go();};
 
   /* ── Fabriques de scènes ── */
 
@@ -9613,7 +9708,7 @@ function _boyScene(ca){
    ligne d'écriture (ici la piste), le nom est secondaire, le doublement
    ajoute le son [n], le soukoun ne laisse que le son de la lettre. */
 function _boyVowelCourse(ca){
-  var B=_boyScene(ca),b=B.bleu;
+  var B=_boyScene(ca,{cours:'voyelles',session:_boySession&&_boySession.id}),b=B.bleu;
   var F=_vw('َ'),K=_vw('ِ'),D=_vw('ُ');
   var TF=_vw('ً'),TK=_vw('ٍ'),TD=_vw('ٌ');
   var SK=_vw('ْ');
@@ -9687,7 +9782,7 @@ function _boyVowelCourse(ca){
 
 /* ── MISSION : LES PROLONGATIONS ── (reprend renderPLesson) */
 function _boyProlongCourse(ca){
-  var B=_boyScene(ca),b=B.bleu;
+  var B=_boyScene(ca,{cours:'prolongation',session:_boySession&&_boySession.id}),b=B.bleu;
   function q(s){return b('« '+s+' »');}
   B.run([
     B.brief('MISSION · BRIEFING','Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
@@ -9743,7 +9838,7 @@ function _boyLetterCourse(ca,idx,premiere){
   var lourde=_CL_HEAVY.indexOf(L.ar)>=0;
   var lat=_CL_LAT[L.ar]!==undefined?_CL_LAT[L.ar]:'';
   var avecProlong=idx>=3;
-  var B=_boyScene(ca),b=B.bleu;
+  var B=_boyScene(ca,{cours:'lettre',arg:idx,premiere:premiere,session:_boySession&&_boySession.id}),b=B.bleu;
   function q(s){return b('« '+(lat+s).toLowerCase()+' »');}
   var A=L.ar,S=A+'ْ';
   var sc=[];
@@ -10203,7 +10298,7 @@ function _showFinish(pct,ca){
 }
 // VOWEL LESSON
 function renderVLesson(ca,s){
-  ca.innerHTML='';_navPush('sessions/lesson');
+  ca.innerHTML='';_navPush('sessions/lesson');repriseNoter({type:'lecon',session:s.id});
   // Hint clique pour écouter
   var hintEl=document.createElement('div');
   hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';
@@ -10333,7 +10428,7 @@ function renderVLesson(ca,s){
 
 // PROLONG LESSON — cours unique scrollable
 function renderPLesson(ca,s){
-  ca.innerHTML='';_navPush('sessions/lesson');
+  ca.innerHTML='';_navPush('sessions/lesson');repriseNoter({type:'lecon',session:s.id});
   var hintEl=document.createElement('div');hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';hintEl.textContent=t('click_to_listen');ca.appendChild(hintEl);
   function mkOrb(txt){
     var d=document.createElement('span');
@@ -10474,7 +10569,7 @@ function renderPLesson(ca,s){
 
 // LETTER LESSON
 function renderLLesson(ca,s,idx){
-  ca.innerHTML='';_navPush('sessions/lesson');
+  ca.innerHTML='';_navPush('sessions/lesson');repriseNoter({type:'lecon',session:s.id,lettre:idx||0});
   var hintEl=document.createElement('div');hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:4px;opacity:.7';hintEl.textContent=t('click_to_listen');ca.appendChild(hintEl);
   const letter=s.letters[idx];const isTaMarbuta=letter.ar==='ة';const isHamza=letter.ar==='ء';const isSASession=(s.id===1);
   const tabs=document.createElement('div');tabs.className='ltabs';
