@@ -1,5 +1,5 @@
-// iamlearningarabic — Service Worker v46
-const CACHE = 'arab-v46';
+// iamlearningarabic — Service Worker v47
+const CACHE = 'arab-v47';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -47,7 +47,11 @@ self.addEventListener('fetch', function(e) {
       url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '') {
     e.respondWith(
       fetch(e.request, {cache: 'no-store'}).then(function(response) {
-        if (response && response.status === 200) {
+        // Une page d'application demandée sans session valide est redirigée
+        // vers la page publique : Cache.put refuse ces réponses, et les
+        // mettre en cache reviendrait à ranger la page de connexion sous
+        // l'adresse d'un cours.
+        if (response && response.status === 200 && !response.redirected) {
           var clone = response.clone();
           caches.open(CACHE).then(function(c) { c.put(e.request, clone); });
         }

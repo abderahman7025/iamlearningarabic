@@ -111,6 +111,8 @@ async function doLogin(){
     if(d.success){
       localStorage.setItem('arab_token',d.token);
       localStorage.setItem('arab_email',d.email);
+      /* api/app.js lit ce cookie : une navigation ne porte pas d'en-tete Authorization */
+      document.cookie='arab_token='+encodeURIComponent(d.token)+'; path=/; max-age='+(24*60*60)+'; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
       window.location.replace('/app');
     }else{
       if(d.error && d.error.includes('non activ')){

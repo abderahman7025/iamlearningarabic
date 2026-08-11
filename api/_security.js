@@ -96,8 +96,13 @@ function verifyToken(token, email) {
   const payload = tokenEmail + ':' + expiresStr;
   const expectedSig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
-  // Protection timing attack
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
+  // Protection timing attack. timingSafeEqual exige deux tampons de même
+  // longueur : sans ce test, un jeton bricolé à la main faisait tomber la
+  // fonction en erreur 500 au lieu d'un refus propre.
+  const recue = Buffer.from(signature);
+  const attendue = Buffer.from(expectedSig);
+  if (recue.length !== attendue.length) return false;
+  if (!crypto.timingSafeEqual(recue, attendue)) {
     return false;
   }
 

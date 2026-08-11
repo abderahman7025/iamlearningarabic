@@ -6,21 +6,22 @@ const { applyMiddleware, verifyToken, rateLimit, getClientIp, logEvent } = requi
 /**
  * Sert l'application de cours UNIQUEMENT aux comptes ayant payé.
  *
- * Aujourd'hui le fichier de l'application est envoyé à tout visiteur, et la
- * page de connexion ne fait que masquer des écrans une fois le contenu déjà
- * livré : n'importe qui peut lire les cours dans le code source. Cette
- * fonction est le point d'entrée qui remplacera ce service statique.
+ * public/index.html ne contient plus que la page publique (vente, connexion,
+ * inscription, paiement). L'application entière vit dans app/app.html, hors
+ * du dossier servi en statique : elle ne peut être obtenue que par ici.
  *
  * Le jeton est signé (HMAC) et contient l'email et sa date d'expiration ;
  * on revérifie ensuite en base que le compte est bien payant, pour qu'un
  * jeton encore valide d'un compte désactivé ne donne plus accès.
+ *
+ * Une navigation ordinaire ne peut pas porter d'en-tête Authorization :
+ * le jeton est lu dans le cookie arab_token, posé à la connexion.
  */
 
-// Emplacements possibles du fichier applicatif, dans l'ordre de préférence.
-// app/app.html n'est pas servi statiquement par Vercel : c'est la cible.
+// app/app.html n'est jamais servi en statique : c'est tout l'intérêt.
 const CHEMINS = [
   path.join(process.cwd(), 'app', 'app.html'),
-  path.join(process.cwd(), 'public', 'index.html'),
+  path.join(__dirname, '..', 'app', 'app.html'),
 ];
 
 let _cacheHtml = null;
@@ -48,6 +49,32 @@ function jetonDeLaRequete(req) {
   return null;
 }
 
+// Une navigation attend une page, pas du JSON : on la renvoie vers la page
+// publique, en gardant l'adresse demandée pour y revenir après connexion.
+function estUneNavigation(req) {
+  const accept = (req.headers && req.headers.accept) || '';
+  return accept.indexOf('text/html') >= 0;
+}
+
+// L'adresse d'origine (/fille/lecon/...) est passée par la réécriture, car la
+// fonction, elle, est appelée sur /api/app. Tout ce qui n'est pas un chemin
+// simple est ignoré : on renverra vers la page de connexion sans destination.
+function cheminDemande(req) {
+  try {
+    const s = (req.query && req.query.suite) || '';
+    return /^\/[A-Za-z0-9/_-]*$/.test(s) ? s : null;
+  } catch (e) { return null; }
+}
+
+function versPagePublique(req, res, suite) {
+  const url = suite && suite !== '/'
+    ? '/connexion?suite=' + encodeURIComponent(suite)
+    : '/connexion';
+  res.setHeader('Location', url);
+  res.setHeader('Cache-Control', 'private, no-store');
+  return res.status(302).end();
+}
+
 module.exports = async (req, res) => {
   if (applyMiddleware(req, res)) return;
 
@@ -55,9 +82,13 @@ module.exports = async (req, res) => {
   const { limited } = rateLimit(ip, 'app', 60, 60 * 1000);
   if (limited) return res.status(429).send('Trop de requêtes.');
 
+  const navigation = estUneNavigation(req);
+  const suite = cheminDemande(req);
+
   const token = jetonDeLaRequete(req);
   if (!token) {
     logEvent('app_no_token', { ip });
+    if (navigation) return versPagePublique(req, res, suite);
     return res.status(401).json({ error: 'Connexion requise.' });
   }
 
@@ -65,6 +96,7 @@ module.exports = async (req, res) => {
   const email = String(token).split(':')[0];
   if (!email || !verifyToken(token, email)) {
     logEvent('app_bad_token', { ip });
+    if (navigation) return versPagePublique(req, res, suite);
     return res.status(401).json({ error: 'Session expirée. Reconnectez-vous.' });
   }
 
@@ -75,6 +107,7 @@ module.exports = async (req, res) => {
       .from('users').select('email, paid').eq('email', email.toLowerCase()).single();
     if (!user || !user.paid) {
       logEvent('app_not_paid', { ip, email });
+      if (navigation) return versPagePublique(req, res, null);
       return res.status(403).json({ error: 'Accès réservé aux comptes actifs.' });
     }
   } catch (e) {

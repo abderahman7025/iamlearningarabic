@@ -99,6 +99,8 @@ async function doRegister(){
       if(ld.success){
         localStorage.setItem('arab_token',ld.token);
         localStorage.setItem('arab_email',ld.email);
+        /* api/app.js lit ce cookie : une navigation ne porte pas d'en-tete Authorization */
+        document.cookie='arab_token='+encodeURIComponent(ld.token)+'; path=/; max-age='+(24*60*60)+'; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
       }
       document.getElementById('main-form').style.display='none';
       document.getElementById('success-box').style.display='block';

@@ -3,7 +3,8 @@
   "functions": {
     "api/*.js": {
       "memory": 128,
-      "maxDuration": 10
+      "maxDuration": 10,
+      "includeFiles": "app/**"
     }
   },
   "headers": [
@@ -62,7 +63,7 @@
       ]
     },
     {
-      "source": "/(index|app)\\.html",
+      "source": "/index.html",
       "headers": [
         {
           "key": "Cache-Control",
@@ -103,14 +104,6 @@
   ],
   "rewrites": [
     {
-      "source": "/app",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/app/:path*",
-      "destination": "/index.html"
-    },
-    {
       "source": "/connexion",
       "destination": "/index.html"
     },
@@ -119,7 +112,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/interface",
+      "source": "/paiement",
       "destination": "/index.html"
     },
     {
@@ -127,60 +120,72 @@
       "destination": "/index.html"
     },
     {
+      "source": "/app",
+      "destination": "/api/app?suite=/app"
+    },
+    {
+      "source": "/interface",
+      "destination": "/api/app?suite=/interface"
+    },
+    {
       "source": "/fille",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/fille"
     },
     {
       "source": "/garcon",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/garcon"
     },
     {
       "source": "/adulte",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/adulte"
     },
     {
       "source": "/girl",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/girl"
     },
     {
       "source": "/boy",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/boy"
     },
     {
       "source": "/adult",
-      "destination": "/index.html"
+      "destination": "/api/app?suite=/adult"
     },
     {
-      "source": "/fille/:path*",
-      "destination": "/index.html"
+      "source": "/app/:chemin*",
+      "destination": "/api/app?suite=/app/:chemin*"
     },
     {
-      "source": "/garcon/:path*",
-      "destination": "/index.html"
+      "source": "/fille/:chemin*",
+      "destination": "/api/app?suite=/fille/:chemin*"
     },
     {
-      "source": "/adulte/:path*",
-      "destination": "/index.html"
+      "source": "/garcon/:chemin*",
+      "destination": "/api/app?suite=/garcon/:chemin*"
     },
     {
-      "source": "/girl/:path*",
-      "destination": "/index.html"
+      "source": "/adulte/:chemin*",
+      "destination": "/api/app?suite=/adulte/:chemin*"
     },
     {
-      "source": "/boy/:path*",
-      "destination": "/index.html"
+      "source": "/girl/:chemin*",
+      "destination": "/api/app?suite=/girl/:chemin*"
     },
     {
-      "source": "/adult/:path*",
-      "destination": "/index.html"
+      "source": "/boy/:chemin*",
+      "destination": "/api/app?suite=/boy/:chemin*"
     },
     {
-      "source": "/cours/:path*",
-      "destination": "/index.html"
+      "source": "/adult/:chemin*",
+      "destination": "/api/app?suite=/adult/:chemin*"
     },
     {
-      "source": "/admin/:path*",
-      "destination": "/index.html"
+      "source": "/cours/:chemin*",
+      "destination": "/api/app?suite=/cours/:chemin*"
+    },
+    {
+      "source": "/admin/:chemin*",
+      "destination": "/api/app?suite=/admin/:chemin*"
     }
   ],
   "crons": [
