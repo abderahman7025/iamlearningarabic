@@ -1,65 +1,186 @@
 {
   "version": 2,
   "functions": {
-    "api/*.js": { "memory": 128, "maxDuration": 10 }
+    "api/*.js": {
+      "memory": 128,
+      "maxDuration": 10
+    }
   },
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,POST,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Strict-Transport-Security",    "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "X-Content-Type-Options",        "value": "nosniff" },
-        { "key": "X-Frame-Options",               "value": "DENY" },
-        { "key": "X-XSS-Protection",              "value": "1; mode=block" },
-        { "key": "Referrer-Policy",               "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy",            "value": "geolocation=(), microphone=(), camera=(), payment=(self)" },
-        { "key": "Content-Security-Policy",       "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' https://*.supabase.co blob: data:; connect-src 'self' https://*.iamlearningarabic.com https://*.supabase.co https://api.stripe.com https://api.brevo.com wss://*.supabase.co; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" }
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=(), payment=(self)"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' https://*.supabase.co blob: data:; connect-src 'self' https://*.iamlearningarabic.com https://*.supabase.co https://api.stripe.com https://api.brevo.com wss://*.supabase.co; frame-src https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        }
       ]
     },
     {
       "source": "/(index|app)\\.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Pragma",        "value": "no-cache" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
       ]
     },
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Pragma",        "value": "no-cache" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/((fille|garcon|adulte|girl|boy|adult|cours|app|admin)(/.*)?|accueil|connexion|inscription|interface)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/app",          "destination": "/index.html" },
-    { "source": "/app/:path*",   "destination": "/index.html" },
-    { "source": "/connexion",    "destination": "/index.html" },
-    { "source": "/inscription",  "destination": "/index.html" },
-    { "source": "/interface",    "destination": "/index.html" },
-    { "source": "/accueil",      "destination": "/index.html" },
-    { "source": "/fille",        "destination": "/index.html" },
-    { "source": "/garcon",       "destination": "/index.html" },
-    { "source": "/adulte",       "destination": "/index.html" },
-    { "source": "/girl",         "destination": "/index.html" },
-    { "source": "/boy",          "destination": "/index.html" },
-    { "source": "/adult",        "destination": "/index.html" },
-    { "source": "/fille/:path*", "destination": "/index.html" },
-    { "source": "/garcon/:path*","destination": "/index.html" },
-    { "source": "/adulte/:path*","destination": "/index.html" },
-    { "source": "/girl/:path*",  "destination": "/index.html" },
-    { "source": "/boy/:path*",   "destination": "/index.html" },
-    { "source": "/adult/:path*", "destination": "/index.html" },
-    { "source": "/cours/:path*", "destination": "/index.html" },
-    { "source": "/admin/:path*", "destination": "/index.html" }
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/connexion",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/inscription",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/interface",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/accueil",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/fille",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/garcon",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adulte",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/girl",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/boy",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adult",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/fille/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/garcon/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adulte/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/girl/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/boy/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/adult/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/cours/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/index.html"
+    }
   ]
 }

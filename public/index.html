@@ -12778,12 +12778,34 @@ function checkChildBadges(lessonsDone, score100) {
 
 // ── PWA : enregistrement du Service Worker ──
 if ('serviceWorker' in navigator) {
+  /* Un simple rechargement doit suffire à voir la dernière version.
+     Trois verrous étaient nécessaires :
+     1. updateViaCache:'none' — sinon le navigateur peut servir sw.js
+        depuis son propre cache HTTP pendant des heures et ne jamais
+        remarquer qu'une nouvelle version existe.
+     2. reg.update() à chaque chargement — on va vérifier explicitement.
+     3. rechargement automatique quand le nouveau Service Worker prend la
+        main : sans lui la page affichée reste l'ancienne, et il fallait
+        recharger une seconde fois (ou vider les données). */
+  var _swRechargeFaite = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    if (_swRechargeFaite) return;      // garde-fou anti-boucle
+    _swRechargeFaite = true;
+    window.location.reload();
+  });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').then(function(reg) {
-      console.log('SW enregistré:', reg.scope);
-    }).catch(function(err) {
-      console.log('SW erreur:', err);
-    });
+    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+      .then(function(reg) {
+        console.log('SW enregistré:', reg.scope);
+        try { reg.update(); } catch (e) {}
+        /* on revérifie aussi quand l'onglet redevient visible */
+        document.addEventListener('visibilitychange', function() {
+          if (!document.hidden) { try { reg.update(); } catch (e) {} }
+        });
+      })
+      .catch(function(err) {
+        console.log('SW erreur:', err);
+      });
   });
 }
 
