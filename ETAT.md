@@ -123,9 +123,9 @@ page et URL propres, indexables. Elles se rangent à côté de
 - `verifyToken` : un jeton bricolé à la main faisait tomber la fonction en
   erreur 500 (`timingSafeEqual` exige deux tampons de même longueur). Refus
   propre désormais.
-- `public/connexion.html` et `public/inscription.html` — vieilles pages
-  autonomes que plus rien ne référence — posent elles aussi le cookie, sinon
-  elles renvoyaient vers une application qui les refusait.
+- `public/connexion.html` et `public/inscription.html` supprimées : pages
+  autonomes datées du 27 mai, du temps du tunnel Stripe séparé, que plus rien
+  ne référençait. L'historique git les garde si besoin.
 - Interface fille : cours voyelles / prolongations / lettres au format scènes
   narrées (`_kidScene`), une idée par écran, tracé de chaque forme.
 - Interface garçon : conception distincte « missions spatiales »
