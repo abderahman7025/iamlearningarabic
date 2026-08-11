@@ -17,25 +17,15 @@ déploie tout seul.
 
 ---
 
-## À VÉRIFIER SUR LE SITE EN LIGNE (dès le prochain déploiement)
+## Vérifié en ligne le 11 août 2026
 
-Tout a été vérifié en local avec un faux Supabase, jamais sur Vercel. Trois
-points dépendent de la plateforme :
+Déployé et essayé sur le site réel : `app/app.html` arrive bien dans la
+fonction (`includeFiles`), le cookie `arab_token` est accepté en HTTPS, la
+connexion et les leçons marchent, et `/fille` sans compte renvoie à la page
+de connexion. La séparation tient.
 
-1. **`app/app.html` doit arriver dans la fonction.** `vercel.json` le demande
-   par `"includeFiles": "app/**"`. Si `/app` répond « Application
-   indisponible », c'est cela : le fichier n'a pas été embarqué.
-2. **Les réécritures passent l'adresse d'origine** (`/fille/lecon` →
-   `/api/app?suite=/fille/lecon`). Si `suite` arrive tel quel (`:chemin*` non
-   remplacé), `api/app.js` l'ignore et renvoie simplement vers `/connexion` :
-   on perd le retour au lien profond, rien d'autre.
-3. **Le cookie `arab_token`** est posé par le navigateur avec `Secure` en
-   HTTPS. Si la connexion réussit mais que `/interface` renvoie à la page de
-   connexion, le cookie n'a pas été accepté.
-
-Chemin complet à refaire une fois en ligne : acheter → créer le mot de passe →
-se connecter → choisir un profil → ouvrir une leçon → recharger la page →
-se déconnecter → revenir sur `/fille/lecon` sans compte.
+Reste à essayer une fois : le tunnel d'achat complet (paiement Stripe →
+création du mot de passe → première connexion).
 
 ---
 
