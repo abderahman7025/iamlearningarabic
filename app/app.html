@@ -10075,12 +10075,19 @@ function _boyProlongCourse(ca){
 
     B.brief('ÉTAPE 11 · RÈGLE','Ces lettres prolongent<br>leur voyelle '+b('UNIQUEMENT')+'<br>si elles n\'ont aucune<br>voyelle sur ou sous elles ! ⚠️',
       'Ces trois lettres prolongent leur voyelle uniquement si elles n\'ont aucune voyelle sur ou sous elles.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بُوَ','بُوَ',
-      'Ici le '+pou('و')+' porte une '+pou('◌َ')+' :<br>on ne dit pas '+q('bouu')+'<br>mais '+q('bouwa')+' !',
-      'Ici le waw porte une fatha. On ne dit pas bou long, mais bouwa.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بِيَ','بِيَ',
+    /* Un contre-exemple par lettre de prolongation, dans l'ordre du cours.
+       Celui de l'alif s'écrirait avec une hamza dans un vrai mot : on s'en
+       passe ici, l'écran ne sert qu'à montrer la voyelle qui empêche la
+       prolongation. */
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pa2('بَاِ'),'بَاِ',
+      'Ici le '+pa('ا')+' porte une '+pa('◌ِ')+' :<br>on ne dit pas '+q('baa')+'<br>mais '+q('ba-ï')+' !',
+      'Ici le alif porte une kasra. On ne dit pas ba prolongé, mais ba i.'),
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pi2('بِيَ'),'بِيَ',
       'Ici le '+pi('ي')+' porte une '+pi('◌َ')+' :<br>on ne dit pas '+q('bii')+'<br>mais '+q('biya')+' !',
-      'Ici le ya porte une fatha. On ne dit pas bi long, mais biya.'),
+      'Ici le ya porte une fatha. On ne dit pas bi prolongé, mais biya.'),
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pou2('بُوَ'),'بُوَ',
+      'Ici le '+pou('و')+' porte une '+pou('◌َ')+' :<br>on ne dit pas '+q('bouu')+'<br>mais '+q('bouwa')+' !',
+      'Ici le waw porte une fatha. On ne dit pas bou prolongé, mais bouwa.'),
 
     B.controleMulti('CONTRÔLE 1','Trouve '+b('la ou les')+'<br>prolongations !',
       'Trouve la ou les prolongations.',['بَ','بَا','بُو'],['بَا','بُو']),
