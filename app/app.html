@@ -2535,7 +2535,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   50%{transform:translate(6px,-28px)}75%{transform:translate(-28px,-4px)}100%{transform:translate(-6px,28px)}}
 .boy-flotte{position:absolute;font-family:'Scheherazade New',serif;font-size:2.5rem;color:#01579b;
   cursor:pointer;line-height:1;text-shadow:0 2px 6px rgba(255,255,255,.9)}
-.boy-wrap{padding:70px 8px 60px;max-width:none;margin:0 auto}
+/* La barre du haut est déjà compensée par le padding de #ca : en ajouter 70
+   de plus laissait un grand vide au-dessus du panneau, et poussait le bouton
+   hors de l'écran sur les textes longs. */
+.boy-wrap{padding:14px 8px 40px;max-width:none;margin:0 auto}
 .boy-panel{position:relative;overflow:hidden;text-align:center;background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%);
   border:3px solid rgba(2,136,209,.30);border-radius:22px;padding:26px 18px;margin-bottom:14px;
   box-shadow:0 10px 26px rgba(1,87,155,.16);animation:bAppear .38s ease both}
@@ -2578,6 +2581,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   margin-top:14px;transition:transform .15s,opacity .3s}
 .boy-btn:active{transform:translateY(2px)}
 .boy-btn.sec{background:linear-gradient(135deg,#78909c,#455a64);box-shadow:0 6px 16px rgba(69,90,100,.3)}
+/* Retour en arrière : une flèche fine à gauche du bouton principal. Discrète
+   à dessein — c'est un recours, pas la marche à suivre. */
+.boy-retour{width:52px;flex:0 0 52px;padding:0;margin-top:0;font-size:1.6rem;font-weight:400;
+  line-height:1;background:none;color:#0277bd;border:2px solid rgba(2,136,209,.35);box-shadow:none}
+.boy-retour:active{background:rgba(2,136,209,.10)}
+/* Le bouton qui fait avancer respire, pour rester l'évidence de l'écran. */
+.boy-btn.bat{animation:bBat 2.2s ease-in-out infinite}
+@keyframes bBat{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+@media (prefers-reduced-motion:reduce){.boy-btn.bat{animation:none}}
 .boy-cible{border:3px solid rgba(2,136,209,.35);background:#fff;cursor:pointer;
   width:104px;height:104px;display:flex;align-items:center;justify-content:center;
   font-family:'Scheherazade New',serif;font-size:2.6rem;color:#01579b;line-height:1;
@@ -6605,7 +6617,10 @@ function _boyLettreFinie(session,idx){
   try{localStorage.setItem(cle,JSON.stringify(faites));}catch(e){}
   var attendues=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
                  .filter(function(i){return i>=0;});
-  var tout=attendues.every(function(i){return faites.indexOf(i)>=0;});
+  /* attendues.length : sans ce garde-fou, une île dont on ne retrouve aucune
+     lettre était déclarée terminée dès la première — every() sur un tableau
+     vide répond vrai. */
+  var tout=attendues.length>0&&attendues.every(function(i){return faites.indexOf(i)>=0;});
   if(tout)_boyValideSession(session.id);
   /* L'appelant a besoin de savoir si l'île est finie : on ne propose pas la
      même suite selon qu'il reste des lettres ou non. */
@@ -9443,6 +9458,27 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
   cx.fillText(t,x,baseY+dy);
 }
 
+/* Deux couleurs dans une même syllabe : le « socle » — la lettre qui ne fait
+   que porter — garde la couleur de base, la voyelle et sa lettre de
+   prolongation prennent la couleur du couple.
+
+   On dessine le socle, puis la syllabe entière EN DESSOUS
+   (destination-over) : là où le socle a déjà peint, il reste ; partout
+   ailleurs, l'accent apparaît. Peindre le socle par-dessus ne marcherait
+   pas : une lettre isolée n'a pas la même forme qu'attachée, les tracés ne
+   se superposeraient pas. Le socle est donc donné avec un liant (ZWJ) pour
+   qu'il prenne exactement la forme qu'il a dans la syllabe. */
+function _dessineDeuxCouleurs(cx,complet,socle,x,baseY,px,couleurBase,couleurAccent){
+  var Wf=cx.measureText(complet).width,Wb=cx.measureText(socle).width;
+  cx.save();
+  cx.fillStyle=couleurBase;
+  cx.fillText(socle,x+(Wf-Wb)/2,baseY);
+  cx.globalCompositeOperation='destination-over';
+  cx.fillStyle=couleurAccent;
+  cx.fillText(complet,x,baseY);
+  cx.restore();
+}
+
 /* ── Sens d'écriture ────────────────────────────────────────────────────────
    De petites flèches numérotées sur le modèle de droite : par où commencer,
    et dans quel ordre. Le tracé change d'une lettre à l'autre, et selon
@@ -9455,9 +9491,13 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
    « n » numérote le mouvement ; on l'omet quand il n'y en a qu'un. */
 var _SENS_ECRITURE={
   'ا':{
-    seule:[{de:[0.50,0.16],a:[0.50,0.60]}],
-    liee:[{de:[0.68,0.62],a:[0.48,0.62],n:1},
-          {de:[0.45,0.60],a:[0.45,0.18],n:2}]
+    /* seule ou en début : la barre se trace du haut vers le bas. La flèche
+       longe la barre sans la toucher, et reste plus courte qu'elle. */
+    seule:[{de:[0.60,0.26],a:[0.60,0.50]}],
+    /* attachée : le trait de liaison d'abord, vers la gauche, puis la barre
+       qui remonte. Chaque flèche est posée à côté de son trait. */
+    liee:[{de:[0.66,0.72],a:[0.52,0.72],n:1},
+          {de:[0.36,0.56],a:[0.36,0.32],n:2}]
   }
 };
 function _dessineSensEcriture(cx,modele,xCase,largeur,CH){
@@ -9469,24 +9509,24 @@ function _dessineSensEcriture(cx,modele,xCase,largeur,CH){
   if(!traits||!traits.length)return;
   function X(f){return xCase+(f-0.5)*largeur;}
   cx.save();
-  cx.setLineDash([]);cx.lineCap='round';cx.lineWidth=2.5;
+  cx.setLineDash([]);cx.lineCap='round';cx.lineWidth=1.8;
   cx.strokeStyle='#e65100';cx.fillStyle='#e65100';
   traits.forEach(function(tr){
     var x0=X(tr.de[0]),y0=tr.de[1]*CH,x1=X(tr.a[0]),y1=tr.a[1]*CH;
     cx.beginPath();cx.moveTo(x0,y0);cx.lineTo(x1,y1);cx.stroke();
-    var ang=Math.atan2(y1-y0,x1-x0),h=9;
+    var ang=Math.atan2(y1-y0,x1-x0),h=6;
     cx.beginPath();cx.moveTo(x1,y1);
     cx.lineTo(x1-h*Math.cos(ang-0.45),y1-h*Math.sin(ang-0.45));
     cx.lineTo(x1-h*Math.cos(ang+0.45),y1-h*Math.sin(ang+0.45));
     cx.closePath();cx.fill();
     if(tr.n){
-      var nx=x0-Math.cos(ang)*13,ny=y0-Math.sin(ang)*13;
-      cx.beginPath();cx.arc(nx,ny,9,0,Math.PI*2);
-      cx.fillStyle='#fff';cx.fill();cx.lineWidth=1.5;cx.stroke();
+      var nx=x0-Math.cos(ang)*10,ny=y0-Math.sin(ang)*10;
+      cx.beginPath();cx.arc(nx,ny,7,0,Math.PI*2);
+      cx.fillStyle='#fff';cx.fill();cx.lineWidth=1.2;cx.stroke();
       cx.fillStyle='#e65100';
-      cx.font='700 13px Outfit,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
+      cx.font='700 10px Outfit,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
       cx.fillText(String(tr.n),nx,ny);
-      cx.lineWidth=2.5;
+      cx.lineWidth=1.8;
     }
   });
   cx.restore();
@@ -9524,13 +9564,30 @@ function _boyScene(ca,reprise){
      qu'on veuille relire celui d'avant. Ajouté après le rendu de la scène,
      donc valable pour toutes — briefing, hublot, piste, tracé, contrôle. */
   function ajouteRetour(){
-    if(i<=0||!_dernierPanneau)return;
+    if(!_dernierPanneau)return;
+    /* Le bouton d'avancement de la scène : on le met sur une rangée, avec le
+       retour en arrière à sa gauche. Une flèche fine et discrète — c'est un
+       recours, pas la marche à suivre — et le bouton principal pulse pour
+       rester l'évidence. */
+    var boutons=[].slice.call(_dernierPanneau.querySelectorAll('.boy-btn'))
+      .filter(function(b){return b.className.indexOf('sec')<0;});
+    var principal=boutons[boutons.length-1];
+    if(!principal)return;
+    principal.classList.add('bat');
+    if(i<=0)return;
+    var rangee=document.createElement('div');
+    rangee.style.cssText='display:flex;align-items:stretch;gap:8px;margin-top:10px';
+    _dernierPanneau.insertBefore(rangee,principal);
     var r=document.createElement('button');
-    r.className='boy-btn sec';
-    r.style.cssText+=';margin-top:8px;padding:8px;font-size:.78rem;opacity:.8';
-    r.textContent='◂ REVOIR L\'ÉCRAN PRÉCÉDENT';
+    r.className='boy-btn sec boy-retour';
+    r.setAttribute('aria-label','Revoir l\'écran précédent');
+    r.title='Revoir l\'écran précédent';
+    r.textContent='‹';
     r.onclick=function(){N.stop();precedent();};
-    _dernierPanneau.appendChild(r);
+    rangee.appendChild(r);
+    principal.style.flex='1';
+    principal.style.marginTop='0';
+    rangee.appendChild(principal);
   }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';t.innerHTML=html;p.appendChild(t);
@@ -9612,8 +9669,12 @@ function _boyScene(ca,reprise){
       cx.textBaseline='alphabetic';cx.textAlign='center';
       items.forEach(function(o,k){
         var g=(typeof _VOW_BASE!=='undefined')?String(o[0]).split(_VOW_BASE).join(''):o[0];
-        cx.fillStyle=o[3]||'#0277bd';
-        _dessineSurLigne(cx,g,xCase(k),baseY,PX);
+        if(o[3]&&o[4]){
+          _dessineDeuxCouleurs(cx,g,o[4],xCase(k),baseY,PX,'#0277bd',o[3]);
+        }else{
+          cx.fillStyle=o[3]||'#0277bd';
+          _dessineSurLigne(cx,g,xCase(k),baseY,PX);
+        }
       });
       cx.restore();
       cx.save();
@@ -9677,7 +9738,7 @@ function _boyScene(ca,reprise){
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
-  api.tracer=function(etape,glyph,html,fr){
+  api.tracer=function(etape,glyph,html,fr,repetitions){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var modele=Array.isArray(glyph)?glyph[0]:((typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph);
@@ -9686,14 +9747,16 @@ function _boyScene(ca,reprise){
       /* modele peut etre une liste : on trace alors les 4 formes */
       var liste=Array.isArray(glyph)
         ? glyph.map(function(g){return (typeof _VOW_BASE!=='undefined')?String(g).split(_VOW_BASE).join(''):g;})
-        : [modele,modele,modele];
+        : (function(){var l=[],r=repetitions||3;while(l.length<r)l.push(modele);return l;})();
       /* Taille du modèle. Un signe montré seul — une voyelle sans lettre —
          occupe très peu de place : à la taille d'une lettre il était minuscule
          sous le doigt d'un enfant. On le grossit franchement, et on donne au
          canvas la hauteur qu'il faut pour qu'il ne déborde pas. Quatre formes
          côte à côte, en revanche, doivent tenir dans leur case. */
       var signeSeul=!String(liste[0]).replace(_MARQUES,'');
-      var PX=signeSeul?124:(liste.length>=4?80:100);
+      /* Moins il y a de cases, plus le modèle peut être grand : un doigt
+         d'enfant a besoin de place pour repasser dessus. */
+      var PX=signeSeul?124:({1:150,2:126,3:104}[liste.length]||80);
       var CW=520,CH=signeSeul?250:220;
       var cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
       cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
@@ -9711,13 +9774,17 @@ function _boyScene(ca,reprise){
         function caseX(k){return CW-pas*(k+0.5);}
         cx.save();
         cx.font=PX+"px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
-        cx.fillStyle='rgba(2,136,209,0.10)';cx.textAlign='center';
+        /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
+           d'un coup d'œil ce qu'il a écrit lui-même. */
+        cx.fillStyle='rgba(96,125,139,0.30)';cx.textAlign='center';
         for(var k=0;k<nb;k++)_dessineSurLigne(cx,liste[k],caseX(k),baseY,PX);
         cx.restore();
         if(Array.isArray(glyph)){
           cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
           cx.fillStyle='rgba(1,87,155,.55)';
-          var noms=['isolée','début','milieu','fin'];
+          /* Deux cases : la lettre suivie d'une prolongation ne peut être
+             qu'en début ou au milieu d'un mot. */
+          var noms=(nb===2)?['début','milieu']:['isolée','début','milieu','fin'];
           for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8);
           cx.restore();
         }
@@ -9737,7 +9804,7 @@ function _boyScene(ca,reprise){
       function pos(e){var r=cv.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
         return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
       function deb(e){trace=true;if(btn)btn.style.opacity='1';var q=pos(e);cx.beginPath();cx.moveTo(q.x,q.y);e.preventDefault();}
-      function mv(e){if(!trace)return;var q=pos(e);cx.lineWidth=6;cx.strokeStyle='#0277bd';cx.lineCap='round';cx.lineTo(q.x,q.y);cx.stroke();e.preventDefault();}
+      function mv(e){if(!trace)return;var q=pos(e);cx.lineWidth=7;cx.strokeStyle='#e65100';cx.lineCap='round';cx.lineTo(q.x,q.y);cx.stroke();e.preventDefault();}
       function fin(){trace=false;}
       cv.addEventListener('mousedown',deb);cv.addEventListener('mousemove',mv);cv.addEventListener('mouseup',fin);
       cv.addEventListener('touchstart',deb,{passive:false});cv.addEventListener('touchmove',mv,{passive:false});cv.addEventListener('touchend',fin);
@@ -9962,6 +10029,12 @@ function _boyProlongCourse(ca){
   function pa(s){return '<span style="color:'+CA+'">'+s+'</span>';}
   function pou(s){return '<span style="color:'+COU+'">'+s+'</span>';}
   function pi(s){return '<span style="color:'+CI+'">'+s+'</span>';}
+  /* Dans le hublot, la lettre porteuse reste bleue : seuls la voyelle et sa
+     lettre de prolongation prennent la couleur du couple. */
+  function couple(s,c){return s.charAt(0)+'<span style="color:'+c+'">'+s.slice(1)+'</span>';}
+  function pa2(s){return couple(s,CA);}
+  function pi2(s){return couple(s,CI);}
+  function pou2(s){return couple(s,COU);}
   B.run([
     B.brief('MISSION · BRIEFING','Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
       'Mission du jour : les prolongations.','▶ DÉCOLLAGE'),
@@ -9972,36 +10045,54 @@ function _boyProlongCourse(ca){
       'Avec un alif, le son devient long.'),
     B.brief('ÉTAPE 4 · ENJEU','Allonger ou non<br>peut '+b('changer le sens')+' ! ⚠️',
       'Allonger ou non peut complètement changer le sens.'),
-    B.obs('ÉTAPE 5 · EXEMPLE','لَأُحِبُّك','لَأُحِبُّك','Par exemple,<br>sans allonger :<br>'+b('je t\'aime')+' ❤️',
-      'Par exemple, sans allonger : je t\'aime.'),
-    B.obs('ÉTAPE 6 · EXEMPLE','لَا أُحِبُّك','لَا أُحِبُّك','Par exemple,<br>en allongeant :<br>'+b('je ne t\'aime pas')+' 💔',
-      'Par exemple, en allongeant : je ne t\'aime pas.'),
+    B.obs('ÉTAPE 5 · EXEMPLE','لَأُحِبُّك','لَأُحِبُّك','Par exemple,<br>sans prolonger :<br>'+b('je t\'aime')+' ❤️',
+      'Par exemple, sans prolonger : je t\'aime.'),
+    B.obs('ÉTAPE 6 · EXEMPLE','لَا أُحِبُّك','لَا أُحِبُّك','Alors qu\'en prolongeant :<br>'+b('je ne t\'aime pas')+' 💔',
+      'Alors qu\'en prolongeant : je ne t\'aime pas.'),
     /* De droite à gauche, comme on les lit : bā, bī, bū. Chaque syllabe
        porte la couleur de sa voyelle. */
+    /* Seuls la voyelle et sa lettre de prolongation sont en couleur : le
+       ب n'est là que pour les porter. Le 5e champ dit quelle partie garder
+       en bleu. */
     B.surPiste('ÉTAPE 7 · LES 3','Chaque voyelle est<br>prolongée par sa '+b('propre')+'<br>lettre, toujours.',
       'Chaque voyelle est prolongée par sa propre lettre, toujours.',
-      [['بَا','ā','بَا',CA],['بِي','ī','بِي',CI],['بُو','ū','بُو',COU]],[]),
-    B.obs('ÉTAPE 8 · ALIF','بَا','بَا',
-      'Le son '+pa('a')+' s\'écrit<br>'+pa('au-dessus')+' de la lettre :<br>on le prolonge avec le '+pa('ا')+',<br>qui monte '+pa('au-dessus')+' de la ligne.',
-      'Le son a s\'écrit au-dessus de la lettre. On le prolonge avec le alif, qui monte au-dessus de la ligne.'),
-    B.tracer('ÉTAPE 8 · TRACÉ','بَا','Trace '+b('بَا')+' ✍️','Trace ba long.'),
-    B.obs('ÉTAPE 9 · YA','بِي','بِي',
-      'Le son '+pi('i')+' s\'écrit<br>'+pi('en-dessous')+' de la lettre :<br>on le prolonge avec le '+pi('ي')+',<br>qui descend '+pi('sous')+' la ligne.',
-      'Le son i s\'écrit en dessous de la lettre. On le prolonge avec le ya, qui descend sous la ligne.'),
-    B.tracer('ÉTAPE 9 · TRACÉ','بِي','Trace '+b('بِي')+' ✍️','Trace bi long.'),
-    B.obs('ÉTAPE 10 · WAW','بُو','بُو',
-      'Le son '+pou('ou')+' s\'écrit<br>'+pou('au-dessus')+' de la lettre :<br>on le prolonge avec le '+pou('و')+',<br>qui lui '+pou('ressemble')+'.',
-      'Le son ou s\'écrit au-dessus de la lettre. On le prolonge avec le waw, qui lui ressemble.'),
-    B.tracer('ÉTAPE 10 · TRACÉ','بُو','Trace '+b('بُو')+' ✍️','Trace bou long.'),
-    B.brief('ÉTAPE 11 · RÈGLE','Ces lettres n\'allongent<br>que si elles n\'ont<br>'+b('aucune voyelle')+' ! ⚠️',
-      'Ces lettres allongent seulement si aucune voyelle n\'est posée dessus.'),
+      [['بَا','ā','بَا',CA,'ب'+Z],['بِي','ī','بِي',CI,'ب'+Z],['بُو','ū','بُو',COU,'ب'+Z]],[]),
+
+    B.obs('ÉTAPE 8 · ALIF',pa2('بَا'),'بَا',
+      'La voyelle '+pa('◌َ')+' s\'écrit<br>'+pa('au-dessus')+' de la lettre :<br>on la prolonge avec le '+pa('ا')+',<br>qui monte '+pa('au-dessus')+' de la ligne.',
+      'La voyelle fatha s\'écrit au-dessus de la lettre. On la prolonge avec le alif, qui monte au-dessus de la ligne.'),
+    B.tracer('ÉTAPE 8 · TRACÉ',['بَا','ـبَا'],'Trace '+b('بَا')+' ✍️','Trace ba prolongé.'),
+
+    B.obs('ÉTAPE 9 · YA',pi2('بِي'),'بِي',
+      'La voyelle '+pi('◌ِ')+' s\'écrit<br>'+pi('en-dessous')+' de la lettre :<br>on la prolonge avec le '+pi('ي')+',<br>qui descend '+pi('sous')+' la ligne.',
+      'La voyelle kasra s\'écrit en dessous de la lettre. On la prolonge avec le ya, qui descend sous la ligne.'),
+    B.tracer('ÉTAPE 9 · TRACÉ',['بِي','ـبِي'],'Trace '+b('بِي')+' ✍️','Trace bi prolongé.'),
+
+    B.obs('ÉTAPE 10 · WAW',pou2('بُو'),'بُو',
+      'La voyelle '+pou('◌ُ')+' ressemble<br>à un petit '+pou('و')+' :<br>on la prolonge donc<br>avec le '+pou('و')+' 👀',
+      'La voyelle damma ressemble à un petit waw. On la prolonge donc avec le waw.'),
+    B.tracer('ÉTAPE 10 · TRACÉ',['بُو','ـبُو'],'Trace '+b('بُو')+' ✍️','Trace bou prolongé.'),
+
+    B.brief('ÉTAPE 11 · RÈGLE','Ces lettres prolongent<br>leur voyelle '+b('UNIQUEMENT')+'<br>si elles n\'ont aucune<br>voyelle sur ou sous elles ! ⚠️',
+      'Ces trois lettres prolongent leur voyelle uniquement si elles n\'ont aucune voyelle sur ou sous elles.'),
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بُوَ','بُوَ',
+      'Ici le '+pou('و')+' porte une '+pou('◌َ')+' :<br>on ne dit pas '+q('bouu')+'<br>mais '+q('bouwa')+' !',
+      'Ici le waw porte une fatha. On ne dit pas bou long, mais bouwa.'),
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بِيَ','بِيَ',
+      'Ici le '+pi('ي')+' porte une '+pi('◌َ')+' :<br>on ne dit pas '+q('bii')+'<br>mais '+q('biya')+' !',
+      'Ici le ya porte une fatha. On ne dit pas bi long, mais biya.'),
+
     B.controleMulti('CONTRÔLE 1','Trouve '+b('la ou les')+'<br>prolongations !',
       'Trouve la ou les prolongations.',['بَ','بَا','بُو'],['بَا','بُو']),
-    B.controle('CONTRÔLE 2','Où est le son '+q('bououou')+' ?','Où est le son long avec le waw ?',['بُ','بُو','بِي'],'بُو'),
-    B.brief('ÉTAPE 12 · CHADDAH','Le petit '+b('chapeau')+' ّ :<br>on appuie '+b('deux fois')+' 💪',
-      'Le petit chapeau : on appuie deux fois sur la lettre.'),
+    B.controle('CONTRÔLE 2','Où est le son '+q('bououou')+' ?','Où est le son prolongé avec le waw ?',['بُ','بُو','بِي'],'بُو'),
+
+    B.obs('ÉTAPE 12 · UN DERNIER SIGNE','بّ','بّ',
+      'Voyons un dernier signe.<br>Il se place '+b('toujours')+'<br>au-dessus d\'une lettre<br>et ressemble à un '+b('w')+' :<br>la '+b('chaddah')+'.',
+      'Voyons maintenant un dernier petit signe. Il se place toujours au-dessus d\'une lettre et ressemble à un w : la chaddah.'),
+    B.brief('ÉTAPE 12 · CHADDAH','Avec ce petit '+b('chapeau')+',<br>on insiste sur la lettre :<br>on la prononce '+b('deux fois')+' 💪',
+      'Avec ce petit chapeau, on insiste sur la lettre : on la prononce deux fois.'),
     B.obs('ÉTAPE 13 · EXEMPLE','جَدّ','جَدّ',b('جَدّ')+' :<br>ça veut dire<br>'+b('grand-père')+' 👴','Jad-d, ça veut dire grand-père.'),
-    B.tracer('ÉTAPE 13 · TRACÉ','جَدّ','Trace '+b('جَدّ')+' ✍️','Trace jadd.'),
+    B.tracer('ÉTAPE 13 · TRACÉ','جَدّ','Trace '+b('جَدّ')+' ✍️','Trace jadd.',2),
     B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on insiste<br>sur la '+b('lettre')+'.<br>Prolongation = on insiste<br>sur la '+b('voyelle')+'.',
       'Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.'),
     function(api){_boyValideSession(_boySession&&_boySession.id);
@@ -10038,8 +10129,8 @@ function _boyLetterCourse(ca,idx,premiere){
       'Attention : c\'est une lettre épaisse. On la dit avec une voix grave et pleine.'));
   }
   if(!attache){
-    sc.push(B.brief('ÉTAPE · ACCROCHAGE','Elle ne s\'accroche '+b('pas')+'<br>à la lettre suivante 🚫',
-      'Cette lettre ne s\'accroche pas à la lettre suivante.'));
+    sc.push(B.brief('ÉTAPE · ACCROCHAGE','Elle ne s\'accroche '+b('JAMAIS')+'<br>à la lettre suivante 🚫',
+      'Cette lettre ne s\'accroche jamais à la lettre suivante.'));
   }
   /* Les 4 formes : observation PUIS tracé, sans exception */
   var NOMS=['ISOLÉE','DÉBUT','MILIEU','FIN'];
