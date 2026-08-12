@@ -17,29 +17,27 @@ déploie tout seul.
 
 ---
 
-## ⚠ RIEN N'EST DÉPLOYÉ — le lien GitHub → Vercel est rompu
+## Déploiement — débloqué le 11 août 2026, après deux pannes empilées
 
-Constaté le 11 août 2026. La production sert le commit `c6206e0`. Les huit
-commits suivants sont sur GitHub (vérifié : `git ls-remote` et le dépôt local
-pointent sur le même SHA) mais Vercel n'en crée aucun déploiement — ni
-réussi, ni en échec, ni annulé, filtre de statut ouvert en grand.
+Pendant plusieurs sessions, la production est restée figée sur `c6206e0`
+sans que rien ne le signale : les commits partaient sur GitHub, le site
+servait une vieille version, et les vérifications « en ligne » mentaient.
+Deux causes, l'une cachant l'autre.
 
-Relevé sur le site en ligne : `sw.js` en v44, page d'accueil de 6,38 Mo
-contenant encore tout le cours, `/api/app`, `/api/keepalive` et
-`/images/app-*.png` en 404.
+1. `vercel.json` contenait un motif `source` avec un groupe imbriqué
+   (ajouté par `18f775f`). Vercel **rejette un fichier invalide avant de
+   créer le déploiement** : rien n'apparaît dans la liste, pas même une
+   erreur. C'est le piège le plus vicieux du projet.
+2. Une fois corrigé : quatorze fonctions dans `api/` pour un plafond de
+   douze sur le forfait Hobby. Réglé en supprimant `create-checkout.js`
+   (mort) et en réunissant `audio-get` et `audio-upload` dans `audio.js`.
 
-Conséquences tant que ce n'est pas réparé :
-- le cours reste lisible sans payer (tout le chantier 1 est hors ligne) ;
-- le cron anti-pause Supabase ne tourne pas : le projet peut se mettre en
-  pause après ~7 jours.
+Vérifié en ligne après déblocage : page publique de 210 Ko sans une ligne
+de cours, `/fille` sans compte refusé, `/api/audio` et `/api/keepalive`
+qui répondent, images servies, `sw.js` à jour.
 
-À faire : rétablir le lien dans `Settings → Git` du projet Vercel
-`arab-learn-backend`, et vérifier sur GitHub que l'application Vercel a bien
-accès au dépôt (github.com/settings/installations). En dépannage immédiat,
-`npx vercel --prod` depuis ce dossier déploie sans passer par GitHub.
-
-**Une vérification « en ligne » ne vaut rien tant que ce point n'est pas
-réglé** : ce que l'on voit sur le site est l'ancienne version.
+**Réflexe à garder** : après un push, jeter un œil à la page Deployments.
+Une liste qui ne bouge pas ne veut pas dire « tout va bien ».
 
 ---
 
@@ -92,6 +90,35 @@ exercices. Extraire les données n'aurait protégé qu'un quart du fichier.
 ---
 
 ## À FAIRE ENSUITE
+
+**L'ordre compte** : garçon validé → fille alignée dessus → traductions →
+voix. Inversé, chaque étape jette le travail de la précédente — traduire
+95 phrases × 13 langues sur une interface qu'on va refaire, puis enregistrer
+les voix sur des textes qui vont changer.
+
+### Chantier 1 bis — Aligner l'interface fille sur celle du garçon
+
+Décision du client : ne pas toucher aux deux interfaces enfant en même
+temps. L'interface fille actuelle sert de repli tant que le garçon n'est pas
+validé. Une fois validé, la fille reprend **exactement** la mécanique du
+garçon, avec un autre univers que l'espace.
+
+- Seuil de déclenchement : non pas « le garçon est parfait », mais « je ne
+  veux plus rien changer à sa **structure** » — découpage des écrans et leur
+  ordre, contenu de chaque écran, déblocage des lettres, rôle de la ligne
+  d'écriture. Les formulations, couleurs et animations peuvent encore bouger
+  après.
+- Le portage doit produire **un seul moteur de scènes avec deux habillages**,
+  pas un second code recopié : aujourd'hui `_kidScene` et `_boyScene` sont
+  deux chemins séparés, et toute correction est à faire deux fois.
+- Univers proposés pour la fille, avec la correspondance pièce par pièce
+  (hublot → cadre de la lettre, piste → ligne d'écriture, jauge de décollage
+  → progression) : licorne (chemin d'étoiles, corne qui s'allume — reprend
+  les licornes déjà présentes dans le décor animé), montgolfière (horizon,
+  brûleur), jardin (allée, arrosoir, fleur qui éclôt), pâtisserie. **Choix du
+  client en attente.**
+- Piège : l'arc-en-ciel ferait une mauvaise ligne d'écriture, il est courbe.
+  La ligne doit rester droite, c'est celle du cours adulte.
 
 ### Chantier 2 — Traductions : tout, partout
 Décision du client : **tout doit être traduit dans les 13 langues**.
