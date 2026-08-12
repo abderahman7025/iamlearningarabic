@@ -3966,7 +3966,7 @@ var AUDIO_URLS = {};
 
 function loadAudioUrls() {
   try {
-    fetch(API_URL + '/api/audio-get')
+    fetch(API_URL + '/api/audio')
       .then(function(r){ return r.json(); })
       .then(function(data){ 
         if(data && data.urls) {
@@ -12483,7 +12483,7 @@ function adminStartRecord(ar, label, item, btn, info) {
         // Sauvegarder localement
         localStorage.setItem(adminCurrentKey, base64);
         // Envoyer vers Supabase via le backend
-        fetch(API_URL + '/api/audio-upload', {
+        fetch(API_URL + '/api/audio', {
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
           body: JSON.stringify({ ar: arText, audioBase64: base64 })
@@ -12593,7 +12593,7 @@ function adminDoImport(input) {
         document.getElementById('imp-status').textContent = 'Upload : ' + ar + ' (' + idx + '/' + count + ')';
         document.getElementById('imp-count').textContent = uploaded + ' uploadés, ' + errors + ' erreurs';
 
-        fetch(API_URL + '/api/audio-upload', {
+        fetch(API_URL + '/api/audio', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({ ar: ar, audioBase64: data[ar] })

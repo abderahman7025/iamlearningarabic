@@ -158,6 +158,17 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Pièges connus
 
+- **Douze fonctions au maximum** dans `api/` (forfait Vercel Hobby ; les
+  fichiers commençant par `_` ne comptent pas). On y est exactement : la
+  treizième fera échouer la construction. Pour en ajouter une, il faudra en
+  réunir deux autres — comme `audio.js`, qui a absorbé `audio-get` et
+  `audio-upload` — ou passer au forfait Pro.
+- **`vercel.json` : pas de groupe dans un groupe** dans un motif `source`.
+  `/((a|b)(/.*)?|c)` est refusé, `/(a|b)` et `/(a|b)/(.*)` passent. Un fichier
+  invalide est rejeté avant la création du déploiement : rien n'apparaît dans
+  la liste, pas même une erreur. Vérifier la page Deployments après un push
+  qui touche à ce fichier.
+
 - Les projets Supabase gratuits se mettent en pause après ~7 jours sans
   activité. Le cron s'en charge désormais.
 - `Authentication → Users` dans Supabase n'est **pas** utilisé par le site :
