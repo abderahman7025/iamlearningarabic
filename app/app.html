@@ -6607,6 +6607,9 @@ function _boyLettreFinie(session,idx){
                  .filter(function(i){return i>=0;});
   var tout=attendues.every(function(i){return faites.indexOf(i)>=0;});
   if(tout)_boyValideSession(session.id);
+  /* L'appelant a besoin de savoir si l'île est finie : on ne propose pas la
+     même suite selon qu'il reste des lettres ou non. */
+  return tout;
 }
 
 function _boyLetterPicker(ca,session){
@@ -9557,6 +9560,20 @@ function _boyScene(ca,reprise){
       h.onclick=function(){N.stop();};
     }else{
       h.innerHTML='<span>'+glyph+'</span>';
+      /* Un mot entier écrit à la taille d'une lettre débordait du hublot et
+         touchait les parois. On le réduit jusqu'à ce qu'il tienne, marge
+         comprise — une seule lettre garde donc sa pleine taille. */
+      var sp=h.firstChild;
+      sp.style.whiteSpace='nowrap';
+      var ajuste=function(){
+        var max=h.clientWidth-40;if(max<40)return;
+        var px=parseFloat(getComputedStyle(sp).fontSize)||74,garde=0;
+        while(sp.getBoundingClientRect().width>max&&px>20&&garde++<40){
+          px-=3;sp.style.fontSize=px+'px';
+        }
+      };
+      requestAnimationFrame(ajuste);
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajuste);}catch(e){}
       h.onclick=function(){N.stop();N.dire(son||glyph);};
     }
     p.appendChild(h);
@@ -9582,6 +9599,8 @@ function _boyScene(ca,reprise){
     cv.style.cssText='display:block;margin:8px auto 2px;max-width:100%;cursor:pointer';
     var cx=cv.getContext('2d');
     var baseY=Math.round(CH*0.60),pas=CW/n;
+    /* De droite à gauche : le premier signe donné est le premier lu. */
+    function xCase(k){return CW-pas*(k+0.5);}
     function dessine(){
       cx.clearRect(0,0,CW,CH);
       cx.save();
@@ -9590,22 +9609,29 @@ function _boyScene(ca,reprise){
       cx.restore();
       cx.save();
       cx.font=PX+"px 'Scheherazade New',serif";
-      cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle='#0277bd';
+      cx.textBaseline='alphabetic';cx.textAlign='center';
       items.forEach(function(o,k){
         var g=(typeof _VOW_BASE!=='undefined')?String(o[0]).split(_VOW_BASE).join(''):o[0];
-        _dessineSurLigne(cx,g,pas*(k+0.5),baseY,PX);
+        cx.fillStyle=o[3]||'#0277bd';
+        _dessineSurLigne(cx,g,xCase(k),baseY,PX);
       });
       cx.restore();
       cx.save();
-      cx.font='600 13px Outfit,sans-serif';cx.textAlign='center';cx.fillStyle='rgba(1,87,155,.7)';
-      items.forEach(function(o,k){if(o[1])cx.fillText(o[1],pas*(k+0.5),CH-10);});
+      cx.font='600 13px Outfit,sans-serif';cx.textAlign='center';
+      items.forEach(function(o,k){
+        if(!o[1])return;
+        cx.fillStyle=o[3]||'rgba(1,87,155,.7)';
+        cx.fillText(o[1],xCase(k),CH-10);
+      });
       cx.restore();
     }
     try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(dessine);}catch(e){}
     dessine();
     cv.onclick=function(ev){
       var r=cv.getBoundingClientRect();
-      var k=Math.floor(((ev.clientX-r.left)/r.width)*n);
+      /* les cases sont posées de droite à gauche : on inverse pour retrouver
+         le signe touché */
+      var k=n-1-Math.floor(((ev.clientX-r.left)/r.width)*n);
       var o=items[Math.max(0,Math.min(n-1,k))];
       if(o){N.stop();N.dire(o[2]||o[0]);}
     };
@@ -9654,10 +9680,6 @@ function _boyScene(ca,reprise){
   api.tracer=function(etape,glyph,html,fr){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
-      var CW=520,CH=200,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
-      cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
-        +'background:#fff;border:3px solid rgba(2,136,209,.30);touch-action:none';
-      var cx=cv.getContext('2d');
       var modele=Array.isArray(glyph)?glyph[0]:((typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
          page, au lieu d'un seul essai. */
@@ -9665,18 +9687,32 @@ function _boyScene(ca,reprise){
       var liste=Array.isArray(glyph)
         ? glyph.map(function(g){return (typeof _VOW_BASE!=='undefined')?String(g).split(_VOW_BASE).join(''):g;})
         : [modele,modele,modele];
+      /* Taille du modèle. Un signe montré seul — une voyelle sans lettre —
+         occupe très peu de place : à la taille d'une lettre il était minuscule
+         sous le doigt d'un enfant. On le grossit franchement, et on donne au
+         canvas la hauteur qu'il faut pour qu'il ne déborde pas. Quatre formes
+         côte à côte, en revanche, doivent tenir dans leur case. */
+      var signeSeul=!String(liste[0]).replace(_MARQUES,'');
+      var PX=signeSeul?124:(liste.length>=4?80:100);
+      var CW=520,CH=signeSeul?250:220;
+      var cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
+      cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
+        +'background:#fff;border:3px solid rgba(2,136,209,.30);touch-action:none';
+      var cx=cv.getContext('2d');
       function guide(){
         cx.clearRect(0,0,CW,CH);
-        var baseY=Math.round(CH*0.62);
+        /* Un signe seul descend bien plus bas que le corps d'une lettre :
+           on remonte sa ligne d'écriture pour lui laisser la place. */
+        var baseY=Math.round(CH*(signeSeul?0.50:0.62));
         var nb=liste.length,pas=CW/nb;
         /* L'arabe s'écrit de droite à gauche : la première forme est à
            droite. On garde les tableaux dans l'ordre logique (isolée, début,
            milieu, fin) et on pose la case k en partant de la droite. */
         function caseX(k){return CW-pas*(k+0.5);}
         cx.save();
-        cx.font="74px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
+        cx.font=PX+"px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
         cx.fillStyle='rgba(2,136,209,0.10)';cx.textAlign='center';
-        for(var k=0;k<nb;k++)_dessineSurLigne(cx,liste[k],caseX(k),baseY,74);
+        for(var k=0;k<nb;k++)_dessineSurLigne(cx,liste[k],caseX(k),baseY,PX);
         cx.restore();
         if(Array.isArray(glyph)){
           cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
@@ -9788,7 +9824,7 @@ function _boyScene(ca,reprise){
   };
 
   /* Fin de mission */
-  api.mission=function(html,fr,onRetour){
+  api.mission=function(html,fr,onRetour,label){
     return function(){
       if(typeof launchConfetti==='function')try{launchConfetti('boy');}catch(e){}
       var p=panneau('MISSION ACCOMPLIE');
@@ -9796,7 +9832,42 @@ function _boyScene(ca,reprise){
       f.style.cssText='font-size:3.6rem;animation:bFusee 1.6s ease-in-out infinite';
       f.textContent='🚀';p.appendChild(f);
       titre(p,html,fr);
-      bouton(p,'▸ RETOUR À LA BASE',onRetour||function(){renderSessionsMap(ca);});
+      bouton(p,label||'▸ RETOUR À LA BASE',onRetour||function(){renderSessionsMap(ca);});
+    };
+  };
+  /* Contrôle à plusieurs bonnes réponses. « Lequel est prolongé ? » n'en
+     avait pas qu'une : deux des trois propositions l'étaient. L'enfant doit
+     ici toutes les trouver avant de passer à la suite. */
+  api.controleMulti=function(etape,html,fr,options,cibles){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+      var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var reste=cibles.slice();
+      var r=document.createElement('div');
+      r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
+      opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
+        var c=document.createElement('div');c.className='boy-cible';c.textContent=o.g;
+        c.onclick=function(){
+          if(c.classList.contains('ok')||c.classList.contains('ko'))return;
+          N.stop();N.dire(o.s);
+          if(cibles.indexOf(o.g)>=0){
+            c.classList.add('ok');
+            reste=reste.filter(function(x){return x!==o.g;});
+            if(typeof playBravo==='function')playBravo();
+            if(!reste.length){
+              if(typeof launchConfetti==='function')try{launchConfetti('boy');}catch(e){}
+              N.plusTard(suivant,900);
+            }
+          }else{
+            c.classList.add('ko');
+            if(typeof playError==='function')playError();
+          }
+        };
+        r.appendChild(c);
+      });
+      p.appendChild(r);
+      var n=document.createElement('div');n.className='boy-note';
+      n.textContent='🎯 Il y en a '+cibles.length+' à trouver';p.appendChild(n);
     };
   };
   return api;
@@ -9884,6 +9955,13 @@ function _boyVowelCourse(ca){
 function _boyProlongCourse(ca){
   var B=_boyScene(ca,{cours:'prolongation',session:_boySession&&_boySession.id}),b=B.bleu;
   function q(s){return b('« '+s+' »');}
+  /* Chaque voyelle et sa lettre de prolongation portent la même couleur, et
+     cette couleur n'est celle d'aucun autre texte : l'œil fait le lien
+     avant que la phrase soit lue. */
+  var CA='#e65100',COU='#2e7d32',CI='#6a1b9a';
+  function pa(s){return '<span style="color:'+CA+'">'+s+'</span>';}
+  function pou(s){return '<span style="color:'+COU+'">'+s+'</span>';}
+  function pi(s){return '<span style="color:'+CI+'">'+s+'</span>';}
   B.run([
     B.brief('MISSION · BRIEFING','Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
       'Mission du jour : les prolongations.','▶ DÉCOLLAGE'),
@@ -9894,30 +9972,38 @@ function _boyProlongCourse(ca){
       'Avec un alif, le son devient long.'),
     B.brief('ÉTAPE 4 · ENJEU','Allonger ou non<br>peut '+b('changer le sens')+' ! ⚠️',
       'Allonger ou non peut complètement changer le sens.'),
-    B.obs('ÉTAPE 5 · EXEMPLE','لَأُحِبُّك','لَأُحِبُّك','Sans allonger :<br>'+b('je t\'aime')+' ❤️','Sans allonger : je t\'aime.'),
-    B.obs('ÉTAPE 6 · EXEMPLE','لَا أُحِبُّك','لَا أُحِبُّك','En allongeant :<br>'+b('je ne t\'aime pas')+' 💔','En allongeant : je ne t\'aime pas.'),
-    B.surPiste('ÉTAPE 7 · LES 3','Chaque voyelle a<br>sa lettre d\''+b('allongement')+'.',
-      'Chaque voyelle a sa lettre d\'allongement.',
-      [['بَا','ā','بَا'],['بُو','ū','بُو']],[['بِي','ī','بِي']]),
-    B.obs('ÉTAPE 8 · ALIF','بَا','بَا','La '+b('fatḥa')+' est en haut,<br>le '+b('ا')+' aussi ⬆️',
-      'La fatha est en haut, le alif monte en haut aussi.'),
+    B.obs('ÉTAPE 5 · EXEMPLE','لَأُحِبُّك','لَأُحِبُّك','Par exemple,<br>sans allonger :<br>'+b('je t\'aime')+' ❤️',
+      'Par exemple, sans allonger : je t\'aime.'),
+    B.obs('ÉTAPE 6 · EXEMPLE','لَا أُحِبُّك','لَا أُحِبُّك','Par exemple,<br>en allongeant :<br>'+b('je ne t\'aime pas')+' 💔',
+      'Par exemple, en allongeant : je ne t\'aime pas.'),
+    /* De droite à gauche, comme on les lit : bā, bī, bū. Chaque syllabe
+       porte la couleur de sa voyelle. */
+    B.surPiste('ÉTAPE 7 · LES 3','Chaque voyelle est<br>prolongée par sa '+b('propre')+'<br>lettre, toujours.',
+      'Chaque voyelle est prolongée par sa propre lettre, toujours.',
+      [['بَا','ā','بَا',CA],['بِي','ī','بِي',CI],['بُو','ū','بُو',COU]],[]),
+    B.obs('ÉTAPE 8 · ALIF','بَا','بَا',
+      'Le son '+pa('a')+' s\'écrit<br>'+pa('au-dessus')+' de la lettre :<br>on le prolonge avec le '+pa('ا')+',<br>qui monte '+pa('au-dessus')+' de la ligne.',
+      'Le son a s\'écrit au-dessus de la lettre. On le prolonge avec le alif, qui monte au-dessus de la ligne.'),
     B.tracer('ÉTAPE 8 · TRACÉ','بَا','Trace '+b('بَا')+' ✍️','Trace ba long.'),
-    B.obs('ÉTAPE 9 · WAW','بُو','بُو','La '+b('ḍamma')+' ressemble<br>au '+b('و')+' 👀',
-      'La damma ressemble au waw.'),
-    B.tracer('ÉTAPE 9 · TRACÉ','بُو','Trace '+b('بُو')+' ✍️','Trace bou long.'),
-    B.obs('ÉTAPE 10 · YA','بِي','بِي','La '+b('kasra')+' est en bas,<br>le '+b('ي')+' aussi ⬇️',
-      'La kasra est en bas, le ya descend en bas aussi.'),
-    B.tracer('ÉTAPE 10 · TRACÉ','بِي','Trace '+b('بِي')+' ✍️','Trace bi long.'),
+    B.obs('ÉTAPE 9 · YA','بِي','بِي',
+      'Le son '+pi('i')+' s\'écrit<br>'+pi('en-dessous')+' de la lettre :<br>on le prolonge avec le '+pi('ي')+',<br>qui descend '+pi('sous')+' la ligne.',
+      'Le son i s\'écrit en dessous de la lettre. On le prolonge avec le ya, qui descend sous la ligne.'),
+    B.tracer('ÉTAPE 9 · TRACÉ','بِي','Trace '+b('بِي')+' ✍️','Trace bi long.'),
+    B.obs('ÉTAPE 10 · WAW','بُو','بُو',
+      'Le son '+pou('ou')+' s\'écrit<br>'+pou('au-dessus')+' de la lettre :<br>on le prolonge avec le '+pou('و')+',<br>qui lui '+pou('ressemble')+'.',
+      'Le son ou s\'écrit au-dessus de la lettre. On le prolonge avec le waw, qui lui ressemble.'),
+    B.tracer('ÉTAPE 10 · TRACÉ','بُو','Trace '+b('بُو')+' ✍️','Trace bou long.'),
     B.brief('ÉTAPE 11 · RÈGLE','Ces lettres n\'allongent<br>que si elles n\'ont<br>'+b('aucune voyelle')+' ! ⚠️',
       'Ces lettres allongent seulement si aucune voyelle n\'est posée dessus.'),
-    B.controle('CONTRÔLE 1','Lequel est '+b('allongé')+' ?','Lequel est allongé ?',['بَ','بَا','بُو'],'بَا'),
+    B.controleMulti('CONTRÔLE 1','Trouve '+b('la ou les')+'<br>prolongations !',
+      'Trouve la ou les prolongations.',['بَ','بَا','بُو'],['بَا','بُو']),
     B.controle('CONTRÔLE 2','Où est le son '+q('bououou')+' ?','Où est le son long avec le waw ?',['بُ','بُو','بِي'],'بُو'),
     B.brief('ÉTAPE 12 · CHADDAH','Le petit '+b('chapeau')+' ّ :<br>on appuie '+b('deux fois')+' 💪',
       'Le petit chapeau : on appuie deux fois sur la lettre.'),
     B.obs('ÉTAPE 13 · EXEMPLE','جَدّ','جَدّ',b('جَدّ')+' :<br>ça veut dire<br>'+b('grand-père')+' 👴','Jad-d, ça veut dire grand-père.'),
     B.tracer('ÉTAPE 13 · TRACÉ','جَدّ','Trace '+b('جَدّ')+' ✍️','Trace jadd.'),
-    B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on appuie sur la '+b('lettre')+'.<br>Allongement = on étire la '+b('voyelle')+'.',
-      'Le chapeau fait appuyer sur la lettre. L\'allongement étire la voyelle.'),
+    B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on insiste<br>sur la '+b('lettre')+'.<br>Prolongation = on insiste<br>sur la '+b('voyelle')+'.',
+      'Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.'),
     function(api){_boyValideSession(_boySession&&_boySession.id);
       B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les prolongations.')(api);}
   ]);
@@ -10049,10 +10135,28 @@ function _boyLetterCourse(ca,idx,premiere){
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     api.bouton(p,'SUIVANT ▸',api.suivant);
   });
-  sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',A,'Trace une dernière fois<br>'+b(L.name)+' ✍️','Trace une dernière fois cette lettre.'));
-  sc.push(function(api){_boyLettreFinie(_boySession,idx);
-    B.mission('Lettre '+b(L.name)+'<br>maîtrisée ! 🎖️','Mission accomplie !',
-      function(){if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);})(api);});
+  /* Le dernier tracé reprend les quatre formes, dans le sens de lecture :
+     c'est le moment où l'enfant montre qu'il sait écrire la lettre partout,
+     pas seulement seule. */
+  sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',_boy4formes(L,af),
+    'Trace une dernière fois<br>'+b(L.name)+'<br>dans ses '+b('4 formes')+' ✍️',
+    'Trace une dernière fois cette lettre, dans ses quatre formes.'));
+  sc.push(function(api){
+    var ileFinie=_boyLettreFinie(_boySession,idx);
+    /* Une fois toutes les lettres de l'île apprises, revenir à la liste des
+       lettres n'a plus de sens : l'enfant veut la suite. */
+    if(ileFinie){
+      B.mission('Bravo ! 🎉<br>Tu as terminé<br>'+b('toute l\'île')+' !<br>'
+        +'À très vite pour la<br>'+b('prochaine aventure')+' ! 🚀',
+        'Bravo ! Tu as terminé toute l\'île. Tu as été formidable. À très vite pour la prochaine aventure !',
+        function(){renderSessionsMap(ca);},'▸ LA SUITE DE L\'AVENTURE')(api);
+    }else{
+      B.mission('Bravo ! 🎉<br>Tu maîtrises '+b(L.name)+' 🎖️<br>Continue comme ça !',
+        'Bravo ! Tu maîtrises cette lettre. Continue comme ça !',
+        function(){if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);},
+        '▸ LETTRE SUIVANTE')(api);
+    }
+  });
 
   B.run(sc);
 }
