@@ -17,15 +17,29 @@ déploie tout seul.
 
 ---
 
-## Vérifié en ligne le 11 août 2026
+## ⚠ RIEN N'EST DÉPLOYÉ — le lien GitHub → Vercel est rompu
 
-Déployé et essayé sur le site réel : `app/app.html` arrive bien dans la
-fonction (`includeFiles`), le cookie `arab_token` est accepté en HTTPS, la
-connexion et les leçons marchent, et `/fille` sans compte renvoie à la page
-de connexion. La séparation tient.
+Constaté le 11 août 2026. La production sert le commit `c6206e0`. Les huit
+commits suivants sont sur GitHub (vérifié : `git ls-remote` et le dépôt local
+pointent sur le même SHA) mais Vercel n'en crée aucun déploiement — ni
+réussi, ni en échec, ni annulé, filtre de statut ouvert en grand.
 
-Reste à essayer une fois : le tunnel d'achat complet (paiement Stripe →
-création du mot de passe → première connexion).
+Relevé sur le site en ligne : `sw.js` en v44, page d'accueil de 6,38 Mo
+contenant encore tout le cours, `/api/app`, `/api/keepalive` et
+`/images/app-*.png` en 404.
+
+Conséquences tant que ce n'est pas réparé :
+- le cours reste lisible sans payer (tout le chantier 1 est hors ligne) ;
+- le cron anti-pause Supabase ne tourne pas : le projet peut se mettre en
+  pause après ~7 jours.
+
+À faire : rétablir le lien dans `Settings → Git` du projet Vercel
+`arab-learn-backend`, et vérifier sur GitHub que l'application Vercel a bien
+accès au dépôt (github.com/settings/installations). En dépannage immédiat,
+`npx vercel --prod` depuis ce dossier déploie sans passer par GitHub.
+
+**Une vérification « en ligne » ne vaut rien tant que ce point n'est pas
+réglé** : ce que l'on voit sur le site est l'ancienne version.
 
 ---
 
