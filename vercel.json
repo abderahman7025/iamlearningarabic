@@ -89,7 +89,33 @@
       ]
     },
     {
-      "source": "/((fille|garcon|adulte|girl|boy|adult|cours|app|admin)(/.*)?|accueil|connexion|inscription|interface)",
+      "source": "/(fille|garcon|adulte|girl|boy|adult|cours|app|admin)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/(fille|garcon|adulte|girl|boy|adult|cours|app|admin)/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
+      "source": "/(accueil|connexion|inscription|interface|paiement)",
       "headers": [
         {
           "key": "Cache-Control",
