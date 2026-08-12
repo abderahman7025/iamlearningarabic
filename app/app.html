@@ -9421,6 +9421,74 @@ function _boyNarration(){
 }
 
 /* Moteur d'affichage des missions */
+/* ── Un signe posé sur la ligne d'écriture ──────────────────────────────────
+   Deux règles, tirées de l'écriture réelle :
+
+   1. Le corps de la lettre se pose TOUJOURS sur la ligne. Une voyelle ne le
+      déplace jamais — c'est elle qui monte ou descend, pas la lettre. Un
+      décalage appliqué à tout le dessin faisait plonger la lettre sous la
+      ligne dès qu'elle portait une kasra.
+   2. Un signe montré SEUL, sans lettre porteuse, est posé par la police
+      juste sous la ligne : il collait au pointillé et on ne voyait pas
+      qu'il était dessous. Celui-là, et lui seul, on le descend. */
+var _MARQUES=/[ً-ْٰ]/g;
+var _SOUS_LA_LIGNE=/[ٍِ]/;   /* kasra · tanwīn kasr */
+function _dessineSurLigne(cx,texte,x,baseY,px){
+  var t=String(texte);
+  var corps=t.replace(_MARQUES,'');
+  var dy=(!corps&&_SOUS_LA_LIGNE.test(t))?Math.round(px*0.24):0;
+  cx.fillText(t,x,baseY+dy);
+}
+
+/* ── Sens d'écriture ────────────────────────────────────────────────────────
+   De petites flèches numérotées sur le modèle de droite : par où commencer,
+   et dans quel ordre. Le tracé change d'une lettre à l'autre, et selon
+   qu'elle est attachée ou non : c'est une donnée à saisir lettre par lettre,
+   pas une règle à deviner. Une lettre absente de cette table n'est pas
+   fléchée — mieux vaut pas de flèche qu'une flèche fausse.
+
+   Coordonnées en fractions de la case : x de 0 (gauche) à 1 (droite),
+   y de 0 (haut) à 1 (bas). La ligne d'écriture est à y = 0,62.
+   « n » numérote le mouvement ; on l'omet quand il n'y en a qu'un. */
+var _SENS_ECRITURE={
+  'ا':{
+    seule:[{de:[0.50,0.16],a:[0.50,0.60]}],
+    liee:[{de:[0.68,0.62],a:[0.48,0.62],n:1},
+          {de:[0.45,0.60],a:[0.45,0.18],n:2}]
+  }
+};
+function _dessineSensEcriture(cx,modele,xCase,largeur,CH){
+  var t=String(modele||'').replace(_MARQUES,'');
+  var base=t.split(_TATWEEL).join('');
+  var d=_SENS_ECRITURE[base];
+  if(!d)return;
+  var traits=(t.indexOf(_TATWEEL)===0)?d.liee:d.seule;
+  if(!traits||!traits.length)return;
+  function X(f){return xCase+(f-0.5)*largeur;}
+  cx.save();
+  cx.setLineDash([]);cx.lineCap='round';cx.lineWidth=2.5;
+  cx.strokeStyle='#e65100';cx.fillStyle='#e65100';
+  traits.forEach(function(tr){
+    var x0=X(tr.de[0]),y0=tr.de[1]*CH,x1=X(tr.a[0]),y1=tr.a[1]*CH;
+    cx.beginPath();cx.moveTo(x0,y0);cx.lineTo(x1,y1);cx.stroke();
+    var ang=Math.atan2(y1-y0,x1-x0),h=9;
+    cx.beginPath();cx.moveTo(x1,y1);
+    cx.lineTo(x1-h*Math.cos(ang-0.45),y1-h*Math.sin(ang-0.45));
+    cx.lineTo(x1-h*Math.cos(ang+0.45),y1-h*Math.sin(ang+0.45));
+    cx.closePath();cx.fill();
+    if(tr.n){
+      var nx=x0-Math.cos(ang)*13,ny=y0-Math.sin(ang)*13;
+      cx.beginPath();cx.arc(nx,ny,9,0,Math.PI*2);
+      cx.fillStyle='#fff';cx.fill();cx.lineWidth=1.5;cx.stroke();
+      cx.fillStyle='#e65100';
+      cx.font='700 13px Outfit,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
+      cx.fillText(String(tr.n),nx,ny);
+      cx.lineWidth=2.5;
+    }
+  });
+  cx.restore();
+}
+
 function _boyScene(ca,reprise){
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
   var _repriseSuivie=!!reprise;
@@ -9438,13 +9506,28 @@ function _boyScene(ca,reprise){
       +'<div class="fusee">🚀</div>';
     wrap.appendChild(j);
   }
+  /* Dernier panneau construit : sert à y accrocher le retour en arrière,
+     quel que soit le type de scène. */
+  var _dernierPanneau=null;
   function panneau(etape){
     var p=document.createElement('div');p.className='boy-panel';
     if(etape){
       var e=document.createElement('div');e.className='boy-step';
       e.innerHTML='<i></i>'+etape+'<i></i>';p.appendChild(e);
     }
-    wrap.appendChild(p);return p;
+    wrap.appendChild(p);_dernierPanneau=p;return p;
+  }
+  /* Revoir l'écran précédent : on passe à l'écran suivant, et il arrive
+     qu'on veuille relire celui d'avant. Ajouté après le rendu de la scène,
+     donc valable pour toutes — briefing, hublot, piste, tracé, contrôle. */
+  function ajouteRetour(){
+    if(i<=0||!_dernierPanneau)return;
+    var r=document.createElement('button');
+    r.className='boy-btn sec';
+    r.style.cssText+=';margin-top:8px;padding:8px;font-size:.78rem;opacity:.8';
+    r.textContent='◂ REVOIR L\'ÉCRAN PRÉCÉDENT';
+    r.onclick=function(){N.stop();precedent();};
+    _dernierPanneau.appendChild(r);
   }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';t.innerHTML=html;p.appendChild(t);
@@ -9453,6 +9536,12 @@ function _boyScene(ca,reprise){
   }
   function bleu(s){return '<span style="color:#0288d1">'+s+'</span>';}
   api.bleu=bleu;
+  /* Les deux formes de référence gardent leur couleur partout : orange pour
+     l'isolée et ce qui en dérive, violet pour le début et ce qui en dérive. */
+  var ISO='#e65100',DEB='#6a1b9a',LIEN='#90a4ae';
+  function iso(s){return '<span style="color:'+ISO+'">'+s+'</span>';}
+  function deb(s){return '<span style="color:'+DEB+'">'+s+'</span>';}
+  api.iso=iso;api.deb=deb;
   /* Hublot : la lettre dans le sas du vaisseau, cliquable */
   function hublot(p,glyph,son,note){
     var h=document.createElement('div');h.className='boy-hublot';
@@ -9504,7 +9593,7 @@ function _boyScene(ca,reprise){
       cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle='#0277bd';
       items.forEach(function(o,k){
         var g=(typeof _VOW_BASE!=='undefined')?String(o[0]).split(_VOW_BASE).join(''):o[0];
-        cx.fillText(g,pas*(k+0.5),baseY);
+        _dessineSurLigne(cx,g,pas*(k+0.5),baseY,PX);
       });
       cx.restore();
       cx.save();
@@ -9531,8 +9620,10 @@ function _boyScene(ca,reprise){
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ca.scrollTop=0;if(_repriseSuivie)repriseScene(i);}
+  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
+  function precedent(){if(i<=0)return;i--;go();}
+  api.precedent=precedent;
   api.suivant=suivant;
   api.run=function(list,f){scenes=list;if(f)fini=f;i=_repriseDebut(scenes.length);go();};
 
@@ -9560,7 +9651,7 @@ function _boyScene(ca,reprise){
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
-  api.tracer=function(etape,glyph,html,fr,dy){
+  api.tracer=function(etape,glyph,html,fr){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var CW=520,CH=200,cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
@@ -9576,24 +9667,31 @@ function _boyScene(ca,reprise){
         : [modele,modele,modele];
       function guide(){
         cx.clearRect(0,0,CW,CH);
-        var baseY=Math.round(CH*0.62)+(dy||0);
+        var baseY=Math.round(CH*0.62);
+        var nb=liste.length,pas=CW/nb;
+        /* L'arabe s'écrit de droite à gauche : la première forme est à
+           droite. On garde les tableaux dans l'ordre logique (isolée, début,
+           milieu, fin) et on pose la case k en partant de la droite. */
+        function caseX(k){return CW-pas*(k+0.5);}
         cx.save();
         cx.font="74px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
         cx.fillStyle='rgba(2,136,209,0.10)';cx.textAlign='center';
-        var N=liste.length,pas=CW/N;
-        for(var k=0;k<N;k++)cx.fillText(liste[k],pas*(k+0.5),baseY);
+        for(var k=0;k<nb;k++)_dessineSurLigne(cx,liste[k],caseX(k),baseY,74);
         cx.restore();
         if(Array.isArray(glyph)){
           cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
           cx.fillStyle='rgba(1,87,155,.55)';
           var noms=['isolée','début','milieu','fin'];
-          for(var j=0;j<N;j++)cx.fillText(noms[j]||'',pas*(j+0.5),CH-8);
+          for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8);
           cx.restore();
         }
         cx.save();
         cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2;cx.setLineDash([9,6]);
-        cx.beginPath();cx.moveTo(10,Math.round(CH*0.62));cx.lineTo(CW-10,Math.round(CH*0.62));cx.stroke();
+        cx.beginPath();cx.moveTo(10,baseY);cx.lineTo(CW-10,baseY);cx.stroke();
         cx.restore();
+        /* Sens d'écriture, sur le premier modèle seulement — celui de
+           droite. Le montrer sur les quatre surchargerait le dessin. */
+        _dessineSensEcriture(cx,liste[0],caseX(0),pas,CH);
       }
       guide();p.appendChild(cv);
       var eff=document.createElement('button');eff.className='boy-btn sec';
@@ -9653,36 +9751,38 @@ function _boyScene(ca,reprise){
   api.tableau=function(etape,html,fr,formes){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
-      var ISO='#e65100',DEB='#6a1b9a',LIEN='#90a4ae';
+      /* Deux lignes de deux, dans le sens de lecture arabe : isolée en haut
+         à droite, fin en haut à gauche, début en bas à droite, milieu en bas
+         à gauche. Chaque forme se retrouve ainsi à côté de celle dont elle
+         dérive : isolée -> fin, début -> milieu. La règle est déjà dans le
+         titre : la répéter sous le tableau n'apprend rien de plus. */
       var t=document.createElement('div');
-      t.style.cssText='display:grid;grid-template-columns:repeat(4,1fr);gap:6px;direction:rtl;'
-        +'margin:6px auto 4px;max-width:460px';
+      t.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:8px;direction:rtl;'
+        +'margin:6px auto 4px;max-width:330px';
       var noms=['ISOLÉE','DÉBUT','MILIEU','FIN'];
       var coul=[ISO,DEB,DEB,ISO];
-      noms.forEach(function(nm,k){
-        var c=document.createElement('div');
-        c.style.cssText='font-family:Outfit,sans-serif;font-size:.62rem;font-weight:900;letter-spacing:.06em;'
-          +'color:'+coul[k]+';direction:ltr;padding-bottom:4px';
-        c.textContent=nm;t.appendChild(c);
-      });
-      formes.forEach(function(f,k){
+      [0,3,1,2].forEach(function(k){
+        var f=formes[k];if(f===undefined)return;
         var c=document.createElement('div');
         c.style.cssText='background:#fff;border:2px solid '+coul[k]+'55;border-radius:14px;'
-          +'padding:10px 4px;font-family:\'Scheherazade New\',serif;font-size:2.2rem;line-height:1.6;cursor:pointer';
+          +'padding:8px 4px 10px;cursor:pointer';
+        var nm=document.createElement('div');
+        nm.style.cssText='font-family:Outfit,sans-serif;font-size:.6rem;font-weight:900;'
+          +'letter-spacing:.06em;color:'+coul[k]+';direction:ltr;margin-bottom:2px';
+        nm.textContent=noms[k];c.appendChild(nm);
         /* on separe le trait de liaison de la lettre pour les colorer differemment */
         var g=String(f);
-        var lien=g.indexOf('\u0640')===0?'\u0640':'';
+        var lien=g.indexOf('ـ')===0?'ـ':'';
         var reste=lien?g.slice(1):g;
-        c.innerHTML=(lien?'<span style="color:'+LIEN+'">'+lien+'</span>':'')
+        var gl=document.createElement('div');
+        gl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:2.2rem;line-height:1.5';
+        gl.innerHTML=(lien?'<span style="color:'+LIEN+'">'+lien+'</span>':'')
           +'<span style="color:'+coul[k]+'">'+reste+'</span>';
+        c.appendChild(gl);
         c.onclick=function(){N.stop();N.dire(f);};
         t.appendChild(c);
       });
       p.appendChild(t);
-      var leg=document.createElement('div');leg.className='boy-note';
-      leg.innerHTML='<span style="color:'+DEB+';font-weight:900">MILIEU = ـ + DÉBUT</span>'
-        +' &nbsp;·&nbsp; <span style="color:'+ISO+';font-weight:900">FIN = ـ + ISOLÉE</span>';
-      p.appendChild(leg);
       bouton(p,'SUIVANT ▸',suivant);
     };
   };
@@ -9728,19 +9828,19 @@ function _boyVowelCourse(ca){
       'Il existe seulement trois voyelles.'),
     B.obs('ÉTAPE 6 · FATḤA',F,'a','Un trait au-'+b('dessus')+' :<br>ça fait '+q('a')+' ☀️',
       'Un trait au-dessus, ça fait « a »'),
-    B.surPiste('ÉTAPE 6 · SA PLACE','La '+b('fatḥa')+' se pose<br>'+b('au-dessus')+' de la ligne.',
-      'La fatha se pose au-dessus de la ligne d\'écriture.',[[F,'a','a']],[]),
+    B.surPiste('ÉTAPE 6 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[[F,'a','a']],[]),
     B.tracer('ÉTAPE 6 · TRACÉ',F,'À toi de tracer<br>la '+b('fatḥa')+' ✍️','À toi de tracer la fatha.'),
     B.obs('ÉTAPE 7 · ḌAMMA',D,'ou','Une boucle au-'+b('dessus')+' :<br>ça fait '+q('ou')+' 🌙',
       'Une boucle au-dessus, ça fait « ou »'),
-    B.surPiste('ÉTAPE 7 · SA PLACE','La '+b('ḍamma')+' se pose<br>'+b('au-dessus')+' de la ligne.',
-      'La damma se pose au-dessus de la ligne d\'écriture.',[[D,'ou','ou']],[]),
+    B.surPiste('ÉTAPE 7 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[[D,'ou','ou']],[]),
     B.tracer('ÉTAPE 7 · TRACÉ',D,'À toi de tracer<br>la '+b('ḍamma')+' ✍️','À toi de tracer la damma.'),
     B.obs('ÉTAPE 8 · KASRA',K,'i','Un trait en-'+b('dessous')+' :<br>ça fait '+q('i')+' ⭐',
       'Un trait en-dessous, ça fait « i »'),
-    B.surPiste('ÉTAPE 8 · SA PLACE','La '+b('kasra')+' se pose<br>'+b('en-dessous')+' de la ligne.',
-      'La kasra se pose en dessous de la ligne d\'écriture.',[],[[K,'i','i']]),
-    B.tracer('ÉTAPE 8 · TRACÉ',K,'À toi de tracer<br>la '+b('kasra')+' ✍️','À toi de tracer la kasra.',18),
+    B.surPiste('ÉTAPE 8 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[],[[K,'i','i']]),
+    B.tracer('ÉTAPE 8 · TRACÉ',K,'À toi de tracer<br>la '+b('kasra')+' ✍️','À toi de tracer la kasra.'),
 
     B.controle('CONTRÔLE 1','Où est le son '+q('a')+' ?','Où est le son « a » ?',[F,K,D],F),
     B.controle('CONTRÔLE 2','Où est le son '+q('i')+' ?','Où est le son « i » ?',[F,K,D],K),
@@ -9754,19 +9854,19 @@ function _boyVowelCourse(ca){
       'Si on double une voyelle, on ajoute le son « n »'),
     B.obs('ÉTAPE 12 · TANWĪN',TF,'anne','Deux traits au-dessus :<br>'+q('a')+' devient '+q('an'),
       'Deux traits au-dessus : « a » devient « an »'),
-    B.surPiste('ÉTAPE 12 · SA PLACE','Elle reste<br>'+b('au-dessus')+' de la ligne.',
-      'Elle reste au-dessus de la ligne d\'écriture.',[[TF,'an','anne']],[]),
+    B.surPiste('ÉTAPE 12 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[[TF,'an','anne']],[]),
     B.tracer('ÉTAPE 12 · TRACÉ',TF,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
     B.obs('ÉTAPE 13 · TANWĪN',TD,'oune','Deux boucles au-dessus :<br>'+q('ou')+' devient '+q('oun'),
       'Deux boucles au-dessus : « ou » devient « oun »'),
-    B.surPiste('ÉTAPE 13 · SA PLACE','Elle reste<br>'+b('au-dessus')+' de la ligne.',
-      'Elle reste au-dessus de la ligne d\'écriture.',[[TD,'oun','oune']],[]),
+    B.surPiste('ÉTAPE 13 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[[TD,'oun','oune']],[]),
     B.tracer('ÉTAPE 13 · TRACÉ',TD,'Trace les '+b('deux boucles')+' ✍️','Trace les deux boucles.'),
     B.obs('ÉTAPE 14 · TANWĪN',TK,'inne','Deux traits en-dessous :<br>'+q('i')+' devient '+q('in'),
       'Deux traits en-dessous : « i » devient « in »'),
-    B.surPiste('ÉTAPE 14 · SA PLACE','Elle reste<br>'+b('en-dessous')+' de la ligne.',
-      'Elle reste en dessous de la ligne d\'écriture.',[],[[TK,'in','inne']]),
-    B.tracer('ÉTAPE 14 · TRACÉ',TK,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.',18),
+    B.surPiste('ÉTAPE 14 · SUR LA LIGNE','Voilà ce que<br>ça donne 👀',
+      'Voilà ce que ça donne.',[],[[TK,'in','inne']]),
+    B.tracer('ÉTAPE 14 · TRACÉ',TK,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
 
     B.controle('CONTRÔLE 4','Où est le son '+q('an')+' ?','Où est le son « an » ?',[TF,TK,TD],TF),
     B.controle('CONTRÔLE 5','Où est le son '+q('oun')+' ?','Où est le son « oun » ?',[TF,TK,TD],TD),
@@ -9869,15 +9969,18 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(B.brief('ÉTAPE · MÉMO','Deux formes à retenir :<br>'+b('isolée')+' et '+b('début')+'.',
       'Il n\'y a que deux formes à retenir : la forme isolée et la forme du début.'));
   }
-  sc.push(B.tableau('ÉTAPE · DÉDUCTION','Milieu = début + '+b('ـ')+'<br>Fin = isolée + '+b('ـ'),
+  sc.push(B.tableau('ÉTAPE · DÉDUCTION',
+    B.deb('Milieu')+' = '+B.deb('début')+' + '+b('ـ')+'<br>'+B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('ـ'),
     'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
     [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
+  sc.push(B.brief('ÉTAPE · LA CLÉ',
+    'C\'est pourquoi il faut<br>connaître par cœur<br>'+B.iso('isolée')+' et '+B.deb('début')+' :<br>les deux autres se '+b('déduisent')+' ! 🔑',
+    'C\'est pourquoi il est très important de connaître parfaitement l\'écriture de chaque lettre isolée et en début de mot. Tu pourras alors déduire les deux autres formes.'));
   sc.push(B.brief('ÉTAPE · PORTÉE','Cette règle vaut pour<br>'+b('toutes les lettres')+',<br>sauf '+b('3')+' que l\'on verra<br>plus tard ! ⚠️',
     'Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.'));
-  if(idx<=2&&attache){
-    sc.push(B.brief('ÉTAPE · EXCEPTIONS','Ces 3 lettres :<br>'+b('ع غ ء'),
-      'Ces trois lettres sont : ayn, ghayn et hamza.'));
-  }
+  /* On ne nomme pas les trois exceptions ici : les citer à un enfant qui ne
+     les a pas encore vues n'apprend rien et charge l'écran. Chacune se
+     présente d'elle-même le jour où elle arrive (voir juste en dessous). */
   if(A==='ع'||A==='غ'){
     sc.push(B.brief('ÉTAPE · EXCEPTION','En voici une ! Ses formes<br>ne se '+b('déduisent pas')+'.<br>Apprends-les une par une.',
       'En voici une. Ses formes ne se déduisent pas les unes des autres.'));
@@ -9899,13 +10002,13 @@ function _boyLetterCourse(ca,idx,premiere){
   [['َ','a','au-dessus'],['ِ','i','en-dessous'],['ُ','ou','au-dessus']].forEach(function(v,n){
     sc.push(B.obs('VOYELLE '+(n+1)+'/3',A+v[0],A+v[0],
       'Signe '+b(v[2])+' :<br>ça fait '+q(v[1]),'Signe '+v[2]+', ça fait '+(lat+v[1]).toLowerCase()));
-    sc.push(B.surPiste('VOYELLE '+(n+1)+'/3 · SA PLACE',
-      'Le signe se pose<br>'+b(v[2])+' de la ligne.','Le signe se pose '+v[2]+' de la ligne.',
+    sc.push(B.surPiste('VOYELLE '+(n+1)+'/3 · SUR LA LIGNE',
+      'Voilà ce que<br>ça donne 👀','Voilà ce que ça donne.',
       v[0]==='ِ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
       v[0]==='ِ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
     sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
-      'Trace cette syllabe dans ses quatre formes.',v[0]==='ِ'?18:0));
+      'Trace cette syllabe dans ses quatre formes.'));
   });
   /* Les propositions melangent les FORMES : l'enfant doit reconnaitre le
      son quelle que soit la place de la lettre dans le mot. */
@@ -9920,13 +10023,13 @@ function _boyLetterCourse(ca,idx,premiere){
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
       'Doublé, ça fait '+(lat+v[1]).toLowerCase()));
-    sc.push(B.surPiste('TANWĪN '+(n+1)+'/3 · SA PLACE',
-      'Il garde la même<br>'+b('place')+' sur la ligne.','Il garde la même place sur la ligne.',
+    sc.push(B.surPiste('TANWĪN '+(n+1)+'/3 · SUR LA LIGNE',
+      'Voilà ce que<br>ça donne 👀','Voilà ce que ça donne.',
       v[0]==='ٍ'?[]:[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]],
       v[0]==='ٍ'?[[A+v[0],(lat+v[1]).toLowerCase(),A+v[0]]]:[]));
     sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
-      'Trace ce tanwîn dans ses quatre formes.',v[0]==='ٍ'?18:0));
+      'Trace ce tanwîn dans ses quatre formes.'));
   });
   sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ','Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕',
     'Petit rond : on ne prononce que le son de la lettre.'));
