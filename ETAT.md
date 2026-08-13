@@ -89,51 +89,54 @@ exercices. Extraire les données n'aurait protégé qu'un quart du fichier.
 
 ---
 
-## EN COURS — Animer le modèle à repasser (interface garçon)
+## FAIT — Animer le modèle à repasser (interface garçon)
 
-Validé avec le client. Deux animations, à construire dans `app/app.html`.
+Les deux animations validées avec le client sont en place, pour **les trente
+lettres**.
 
 **1. Le modèle s'écrit tout seul, dans les canvas de tracé.**
-**Posé pour l'alif et le bā — en attente du verdict du client.** Les 17 autres
-bases ne seront tracées qu'une fois le rendu validé : vitesse, départ du
-trait, prise des boucles. Ajuster deux lettres coûte moins que trente-huit
-trajectoires.
 
-Ce qui est en place dans `app/app.html` :
-- `_TRACE_MODELE` : une trajectoire par forme (`ا ـا ب بـ ـبـ ـب`), en « em »
-  depuis l'ancre du glyphe, donc valable à toutes les tailles. Les sens de
-  tracé des 19 bases sont dans `SENS-ECRITURE.md`, dictés par le client ;
-  elles couvrent les 30 lettres, seuls les points changent.
-- **Le chemin n'est jamais dessiné** : il sert de masque. On peint la lettre
-  sur un calque, on n'en garde (`destination-in`) que ce qu'un trait épais
-  posé le long du chemin a déjà couvert. Les points ne sont sur aucun chemin :
-  ils arrivent d'un coup à la fin, comme le veut la règle.
-- Conséquence : **un chemin qui passe à côté d'un morceau de lettre le laisse
-  invisible jusqu'à la fin.** Les coordonnées ont donc été mesurées en
-  balayant les pixels du glyphe rendu par Scheherazade New, pas estimées à
-  l'œil. Refaire cette mesure pour toute nouvelle base.
+- Le chemin n'est jamais dessiné, et il ne suit PAS la lettre au pixel près :
+  il donne l'**ordre du parcours**. Chaque pixel de la lettre est rangé selon
+  l'endroit du chemin dont il est le plus proche, puis rendu dans cet ordre.
+  D'où deux propriétés qui font tout l'intérêt de la méthode : la lettre est
+  toujours révélée en entier, même si le chemin passe à côté d'un morceau ;
+  et un chemin grossier suffit, ce qui a rendu les cent trois formes tenables.
+  (La première version masquait la lettre avec un gros trait posé le long du
+  chemin : elle demandait des coordonnées au pixel près, et un chemin un peu
+  à côté laissait un morceau de lettre invisible. Ne pas y revenir.)
+- Les points ne sont pas rattachés au corps : ce sont des taches d'encre
+  détachées (repérées par composantes connexes), gardées pour la toute fin.
+  C'est la règle du client. Les voyelles posées sur la lettre suivent le même
+  sort.
+- `_TRACE_MODELE` : un geste par base et par forme (seule, début, milieu,
+  fin), en « em » depuis l'ancre du glyphe, donc valable à toutes les tailles.
+  `_BASE_TRACE` renvoie chaque lettre à sa base : seuls les points changent,
+  donc le geste s'écrit une fois pour la famille. Les sens de tracé des 19
+  bases sont dans `SENS-ECRITURE.md`, dictés par le client.
 - **Deux canvas superposés** : le modèle animé dessous, l'encre de l'enfant
   au-dessus. Sinon chaque tour d'animation efface son tracé. « EFFACER » ne
   nettoie que l'encre.
 - L'animation tourne sur **la case voisine, à gauche de celle où l'enfant
-  écrit** : au départ celle de droite ; dès son premier trait, elle saute
-  d'un cran à gauche ; sur la dernière case, elle s'arrête. La case qu'elle
-  quitte reste entière. On sait dans quelle case tombe un trait par sa
-  position en x.
+  écrit** : au départ celle de droite ; dès son premier trait, elle saute d'un
+  cran à gauche ; sur la dernière case, elle s'arrête. La case qu'elle quitte
+  reste entière.
 - Un bouton « ▶ REVOIR » relance l'animation sur la case en cours.
-- Rythme : 1,7 s d'écriture, 0,45 s de pose, les points, 1,4 s, puis on
-  recommence. Trois constantes en tête de la boucle, à régler avec le client.
-- Une forme absente de la table n'est pas animée : son modèle s'affiche
-  entier, comme avant. Rien ne casse pour les 28 autres lettres.
-- Les flèches numérotées (`_SENS_ECRITURE`) ont été supprimées : elles
-  disaient par où commencer sans montrer le geste.
+- Rythme : 1,7 s d'écriture, 0,42 s de souffle, les points, 0,45 s — le client
+  veut que ça enchaîne, sans temps mort une fois la lettre finie. Trois
+  constantes en tête de la boucle.
+- Vérification automatique à refaire après toute retouche de la table : pour
+  les 103 formes, le corps doit être entièrement révélé à la fin du geste, et
+  le départ comme l'arrivée du chemin doivent tomber à moins de 0,12 em de
+  l'encre. C'est ce qui a rattrapé le ع et le ق, dont le départ était dans le
+  vide.
 
-**2. Le tableau des formes s'anime.**
-À l'arrivée, seules isolée et début sont visibles. Pendant que la voix dit
-« la lettre du milieu s'écrit comme celle du début », la forme début
-apparaît à la place du milieu ; sur « en ajoutant un tiret », le tiret vient
-s'y coller. Même déroulé pour fin et isolée. Le minutage se cale sur
-`surSilence()` de la narration.
+**2. Le tableau des formes s'anime.** À l'arrivée, seules isolée et début sont
+visibles. La phrase est découpée en quatre morceaux : chacun est dit, et son
+geste part en même temps — le corps de la forme paraît, puis le trait de
+liaison vient s'y coller par la droite. On attend le silence
+(`surSilence()`) avant le morceau suivant, avec un filet de 2,6 s au cas où la
+voix ne rendrait jamais la main.
 
 ---
 
@@ -198,6 +201,14 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- Retours du client sur les écrans : voyelles en apesanteur qui sortaient du
+  hublot (amplitude de dérive divisée par deux), kasra et tanwīn kasr montrés
+  seuls qui collaient à la ligne (descendus de 0,24 em, comme dans les
+  canvas), trait de liaison du socle trop long dans les syllabes en deux
+  couleurs (la moitié du tiret revient à la prolongation).
+- **Fin d'un cours sur une île déjà bouclée** : on revient à la liste des
+  lettres de l'île, pas à la carte. `_boyLettreFinie` répond désormais
+  `{finie, deja}` — « deja » se lit AVANT d'enregistrer la lettre du jour.
 - **Le cercle pointillé ◌ ne s'affiche plus nulle part.** Il reste la clé des
   enregistrements (« ◌َ »), mais tout ce qui montre un glyphe passe par
   `_sansCercle()`. Un signe seul n'ayant aucune largeur, on lui réserve de la
