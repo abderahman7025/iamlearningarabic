@@ -5633,7 +5633,7 @@ var islandDefs=[
         if(segsMob.length>0){
           if(charIdxM>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
           else{var ip=bezierPtM(0,segsMob[charIdxM]);placeCharMob(ip.x,ip.y);}
-          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
+          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
         }
         var animFrameM=null,currentIdxM=charIdxM;
         function animateToM(targetIdx,onDone){
@@ -5794,7 +5794,7 @@ var islandDefs=[
       }
       placeCharAt(initX,initY);
       // Scroll vers le gugus
-      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
+      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
 
       var animFrame=null,currentIdx=charIdx;
 
@@ -6038,7 +6038,10 @@ function renderMemoryPlay(ca,deck){
     inner.appendChild(front);inner.appendChild(back);card.appendChild(inner);
     card.onclick=function(){
       if(locked)return;if(this.classList.contains('flipped')||this.classList.contains('matched'))return;
+      /* On entend la lettre en la retournant : le jeu fait travailler le son
+         autant que la mémoire. */
       this.classList.add('flipped');flipped.push({card:this,p:p});
+      try{speak(p.ar);}catch(e){}
       if(flipped.length===2){
         locked=true;attempts++;
         setTimeout(function(){
@@ -6987,7 +6990,7 @@ function renderChildIslandMap(ca){
         if(segsMob.length>0){
           if(charIdxC>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
           else{var ip=bezierPtM(0,segsMob[charIdxC]);placeCharMob(ip.x,ip.y);}
-          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
+          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
         }
         var animFrameM=null,currentIdxM=charIdxC;
         function animateToM(targetIdx,onDone){
@@ -7088,7 +7091,7 @@ function renderChildIslandMap(ca){
       if(charIdxC>=segments.length){initX=segments[segments.length-1].x3;initY=segments[segments.length-1].y3;}
       else{initX=segments[charIdxC].x0;initY=segments[charIdxC].y0;}
       placeCharAt(initX,initY);
-      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'smooth'});}},100);
+      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
       var animFrame=null,currentIdx=charIdxC;
       function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
@@ -9632,7 +9635,7 @@ function _boyScene(ca,reprise){
   function deb(s){return '<span style="color:'+DEB+'">'+s+'</span>';}
   api.iso=iso;api.deb=deb;
   /* Hublot : la lettre dans le sas du vaisseau, cliquable */
-  function hublot(p,glyph,son,note,ligne){
+  function hublot(p,glyph,son,note,ligne,socle,accent){
     var h=document.createElement('div');h.className='boy-hublot'+(ligne?' ligne':'');
     if(Array.isArray(glyph)){
       /* Les signes en apesanteur dérivent au-delà du cercle : sans marge
@@ -9648,6 +9651,25 @@ function _boyScene(ca,reprise){
         h.appendChild(f);
       });
       h.onclick=function(){N.stop();};
+    }else if(socle){
+      /* Deux couleurs exactes : en HTML, une voyelle est repeinte a la
+         couleur de la lettre qui la porte, meme placee dans un autre span.
+         Le canvas, lui, obeit. */
+      var cvH=document.createElement('canvas');cvH.width=320;cvH.height=320;
+      cvH.style.cssText='width:150px;height:150px;position:relative;z-index:1';
+      var cxH=cvH.getContext('2d');
+      function peint(){
+        cxH.clearRect(0,0,320,320);
+        cxH.font="150px 'Scheherazade New',serif";cxH.textBaseline='alphabetic';
+        var bY=200;
+        if(ligne){cxH.save();cxH.strokeStyle='rgba(1,87,155,.42)';cxH.lineWidth=5;cxH.setLineDash([14,10]);
+          cxH.beginPath();cxH.moveTo(46,bY);cxH.lineTo(274,bY);cxH.stroke();cxH.restore();}
+        _dessineDeuxCouleurs(cxH,glyph,socle,160,bY,150,'#01579b',accent||'#e65100');
+      }
+      peint();
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
+      h.appendChild(cvH);
+      h.onclick=function(){N.stop();N.dire(son||glyph);};
     }else{
       h.innerHTML='<span>'+glyph+'</span>';
       /* Un mot entier écrit à la taille d'une lettre débordait du hublot et
@@ -9757,9 +9779,9 @@ function _boyScene(ca,reprise){
     };
   };
   /* Observation : texte + hublot */
-  api.obs=function(etape,glyph,son,html,fr,note,ligne){
+  api.obs=function(etape,glyph,son,html,fr,note,ligne,socle,accent){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);hublot(p,glyph,son,note,ligne);
+      var p=panneau(etape);titre(p,html,fr);hublot(p,glyph,son,note,ligne,socle,accent);
       bouton(p,'SUIVANT ▸',suivant);
     };
   };
@@ -10080,19 +10102,19 @@ function _boyProlongCourse(ca){
       'Chaque voyelle est prolongée par la même lettre, toujours.',
       [['بَا','ā','بَا',CA,'ب'+Z],['بِي','ī','بِي',CI,'ب'+Z],['بُو','ū','بُو',COU,'ب'+Z]],[]),
 
-    B.obs('ÉTAPE 8 · ALIF',pa2('بَا'),'بَا',
+    B.obs('ÉTAPE 8 · ALIF','بَا','بَا',
       'La voyelle '+gros(pa('َ'))+' s\'écrit<br>'+pa('au-dessus')+' de la lettre :<br>on la prolonge avec le '+pa('ا')+',<br>qui monte '+pa('au-dessus')+' de la ligne.',
-      'La voyelle fatha s\'écrit au-dessus de la lettre. On la prolonge avec le alif, qui monte au-dessus de la ligne.'),
+      'La voyelle fatha s\'écrit au-dessus de la lettre. On la prolonge avec le alif, qui monte au-dessus de la ligne.',null,true,'ب'+Z,CA),
     B.tracer('ÉTAPE 8 · TRACÉ',['بَا','ـبَا'],'Trace '+b('بَا')+' ✍️','Trace ba prolongé.'),
 
-    B.obs('ÉTAPE 9 · YA',pi2('بِي'),'بِي',
+    B.obs('ÉTAPE 9 · YA','بِي','بِي',
       'La voyelle '+gros(pi('ِ'))+' s\'écrit<br>'+pi('en-dessous')+' de la lettre :<br>on la prolonge avec le '+pi('ي')+',<br>qui descend '+pi('sous')+' la ligne.',
-      'La voyelle kasra s\'écrit en dessous de la lettre. On la prolonge avec le ya, qui descend sous la ligne.'),
+      'La voyelle kasra s\'écrit en dessous de la lettre. On la prolonge avec le ya, qui descend sous la ligne.',null,true,'ب'+Z,CI),
     B.tracer('ÉTAPE 9 · TRACÉ',['بِي','ـبِي'],'Trace '+b('بِي')+' ✍️','Trace bi prolongé.'),
 
-    B.obs('ÉTAPE 10 · WAW',pou2('بُو'),'بُو',
+    B.obs('ÉTAPE 10 · WAW','بُو','بُو',
       'La voyelle '+gros(pou('ُ'))+' ressemble<br>à un petit '+pou('و')+' :<br>on la prolonge donc<br>avec le '+pou('و')+' 👀',
-      'La voyelle damma ressemble à un petit waw. On la prolonge donc avec le waw.'),
+      'La voyelle damma ressemble à un petit waw. On la prolonge donc avec le waw.',null,true,'ب'+Z,COU),
     B.tracer('ÉTAPE 10 · TRACÉ',['بُو','ـبُو'],'Trace '+b('بُو')+' ✍️','Trace bou prolongé.'),
 
     B.brief('ÉTAPE 11 · RÈGLE','Ces lettres prolongent<br>leur voyelle '+b('UNIQUEMENT')+'<br>si elles n\'ont aucune<br>voyelle sur ou sous elles ! ⚠️',
@@ -10101,13 +10123,13 @@ function _boyProlongCourse(ca){
        Celui de l'alif s'écrirait avec une hamza dans un vrai mot : on s'en
        passe ici, l'écran ne sert qu'à montrer la voyelle qui empêche la
        prolongation. */
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pa2('بَاِ'),'بَاِ',
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بَاِ','بَاِ',
       'Ici le '+pa('ا')+' porte une '+gros(pa('ِ'))+' :<br>on ne dit pas '+q('baa')+'<br>mais '+q('ba-ï')+' !',
       'Ici le alif porte une kasra. On ne dit pas ba prolongé, mais ba i.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pi2('بِيَ'),'بِيَ',
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بِيَ','بِيَ',
       'Ici le '+pi('ي')+' porte une '+gros(pi('َ'))+' :<br>on ne dit pas '+q('bii')+'<br>mais '+q('biya')+' !',
       'Ici le ya porte une fatha. On ne dit pas bi prolongé, mais biya.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE',pou2('بُوَ'),'بُوَ',
+    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بُوَ','بُوَ',
       'Ici le '+pou('و')+' porte une '+gros(pou('َ'))+' :<br>on ne dit pas '+q('bouu')+'<br>mais '+q('bouwa')+' !',
       'Ici le waw porte une fatha. On ne dit pas bou prolongé, mais bouwa.'),
 
