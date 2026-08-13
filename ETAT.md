@@ -198,6 +198,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le cercle pointillé ◌ ne s'affiche plus nulle part.** Il reste la clé des
+  enregistrements (« ◌َ »), mais tout ce qui montre un glyphe passe par
+  `_sansCercle()`. Un signe seul n'ayant aucune largeur, on lui réserve de la
+  place là où il faut pouvoir le toucher (hublot, cibles, grosses lettres).
+- **La ligne d'écriture est dans TOUS les hublots**, y compris pour une lettre
+  sans voyelle et pour le soukoun. Quand le hublot est un canvas (syllabe en
+  deux couleurs), la ligne est tracée dedans, sur la ligne de base exacte du
+  glyphe, et celle du CSS est retirée — sinon on en voyait deux, à deux pixels
+  l'une de l'autre.
+- **Le bā fantôme est parti** : voir le piège du ZWJ dans le canvas, plus bas.
+- De l'air autour d'une lettre arabe posée dans une phrase française
+  (`.ar-air`) : sans cela le mot d'avant et la virgule d'après se collaient
+  dessus.
+- L'écran du NOM des voyelles joue le nom (« fatha », « damma », « kasra »)
+  quand on appuie dessus, plus leur son : c'est de leur nom qu'il parle.
 - Séparation page publique / application (chantier 1 ci-dessus).
 - **Reprise** : l'écran courant est gardé dans `localStorage.arab_reprise`
   (page, leçon adulte et lettre affichée, ou cours enfant et numéro de
@@ -243,6 +258,13 @@ page et URL propres, indexables. Elles se rangent à côté de
   invalide est rejeté avant la création du déploiement : rien n'apparaît dans
   la liste, pas même une erreur. Vérifier la page Deployments après un push
   qui touche à ce fichier.
+
+- **Le canvas n'applique pas le liant invisible (ZWJ).** `fillText('ب'+ZWJ)`
+  sort la forme ISOLÉE, pas la forme de début — mesuré : même largeur et même
+  tracé que `'ب'` seul. C'est ce qui posait un gros bā bleu en travers des
+  syllabes en deux couleurs. Dans un canvas, la liaison se force avec le
+  **tiret de liaison visible (tatweel `ـ`)**, jamais avec le ZWJ. En HTML, le
+  ZWJ fonctionne — d'où le piège, ça marche d'un côté et pas de l'autre.
 
 - Les projets Supabase gratuits se mettent en pause après ~7 jours sans
   activité. Le cron s'en charge désormais.

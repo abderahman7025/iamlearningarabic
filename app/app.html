@@ -2550,6 +2550,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-step i{width:7px;height:7px;border-radius:50%;background:#0277bd;animation:bBlink 1.4s infinite;font-style:normal}
 .boy-titre{font-size:1.28rem;font-weight:900;color:#01579b;line-height:1.9;letter-spacing:.01em;
   text-align:center;margin:0 auto 18px;max-width:22em}
+/* De l'air autour d'une lettre arabe posée dans une phrase française : sans
+   cela le mot d'avant et la virgule d'après viennent se coller dessus. */
+.ar-air{display:inline-block;margin:0 .34em;line-height:1}
 .boy-hublot{width:174px;height:174px;border-radius:50%;margin:6px auto 22px;position:relative;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#ffffff,#cdeafc 58%,#9ad4f5);
@@ -3223,7 +3226,7 @@ const T={
     bonus_s2_p3:'Dans le Quran, il s\'écrit avec un mini ص au dessus :',
     bonus_s2_p4:'Dans cet exemple, aucun des 3 entourés en rouge ne se prononce. On passe directement au ل .',
     bonus_s2_bonus:'Bonus : Lorsque l\'on a un petit ا, il s\'agit d\'un ا à part entière.',
-    bonus_s2_p5:'Ici, la ◌َ du م doit est prolongée par le ا .',
+    bonus_s2_p5:'Ici, la fatḥa du م doit être prolongée par le ا .',
     bonus_s3_p1:'Le nom d\'Allah a une particularité.',
     bonus_s3_p2:'En effet, le deuxième ل peut être emphatique مُفَخَّمَةٌ ou neutre مُرَقَّقَةٌ .',
     bonus_s3_kasra:'Tout dépend de la voyelle qui précède ce ل :',
@@ -8126,7 +8129,12 @@ function _kidScene(ca,reprise){
        م ن ق ر ز و) descendent sous la ligne de base et empiétaient sur le
        texte juste en dessous. */
     g.style.cssText='font-family:var(--fa);font-size:'+(size||7)+'rem;color:var(--k2);line-height:1.5;padding-bottom:.12em;cursor:pointer;display:inline-block;overflow:visible;transition:transform .25s cubic-bezier(.34,1.56,.64,1);transform:scale(.3);opacity:0';
-    g.textContent=glyph;
+    /* Le cercle pointillé de support ne s'affiche plus : c'est la voyelle
+       seule que l'enfant doit regarder. Sans lui, le signe n'a plus aucune
+       largeur : on lui en donne une, sinon il n'y aurait plus rien à toucher
+       pour l'entendre. */
+    g.textContent=_sansCercle(glyph);
+    if(_signeSeul(glyph))g.style.cssText+=';min-width:1.4em;padding:0 .3em;text-align:center';
     g.onclick=function(){sayAr(sound||glyph);g.style.transform='scale(1.18)';setTimeout(function(){g.style.transform='scale(1)';},180);};
     later(function(){g.style.transform='scale(1)';g.style.opacity='1';},60);
     return g;
@@ -8135,7 +8143,7 @@ function _kidScene(ca,reprise){
   function phrase(html,fr){
     var p=document.createElement('div');
     p.style.cssText='font-size:1.4rem;font-weight:800;color:var(--k2);line-height:1.45;margin:6px 0 14px;opacity:0;transform:translateY(10px);transition:all .4s';
-    p.innerHTML=html;
+    p.innerHTML=_airAutourArabe(_sansCercle(html));
     later(function(){p.style.opacity='1';p.style.transform='translateY(0)';},80);
     later(function(){sayFr(fr||stripTags(html));},450);
     return p;
@@ -8278,7 +8286,7 @@ function _kidScene(ca,reprise){
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
         b.className='kid-cloud kid-pulse';b.style.cssText+=';font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s';
-        b.textContent=o.g;
+        b.textContent=_sansCercle(o.g);
         b.onclick=function(){
           sayAr(o.s);
           if(answered)return;
@@ -8317,7 +8325,7 @@ function _kidScene(ca,reprise){
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');
         b.className='kid-cloud kid-pulse';b.style.cssText+=';font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:92px;padding:10px 8px;height:112px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s';
-        b.textContent=o.g;
+        b.textContent=_sansCercle(o.g);
         b.onclick=function(){
           if(answered||b._ko)return;
           sayAr(o.s);
@@ -8374,7 +8382,7 @@ function _kidScene(ca,reprise){
       /* Le cercle pointillé ◌ n'est qu'un support d'AFFICHAGE : dans le
          canvas il ferait doublon avec la ligne d'écriture en pointillés,
          déjà présente. On ne trace donc que la voyelle elle-même. */
-      var modele=(typeof _VOW_BASE!=='undefined')?glyph.split(_VOW_BASE).join(''):glyph;
+      var modele=_sansCercle(glyph);
       /* kasra (U+0650) et tanwīn kasr (U+064D) se posent SOUS la ligne :
          on les descend pour qu'ils ne collent pas au pointillé. */
       var dy=/[ٍِ]/.test(modele)?18:0;
@@ -8418,12 +8426,26 @@ function _kidScene(ca,reprise){
    grosses lettres animées, peu de texte, tout lu automatiquement.
    ═══════════════════════════════════════════════════════════ */
 /* Support neutre pour montrer une voyelle SEULE.
-   Une voyelle est un signe combinant : affichée seule elle a une largeur de 0
-   et reste donc invisible. Le cercle pointillé ◌ (U+25CC) est le placeholder
-   typographique standard : ce n'est pas une lettre, il signifie « la lettre
-   se met ici ». Le cours des voyelles ne montre donc aucune lettre arabe. */
+   Une voyelle est un signe combinant : affichée seule elle a une largeur de 0.
+   Le cercle pointillé ◌ (U+25CC) reste la CLÉ des enregistrements — les 370
+   entrées du studio sont rangées sous « ◌َ », « ◌ِ »… — mais il ne s'affiche
+   PLUS nulle part : décision du client. La ligne d'écriture en pointillés,
+   présente dans tous les hublots, dit désormais où se met la lettre.
+   Tout ce qui MONTRE un glyphe passe donc par _sansCercle(). */
 var _VOW_BASE='◌';
 function _vw(mark){return _VOW_BASE+mark;}
+function _sansCercle(t){return String(t===null||t===undefined?'':t).split(_VOW_BASE).join('');}
+/* Une lettre ou une voyelle arabe posée au fil d'une phrase française colle
+   à ses voisins : le passage d'un sens d'écriture à l'autre ne laisse aucune
+   chasse autour d'elle, et la ponctuation qui suit vient buter dessus. On lui
+   rend de l'air, partout où une phrase est affichée. */
+var _RUN_ARABE=/[؀-ۿﭐ-﷿ﹰ-﻿]+/g;
+function _airAutourArabe(html){
+  return String(html).replace(_RUN_ARABE,function(m){return '<span class="ar-air">'+m+'</span>';});
+}
+/* Un signe seul (voyelle, tanwīn, soukoun) n'a pas de corps : à la taille
+   d'une lettre il est minuscule. On le grossit là où il s'affiche seul. */
+function _signeSeul(t){return !_sansCercle(t).replace(_MARQUES,'');}
 
 function _vowelCourse(ca){
   var S=_kidScene(ca,{cours:'voyelles'});
@@ -8443,9 +8465,11 @@ function _vowelCourse(ca){
       'On va apprendre les voyelles !'),
     S.tell(null,null,'Une voyelle,<br>c\'est un petit '+hi('signe')+' ✨',
       'Une voyelle, c\'est un petit signe magique.'),
-    S.tell(_VOW_BASE,null,'Il se pose '+hi('sur')+',<br>ou '+hi('sous')+' une lettre !',
-      'Il se pose sur, ou sous une lettre. Le rond en pointillés, c\'est la place de la lettre.',
-      '⭕ Ici, c\'est la place de la lettre'),
+    /* Le cercle pointillé qui figurait « la place de la lettre » a été retiré
+       partout : on le dit avec des mots plutôt que de montrer un symbole que
+       l'enfant prendrait pour une lettre. */
+    S.tell(null,null,'Il se pose '+hi('sur')+',<br>ou '+hi('sous')+' une lettre !',
+      'Il se pose sur, ou sous une lettre.'),
 
     /* ── Les 3 voyelles, une par écran (+ tracé) ── */
     S.tell(FATHA,FATHA,'Un petit trait '+hi('au-dessus')+'…<br>ça fait '+son('a')+' ! ☀️',
@@ -9489,6 +9513,12 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
    se superposeraient pas. Le socle est donc donné avec un liant (ZWJ) pour
    qu'il prenne exactement la forme qu'il a dans la syllabe. */
 function _dessineDeuxCouleurs(cx,complet,socle,x,baseY,px,couleurBase,couleurAccent){
+  /* Le canvas n'applique PAS le liant invisible (ZWJ) : le socle en sortait
+     en forme ISOLÉE, et on voyait un second bā, bleu, posé en travers de la
+     syllabe. Le tiret de liaison visible (tatweel), lui, donne exactement la
+     même forme que dans la syllabe — vérifié au pixel : le socle ainsi tracé
+     tient entièrement à l'intérieur du tracé de la syllabe. */
+  socle=String(socle).split(Z).join(_TATWEEL);
   var Wf=cx.measureText(complet).width;
   cx.save();
   /* Les deux tracés sont alignés par leur bord droit — en arabe, la première
@@ -9690,7 +9720,8 @@ function _boyScene(ca,reprise){
     rangee.appendChild(principal);
   }
   function titre(p,html,fr){
-    var t=document.createElement('div');t.className='boy-titre';t.innerHTML=html;p.appendChild(t);
+    var t=document.createElement('div');t.className='boy-titre';
+    t.innerHTML=_airAutourArabe(_sansCercle(html));p.appendChild(t);
     N.plusTard(function(){N.dire(fr||html);},420);
     return t;
   }
@@ -9704,7 +9735,12 @@ function _boyScene(ca,reprise){
   api.iso=iso;api.deb=deb;
   /* Hublot : la lettre dans le sas du vaisseau, cliquable */
   function hublot(p,glyph,son,note,ligne,socle,accent){
-    var h=document.createElement('div');h.className='boy-hublot'+(ligne?' ligne':'');
+    /* La ligne d'écriture est désormais dans TOUS les hublots, sans
+       exception : une lettre sans voyelle ou avec un soukoun a besoin d'elle
+       autant qu'une autre, c'est elle qui dit ce qui est au-dessus et ce qui
+       est en dessous. Le paramètre « ligne » n'est plus qu'un souvenir des
+       appels existants. */
+    var h=document.createElement('div');h.className='boy-hublot ligne';
     if(Array.isArray(glyph)){
       /* Les signes en apesanteur dérivent au-delà du cercle : sans marge
          supplémentaire, ils venaient toucher le bouton. */
@@ -9712,14 +9748,22 @@ function _boyScene(ca,reprise){
       /* plusieurs signes qui derivent dans le hublot, en apesanteur */
       glyph.forEach(function(o,n){
         var f=document.createElement('span');f.className='boy-flotte';
-        /* le cercle n'est qu'un support : il s'efface devant la voyelle */
-        f.innerHTML=String(o[0]).split(_VOW_BASE).join('<span style="opacity:.3">'+_VOW_BASE+'</span>');
+        /* Plus de cercle pointillé, et le signe à sa pleine couleur : c'est
+           lui qu'on regarde. Seul, il est minuscule — on le grossit. */
+        f.textContent=_sansCercle(o[0]);
+        /* Un signe seul n'a aucune largeur : sans cette réserve de place, il
+           n'y aurait rien à toucher pour l'entendre. */
+        if(_signeSeul(o[0]))f.style.cssText+=';font-size:4.4rem;min-width:.9em;padding:0 .2em;text-align:center';
         f.style.animation='bFlotte'+(n%3+1)+' '+(11+n*3)+'s ease-in-out infinite';
         f.onclick=function(ev){ev.stopPropagation();N.stop();N.dire(o[1]||o[0]);};
         h.appendChild(f);
       });
       h.onclick=function(){N.stop();};
     }else if(socle){
+      /* Ici la ligne est tracée DANS le canvas, sur la ligne de base exacte
+         du glyphe : on retire celle du CSS, qui tomberait deux pixels à côté
+         et se verrait en double. */
+      h.classList.remove('ligne');
       /* Deux couleurs exactes : en HTML, une voyelle est repeinte a la
          couleur de la lettre qui la porte, meme placee dans un autre span.
          Le canvas, lui, obeit. */
@@ -9730,16 +9774,16 @@ function _boyScene(ca,reprise){
         cxH.clearRect(0,0,320,320);
         cxH.font="150px 'Scheherazade New',serif";cxH.textBaseline='alphabetic';
         var bY=200;
-        if(ligne){cxH.save();cxH.strokeStyle='rgba(1,87,155,.42)';cxH.lineWidth=5;cxH.setLineDash([14,10]);
-          cxH.beginPath();cxH.moveTo(46,bY);cxH.lineTo(274,bY);cxH.stroke();cxH.restore();}
-        _dessineDeuxCouleurs(cxH,glyph,socle,160,bY,150,'#01579b',accent||'#e65100');
+        cxH.save();cxH.strokeStyle='rgba(1,87,155,.42)';cxH.lineWidth=5;cxH.setLineDash([14,10]);
+        cxH.beginPath();cxH.moveTo(46,bY);cxH.lineTo(274,bY);cxH.stroke();cxH.restore();
+        _dessineDeuxCouleurs(cxH,_sansCercle(glyph),socle,160,bY,150,'#01579b',accent||'#e65100');
       }
       peint();
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
       h.appendChild(cvH);
       h.onclick=function(){N.stop();N.dire(son||glyph);};
     }else{
-      h.innerHTML='<span>'+glyph+'</span>';
+      h.innerHTML='<span>'+_sansCercle(glyph)+'</span>';
       /* Un mot entier écrit à la taille d'une lettre débordait du hublot et
          touchait les parois. On le réduit jusqu'à ce qu'il tienne, marge
          comprise — une seule lettre garde donc sa pleine taille. */
@@ -9791,7 +9835,7 @@ function _boyScene(ca,reprise){
       cx.font=PX+"px 'Scheherazade New',serif";
       cx.textBaseline='alphabetic';cx.textAlign='center';
       items.forEach(function(o,k){
-        var g=(typeof _VOW_BASE!=='undefined')?String(o[0]).split(_VOW_BASE).join(''):o[0];
+        var g=_sansCercle(o[0]);
         if(o[3]&&o[4]){
           _dessineDeuxCouleurs(cx,g,o[4],xCase(k),baseY,PX,'#0277bd',o[3]);
         }else{
@@ -9864,12 +9908,12 @@ function _boyScene(ca,reprise){
   api.tracer=function(etape,glyph,html,fr,repetitions){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
-      var modele=Array.isArray(glyph)?glyph[0]:((typeof _VOW_BASE!=='undefined')?String(glyph).split(_VOW_BASE).join(''):glyph);
+      var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
          page, au lieu d'un seul essai. */
       /* modele peut etre une liste : on trace alors les 4 formes */
       var liste=Array.isArray(glyph)
-        ? glyph.map(function(g){return (typeof _VOW_BASE!=='undefined')?String(g).split(_VOW_BASE).join(''):g;})
+        ? glyph.map(function(g){return _sansCercle(g);})
         : (function(){var l=[],r=repetitions||3;while(l.length<r)l.push(modele);return l;})();
       /* Taille du modèle. Un signe montré seul — une voyelle sans lettre —
          occupe très peu de place : à la taille d'une lettre il était minuscule
@@ -10020,7 +10064,12 @@ function _boyScene(ca,reprise){
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px';
       var repondu=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
-        var b=document.createElement('div');b.className='boy-cible';b.textContent=o.g;
+        var b=document.createElement('div');b.className='boy-cible';
+        b.textContent=_sansCercle(o.g);
+        /* Une voyelle seule, sans son cercle de support, est un tout petit
+           trait : dans une cible de 104 px il fallait la grossir pour qu'elle
+           se voie et se touche. */
+        if(_signeSeul(o.g))b.style.fontSize='4.2rem';
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           N.stop();N.dire(o.s);
@@ -10167,9 +10216,12 @@ function _boyVowelCourse(ca){
     B.controle('CONTRÔLE 2','Où est le son '+q('i')+' ?','Où est le son « i » ?',[F,K,D],K),
     B.controle('CONTRÔLE 3','Où est le son '+q('ou')+' ?','Où est le son « ou » ?',[F,K,D],D),
 
+    /* Cet écran parle du NOM des voyelles : on joue donc le nom quand
+       l'enfant appuie dessus, pas le son — il vient de l'entendre trois
+       écrans plus haut. */
     B.surPiste('ÉTAPE 9 · NOMS','Elles ont un '+b('nom')+',<br>mais retiens le '+b('SON')+' !',
       'Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.',
-      [[F,'fatḥa','a'],[D,'ḍamma','ou']],[[K,'kasra','i']]),
+      [[F,'fatḥa','fatha'],[D,'ḍamma','damma']],[[K,'kasra','kasra']]),
 
     B.brief('ÉTAPE 10 · DOUBLEMENT','Si on '+b('double')+' une voyelle,<br>on ajoute le son '+q('n')+' 👃',
       'Si on double une voyelle, on ajoute le son « n »'),
