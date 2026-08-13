@@ -89,6 +89,38 @@ exercices. Extraire les données n'aurait protégé qu'un quart du fichier.
 
 ---
 
+## EN COURS — Animer le modèle à repasser (interface garçon)
+
+Validé avec le client. Deux animations, à construire dans `app/app.html`.
+
+**1. Le modèle s'écrit tout seul, dans les canvas de tracé.**
+- Les sens de tracé des 19 bases sont dans `SENS-ECRITURE.md`, dictés par le
+  client. Elles couvrent les 30 lettres : seuls les points changent.
+- Il faut **deux canvas superposés** : le modèle animé dessous, l'encre de
+  l'enfant au-dessus. Sinon chaque tour d'animation efface son tracé.
+  « EFFACER » ne nettoie que l'encre.
+- L'animation tourne sur **la case voisine, à gauche de celle où l'enfant
+  écrit** : au départ celle de droite ; dès son premier trait, elle saute
+  d'un cran à gauche ; sur la dernière case, elle s'arrête. On sait dans
+  quelle case tombe un trait par sa position en x.
+- Un bouton « ▶ revoir » relance l'animation sur une case.
+- Technique retenue : une trajectoire par forme (suite de points en
+  fractions de case), révélée progressivement en déplaçant un masque le long
+  du chemin, puis révélation finale pour les points.
+- **Ordre convenu : l'alif et le bā d'abord, seuls.** Le client juge le
+  rendu — vitesse, départ du trait, prise des boucles — avant que les 17
+  autres bases ne soient posées. Ajuster deux lettres coûte moins que
+  trente-huit trajectoires.
+
+**2. Le tableau des formes s'anime.**
+À l'arrivée, seules isolée et début sont visibles. Pendant que la voix dit
+« la lettre du milieu s'écrit comme celle du début », la forme début
+apparaît à la place du milieu ; sur « en ajoutant un tiret », le tiret vient
+s'y coller. Même déroulé pour fin et isolée. Le minutage se cale sur
+`surSilence()` de la narration.
+
+---
+
 ## À FAIRE ENSUITE
 
 **L'ordre compte** : garçon validé → fille alignée dessus → traductions →
