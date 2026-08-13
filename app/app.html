@@ -9507,57 +9507,125 @@ function _dessineDeuxCouleurs(cx,complet,socle,x,baseY,px,couleurBase,couleurAcc
   cx.restore();
 }
 
-/* ── Sens d'écriture ────────────────────────────────────────────────────────
-   De petites flèches numérotées sur le modèle de droite : par où commencer,
-   et dans quel ordre. Le tracé change d'une lettre à l'autre, et selon
-   qu'elle est attachée ou non : c'est une donnée à saisir lettre par lettre,
-   pas une règle à deviner. Une lettre absente de cette table n'est pas
-   fléchée — mieux vaut pas de flèche qu'une flèche fausse.
+/* ── Le modèle s'écrit tout seul ────────────────────────────────────────────
+   Dans les canvas de tracé, la lettre grise n'apparaît plus d'un bloc : un
+   crayon invisible la parcourt dans le sens dicté par le client
+   (SENS-ECRITURE.md) et la révèle au fur et à mesure. Les flèches numérotées
+   qui servaient à cela disaient « par où commencer » sans montrer le geste ;
+   l'animation le montre, et elles ont été retirées.
 
-   Coordonnées en fractions de la case : x de 0 (gauche) à 1 (droite),
-   y de 0 (haut) à 1 (bas). La ligne d'écriture est à y = 0,62.
-   « n » numérote le mouvement ; on l'omet quand il n'y en a qu'un. */
-var _SENS_ECRITURE={
-  'ا':{
-    /* seule ou en début : la barre se trace du haut vers le bas. La flèche
-       longe la barre sans la toucher, et reste plus courte qu'elle. */
-    seule:[{de:[0.60,0.26],a:[0.60,0.50]}],
-    /* attachée : le trait de liaison d'abord, vers la gauche, puis la barre
-       qui remonte. Chaque flèche est posée à côté de son trait. */
-    liee:[{de:[0.66,0.72],a:[0.52,0.72],n:1},
-          {de:[0.36,0.56],a:[0.36,0.32],n:2}]
-  }
+   Le chemin n'est JAMAIS dessiné : il sert de masque. On peint la lettre sur
+   un calque, puis on n'en garde (destination-in) que ce qu'un trait épais,
+   posé le long du chemin, a déjà couvert. Deux conséquences :
+   - un chemin qui passe à côté d'un morceau de lettre le laisse invisible
+     jusqu'à la fin. Les coordonnées ci-dessous sont donc MESURÉES sur le
+     rendu réel de Scheherazade New (balayage des pixels du glyphe), pas
+     estimées à l'œil ;
+   - les points ne sont sur aucun chemin : ils arrivent d'un coup à la toute
+     fin, quand on montre la lettre entière. C'est exactement la règle du
+     client — « les points, toujours à la fin, une fois le corps terminé ».
+
+   Coordonnées en « em », c'est-à-dire en multiples de la taille du modèle,
+   depuis l'ancre du glyphe : x vers la droite du centre de la case, y vers le
+   bas depuis la ligne d'écriture. Elles valent donc à toutes les tailles.
+
+   Une forme absente de la table n'est pas animée : son modèle s'affiche
+   entier, comme avant. On commence par l'alif et le bā seuls, le temps que le
+   client juge la vitesse, le départ du trait et la prise des boucles :
+   ajuster deux lettres coûte moins que trente-huit trajectoires. */
+var _TRACE_MODELE={
+  /* alif seul : du haut vers le bas */
+  'ا':[[[0,-0.66],[0,-0.01]]],
+  /* alif attaché : le trait vers la gauche, puis SANS LEVER la barre du bas
+     vers le haut — un seul geste, donc une seule suite de points */
+  'ـا':[[[0.18,-0.05],[-0.02,-0.05],[-0.07,-0.05],[-0.07,-0.30],[-0.07,-0.64]]],
+  /* bā isolée : le petit trait vertical de droite en commençant par le haut,
+     puis le trait horizontal vers la gauche, puis on remonte le petit trait
+     vertical de gauche */
+  'ب':[[[0.38,-0.32],[0.375,-0.20],[0.37,-0.10],[0.31,-0.11],[0.25,-0.09],[0.15,-0.06],
+        [0.05,-0.04],[-0.05,-0.03],[-0.15,-0.03],[-0.25,-0.05],[-0.32,-0.07],
+        [-0.36,-0.14],[-0.37,-0.26]]],
+  /* bā début : l'isolée sans le petit trait de gauche, le trait file vers la
+     lettre suivante */
+  'بـ':[[[0.05,-0.28],[0.045,-0.16],[0.04,-0.06],[-0.05,-0.05],[-0.12,-0.05],[-0.19,-0.05]]],
+  /* bā milieu : trait de liaison, on monte le petit trait vertical, on
+     redescend le même trait, puis le trait horizontal vers la gauche */
+  'ـبـ':[[[0.23,-0.05],[0.12,-0.05],[0.06,-0.05],[0.045,-0.11],[0.04,-0.16],
+          [0.032,-0.10],[0.03,-0.05],[-0.10,-0.05],[-0.235,-0.05]]],
+  /* bā fin : comme le milieu, et la boucle se referme sur le petit trait de
+     gauche au lieu de filer */
+  'ـب':[[[0.53,-0.05],[0.42,-0.05],[0.34,-0.05],[0.315,-0.10],[0.31,-0.13],
+         [0.30,-0.08],[0.30,-0.04],[0.15,-0.02],[0,-0.01],[-0.15,-0.01],
+         [-0.30,-0.02],[-0.37,-0.06],[-0.42,-0.14],[-0.43,-0.24]]]
 };
-function _dessineSensEcriture(cx,modele,xCase,largeur,CH){
-  var t=String(modele||'').replace(_MARQUES,'');
-  var base=t.split(_TATWEEL).join('');
-  var d=_SENS_ECRITURE[base];
-  if(!d)return;
-  var traits=(t.indexOf(_TATWEEL)===0)?d.liee:d.seule;
-  if(!traits||!traits.length)return;
-  function X(f){return xCase+(f-0.5)*largeur;}
-  cx.save();
-  cx.setLineDash([]);cx.lineCap='round';cx.lineWidth=1.8;
-  cx.strokeStyle='#e65100';cx.fillStyle='#e65100';
-  traits.forEach(function(tr){
-    var x0=X(tr.de[0]),y0=tr.de[1]*CH,x1=X(tr.a[0]),y1=tr.a[1]*CH;
-    cx.beginPath();cx.moveTo(x0,y0);cx.lineTo(x1,y1);cx.stroke();
-    var ang=Math.atan2(y1-y0,x1-x0),h=6;
-    cx.beginPath();cx.moveTo(x1,y1);
-    cx.lineTo(x1-h*Math.cos(ang-0.45),y1-h*Math.sin(ang-0.45));
-    cx.lineTo(x1-h*Math.cos(ang+0.45),y1-h*Math.sin(ang+0.45));
-    cx.closePath();cx.fill();
-    if(tr.n){
-      var nx=x0-Math.cos(ang)*10,ny=y0-Math.sin(ang)*10;
-      cx.beginPath();cx.arc(nx,ny,7,0,Math.PI*2);
-      cx.fillStyle='#fff';cx.fill();cx.lineWidth=1.2;cx.stroke();
-      cx.fillStyle='#e65100';
-      cx.font='700 10px Outfit,sans-serif';cx.textAlign='center';cx.textBaseline='middle';
-      cx.fillText(String(tr.n),nx,ny);
-      cx.lineWidth=1.8;
+/* Épaisseur du masque, en em. Assez large pour couvrir le trait de la police
+   et le peu d'écart qui reste entre le chemin et son axe, assez étroite pour
+   ne pas découvrir les points avant l'heure : ils sont à plus de 0,2 em du
+   corps de la lettre. */
+var _TRACE_EPAIS=0.22;
+/* Les signes (voyelles, tanwīn) ne changent pas le geste : on cherche la
+   trajectoire de la lettre nue. */
+function _trajectoire(texte){
+  var base=String(texte||'').replace(_MARQUES,'');
+  return _TRACE_MODELE[base]||null;
+}
+function _longueurTrace(gestes){
+  var L=0;
+  gestes.forEach(function(s){
+    for(var k=1;k<s.length;k++){
+      var dx=s[k][0]-s[k-1][0],dy=s[k][1]-s[k-1][1];
+      L+=Math.sqrt(dx*dx+dy*dy);
     }
   });
-  cx.restore();
+  return L;
+}
+/* Trace le chemin jusqu'à la fraction p de sa longueur totale — la vitesse du
+   crayon est donc constante, quelle que soit la lettre. */
+function _cheminTrace(cx,gestes,p,ax,ay,px){
+  var cible=p*_longueurTrace(gestes),fait=0;
+  function X(u){return ax+u*px;}
+  function Y(v){return ay+v*px;}
+  gestes.forEach(function(s){
+    if(fait>=cible)return;
+    cx.beginPath();cx.moveTo(X(s[0][0]),Y(s[0][1]));
+    var pose=false;
+    for(var k=1;k<s.length;k++){
+      var dx=s[k][0]-s[k-1][0],dy=s[k][1]-s[k-1][1],d=Math.sqrt(dx*dx+dy*dy);
+      if(fait+d<=cible){cx.lineTo(X(s[k][0]),Y(s[k][1]));fait+=d;pose=true;}
+      else{
+        var f=(d>0)?(cible-fait)/d:0;
+        if(f>0){cx.lineTo(X(s[k-1][0]+dx*f),Y(s[k-1][1]+dy*f));pose=true;}
+        fait=cible;break;
+      }
+    }
+    /* Un geste qui n'a pas encore commencé ne laisse rien : un point posé
+       seul se verrait comme une tache. */
+    if(pose)cx.stroke();
+  });
+}
+/* Peint le modèle révélé jusqu'à la fraction p. p >= 1 : la lettre entière,
+   points compris. Sans trajectoire connue, on affiche la lettre entière. */
+var _TRACE_GRIS='rgba(96,125,139,0.30)';
+function _modeleRevele(cx,calque,texte,ax,ay,px,p){
+  function pose(c,style){
+    c.save();
+    c.font=px+"px 'Scheherazade New',serif";
+    c.textBaseline='alphabetic';c.textAlign='center';c.fillStyle=style;
+    _dessineSurLigne(c,texte,ax,ay,px);
+    c.restore();
+  }
+  var gestes=(p>=1)?null:_trajectoire(texte);
+  if(!gestes){pose(cx,_TRACE_GRIS);return;}
+  var k=calque.getContext('2d');
+  k.clearRect(0,0,calque.width,calque.height);
+  pose(k,_TRACE_GRIS);
+  k.save();
+  k.globalCompositeOperation='destination-in';
+  k.lineCap='round';k.lineJoin='round';
+  k.lineWidth=_TRACE_EPAIS*px;k.strokeStyle='#000';
+  _cheminTrace(k,gestes,p,ax,ay,px);
+  k.restore();
+  cx.drawImage(calque,0,0);
 }
 
 function _boyScene(ca,reprise){
@@ -9813,27 +9881,39 @@ function _boyScene(ca,reprise){
          d'enfant a besoin de place pour repasser dessus. */
       var PX=signeSeul?124:({1:150,2:126,3:104}[liste.length]||80);
       var CW=520,CH=signeSeul?250:220;
-      var cv=document.createElement('canvas');cv.width=CW;cv.height=CH;
-      cv.style.cssText='display:block;margin:6px auto;max-width:100%;border-radius:14px;'
-        +'background:#fff;border:3px solid rgba(2,136,209,.30);touch-action:none';
-      var cx=cv.getContext('2d');
-      function guide(){
+      /* DEUX calques superposés : le modèle animé dessous, l'encre de l'enfant
+         au-dessus. Sur un seul canvas, chaque tour d'animation effacerait son
+         tracé — et « EFFACER » ne doit nettoyer que l'encre. */
+      var boite=document.createElement('div');
+      boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
+        +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba(2,136,209,.30)';
+      var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
+      cvM.style.cssText='display:block;width:100%;height:auto';
+      var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
+      cvE.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none';
+      boite.appendChild(cvM);boite.appendChild(cvE);p.appendChild(boite);
+      var cx=cvM.getContext('2d'),cxE=cvE.getContext('2d');
+      /* Calque de travail du masque : un seul pour tout l'écran. */
+      var calque=document.createElement('canvas');calque.width=CW;calque.height=CH;
+      /* Un signe seul descend bien plus bas que le corps d'une lettre :
+         on remonte sa ligne d'écriture pour lui laisser la place. */
+      var baseY=Math.round(CH*(signeSeul?0.50:0.62));
+      var nb=liste.length,pas=CW/nb;
+      /* L'arabe s'écrit de droite à gauche : la première forme est à
+         droite. On garde les tableaux dans l'ordre logique (isolée, début,
+         milieu, fin) et on pose la case k en partant de la droite. */
+      function caseX(k){return CW-pas*(k+0.5);}
+      /* La case où tombe un trait se lit dans sa seule position en x. */
+      function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-x)/pas)));}
+      /* prog : avancement du modèle animé, de 0 à 1. Les autres cases sont
+         toujours entières — l'enfant doit pouvoir repasser dessus. */
+      function guide(prog){
         cx.clearRect(0,0,CW,CH);
-        /* Un signe seul descend bien plus bas que le corps d'une lettre :
-           on remonte sa ligne d'écriture pour lui laisser la place. */
-        var baseY=Math.round(CH*(signeSeul?0.50:0.62));
-        var nb=liste.length,pas=CW/nb;
-        /* L'arabe s'écrit de droite à gauche : la première forme est à
-           droite. On garde les tableaux dans l'ordre logique (isolée, début,
-           milieu, fin) et on pose la case k en partant de la droite. */
-        function caseX(k){return CW-pas*(k+0.5);}
-        cx.save();
-        cx.font=PX+"px 'Scheherazade New',serif";cx.textBaseline='alphabetic';
         /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
            d'un coup d'œil ce qu'il a écrit lui-même. */
-        cx.fillStyle='rgba(96,125,139,0.30)';cx.textAlign='center';
-        for(var k=0;k<nb;k++)_dessineSurLigne(cx,liste[k],caseX(k),baseY,PX);
-        cx.restore();
+        for(var k=0;k<nb;k++){
+          _modeleRevele(cx,calque,liste[k],caseX(k),baseY,PX,(k===caseAnim)?prog:1);
+        }
         if(Array.isArray(glyph)){
           cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
           cx.fillStyle='rgba(1,87,155,.55)';
@@ -9847,21 +9927,76 @@ function _boyScene(ca,reprise){
         cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2;cx.setLineDash([9,6]);
         cx.beginPath();cx.moveTo(10,baseY);cx.lineTo(CW-10,baseY);cx.stroke();
         cx.restore();
-        /* Le sens d'écriture sera montré par l'animation du modèle, pas
-           par des flèches. */
       }
-      guide();p.appendChild(cv);
+      /* ── Le modèle s'écrit tout seul ──
+         L'animation tourne sur la case VOISINE, à gauche de celle où l'enfant
+         écrit : au départ celle de droite, la première à remplir ; dès son
+         premier trait, elle saute d'un cran à gauche pour ne pas s'animer
+         sous sa main ; sur la dernière case, elle s'arrête. Une case qu'elle
+         quitte reste entière. */
+      var ECRITURE=1700,POSE=450,POINTS=1400;  /* ms : le geste, le temps de
+         souffle avant les points, puis la lettre entière avant de recommencer */
+      var caseAnim=-1,caseEcrite=0,raf=null,depart=0,dernier=0;
+      function boucle(){
+        /* L'écran a changé : le canvas n'est plus dans la page, on s'arrête.
+           Sans cela l'animation d'une scène quittée tournerait pour rien. */
+        if(!cvM.isConnected){raf=null;return;}
+        /* Plus de case à animer : on rend la main plutôt que de tourner à
+           vide jusqu'à la fin de l'écran. */
+        if(caseAnim<0){raf=null;return;}
+        raf=requestAnimationFrame(boucle);
+        var T=Date.now();
+        if(T-dernier<33)return;            /* 30 images/s suffisent */
+        dernier=T;
+        var c=(T-depart)%(ECRITURE+POSE+POINTS);
+        /* 0,999 et non 1 : le corps est fini, mais les points attendent. */
+        guide(c<ECRITURE?c/ECRITURE:(c<ECRITURE+POSE?0.999:1));
+      }
+      function anime(k){
+        if(k<0||k>=nb||!_trajectoire(liste[k])){caseAnim=-1;guide(1);return;}
+        caseAnim=k;depart=Date.now();dernier=0;
+        guide(0);
+        if(raf===null)raf=requestAnimationFrame(boucle);
+      }
+      guide(1);
+      var barre=document.createElement('div');
+      barre.style.cssText='display:flex;gap:8px;justify-content:center;margin-top:8px';
+      p.appendChild(barre);
       var eff=document.createElement('button');eff.className='boy-btn sec';
-      eff.style.cssText+=';padding:9px;font-size:.85rem;margin-top:8px';
-      eff.textContent='↺ EFFACER';eff.onclick=function(){guide();};p.appendChild(eff);
+      eff.style.cssText+=';padding:9px;font-size:.85rem;margin:0';
+      /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste. */
+      eff.textContent='↺ EFFACER';eff.onclick=function(){cxE.clearRect(0,0,CW,CH);};
+      barre.appendChild(eff);
+      if(_trajectoire(liste[0])){
+        var rev=document.createElement('button');rev.className='boy-btn sec';
+        rev.style.cssText+=';padding:9px;font-size:.85rem;margin:0';
+        rev.textContent='▶ REVOIR';
+        rev.onclick=function(){anime(caseAnim>=0?caseAnim:caseEcrite);};
+        barre.appendChild(rev);
+      }
       var trace=false,btn;
-      function pos(e){var r=cv.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
+      function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
         return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
-      function deb(e){trace=true;if(btn)btn.style.opacity='1';var q=pos(e);cx.beginPath();cx.moveTo(q.x,q.y);e.preventDefault();}
-      function mv(e){if(!trace)return;var q=pos(e);cx.lineWidth=7;cx.strokeStyle='#e65100';cx.lineCap='round';cx.lineTo(q.x,q.y);cx.stroke();e.preventDefault();}
+      function deb(e){
+        trace=true;if(btn)btn.style.opacity='1';var q=pos(e);
+        caseEcrite=caseDe(q.x);
+        /* Un cran à gauche de la case attaquée. On ne relance rien tant que
+           l'enfant reste dans la même case, sinon l'animation repartirait de
+           zéro à chaque trait. */
+        if(caseEcrite+1!==caseAnim)anime(caseEcrite+1);
+        cxE.beginPath();cxE.moveTo(q.x,q.y);e.preventDefault();
+      }
+      function mv(e){if(!trace)return;var q=pos(e);cxE.lineWidth=7;cxE.strokeStyle='#e65100';cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
       function fin(){trace=false;}
-      cv.addEventListener('mousedown',deb);cv.addEventListener('mousemove',mv);cv.addEventListener('mouseup',fin);
-      cv.addEventListener('touchstart',deb,{passive:false});cv.addEventListener('touchmove',mv,{passive:false});cv.addEventListener('touchend',fin);
+      cvE.addEventListener('mousedown',deb);cvE.addEventListener('mousemove',mv);cvE.addEventListener('mouseup',fin);
+      cvE.addEventListener('touchstart',deb,{passive:false});cvE.addEventListener('touchmove',mv,{passive:false});cvE.addEventListener('touchend',fin);
+      /* La première case s'écrit toute seule dès l'arrivée sur l'écran. */
+      anime(0);
+      /* Une lettre non animée est dessinée une seule fois : si la police
+         arabe n'est pas encore chargée, ce dessin-là est à refaire. */
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){
+        if(cvM.isConnected&&caseAnim<0)guide(1);
+      });}catch(e){}
       btn=bouton(p,'SUIVANT ▸',suivant);
       btn.style.opacity='.45';
       N.plusTard(function(){btn.style.opacity='1';},9000);

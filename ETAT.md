@@ -94,23 +94,39 @@ exercices. Extraire les données n'aurait protégé qu'un quart du fichier.
 Validé avec le client. Deux animations, à construire dans `app/app.html`.
 
 **1. Le modèle s'écrit tout seul, dans les canvas de tracé.**
-- Les sens de tracé des 19 bases sont dans `SENS-ECRITURE.md`, dictés par le
-  client. Elles couvrent les 30 lettres : seuls les points changent.
-- Il faut **deux canvas superposés** : le modèle animé dessous, l'encre de
-  l'enfant au-dessus. Sinon chaque tour d'animation efface son tracé.
-  « EFFACER » ne nettoie que l'encre.
+**Posé pour l'alif et le bā — en attente du verdict du client.** Les 17 autres
+bases ne seront tracées qu'une fois le rendu validé : vitesse, départ du
+trait, prise des boucles. Ajuster deux lettres coûte moins que trente-huit
+trajectoires.
+
+Ce qui est en place dans `app/app.html` :
+- `_TRACE_MODELE` : une trajectoire par forme (`ا ـا ب بـ ـبـ ـب`), en « em »
+  depuis l'ancre du glyphe, donc valable à toutes les tailles. Les sens de
+  tracé des 19 bases sont dans `SENS-ECRITURE.md`, dictés par le client ;
+  elles couvrent les 30 lettres, seuls les points changent.
+- **Le chemin n'est jamais dessiné** : il sert de masque. On peint la lettre
+  sur un calque, on n'en garde (`destination-in`) que ce qu'un trait épais
+  posé le long du chemin a déjà couvert. Les points ne sont sur aucun chemin :
+  ils arrivent d'un coup à la fin, comme le veut la règle.
+- Conséquence : **un chemin qui passe à côté d'un morceau de lettre le laisse
+  invisible jusqu'à la fin.** Les coordonnées ont donc été mesurées en
+  balayant les pixels du glyphe rendu par Scheherazade New, pas estimées à
+  l'œil. Refaire cette mesure pour toute nouvelle base.
+- **Deux canvas superposés** : le modèle animé dessous, l'encre de l'enfant
+  au-dessus. Sinon chaque tour d'animation efface son tracé. « EFFACER » ne
+  nettoie que l'encre.
 - L'animation tourne sur **la case voisine, à gauche de celle où l'enfant
   écrit** : au départ celle de droite ; dès son premier trait, elle saute
-  d'un cran à gauche ; sur la dernière case, elle s'arrête. On sait dans
-  quelle case tombe un trait par sa position en x.
-- Un bouton « ▶ revoir » relance l'animation sur une case.
-- Technique retenue : une trajectoire par forme (suite de points en
-  fractions de case), révélée progressivement en déplaçant un masque le long
-  du chemin, puis révélation finale pour les points.
-- **Ordre convenu : l'alif et le bā d'abord, seuls.** Le client juge le
-  rendu — vitesse, départ du trait, prise des boucles — avant que les 17
-  autres bases ne soient posées. Ajuster deux lettres coûte moins que
-  trente-huit trajectoires.
+  d'un cran à gauche ; sur la dernière case, elle s'arrête. La case qu'elle
+  quitte reste entière. On sait dans quelle case tombe un trait par sa
+  position en x.
+- Un bouton « ▶ REVOIR » relance l'animation sur la case en cours.
+- Rythme : 1,7 s d'écriture, 0,45 s de pose, les points, 1,4 s, puis on
+  recommence. Trois constantes en tête de la boucle, à régler avec le client.
+- Une forme absente de la table n'est pas animée : son modèle s'affiche
+  entier, comme avant. Rien ne casse pour les 28 autres lettres.
+- Les flèches numérotées (`_SENS_ECRITURE`) ont été supprimées : elles
+  disaient par où commencer sans montrer le geste.
 
 **2. Le tableau des formes s'anime.**
 À l'arrivée, seules isolée et début sont visibles. Pendant que la voix dit
