@@ -9810,8 +9810,10 @@ function _positionSurChemin(plat,u,v){
   }
   return pos;
 }
-/* Les taches d'encre séparées : la plus grande est le corps de la lettre,
-   les autres sont ses points (et les voyelles posées dessus). */
+/* Les taches d'encre séparées. Ce qui est corps de lettre et ce qui est
+   point se décide plus loin, d'après le passage du crayon : la taille de la
+   tache ne dit rien — le petit kāf logé dans le ك est minuscule et fait
+   pourtant partie de la lettre. */
 function _tachesEncre(encre,w,h){
   var lab=new Int32Array(w*h),n=0,tailles=[0],pile=new Int32Array(w*h);
   for(var i=0;i<w*h;i++){
@@ -9827,11 +9829,23 @@ function _tachesEncre(encre,w,h){
     }
     tailles[n]=t;
   }
-  var corps=0,max=-1;
-  for(var k=1;k<=n;k++)if(tailles[k]>max){max=tailles[k];corps=k;}
-  return {lab:lab,corps:corps};
+  return {lab:lab,nb:n};
 }
 var _TRACE_GRIS='rgba(96,125,139,0.30)';
+/* Quelle part de la largeur d'une forme attachée revient à son trait de
+   liaison de tête ? Sert à découper une forme en deux sans la couper en deux
+   chaînes — ce qui casserait la liaison arabe. */
+var _cxMesure=null;
+function _partLiaison(forme){
+  var f=String(forme);
+  if(f.charAt(0)!==_TATWEEL)return 0;
+  if(!_cxMesure)_cxMesure=document.createElement('canvas').getContext('2d');
+  _cxMesure.font="60px 'Scheherazade New',serif";
+  var W=_cxMesure.measureText(f).width;
+  if(!W)return 0;
+  var sans=_cxMesure.measureText(f.slice(1)).width;
+  return Math.max(0,Math.min(60,100*(W-sans)/W));
+}
 /* Les signes (voyelles, tanwīn) ne changent pas le geste : on cherche le
    trait de la lettre nue, et sa forme — seule, début, milieu ou fin — se lit
    dans ses traits de liaison. */
@@ -9867,11 +9881,61 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   if(!plat.seg.length)return null;
   var corps=[],points=[];
   var ancreX=ax-x0,ancreY=ay-y0;
+  /* ── L'ordre du geste ──
+     On PROMÈNE un pinceau le long du chemin, et chaque pixel prend le rang du
+     moment où le pinceau le couvre pour la première fois. Ranger les pixels
+     par « endroit du chemin le plus proche » semblait équivalent et coûtait
+     moins cher : c'est faux dès qu'un trait revient sur lui-même ou fait une
+     boucle — les deux côtés de la boucle sont à égale distance du chemin, et
+     la lettre se révélait par plaques, dans le désordre. Le pinceau, lui,
+     n'arrive de l'autre côté que lorsqu'il y est vraiment passé.
+     Un pixel que le pinceau n'atteint jamais reprend le rang de l'endroit du
+     chemin dont il est le plus proche : la lettre est toujours révélée en
+     entier, même sous un chemin approximatif. */
+  var rang=new Float64Array(w*h);
+  for(i=0;i<w*h;i++)rang[i]=-1;
+  var R=Math.max(2,Math.round(0.15*px));            /* rayon du pinceau */
+  var nPas=Math.max(40,Math.round(plat.L/0.015));
+  for(var k=0;k<=nPas;k++){
+    var pos=plat.L*k/nPas,reste=pos,pu=0,pv=0;
+    for(var m=0;m<plat.seg.length;m++){
+      var sg=plat.seg[m];
+      if(pos<=sg[5]+sg[4]||m===plat.seg.length-1){
+        var f=Math.max(0,Math.min(1,(pos-sg[5])/sg[4]));
+        pu=sg[0]+(sg[2]-sg[0])*f;pv=sg[1]+(sg[3]-sg[1])*f;break;
+      }
+    }
+    var cxp=Math.round(ancreX+pu*px),cyp=Math.round(ancreY+pv*px);
+    for(var yy=Math.max(0,cyp-R);yy<=Math.min(h-1,cyp+R);yy++){
+      for(var xx=Math.max(0,cxp-R);xx<=Math.min(w-1,cxp+R);xx++){
+        var j=yy*w+xx;
+        if(!encre[j]||rang[j]>=0)continue;
+        var dx=xx-cxp,dy=yy-cyp;
+        if(dx*dx+dy*dy>R*R)continue;
+        rang[j]=k;
+      }
+    }
+  }
+  /* Ce qui appartient au corps ne se devine pas à la taille de la tache : le
+     petit kāf logé dans le ك est une tache à part, mais le crayon passe
+     dessus — c'est un morceau de lettre. Un point, lui, n'est sur aucun
+     chemin. On classe donc chaque tache selon ce que le pinceau en a couvert. */
+  var vus={},tot={};
   for(i=0;i<w*h;i++){
     if(!encre[i])continue;
-    if(taches.lab[i]!==taches.corps){points.push(i);continue;}
-    var x=i%w,y=(i-x)/w;
-    corps.push([i,_positionSurChemin(plat,(x-ancreX)/px,(y-ancreY)/px)]);
+    var lb=taches.lab[i];
+    tot[lb]=(tot[lb]||0)+1;
+    if(rang[i]>=0)vus[lb]=(vus[lb]||0)+1;
+  }
+  function estCorps(lb){return (vus[lb]||0)>=0.25*tot[lb];}
+  for(i=0;i<w*h;i++){
+    if(!encre[i])continue;
+    if(!estCorps(taches.lab[i])){points.push(i);rang[i]=-1;continue;}
+    if(rang[i]<0){
+      var x2=i%w,y2=(i-x2)/w;
+      rang[i]=nPas*_positionSurChemin(plat,(x2-ancreX)/px,(y2-ancreY)/px)/(plat.L||1);
+    }
+    corps.push([i,rang[i]]);
   }
   corps.sort(function(a,b){return a[1]-b[1];});
   var ordre=new Int32Array(corps.length);
@@ -10046,6 +10110,11 @@ function _boyScene(ca,reprise){
          (voir _dessineSurLigne). */
       if(_signeSeul(glyph)&&_SOUS_LA_LIGNE.test(_sansCercle(glyph)))
         sp.style.cssText+=';position:relative;top:.24em';
+      /* ج ح خ isolées : leur tête monte haut et leur boucle plonge, ce qui les
+         faisait flotter au-dessus de la ligne dans le hublot. On les descend
+         un peu — demande du client, et seulement pour la forme isolée. */
+      if(/^[جحخ]$/.test(_sansCercle(glyph).replace(_MARQUES,'')))
+        sp.style.cssText+=';position:relative;top:.11em';
       var ajuste=function(){
         var max=h.clientWidth-40;if(max<40)return;
         var px=parseFloat(getComputedStyle(sp).fontSize)||74,garde=0;
@@ -10162,7 +10231,7 @@ function _boyScene(ca,reprise){
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
-  api.tracer=function(etape,glyph,html,fr,repetitions){
+  api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
@@ -10227,7 +10296,7 @@ function _boyScene(ca,reprise){
           cx.fillStyle='rgba(1,87,155,.55)';
           /* Deux cases : la lettre suivie d'une prolongation ne peut être
              qu'en début ou au milieu d'un mot. */
-          var noms=(nb===2)?['début','milieu']:['isolée','début','milieu','fin'];
+          var noms=nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
           for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8);
           cx.restore();
         }
@@ -10246,7 +10315,7 @@ function _boyScene(ca,reprise){
          Ce dernier temps est court exprès — le client veut que ça enchaîne :
          la lettre finie se montre le temps qu'on la voie, et le geste
          repart. */
-      var ECRITURE=1700,POSE=420,POINTS=450;
+      var ECRITURE=1050,POSE=280,POINTS=330;
       var caseAnim=-1,caseEcrite=0,raf=null,depart=0,dernier=0,rev=null;
       function boucle(){
         /* L'écran a changé : le canvas n'est plus dans la page, on s'arrête.
@@ -10394,28 +10463,40 @@ function _boyScene(ca,reprise){
         nm.style.cssText='font-family:Outfit,sans-serif;font-size:.6rem;font-weight:900;'
           +'letter-spacing:.06em;color:'+coul[k]+';direction:ltr;margin-bottom:2px';
         nm.textContent=noms[k];c.appendChild(nm);
-        /* on separe le trait de liaison de la lettre pour les colorer differemment */
         var g=String(f);
-        var lien=g.indexOf('ـ')===0?'ـ':'';
-        var reste=lien?g.slice(1):g;
         var gl=document.createElement('div');
         gl.style.cssText='font-family:\'Scheherazade New\',serif;font-size:2.2rem;line-height:1.5';
-        var sLien=document.createElement('span');
-        sLien.style.cssText='color:'+LIEN+';transition:opacity .35s,transform .35s';
-        sLien.textContent=lien;
-        var sCorps=document.createElement('span');
-        sCorps.style.cssText='color:'+coul[k]+';display:inline-block;'
-          +'transition:opacity .4s,transform .4s cubic-bezier(.34,1.56,.64,1)';
-        sCorps.textContent=reste;
-        gl.appendChild(sLien);gl.appendChild(sCorps);
-        c.appendChild(gl);
-        /* milieu (2) et fin (3) : on cache le corps, et le trait de liaison
-           attend à droite, là d'où vient la lettre précédente. */
-        if(k>=2){
+        if(k<2){
+          /* isolée et début : rien à animer, la forme s'écrit telle quelle */
+          var sp=document.createElement('span');
+          sp.style.color=coul[k];sp.textContent=g;gl.appendChild(sp);
+        }else{
+          /* Milieu et fin : DEUX EXEMPLAIRES de la MÊME forme, superposés et
+             découpés — l'un ne montre que la lettre, l'autre que son trait de
+             liaison. C'est le seul moyen d'avoir, à la fin, la forme
+             naturelle à 100 % : couper la chaîne en deux morceaux dans deux
+             balises casse la liaison arabe, et le trait redevient un tiret
+             tout droit, ce qui n'est pas la même chose. */
+          var part=_partLiaison(g);
+          var pile=document.createElement('span');
+          pile.style.cssText='position:relative;display:inline-block';
+          var sCorps=document.createElement('span');
+          sCorps.style.cssText='display:inline-block;color:'+coul[k]
+            +';clip-path:inset(0 '+part.toFixed(1)+'% 0 0)'
+            +';transition:opacity .4s,transform .4s cubic-bezier(.34,1.56,.64,1)';
+          sCorps.textContent=g;
+          var sLien=document.createElement('span');
+          sLien.style.cssText='position:absolute;left:0;top:0;color:'+LIEN
+            +';clip-path:inset(0 0 0 '+(100-part).toFixed(1)+'%)'
+            +';transition:opacity .35s,transform .35s';
+          sLien.textContent=g;
+          pile.appendChild(sCorps);pile.appendChild(sLien);gl.appendChild(pile);
           corps[k]=sCorps;liens[k]=sLien;
           sCorps.style.opacity='0';sCorps.style.transform='scale(.55)';
+          /* le trait attend à droite, là d'où vient la lettre précédente */
           sLien.style.opacity='0';sLien.style.transform='translateX(16px)';
         }
+        c.appendChild(gl);
         c.onclick=function(){N.stop();N.dire(f);};
         t.appendChild(c);
       });
@@ -10675,10 +10756,6 @@ function _boyProlongCourse(ca){
 }
 
 /* ── MISSION : UNE LETTRE ── (reprend renderLLesson) */
-/* Les 4 formes de la lettre, chacune portant la meme voyelle. */
-function _boy4formes(L,af,signe){
-  return _childForms(L,af).map(function(f){return f.form+(signe||'');});
-}
 
 function _boyLetterCourse(ca,idx,premiere){
   var L=CHILD_LETTERS[idx];
@@ -10689,6 +10766,16 @@ function _boyLetterCourse(ca,idx,premiere){
   var lourde=_CL_HEAVY.indexOf(L.ar)>=0;
   var lat=_CL_LAT[L.ar]!==undefined?_CL_LAT[L.ar]:'';
   var avecProlong=idx>=3;
+  /* Le tā marbūṭa ne vit qu'à la FIN d'un mot : ni début, ni milieu, ni
+     déduction, ni prolongation, et le soukoun ne se pose jamais dessus.
+     La hamza, elle, s'écrit toujours pareil — elle ne s'accroche ni avant ni
+     après : une seule forme, l'isolée. Ses voyelles et ses prolongations
+     restent, elles. */
+  var finDeMot=(L.ar==='ة');
+  var formeUnique=(L.ar==='ء');
+  /* ع et غ sont les exceptions annoncées : leurs formes ne se déduisent pas,
+     le tableau de déduction n'a donc rien à y faire. */
+  var sansDeduction=finDeMot||formeUnique||L.ar==='ع'||L.ar==='غ';
   var B=_boyScene(ca,{cours:'lettre',arg:idx,premiere:premiere,session:_boySession&&_boySession.id}),b=B.bleu;
   function q(s){return b('« '+(lat+s).toLowerCase()+' »');}
   var A=L.ar,S=A+'ْ';
@@ -10699,8 +10786,8 @@ function _boyLetterCourse(ca,idx,premiere){
   sc.push(B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,'Voici '+b(L.name)+'.<br>Écoute son son.',
     'Voici la lettre '+L.name));
   if(lourde){
-    sc.push(B.brief('ÉTAPE 2 · ALERTE','C\'est une lettre '+b('épaisse')+' !<br>Voix grave et pleine 🦁',
-      'Attention : c\'est une lettre épaisse. On la dit avec une voix grave et pleine.'));
+    sc.push(B.brief('ÉTAPE 2 · ALERTE','C\'est une lettre '+b('grave')+' !<br>On verra ce que ça veut dire<br>avec la '+b('fatḥa')+' 🦁',
+      'C\'est une lettre grave. On verra la signification avec la fatha.'));
   }
   if(!attache){
     sc.push(B.brief('ÉTAPE · ACCROCHAGE','Elle ne s\'accroche '+b('JAMAIS')+'<br>à la lettre suivante 🚫',
@@ -10709,22 +10796,42 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Les 4 formes : observation PUIS tracé, sans exception */
   var NOMS=['ISOLÉE','DÉBUT','MILIEU','FIN'];
   var OU=['toute seule','au début du mot','au milieu du mot','à la fin du mot'];
-  formes.forEach(function(f,n){
-    sc.push(B.obs('FORME '+(n+1)+'/4 · '+NOMS[n],f.form,S,
+  /* Le tā marbūṭa ne s'écrit qu'en fin de mot, la hamza ne s'écrit que d'une
+     seule façon : on ne montre que les formes qui existent vraiment. */
+  var aMontrer=formeUnique?[0]:(finDeMot?[0,3]:[0,1,2,3]);
+  var total=aMontrer.length;
+  /* Les tracés à plusieurs cases ne montrent que ces formes-là, et portent
+     leurs vrais noms : « isolée » et « fin » pour le tā marbūṭa, pas
+     « début » et « milieu ». */
+  function formesMontrees(signe){
+    return aMontrer.map(function(n){return formes[n].form+(signe||'');});
+  }
+  var nomsMontres=aMontrer.map(function(n){return NOMS[n].toLowerCase();});
+  var combien=total>1?('ses '+total+' formes'):'cette forme';
+  aMontrer.forEach(function(n,rang){
+    var f=formes[n];
+    var rep=total>1?(' '+(rang+1)+'/'+total):'';
+    sc.push(B.obs('FORME'+rep+' · '+NOMS[n],f.form,S,
       OU[n].charAt(0).toUpperCase()+OU[n].slice(1)+',<br>elle s\'écrit '+b('ainsi')+'.',
       OU[n]+', elle s\'écrit ainsi.'));
-    sc.push(B.tracer('FORME '+(n+1)+'/4 · TRACÉ',f.form,
+    sc.push(B.tracer('FORME'+rep+' · TRACÉ',f.form,
       'Trace la forme<br>'+b(NOMS[n].toLowerCase())+' ✍️','Trace la forme '+NOMS[n].toLowerCase()+'.'));
   });
   /* « Deux formes à retenir » disait ce que le tableau montre juste après :
      l'écran est retiré. Et la règle générale ne se rappelle qu'une fois, à
      la toute première lettre — la répéter à chaque lettre lasse. */
   var premiereLettre=(idx===0);
-  sc.push(B.tableau('ÉTAPE · DÉDUCTION',
-    B.deb('Milieu')+' = '+B.deb('début')+' + '+b('ـ')+'<br>'+B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('ـ'),
-    'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
-    [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
-  if(premiereLettre){
+  /* Le tiret n'est pas écrit tel quel dans le titre : posé seul il ressemble
+     à un trait droit, alors que c'est le trait de liaison arabe. C'est
+     l'animation du tableau qui le montre, collé à la lettre. */
+  if(!sansDeduction){
+    sc.push(B.tableau('ÉTAPE · DÉDUCTION',
+      B.deb('Milieu')+' = '+B.deb('début')+' + le '+b('trait de liaison')+'<br>'
+        +B.iso('Fin')+' = '+B.iso('isolée')+' + le '+b('trait de liaison'),
+      'La forme du milieu, c\'est celle du début avec le trait de liaison devant. La forme de la fin, c\'est l\'isolée avec le trait de liaison devant.',
+      [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
+  }
+  if(premiereLettre&&!sansDeduction){
     sc.push(B.brief('ÉTAPE · LA CLÉ',
       'C\'est pourquoi il faut<br>connaître par cœur<br>'+B.iso('isolée')+' et '+B.deb('début')+' :<br>les deux autres se '+b('déduisent')+' ! 🔑',
       'C\'est pourquoi il est très important de connaître parfaitement l\'écriture de chaque lettre isolée et en début de mot. Tu pourras alors déduire les deux autres formes.'));
@@ -10755,33 +10862,49 @@ function _boyLetterCourse(ca,idx,premiere){
   [['َ','a','au-dessus'],['ِ','i','en-dessous'],['ُ','ou','au-dessus']].forEach(function(v,n){
     sc.push(B.obs('VOYELLE '+(n+1)+'/3',A+v[0],A+v[0],
       'Signe '+b(v[2])+' :<br>ça fait '+q(v[1]),'Signe '+v[2]+', ça fait '+(lat+v[1]).toLowerCase(),null,true));
-    sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
-      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
-      'Trace cette syllabe dans ses quatre formes.'));
+    /* Le khā se dit « kha », pas « khè » : c'est la faute la plus courante,
+       et elle vaut d'être dite au moment où l'enfant entend la syllabe. */
+    if(A==='خ'&&n===0){
+      sc.push(B.brief('ÉTAPE · ATTENTION','On ne dit pas '+b('« khè »')+'<br>mais '+b('« kha »')+' ! 👂',
+        'On ne dit pas khè, mais kha.'));
+    }
+    sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',formesMontrees(v[0]),
+      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(combien)+' ✍️',
+      'Trace cette syllabe dans '+combien+'.',null,nomsMontres));
   });
   /* Les propositions melangent les FORMES : l'enfant doit reconnaitre le
      son quelle que soit la place de la lettre dans le mot. */
   var f4=_childForms(L,af);
+  /* Les propositions prennent une forme qui EXISTE pour cette lettre : la
+     hamza n'en a qu'une, le tā marbūṭa n'en a pas de début ni de milieu. */
+  function fx(n){return f4[aMontrer.indexOf(n)>=0?n:aMontrer[aMontrer.length-1]].form;}
   sc.push(B.controle('CONTRÔLE 1','Où est '+q('a')+' ?','Où est ce son ?',
-    [[f4[1].form+'َ',A+'َ'],[f4[1].form+'ِ',A+'ِ'],[f4[1].form+'ُ',A+'ُ']],f4[1].form+'َ'));
+    [[fx(1)+'َ',A+'َ'],[fx(1)+'ِ',A+'ِ'],[fx(1)+'ُ',A+'ُ']],fx(1)+'َ'));
   sc.push(B.controle('CONTRÔLE 2','Où est '+q('ou')+' ?','Où est ce son ?',
-    [[f4[3].form+'ُ',A+'ُ'],[f4[3].form+'َ',A+'َ'],[f4[3].form+'ِ',A+'ِ']],f4[3].form+'ُ'));
+    [[fx(3)+'ُ',A+'ُ'],[fx(3)+'َ',A+'َ'],[fx(3)+'ِ',A+'ِ']],fx(3)+'ُ'));
   sc.push(B.controle('CONTRÔLE 3','Où est '+q('i')+' ?','Où est ce son ?',
-    [[f4[2].form+'ِ',A+'ِ'],[f4[2].form+'َ',A+'َ'],[f4[2].form+'ُ',A+'ُ']],f4[2].form+'ِ'));
+    [[fx(2)+'ِ',A+'ِ'],[fx(2)+'َ',A+'َ'],[fx(2)+'ُ',A+'ُ']],fx(2)+'ِ'));
   /* Tanwīn */
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
       'Doublé, ça fait '+(lat+v[1]).toLowerCase(),null,true));
-    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',_boy4formes(L,af,v[0]),
-      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans ses '+b('4 formes')+' ✍️',
-      'Trace ce tanwîn dans ses quatre formes.'));
+    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',formesMontrees(v[0]),
+      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(combien)+' ✍️',
+      'Trace ce tanwîn dans '+combien+'.',null,nomsMontres));
   });
-  sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ','Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕',
+  /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas. */
+  if(!finDeMot){
+    sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ','Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕',
     'Petit rond : on ne prononce que le son de la lettre.'));
-  if(avecProlong){
+  }
+  if(avecProlong&&!finDeMot){
     [['َا','aaa','ا'],['ُو','ouou','و'],['ِي','iii','ي']].forEach(function(v,n){
       sc.push(B.obs('ALLONGEMENT '+(n+1)+'/3',A+v[0],A+v[0],'Avec '+b(v[2])+' :<br>ça fait '+q(v[1])+' 🎵',
         'Avec cette lettre, le son s\'étire.'));
+      if(A==='خ'&&n===0){
+        sc.push(B.brief('ÉTAPE · ATTENTION','Là non plus :<br>pas '+b('« khèè »')+'<br>mais '+b('« khaa »')+' ! 👂',
+          'On ne dit pas khèè, mais khaa.'));
+      }
       sc.push(B.tracer('ALLONGEMENT '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️','Trace cet allongement.'));
     });
   }
@@ -10797,9 +10920,9 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Le dernier tracé reprend les quatre formes, dans le sens de lecture :
      c'est le moment où l'enfant montre qu'il sait écrire la lettre partout,
      pas seulement seule. */
-  sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',_boy4formes(L,af),
-    'Trace une dernière fois<br>'+b(L.name)+'<br>dans ses '+b('4 formes')+' ✍️',
-    'Trace une dernière fois cette lettre, dans ses quatre formes.'));
+  sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',formesMontrees(),
+    'Trace une dernière fois<br>'+b(L.name)+'<br>dans '+b(combien)+' ✍️',
+    'Trace une dernière fois cette lettre, dans '+combien+'.',null,nomsMontres));
   sc.push(function(api){
     var ile=_boyLettreFinie(_boySession,idx);
     /* Une île qu'on vient de terminer appelle la suite de l'aventure. Une
@@ -13209,6 +13332,12 @@ var ADMIN_SOUNDS = [
   {ar:'◌ٍ',label:'tanwīn kasr — le son in'},
   {ar:'◌ٌ',label:'tanwīn ḍamm — le son oun'},
   {ar:'◌ْ',label:'soukoun — on ne prononce rien'},
+
+  /* ── Le khā ── deux mises en garde dites dans son cours. La synthèse
+     française dit « khè » justement, donc ces deux-là DOIVENT être
+     enregistrées pour avoir un sens. */
+  {ar:'On ne dit pas khè, mais kha.',label:'khā — « kha », pas « khè »'},
+  {ar:'On ne dit pas khèè, mais khaa.',label:'khā allongé — « khaa », pas « khèè »'},
 
   /* ── Interface fille : chaînes utilisées par les cours enfant ──
      Sans enregistrement, elles passent par la synthèse vocale et sont

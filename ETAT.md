@@ -97,18 +97,25 @@ lettres**.
 **1. Le modèle s'écrit tout seul, dans les canvas de tracé.**
 
 - Le chemin n'est jamais dessiné, et il ne suit PAS la lettre au pixel près :
-  il donne l'**ordre du parcours**. Chaque pixel de la lettre est rangé selon
-  l'endroit du chemin dont il est le plus proche, puis rendu dans cet ordre.
-  D'où deux propriétés qui font tout l'intérêt de la méthode : la lettre est
-  toujours révélée en entier, même si le chemin passe à côté d'un morceau ;
-  et un chemin grossier suffit, ce qui a rendu les cent trois formes tenables.
-  (La première version masquait la lettre avec un gros trait posé le long du
-  chemin : elle demandait des coordonnées au pixel près, et un chemin un peu
-  à côté laissait un morceau de lettre invisible. Ne pas y revenir.)
+  il donne l'**ordre du parcours**. On promène un pinceau le long du geste, et
+  chaque pixel prend le rang du moment où le pinceau le couvre pour la
+  première fois. Un pixel jamais atteint reprend le rang de l'endroit du
+  chemin dont il est le plus proche : la lettre est donc toujours révélée en
+  entier, même sous un chemin grossier — c'est ce qui a rendu les cent trois
+  formes tenables.
+  **Deux fausses bonnes idées, déjà essayées, à ne pas refaire** : masquer la
+  lettre avec un gros trait posé le long du chemin (il faut alors des
+  coordonnées au pixel près, et un chemin un peu à côté laisse un morceau
+  invisible) ; et ranger les pixels par « endroit du chemin le plus proche »
+  sans promener de pinceau (dès qu'un trait revient sur lui-même ou fait une
+  boucle, les deux côtés sont à égale distance et la lettre se révèle par
+  plaques — c'est ce que le client a vu sur le م, le ه, le ص).
 - Les points ne sont pas rattachés au corps : ce sont des taches d'encre
-  détachées (repérées par composantes connexes), gardées pour la toute fin.
-  C'est la règle du client. Les voyelles posées sur la lettre suivent le même
-  sort.
+  détachées, gardées pour la toute fin. C'est la règle du client, et les
+  voyelles posées sur la lettre suivent le même sort. Ce qui est corps et ce
+  qui est point ne se décide PAS à la taille de la tache mais au passage du
+  crayon : le petit kāf logé dans le ك est minuscule et fait pourtant partie
+  de la lettre — il s'écrit donc, du haut vers le bas, après le corps.
 - `_TRACE_MODELE` : un geste par base et par forme (seule, début, milieu,
   fin), en « em » depuis l'ancre du glyphe, donc valable à toutes les tailles.
   `_BASE_TRACE` renvoie chaque lettre à sa base : seuls les points changent,
@@ -122,9 +129,9 @@ lettres**.
   cran à gauche ; sur la dernière case, elle s'arrête. La case qu'elle quitte
   reste entière.
 - Un bouton « ▶ REVOIR » relance l'animation sur la case en cours.
-- Rythme : 1,7 s d'écriture, 0,42 s de souffle, les points, 0,45 s — le client
-  veut que ça enchaîne, sans temps mort une fois la lettre finie. Trois
-  constantes en tête de la boucle.
+- Rythme : 1,05 s d'écriture, 0,28 s de souffle, les points, 0,33 s. Le client
+  a demandé plus rapide, et que ça enchaîne sans temps mort une fois la lettre
+  finie. Trois constantes en tête de la boucle.
 - Vérification automatique à refaire après toute retouche de la table : pour
   les 103 formes, le corps doit être entièrement révélé à la fin du geste, et
   le départ comme l'arrivée du chemin doivent tomber à moins de 0,12 em de
@@ -134,9 +141,23 @@ lettres**.
 **2. Le tableau des formes s'anime.** À l'arrivée, seules isolée et début sont
 visibles. La phrase est découpée en quatre morceaux : chacun est dit, et son
 geste part en même temps — le corps de la forme paraît, puis le trait de
-liaison vient s'y coller par la droite. On attend le silence
-(`surSilence()`) avant le morceau suivant, avec un filet de 2,6 s au cas où la
-voix ne rendrait jamais la main.
+liaison vient s'y coller par la droite. On attend le silence (`surSilence()`)
+avant le morceau suivant, avec un filet de 2,6 s au cas où la voix ne rendrait
+jamais la main.
+
+**Le trait de liaison n'est pas un tiret.** Une forme attachée est donc
+affichée en DEUX EXEMPLAIRES superposés de la même chaîne, découpés par
+`clip-path` : l'un ne montre que la lettre, l'autre que son trait. Couper la
+chaîne en deux balises casserait la liaison arabe et le trait redeviendrait un
+tiret tout droit — le client l'a vu tout de suite. La part revenant au trait
+se mesure avec `_partLiaison()`.
+
+**Les lettres qui n'ont pas toutes les formes.** Le tā marbūṭa ne vit qu'en
+fin de mot : ni début, ni milieu, ni déduction, ni prolongation, et jamais de
+soukoun. La hamza s'écrit toujours pareil : une seule forme, l'isolée — mais
+elle garde ses voyelles et ses prolongations. Le ع et le غ n'ont pas de
+déduction non plus : ce sont les exceptions annoncées. Tout cela tient dans
+`finDeMot`, `formeUnique` et `sansDeduction`, en tête de `_boyLetterCourse`.
 
 ---
 
