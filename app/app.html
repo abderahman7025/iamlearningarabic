@@ -10119,10 +10119,37 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
     if(rang[i]>=0)vus[lb]=(vus[lb]||0)+1;
   }
   function estCorps(lb){return (vus[lb]||0)>=0.25*tot[lb];}
+  /* ── Ce que le pinceau a manqué ──
+     De proche en proche, à travers l'encre : un pixel non touché prend le
+     rang de son plus proche voisin déjà rangé, en suivant le trait.
+     Le prendre « à l'endroit du chemin le plus proche » était faux, et c'est
+     ce que le client voyait : la barre horizontale posée sous la boucle du ف
+     apparaissait dès le début du geste, parce que le chemin de la boucle
+     passe juste au-dessus d'elle — alors que le crayon, lui, n'y était pas
+     encore. En suivant l'encre, cette barre attend que le crayon l'atteigne
+     vraiment, par son extrémité. */
+  var file=new Int32Array(w*h),tete=0,queue=0;
+  for(i=0;i<w*h;i++){
+    if(encre[i]&&rang[i]>=0&&estCorps(taches.lab[i]))file[queue++]=i;
+  }
+  while(tete<queue){
+    var jj=file[tete++],xj=jj%w,yj=(jj-xj)/w;
+    function pousse(v){
+      if(v<0||v>=w*h||!encre[v]||rang[v]>=0)return;
+      if(!estCorps(taches.lab[v]))return;
+      rang[v]=rang[jj]+0.001;file[queue++]=v;
+    }
+    if(xj>0)pousse(jj-1);
+    if(xj<w-1)pousse(jj+1);
+    if(yj>0)pousse(jj-w);
+    if(yj<h-1)pousse(jj+w);
+  }
   for(i=0;i<w*h;i++){
     if(!encre[i])continue;
     if(!estCorps(taches.lab[i])){points.push(i);rang[i]=-1;continue;}
     if(rang[i]<0){
+      /* Un recoin que même le voisinage n'a pas atteint : on le rattache au
+         chemin, faute de mieux. */
       var x2=i%w,y2=(i-x2)/w;
       rang[i]=nPas*_positionSurChemin(plat,(x2-ancreX)/px,(y2-ancreY)/px)/(plat.L||1);
     }

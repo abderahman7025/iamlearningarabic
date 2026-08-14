@@ -102,7 +102,11 @@ lettres**.
   première fois. Un pixel jamais atteint reprend le rang de l'endroit du
   chemin dont il est le plus proche : la lettre est donc toujours révélée en
   entier, même sous un chemin grossier — c'est ce qui a rendu les cent trois
-  formes tenables.
+  formes tenables. Un pixel non touché prend le rang de son plus proche
+  voisin d'encre déjà rangé, DE PROCHE EN PROCHE à travers le trait — surtout
+  pas « l'endroit du chemin le plus proche » : la barre horizontale posée sous
+  la boucle du ف se voyait alors dès le début du geste, le chemin de la boucle
+  passant juste au-dessus d'elle.
   **Deux fausses bonnes idées, déjà essayées, à ne pas refaire** : masquer la
   lettre avec un gros trait posé le long du chemin (il faut alors des
   coordonnées au pixel près, et un chemin un peu à côté laisse un morceau
@@ -142,7 +146,11 @@ lettres**.
 - Rythme : 1,05 s d'écriture, 0,28 s de souffle, les points, 0,33 s. Le client
   a demandé plus rapide, et que ça enchaîne sans temps mort une fois la lettre
   finie. Trois constantes en tête de la boucle.
-- Vérification automatique à refaire après toute retouche de la table : pour
+- Vérification automatique à refaire après toute retouche de la table, **à la
+  taille réelle d'une case (PX=104)** : une carte d'ordre tracée plus grand
+  agrège les pixels et cache les défauts — c'est comme cela qu'un « bout de
+  barre » révélé dès 20 % du geste m'a échappé. Contrôler aussi qu'aucun
+  dixième ne découvre plus de 45 % du corps d'un coup. Pour
   les 103 formes, le corps doit être entièrement révélé à la fin du geste, et
   le départ comme l'arrivée du chemin doivent tomber à moins de 0,12 em de
   l'encre. C'est ce qui a rattrapé le ع et le ق, dont le départ était dans le
