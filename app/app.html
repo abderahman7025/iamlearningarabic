@@ -5296,6 +5296,36 @@ function showContactSuccess(){
 // ════════════════════════════════════════════════════════
 //  CARTE DE PROGRESSION — ÎLES
 // ════════════════════════════════════════════════════════
+/* Où poser le personnage en arrivant sur la carte.
+   Il ne doit PAS repartir du coin en haut à gauche : l'enfant revient d'une
+   île, ou du menu, et veut se retrouver là où il en est. On prend donc, dans
+   l'ordre : l'île qu'il vient de quitter, sinon la dernière entamée, sinon
+   la dernière validée. La convention est celle du chemin : 0 = le coin,
+   i+1 = posé sur l'île i. */
+function _ileDepart(islandDefs){
+  var derniere=-1;
+  try{
+    var v=localStorage.getItem('arab_ile');
+    if(v!==null&&v!=='')derniere=Math.max(derniere,parseInt(v,10));
+  }catch(e){}
+  islandDefs.forEach(function(isle,i){
+    var entamee=isle.sids.some(function(sid){
+      if(st.scores&&st.scores[sid]!==undefined)return true;
+      var a=(st.accuracy||{})[sid];
+      if(a&&a.t>0)return true;
+      try{return (JSON.parse(localStorage.getItem('boy_lettres_'+sid)||'[]')||[]).length>0;}catch(e){return false;}
+    });
+    if(entamee)derniere=Math.max(derniere,i);
+  });
+  if(derniere>=0)return Math.min(derniere+1,islandDefs.length);
+  var valide=0;
+  for(var i=0;i<islandDefs.length;i++){
+    var fait=islandDefs[i].sids.every(function(sid){
+      var a=(st.accuracy||{})[sid];return a&&a.t>0&&a.c/a.t>=0.8;});
+    if(fait)valide=i+1;else break;
+  }
+  return valide;
+}
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
@@ -5375,7 +5405,7 @@ var islandDefs=[
   // Mini-jeux entre les îles
   var mgDefs=[
     {after:3, game:'memory', icon:'🃏',
-     label:{'fr':'Mémoires des lettres','en':'Letter Memory','es':'Memoria de letras','de':'Buchstaben-Memory','nl':'Letter Memory','it':'Memory delle lettere','pt':'Memória das letras','ru':'Игра памяти — буквы','tr':'Harf Memory','zh':'字母记忆','id':'Memory Huruf','ur':'حروف کا میموری','hi':'अक्षर मेमोरी'}[st.lang]||'Mémoires des lettres',
+     label:{'fr':'Memories des lettres','en':'Letter Memory','es':'Memoria de letras','de':'Buchstaben-Memory','nl':'Letter Memory','it':'Memory delle lettere','pt':'Memória das letras','ru':'Игра памяти — буквы','tr':'Harf Memory','zh':'字母记忆','id':'Memory Huruf','ur':'حروف کا میموری','hi':'अक्षर मेमोरी'}[st.lang]||'Memories des lettres',
      sub:{'fr':'Associe les lettres à leurs sons','en':'Match letters to their sounds','es':'Asocia letras con sonidos','de':'Buchstaben zu Lauten zuordnen','nl':'Koppel letters aan klanken','it':'Abbina lettere ai loro suoni','pt':'Associe letras a sons','ru':'Сопоставь буквы звукам','tr':'Harfleri sesleriyle eşleştir','zh':'将字母与读音匹配','id':'Cocokkan huruf dengan bunyinya','ur':'حروف کو آوازوں سے ملاؤ','hi':'अक्षरों को उनकी ध्वनियों से मिलाएँ'}[st.lang]||'Associe les lettres à leurs sons'},
     {after:7, game:'puzzle', icon:'🔤',
      label:{'fr':'Puzzle des mots','en':'Word Puzzle','es':'Puzzle de palabras','de':'Wörter-Puzzle','nl':'Woord Puzzel','it':'Puzzle delle parole','pt':'Puzzle de palavras','ru':'Слово-пазл','tr':'Kelime Bulmacası','zh':'单词拼图','id':'Puzzle Kata','ur':'الفاظ کا پزل','hi':'शब्द पहेली'}[st.lang]||'Puzzle des mots',
@@ -5476,7 +5506,11 @@ var islandDefs=[
     card.appendChild(nm);
     card.appendChild(sub);
     card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(ss,lbl){return function(){_lessonPushed=false;_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');openSession(ss[0]);};})(isleSessions,isle.label);}
+    if(!isLocked){card.onclick=(function(ss,lbl,ii){return function(){_lessonPushed=false;_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+      /* On retient l'île ouverte : en revenant sur la carte, le personnage
+         doit être POSÉ dessus, pas refaire le chemin depuis le coin. */
+      try{localStorage.setItem('arab_ile',String(ii));}catch(e){}
+      openSession(ss[0]);};})(isleSessions,isle.label,isleIdx);}
 
     globeDiv.appendChild(card);
 
@@ -5628,12 +5662,8 @@ var islandDefs=[
           var segLkM=(isleCardsMob[i]&&isleCardsMob[i].classList.contains('locked-isle'))||(isleCardsMob[i+1]&&isleCardsMob[i+1].classList.contains('locked-isle'));
           segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey, segLkM);
-        }// charIdx : 0=home, i+1=ile i validee (>=80%)
-        var charIdxM=0;
-        for(var i=0;i<islandDefs.length;i++){
-          var doneM=islandDefs[i].sids.every(function(sid){var _a=(st.accuracy||{})[sid];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
-          if(doneM){charIdxM=i+1;}else{break;}
-        }
+        }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
+        var charIdxM=_ileDepart(islandDefs);
         function placeCharMob(x,y){charElMob.style.transform='none';charElMob.style.left=(x-34)+'px';charElMob.style.top=(y-80)+'px';}
         function bezierPtM(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
         // Placement initial + scroll vers gugus
@@ -5646,6 +5676,13 @@ var islandDefs=[
         function animateToM(targetIdx,onDone){
           if(animFrameM){cancelAnimationFrame(animFrameM);animFrameM=null;}
           if(currentIdxM===targetIdx){if(onDone)onDone();return;}
+          /* Revenir en arrière de dix îles prenait un temps fou à regarder :
+             on se pose directement sur l'île qui suit la visée, et il ne
+             reste qu'un pas à faire. */
+          if(targetIdx<currentIdxM-1){
+            currentIdxM=targetIdx+1;
+            var rp=bezierPtM(1,segsMob[currentIdxM-1]);placeCharMob(rp.x,rp.y);
+          }
           var step=currentIdxM<targetIdx?1:-1;
           var queue=[];
           for(var i=currentIdxM;i!==targetIdx;i+=step){
@@ -5773,12 +5810,8 @@ var islandDefs=[
       }
       globeDiv.appendChild(charEl);
 
-      // charIdx : 0=home, i+1=Ã®le i engagÃ©e (score>0)
-      var charIdx=0;
-      for(var i=0;i<islandDefs.length;i++){
-        var done=islandDefs[i].sids.every(function(sid){var _a=(st.accuracy||{})[sid];return _a&&_a.t>0&&_a.c/_a.t>=0.8;});
-        if(done){charIdx=i+1;}else{break;}
-      }
+      /* charIdx : 0 = le coin, i+1 = posé sur l'île i */
+      var charIdx=_ileDepart(islandDefs);
 
       function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
 
@@ -5808,6 +5841,12 @@ var islandDefs=[
       function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
         if(currentIdx===targetIdx){if(onDone)onDone();return;}
+        /* Voir le personnage refaire dix îles en arrière est interminable :
+           on se pose sur l'île qui suit la visée, il ne reste qu'un pas. */
+        if(targetIdx<currentIdx-1){
+          currentIdx=targetIdx+1;
+          var rp=bezierPt(1,segments[currentIdx-1]);placeCharAt(rp.x,rp.y);
+        }
         var step=currentIdx<targetIdx?1:-1;
         var queue=[];
         for(var i=currentIdx;i!==targetIdx;i+=step){
@@ -9504,11 +9543,20 @@ function _boyNarration(){
       qu'il était dessous. Celui-là, et lui seul, on le descend. */
 var _MARQUES=/[ً-ْٰ]/g;
 var _SOUS_LA_LIGNE=/[ٍِ]/;   /* kasra · tanwīn kasr */
+/* 3. ج ح خ ISOLÉES : leur tête monte haut et leur boucle plonge ; le client
+      les veut posées un peu plus bas que la ligne. Le décalage vaut pour le
+      dessin ET pour le chemin de l'animation — sinon le crayon passerait à
+      côté de la lettre. */
+var _JAMBAGE_ISOLE=/^[جحخ]$/;
+function _descenteGlyphe(texte,px){
+  var t=String(texte),corps=t.replace(_MARQUES,'');
+  if(!corps&&_SOUS_LA_LIGNE.test(t))return Math.round(px*0.24);
+  if(_JAMBAGE_ISOLE.test(corps))return Math.round(px*0.11);
+  return 0;
+}
 function _dessineSurLigne(cx,texte,x,baseY,px){
   var t=String(texte);
-  var corps=t.replace(_MARQUES,'');
-  var dy=(!corps&&_SOUS_LA_LIGNE.test(t))?Math.round(px*0.24):0;
-  cx.fillText(t,x,baseY+dy);
+  cx.fillText(t,x,baseY+_descenteGlyphe(t,px));
 }
 
 /* Deux couleurs dans une même syllabe : le « socle » — la lettre qui ne fait
@@ -9892,6 +9940,9 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
      Un pixel que le pinceau n'atteint jamais reprend le rang de l'endroit du
      chemin dont il est le plus proche : la lettre est toujours révélée en
      entier, même sous un chemin approximatif. */
+  /* Le chemin suit le glyphe, décalage compris : sans cela le pinceau
+     passerait au-dessus d'un ج descendu. */
+  ancreY+=_descenteGlyphe(texte,px);
   var rang=new Float64Array(w*h);
   for(i=0;i<w*h;i++)rang[i]=-1;
   var R=Math.max(2,Math.round(0.15*px));            /* rayon du pinceau */
@@ -10613,8 +10664,8 @@ function _boyVowelCourse(ca){
     B.obs('ÉTAPE 1 · REPÉRAGE',[[F,'a'],[D,'ou'],[K,'i']],null,
       'Une voyelle,<br>c\'est un petit '+b('signe')+'.',
       'Une voyelle, c\'est un petit signe.',null),
-    B.brief('ÉTAPE 2 · POSITION','Il se place '+b('sur')+',<br>ou '+b('sous')+' la lettre.',
-      'Il se place sur, ou sous la lettre.'),
+    B.brief('ÉTAPE 2 · POSITION','Elle se place '+b('sur')+',<br>ou '+b('sous')+' la lettre.',
+      'Elle se place sur, ou sous la lettre.'),
     B.brief('ÉTAPE 3 · ORDRE','On dit d\'abord la '+b('lettre')+',<br>'+b('PUIS')+' la voyelle.',
       'Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.'),
     B.brief('ÉTAPE 4 · INVENTAIRE','Il en existe<br>seulement '+b('3')+' ! 🖐️',
@@ -10783,8 +10834,15 @@ function _boyLetterCourse(ca,idx,premiere){
 
   sc.push(B.brief('MISSION · BRIEFING','Nouvelle lettre :<br>'+b(L.name)+' 🎯',
     'Mission du moment : la lettre '+L.name,premiere?'▶ DÉCOLLAGE':'SUIVANT ▸'));
-  sc.push(B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,'Voici '+b(L.name)+'.<br>Écoute son son.',
-    'Voici la lettre '+L.name));
+  /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
+     déjà : les deux sont réunis. Et la hamza n'a pas de son propre. */
+  sc.push(formeUnique
+    ? B.obs('ÉTAPE 1 · IDENTIFICATION',A,null,
+        'Voici '+b(L.name)+'.<br>Elle s\'écrit '+b('toujours')+' ainsi.',
+        'Cette lettre n\'a aucun son. On prononce juste sa voyelle.')
+    : B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,
+        'Voici '+b(L.name)+'.<br>'+b('Isolée')+', elle s\'écrit ainsi.',
+        'Voici la lettre '+L.name+'. Isolée, elle s\'écrit ainsi.'));
   if(lourde){
     sc.push(B.brief('ÉTAPE 2 · ALERTE','C\'est une lettre '+b('grave')+' !<br>On verra ce que ça veut dire<br>avec la '+b('fatḥa')+' 🦁',
       'C\'est une lettre grave. On verra la signification avec la fatha.'));
@@ -10795,7 +10853,10 @@ function _boyLetterCourse(ca,idx,premiere){
   }
   /* Les 4 formes : observation PUIS tracé, sans exception */
   var NOMS=['ISOLÉE','DÉBUT','MILIEU','FIN'];
-  var OU=['toute seule','au début du mot','au milieu du mot','à la fin du mot'];
+  /* Le tā marbūṭa n'a que deux formes, et sa forme attachée est forcément
+     celle de la fin : on dit « attachée », c'est ce que l'enfant voit. */
+  var OU=['toute seule','au début du mot','au milieu du mot',
+          finDeMot?'attachée':'à la fin du mot'];
   /* Le tā marbūṭa ne s'écrit qu'en fin de mot, la hamza ne s'écrit que d'une
      seule façon : on ne montre que les formes qui existent vraiment. */
   var aMontrer=formeUnique?[0]:(finDeMot?[0,3]:[0,1,2,3]);
@@ -10811,11 +10872,17 @@ function _boyLetterCourse(ca,idx,premiere){
   aMontrer.forEach(function(n,rang){
     var f=formes[n];
     var rep=total>1?(' '+(rang+1)+'/'+total):'';
-    sc.push(B.obs('FORME'+rep+' · '+NOMS[n],f.form,S,
-      OU[n].charAt(0).toUpperCase()+OU[n].slice(1)+',<br>elle s\'écrit '+b('ainsi')+'.',
-      OU[n]+', elle s\'écrit ainsi.'));
-    sc.push(B.tracer('FORME'+rep+' · TRACÉ',f.form,
-      'Trace la forme<br>'+b(NOMS[n].toLowerCase())+' ✍️','Trace la forme '+NOMS[n].toLowerCase()+'.'));
+    /* L'isolée vient d'être montrée à l'identification : on ne la remontre
+       pas, on la fait tracer directement. */
+    if(n!==0){
+      sc.push(B.obs('FORME'+rep+' · '+NOMS[n],f.form,S,
+        OU[n].charAt(0).toUpperCase()+OU[n].slice(1)+',<br>elle s\'écrit '+b('ainsi')+'.',
+        OU[n]+', elle s\'écrit ainsi.'));
+    }
+    sc.push(formeUnique
+      ? B.tracer('FORME · TRACÉ',f.form,'Trace la '+b('lettre')+' ✍️','Trace la lettre.')
+      : B.tracer('FORME'+rep+' · TRACÉ',f.form,
+          'Trace la forme<br>'+b(NOMS[n].toLowerCase())+' ✍️','Trace la forme '+NOMS[n].toLowerCase()+'.'));
   });
   /* « Deux formes à retenir » disait ce que le tableau montre juste après :
      l'écran est retiré. Et la règle générale ne se rappelle qu'une fois, à
@@ -10826,9 +10893,9 @@ function _boyLetterCourse(ca,idx,premiere){
      l'animation du tableau qui le montre, collé à la lettre. */
   if(!sansDeduction){
     sc.push(B.tableau('ÉTAPE · DÉDUCTION',
-      B.deb('Milieu')+' = '+B.deb('début')+' + le '+b('trait de liaison')+'<br>'
-        +B.iso('Fin')+' = '+B.iso('isolée')+' + le '+b('trait de liaison'),
-      'La forme du milieu, c\'est celle du début avec le trait de liaison devant. La forme de la fin, c\'est l\'isolée avec le trait de liaison devant.',
+      B.deb('Milieu')+' = '+B.deb('début')+' + '+b('—')+'<br>'
+        +B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('—'),
+      'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
   }
   if(premiereLettre&&!sansDeduction){
@@ -10842,19 +10909,19 @@ function _boyLetterCourse(ca,idx,premiere){
      les a pas encore vues n'apprend rien et charge l'écran. Chacune se
      présente d'elle-même le jour où elle arrive (voir juste en dessous). */
   if(A==='ع'||A==='غ'){
-    sc.push(B.brief('ÉTAPE · EXCEPTION','En voici une ! Ses formes<br>ne se '+b('déduisent pas')+'.<br>Apprends-les une par une.',
-      'En voici une. Ses formes ne se déduisent pas les unes des autres.'));
+    sc.push(B.brief('ÉTAPE · EXCEPTION','Pour cette lettre,<br>il faut apprendre<br>les '+b('4 formes')+' ! ⚠️',
+      'Pour cette lettre, il faut apprendre les quatre formes.'));
   }
   if(A==='ء'){
     ['أ','ؤ','ئ'].forEach(function(g,n){
-      sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ','La hamza s\'assoit<br>sur le '+b(['ا','و','ي'][n])+' 🪑',
-        'La hamza s\'assoit sur le '+['alif','waw','ya'][n]+'.'));
+      sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ','Parfois, tu verras<br>la hamzah sur le '+b(['ا','و','ي'][n])+' 🪑',
+        'Parfois, tu verras la hamzah sur le '+['alif','waw','ya'][n]+'.'));
       sc.push(B.tracer('SUPPORT '+(n+1)+'/3 · TRACÉ',g,'Trace '+b(g)+' ✍️','Trace ce support.'));
     });
   }
   if(A==='ة'){
-    sc.push(B.brief('ÉTAPE · PLACE','Elle se met '+b('toujours')+'<br>à la fin du mot 🔚',
-      'Cette lettre se met toujours à la fin du mot.'));
+    sc.push(B.brief('ÉTAPE · PLACE','Elle se trouvera '+b('toujours')+'<br>à la fin du mot 🔚',
+      'Elle se trouvera toujours à la fin du mot.'));
   }
   /* La lettre sur la piste, avec ses voyelles */
   sc.push(B.brief('ÉTAPE · SUR LA PISTE','Maintenant,<br>ses '+b('voyelles')+'.',
@@ -10925,13 +10992,22 @@ function _boyLetterCourse(ca,idx,premiere){
     'Trace une dernière fois cette lettre, dans '+combien+'.',null,nomsMontres));
   sc.push(function(api){
     var ile=_boyLettreFinie(_boySession,idx);
+    /* Dernière île du parcours : plus rien après elle. */
+    var derniereIle=!!(_boySession&&ALL_S.indexOf(_boySession)===ALL_S.length-1);
     /* Une île qu'on vient de terminer appelle la suite de l'aventure. Une
        île déjà bouclée qu'on révise, non : on rend l'enfant à la liste des
        lettres de SON île, là d'où il est parti. */
     if(ile.finie&&ile.deja&&_boySession){
       B.mission('Bravo ! 🎉<br>Tu as revu '+b(L.name)+' 🎖️<br>Tu la connais bien !',
         'Bravo ! Tu as revu cette lettre. Tu la connais bien !',
-        function(){_boyLetterPicker(ca,_boySession);},'▸ LES LETTRES DE MON ÎLE')(api);
+        function(){_boyLetterPicker(ca,_boySession);},'▸ MON ÎLE')(api);
+    }else if(ile.finie&&derniereIle){
+      /* La toute dernière île : il n'y a plus d'aventure à annoncer, on
+         envoie l'enfant s'entraîner. */
+      B.mission('Bravo ! 🎉<br>Tu as terminé<br>'+b('toute l\'île')+' !<br>'
+        +'Teste tes connaissances<br>dans la rubrique '+b('Exercices')+' 🏅',
+        'Bravo ! Tu as terminé toute l\'île. Teste tes connaissances dans la rubrique Exercices.',
+        function(){showS('s-menu',true,true);},'▸ MENU PRINCIPAL')(api);
     }else if(ile.finie){
       B.mission('Bravo ! 🎉<br>Tu as terminé<br>'+b('toute l\'île')+' !<br>'
         +'À très vite pour la<br>'+b('prochaine aventure')+' ! 🚀',

@@ -222,6 +222,16 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Carte des îles** : le personnage n'arrive plus au coin en haut à gauche.
+  `_ileDepart()` le pose sur l'île qu'on vient de quitter (retenue dans
+  `arab_ile` au clic), sinon la dernière entamée, sinon la dernière validée.
+  Et revenir en arrière ne refait plus tout le chemin : on se pose sur l'île
+  qui suit la visée, il ne reste qu'un pas à marcher.
+- **La dernière île** ne promet plus « la prochaine aventure » : elle renvoie
+  aux exercices, par le menu principal.
+- L'écran « toute seule, elle s'écrit ainsi » a été supprimé pour toutes les
+  lettres : l'identification le dit déjà (« Voici X. Isolée, elle s'écrit
+  ainsi. »).
 - Retours du client sur les écrans : voyelles en apesanteur qui sortaient du
   hublot (amplitude de dérive divisée par deux), kasra et tanwīn kasr montrés
   seuls qui collaient à la ligne (descendus de 0,24 em, comme dans les
