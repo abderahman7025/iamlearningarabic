@@ -120,10 +120,12 @@ lettres**.
   tache mais au passage du crayon : le petit kāf logé dans le ك est minuscule
   et fait pourtant partie de la lettre — il s'écrit donc, du haut vers le bas,
   après le corps.
-- **Rayon du pinceau : 0,075 em.** Large, il découvrait d'un coup tout un
+- **Rayon du pinceau : 0,055 em.** Large, il découvrait d'un coup tout un
   trait de liaison (vu par le client sur l'alif attaché) et, sur une petite
-  boucle comme celle du و ou du ق, il couvrait les deux côtés à la fois. Il
-  doit rester juste au-dessus de l'épaisseur du trait.
+  boucle comme celle du و ou du ق, il couvrait les deux côtés à la fois, et
+  il mordait sur la barre horizontale posée juste sous la boucle du ف. Il doit
+  rester juste au-dessus de l'épaisseur du trait. Le point bas des boucles du
+  ف et du ق est aussi remonté d'un cheveu, pour la même raison.
 - `_TRACE_MODELE` : un geste par base et par forme (seule, début, milieu,
   fin), en « em » depuis l'ancre du glyphe, donc valable à toutes les tailles.
   `_BASE_TRACE` renvoie chaque lettre à sa base : seuls les points changent,
