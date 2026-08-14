@@ -2557,6 +2557,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
 .ar-air{display:inline-block;margin:0 .34em;line-height:1}
+/* Un mot sur lequel on peut appuyer, au fil d'une phrase du cours. */
+.boy-lien{color:#0288d1;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.boy-lien:active{opacity:.6}
 .boy-hublot{width:174px;height:174px;border-radius:50%;margin:6px auto 22px;position:relative;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#ffffff,#cdeafc 58%,#9ad4f5);
@@ -4871,9 +4874,23 @@ function stopSpeech(){
 // - Clic 3 sur le même (en pause) → reprend depuis la phrase pausée
 // - Double-clic (< 350ms)         → restart depuis le début
 // - Clic sur un autre texte       → arrête et lit le nouveau
+/* UN SEUL contexte audio pour toute l'application.
+   Chaque appel en créait un nouveau : les navigateurs en limitent le nombre
+   (six sur Chrome), et passé la sixième bonne réponse, la création échouait —
+   plus aucun son jusqu'au rechargement. Il faut aussi le réveiller : sur
+   mobile il se met en pause dès que l'écran est resté immobile. */
+var _sonCtx=null;
+function _ctxSon(){
+  try{
+    if(typeof getChildAudioCtx==='function'){var c=getChildAudioCtx();if(c)_sonCtx=c;}
+    if(!_sonCtx)_sonCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(_sonCtx.state==='suspended'&&_sonCtx.resume)_sonCtx.resume();
+  }catch(e){return null;}
+  return _sonCtx;
+}
 function playBravo(){
   try{
-    var ac=new(window.AudioContext||window.webkitAudioContext)();
+    var ac=_ctxSon();if(!ac)return;
     [[523,.0],[659,.1],[784,.2],[1047,.3]].forEach(function(n){
       var o=ac.createOscillator(),g=ac.createGain();
       o.connect(g);g.connect(ac.destination);o.type='sine';o.frequency.value=n[0];
@@ -4885,7 +4902,7 @@ function playBravo(){
 }
 function playError(){
   try{
-    var ac=new(window.AudioContext||window.webkitAudioContext)();
+    var ac=_ctxSon();if(!ac)return;
     var o=ac.createOscillator(),g=ac.createGain();
     o.connect(g);g.connect(ac.destination);o.type='square';o.frequency.value=200;
     g.gain.setValueAtTime(.12,ac.currentTime);
@@ -5326,6 +5343,25 @@ function _ileDepart(islandDefs){
   }
   return valide;
 }
+/* La carte se dessine en deux temps : le HTML d'abord, puis les positions une
+   fois les images d'îles chargées (on ne peut mesurer qu'après). On attend
+   donc ces images plutôt qu'un délai fixe — et la carte reste CACHÉE pendant
+   ce temps : sinon on voyait le haut du chemin une fraction de seconde, puis
+   un saut jusqu'à l'île en cours. Le client ne veut pas de ce saut. */
+function _quandCartePrete(el,max,fn){
+  var imgs=[].slice.call(el.querySelectorAll('img'));
+  var reste=imgs.filter(function(i){return !i.complete;}).length;
+  var fait=false;
+  function go(){if(fait)return;fait=true;fn();}
+  setTimeout(go,max||1500);
+  if(!reste){setTimeout(go,0);return;}
+  imgs.forEach(function(i){
+    if(i.complete)return;
+    function un(){if(--reste<=0)go();}
+    i.addEventListener('load',un,{once:true});
+    i.addEventListener('error',un,{once:true});
+  });
+}
 function renderSessionsMap(ca){
   ca.innerHTML='';
   ca.style.cssText='';
@@ -5339,6 +5375,10 @@ function renderSessionsMap(ca){
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
   var wrap=document.createElement('div');
   wrap.className='sess-map-wrap';
+  /* Cachée le temps de poser le personnage et de faire défiler jusqu'à lui :
+     l'enfant doit trouver son île déjà à l'écran, sans voir le haut du chemin
+     puis un saut. */
+  wrap.style.visibility='hidden';
 
   // Titre carte
   var titleDiv=document.createElement('div');
@@ -5565,20 +5605,29 @@ var islandDefs=[
     var isLandscape=DW>DH;
 
     // Listener resize/orientation — relance la carte si le mode change
-    if(window._sessMapResizeFn){window.removeEventListener('resize',window._sessMapResizeFn);}
+    if(window._sessMapResizeFn){
+      window.removeEventListener('resize',window._sessMapResizeFn);
+      window.removeEventListener('orientationchange',window._sessMapResizeFn);
+    }
     window._sessMapWasLandscape=isLandscape;
     window._sessMapResizeFn=function(){
       var nowLandscape=window.innerWidth>window.innerHeight;
-      if(nowLandscape!==window._sessMapWasLandscape){
-        window._sessMapWasLandscape=nowLandscape;
-        // Ne re-rend que si l'utilisateur est bien sur la carte
-        if(st._curPage==='sessions'){
-          var _rca=document.getElementById('ca');
-          if(_rca)renderSessionsMap(_rca);
-        }
-      }
+      if(nowLandscape===window._sessMapWasLandscape)return;
+      window._sessMapWasLandscape=nowLandscape;
+      /* La carte est le seul écran dont la disposition est calculée en
+         JavaScript : elle doit être redessinée quand le téléphone tourne.
+         Le test portait sur 'sessions' alors que la carte se marque
+         'sessions-map' — la rotation ne faisait donc rien du tout. */
+      if(st._curPage!=='sessions-map')return;
+      var _rca=document.getElementById('ca');
+      if(!_rca)return;
+      if(st.profile==='girl')renderChildIslandMap(_rca);else renderSessionsMap(_rca);
     };
     window.addEventListener('resize',window._sessMapResizeFn);
+    /* Android ne déclenche pas toujours « resize » en tournant l'appareil. */
+    window.addEventListener('orientationchange',function(){
+      setTimeout(window._sessMapResizeFn,250);
+    });
 
     if(isLandscape){
       var _gm=document.getElementById('girl-mascot');
@@ -5614,7 +5663,7 @@ var islandDefs=[
       charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
       if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
       globeDiv.appendChild(charElMob);
-      setTimeout(function(){
+      _quandCartePrete(ca,1500,function(){
         var gW=globeDiv.offsetWidth;
         var gH=globeDiv.scrollHeight;
         var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -5670,8 +5719,15 @@ var islandDefs=[
         if(segsMob.length>0){
           if(charIdxM>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
           else{var ip=bezierPtM(0,segsMob[charIdxM]);placeCharMob(ip.x,ip.y);}
-          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
+          /* Défilement AVANT de montrer la carte, et sans animation : l'île en
+             cours est là dès la première image affichée. */
+          var _ca=document.getElementById('ca');
+          if(_ca&&charElMob){
+            var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;
+            _ca.scrollTop=Math.max(0,top-_ca.clientHeight/2);
+          }
         }
+        wrap.style.visibility='';
         var animFrameM=null,currentIdxM=charIdxM;
         function animateToM(targetIdx,onDone){
           if(animFrameM){cancelAnimationFrame(animFrameM);animFrameM=null;}
@@ -5705,7 +5761,7 @@ var islandDefs=[
           if(card.classList.contains('locked-isle'))return;
           card.addEventListener('click',function(){animateToM(idx+1,function(){if(origFnM)origFnM.call(card);});});
         });
-      },1500);
+      });
       return;
     }
     wrap.style.maxWidth='none';
@@ -5733,7 +5789,7 @@ var islandDefs=[
     if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
-    setTimeout(function(){
+    _quandCartePrete(ca,1500,function(){
       globeDiv.style.position='relative';
       var gW=globeDiv.offsetWidth;
       var gH=globeDiv.scrollHeight;
@@ -5833,8 +5889,14 @@ var islandDefs=[
         initY=segments[charIdx].y0;
       }
       placeCharAt(initX,initY);
-      // Scroll vers le gugus
-      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
+      /* Défilement AVANT de montrer la carte : l'île en cours doit être à
+         l'écran dès la première image affichée, sans saut. */
+      var _cad=document.getElementById('ca');
+      if(_cad&&charEl){
+        var topD=charEl.getBoundingClientRect().top-_cad.getBoundingClientRect().top+_cad.scrollTop;
+        _cad.scrollTop=Math.max(0,topD-_cad.clientHeight/2);
+      }
+      wrap.style.visibility='';
 
       var animFrame=null,currentIdx=charIdx;
 
@@ -5891,7 +5953,7 @@ var islandDefs=[
         });
       });
 
-    },1500);
+    });
   },0);
 wrap.appendChild(globeDiv);
   ca.appendChild(wrap);
@@ -6328,7 +6390,12 @@ var _AF={
   'و':{i:'و',       m:Z+'و',       f:Z+'و'},
   'ي':{i:'ي'+Z,     m:Z+'ي'+Z,     f:Z+'ي'},
   'ء':{i:'ء',       m:'ء',         f:'ء'},
-  'ة':{i:'ة',       m:Z+'ة',       f:Z+'ة'}
+  'ة':{i:'ة',       m:Z+'ة',       f:Z+'ة'},
+  /* La hamza sur son siège : le siège garde SES règles d'accrochage — l'alif
+     et le wāw n'appellent pas la lettre suivante, le yā si. */
+  'أ':{i:'أ',       m:Z+'أ',       f:Z+'أ'},
+  'ؤ':{i:'ؤ',       m:Z+'ؤ',       f:Z+'ؤ'},
+  'ئ':{i:'ئ'+Z,     m:Z+'ئ'+Z,     f:Z+'ئ'}
 };
 /* Ordre calqué sur ALL_S : SV→SA(ا و ي)→SP→LS id3(ب ت ث)→…→LS id11(ه ء ة) */
 var CHILD_LETTERS=[
@@ -8718,6 +8785,19 @@ var _CL_LAT={'ا':'','ب':'B','ت':'T','ث':'TH','ج':'DJ','ح':'H','خ':'KH','�
   'ف':'F','ق':'Q','ك':'K','ل':'L','م':'M','ن':'N','ه':'H','و':'W','ي':'Y','ء':'','ة':'T'};
 /* Lettres « épaisses » (emphatiques) — mêmes que type:'heavy' côté adulte */
 var _CL_HEAVY='خرصضطظغق';
+/* Lettres qui s'écrivent exactement comme une autre, aux points près. La
+   référence est celle qui n'en a pas — c'est elle qu'on montre en premier,
+   et les autres s'y raccrochent. */
+var _CL_JUMELLES={
+  'ج':{comme:'ح',point:'un point en dessous'},
+  'خ':{comme:'ح',point:'un point au-dessus'},
+  'ذ':{comme:'د',point:'un point au-dessus'},
+  'ز':{comme:'ر',point:'un point au-dessus'},
+  'ش':{comme:'س',point:'trois points au-dessus'},
+  'ض':{comme:'ص',point:'un point au-dessus'},
+  'ظ':{comme:'ط',point:'un point au-dessus'},
+  'غ':{comme:'ع',point:'un point au-dessus'}
+};
 /* Comment nommer chaque position dans une phrase d'enfant */
 var _CL_POS={'Isolée':'Toute seule','Début':'Au début','Milieu':'Au milieu','Fin':'À la fin'};
 
@@ -9880,6 +9960,22 @@ function _tachesEncre(encre,w,h){
   return {lab:lab,nb:n};
 }
 var _TRACE_GRIS='rgba(96,125,139,0.30)';
+/* Un paquet de scènes dont l'ordre est tiré au sort, et l'aplatissement qui
+   permet de le glisser dans la liste des scènes. */
+function _melange(l){return l.slice().sort(function(){return Math.random()-0.5;});}
+/* Poser un signe SUR la lettre, et non sur son trait de liaison.
+   « خـ » + fatḥa donnait « خـَ » : le signe tombait sur le tiret qui appelle
+   la lettre suivante, pas sur le khā. Il faut le glisser avant ce tiret. */
+function _avecSigne(forme,signe){
+  var s=String(forme);
+  if(!signe)return s;
+  return s.charAt(s.length-1)===_TATWEEL ? s.slice(0,-1)+signe+_TATWEEL : s+signe;
+}
+function _aplati(l){
+  var out=[];
+  (l||[]).forEach(function(x){if(Array.isArray(x))out=out.concat(_aplati(x));else out.push(x);});
+  return out;
+}
 /* Quelle part de la largeur d'une forme attachée revient à son trait de
    liaison de tête ? Sert à découper une forme en deux sans la couper en deux
    chaînes — ce qui casserait la liaison arabe. */
@@ -10062,7 +10158,21 @@ function _boyScene(ca,reprise){
     var boutons=[].slice.call(_dernierPanneau.querySelectorAll('.boy-btn'))
       .filter(function(b){return b.className.indexOf('sec')<0;});
     var principal=boutons[boutons.length-1];
-    if(!principal)return;
+    /* Les écrans de contrôle n'ont pas de bouton d'avancement — c'est la
+       bonne réponse qui fait avancer. L'enfant y a droit au retour quand
+       même : on lui pose la flèche seule. */
+    if(!principal){
+      if(i<=0)return;
+      var seul=document.createElement('button');
+      seul.className='boy-btn sec boy-retour';
+      seul.style.cssText+=';display:block;margin:16px auto 0';
+      seul.setAttribute('aria-label','Revoir l\'écran précédent');
+      seul.title='Revoir l\'écran précédent';
+      seul.textContent='‹';
+      seul.onclick=function(){N.stop();precedent();};
+      _dernierPanneau.appendChild(seul);
+      return;
+    }
     /* Le bouton ne se met à battre qu'une fois la phrase dite : tant qu'on
        parle à l'enfant, rien ne l'invite à passer. */
     N.surSilence(function(){
@@ -10256,7 +10366,7 @@ function _boyScene(ca,reprise){
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
   api.suivant=suivant;
-  api.run=function(list,f){scenes=list;if(f)fini=f;i=_repriseDebut(scenes.length);go();};
+  api.run=function(list,f){scenes=_aplati(list);if(f)fini=f;i=_repriseDebut(scenes.length);go();};
 
   /* ── Fabriques de scènes ── */
 
@@ -10680,9 +10790,13 @@ function _boyVowelCourse(ca){
       'Un trait en-dessous, ça fait « i »',null,true),
     B.tracer('ÉTAPE 8 · TRACÉ',K,'À toi de tracer<br>la '+b('kasra')+' ✍️','À toi de tracer la kasra.'),
 
-    B.controle('CONTRÔLE 1','Où est le son '+q('a')+' ?','Où est le son « a » ?',[F,K,D],F),
-    B.controle('CONTRÔLE 2','Où est le son '+q('i')+' ?','Où est le son « i » ?',[F,K,D],K),
-    B.controle('CONTRÔLE 3','Où est le son '+q('ou')+' ?','Où est le son « ou » ?',[F,K,D],D),
+    /* Ordre tiré au sort : toujours a, puis i, puis ou, et l'enfant répond de
+       mémoire sans plus écouter. */
+    _melange([
+      B.controle('CONTRÔLE','Où est le son '+q('a')+' ?','Où est le son « a » ?',[F,K,D],F),
+      B.controle('CONTRÔLE','Où est le son '+q('i')+' ?','Où est le son « i » ?',[F,K,D],K),
+      B.controle('CONTRÔLE','Où est le son '+q('ou')+' ?','Où est le son « ou » ?',[F,K,D],D)
+    ]),
 
     /* Cet écran parle du NOM des voyelles : on joue donc le nom quand
        l'enfant appuie dessus, pas le son — il vient de l'entendre trois
@@ -10703,8 +10817,11 @@ function _boyVowelCourse(ca){
       'Deux traits en-dessous : « i » devient « in »'),
     B.tracer('ÉTAPE 14 · TRACÉ',TK,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
 
-    B.controle('CONTRÔLE 4','Où est le son '+q('an')+' ?','Où est le son « an » ?',[TF,TK,TD],TF),
-    B.controle('CONTRÔLE 5','Où est le son '+q('oun')+' ?','Où est le son « oun » ?',[TF,TK,TD],TD),
+    _melange([
+      B.controle('CONTRÔLE','Où est le son '+q('an')+' ?','Où est le son « an » ?',[TF,TK,TD],TF),
+      B.controle('CONTRÔLE','Où est le son '+q('oun')+' ?','Où est le son « oun » ?',[TF,TK,TD],TD),
+      B.controle('CONTRÔLE','Où est le son '+q('in')+' ?','Où est le son « in » ?',[TF,TK,TD],TK)
+    ]),
 
     B.obs('ÉTAPE 15 · SOUKOUN',SK,null,'Un petit rond :<br>on ne prononce que<br>le '+b('son de la lettre')+' ⭕',
       'Un petit rond : on ne prononce que le son de la lettre.','⭕ Pas de voyelle'),
@@ -10834,6 +10951,18 @@ function _boyLetterCourse(ca,idx,premiere){
 
   sc.push(B.brief('MISSION · BRIEFING','Nouvelle lettre :<br>'+b(L.name)+' 🎯',
     'Mission du moment : la lettre '+L.name,premiere?'▶ DÉCOLLAGE':'SUIVANT ▸'));
+  /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
+     de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
+     référence est la lettre sans point de la famille. */
+  var jumelle=_CL_JUMELLES[A];
+  if(jumelle){
+    var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
+    if(ref){
+      sc.push(B.brief('MISSION · UN AIR CONNU',
+        b(L.name)+' s\'écrit exactement<br>comme '+b(ref.name)+',<br>avec '+b(jumelle.point)+' 👀',
+        'La lettre '+L.name+' s\'écrit exactement comme la lettre '+ref.name+', avec '+jumelle.point+'.'));
+    }
+  }
   /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
      déjà : les deux sont réunis. Et la hamza n'a pas de son propre. */
   sc.push(formeUnique
@@ -10843,11 +10972,23 @@ function _boyLetterCourse(ca,idx,premiere){
     : B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,
         'Voici '+b(L.name)+'.<br>'+b('Isolée')+', elle s\'écrit ainsi.',
         'Voici la lettre '+L.name+'. Isolée, elle s\'écrit ainsi.'));
-  if(lourde){
-    sc.push(B.brief('ÉTAPE 2 · ALERTE','C\'est une lettre '+b('grave')+' !<br>On verra ce que ça veut dire<br>avec la '+b('fatḥa')+' 🦁',
-      'C\'est une lettre grave. On verra la signification avec la fatha.'));
+  /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
+     là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
+     française se trompe. « khè » au lieu de « kha ». */
+  function grave(son,juste){
+    return B.brief('ÉTAPE · ATTENTION','On ne dit pas '+b('« '+son+' »')+'<br>mais '+b('« '+juste+' »')+',<br>car c\'est une lettre '+b('grave')+' 👂',
+      'On ne dit pas '+son+', mais '+juste+', car c\'est une lettre grave.');
   }
-  if(!attache){
+  var latMin=(lat||'').toLowerCase();
+  if(finDeMot){
+    /* Le tā marbūṭa n'a pas d'histoire d'accrochage à raconter : ce qui
+       compte pour lui, c'est sa place. */
+    sc.push(B.brief('ÉTAPE · PLACE','Elle se trouvera '+b('toujours')+'<br>à la fin du mot 🔚',
+      'Elle se trouvera toujours à la fin du mot.'));
+  }else if(formeUnique){
+    sc.push(B.brief('ÉTAPE · ACCROCHAGE','Sans support, elle ne s\'attache<br>'+b('JAMAIS')+',<br>ni avant, ni après 🚫',
+      'Sans support, elle ne s\'attache jamais, ni avant, ni après.'));
+  }else if(!attache){
     sc.push(B.brief('ÉTAPE · ACCROCHAGE','Elle ne s\'accroche '+b('JAMAIS')+'<br>à la lettre suivante 🚫',
       'Cette lettre ne s\'accroche jamais à la lettre suivante.'));
   }
@@ -10865,7 +11006,7 @@ function _boyLetterCourse(ca,idx,premiere){
      leurs vrais noms : « isolée » et « fin » pour le tā marbūṭa, pas
      « début » et « milieu ». */
   function formesMontrees(signe){
-    return aMontrer.map(function(n){return formes[n].form+(signe||'');});
+    return aMontrer.map(function(n){return _avecSigne(formes[n].form,signe);});
   }
   var nomsMontres=aMontrer.map(function(n){return NOMS[n].toLowerCase();});
   var combien=total>1?('ses '+total+' formes'):'cette forme';
@@ -10916,12 +11057,18 @@ function _boyLetterCourse(ca,idx,premiere){
     ['أ','ؤ','ئ'].forEach(function(g,n){
       sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ','Parfois, tu verras<br>la hamzah sur le '+b(['ا','و','ي'][n])+' 🪑',
         'Parfois, tu verras la hamzah sur le '+['alif','waw','ya'][n]+'.'));
-      sc.push(B.tracer('SUPPORT '+(n+1)+'/3 · TRACÉ',g,'Trace '+b(g)+' ✍️','Trace ce support.'));
+      /* Le siège, lui, s'attache : on trace ses formes, la hamzah dessus. */
+      var afSiege=_AF[g]||_AF[['ا','و','ي'][n]]||{i:g,m:g,f:g};
+      var fSiege=_childForms({ar:g},afSiege);
+      var vues={},listeSiege=[],nomsSiege=[];
+      fSiege.forEach(function(f,k){
+        if(vues[f.form])return;vues[f.form]=1;
+        listeSiege.push(f.form);nomsSiege.push(NOMS[k].toLowerCase());
+      });
+      sc.push(B.tracer('SUPPORT '+(n+1)+'/3 · TRACÉ',listeSiege,
+        'Trace '+b(g)+'<br>dans ses '+b(listeSiege.length+' formes')+' ✍️',
+        'Trace ce support dans ses formes.',null,nomsSiege));
     });
-  }
-  if(A==='ة'){
-    sc.push(B.brief('ÉTAPE · PLACE','Elle se trouvera '+b('toujours')+'<br>à la fin du mot 🔚',
-      'Elle se trouvera toujours à la fin du mot.'));
   }
   /* La lettre sur la piste, avec ses voyelles */
   sc.push(B.brief('ÉTAPE · SUR LA PISTE','Maintenant,<br>ses '+b('voyelles')+'.',
@@ -10929,12 +11076,7 @@ function _boyLetterCourse(ca,idx,premiere){
   [['َ','a','au-dessus'],['ِ','i','en-dessous'],['ُ','ou','au-dessus']].forEach(function(v,n){
     sc.push(B.obs('VOYELLE '+(n+1)+'/3',A+v[0],A+v[0],
       'Signe '+b(v[2])+' :<br>ça fait '+q(v[1]),'Signe '+v[2]+', ça fait '+(lat+v[1]).toLowerCase(),null,true));
-    /* Le khā se dit « kha », pas « khè » : c'est la faute la plus courante,
-       et elle vaut d'être dite au moment où l'enfant entend la syllabe. */
-    if(A==='خ'&&n===0){
-      sc.push(B.brief('ÉTAPE · ATTENTION','On ne dit pas '+b('« khè »')+'<br>mais '+b('« kha »')+' ! 👂',
-        'On ne dit pas khè, mais kha.'));
-    }
+    if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',formesMontrees(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(combien)+' ✍️',
       'Trace cette syllabe dans '+combien+'.',null,nomsMontres));
@@ -10945,34 +11087,69 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Les propositions prennent une forme qui EXISTE pour cette lettre : la
      hamza n'en a qu'une, le tā marbūṭa n'en a pas de début ni de milieu. */
   function fx(n){return f4[aMontrer.indexOf(n)>=0?n:aMontrer[aMontrer.length-1]].form;}
-  sc.push(B.controle('CONTRÔLE 1','Où est '+q('a')+' ?','Où est ce son ?',
-    [[fx(1)+'َ',A+'َ'],[fx(1)+'ِ',A+'ِ'],[fx(1)+'ُ',A+'ُ']],fx(1)+'َ'));
-  sc.push(B.controle('CONTRÔLE 2','Où est '+q('ou')+' ?','Où est ce son ?',
-    [[fx(3)+'ُ',A+'ُ'],[fx(3)+'َ',A+'َ'],[fx(3)+'ِ',A+'ِ']],fx(3)+'ُ'));
-  sc.push(B.controle('CONTRÔLE 3','Où est '+q('i')+' ?','Où est ce son ?',
-    [[fx(2)+'ِ',A+'ِ'],[fx(2)+'َ',A+'َ'],[fx(2)+'ُ',A+'ُ']],fx(2)+'ِ'));
+  /* L'ordre des questions est tiré au sort : toujours a, puis ou, puis i,
+     l'enfant finit par répondre de mémoire sans écouter. */
+  [[1,'َ','a'],[3,'ُ','ou'],[2,'ِ','i']].sort(function(){return Math.random()-.5;})
+    .forEach(function(o,n){
+      var f=fx(o[0]);
+      function cible(sg){return _avecSigne(f,sg);}
+      sc.push(B.controle('CONTRÔLE '+(n+1),'Où est '+q(o[2])+' ?','Où est ce son ?',
+        [[cible('َ'),A+'َ'],[cible('ِ'),A+'ِ'],[cible('ُ'),A+'ُ']],cible(o[1])));
+    });
   /* Tanwīn */
+  /* Le tanwīn ne se pose QUE sur la dernière lettre d'un mot : on ne fait
+     donc tracer que l'isolée et la forme attachée de fin. */
+  var tanwFormes=aMontrer.filter(function(n){return n===0||n===3;});
+  var tanwListe=function(signe){return tanwFormes.map(function(n){return _avecSigne(formes[n].form,signe);});};
+  var tanwNoms=tanwFormes.map(function(n){return NOMS[n].toLowerCase();});
+  var tanwCombien=tanwFormes.length>1?('ses '+tanwFormes.length+' formes de fin de mot'):'cette forme';
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
       'Doublé, ça fait '+(lat+v[1]).toLowerCase(),null,true));
-    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',formesMontrees(v[0]),
-      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(combien)+' ✍️',
-      'Trace ce tanwîn dans '+combien+'.',null,nomsMontres));
+    if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
+    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',tanwListe(v[0]),
+      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
+      'Trace ce tanwîn dans '+tanwCombien+'.',null,tanwNoms));
   });
   /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas. */
   if(!finDeMot){
-    sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ','Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕',
-    'Petit rond : on ne prononce que le son de la lettre.'));
+    /* L'alif et la hamzah n'ont pas de son propre : avec un soukoun, on ne
+       prononce rien du tout. */
+    var muette=(A==='ا'||A==='ء');
+    sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ',
+      muette?('Petit rond :<br>on ne '+b('prononce rien')+' ⭕')
+            :('Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕'),
+      muette?'Petit rond : on ne prononce rien.'
+            :'Petit rond : on ne prononce que le son de la lettre.'));
+    /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
+       fait donc tracer sur les formes début et milieu, les seules où il
+       apparaît. */
+    if(attache){
+      sc.push(B.tracer('ÉTAPE · SOUKOUN · TRACÉ',
+        [_avecSigne(formes[1].form,'ْ'),_avecSigne(formes[2].form,'ْ')],
+        'Trace le '+b('soukoun')+'<br>sur le '+b('début')+' et le '+b('milieu')+' ✍️',
+        'Trace le soukoun sur la forme du début et sur celle du milieu.',
+        null,['début','milieu']));
+    }
   }
   if(avecProlong&&!finDeMot){
     [['َا','aaa','ا'],['ُو','ouou','و'],['ِي','iii','ي']].forEach(function(v,n){
       sc.push(B.obs('ALLONGEMENT '+(n+1)+'/3',A+v[0],A+v[0],'Avec '+b(v[2])+' :<br>ça fait '+q(v[1])+' 🎵',
         'Avec cette lettre, le son s\'étire.'));
-      if(A==='خ'&&n===0){
-        sc.push(B.brief('ÉTAPE · ATTENTION','Là non plus :<br>pas '+b('« khèè »')+'<br>mais '+b('« khaa »')+' ! 👂',
-          'On ne dit pas khèè, mais khaa.'));
-      }
-      sc.push(B.tracer('ALLONGEMENT '+(n+1)+'/3 · TRACÉ',A+v[0],'Trace '+b((lat+v[1]).toLowerCase())+' ✍️','Trace cet allongement.'));
+      if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
+      /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
+         dans les trois places qu'elle y prend — la lettre au début puis au
+         milieu, et la prolongation qui appelle la suite ou termine le mot.
+         Une lettre de prolongation qui ne s'accroche pas (ا et و) coupe le
+         mot : elle n'a pas de forme « milieu », donc deux cases suffisent. */
+      var pSuit=(v[2]==='ي');   /* seul le yā appelle encore la lettre d'après */
+      var casesP=[],nomsP=[];
+      casesP.push(A+v[0]+(pSuit?_TATWEEL:''));nomsP.push('début');
+      if(pSuit){casesP.push(_TATWEEL+A+v[0]+_TATWEEL);nomsP.push('milieu');}
+      casesP.push(_TATWEEL+A+v[0]);nomsP.push('fin');
+      sc.push(B.tracer('ALLONGEMENT '+(n+1)+'/3 · TRACÉ',casesP,
+        'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(casesP.length+' places')+' ✍️',
+        'Trace cet allongement dans ses différentes places.',null,nomsP));
     });
   }
   /* Le mot */
@@ -11004,15 +11181,21 @@ function _boyLetterCourse(ca,idx,premiere){
     }else if(ile.finie&&derniereIle){
       /* La toute dernière île : il n'y a plus d'aventure à annoncer, on
          envoie l'enfant s'entraîner. */
-      B.mission('Bravo ! 🎉<br>Tu as terminé<br>'+b('toute l\'île')+' !<br>'
-        +'Teste tes connaissances<br>dans la rubrique '+b('Exercices')+' 🏅',
-        'Bravo ! Tu as terminé toute l\'île. Teste tes connaissances dans la rubrique Exercices.',
+      B.mission('Bravo ! 🎉<br>Tu as validé<br>'+b('toutes les missions')+' !<br>'
+        +'Teste tes connaissances<br>dans la rubrique '
+        +'<span class="boy-lien" onclick="navToPage(\'exercises\')">Exercices</span> 🏅',
+        'Bravo ! Tu as validé toutes les missions ! Teste tes connaissances dans la rubrique Exercices.',
         function(){showS('s-menu',true,true);},'▸ MENU PRINCIPAL')(api);
     }else if(ile.finie){
-      B.mission('Bravo ! 🎉<br>Tu as terminé<br>'+b('toute l\'île')+' !<br>'
-        +'À très vite pour la<br>'+b('prochaine aventure')+' ! 🚀',
-        'Bravo ! Tu as terminé toute l\'île. Tu as été formidable. À très vite pour la prochaine aventure !',
-        function(){renderSessionsMap(ca);},'▸ LA SUITE DE L\'AVENTURE')(api);
+      /* Île terminée : on annonce la mission finie et on ramène l'enfant à la
+         carte sans qu'il ait à appuyer — le temps de lire, pas plus. */
+      B.mission('Bravo ! 🎉<br>Tu as fini ta '+b('mission')+' !<br>'
+        +'À très vite pour une<br>'+b('prochaine aventure')+' ! 🚀',
+        'Bravo ! Tu as fini ta mission ! À très vite pour une prochaine aventure !',
+        function(){renderSessionsMap(ca);},'▸ LA CARTE DES ÎLES')(api);
+      api.plusTard(function(){
+        if(st._curPage==='child')renderSessionsMap(ca);
+      },5200);
     }else{
       B.mission('Bravo ! 🎉<br>Tu maîtrises '+b(L.name)+' 🎖️<br>Continue comme ça !',
         'Bravo ! Tu maîtrises cette lettre. Continue comme ça !',
@@ -13412,8 +13595,9 @@ var ADMIN_SOUNDS = [
   /* ── Le khā ── deux mises en garde dites dans son cours. La synthèse
      française dit « khè » justement, donc ces deux-là DOIVENT être
      enregistrées pour avoir un sens. */
-  {ar:'On ne dit pas khè, mais kha.',label:'khā — « kha », pas « khè »'},
-  {ar:'On ne dit pas khèè, mais khaa.',label:'khā allongé — « khaa », pas « khèè »'},
+  /* Les mises en garde des lettres graves sont ajoutées juste après la liste :
+     elles se déduisent des lettres elles-mêmes, pas la peine de les écrire
+     une par une. */
 
   /* ── Interface fille : chaînes utilisées par les cours enfant ──
      Sans enregistrement, elles passent par la synthèse vocale et sont
@@ -13459,6 +13643,25 @@ var ADMIN_SOUNDS = [
   {ar:'بّ',label:'b-b — chaddah'},
   {ar:'نُورٌ',label:'nūrun — une lumière'}
 ];
+/* ── Les mises en garde des lettres graves ──
+   Trois par lettre : la fatḥa, son tanwīn et sa prolongation. La synthèse
+   française dit justement « khè » là où il faut « kha » : sans ces
+   enregistrements, la phrase se contredit elle-même. Les clés doivent être
+   IDENTIQUES au texte dit par le cours (voir grave() dans _boyLetterCourse). */
+(function(){
+  try{
+    var noms={'خ':'khā','ر':'rā','ص':'ṣād','ض':'ḍād','ط':'ṭā','ظ':'ẓā','غ':'ghayn','ق':'qāf'};
+    _CL_HEAVY.split('').forEach(function(ar){
+      var l=(_CL_LAT[ar]||'').toLowerCase();if(!l)return;
+      [['è','a','fatḥa'],['èn','an','tanwīn fatḥ'],['èè','aa','fatḥa prolongée']]
+        .forEach(function(o){
+          ADMIN_SOUNDS.push({
+            ar:'On ne dit pas '+l+o[0]+', mais '+l+o[1]+', car c\'est une lettre grave.',
+            label:(noms[ar]||ar)+' '+o[2]+' — « '+l+o[1]+' », pas « '+l+o[0]+' »'});
+        });
+    });
+  }catch(e){}
+})();
 
 var adminRecorder = null;
 var adminChunks = [];
@@ -13877,6 +14080,9 @@ function showChildAlert(msg) {
 var _childAudioCtx = null;
 function getChildAudioCtx() {
   if(!_childAudioCtx) try { _childAudioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+  /* Réveil : sur mobile le contexte se met en pause tout seul, et les sons
+     de bonne et de mauvaise réponse ne partaient plus. */
+  try{ if(_childAudioCtx&&_childAudioCtx.state==='suspended'&&_childAudioCtx.resume)_childAudioCtx.resume(); }catch(e){}
   return _childAudioCtx;
 }
 function playChildSound(type) {

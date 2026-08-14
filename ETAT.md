@@ -222,6 +222,20 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Carte des îles** : la carte reste CACHÉE le temps de poser le personnage
+  et de faire défiler jusqu'à lui — sinon on voyait le haut du chemin une
+  fraction de seconde, puis un saut. Elle attend le chargement des images
+  d'îles (`_quandCartePrete`, 1,5 s au pire) plutôt qu'un délai fixe.
+- **Rotation du téléphone** : le test portait sur `st._curPage==='sessions'`
+  alors que la carte se marque `'sessions-map'` — la carte ne se redessinait
+  donc JAMAIS en tournant l'appareil. Corrigé, et `orientationchange` écoute
+  aussi, Android ne déclenchant pas toujours `resize`.
+- **Sons de bonne et mauvaise réponse** : chaque appel créait un nouveau
+  contexte audio. Les navigateurs en limitent le nombre (six sur Chrome) :
+  passé la sixième réponse, plus aucun son jusqu'au rechargement. Un seul
+  contexte désormais, réveillé s'il s'est mis en pause.
+- **Un signe se pose sur la LETTRE, pas sur son trait de liaison**
+  (`_avecSigne`) : « خـ » + fatḥa donnait « خـَ », la voyelle sur le tiret.
 - **Carte des îles** : le personnage n'arrive plus au coin en haut à gauche.
   `_ileDepart()` le pose sur l'île qu'on vient de quitter (retenue dans
   `arab_ile` au clic), sinon la dernière entamée, sinon la dernière validée.
