@@ -110,12 +110,20 @@ lettres**.
   sans promener de pinceau (dès qu'un trait revient sur lui-même ou fait une
   boucle, les deux côtés sont à égale distance et la lettre se révèle par
   plaques — c'est ce que le client a vu sur le م, le ه, le ص).
-- Les points ne sont pas rattachés au corps : ce sont des taches d'encre
-  détachées, gardées pour la toute fin. C'est la règle du client, et les
-  voyelles posées sur la lettre suivent le même sort. Ce qui est corps et ce
-  qui est point ne se décide PAS à la taille de la tache mais au passage du
-  crayon : le petit kāf logé dans le ك est minuscule et fait pourtant partie
-  de la lettre — il s'écrit donc, du haut vers le bas, après le corps.
+- **Trois temps, dans l'ordre où la main écrit** : le corps de la lettre au
+  fil du geste, PUIS ses points un par un de droite à gauche, PUIS sa voyelle
+  de la même façon. L'avancement va donc de 0 à 3, un temps par phase, et un
+  temps vide (pas de point, pas de voyelle) est sauté. Les pixels de la
+  voyelle sont repérés en peignant la même chaîne sans ses signes : les
+  lettres, elles, se dessinent exactement pareil.
+- Ce qui est corps et ce qui est point ne se décide PAS à la taille de la
+  tache mais au passage du crayon : le petit kāf logé dans le ك est minuscule
+  et fait pourtant partie de la lettre — il s'écrit donc, du haut vers le bas,
+  après le corps.
+- **Rayon du pinceau : 0,075 em.** Large, il découvrait d'un coup tout un
+  trait de liaison (vu par le client sur l'alif attaché) et, sur une petite
+  boucle comme celle du و ou du ق, il couvrait les deux côtés à la fois. Il
+  doit rester juste au-dessus de l'épaisseur du trait.
 - `_TRACE_MODELE` : un geste par base et par forme (seule, début, milieu,
   fin), en « em » depuis l'ancre du glyphe, donc valable à toutes les tailles.
   `_BASE_TRACE` renvoie chaque lettre à sa base : seuls les points changent,

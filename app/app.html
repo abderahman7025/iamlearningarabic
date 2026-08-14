@@ -9821,25 +9821,38 @@ var _TRACE_MODELE={
   /* ف — le petit cercle dans le sens des aiguilles d'une montre, puis le
      trait horizontal, puis on remonte un peu */
   'ف':{
-    seule:[[[0.20,-0.05],[0.26,-0.24],[0.40,-0.28],[0.44,-0.14],[0.30,-0.05],[0.10,-0.03],
-            [-0.20,-0.04],[-0.38,-0.10],[-0.44,-0.18]]],
-    debut:[[[0.06,-0.12],[0.12,-0.40],[0.00,-0.56],[-0.08,-0.36],[-0.02,-0.12],
-            [-0.12,-0.05],[-0.22,-0.05]]],
-    milieu:[[[0.32,-0.05],[0.16,-0.05],[0.16,-0.30],[0.04,-0.52],[-0.06,-0.34],[0.00,-0.10],
-             [-0.14,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.56,-0.05],[0.36,-0.05],[0.34,-0.28],[0.22,-0.48],[0.10,-0.30],[0.14,-0.06],
-          [-0.05,0.02],[-0.30,0.04],[-0.46,-0.06]]]
+    /* même principe que le wāw : on part du bas à droite du petit cercle, on
+       le fait dans le sens des aiguilles d'une montre, et une fois revenu au
+       départ on file vers la gauche — sans passer sous la ligne, elle. */
+    seule:[[[0.40,-0.08],[0.30,-0.05],[0.18,-0.10],[0.15,-0.20],[0.23,-0.31],
+            [0.36,-0.31],[0.44,-0.21],[0.42,-0.10],[0.31,-0.05],
+            [0.10,-0.03],[-0.14,-0.03],[-0.32,-0.07],[-0.42,-0.18],[-0.43,-0.31]]],
+    debut:[[[0.13,-0.10],[0.05,-0.07],[-0.02,-0.15],[-0.02,-0.30],[0.05,-0.40],
+            [0.12,-0.31],[0.14,-0.15],[0.12,-0.08],
+            [0.00,-0.05],[-0.13,-0.05],[-0.25,-0.05]]],
+    milieu:[[[0.32,-0.05],[0.19,-0.05],[0.14,-0.10],[0.06,-0.07],[-0.01,-0.15],
+             [-0.01,-0.32],[0.06,-0.44],[0.13,-0.32],[0.15,-0.14],[0.13,-0.08],
+             [0.00,-0.05],[-0.16,-0.05],[-0.32,-0.05]]],
+    fin:[[[0.58,-0.03],[0.42,-0.03],[0.37,-0.09],[0.28,-0.04],[0.20,-0.13],
+          [0.20,-0.29],[0.28,-0.39],[0.36,-0.29],[0.37,-0.12],[0.34,-0.05],
+          [0.14,0.01],[-0.10,0.05],[-0.34,0.05],[-0.46,-0.02],[-0.50,-0.11]]]
   },
   /* ق — idem ف, mais isolée et fin passent sous la ligne */
+  /* ق — le même geste que le fā ; la seule différence, c'est que la boucle
+     passe SOUS la ligne pour l'isolée et pour la fin. */
   'ق':{
-    seule:[[[0.06,-0.05],[0.12,-0.24],[0.24,-0.24],[0.22,-0.07],[0.10,0.04],
-            [-0.08,0.09],[-0.22,0.03],[-0.28,-0.12],[-0.29,-0.26]]],
-    debut:[[[0.06,-0.12],[0.12,-0.40],[0.00,-0.56],[-0.08,-0.36],[-0.02,-0.12],
-            [-0.12,-0.05],[-0.22,-0.05]]],
-    milieu:[[[0.32,-0.05],[0.16,-0.05],[0.16,-0.30],[0.04,-0.52],[-0.06,-0.34],[0.00,-0.10],
-             [-0.14,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.38,-0.05],[0.20,-0.06],[0.16,-0.30],[0.02,-0.38],[-0.08,-0.24],[0.00,-0.06],
-          [0.02,0.12],[-0.14,0.25],[-0.30,0.10]]]
+    seule:[[[0.28,-0.07],[0.19,-0.02],[0.09,-0.07],[0.07,-0.17],[0.16,-0.26],
+            [0.27,-0.21],[0.28,-0.11],[0.26,-0.04],
+            [0.14,0.05],[0.00,0.10],[-0.14,0.09],[-0.25,0.02],[-0.28,-0.13]]],
+    debut:[[[0.13,-0.10],[0.05,-0.07],[-0.02,-0.15],[-0.02,-0.30],[0.05,-0.40],
+            [0.12,-0.31],[0.14,-0.15],[0.12,-0.08],
+            [0.00,-0.05],[-0.13,-0.05],[-0.25,-0.05]]],
+    milieu:[[[0.32,-0.05],[0.19,-0.05],[0.14,-0.10],[0.06,-0.07],[-0.01,-0.15],
+             [-0.01,-0.32],[0.06,-0.44],[0.13,-0.32],[0.15,-0.14],[0.13,-0.08],
+             [0.00,-0.05],[-0.16,-0.05],[-0.32,-0.05]]],
+    fin:[[[0.38,-0.04],[0.26,-0.04],[0.21,-0.10],[0.13,-0.06],[0.06,-0.15],
+          [0.07,-0.29],[0.17,-0.37],[0.27,-0.29],[0.27,-0.14],[0.24,-0.05],
+          [0.16,0.09],[0.02,0.21],[-0.12,0.24],[-0.24,0.18],[-0.29,0.06]]]
   },
   /* ك — la grande barre puis la forme, et le petit kāf dedans, du haut vers
      le bas */
@@ -9893,12 +9906,19 @@ var _TRACE_MODELE={
              [-0.18,-0.04],[-0.35,-0.05]]],
     fin:[[[0.26,-0.05],[0.08,-0.06],[0.00,-0.34],[-0.12,-0.26],[-0.14,-0.12],[-0.04,-0.10]]]
   },
-  /* و — comme le qāf sans finir la boucle ; ne s'accroche pas à la suivante */
+  /* و — on part du BAS À DROITE de la boucle, on la fait dans le sens des
+     aiguilles d'une montre, et une fois revenu au départ on continue vers le
+     bas pour la partie qui passe sous la ligne. Ne s'accroche pas à la
+     suivante. */
   'و':{
-    seule:[[[0.06,-0.06],[0.12,-0.24],[0.02,-0.30],[-0.06,-0.18],[0.02,-0.02],
-            [0.06,0.14],[-0.06,0.28],[-0.24,0.27]]],
-    fin:[[[0.26,-0.05],[0.10,-0.06],[0.02,-0.20],[-0.06,-0.10],[0.00,0.06],
-          [-0.10,0.26],[-0.30,0.27]]]
+    seule:[[[0.13,-0.08],[0.06,-0.04],[-0.01,-0.09],[-0.03,-0.17],[0.01,-0.24],
+            [0.08,-0.27],[0.14,-0.22],[0.15,-0.14],[0.13,-0.07],
+            [0.14,0.03],[0.10,0.13],[0.02,0.22],[-0.10,0.28],[-0.24,0.27]]],
+    /* le trait de liaison arrive par la droite, jusqu'au point de départ de
+       la boucle, puis c'est le même geste */
+    fin:[[[0.25,-0.05],[0.14,-0.05],[0.09,-0.03],[0.01,-0.02],[-0.07,-0.08],
+          [-0.06,-0.16],[0.01,-0.21],[0.08,-0.17],[0.10,-0.09],
+          [0.08,0.02],[0.03,0.13],[-0.05,0.22],[-0.17,0.27],[-0.30,0.26]]]
   },
   /* ي — le serpentin d'un seul trait, en partant du haut à droite ; au
      milieu, elle s'écrit comme le bā */
@@ -10043,9 +10063,29 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   /* Le chemin suit le glyphe, décalage compris : sans cela le pinceau
      passerait au-dessus d'un ج descendu. */
   ancreY+=_descenteGlyphe(texte,px);
+  /* La VOYELLE arrive après les points, et progressivement elle aussi : on
+     repère ses pixels en peignant la même chaîne sans ses signes — les
+     lettres, elles, se dessinent exactement pareil. */
+  var voyelle=[];
+  var texteNu=_sansCercle(texte).replace(_MARQUES,'');
+  if(texteNu!==_sansCercle(texte)){
+    var cvN=document.createElement('canvas');cvN.width=w;cvN.height=h;
+    var cn=cvN.getContext('2d');
+    cn.font=px+"px 'Scheherazade New',serif";
+    cn.textBaseline='alphabetic';cn.textAlign='center';cn.fillStyle=_TRACE_GRIS;
+    _dessineSurLigne(cn,texteNu,ax-x0,ay-y0,px);
+    var dn=cn.getImageData(0,0,w,h).data;
+    for(i=0;i<w*h;i++){
+      if(encre[i]&&dn[i*4+3]<=12){voyelle.push(i);encre[i]=0;}
+    }
+    taches=_tachesEncre(encre,w,h);
+  }
   var rang=new Float64Array(w*h);
   for(i=0;i<w*h;i++)rang[i]=-1;
-  var R=Math.max(2,Math.round(0.15*px));            /* rayon du pinceau */
+  /* Rayon du pinceau. Large, il découvrait d'un coup tout un trait de
+     liaison — le client l'a vu sur l'alif attaché. Juste au-dessus de
+     l'épaisseur du trait, il avance vraiment de droite à gauche. */
+  var R=Math.max(2,Math.round(0.075*px));
   var nPas=Math.max(40,Math.round(plat.L/0.015));
   for(var k=0;k<=nPas;k++){
     var pos=plat.L*k/nPas,reste=pos,pu=0,pv=0;
@@ -10091,33 +10131,63 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   corps.sort(function(a,b){return a[1]-b[1];});
   var ordre=new Int32Array(corps.length);
   for(i=0;i<corps.length;i++)ordre[i]=corps[i][0];
+  /* Les points, puis la voyelle, ne tombent plus d'un bloc : ils se posent
+     eux aussi de droite à gauche, un point après l'autre — c'est le sens de
+     l'écriture, et avec deux ou trois points on voit la différence. */
+  function deDroiteAGauche(liste){
+    /* d'abord tache par tache, la plus à droite en premier ; puis, dans une
+       tache, du bord droit vers le bord gauche */
+    var parTache={};
+    liste.forEach(function(j){
+      var lb=taches.lab[j]||0,x=j%w;
+      var t=parTache[lb]||(parTache[lb]={max:-1,pix:[]});
+      t.pix.push(j);if(x>t.max)t.max=x;
+    });
+    var out=[];
+    Object.keys(parTache).map(function(k){return parTache[k];})
+      .sort(function(a,b){return b.max-a.max;})
+      .forEach(function(t){
+        t.pix.sort(function(a,b){return (b%w)-(a%w);});
+        out=out.concat(t.pix);
+      });
+    return out;
+  }
+  points=deDroiteAGauche(points);
+  voyelle=voyelle.sort(function(a,b){return (b%w)-(a%w);});
   return {cv:cv,ctx:c,img:img,tampon:c.createImageData(w,h),
-          ordre:ordre,points:points,x0:x0,y0:y0,fait:-1};
+          ordre:ordre,points:points,voyelle:voyelle,x0:x0,y0:y0,fait:-1};
 }
-/* Peint la forme révélée jusqu'à la fraction p de son geste. p >= 1 : la
-   lettre entière, points compris. Renvoie le calque à poser sur le canvas. */
+/* Peint la forme révélée. L'avancement va de 0 à 3, en TROIS temps — c'est
+   l'ordre d'écriture voulu par le client :
+     0 → 1 : le corps de la lettre, au fil du geste ;
+     1 → 2 : ses points, un par un, de droite à gauche ;
+     2 → 3 : sa voyelle, de la même façon.
+   Renvoie le calque à poser sur le canvas. */
 function _reveleJusqua(rev,p){
-  var n=rev.ordre.length;
-  var cible=(p>=1)?n:Math.max(0,Math.min(n,Math.floor(p*n)));
-  /* On revient en arrière (l'animation recommence) : on repart d'une page
-     blanche, sinon la lettre resterait écrite. */
-  if(cible<rev.fait||rev.fait<0){
-    rev.tampon.data.set(new Uint8Array(rev.tampon.data.length));
-    rev.fait=0;
-  }
   var s=rev.img.data,t=rev.tampon.data,i,j;
-  for(i=rev.fait;i<cible;i++){
-    j=rev.ordre[i]*4;
-    t[j]=s[j];t[j+1]=s[j+1];t[j+2]=s[j+2];t[j+3]=s[j+3];
+  function combien(liste,part){
+    return Math.max(0,Math.min(liste.length,Math.round(part*liste.length)));
   }
-  rev.fait=cible;
-  /* Les points arrivent d'un coup, quand le corps est terminé. */
-  if(p>=1){
-    for(i=0;i<rev.points.length;i++){
-      j=rev.points[i]*4;
+  var nC=combien(rev.ordre,Math.min(1,p));
+  var nP=combien(rev.points,Math.min(1,Math.max(0,p-1)));
+  var nV=combien(rev.voyelle,Math.min(1,Math.max(0,p-2)));
+  /* On revient en arrière (l'animation recommence) : page blanche, sinon la
+     lettre resterait écrite. */
+  var recule=(rev.fait<0)||(nC<rev.faitC||nP<rev.faitP||nV<rev.faitV);
+  if(recule){
+    rev.tampon.data.set(new Uint8Array(rev.tampon.data.length));
+    rev.faitC=0;rev.faitP=0;rev.faitV=0;rev.fait=0;
+  }
+  function pose(liste,de,a){
+    for(i=de;i<a;i++){
+      j=liste[i]*4;
       t[j]=s[j];t[j+1]=s[j+1];t[j+2]=s[j+2];t[j+3]=s[j+3];
     }
   }
+  pose(rev.ordre,rev.faitC,nC);rev.faitC=nC;
+  pose(rev.points,rev.faitP,nP);rev.faitP=nP;
+  pose(rev.voyelle,rev.faitV,nV);rev.faitV=nV;
+  rev.fait=1;
   rev.ctx.putImageData(rev.tampon,0,0);
   return rev.cv;
 }
@@ -10476,11 +10546,11 @@ function _boyScene(ca,reprise){
          premier trait, elle saute d'un cran à gauche pour ne pas s'animer
          sous sa main ; sur la dernière case, elle s'arrête. Une case qu'elle
          quitte reste entière. */
-      /* ms : le geste, le souffle avant les points, puis la lettre entière.
-         Ce dernier temps est court exprès — le client veut que ça enchaîne :
-         la lettre finie se montre le temps qu'on la voie, et le geste
-         repart. */
-      var ECRITURE=1050,POSE=280,POINTS=330;
+      /* ms. L'écriture se fait en trois temps, dans l'ordre où la main écrit :
+         le corps de la lettre, puis ses points, puis sa voyelle. Entre chacun,
+         un souffle. Le dernier temps est court exprès : le client veut que ça
+         enchaîne, la lettre finie se montre juste ce qu'il faut. */
+      var ECRITURE=1050,POSE=240,POINTS=300,POSE2=180,VOYELLE=300,FIN=330;
       var caseAnim=-1,caseEcrite=0,raf=null,depart=0,dernier=0,rev=null;
       function boucle(){
         /* L'écran a changé : le canvas n'est plus dans la page, on s'arrête.
@@ -10493,9 +10563,21 @@ function _boyScene(ca,reprise){
         var T=Date.now();
         if(T-dernier<33)return;            /* 30 images/s suffisent */
         dernier=T;
-        var c=(T-depart)%(ECRITURE+POSE+POINTS);
-        /* 0,999 et non 1 : le corps est fini, mais les points attendent. */
-        guide(c<ECRITURE?c/ECRITURE:(c<ECRITURE+POSE?0.999:1));
+        /* Un temps vide — pas de point, pas de voyelle — est sauté : sans
+           cela l'animation attendrait devant une lettre déjà finie. */
+        var aPoints=rev&&rev.points.length,aVoyelle=rev&&rev.voyelle.length;
+        var dPts=aPoints?POINTS:0,dPause2=(aPoints&&aVoyelle)?POSE2:0;
+        var dVoy=aVoyelle?VOYELLE:0;
+        var total=ECRITURE+POSE+dPts+dPause2+dVoy+FIN;
+        var c=(T-depart)%total;
+        var p;
+        if(c<ECRITURE)p=c/ECRITURE;
+        else if((c-=ECRITURE)<POSE)p=1;
+        else if((c-=POSE)<dPts)p=1+c/POINTS;
+        else if((c-=dPts)<dPause2)p=2;
+        else if((c-=dPause2)<dVoy)p=2+c/VOYELLE;
+        else p=3;
+        guide(p);
       }
       function anime(k){
         /* La case est préparée ici : on y peint la lettre à part, et on range
@@ -10508,12 +10590,12 @@ function _boyScene(ca,reprise){
         rev=(k>=0&&k<nb)
           ? _revelateur(liste[k],caseX(k),baseY,PX,xg,0,xd-xg,CH)
           : null;
-        if(!rev){caseAnim=-1;guide(1);return;}
+        if(!rev){caseAnim=-1;guide(3);return;}
         caseAnim=k;depart=Date.now();dernier=0;
         guide(0);
         if(raf===null)raf=requestAnimationFrame(boucle);
       }
-      guide(1);
+      guide(3);
       var barre=document.createElement('div');
       barre.style.cssText='display:flex;gap:8px;justify-content:center;margin-top:8px';
       p.appendChild(barre);
@@ -10550,7 +10632,7 @@ function _boyScene(ca,reprise){
       /* Une lettre non animée est dessinée une seule fois : si la police
          arabe n'est pas encore chargée, ce dessin-là est à refaire. */
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){
-        if(cvM.isConnected&&caseAnim<0)guide(1);
+        if(cvM.isConnected&&caseAnim<0)guide(3);
       });}catch(e){}
       btn=bouton(p,'SUIVANT ▸',suivant);
       btn.style.opacity='.45';
