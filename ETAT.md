@@ -170,6 +170,21 @@ chaîne en deux balises casserait la liaison arabe et le trait redeviendrait un
 tiret tout droit — le client l'a vu tout de suite. La part revenant au trait
 se mesure avec `_partLiaison()`.
 
+**La règle des formes attachées, dictée par le client.** Une forme attachée,
+c'est le trait de liaison de la DROITE vers la GAUCHE, puis **exactement le
+geste de l'isolée ou du début** — même sens. J'ai essayé d'inverser les
+boucles des formes attachées (wāw, fā, qāf) en croyant bien faire : le client
+a refusé net. Ne pas y revenir.
+
+**Ce que le client a validé et qu'il ne faut plus toucher** : lām début,
+milieu et fin ; kāf isolé et fin ; ʿayn début ; ṣād début ; mīm milieu ;
+hā isolé et fin ; djīm début et milieu ; ṭā isolé et début ; wāw isolé et
+début. Quand une forme est juste, elle sert de modèle à ses sœurs.
+
+**Départ d'un trait vertical** : mettre des points RAPPROCHéS au début du
+chemin. Espacés, le pinceau ouvre le haut et le bas ensemble et le trait
+semble monter au lieu de descendre (vu sur le rā et le nūn).
+
 **Les lettres qui n'ont pas toutes les formes.** Le tā marbūṭa ne vit qu'en
 fin de mot : ni début, ni milieu, ni déduction, ni prolongation, et jamais de
 soukoun. La hamza s'écrit toujours pareil : une seule forme, l'isolée — mais
@@ -239,6 +254,14 @@ page et URL propres, indexables. Elles se rangent à côté de
 ---
 
 ## Fait récemment (ne pas refaire)
+
+- **Retour automatique de fin d'île** : il vérifie que l'écran de fin est
+  encore à l'affiche (`api.wrap.isConnected`). Sans ce garde-fou, le minuteur
+  renvoyait à la carte le cours que l'enfant venait d'ouvrir.
+- Le tā marbūṭa se trace en « forme **attachée** » (`nomForme()`), à
+  l'observation comme au tracé.
+- Les jumelles se comparent à la PREMIÈRE lettre de leur famille : ḥā et khā
+  au djīm, pas l'inverse (`_CL_JUMELLES`).
 
 - **Carte des îles** : la carte reste CACHÉE le temps de poser le personnage
   et de faire défiler jusqu'à lui — sinon on voyait le haut du chemin une
