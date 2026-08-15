@@ -8791,16 +8791,18 @@ var _CL_HEAVY='خرصضطظغق';
 var _CL_JUMELLES={
   /* Le bā porte déjà un point : ses jumelles ne l'ajoutent pas, elles le
      déplacent. On le dit tel quel plutôt que de faire semblant. */
-  'ت':{comme:'ب',point:'deux points au-dessus, au lieu du point en dessous'},
-  'ث':{comme:'ب',point:'trois points au-dessus, au lieu du point en dessous'},
-  'ج':{comme:'ح',point:'un point en dessous'},
-  'خ':{comme:'ح',point:'un point au-dessus'},
-  'ذ':{comme:'د',point:'un point au-dessus'},
-  'ز':{comme:'ر',point:'un point au-dessus'},
-  'ش':{comme:'س',point:'trois points au-dessus'},
-  'ض':{comme:'ص',point:'un point au-dessus'},
-  'ظ':{comme:'ط',point:'un point au-dessus'},
-  'غ':{comme:'ع',point:'un point au-dessus'}
+  'ت':{comme:'ب',point:'avec deux points au-dessus, au lieu du point en dessous'},
+  'ث':{comme:'ب',point:'avec trois points au-dessus, au lieu du point en dessous'},
+  /* La référence d'une famille est sa PREMIÈRE lettre, celle que l'enfant a
+     déjà apprise — pour cette famille-là, c'est le djīm. */
+  'ح':{comme:'ج',point:'mais sans aucun point'},
+  'خ':{comme:'ج',point:'avec un point au-dessus, au lieu du point en dessous'},
+  'ذ':{comme:'د',point:'avec un point au-dessus'},
+  'ز':{comme:'ر',point:'avec un point au-dessus'},
+  'ش':{comme:'س',point:'avec trois points au-dessus'},
+  'ض':{comme:'ص',point:'avec un point au-dessus'},
+  'ظ':{comme:'ط',point:'avec un point au-dessus'},
+  'غ':{comme:'ع',point:'avec un point au-dessus'}
 };
 /* Comment nommer chaque position dans une phrase d'enfant */
 var _CL_POS={'Isolée':'Toute seule','Début':'Au début','Milieu':'Au milieu','Fin':'À la fin'};
@@ -9751,15 +9753,20 @@ var _TRACE_MODELE={
   'ج':{
     /* la partie tout en haut, puis on redescend, puis la grosse boucle qui
        passe sous la ligne */
-    seule:[[[-0.26,-0.25],[0.14,-0.22],[-0.08,-0.10],[-0.30,0.02],[-0.31,0.24],
-            [-0.16,0.44],[0.06,0.49],[0.26,0.44]]],
+    /* Calquée sur la forme début, que le client trouve juste : la tête se
+       trace de son bout gauche vers la droite, puis le crayon redescend en
+       biais et la grosse boucle part sous la ligne. */
+    seule:[[[-0.27,-0.26],[-0.12,-0.25],[0.02,-0.24],[0.15,-0.22],
+            [0.02,-0.15],[-0.12,-0.07],[-0.26,0.01],
+            [-0.32,0.13],[-0.30,0.27],[-0.20,0.40],[-0.04,0.48],[0.12,0.48],[0.26,0.43]]],
     /* même tête, puis le trait horizontal vers la gauche au lieu de la boucle */
     debut:[[[-0.28,-0.28],[0.30,-0.24],[0.00,-0.12],[-0.24,-0.05],[-0.41,-0.05]]],
     milieu:[[[0.47,-0.05],[0.32,-0.05]],
             [[-0.30,-0.30],[0.28,-0.22],[-0.02,-0.12],[-0.28,-0.05],[-0.47,-0.05]]],
-    fin:[[[0.40,-0.05],[0.24,-0.06]],
-         [[-0.28,-0.26],[0.14,-0.22],[-0.08,-0.10],[-0.30,0.04],[-0.32,0.24],
-          [-0.14,0.45],[0.08,0.49],[0.24,0.44]]]
+    fin:[[[0.40,-0.05],[0.30,-0.05],[0.24,-0.06]],
+         [[-0.29,-0.26],[-0.14,-0.25],[0.00,-0.24],[0.13,-0.22],
+          [0.00,-0.15],[-0.14,-0.07],[-0.28,0.02],
+          [-0.34,0.14],[-0.32,0.28],[-0.22,0.41],[-0.06,0.49],[0.10,0.48],[0.24,0.43]]]
   },
   /* د ذ — ne s'accrochent pas à la suivante */
   'د':{
@@ -9769,8 +9776,13 @@ var _TRACE_MODELE={
   },
   /* ر ز — idem د, mais la boucle descend sous la ligne */
   'ر':{
-    seule:[[[0.11,-0.20],[0.06,-0.02],[-0.02,0.14],[-0.14,0.25],[-0.25,0.25]]],
-    fin:[[[0.23,-0.05],[0.10,-0.06],[0.02,0.08],[-0.08,0.22],[-0.20,0.29],[-0.28,0.27]]]
+    /* La tête se trace du HAUT vers le bas : points rapprochés au départ,
+       sinon le pinceau ouvre le haut et le bas ensemble et le trait semble
+       remonter. */
+    seule:[[[0.12,-0.22],[0.11,-0.15],[0.09,-0.08],[0.06,-0.01],[0.01,0.08],
+            [-0.06,0.17],[-0.15,0.25],[-0.26,0.25]]],
+    fin:[[[0.23,-0.05],[0.14,-0.05],[0.09,0.00],[0.04,0.08],[-0.03,0.17],
+          [-0.12,0.25],[-0.21,0.29],[-0.28,0.27]]]
   },
   /* س ش — les boucles l'une après l'autre, comme un « u » attaché mais en
      partant de la droite */
@@ -9791,10 +9803,15 @@ var _TRACE_MODELE={
             [-0.05,0.02],[-0.20,0.26],[-0.40,0.31],[-0.54,0.17]]],
     debut:[[[-0.02,-0.02],[0.14,-0.26],[0.28,-0.33],[0.38,-0.20],[0.26,-0.05],[0.05,-0.03],
             [-0.20,-0.05],[-0.50,-0.05]]],
-    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.30,-0.22],[0.16,-0.32],[0.02,-0.18],[0.06,-0.04],
+    /* Milieu et fin : le trait de liaison d'abord, jusqu'au départ de l'œil,
+       puis exactement le geste du début — l'œil monte à 45° vers la droite,
+       fait le tour, et la suite vient après. */
+    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.16,-0.04],[0.02,-0.04],
+             [0.16,-0.26],[0.30,-0.32],[0.38,-0.20],[0.28,-0.06],[0.06,-0.04],
              [-0.20,-0.05],[-0.54,-0.05]]],
-    fin:[[[0.64,-0.05],[0.44,-0.05],[0.40,-0.24],[0.24,-0.32],[0.08,-0.16],[0.10,-0.03],
-          [-0.05,0.04],[-0.22,0.28],[-0.42,0.32],[-0.58,0.17]]]
+    fin:[[[0.62,-0.05],[0.44,-0.05],[0.24,-0.04],[0.08,-0.03],
+          [0.22,-0.26],[0.36,-0.32],[0.44,-0.20],[0.34,-0.06],[0.12,-0.03],
+          [-0.05,0.06],[-0.24,0.28],[-0.44,0.32],[-0.58,0.18]]]
   },
   /* ط ظ — l'œil, puis le crayon se lève et la barre verticale descend du haut */
   'ط':{
@@ -9802,21 +9819,38 @@ var _TRACE_MODELE={
            [[-0.14,-0.70],[-0.14,-0.06]]],
     debut:[[[-0.36,-0.04],[-0.12,-0.22],[0.06,-0.32],[0.24,-0.26],[0.26,-0.10],[0.06,-0.03],[-0.36,-0.05]],
            [[-0.15,-0.72],[-0.15,-0.06]]],
-    milieu:[[[0.41,-0.05],[0.24,-0.05],[0.10,-0.30],[-0.06,-0.24],[-0.10,-0.06],[-0.42,-0.05]],
-            [[-0.14,-0.72],[-0.14,-0.06]]],
-    fin:[[[0.45,-0.05],[0.28,-0.05],[0.14,-0.30],[-0.02,-0.24],[-0.08,-0.06],[-0.40,-0.05]],
-         [[-0.12,-0.71],[-0.12,-0.06]]]
+    /* Milieu et fin : le trait de liaison va de la droite vers la gauche
+       jusqu'au départ de l'œil, puis c'est le geste du début — l'œil monte à
+       45°, fait le tour, et la barre verticale vient en dernier. */
+    milieu:[[[0.41,-0.05],[0.24,-0.05],[0.04,-0.05],[-0.10,-0.06],
+             [0.02,-0.22],[0.18,-0.30],[0.28,-0.22],[0.24,-0.08],[0.04,-0.05],
+             [-0.20,-0.05],[-0.42,-0.05]],
+            [[-0.14,-0.72],[-0.14,-0.40],[-0.14,-0.06]]],
+    fin:[[[0.45,-0.05],[0.28,-0.05],[0.08,-0.05],[-0.08,-0.06],
+          [0.04,-0.22],[0.20,-0.30],[0.30,-0.22],[0.26,-0.08],[0.06,-0.05],
+          [-0.20,-0.05],[-0.40,-0.05]],
+         [[-0.12,-0.71],[-0.12,-0.40],[-0.12,-0.06]]]
   },
   /* ع غ — les deux « c » sans lever ; ses formes ne se déduisent pas */
   'ع':{
-    seule:[[[0.07,-0.28],[-0.02,-0.45],[-0.18,-0.44],[-0.26,-0.30],[-0.20,-0.16],
-            [-0.12,-0.12],[-0.25,0.06],[-0.26,0.30],[-0.14,0.44],[0.10,0.46],[0.34,0.42]]],
+    /* Le « c » du haut se trace comme dans la forme début, que le client
+       trouve juste : on part du côté droit, on passe par le haut, on
+       redescend à gauche et on revient — puis la grande boucle sous la
+       ligne. */
+    seule:[[[0.08,-0.30],[-0.02,-0.42],[-0.16,-0.45],[-0.25,-0.36],[-0.24,-0.24],
+            [-0.14,-0.16],[-0.06,-0.13],
+            [-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]],
     debut:[[[0.14,-0.36],[-0.02,-0.41],[-0.12,-0.28],[-0.02,-0.14],[0.10,-0.10],
             [-0.10,-0.05],[-0.33,-0.05]]],
-    /* le petit « triangle » : on monte à 45°, le trait du haut, on redescend */
-    milieu:[[[0.31,-0.05],[0.14,-0.05],[0.02,-0.28],[-0.10,-0.27],[-0.14,-0.06],[-0.32,-0.05]]],
-    fin:[[[0.34,-0.05],[0.16,-0.06],[0.04,-0.30],[-0.08,-0.28],[-0.12,-0.06],
-          [-0.02,0.12],[-0.16,0.32],[-0.10,0.48],[0.10,0.50],[0.26,0.46]]]
+    /* Milieu et fin : le trait de liaison arrive par la droite, puis le petit
+       triangle se ferme dans le sens des aiguilles d'une montre, et la sortie
+       vient après — à gauche pour le milieu, en boucle sous la ligne pour la
+       fin. */
+    milieu:[[[0.31,-0.05],[0.18,-0.05],[0.12,-0.12],[0.02,-0.28],[-0.10,-0.26],
+             [-0.12,-0.12],[-0.05,-0.05],[-0.20,-0.05],[-0.32,-0.05]]],
+    fin:[[[0.35,-0.05],[0.22,-0.05],[0.16,-0.12],[0.05,-0.29],[-0.07,-0.27],
+          [-0.09,-0.13],[-0.02,-0.06],
+          [-0.05,0.10],[-0.14,0.30],[-0.06,0.46],[0.14,0.50],[0.30,0.42]]]
   },
   /* ف — le petit cercle dans le sens des aiguilles d'une montre, puis le
      trait horizontal, puis on remonte un peu */
@@ -9830,14 +9864,13 @@ var _TRACE_MODELE={
     debut:[[[0.13,-0.12],[0.05,-0.10],[-0.02,-0.17],[-0.02,-0.30],[0.05,-0.40],
             [0.12,-0.31],[0.14,-0.15],[0.12,-0.08],
             [0.00,-0.05],[-0.13,-0.05],[-0.25,-0.05]]],
-    /* Formes attachées : la boucle monte par la droite. Son bas est à la
-       hauteur du trait de liaison — le parcourir en premier donnait une
-       longue barre au lieu d'une boucle. */
-    milieu:[[[0.32,-0.05],[0.19,-0.05],[0.15,-0.10],[0.16,-0.22],[0.10,-0.36],
-             [0.02,-0.36],[-0.02,-0.24],[-0.01,-0.13],[0.05,-0.08],[0.13,-0.08],
+    /* Formes attachées : le trait de liaison arrive par la droite, puis
+       exactement le geste du début — même sens. */
+    milieu:[[[0.32,-0.05],[0.20,-0.05],[0.13,-0.11],[0.05,-0.11],[-0.01,-0.18],
+             [-0.01,-0.32],[0.06,-0.43],[0.13,-0.32],[0.15,-0.16],[0.12,-0.08],
              [0.00,-0.05],[-0.16,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.58,-0.03],[0.42,-0.03],[0.37,-0.09],[0.38,-0.20],[0.33,-0.31],
-          [0.25,-0.35],[0.19,-0.27],[0.19,-0.16],[0.25,-0.07],[0.33,-0.05],
+    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06],[0.27,-0.05],[0.20,-0.14],
+          [0.20,-0.29],[0.28,-0.38],[0.36,-0.29],[0.37,-0.14],[0.33,-0.06],
           [0.14,0.01],[-0.10,0.05],[-0.34,0.05],[-0.46,-0.02],[-0.50,-0.11]]]
   },
   /* ق — idem ف, mais isolée et fin passent sous la ligne */
@@ -9850,12 +9883,13 @@ var _TRACE_MODELE={
     debut:[[[0.13,-0.12],[0.05,-0.10],[-0.02,-0.17],[-0.02,-0.30],[0.05,-0.40],
             [0.12,-0.31],[0.14,-0.15],[0.12,-0.08],
             [0.00,-0.05],[-0.13,-0.05],[-0.25,-0.05]]],
-    /* Formes attachées : la boucle monte par la droite, comme pour le fā. */
-    milieu:[[[0.32,-0.05],[0.19,-0.05],[0.15,-0.10],[0.16,-0.22],[0.10,-0.36],
-             [0.02,-0.36],[-0.02,-0.24],[-0.01,-0.13],[0.05,-0.08],[0.13,-0.08],
+    /* Formes attachées : trait de liaison par la droite, puis le geste du
+       début — même sens que l'isolée. */
+    milieu:[[[0.32,-0.05],[0.20,-0.05],[0.13,-0.11],[0.05,-0.11],[-0.01,-0.18],
+             [-0.01,-0.32],[0.06,-0.43],[0.13,-0.32],[0.15,-0.16],[0.12,-0.08],
              [0.00,-0.05],[-0.16,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.38,-0.04],[0.26,-0.04],[0.23,-0.10],[0.25,-0.22],[0.19,-0.33],
-          [0.11,-0.35],[0.06,-0.25],[0.06,-0.14],[0.12,-0.07],[0.20,-0.05],
+    fin:[[[0.38,-0.04],[0.28,-0.04],[0.21,-0.08],[0.13,-0.07],[0.07,-0.16],
+          [0.07,-0.29],[0.16,-0.37],[0.26,-0.29],[0.27,-0.15],[0.23,-0.06],
           [0.16,0.09],[0.02,0.21],[-0.12,0.24],[-0.24,0.18],[-0.29,0.06]]]
   },
   /* ك — la grande barre puis la forme, et le petit kāf dedans, du haut vers
@@ -9863,16 +9897,24 @@ var _TRACE_MODELE={
   'ك':{
     seule:[[[0.20,-0.74],[0.16,-0.10],[0.00,-0.04],[-0.26,-0.05]],
            [[-0.02,-0.52],[-0.12,-0.44]]],
-    debut:[[[0.26,-0.70],[0.20,-0.10],[0.00,-0.05],[-0.36,-0.05]],
-           [[0.24,-0.68],[0.10,-0.62]]],
-    milieu:[[[0.43,-0.05],[0.18,-0.05],[0.02,-0.66],[-0.08,-0.30],[-0.14,-0.06],[-0.44,-0.05]],
-            [[0.16,-0.76],[0.04,-0.70]]],
+    /* Début et milieu : d'abord le corps, comme le dāl — on descend puis on
+       file vers la gauche. Ensuite SEULEMENT, crayon levé, la barre penchée
+       du haut, tracée de la droite vers la gauche en descendant. */
+    debut:[[[0.24,-0.60],[0.22,-0.44],[0.21,-0.28],[0.20,-0.12],[0.12,-0.05],
+            [-0.05,-0.05],[-0.22,-0.05],[-0.36,-0.05]],
+           [[0.30,-0.72],[0.20,-0.68],[0.10,-0.63]]],
+    milieu:[[[0.43,-0.05],[0.24,-0.05],[0.12,-0.28],[0.04,-0.56],[0.00,-0.34],
+             [-0.06,-0.12],[-0.16,-0.05],[-0.44,-0.05]],
+            [[0.22,-0.79],[0.12,-0.74],[0.02,-0.69]]],
     fin:[[[0.52,-0.05],[0.10,-0.04],[-0.10,-0.44],[-0.16,-0.20],[-0.24,0.04],[-0.44,0.02]],
          [[-0.04,-0.36],[-0.16,-0.30]]]
   },
   /* ل — la grande barre verticale d'abord, en haut, puis la boucle */
   'ل':{
-    seule:[[[0.15,-0.74],[0.13,-0.10],[0.06,0.08],[-0.08,0.14],[-0.20,0.06],[-0.24,-0.06]]],
+    /* Calquée sur la forme fin, que le client trouve juste : la grande barre
+       descend d'un trait, puis la boucle. */
+    seule:[[[0.16,-0.75],[0.15,-0.58],[0.14,-0.40],[0.13,-0.22],[0.12,-0.06],
+            [0.09,0.04],[0.02,0.12],[-0.08,0.14],[-0.18,0.08],[-0.24,-0.04]]],
     debut:[[[0.04,-0.72],[0.02,-0.08],[-0.08,-0.05],[-0.18,-0.05]]],
     /* on monte le trait vertical, on redescend dessus, puis la liaison à gauche */
     milieu:[[[0.25,-0.05],[0.04,-0.05],[0.02,-0.68],[0.00,-0.20],[-0.02,-0.05],[-0.25,-0.05]]],
@@ -9882,32 +9924,55 @@ var _TRACE_MODELE={
   /* م — le rond comme le ه, dans le sens inverse des aiguilles d'une montre,
      puis le trait qui descend */
   'م':{
-    seule:[[[0.00,-0.32],[0.12,-0.22],[0.14,-0.10],[0.00,-0.02],[-0.12,-0.12],[-0.10,-0.26],
-            [0.00,-0.30],[-0.04,0.10],[-0.06,0.40]]],
-    debut:[[[0.06,-0.30],[0.16,-0.20],[0.14,-0.08],[0.02,-0.03],[-0.08,-0.12],[-0.04,-0.24],
+    /* Le rond démarre un peu plus à gauche qu'avant : c'est là que la main
+       le commence. */
+    seule:[[[-0.04,-0.32],[0.08,-0.26],[0.14,-0.16],[0.10,-0.05],[-0.02,-0.02],
+            [-0.12,-0.10],[-0.12,-0.22],[-0.04,-0.30],
+            [-0.03,-0.16],[-0.04,0.02],[-0.05,0.16],[-0.06,0.30],[-0.06,0.42]]],
+    debut:[[[0.02,-0.31],[0.12,-0.25],[0.16,-0.14],[0.10,-0.04],[0.00,-0.02],
+            [-0.08,-0.12],[-0.05,-0.24],
             [-0.14,-0.05],[-0.27,-0.05]]],
     milieu:[[[0.38,-0.05],[0.14,-0.05],[0.02,-0.22],[0.10,-0.14],[0.04,-0.04],[-0.08,-0.10],
              [-0.02,-0.20],[-0.16,-0.06],[-0.38,-0.05]]],
-    fin:[[[0.33,-0.05],[0.10,-0.06],[-0.02,-0.18],[0.04,-0.10],[-0.02,-0.03],[-0.14,-0.10],
-          [-0.10,-0.18],[-0.16,0.16],[-0.20,0.46]]]
+    /* La barre à gauche du rond descend d'un trait continu : des points
+       rapprochés, sinon elle apparaît par morceaux. */
+    fin:[[[0.33,-0.05],[0.10,-0.06],[-0.02,-0.18],[0.04,-0.10],[-0.02,-0.03],
+          [-0.14,-0.10],[-0.10,-0.18],
+          [-0.12,-0.06],[-0.14,0.06],[-0.16,0.18],[-0.18,0.30],[-0.19,0.40],
+          [-0.20,0.48]]]
   },
   /* ن — la boucle en commençant par la droite, dans le sens des aiguilles
      d'une montre ; au milieu, elle s'écrit comme le bā */
   'ن':{
-    seule:[[[0.20,-0.10],[0.22,0.06],[0.10,0.18],[-0.08,0.19],[-0.20,0.08],[-0.21,-0.08]]],
-    debut:[[[0.04,-0.26],[0.03,-0.06],[-0.06,-0.05],[-0.19,-0.05]]],
-    milieu:[[[0.23,-0.05],[0.06,-0.05],[0.04,-0.16],[0.03,-0.05],[-0.24,-0.05]]],
-    fin:[[[0.39,-0.05],[0.20,-0.06],[0.24,0.10],[0.10,0.30],[-0.10,0.33],[-0.26,0.22],[-0.32,0.08]]]
+    /* Le côté droit se trace du HAUT vers le bas : c'est par là qu'on entre
+       dans la boucle. Des points rapprochés au départ, sinon le pinceau
+       découvre le haut et le bas d'un coup et le trait semble monter. */
+    seule:[[[0.21,-0.13],[0.22,-0.05],[0.22,0.03],[0.20,0.11],[0.12,0.18],
+            [0.00,0.20],[-0.12,0.15],[-0.20,0.06],[-0.22,-0.06]]],
+    debut:[[[0.04,-0.28],[0.04,-0.20],[0.03,-0.12],[0.03,-0.06],[-0.06,-0.05],
+            [-0.19,-0.05]]],
+    /* au milieu, elle s'écrit comme le bā */
+    milieu:[[[0.23,-0.05],[0.06,-0.05],[0.04,-0.16],[0.03,-0.05],[-0.235,-0.05]]],
+    /* trait de liaison par la droite, puis le geste de l'isolée */
+    fin:[[[0.38,-0.05],[0.28,-0.05],[0.24,-0.02],[0.25,0.08],[0.22,0.18],
+          [0.12,0.28],[-0.02,0.32],[-0.16,0.28],[-0.27,0.18],[-0.32,0.06]]]
   },
   /* ه ة — on commence en haut au milieu, on redescend à 45° à droite, et le
      rond se fait dans le sens inverse des aiguilles d'une montre */
   'ه':{
     seule:[[[0.00,-0.34],[0.10,-0.24],[0.11,-0.10],[0.00,-0.02],[-0.10,-0.12],[-0.08,-0.26],
             [0.00,-0.33]]],
-    debut:[[[0.10,-0.38],[0.20,-0.26],[0.16,-0.10],[0.02,-0.06],[-0.04,-0.24],
-            [-0.16,-0.05],[-0.32,-0.05]]],
-    milieu:[[[0.35,-0.05],[0.16,-0.05],[0.04,-0.28],[-0.04,-0.12],[0.04,0.16],[-0.08,0.22],
-             [-0.18,-0.04],[-0.35,-0.05]]],
+    /* Début : comme l'isolée — on part du haut, on descend à droite, et le
+       rond se fait dans le sens inverse des aiguilles d'une montre ; le trait
+       de liaison ne part qu'une fois le rond fermé. */
+    debut:[[[0.08,-0.40],[0.17,-0.31],[0.19,-0.17],[0.11,-0.06],[0.00,-0.11],
+            [-0.02,-0.27],[0.06,-0.39],
+            [0.02,-0.06],[-0.12,-0.05],[-0.24,-0.05],[-0.33,-0.05]]],
+    /* Milieu : le trait de liaison, puis les deux ventres, celui du haut
+       d'abord, celui du bas ensuite, et la sortie à gauche. */
+    milieu:[[[0.35,-0.05],[0.20,-0.05],[0.10,-0.14],[0.02,-0.30],[-0.08,-0.24],
+             [-0.06,-0.10],[0.02,0.02],[0.05,0.15],[-0.04,0.23],[-0.13,0.12],
+             [-0.12,-0.02],[-0.24,-0.05],[-0.36,-0.05]]],
     fin:[[[0.26,-0.05],[0.08,-0.06],[0.00,-0.34],[-0.12,-0.26],[-0.14,-0.12],[-0.04,-0.10]]]
   },
   /* و — on part du BAS À DROITE de la boucle, on la fait dans le sens des
@@ -9918,15 +9983,13 @@ var _TRACE_MODELE={
     seule:[[[0.13,-0.08],[0.06,-0.04],[-0.01,-0.09],[-0.03,-0.17],[0.01,-0.24],
             [0.08,-0.27],[0.14,-0.22],[0.15,-0.14],[0.13,-0.07],
             [0.14,0.03],[0.10,0.13],[0.02,0.22],[-0.10,0.28],[-0.24,0.27]]],
-    /* Le trait de liaison arrive par la droite, jusqu'à la boucle. Là, et là
-       SEULEMENT, la boucle se fait dans l'autre sens — en montant par la
-       droite : son bas est à la même hauteur que le trait de liaison, et le
-       parcourir en premier donnait une longue barre au lieu d'une boucle.
-       Sur l'isolée, qui n'a pas de trait devant, le geste reste celui du
-       client : on part du bas à droite. */
-    fin:[[[0.25,-0.05],[0.14,-0.05],[0.11,-0.09],[0.09,-0.17],[0.02,-0.21],
-          [-0.06,-0.17],[-0.07,-0.08],[0.01,-0.02],[0.09,-0.03],
-          [0.08,0.02],[0.03,0.13],[-0.05,0.22],[-0.17,0.27],[-0.30,0.26]]]
+    /* Le trait de liaison arrive par la droite, jusqu'au point de départ de
+       la boucle ; ensuite, exactement le geste de l'isolée — même sens,
+       aiguilles d'une montre. */
+    fin:[[[0.26,-0.05],[0.18,-0.05],[0.11,-0.04],[0.04,-0.02],[-0.04,-0.06],
+          [-0.07,-0.13],[-0.04,-0.19],[0.02,-0.21],[0.08,-0.18],[0.10,-0.11],
+          [0.09,-0.04],[0.08,0.04],[0.03,0.14],[-0.05,0.22],[-0.17,0.27],
+          [-0.30,0.26]]]
   },
   /* ي — le serpentin d'un seul trait, en partant du haut à droite ; au
      milieu, elle s'écrit comme le bā */
@@ -11074,14 +11137,14 @@ function _boyLetterCourse(ca,idx,premiere){
     'Mission du moment : la lettre '+L.name,premiere?'▶ DÉCOLLAGE':'SUIVANT ▸'));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
-     référence est la lettre sans point de la famille. */
+     référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
   var jumelle=_CL_JUMELLES[A];
   if(jumelle){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
     if(ref){
       sc.push(B.brief('MISSION · UN AIR CONNU',
-        b(L.name)+' s\'écrit exactement<br>comme '+b(ref.name)+',<br>avec '+b(jumelle.point)+' 👀',
-        'La lettre '+L.name+' s\'écrit exactement comme la lettre '+ref.name+', avec '+jumelle.point+'.'));
+        b(L.name)+' s\'écrit exactement<br>comme '+b(ref.name)+',<br>'+b(jumelle.point)+' 👀',
+        'La lettre '+L.name+' s\'écrit exactement comme la lettre '+ref.name+', '+jumelle.point+'.'));
     }
   }
   /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
@@ -11129,7 +11192,10 @@ function _boyLetterCourse(ca,idx,premiere){
   function formesMontrees(signe){
     return aMontrer.map(function(n){return _avecSigne(formes[n].form,signe);});
   }
-  var nomsMontres=aMontrer.map(function(n){return NOMS[n].toLowerCase();});
+  /* Le tā marbūṭa n'a pas de « forme fin » : elle n'existe qu'attachée, et
+     c'est ainsi qu'on la nomme, au tracé comme à l'observation. */
+  function nomForme(n){return (finDeMot&&n===3)?'attachée':NOMS[n].toLowerCase();}
+  var nomsMontres=aMontrer.map(nomForme);
   var combien=total>1?('ses '+total+' formes'):'cette forme';
   aMontrer.forEach(function(n,rang){
     var f=formes[n];
@@ -11144,7 +11210,7 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(formeUnique
       ? B.tracer('FORME · TRACÉ',f.form,'Trace la '+b('lettre')+' ✍️','Trace la lettre.')
       : B.tracer('FORME'+rep+' · TRACÉ',f.form,
-          'Trace la forme<br>'+b(NOMS[n].toLowerCase())+' ✍️','Trace la forme '+NOMS[n].toLowerCase()+'.'));
+          'Trace la forme<br>'+b(nomForme(n))+' ✍️','Trace la forme '+nomForme(n)+'.'));
   });
   /* « Deux formes à retenir » disait ce que le tableau montre juste après :
      l'écran est retiré. Et la règle générale ne se rappelle qu'une fois, à
@@ -11314,8 +11380,13 @@ function _boyLetterCourse(ca,idx,premiere){
         +'À très vite pour une<br>'+b('prochaine aventure')+' ! 🚀',
         'Bravo ! Tu as fini ta mission ! À très vite pour une prochaine aventure !',
         function(){renderSessionsMap(ca);},'▸ LA CARTE DES ÎLES')(api);
+      /* Le retour automatique ne doit valoir QUE pour cet écran-là : si
+         l'enfant a déjà ouvert une autre île entre-temps, son cours se
+         faisait renvoyer à la carte tout seul. On vérifie donc que l'écran
+         de fin est encore à l'affiche. */
+      var ecranFin=api.wrap;
       api.plusTard(function(){
-        if(st._curPage==='child')renderSessionsMap(ca);
+        if(ecranFin&&ecranFin.isConnected)renderSessionsMap(ca);
       },5200);
     }else{
       B.mission('Bravo ! 🎉<br>Tu maîtrises '+b(L.name)+' 🎖️<br>Continue comme ça !',
