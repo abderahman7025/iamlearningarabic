@@ -11331,12 +11331,22 @@ function _boyLetterCourse(ca,idx,premiere){
          mot : elle n'a pas de forme « milieu », donc deux cases suffisent. */
       var pSuit=(v[2]==='ي');   /* seul le yā appelle encore la lettre d'après */
       var casesP=[],nomsP=[];
-      casesP.push(A+v[0]+(pSuit?_TATWEEL:''));nomsP.push('début');
-      if(pSuit){casesP.push(_TATWEEL+A+v[0]+_TATWEEL);nomsP.push('milieu');}
-      casesP.push(_TATWEEL+A+v[0]);nomsP.push('fin');
+      /* La hamza ne s'accroche NI avant NI après : pas de trait de liaison
+         devant elle, même prolongée. Elle n'a donc qu'une seule place, la
+         syllabe telle quelle — et pas de nom de forme sous la case. */
+      if(formeUnique){
+        casesP.push(A+v[0]);nomsP.push('');
+      }else{
+        casesP.push(A+v[0]+(pSuit?_TATWEEL:''));nomsP.push('début');
+        if(pSuit){casesP.push(_TATWEEL+A+v[0]+_TATWEEL);nomsP.push('milieu');}
+        casesP.push(_TATWEEL+A+v[0]);nomsP.push('fin');
+      }
+      var plusieursP=casesP.length>1;
       sc.push(B.tracer('ALLONGEMENT '+(n+1)+'/3 · TRACÉ',casesP,
-        'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(casesP.length+' places')+' ✍️',
-        'Trace cet allongement dans ses différentes places.',null,nomsP));
+        'Trace '+b((lat+v[1]).toLowerCase())
+          +(plusieursP?('<br>dans '+b(casesP.length+' places')):'')+' ✍️',
+        plusieursP?'Trace cet allongement dans ses différentes places.'
+                  :'Trace cet allongement.',null,nomsP));
     });
   }
   /* Le mot */
