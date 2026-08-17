@@ -10868,33 +10868,66 @@ function _boyScene(ca,reprise){
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
-  /* ── Tout le cadre à l'écran ──────────────────────────────────────────
-     Le client veut voir l'écran de cours EN ENTIER — le cadre et son bouton
-     — sans avoir à faire défiler. C'est en paysage que ça coince : la
-     hauteur manque, et le bouton passait sous le bord. On mesure ce que le
-     contenu occupe et, s'il déborde, on le réduit d'un bloc plutôt que de
-     retoucher trente tailles de police une par une.
-     Le plancher est à 40 % : le cadre fait déjà presque la taille de
-     l'écran, il ne lui manque qu'un cheveu, et le client ne veut surtout pas
-     d'une mise en page repensée. Un plancher trop haut (55 %) laissait le
-     bouton SUIVANT passer sous le bord. */
-  function ajusteEcran(){
+  /* ── Le cadre REMPLIT l'écran ─────────────────────────────────────────
+     Le client veut voir l'écran de cours en entier — le cadre et son bouton
+     — et il veut qu'il occupe TOUTE la hauteur disponible, du haut au bas.
+     Le réduire quand il déborde ne suffisait donc pas : quand la place est
+     là, il doit aussi GRANDIR. Sur une tablette en paysage il flottait au
+     milieu, avec du vide au-dessus et en dessous.
+
+     Trois précautions, chacune payée par un essai raté :
+     - on vise le BAS DU DERNIER BOUTON, pas `scrollHeight` : celui-ci
+       compte les 40 px de marge basse du cadre, et le bouton s'arrêtait
+       donc bien avant le bord ;
+     - on part du haut RÉEL du cadre (`getBoundingClientRect`), pas d'un
+       64 px écrit en dur qui ignore la jauge ;
+     - agrandir déborderait en largeur, le cadre faisant déjà toute la
+       page : on rétrécit donc sa largeur CSS d'autant (100/k %), et le
+       grossissement la ramène exactement à 100 %. Le texte se replaçant à
+       cette nouvelle largeur, on remesure une fois. */
+  function ajusteEcran(essai){
     /* Un cours quitté laisse son écouteur derrière lui : sans ce garde-fou
        il travaillerait sur un cadre qui n'est plus à l'affiche. */
     if(!wrap.isConnected)return;
-    wrap.style.transform='';wrap.style.transformOrigin='';wrap.style.height='';
+    if(!essai){wrap.style.transform='';wrap.style.transformOrigin='';
+               wrap.style.height='';wrap.style.width='';
+               wrap.style.marginLeft='';wrap.style.marginRight='';_echelleCadre=1;}
     var vv=window.visualViewport;
     var vh=(vv&&vh_ok(vv.height))||window.innerHeight||0;
-    var dispo=vh-64-10;                 /* ca porte un paddingTop de 64 */
-    var h=wrap.scrollHeight;
-    if(!h||!dispo||h<=dispo)return;
-    var k=Math.max(0.40,dispo/h);
-    wrap.style.transformOrigin='top center';
+    if(!vh)return;
+    var haut=wrap.getBoundingClientRect().top;
+    var dispo=vh-haut-8;
+    if(dispo<=40)return;
+    /* Le bas du contenu vivant : le dernier bouton, pas la marge de page. */
+    var bas=haut,els=wrap.getElementsByTagName('*');
+    for(var n=0;n<els.length;n++){
+      var r=els[n].getBoundingClientRect();
+      if(r.width>0&&r.height>0&&r.bottom>bas)bas=r.bottom;
+    }
+    var h=(bas-haut)/(_echelleCadre||1);
+    if(h<=0)return;
+    var k=dispo/h;
+    k=Math.max(0.40,Math.min(1.7,k));
+    _echelleCadre=k;
+    /* Origine EN HAUT À GAUCHE, pas au centre. Le cadre reçoit une largeur
+       CSS de 100/k % : au centre, son milieu tombe alors bien à droite du
+       milieu de la page, et le grossissement le poussait hors de l'écran.
+       Depuis le coin gauche, la largeur revient exactement à 100 %. */
+    wrap.style.transformOrigin='top left';
+    wrap.style.width=(100/k)+'%';
+    /* `boy-wrap` est centré par des marges automatiques. Dès que sa largeur
+       CSS descend sous 100 % — le cas quand on agrandit — ces marges le
+       décalent vers la droite, et le grossissement depuis le coin gauche
+       l'envoyait alors dépasser du bord. On les neutralise. */
+    wrap.style.marginLeft='0';wrap.style.marginRight='0';
     wrap.style.transform='scale('+k+')';
-    /* Sans cette hauteur, la place laissée reste celle d'avant la réduction
-       et la page garde une longue traîne vide en dessous. */
+    /* Sans cette hauteur, la place laissée reste celle d'avant et la page
+       garde une traîne vide — ou se met à défiler pour rien. */
     wrap.style.height=Math.ceil(h*k)+'px';
+    /* Le texte s'est replacé à la nouvelle largeur : une seule reprise. */
+    if(!essai)ajusteEcran(1);
   }
+  var _echelleCadre=1;
   function vh_ok(v){return (typeof v==='number'&&v>0)?v:0;}
   /* La hauteur du cadre bouge APRÈS le premier calcul : la police arabe
      arrive, une image se pose, la barre d'adresse se replie. On remesure
@@ -10905,9 +10938,13 @@ function _boyScene(ca,reprise){
     try{if(document.fonts&&document.fonts.ready)
       document.fonts.ready.then(function(){ajusteEcran();});}catch(e){}
   }
-  window.addEventListener('resize',ajusteEcran);
-  window.addEventListener('orientationchange',ajusteEcran);
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',ajusteEcran);
+  /* Passé tel quel à addEventListener, l'objet Event arriverait dans
+     `essai` — la remise à zéro serait sautée et le cadre se réduirait en
+     cascade à chaque rotation. */
+  function relanceAjuste(){ajusteEcran();}
+  window.addEventListener('resize',relanceAjuste);
+  window.addEventListener('orientationchange',relanceAjuste);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',relanceAjuste);
   function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;ajusteEcran();ajusteBientot();if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
