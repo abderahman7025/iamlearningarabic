@@ -9,7 +9,7 @@ Deux fichiers, désormais :
 | Fichier | Qui le reçoit | Contenu |
 |---|---|---|
 | `public/index.html` (211 Ko) | tout le monde | vente, connexion, inscription, paiement |
-| `app/app.html` (907 Ko) | **comptes payants seulement**, via `api/app.js` | toute l'application |
+| `app/app.html` (≈ 1,0 Mo) | **comptes payants seulement**, via `api/app.js` | toute l'application |
 
 Après CHAQUE modification de `app/app.html` ou de `public/index.html` :
 incrémenter la version dans `public/sw.js`, committer, pousser. Vercel
@@ -194,6 +194,47 @@ déduction non plus : ce sont les exceptions annoncées. Tout cela tient dans
 
 ---
 
+## FAIT — Écrire en grand (mode plein écran du tracé)
+
+Constat du client : ses enfants n'arrivent pas à écrire, la case est trop
+petite. Mesuré sur un téléphone de 390 px : le panneau ne laisse que 294 px,
+une case de tracé à quatre formes tombe à **73 px** et le modèle à 45 px.
+
+**Ce qu'une page web n'a PAS le droit de faire : faire pivoter l'appareil.**
+`screen.orientation.lock()` n'existe que sur Chrome Android, et seulement en
+plein écran. Safari sur iPhone n'a ni plein écran ni verrouillage
+d'orientation. Ne pas repartir sur cette piste : elle est fermée.
+
+Ce qui a été fait à la place :
+
+- `_blocEcriture(hote,o)` — les deux calques, la barre de boutons,
+  l'animation et les gestes, sortis de `api.tracer` en **une fonction qu'on
+  appelle deux fois** : une pour le panneau, une pour le calque plein écran.
+  Toutes les tailles descendent d'un seul facteur `k` mesuré sur la place
+  disponible, donc le plein écran garde **exactement** les proportions où le
+  client a réglé les gestes. `k` ne descend jamais sous 1 : à taille de
+  panneau, l'écran est rigoureusement celui d'avant.
+- Bouton **« ⛶ AGRANDIR »** sur chaque écran de tracé. Le choix est retenu
+  pour la session (`_boyPleinEcran`) : les tracés suivants s'ouvrent déjà en
+  grand. « ⤡ RÉDUIRE » l'oublie ; « SUIVANT » depuis le calque le garde —
+  et ne quitte pas le plein écran natif, qu'on ne pourrait pas redemander
+  sans un appui de doigt.
+- Le calque est un `position:fixed` qui prend tout l'écran : ça marche
+  partout, iPhone compris. On demande **en plus** le plein écran natif et le
+  paysage, et on se passe très bien d'un refus.
+- Moins de 560 px de large : une carte « 📱↻ Tourne ton téléphone » plutôt
+  qu'un agrandissement qui n'apporterait rien. Elle se remplace toute seule
+  dès l'appareil tourné (`resize`, `orientationchange`, et le `resize` du
+  `visualViewport`, seul fiable quand la barre d'adresse se replie).
+- L'encre déjà posée suit l'enfant dans les deux sens (`reprendreEncre`), et
+  le bloc caché derrière le calque est **arrêté** (`stop`) : `isConnected`
+  reste vrai pour un panneau seulement masqué, il tournerait pour rien.
+
+Gain mesuré, téléphone 844 × 390 en paysage : la case passe de 73 à 175 px,
+soit **2,4 fois** plus grande.
+
+---
+
 ## À FAIRE ENSUITE
 
 **L'ordre compte** : garçon validé → fille alignée dessus → traductions →
@@ -255,6 +296,12 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **La hamza n'a pas de trait de liaison, même prolongée.** Les écrans
+  d'allongement lui fabriquaient ses cases comme à une lettre ordinaire :
+  un tatweel devant (case « fin »), un derrière (case « milieu »), soit
+  « ـءَا ». Elle n'a plus qu'**une seule case**, la syllabe telle quelle, et
+  pas de nom de forme dessous. Effet de bord bienvenu : une case seule se
+  dessine à PX=150 au lieu de 104.
 - **Retour automatique de fin d'île** : il vérifie que l'écran de fin est
   encore à l'affiche (`api.wrap.isConnected`). Sans ce garde-fou, le minuteur
   renvoyait à la carte le cours que l'enfant venait d'ouvrir.
@@ -363,6 +410,15 @@ page et URL propres, indexables. Elles se rangent à côté de
   **tiret de liaison visible (tatweel `ـ`)**, jamais avec le ZWJ. En HTML, le
   ZWJ fonctionne — d'où le piège, ça marche d'un côté et pas de l'autre.
 
+- **`.boy-btn` étale un bouton sur toute la largeur** (`display:block;
+  width:100%`). Dans une barre en `flex-wrap`, les boutons s'empilaient donc
+  les uns sous les autres, et le calque plein écran débordait de l'écran. Un
+  bouton posé dans une barre doit porter `width:auto` en style en ligne.
+- **Un onglet en arrière-plan ne bat pas.** `requestAnimationFrame` ne se
+  déclenche pas tant que la page n'est pas affichée : sur un banc d'essai
+  automatique, une animation semble donc à l'arrêt alors qu'elle va très
+  bien. Remplacer l'horloge (`requestAnimationFrame` par un `setTimeout`)
+  avant de conclure quoi que ce soit.
 - Les projets Supabase gratuits se mettent en pause après ~7 jours sans
   activité. Le cron s'en charge désormais.
 - `Authentication → Users` dans Supabase n'est **pas** utilisé par le site :

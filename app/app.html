@@ -10290,6 +10290,198 @@ function _reveleJusqua(rev,p){
   return rev.cv;
 }
 
+/* Le mode plein écran, une fois choisi, vaut pour toute la session : l'enfant
+   appuie sur « AGRANDIR » une seule fois. « RÉDUIRE » l'oublie. */
+var _boyPleinEcran=false;
+
+/* ── Un bloc d'écriture complet ──────────────────────────────────────────
+   Les deux calques superposés (le modèle animé dessous, l'encre de l'enfant
+   au-dessus), la barre de boutons, l'animation et les gestes. C'est une
+   fonction parce qu'on en fabrique DEUX : celui du panneau, et le même en
+   bien plus grand dans le calque plein écran. Le code n'existe qu'une fois.
+
+   o : {liste, signeSeul, nomme, nomsCases, dispoW, dispoH, siEcrit}
+
+   Toutes les tailles descendent d'un seul facteur k, mesuré sur la place
+   disponible : le plein écran garde donc EXACTEMENT les proportions du
+   panneau, où le client a réglé les gestes. k ne descend jamais sous 1. */
+function _blocEcriture(hote,o){
+  var liste=o.liste,nb=liste.length;
+  var CW0=520,CH0=o.signeSeul?250:220;
+  /* Moins il y a de cases, plus le modèle peut être grand : un doigt
+     d'enfant a besoin de place pour repasser dessus. */
+  var PX0=o.signeSeul?124:({1:150,2:126,3:104}[nb]||80);
+  var k=(o.dispoW||CW0)/CW0;
+  if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
+  k=Math.max(1,k);
+  var CW=Math.round(CW0*k),CH=Math.round(CH0*k),PX=Math.round(PX0*k);
+
+  var el=document.createElement('div');el.style.cssText='width:100%';
+  var boite=document.createElement('div');
+  boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
+    +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba(2,136,209,.30)';
+  var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
+  cvM.style.cssText='display:block;width:100%;height:auto';
+  var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
+  cvE.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none';
+  boite.appendChild(cvM);boite.appendChild(cvE);el.appendChild(boite);
+  hote.appendChild(el);
+  var cx=cvM.getContext('2d'),cxE=cvE.getContext('2d');
+  /* Un signe seul descend bien plus bas que le corps d'une lettre :
+     on remonte sa ligne d'écriture pour lui laisser la place. */
+  var baseY=Math.round(CH*(o.signeSeul?0.50:0.62));
+  var pas=CW/nb;
+  /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
+     garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
+     on pose la case n en partant de la droite. */
+  function caseX(n){return CW-pas*(n+0.5);}
+  /* La case où tombe un trait se lit dans sa seule position en x. */
+  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-x)/pas)));}
+  /* Le modèle entier, d'un bloc : les cases où rien ne s'anime. */
+  function modeleEntier(n){
+    cx.save();
+    cx.font=PX+"px 'Scheherazade New',serif";
+    cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
+    _dessineSurLigne(cx,liste[n],caseX(n),baseY,PX);
+    cx.restore();
+  }
+  function guide(prog){
+    cx.clearRect(0,0,CW,CH);
+    /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
+       d'un coup d'œil ce qu'il a écrit lui-même. */
+    for(var n=0;n<nb;n++){
+      if(n===caseAnim&&rev)cx.drawImage(_reveleJusqua(rev,prog),rev.x0,rev.y0);
+      else modeleEntier(n);
+    }
+    if(o.nomme){
+      cx.save();cx.font='600 '+Math.round(12*k)+'px Outfit,sans-serif';cx.textAlign='center';
+      cx.fillStyle='rgba(1,87,155,.55)';
+      /* Deux cases : la lettre suivie d'une prolongation ne peut être
+         qu'en début ou au milieu d'un mot. */
+      var noms=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
+      for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8*k);
+      cx.restore();
+    }
+    cx.save();
+    cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2*k;cx.setLineDash([9*k,6*k]);
+    cx.beginPath();cx.moveTo(10*k,baseY);cx.lineTo(CW-10*k,baseY);cx.stroke();
+    cx.restore();
+  }
+  /* ── Le modèle s'écrit tout seul ──
+     L'animation tourne sur la case VOISINE, à gauche de celle où l'enfant
+     écrit : au départ celle de droite, la première à remplir ; dès son
+     premier trait, elle saute d'un cran à gauche pour ne pas s'animer
+     sous sa main ; sur la dernière case, elle s'arrête. Une case qu'elle
+     quitte reste entière. */
+  /* ms. L'écriture se fait en trois temps, dans l'ordre où la main écrit :
+     le corps de la lettre, puis ses points, puis sa voyelle. Entre chacun,
+     un souffle. Le dernier temps est court exprès : le client veut que ça
+     enchaîne, la lettre finie se montre juste ce qu'il faut. */
+  var ECRITURE=1050,POSE=240,POINTS=300,POSE2=180,VOYELLE=300,FIN=330;
+  var caseAnim=-1,caseEcrite=0,raf=null,depart=0,dernier=0,rev=null,mort=false;
+  function boucle(){
+    /* L'écran a changé, ou le bloc a été remplacé par sa version plein
+       écran : le canvas n'est plus à l'affiche, on s'arrête. Sans cela
+       l'animation d'une scène quittée tournerait pour rien. */
+    if(mort||!cvM.isConnected){raf=null;return;}
+    /* Plus de case à animer : on rend la main plutôt que de tourner à
+       vide jusqu'à la fin de l'écran. */
+    if(caseAnim<0){raf=null;return;}
+    raf=requestAnimationFrame(boucle);
+    var T=Date.now();
+    if(T-dernier<33)return;            /* 30 images/s suffisent */
+    dernier=T;
+    /* Un temps vide — pas de point, pas de voyelle — est sauté : sans
+       cela l'animation attendrait devant une lettre déjà finie. */
+    var aPoints=rev&&rev.points.length,aVoyelle=rev&&rev.voyelle.length;
+    var dPts=aPoints?POINTS:0,dPause2=(aPoints&&aVoyelle)?POSE2:0;
+    var dVoy=aVoyelle?VOYELLE:0;
+    var total=ECRITURE+POSE+dPts+dPause2+dVoy+FIN;
+    var c=(T-depart)%total;
+    var pr;
+    if(c<ECRITURE)pr=c/ECRITURE;
+    else if((c-=ECRITURE)<POSE)pr=1;
+    else if((c-=POSE)<dPts)pr=1+c/POINTS;
+    else if((c-=dPts)<dPause2)pr=2;
+    else if((c-=dPause2)<dVoy)pr=2+c/VOYELLE;
+    else pr=3;
+    guide(pr);
+  }
+  function anime(n){
+    /* La case est préparée ici : on y peint la lettre à part, et on range
+       ses pixels dans l'ordre du geste. C'est fait une fois par case, pas
+       à chaque image. */
+    /* La boîte déborde un peu de la case : certaines formes attachées
+       sont plus larges qu'elle, et le calque les couperait. */
+    var xg=Math.max(0,Math.round(CW-pas*(n+1)-pas*0.18));
+    var xd=Math.min(CW,Math.round(CW-pas*n+pas*0.18));
+    rev=(n>=0&&n<nb)
+      ? _revelateur(liste[n],caseX(n),baseY,PX,xg,0,xd-xg,CH)
+      : null;
+    if(!rev){caseAnim=-1;guide(3);return;}
+    caseAnim=n;depart=Date.now();dernier=0;
+    guide(0);
+    if(raf===null)raf=requestAnimationFrame(boucle);
+  }
+  guide(3);
+  var barre=document.createElement('div');
+  /* Trois boutons doivent tenir sur une ligne dans un panneau de téléphone :
+     l'écart et les marges intérieures sont comptés au plus juste. En dessous,
+     la barre revient à la ligne d'elle-même. */
+  barre.style.cssText='display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px';
+  el.appendChild(barre);
+  /* `width:auto` est indispensable : la classe boy-btn étale un bouton sur
+     toute la largeur, et dans une barre qui revient à la ligne les boutons
+     s'empilaient alors les uns sous les autres. */
+  function petitBouton(txt,fn){
+    var b=document.createElement('button');b.className='boy-btn sec';
+    b.style.cssText+=';width:auto;padding:9px 8px;font-size:.8rem;margin:0;white-space:nowrap';
+    b.textContent=txt;b.onclick=fn;barre.appendChild(b);return b;
+  }
+  /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste. */
+  petitBouton('↺ EFFACER',function(){cxE.clearRect(0,0,CW,CH);});
+  if(_trajectoire(liste[0]))petitBouton('▶ REVOIR',function(){
+    anime(caseAnim>=0?caseAnim:caseEcrite);
+  });
+  var trace=false;
+  function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
+    return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
+  function deb(e){
+    trace=true;if(o.siEcrit)o.siEcrit();var q=pos(e);
+    caseEcrite=caseDe(q.x);
+    /* Un cran à gauche de la case attaquée. On ne relance rien tant que
+       l'enfant reste dans la même case, sinon l'animation repartirait de
+       zéro à chaque trait. */
+    if(caseEcrite+1!==caseAnim)anime(caseEcrite+1);
+    cxE.beginPath();cxE.moveTo(q.x,q.y);e.preventDefault();
+  }
+  function mv(e){if(!trace)return;var q=pos(e);cxE.lineWidth=Math.round(7*k);
+    cxE.strokeStyle='#e65100';cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
+  function fin(){trace=false;}
+  cvE.addEventListener('mousedown',deb);cvE.addEventListener('mousemove',mv);cvE.addEventListener('mouseup',fin);
+  cvE.addEventListener('touchstart',deb,{passive:false});cvE.addEventListener('touchmove',mv,{passive:false});cvE.addEventListener('touchend',fin);
+  /* La première case s'écrit toute seule dès l'arrivée sur l'écran. */
+  anime(0);
+  /* Une lettre non animée est dessinée une seule fois : si la police
+     arabe n'est pas encore chargée, ce dessin-là est à refaire. */
+  try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){
+    if(!mort&&cvM.isConnected&&caseAnim<0)guide(3);
+  });}catch(e){}
+  return {
+    el:el,barre:barre,cvE:cvE,CW:CW,CH:CH,bouton:petitBouton,
+    /* On arrête un bloc caché derrière le plein écran : `isConnected` reste
+       vrai pour un panneau seulement masqué. */
+    stop:function(){mort=true;if(raf)cancelAnimationFrame(raf);raf=null;},
+    reprendre:function(){mort=false;anime(caseEcrite+1);},
+    /* L'encre déjà posée suit l'enfant quand il agrandit ou réduit :
+       les deux calques n'ont pas la même taille, drawImage la met à
+       l'échelle. */
+    reprendreEncre:function(autre){
+      if(autre&&autre.cvE)try{cxE.drawImage(autre.cvE,0,0,CW,CH);}catch(e){}
+    }
+  };
+}
+
 function _boyScene(ca,reprise){
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
   var _repriseSuivie=!!reprise;
@@ -10574,166 +10766,144 @@ function _boyScene(ca,reprise){
       var liste=Array.isArray(glyph)
         ? glyph.map(function(g){return _sansCercle(g);})
         : (function(){var l=[],r=repetitions||3;while(l.length<r)l.push(modele);return l;})();
-      /* Taille du modèle. Un signe montré seul — une voyelle sans lettre —
-         occupe très peu de place : à la taille d'une lettre il était minuscule
-         sous le doigt d'un enfant. On le grossit franchement, et on donne au
-         canvas la hauteur qu'il faut pour qu'il ne déborde pas. Quatre formes
-         côte à côte, en revanche, doivent tenir dans leur case. */
+      /* Un signe montré seul — une voyelle sans lettre — occupe très peu de
+         place : à la taille d'une lettre il était minuscule sous le doigt
+         d'un enfant. Il se grossit franchement, et le canvas prend la hauteur
+         qu'il faut pour qu'il ne déborde pas. */
       var signeSeul=!String(liste[0]).replace(_MARQUES,'');
-      /* Moins il y a de cases, plus le modèle peut être grand : un doigt
-         d'enfant a besoin de place pour repasser dessus. */
-      var PX=signeSeul?124:({1:150,2:126,3:104}[liste.length]||80);
-      var CW=520,CH=signeSeul?250:220;
-      /* DEUX calques superposés : le modèle animé dessous, l'encre de l'enfant
-         au-dessus. Sur un seul canvas, chaque tour d'animation effacerait son
-         tracé — et « EFFACER » ne doit nettoyer que l'encre. */
-      var boite=document.createElement('div');
-      boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
-        +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba(2,136,209,.30)';
-      var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
-      cvM.style.cssText='display:block;width:100%;height:auto';
-      var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
-      cvE.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none';
-      boite.appendChild(cvM);boite.appendChild(cvE);p.appendChild(boite);
-      var cx=cvM.getContext('2d'),cxE=cvE.getContext('2d');
-      /* Un signe seul descend bien plus bas que le corps d'une lettre :
-         on remonte sa ligne d'écriture pour lui laisser la place. */
-      var baseY=Math.round(CH*(signeSeul?0.50:0.62));
-      var nb=liste.length,pas=CW/nb;
-      /* L'arabe s'écrit de droite à gauche : la première forme est à
-         droite. On garde les tableaux dans l'ordre logique (isolée, début,
-         milieu, fin) et on pose la case k en partant de la droite. */
-      function caseX(k){return CW-pas*(k+0.5);}
-      /* La case où tombe un trait se lit dans sa seule position en x. */
-      function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-x)/pas)));}
-      /* prog : avancement du modèle animé, de 0 à 1. Les autres cases sont
-         toujours entières — l'enfant doit pouvoir repasser dessus. */
-      /* Le modèle entier, d'un bloc : les cases où rien ne s'anime. */
-      function modeleEntier(k){
-        cx.save();
-        cx.font=PX+"px 'Scheherazade New',serif";
-        cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
-        _dessineSurLigne(cx,liste[k],caseX(k),baseY,PX);
-        cx.restore();
+      /* Le bouton SUIVANT reste en veilleuse tant que l'enfant n'a pas écrit.
+         Il y en a deux quand le plein écran est ouvert : celui du panneau et
+         celui du calque. */
+      var aEcrit=false,suivants=[];
+      function siEcrit(){aEcrit=true;suivants.forEach(function(b){b.style.opacity='1';});}
+      function veilleuse(b){suivants.push(b);b.style.opacity=aEcrit?'1':'.45';return b;}
+      var commun={liste:liste,signeSeul:signeSeul,nomme:Array.isArray(glyph),
+                  nomsCases:nomsCases,siEcrit:siEcrit};
+      function opts(sup){var o={},n;for(n in commun)o[n]=commun[n];
+        for(n in sup||{})o[n]=sup[n];return o;}
+      /* Le bloc du panneau, à la taille où le client a réglé les gestes. */
+      var petit=_blocEcriture(p,opts());
+
+      /* ── Le mode plein écran ──────────────────────────────────────────
+         Sur un téléphone, le panneau ne laisse qu'environ 330 px de large :
+         une case de tracé tombe à 110 px, bien trop peu pour un doigt
+         d'enfant. Ce calque prend TOUT l'écran et refait le même bloc, deux
+         fois plus grand.
+
+         Une page web n'a pas le droit de faire pivoter un téléphone : le
+         verrouillage en paysage n'existe que sur Android, et seulement en
+         plein écran — Safari sur iPhone n'a ni l'un ni l'autre. On les
+         demande quand même, et là où c'est refusé on invite simplement
+         l'enfant à tourner son appareil, en redessinant dès que c'est fait. */
+      var plein=null;
+      function dispo(){
+        var vv=window.visualViewport;
+        return{l:Math.round((vv&&vv.width)||window.innerWidth||520),
+               h:Math.round((vv&&vv.height)||window.innerHeight||420)};
       }
-      function guide(prog){
-        cx.clearRect(0,0,CW,CH);
-        /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
-           d'un coup d'œil ce qu'il a écrit lui-même. */
-        for(var k=0;k<nb;k++){
-          if(k===caseAnim&&rev)cx.drawImage(_reveleJusqua(rev,prog),rev.x0,rev.y0);
-          else modeleEntier(k);
+      function agrandir(){
+        if(plein)return;
+        _boyPleinEcran=true;
+        var ov=document.createElement('div');
+        ov.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;z-index:9000;'
+          +'display:flex;flex-direction:column;align-items:center;justify-content:center;'
+          +'padding:8px;overscroll-behavior:contain;touch-action:none;'
+          +'background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%)';
+        var corps=document.createElement('div');
+        corps.style.cssText='width:100%;display:flex;flex-direction:column;align-items:center';
+        ov.appendChild(corps);document.body.appendChild(ov);
+        document.body.style.overflow='hidden';
+        petit.stop();
+        var courant=null;
+        /* Le calque doit partir si la scène change sans passer par ses
+           boutons — un retour en arrière, par exemple. */
+        var veille=setInterval(function(){if(!p.isConnected)fermer(true);},800);
+        plein={fermer:function(fs){fermer(fs);}};
+        pleinEcranNatif();
+        poser();
+        window.addEventListener('resize',relayer);
+        window.addEventListener('orientationchange',relayer);
+        /* Sur mobile, c'est le visualViewport qui bouge quand la barre
+           d'adresse se replie ; `resize` ne suit pas toujours. */
+        if(window.visualViewport)window.visualViewport.addEventListener('resize',relayer);
+        function relayer(){poser();}
+
+        /* reserve : la place que prennent la barre de boutons et les marges.
+           On la devine, puis on la MESURE et on refait le bloc une fois s'il
+           déborde — une barre qui revient à la ligne n'a pas la même hauteur
+           d'un téléphone à l'autre. */
+        function poser(reserve,essai){
+          reserve=reserve||92;essai=essai||0;
+          var precedent=courant;
+          if(precedent)precedent.stop();
+          courant=null;corps.innerHTML='';
+          var d=dispo();
+          /* Trop étroit pour que ça vaille la peine : on demande le quart
+             de tour. Un écran large en portrait — une tablette — passe. */
+          if(d.l<560){
+            var c=document.createElement('div');
+            c.style.cssText='text-align:center;color:#01579b;font-weight:900;padding:24px 16px';
+            c.innerHTML='<div style="font-size:4.2rem;line-height:1.2">📱↻</div>'
+              +'<div style="font-size:1.15rem;margin-top:12px;line-height:1.5">'
+              +'Tourne ton téléphone<br>pour écrire en grand !</div>';
+            corps.appendChild(c);
+            var r=document.createElement('button');r.className='boy-btn sec';
+            r.style.cssText+=';padding:9px 12px;font-size:.85rem;margin:14px 0 0';
+            r.textContent='⤡ RÉDUIRE';r.onclick=function(){fermer(true);};
+            corps.appendChild(r);
+            return;
+          }
+          courant=_blocEcriture(corps,opts({dispoW:d.l-16,dispoH:d.h-reserve}));
+          courant.reprendreEncre(precedent||petit);
+          courant.bouton('⤡ RÉDUIRE',function(){fermer(true);});
+          veilleuse(courant.bouton('SUIVANT ▸',function(){
+            /* On garde le plein écran d'un tracé à l'autre : le redemander
+               sans un appui de doigt serait refusé par le navigateur. */
+            fermer(false);suivant();
+          }));
+          var trop=Math.round(corps.scrollHeight)+16-d.h;
+          if(trop>2&&essai<2)poser(reserve+trop+4,essai+1);
         }
-        if(Array.isArray(glyph)){
-          cx.save();cx.font='600 12px Outfit,sans-serif';cx.textAlign='center';
-          cx.fillStyle='rgba(1,87,155,.55)';
-          /* Deux cases : la lettre suivie d'une prolongation ne peut être
-             qu'en début ou au milieu d'un mot. */
-          var noms=nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
-          for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8);
-          cx.restore();
+        /* fs : on quitte vraiment le plein écran, ou on le garde pour la
+           scène suivante. */
+        function fermer(fs){
+          if(!plein)return;
+          plein=null;clearInterval(veille);
+          window.removeEventListener('resize',relayer);
+          window.removeEventListener('orientationchange',relayer);
+          if(window.visualViewport)window.visualViewport.removeEventListener('resize',relayer);
+          if(courant){courant.stop();petit.reprendreEncre(courant);}
+          if(ov.parentNode)ov.parentNode.removeChild(ov);
+          document.body.style.overflow='';
+          if(fs){_boyPleinEcran=false;quitterPleinEcranNatif();}
+          petit.reprendre();
         }
-        cx.save();
-        cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2;cx.setLineDash([9,6]);
-        cx.beginPath();cx.moveTo(10,baseY);cx.lineTo(CW-10,baseY);cx.stroke();
-        cx.restore();
       }
-      /* ── Le modèle s'écrit tout seul ──
-         L'animation tourne sur la case VOISINE, à gauche de celle où l'enfant
-         écrit : au départ celle de droite, la première à remplir ; dès son
-         premier trait, elle saute d'un cran à gauche pour ne pas s'animer
-         sous sa main ; sur la dernière case, elle s'arrête. Une case qu'elle
-         quitte reste entière. */
-      /* ms. L'écriture se fait en trois temps, dans l'ordre où la main écrit :
-         le corps de la lettre, puis ses points, puis sa voyelle. Entre chacun,
-         un souffle. Le dernier temps est court exprès : le client veut que ça
-         enchaîne, la lettre finie se montre juste ce qu'il faut. */
-      var ECRITURE=1050,POSE=240,POINTS=300,POSE2=180,VOYELLE=300,FIN=330;
-      var caseAnim=-1,caseEcrite=0,raf=null,depart=0,dernier=0,rev=null;
-      function boucle(){
-        /* L'écran a changé : le canvas n'est plus dans la page, on s'arrête.
-           Sans cela l'animation d'une scène quittée tournerait pour rien. */
-        if(!cvM.isConnected){raf=null;return;}
-        /* Plus de case à animer : on rend la main plutôt que de tourner à
-           vide jusqu'à la fin de l'écran. */
-        if(caseAnim<0){raf=null;return;}
-        raf=requestAnimationFrame(boucle);
-        var T=Date.now();
-        if(T-dernier<33)return;            /* 30 images/s suffisent */
-        dernier=T;
-        /* Un temps vide — pas de point, pas de voyelle — est sauté : sans
-           cela l'animation attendrait devant une lettre déjà finie. */
-        var aPoints=rev&&rev.points.length,aVoyelle=rev&&rev.voyelle.length;
-        var dPts=aPoints?POINTS:0,dPause2=(aPoints&&aVoyelle)?POSE2:0;
-        var dVoy=aVoyelle?VOYELLE:0;
-        var total=ECRITURE+POSE+dPts+dPause2+dVoy+FIN;
-        var c=(T-depart)%total;
-        var p;
-        if(c<ECRITURE)p=c/ECRITURE;
-        else if((c-=ECRITURE)<POSE)p=1;
-        else if((c-=POSE)<dPts)p=1+c/POINTS;
-        else if((c-=dPts)<dPause2)p=2;
-        else if((c-=dPause2)<dVoy)p=2+c/VOYELLE;
-        else p=3;
-        guide(p);
+      function pleinEcranNatif(){
+        try{
+          var de=document.documentElement;
+          var rf=de.requestFullscreen||de.webkitRequestFullscreen;
+          if(!rf)return;
+          var pr=rf.call(de);
+          if(pr&&pr.then)pr.then(function(){
+            try{if(screen.orientation&&screen.orientation.lock)
+              screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
+          })['catch'](function(){});
+        }catch(e){}
       }
-      function anime(k){
-        /* La case est préparée ici : on y peint la lettre à part, et on range
-           ses pixels dans l'ordre du geste. C'est fait une fois par case, pas
-           à chaque image. */
-        /* La boîte déborde un peu de la case : certaines formes attachées
-           sont plus larges qu'elle, et le calque les couperait. */
-        var xg=Math.max(0,Math.round(CW-pas*(k+1)-pas*0.18));
-        var xd=Math.min(CW,Math.round(CW-pas*k+pas*0.18));
-        rev=(k>=0&&k<nb)
-          ? _revelateur(liste[k],caseX(k),baseY,PX,xg,0,xd-xg,CH)
-          : null;
-        if(!rev){caseAnim=-1;guide(3);return;}
-        caseAnim=k;depart=Date.now();dernier=0;
-        guide(0);
-        if(raf===null)raf=requestAnimationFrame(boucle);
+      function quitterPleinEcranNatif(){
+        try{
+          if(!(document.fullscreenElement||document.webkitFullscreenElement))return;
+          try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
+          var ef=document.exitFullscreen||document.webkitExitFullscreen;
+          if(ef){var q=ef.call(document);if(q&&q['catch'])q['catch'](function(){});}
+        }catch(e){}
       }
-      guide(3);
-      var barre=document.createElement('div');
-      barre.style.cssText='display:flex;gap:8px;justify-content:center;margin-top:8px';
-      p.appendChild(barre);
-      var eff=document.createElement('button');eff.className='boy-btn sec';
-      eff.style.cssText+=';padding:9px;font-size:.85rem;margin:0';
-      /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste. */
-      eff.textContent='↺ EFFACER';eff.onclick=function(){cxE.clearRect(0,0,CW,CH);};
-      barre.appendChild(eff);
-      if(_trajectoire(liste[0])){
-        var rev=document.createElement('button');rev.className='boy-btn sec';
-        rev.style.cssText+=';padding:9px;font-size:.85rem;margin:0';
-        rev.textContent='▶ REVOIR';
-        rev.onclick=function(){anime(caseAnim>=0?caseAnim:caseEcrite);};
-        barre.appendChild(rev);
-      }
-      var trace=false,btn;
-      function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
-        return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
-      function deb(e){
-        trace=true;if(btn)btn.style.opacity='1';var q=pos(e);
-        caseEcrite=caseDe(q.x);
-        /* Un cran à gauche de la case attaquée. On ne relance rien tant que
-           l'enfant reste dans la même case, sinon l'animation repartirait de
-           zéro à chaque trait. */
-        if(caseEcrite+1!==caseAnim)anime(caseEcrite+1);
-        cxE.beginPath();cxE.moveTo(q.x,q.y);e.preventDefault();
-      }
-      function mv(e){if(!trace)return;var q=pos(e);cxE.lineWidth=7;cxE.strokeStyle='#e65100';cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
-      function fin(){trace=false;}
-      cvE.addEventListener('mousedown',deb);cvE.addEventListener('mousemove',mv);cvE.addEventListener('mouseup',fin);
-      cvE.addEventListener('touchstart',deb,{passive:false});cvE.addEventListener('touchmove',mv,{passive:false});cvE.addEventListener('touchend',fin);
-      /* La première case s'écrit toute seule dès l'arrivée sur l'écran. */
-      anime(0);
-      /* Une lettre non animée est dessinée une seule fois : si la police
-         arabe n'est pas encore chargée, ce dessin-là est à refaire. */
-      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){
-        if(cvM.isConnected&&caseAnim<0)guide(3);
-      });}catch(e){}
-      btn=bouton(p,'SUIVANT ▸',suivant);
-      btn.style.opacity='.45';
+      petit.bouton('⛶ AGRANDIR',agrandir);
+      /* Le choix se retient pour la session : l'enfant appuie une fois, et
+         les tracés suivants s'ouvrent déjà en grand. « RÉDUIRE » l'oublie. */
+      if(_boyPleinEcran)N.plusTard(agrandir,80);
+      var btn=veilleuse(bouton(p,'SUIVANT ▸',suivant));
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
   };
