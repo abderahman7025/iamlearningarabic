@@ -107,6 +107,26 @@ lettres**.
   pas « l'endroit du chemin le plus proche » : la barre horizontale posée sous
   la boucle du ف se voyait alors dès le début du geste, le chemin de la boucle
   passant juste au-dessus d'elle.
+  **Le chemin est PLAQUÉ SUR L'ENCRE** (`_cheminSurEncre`). C'est la
+  correction la plus importante du moteur. Le geste ne donne que l'ordre :
+  ses points sont posés à la main, et la CORDE qui joint deux points voisins
+  traversait le trait au lieu de le suivre. Le pinceau touchait alors les
+  deux bords d'une tête en même temps, et la lettre paraissait s'essuyer
+  d'un bloc, « comme si on cachait la lettre avec une feuille verticale
+  qu'on déplace vers la gauche » — mots du client, sur la tête du ʿayn au
+  milieu. Désormais chaque point du geste est ramené sur le trait le plus
+  proche (rayon 0,14 em), et d'un point au suivant on chemine DANS l'encre,
+  de proche en proche, au lieu de couper tout droit. Deux garde-fous : si
+  l'encre ne relie pas les deux points (le crayon se lève), ou si le détour
+  dépasse 3 fois la corde, on garde la corde.
+  Mesuré sur les 65 gestes, part du pinceau qui tombe sur le trait :
+  **75 % → 98 %** de moyenne. Les pires avant : ṭā isolé 36 %, rā isolé
+  48 %, fā isolé 51 %, kāf début 56 %. Restent sous 90 % : qāf fin (88 %) et
+  kāf fin (78 %), imprécisions de la table, pas du moteur.
+  **Conséquence à retenir** : quand une animation paraît fausse, regarder
+  d'abord si le pinceau reste sur le trait, AVANT de toucher à la table des
+  gestes — l'ordre y était juste dans les quinze formes que le client a
+  redessinées.
   **Deux fausses bonnes idées, déjà essayées, à ne pas refaire** : masquer la
   lettre avec un gros trait posé le long du chemin (il faut alors des
   coordonnées au pixel près, et un chemin un peu à côté laisse un morceau
