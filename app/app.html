@@ -10873,8 +10873,11 @@ function _boyScene(ca,reprise){
      — sans avoir à faire défiler. C'est en paysage que ça coince : la
      hauteur manque, et le bouton passait sous le bord. On mesure ce que le
      contenu occupe et, s'il déborde, on le réduit d'un bloc plutôt que de
-     retoucher trente tailles de police une par une. Jamais en dessous de
-     55 % : passé là, le texte ne se lit plus, et mieux vaut faire défiler. */
+     retoucher trente tailles de police une par une.
+     Le plancher est à 40 % : le cadre fait déjà presque la taille de
+     l'écran, il ne lui manque qu'un cheveu, et le client ne veut surtout pas
+     d'une mise en page repensée. Un plancher trop haut (55 %) laissait le
+     bouton SUIVANT passer sous le bord. */
   function ajusteEcran(){
     /* Un cours quitté laisse son écouteur derrière lui : sans ce garde-fou
        il travaillerait sur un cadre qui n'est plus à l'affiche. */
@@ -10885,7 +10888,7 @@ function _boyScene(ca,reprise){
     var dispo=vh-64-10;                 /* ca porte un paddingTop de 64 */
     var h=wrap.scrollHeight;
     if(!h||!dispo||h<=dispo)return;
-    var k=Math.max(0.55,dispo/h);
+    var k=Math.max(0.40,dispo/h);
     wrap.style.transformOrigin='top center';
     wrap.style.transform='scale('+k+')';
     /* Sans cette hauteur, la place laissée reste celle d'avant la réduction
@@ -10893,9 +10896,19 @@ function _boyScene(ca,reprise){
     wrap.style.height=Math.ceil(h*k)+'px';
   }
   function vh_ok(v){return (typeof v==='number'&&v>0)?v:0;}
+  /* La hauteur du cadre bouge APRÈS le premier calcul : la police arabe
+     arrive, une image se pose, la barre d'adresse se replie. On remesure
+     donc, sinon un écran mesuré trop tôt reste réduit de travers — ou pas
+     réduit du tout, et le bouton passe sous le bord. */
+  function ajusteBientot(){
+    N.plusTard(ajusteEcran,60);N.plusTard(ajusteEcran,400);
+    try{if(document.fonts&&document.fonts.ready)
+      document.fonts.ready.then(function(){ajusteEcran();});}catch(e){}
+  }
   window.addEventListener('resize',ajusteEcran);
   window.addEventListener('orientationchange',ajusteEcran);
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;ajusteEcran();if(_repriseSuivie)repriseScene(i);}
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',ajusteEcran);
+  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;ajusteEcran();ajusteBientot();if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
