@@ -9803,14 +9803,16 @@ var _TRACE_MODELE={
             [-0.05,0.02],[-0.20,0.26],[-0.40,0.31],[-0.54,0.17]]],
     debut:[[[-0.02,-0.02],[0.14,-0.26],[0.28,-0.33],[0.38,-0.20],[0.26,-0.05],[0.05,-0.03],
             [-0.20,-0.05],[-0.50,-0.05]]],
-    /* Milieu et fin : le trait de liaison d'abord, jusqu'au départ de l'œil,
-       puis exactement le geste du début — l'œil monte à 45° vers la droite,
-       fait le tour, et la suite vient après. */
-    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.16,-0.04],[0.02,-0.04],
-             [0.16,-0.26],[0.30,-0.32],[0.38,-0.20],[0.28,-0.06],[0.06,-0.04],
+    /* Milieu et fin : le trait de liaison, ON LÈVE LE CRAYON, puis exactement
+       le geste du début (milieu) ou de l'isolée (fin) — c'est la consigne du
+       client, mot pour mot. D'où DEUX gestes et non un seul : d'un seul
+       tenant, le crayon repartait de la fin du trait de liaison au lieu de
+       repartir du départ de l'œil. */
+    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.16,-0.04],[0.02,-0.04]],
+            [[0.02,-0.04],[0.16,-0.26],[0.30,-0.32],[0.38,-0.20],[0.28,-0.06],[0.06,-0.04],
              [-0.20,-0.05],[-0.54,-0.05]]],
-    fin:[[[0.62,-0.05],[0.44,-0.05],[0.24,-0.04],[0.08,-0.03],
-          [0.22,-0.26],[0.36,-0.32],[0.44,-0.20],[0.34,-0.06],[0.12,-0.03],
+    fin:[[[0.62,-0.05],[0.44,-0.05],[0.24,-0.04],[0.08,-0.03]],
+         [[0.08,-0.03],[0.22,-0.26],[0.36,-0.32],[0.44,-0.20],[0.34,-0.06],[0.12,-0.03],
           [-0.05,0.06],[-0.24,0.28],[-0.44,0.32],[-0.58,0.18]]]
   },
   /* ط ظ — l'œil, puis le crayon se lève et la barre verticale descend du haut */
@@ -9897,11 +9899,18 @@ var _TRACE_MODELE={
   'ك':{
     seule:[[[0.20,-0.74],[0.16,-0.10],[0.00,-0.04],[-0.26,-0.05]],
            [[-0.02,-0.52],[-0.12,-0.44]]],
-    /* Début et milieu : d'abord le corps, comme le dāl — on descend puis on
-       file vers la gauche. Ensuite SEULEMENT, crayon levé, la barre penchée
-       du haut, tracée de la droite vers la gauche en descendant. */
-    debut:[[[0.24,-0.60],[0.22,-0.44],[0.21,-0.28],[0.20,-0.12],[0.12,-0.05],
-            [-0.05,-0.05],[-0.22,-0.05],[-0.36,-0.05]],
+    /* Début et milieu : d'abord le corps, EXACTEMENT COMME LE DĀL — on part
+       du haut, on sort vers la droite, on redescend, et on file vers la
+       gauche. Ce n'était pas le cas : le corps descendait tout droit, à la
+       verticale. Ensuite SEULEMENT, crayon levé, la petite barre penchée du
+       haut à droite — elle vient tout à la fin. */
+    /* Relevé sur le glyphe : le corps monte à x ≈ 0,02 jusqu'à y = −0,63,
+       redescend en penchant vers la gauche, puis file sur la ligne jusqu'à
+       −0,36. La petite barre oblique, elle, occupe x 0,08 à 0,31 tout en
+       haut — un premier essai de corps « comme le dāl » sortait vers
+       x = 0,20 et empiétait donc dessus. */
+    debut:[[[0.02,-0.63],[0.00,-0.45],[-0.02,-0.28],[-0.05,-0.13],[-0.10,-0.05],
+            [-0.20,-0.03],[-0.30,-0.02],[-0.36,-0.02]],
            [[0.30,-0.72],[0.20,-0.68],[0.10,-0.63]]],
     milieu:[[[0.43,-0.05],[0.24,-0.05],[0.12,-0.28],[0.04,-0.56],[0.00,-0.34],
              [-0.06,-0.12],[-0.16,-0.05],[-0.44,-0.05]],
@@ -9969,10 +9978,15 @@ var _TRACE_MODELE={
             [-0.02,-0.27],[0.06,-0.39],
             [0.02,-0.06],[-0.12,-0.05],[-0.24,-0.05],[-0.33,-0.05]]],
     /* Milieu : le trait de liaison, puis les deux ventres, celui du haut
-       d'abord, celui du bas ensuite, et la sortie à gauche. */
-    milieu:[[[0.35,-0.05],[0.20,-0.05],[0.10,-0.14],[0.02,-0.30],[-0.08,-0.24],
-             [-0.06,-0.10],[0.02,0.02],[0.05,0.15],[-0.04,0.23],[-0.13,0.12],
-             [-0.12,-0.02],[-0.24,-0.05],[-0.36,-0.05]]],
+       d'abord, celui du bas ensuite, et la sortie à gauche.
+       LES DEUX VENTRES TOURNENT DANS L'AUTRE SENS qu'avant : le client les
+       a repris tous les deux. Celui du haut part donc vers la GAUCHE en
+       longeant le bas, remonte par la gauche, passe au sommet et redescend
+       par la droite ; celui du bas fait de même, dans son propre sens. */
+    milieu:[[[0.35,-0.05],[0.20,-0.05],[0.10,-0.14],
+             [-0.06,-0.10],[-0.08,-0.24],[0.02,-0.30],[0.09,-0.17],
+             [0.02,0.02],[-0.12,-0.02],[-0.13,0.12],[-0.04,0.23],[0.05,0.15],[0.02,0.03],
+             [-0.14,-0.03],[-0.24,-0.05],[-0.36,-0.05]]],
     fin:[[[0.26,-0.05],[0.08,-0.06],[0.00,-0.34],[-0.12,-0.26],[-0.14,-0.12],[-0.04,-0.10]]]
   },
   /* و — on part du BAS À DROITE de la boucle, on la fait dans le sens des
@@ -10137,7 +10151,20 @@ function _cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px){
   }
   var vu=new Int32Array(w*h),marque=0;
   var file=new Int32Array(w*h),vient=new Int32Array(w*h);
-  function parEncre(a,b){
+  /* Le chemin le plus court DANS l'encre prend forcément le côté le plus
+     court d'une boucle — soit, une fois sur deux, le sens contraire à celui
+     que le client a dicté. On l'enferme donc dans un COULOIR autour de la
+     corde : le bon côté y reste, l'autre en sort tout de suite. C'est ce qui
+     retournait la boucle du fā fin, du qāf fin et du ʿayn alors que la même
+     boucle était juste au milieu. */
+  function parEncre(a,b,ax,ay,bx,by,D){
+    var ux=bx-ax,uy=by-ay,uu=ux*ux+uy*uy;
+    function auLarge(x,y){
+      var t=uu?((x-ax)*ux+(y-ay)*uy)/uu:0;
+      if(t<0)t=0;else if(t>1)t=1;
+      var dx=x-(ax+ux*t),dy=y-(ay+uy*t);
+      return dx*dx+dy*dy>D*D;
+    }
     marque++;
     var tete=0,queue=0;file[queue++]=a;vu[a]=marque;vient[a]=-1;
     while(tete<queue){
@@ -10147,6 +10174,8 @@ function _cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px){
       for(var d=0;d<4;d++){
         v=d===0?(x>0?j-1:-1):d===1?(x<w-1?j+1:-1):d===2?(y>0?j-w:-1):(y<h-1?j+w:-1);
         if(v<0||!encre[v]||vu[v]===marque)continue;
+        var xv=v%w,yv=(v-xv)/w;
+        if(v!==b&&auLarge(xv,yv))continue;
         vu[v]=marque;vient[v]=j;file[queue++]=v;
       }
     }
@@ -10165,13 +10194,15 @@ function _cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px){
       var A=pts[k-1],B=pts[k],fait=false;
       var a=colle(A[0],A[1]),b=colle(B[0],B[1]);
       if(a>=0&&b>=0&&a!==b){
-        var ch=parEncre(a,b);
-        if(ch){
-          var droit=Math.sqrt((B[0]-A[0])*(B[0]-A[0])+(B[1]-A[1])*(B[1]-A[1]));
-          if(ch.length<=3*droit+16){
-            for(var q=1;q<ch.length;q++)sortie.push([ch[q]%w,(ch[q]-ch[q]%w)/w]);
-            fait=true;
-          }
+        var ax=a%w,ay=(a-ax)/w,bx=b%w,by=(b-bx)/w;
+        var droit=Math.sqrt((bx-ax)*(bx-ax)+(by-ay)*(by-ay));
+        /* Couloir serré d'abord ; s'il n'y a pas de passage, on l'élargit
+           une fois avant de renoncer. */
+        var ch=parEncre(a,b,ax,ay,bx,by,Math.max(4,0.13*px))
+            || parEncre(a,b,ax,ay,bx,by,Math.max(8,0.30*px));
+        if(ch&&ch.length<=3*droit+16){
+          for(var q=1;q<ch.length;q++)sortie.push([ch[q]%w,(ch[q]-ch[q]%w)/w]);
+          fait=true;
         }
       }
       if(!fait){
@@ -10247,21 +10278,49 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   var routes=_cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px);
   var nPas=0;routes.forEach(function(r){nPas+=r.length;});
   nPas=Math.max(40,nPas);
+  /* ── Le pinceau peint LE TRAIT SUR LEQUEL IL EST ──
+     Un disque tout bête déborde sur le trait d'à côté. Sur le ʿayn isolé,
+     le haut à droite de la grande boucle passe juste sous la petite tête :
+     il se découvrait donc en même temps qu'elle, alors que le crayon n'y
+     était pas encore. Le pinceau s'étale désormais DANS l'encre, de proche
+     en proche depuis son centre ; un trait qui ne fait que passer à côté
+     reste intact tant que le crayon n'y est pas arrivé par le trait. */
+  var vuP=new Int32Array(w*h),mqP=0,fileP=new Int32Array(w*h),profP=new Int32Array(w*h);
+  var Rg=Math.round(R*1.6);
+  function peint(cxp,cyp,rg){
+    if(cxp<0||cxp>=w||cyp<0||cyp>=h)return;
+    var s=cyp*w+cxp;
+    /* Le centre est tombé juste à côté du trait : on le rattrape d'un pixel
+       ou deux, sinon ce pas de pinceau ne peindrait rien. */
+    if(!encre[s]){
+      var pris=-1;
+      for(var dy=-2;dy<=2&&pris<0;dy++)for(var dx=-2;dx<=2;dx++){
+        var xx=cxp+dx,yy=cyp+dy;
+        if(xx<0||xx>=w||yy<0||yy>=h)continue;
+        if(encre[yy*w+xx]){pris=yy*w+xx;break;}
+      }
+      if(pris<0)return;
+      s=pris;
+    }
+    mqP++;
+    var t=0,q=0;fileP[q++]=s;vuP[s]=mqP;profP[s]=0;
+    while(t<q){
+      var j=fileP[t++],p=profP[j];
+      if(rang[j]<0)rang[j]=rg;
+      if(p>=Rg)continue;
+      var x=j%w,y=(j-x)/w,v;
+      for(var d=0;d<4;d++){
+        v=d===0?(x>0?j-1:-1):d===1?(x<w-1?j+1:-1):d===2?(y>0?j-w:-1):(y<h-1?j+w:-1);
+        if(v<0||!encre[v]||vuP[v]===mqP)continue;
+        var xv=v%w,yv=(v-xv)/w,ex=xv-cxp,ey=yv-cyp;
+        if(ex*ex+ey*ey>R*R)continue;
+        vuP[v]=mqP;profP[v]=p+1;fileP[q++]=v;
+      }
+    }
+  }
   var k=0;
   routes.forEach(function(route){
-    for(var q=0;q<route.length;q++){
-      var cxp=route[q][0],cyp=route[q][1];
-      for(var yy=Math.max(0,cyp-R);yy<=Math.min(h-1,cyp+R);yy++){
-        for(var xx=Math.max(0,cxp-R);xx<=Math.min(w-1,cxp+R);xx++){
-          var j=yy*w+xx;
-          if(!encre[j]||rang[j]>=0)continue;
-          var dx=xx-cxp,dy=yy-cyp;
-          if(dx*dx+dy*dy>R*R)continue;
-          rang[j]=k;
-        }
-      }
-      k++;
-    }
+    for(var q=0;q<route.length;q++){peint(route[q][0],route[q][1],k);k++;}
   });
   /* Ce qui appartient au corps ne se devine pas à la taille de la tache : le
      petit kāf logé dans le ك est une tache à part, mais le crayon passe
@@ -10523,11 +10582,10 @@ function _blocEcriture(hote,o){
     b.style.cssText+=';width:auto;padding:9px 8px;font-size:.8rem;margin:0;white-space:nowrap';
     b.textContent=txt;b.onclick=fn;barre.appendChild(b);return b;
   }
-  /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste. */
+  /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste.
+     « REVOIR » a été retiré à la demande du client : l'animation tourne en
+     boucle sur la case voisine, il n'y a rien à relancer. */
   petitBouton('↺ EFFACER',function(){cxE.clearRect(0,0,CW,CH);});
-  if(_trajectoire(liste[0]))petitBouton('▶ REVOIR',function(){
-    anime(caseAnim>=0?caseAnim:caseEcrite);
-  });
   var trace=false;
   function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
     return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
@@ -10810,7 +10868,34 @@ function _boyScene(ca,reprise){
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;if(_repriseSuivie)repriseScene(i);}
+  /* ── Tout le cadre à l'écran ──────────────────────────────────────────
+     Le client veut voir l'écran de cours EN ENTIER — le cadre et son bouton
+     — sans avoir à faire défiler. C'est en paysage que ça coince : la
+     hauteur manque, et le bouton passait sous le bord. On mesure ce que le
+     contenu occupe et, s'il déborde, on le réduit d'un bloc plutôt que de
+     retoucher trente tailles de police une par une. Jamais en dessous de
+     55 % : passé là, le texte ne se lit plus, et mieux vaut faire défiler. */
+  function ajusteEcran(){
+    /* Un cours quitté laisse son écouteur derrière lui : sans ce garde-fou
+       il travaillerait sur un cadre qui n'est plus à l'affiche. */
+    if(!wrap.isConnected)return;
+    wrap.style.transform='';wrap.style.transformOrigin='';wrap.style.height='';
+    var vv=window.visualViewport;
+    var vh=(vv&&vh_ok(vv.height))||window.innerHeight||0;
+    var dispo=vh-64-10;                 /* ca porte un paddingTop de 64 */
+    var h=wrap.scrollHeight;
+    if(!h||!dispo||h<=dispo)return;
+    var k=Math.max(0.55,dispo/h);
+    wrap.style.transformOrigin='top center';
+    wrap.style.transform='scale('+k+')';
+    /* Sans cette hauteur, la place laissée reste celle d'avant la réduction
+       et la page garde une longue traîne vide en dessous. */
+    wrap.style.height=Math.ceil(h*k)+'px';
+  }
+  function vh_ok(v){return (typeof v==='number'&&v>0)?v:0;}
+  window.addEventListener('resize',ajusteEcran);
+  window.addEventListener('orientationchange',ajusteEcran);
+  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;ajusteEcran();if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
@@ -10905,6 +10990,14 @@ function _boyScene(ca,reprise){
         var veille=setInterval(function(){if(!p.isConnected)fermer(true);},800);
         plein={fermer:function(fs){fermer(fs);}};
         pleinEcranNatif();
+        /* Le calque s'ouvre tout seul, donc sans appui de doigt : le
+           navigateur REFUSE alors le plein écran natif et le verrouillage en
+           paysage, qui exigent un geste. On redemande donc au premier
+           contact de l'enfant avec le calque — le premier trait suffit. */
+        ov.addEventListener('pointerdown',function relance(){
+          ov.removeEventListener('pointerdown',relance);
+          pleinEcranNatif();
+        },true);
         poser();
         window.addEventListener('resize',relayer);
         window.addEventListener('orientationchange',relayer);
@@ -10932,15 +11025,17 @@ function _boyScene(ca,reprise){
               +'<div style="font-size:1.15rem;margin-top:12px;line-height:1.5">'
               +'Tourne ton téléphone<br>pour écrire en grand !</div>';
             corps.appendChild(c);
+            /* Pas de bouton « réduire » — le client n'en veut plus. Mais
+               l'enfant ne doit pas rester coincé s'il ne tourne pas son
+               appareil : le passage à la suite reste offert. */
             var r=document.createElement('button');r.className='boy-btn sec';
-            r.style.cssText+=';padding:9px 12px;font-size:.85rem;margin:14px 0 0';
-            r.textContent='⤡ RÉDUIRE';r.onclick=function(){fermer(true);};
+            r.style.cssText+=';width:auto;padding:9px 12px;font-size:.85rem;margin:14px 0 0';
+            r.textContent='SUIVANT ▸';r.onclick=function(){fermer(false);suivant();};
             corps.appendChild(r);
             return;
           }
           courant=_blocEcriture(corps,opts({dispoW:d.l-16,dispoH:d.h-reserve}));
           courant.reprendreEncre(precedent||petit);
-          courant.bouton('⤡ RÉDUIRE',function(){fermer(true);});
           veilleuse(courant.bouton('SUIVANT ▸',function(){
             /* On garde le plein écran d'un tracé à l'autre : le redemander
                sans un appui de doigt serait refusé par le navigateur. */
@@ -10984,10 +11079,9 @@ function _boyScene(ca,reprise){
           if(ef){var q=ef.call(document);if(q&&q['catch'])q['catch'](function(){});}
         }catch(e){}
       }
-      petit.bouton('⛶ AGRANDIR',agrandir);
-      /* Le choix se retient pour la session : l'enfant appuie une fois, et
-         les tracés suivants s'ouvrent déjà en grand. « RÉDUIRE » l'oublie. */
-      if(_boyPleinEcran)N.plusTard(agrandir,80);
+      /* Plus de bouton « agrandir » : le client veut le plein écran paysage
+         d'office, sur tous les tracés. Le calque s'ouvre donc tout seul. */
+      N.plusTard(agrandir,60);
       var btn=veilleuse(bouton(p,'SUIVANT ▸',suivant));
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
