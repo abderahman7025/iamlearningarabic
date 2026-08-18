@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v87';
+var _VERSION_REPLI='v88';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9954,8 +9954,15 @@ var _TRACE_MODELE={
        client trouvait juste — je l'avais retourné en croyant corriger un
        sens, alors que le défaut venait du moteur, réparé depuis. La grande
        boucle reste un geste à part, crayon levé. */
-    seule:[[[0.08,-0.30],[-0.02,-0.42],[-0.16,-0.45],[-0.25,-0.36],
-            [-0.24,-0.24],[-0.14,-0.16],[-0.06,-0.13]],
+    /* ESSAI : le petit « c » parcouru dans l'AUTRE SENS.
+       La table décrivait déjà le tracé d'un « c » — bout droit, sommet,
+       gauche, bas — et le client voyait pourtant l'inverse à l'écran. On
+       retourne donc l'ordre pour voir ce que ça donne réellement : si le
+       geste devient juste, c'est qu'une inversion se cache quelque part
+       entre la table et le rendu, et il faudra la trouver plutôt que de
+       compenser lettre par lettre. */
+    seule:[[[-0.06,-0.13],[-0.14,-0.16],[-0.24,-0.24],[-0.25,-0.36],
+            [-0.16,-0.45],[-0.02,-0.42],[0.08,-0.30]],
            [[-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]],
     debut:[[[0.14,-0.36],[-0.02,-0.41],[-0.12,-0.28],[-0.02,-0.14],[0.10,-0.10],
             [-0.10,-0.05],[-0.33,-0.05]]],
