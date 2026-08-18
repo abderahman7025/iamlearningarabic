@@ -5319,6 +5319,33 @@ function showContactSuccess(){
    l'ordre : l'île qu'il vient de quitter, sinon la dernière entamée, sinon
    la dernière validée. La convention est celle du chemin : 0 = le coin,
    i+1 = posé sur l'île i. */
+/* ── Deux îles à l'écran ──────────────────────────────────────────────────
+   En revenant d'une lettre, le client veut voir À LA FOIS l'île qu'il vient
+   de quitter et celle qui suit : c'est là que se lit le chemin parcouru. On
+   ne centre donc plus sur le personnage, mais sur le MILIEU des deux îles.
+   `idx` suit la convention du personnage : 0 = le coin, i+1 = posé sur
+   l'île i. L'île quittée est donc `idx-1`, la suivante `idx`.
+   Si l'une des deux manque — tout début ou toute fin du parcours — on centre
+   sur celle qui reste ; si les deux manquent, on retombe sur le personnage. */
+function _centreDeuxIles(ca,cartes,idx,repli){
+  if(!ca)return;
+  var a=cartes&&cartes[idx-1],b=cartes&&cartes[idx];
+  var base=ca.getBoundingClientRect().top-ca.scrollTop;
+  var haut=1e9,bas=-1e9;
+  [a,b].forEach(function(el){
+    if(!el)return;
+    var r=el.getBoundingClientRect();
+    if(r.height<=0)return;
+    if(r.top-base<haut)haut=r.top-base;
+    if(r.bottom-base>bas)bas=r.bottom-base;
+  });
+  if(bas<haut&&repli){
+    var r2=repli.getBoundingClientRect();
+    haut=r2.top-base;bas=r2.bottom-base;
+  }
+  if(bas<haut)return;
+  ca.scrollTop=Math.max(0,(haut+bas)/2-ca.clientHeight/2);
+}
 function _ileDepart(islandDefs){
   var derniere=-1;
   try{
@@ -5722,10 +5749,7 @@ var islandDefs=[
           /* Défilement AVANT de montrer la carte, et sans animation : l'île en
              cours est là dès la première image affichée. */
           var _ca=document.getElementById('ca');
-          if(_ca&&charElMob){
-            var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;
-            _ca.scrollTop=Math.max(0,top-_ca.clientHeight/2);
-          }
+          if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxM,charElMob);
         }
         wrap.style.visibility='';
         var animFrameM=null,currentIdxM=charIdxM;
@@ -5892,10 +5916,7 @@ var islandDefs=[
       /* Défilement AVANT de montrer la carte : l'île en cours doit être à
          l'écran dès la première image affichée, sans saut. */
       var _cad=document.getElementById('ca');
-      if(_cad&&charEl){
-        var topD=charEl.getBoundingClientRect().top-_cad.getBoundingClientRect().top+_cad.scrollTop;
-        _cad.scrollTop=Math.max(0,topD-_cad.clientHeight/2);
-      }
+      if(_cad)_centreDeuxIles(_cad,isleCards,charIdx,charEl);
       wrap.style.visibility='';
 
       var animFrame=null,currentIdx=charIdx;
@@ -7108,7 +7129,8 @@ function renderChildIslandMap(ca){
         if(segsMob.length>0){
           if(charIdxC>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
           else{var ip=bezierPtM(0,segsMob[charIdxC]);placeCharMob(ip.x,ip.y);}
-          setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charElMob){var top=charElMob.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
+          setTimeout(function(){var _ca=document.getElementById('ca');
+            if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxC,charElMob);},60);
         }
         var animFrameM=null,currentIdxM=charIdxC;
         function animateToM(targetIdx,onDone){
@@ -7209,7 +7231,8 @@ function renderChildIslandMap(ca){
       if(charIdxC>=segments.length){initX=segments[segments.length-1].x3;initY=segments[segments.length-1].y3;}
       else{initX=segments[charIdxC].x0;initY=segments[charIdxC].y0;}
       placeCharAt(initX,initY);
-      setTimeout(function(){var _ca=document.getElementById('ca');if(_ca&&charEl){var top=charEl.getBoundingClientRect().top-_ca.getBoundingClientRect().top+_ca.scrollTop;_ca.scrollTo({top:Math.max(0,top-_ca.clientHeight/2),behavior:'auto'});}},60);
+      setTimeout(function(){var _ca=document.getElementById('ca');
+        if(_ca)_centreDeuxIles(_ca,isleCards,charIdxC,charEl);},60);
       var animFrame=null,currentIdx=charIdxC;
       function animateTo(targetIdx,onDone){
         if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
@@ -10438,6 +10461,47 @@ function _reveleJusqua(rev,p){
    appuie sur « AGRANDIR » une seule fois. « RÉDUIRE » l'oublie. */
 var _boyPleinEcran=false;
 
+/* ── Plein écran paysage ──────────────────────────────────────────────────
+   Demandé dès l'ARRIVÉE sur un cours de lettre, plus seulement sur l'écran
+   de tracé. Attention : les deux demandes exigent un geste de l'utilisateur.
+   Ouvrir un cours en est un (l'enfant a appuyé sur la lettre), mais le
+   navigateur ne le rattache pas toujours à la nouvelle page — on réarme donc
+   au premier contact avec le cours, ce qui suffit toujours. */
+function _pleinEcranPaysage(){
+  try{
+    var de=document.documentElement;
+    var rf=de.requestFullscreen||de.webkitRequestFullscreen;
+    if(!rf)return;
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      try{if(screen.orientation&&screen.orientation.lock)
+        screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
+      return;
+    }
+    var pr=rf.call(de);
+    if(pr&&pr.then)pr.then(function(){
+      try{if(screen.orientation&&screen.orientation.lock)
+        screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
+    })['catch'](function(){});
+  }catch(e){}
+}
+function _quitterPleinEcranPaysage(){
+  try{
+    if(!(document.fullscreenElement||document.webkitFullscreenElement))return;
+    try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
+    var ef=document.exitFullscreen||document.webkitExitFullscreen;
+    if(ef){var q=ef.call(document);if(q&&q['catch'])q['catch'](function(){});}
+  }catch(e){}
+}
+/* Réarme la demande au premier contact, une seule fois. */
+function _armePleinEcran(el){
+  if(!el)return;
+  _pleinEcranPaysage();
+  el.addEventListener('pointerdown',function un(){
+    el.removeEventListener('pointerdown',un,true);
+    _pleinEcranPaysage();
+  },true);
+}
+
 /* ── Un bloc d'écriture complet ──────────────────────────────────────────
    Les deux calques superposés (le modèle animé dessous, l'encre de l'enfant
    au-dessus), la barre de boutons, l'animation et les gestes. C'est une
@@ -10630,6 +10694,9 @@ function _boyScene(ca,reprise){
   var _repriseSuivie=!!reprise;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   var wrap=document.createElement('div');wrap.className='boy-wrap';ca.appendChild(wrap);
+  /* Le cours entier se joue en plein écran paysage, dès l'arrivée sur la
+     lettre — pas seulement sur les écrans de tracé. */
+  _armePleinEcran(ca);
   var N=_boyNarration();
   var api={wrap:wrap,dire:N.dire,plusTard:N.plusTard,aEnreg:N.aEnreg};
 
