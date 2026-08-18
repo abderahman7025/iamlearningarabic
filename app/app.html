@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v97';
+var _VERSION_REPLI='v98';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9846,7 +9846,12 @@ var _TRACE_MODELE={
     debut:[[[0.05,-0.28],[0.04,-0.06],[-0.05,-0.05],[-0.19,-0.05]]],
     /* trait de liaison, on monte le petit trait vertical, on redescend le
        même trait, puis le trait horizontal vers la gauche */
-    milieu:[[[0.23,-0.05],[0.06,-0.05],[0.04,-0.16],[0.03,-0.05],[-0.235,-0.05]]],
+    /* Le trait de liaison du départ est jalonné de points RAPPROCHÉS, comme
+       celui de la forme fin : espacés, le chemin se recolle mal au trait et
+       la liaison sort par à-coups au lieu de filer d'un trait. */
+    milieu:[[[0.23,-0.05],[0.19,-0.05],[0.15,-0.05],[0.11,-0.05],[0.06,-0.05],
+             [0.04,-0.16],[0.03,-0.05],
+             [-0.05,-0.05],[-0.13,-0.05],[-0.19,-0.05],[-0.235,-0.05]]],
     /* comme le milieu, et la boucle se referme sur le petit trait de gauche */
     fin:[[[0.53,-0.05],[0.34,-0.05],[0.31,-0.16],[0.30,-0.04],[0,-0.01],
           [-0.30,-0.02],[-0.42,-0.14],[-0.43,-0.24]]]
@@ -9875,15 +9880,28 @@ var _TRACE_MODELE={
   'د':{
     seule:[[[0,-0.40],[0.14,-0.28],[0.10,-0.08],[-0.02,-0.02],[-0.16,-0.02]]],
     /* trait de liaison, puis on monte à 45° en haut à gauche, puis idem isolée */
-    fin:[[[0.33,-0.05],[0.18,-0.08],[0.06,-0.48],[0.16,-0.24],[0.00,-0.04],[-0.26,-0.05]]]
+    /* Le départ se fait COMME LE RĀ : le trait de liaison file de la droite
+       vers la gauche d'un seul mouvement, puis on remonte vers le haut, et
+       seulement ensuite on redescend pour la partie horizontale. Le saut de
+       (0,18 ; −0,08) à (0,06 ; −0,48) était un bond : le chemin ne suivait
+       pas le trait sur toute cette montée, et elle sortait d'un bloc. */
+    fin:[[[0.33,-0.05],[0.28,-0.06],[0.23,-0.07],[0.18,-0.08],
+          [0.15,-0.18],[0.11,-0.30],[0.08,-0.40],[0.06,-0.48],
+          [0.13,-0.34],[0.16,-0.22],[0.12,-0.10],
+          [0.00,-0.04],[-0.14,-0.05],[-0.26,-0.05]]]
   },
   /* ر ز — idem د, mais la boucle descend sous la ligne */
   'ر':{
     /* La tête se trace du HAUT vers le bas : points rapprochés au départ,
        sinon le pinceau ouvre le haut et le bas ensemble et le trait semble
        remonter. */
-    seule:[[[0.12,-0.22],[0.11,-0.15],[0.09,-0.08],[0.06,-0.01],[0.01,0.08],
-            [-0.06,0.17],[-0.15,0.25],[-0.26,0.25]]],
+    /* De haut en bas, d'un seul filé : les points sont rapprochés SUR TOUTE
+       la descente, et pas seulement au départ. Espacés vers le bas, le
+       chemin coupait la courbe et la fin du geste sortait par plaques. */
+    seule:[[[0.12,-0.22],[0.115,-0.185],[0.11,-0.15],[0.10,-0.115],[0.09,-0.08],
+            [0.075,-0.045],[0.06,-0.01],[0.035,0.035],[0.01,0.08],
+            [-0.025,0.125],[-0.06,0.17],[-0.105,0.21],[-0.15,0.25],
+            [-0.205,0.25],[-0.26,0.25]]],
     fin:[[[0.23,-0.05],[0.14,-0.05],[0.09,0.00],[0.04,0.08],[-0.03,0.17],
           [-0.12,0.25],[-0.21,0.29],[-0.28,0.27]]]
   },
@@ -10543,6 +10561,12 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
     tot[lb]=(tot[lb]||0)+1;
     if(rang[i]>=0)vus[lb]=(vus[lb]||0)+1;
   }
+  /* Le seuil reste au quart. Essayé à la moitié puis au tiers pour que le
+     point du yā, effleuré par le pinceau qui longe la ligne, cesse de
+     passer pour un morceau de lettre : dans les deux cas le petit kāf logé
+     dans le ك bascule lui aussi du côté des points, alors qu'il fait
+     vraiment partie de la lettre. Le seuil ne sait pas les distinguer — il
+     faudra les séparer autrement que par la part couverte. */
   function estCorps(lb){return (vus[lb]||0)>=0.25*tot[lb];}
   /* ── Ce que le pinceau a manqué ──
      De proche en proche, à travers l'encre : un pixel non touché prend le
