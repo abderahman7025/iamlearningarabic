@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v83';
+var _VERSION_REPLI='v84';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9942,9 +9942,15 @@ var _TRACE_MODELE={
        trouve juste : on part du côté droit, on passe par le haut, on
        redescend à gauche et on revient — puis la grande boucle sous la
        ligne. */
-    seule:[[[0.08,-0.30],[-0.02,-0.42],[-0.16,-0.45],[-0.25,-0.36],[-0.24,-0.24],
-            [-0.14,-0.16],[-0.06,-0.13],
-            [-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]],
+    /* Le « c » du haut tourne DANS LE SENS DES AIGUILLES. Il était écrit à
+       l'envers (aire −0,137) : on partait du bout DROIT et on montait par la
+       gauche. On part maintenant du bout du BAS, on file vers la gauche, on
+       remonte par la gauche, on passe au sommet et on finit au bout droit —
+       aire +0,140. La grande boucle est un geste à part : le crayon se lève
+       entre les deux, comme le client les a dessinés. */
+    seule:[[[-0.06,-0.13],[-0.16,-0.16],[-0.25,-0.26],[-0.24,-0.38],
+            [-0.13,-0.45],[-0.01,-0.42],[0.08,-0.30]],
+           [[-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]],
     debut:[[[0.14,-0.36],[-0.02,-0.41],[-0.12,-0.28],[-0.02,-0.14],[0.10,-0.10],
             [-0.10,-0.05],[-0.33,-0.05]]],
     /* Milieu et fin : le trait de liaison arrive par la droite, puis le petit
@@ -9984,8 +9990,14 @@ var _TRACE_MODELE={
     milieu:[[[0.32,-0.05],[0.20,-0.05],[0.13,-0.11],[0.05,-0.11],[-0.01,-0.18],
              [-0.01,-0.32],[0.06,-0.43],[0.13,-0.32],[0.15,-0.16],[0.12,-0.08],
              [0.00,-0.05],[-0.16,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06],[0.27,-0.05],[0.20,-0.14],
-          [0.20,-0.29],[0.28,-0.38],[0.36,-0.29],[0.37,-0.14],[0.33,-0.06],
+    /* La boucle de la FIN reprend exactement celle du MILIEU, que le client
+       valide, simplement décalée à sa place (+0,22 en x, +0,03 en y). Elle
+       partait d'ailleurs et se lisait donc à l'envers, alors même que son
+       aire était du bon signe : ce n'est pas le sens seul qui compte, c'est
+       aussi PAR OÙ l'on entre dans la boucle. */
+    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06],
+          [0.35,-0.08],[0.27,-0.08],[0.21,-0.15],[0.21,-0.29],[0.28,-0.40],
+          [0.35,-0.29],[0.37,-0.13],[0.34,-0.05],
           [0.14,0.01],[-0.10,0.05],[-0.34,0.05],[-0.46,-0.02],[-0.50,-0.11]]]
   },
   /* ق — idem ف, mais isolée et fin passent sous la ligne */
