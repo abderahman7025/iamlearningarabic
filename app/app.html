@@ -384,6 +384,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 
 /* ── MENU ── */
 #s-menu{padding:0;overflow-y:auto;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(245,200,66,.08) 0%,transparent 70%)}
+/* Le numéro de version : tout en bas, calé à droite, assez discret pour
+   qu'on l'oublie et assez lisible pour qu'on le retrouve. Sélectionnable,
+   pour pouvoir le recopier. */
+.app-version{text-align:right;padding:0 16px 12px;font-size:.6rem;font-weight:700;
+  letter-spacing:.1em;color:var(--txt2);opacity:.5;user-select:text;min-height:1em}
 .menu-header{
   padding:28px 22px 20px;flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between;
@@ -3110,7 +3115,37 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
       <div class="mb-btn" onclick="doLogout()" style="color:#ff9090" id="quit-btn-lbl"></div>
     </div>
   </div>
+  <!-- Le numéro de version, discret, sous le bouton Quitter et calé à
+       droite. Il est lu dans le CACHE de l'appareil, pas écrit en dur :
+       il dit donc ce que CE téléphone sert vraiment, et non ce que le
+       serveur a publié — c'est la question à laquelle il doit répondre. -->
+  <div class="app-version" id="app-version"></div>
 </div>
+<script>
+(function(){
+  var el=document.getElementById('app-version');
+  if(!el)return;
+  var pose=false;
+  function met(v){if(pose)return;pose=true;el.textContent=v;}
+  try{
+    if(window.caches&&caches.keys){
+      caches.keys().then(function(cles){
+        var n=-1;
+        cles.forEach(function(k){
+          var m=/^arab-v(\d+)$/.exec(k);
+          if(m&&+m[1]>n)n=+m[1];
+        });
+        if(n>=0)met('v'+n);
+      })['catch'](function(){});
+    }
+  }catch(e){}
+  /* Pas de cache lisible (navigation privée, première visite avant que le
+     service worker ait pris la main) : on affiche le numéro du fichier. */
+  setTimeout(function(){
+    met(typeof _VERSION_REPLI!=='undefined'?_VERSION_REPLI:'');
+  },1500);
+})();
+</script>
 
 <!-- MAIN CONTENT SCREEN -->
 <div id="s-main" class="scr">
@@ -7541,6 +7576,9 @@ function _clStep0(wrap,letter,af,goNext){
 
 /* Dédoublonne les positions identiques (lettres qui ne s'attachent pas :
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
+/* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
+   au même chiffre que `public/sw.js`, qui reste la référence. */
+var _VERSION_REPLI='v79';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
