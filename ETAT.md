@@ -255,6 +255,91 @@ soit **2,4 fois** plus grande.
 
 ---
 
+## FAIT — Le banc d'essai des gestes (`/banc`)
+
+Adresse réservée au compte `abder.jah@hotmail.com`, servie par la MÊME
+fonction que l'application (`api/app.js`, paramètre `banc`) : aucune
+fonction ajoutée, on reste aux douze autorisées.
+
+La page ne contient **aucune copie du moteur**. Elle récupère
+`/app?f=<horodatage>` — le paramètre est indispensable, voir les pièges —
+en extrait les scripts et rejoue les formes côte à côte, toutes au même
+rythme. Elle affiche la version d'`app.html` reçue, le nombre de gestes
+d'une forme et ses coordonnées : c'est ce qui permet de distinguer « la
+table qui arrive sur l'appareil est vieille » de « la table est bonne mais
+le rendu l'ignore ».
+
+`AREVOIR`, en tête du script, liste les formes montrées par défaut : on y
+met celles que le client signale, et on en retire ce qu'il valide.
+`/banc?tout=1` montre l'alphabet entier, `/banc?l=و,ك` quelques lettres.
+
+**Sans ce banc, on ne peut pas travailler les gestes.** Avant lui, chaque
+correction partait en production et le client servait d'œil ; cinq tours
+ont été perdus sur des mesures qui disaient l'inverse de ce qu'il voyait.
+
+---
+
+## LEÇONS SUR LES GESTES — à lire avant d'y toucher
+
+Cinq allers-retours perdus tiennent dans ces quatre points.
+
+1. **Recopier, jamais adapter.** Quand le client dit « sers-toi du fā
+   milieu », il faut prendre ses points, dans son ordre, **sans les
+   étirer**. Le ʿayn isolé, le fā isolé, le fā fin, le ṣād milieu et fin,
+   le kāf : tous ont été bons du premier coup le jour où la forme validée
+   a été recopiée telle quelle. Toutes mes mises à l'échelle « pour
+   épouser la boucle cible » ont retourné le parcours.
+2. **La liaison à part, crayon levé.** Une forme attachée dont la boucle
+   sort à l'envers, c'est presque toujours le pinceau qui finit la
+   liaison en frôlant le flanc de la boucle. Couper la liaison en geste
+   séparé règle ça (ṣād, wāw, fā fin).
+3. **Le défaut peut être dans la TABLE, pas dans le moteur** — et
+   l'inverse. Le triangle du ʿayn milieu était écrit à l'envers dans la
+   table (aire signée −0,088) et le moteur le dessinait fidèlement à
+   l'envers. Trois corrections du moteur n'y ont rien changé.
+   **Le sens se calcule** : aire signée du contour en coordonnées écran
+   (y vers le bas), **positif = sens des aiguilles d'une montre**.
+4. **Ne pas se fier à un indicateur qui ne mesure pas la question.**
+   J'ai successivement utilisé l'aire signée, le « haut vers le bas » et
+   le « gauche avant droite » ; les trois répondaient à côté, et les
+   trois m'ont fait affirmer des choses fausses. Le seul contrôle qui
+   vaut, c'est de **regarder** sur `/banc`.
+
+Deux réglages du moteur, trouvés par la mesure :
+
+- **Le pinceau fait 0,026 em de rayon**, pas 0,055. Mesuré à la taille
+  réelle d'une case : le trou de la boucle du fā fait 32 pixels, celui du
+  qāf 22, celui du wāw 16 — le pinceau large les couvrait entièrement,
+  et **aucun chemin ne pouvait alors donner un sens de rotation**. Il est
+  aujourd'hui plus fin que le trait, ce qui ne pose plus problème depuis
+  que les pixels non touchés se rattachent de proche en proche à travers
+  l'encre.
+- **Le chemin ne recule jamais** le long de sa corde (`_cheminSurEncre`).
+  Sans cette règle, le plus court chemin dans l'encre contournait une
+  petite boucle par le mauvais côté — le couloir seul ne suffit pas, les
+  deux côtés d'une boucle de la taille de la tête du ʿayn y tiennent.
+- **Pour situer une boucle, la repérer par son TROU**, pas par sa boîte :
+  le trou est le seul fond que l'encre enferme, et sa boîte élargie de
+  l'épaisseur du trait délimite la boucle sans la queue ni la barre. La
+  boîte de la lettre, elle, donne toute la largeur et fausse tout report.
+
+### Ce qui reste ouvert sur les gestes
+
+- **Le point du yā sort avant la fin du corps.** Cause trouvée : le
+  pinceau qui longe la ligne effleure le point posé dessous et en couvre
+  plus du quart, seuil à partir duquel une tache est comptée comme
+  morceau de lettre (`estCorps`). Remonter le seuil à la moitié puis au
+  tiers fait basculer **le petit kāf logé dans le ك** du côté des points,
+  alors qu'il fait vraiment partie de la lettre. Le seuil ne sait pas les
+  distinguer : il faudra un autre critère (le point est détaché ET hors
+  du passage du crayon ; le petit kāf est traversé sur sa longueur).
+- **Le hā milieu.** Le client le signale depuis le début et ne nomme
+  aucune forme modèle — ses deux ventres n'existent nulle part ailleurs.
+  Il faut lui demander par où entre le crayon et dans quel sens tourne
+  chaque ventre. Ne rien inventer : c'est là que tout a dérapé.
+
+---
+
 ## À FAIRE ENSUITE
 
 **L'ordre compte** : garçon validé → fille alignée dessus → traductions →
@@ -262,7 +347,31 @@ voix. Inversé, chaque étape jette le travail de la précédente — traduire
 95 phrases × 13 langues sur une interface qu'on va refaire, puis enregistrer
 les voix sur des textes qui vont changer.
 
-### Chantier 1 bis — Aligner l'interface fille sur celle du garçon
+### Chantier 1 bis — Interface fille : LICORNE, sur le moteur du garçon
+
+**Décidé le 19 août 2026.** Le client ne veut plus rien changer à la
+structure du garçon : le seuil est franchi. La structure de la fille est
+donc **remplacée** par celle du garçon, à l'identique, avec l'univers
+**licorne** en habillage.
+
+Ce qui change de chaque côté, et qu'il ne faut pas mélanger :
+
+| | fille | garçon |
+|---|---|---|
+| décor du parcours | **les îles, gardées** | **planètes en 3D** (et lune, soleil si les planètes ne suffisent pas) |
+| déplacement | le personnage **vole** d'île en île | le personnage **en fusée**, vole de planète en planète |
+
+Dans les deux cas, le personnage ne marche plus le long du chemin tracé :
+il **vole** d'un point au suivant. La courbe de Bézier qui sert
+aujourd'hui de chemin reste utile — c'est la trajectoire du vol — mais
+elle n'a plus à être dessinée comme un sentier.
+
+Rappel qui vaut toujours : le portage doit produire **un seul moteur de
+scènes avec deux habillages**, pas un second code recopié. Aujourd'hui
+`_kidScene` et `_boyScene` sont deux chemins séparés, et toute correction
+est à faire deux fois — c'est ce qui a coûté le plus cher jusqu'ici.
+
+### (Ancienne rédaction, gardée pour le contexte)
 
 Décision du client : ne pas toucher aux deux interfaces enfant en même
 temps. L'interface fille actuelle sert de repli tant que le garçon n'est pas
@@ -297,6 +406,20 @@ Décision du client : **tout doit être traduit dans les 13 langues**.
 - À faire avant les enregistrements audio, sinon la génération est à refaire.
 
 ### Chantier 3 — Voix naturelles
+
+**Le micro est arrivé et fonctionne (19 août 2026).** Le client veut
+enregistrer ce week-end. L'ordre habituel — traductions AVANT voix —
+n'est à respecter que pour une partie du corpus, et il faut savoir
+laquelle :
+
+- **L'ARABE peut s'enregistrer tout de suite, sans risque.** Lettres,
+  voyelles, syllabes, les 30 mots illustrés : ce corpus ne dépend ni de
+  l'interface ni des traductions. Il ne changera pas.
+- **La narration FRANÇAISE des cours enfant doit attendre.** Ses ~86
+  phrases sont écrites en dur dans `_boyScene` et `_kidScene`, et le
+  portage de la fille sur le moteur du garçon va les remanier. Les
+  enregistrer avant, c'est les refaire après.
+
 - Arabe **et français** : la voix du client, avec son micro, via le studio
   d'enregistrement (panneau admin, 370 entrées).
 - Les 12 autres langues : **Azure Speech** (compte créé, 200 USD de crédits).
@@ -315,6 +438,28 @@ page et URL propres, indexables. Elles se rangent à côté de
 ---
 
 ## Fait récemment (ne pas refaire)
+
+- **Interface garçon en paysage** : plein écran demandé dès l'ouverture
+  d'un cours de lettre (et non plus au seul écran de tracé) ; panneau en
+  **deux colonnes** — la phrase à gauche, ce qu'elle montre à droite, les
+  boutons en bas ; texte agrandi sur des lignes longues au lieu de quatre
+  mots par ligne ; le cadre **remplit** la hauteur, en grandissant quand
+  la place est là et en se réduisant quand elle manque. Les boutons
+  « REVOIR » et « RÉDUIRE » ont été retirés à la demande du client.
+- **Page de déduction** : les deux lignes suivent l'ordre des RANGÉES du
+  tableau — « Fin = isolée + — » en haut, « Milieu = début + — » en bas.
+  La phrase dite suit le même ordre, sinon la voix nomme une ligne pendant
+  que l'autre s'anime.
+- **Carte des îles** : au retour d'une lettre, le centrage se fait sur le
+  MILIEU entre l'île quittée et la suivante, plus sur le personnage
+  (`_centreDeuxIles`, utilisée aux quatre points de défilement).
+- **Numéro de version** en bas à droite du menu principal, collé sous la
+  barre du bas et calé sur son bord droit.
+- **Le bandeau « appuyez sur Échap »** du plein écran appartient au
+  navigateur : aucune ligne de code ne l'enlève. Le client l'accepte.
+  Et **une page web ne peut pas faire pivoter un appareil** : Safari sur
+  iPhone n'a ni plein écran ni verrouillage d'orientation. Ne pas
+  reprendre cette piste, elle est fermée.
 
 - **La hamza n'a pas de trait de liaison, même prolongée.** Les écrans
   d'allongement lui fabriquaient ses cases comme à une lettre ordinaire :
@@ -430,6 +575,30 @@ page et URL propres, indexables. Elles se rangent à côté de
   **tiret de liaison visible (tatweel `ـ`)**, jamais avec le ZWJ. En HTML, le
   ZWJ fonctionne — d'où le piège, ça marche d'un côté et pas de l'autre.
 
+- **`sw.js` porte le numéro à DEUX endroits** : la ligne de commentaire et
+  `const CACHE`. La v80 est partie avec le commentaire à jour et le cache
+  resté à `arab-v79` : le service worker changeait, mais le cache n'étant
+  pas renommé, l'ancienne application pouvait continuer d'être servie. Une
+  correction poussée n'arrivait alors jamais sur l'appareil, sans que rien
+  ne le signale. Toujours vérifier les deux lignes.
+- **Le numéro affiché dans le menu vient du FICHIER, pas du cache.**
+  Première version : il lisait `caches.keys()`. C'était trompeur — le
+  cache se renomme dès le nouveau `sw.js` récupéré, alors que la page
+  ouverte fait toujours tourner l'ancien `app.html`. On lisait « v81 » en
+  exécutant v79. Il lit maintenant `_VERSION_REPLI`, gravé dans le
+  fichier, et prévient en jaune si le cache annonce plus récent.
+  **`_VERSION_REPLI` est à tenir au même numéro que `sw.js`.**
+- **Le service worker sert « cache d'abord » tout ce qui n'est pas une
+  navigation.** Un `fetch('/app')` — celui du banc d'essai, par exemple —
+  reçoit donc une vieille copie. D'où le paramètre horodaté
+  `/app?f=<date>` : aucune entrée du cache ne correspond, la requête part
+  sur le réseau. Ne PAS nommer ce paramètre `banc`, c'est lui qui fait
+  servir la page du banc côté serveur.
+- **`api/app.js` ne garde plus le HTML en mémoire.** Il le faisait
+  (`_cacheHtml`) : sur une plateforme sans serveur, une instance encore
+  chaude d'un déploiement précédent resservait l'ancienne application tant
+  qu'elle restait chaude. Le fichier est relu à chaque requête ; la
+  lecture ne coûte rien à côté du risque.
 - **`.boy-btn` étale un bouton sur toute la largeur** (`display:block;
   width:100%`). Dans une barre en `flex-wrap`, les boutons s'empilaient donc
   les uns sous les autres, et le calque plein écran débordait de l'écran. Un
