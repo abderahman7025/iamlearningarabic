@@ -84,13 +84,28 @@ fetch('/app?f='+Date.now(),{credentials:'same-origin',cache:'no-store'})
 function dessine(){
   var PX=140,W=210,H=210,AX=105,AY=132,vues=[];
   var g=document.getElementById('grille');
-  [['ʿayn',['عـ','ـعـ','ـع','ع']],
-   ['fā',  ['فـ','ـفـ','ـف','ف']],
-   ['qāf', ['قـ','ـقـ','ـق','ق']]].forEach(function(L){
-    L[1].forEach(function(ch,k){
+  var T='ـ';
+  /* TOUTES les lettres qui ont un geste, pas une liste figée : le banc ne
+     doit jamais obliger à redemander « et telle lettre ? ». Une adresse du
+     genre /banc?l=و,ك n'en montre que celles-là, quand on veut regarder de
+     près. */
+  var choix=(new URLSearchParams(location.search).get('l')||'').split(',')
+              .map(function(s){return s.trim();}).filter(Boolean);
+  var noms={'ا':'alif','ب':'bā','ج':'djīm','د':'dāl','ر':'rā','س':'sīn',
+    'ص':'ṣād','ط':'ṭā','ع':'ʿayn','ف':'fā','ق':'qāf','ك':'kāf','ل':'lām',
+    'م':'mīm','ن':'nūn','ه':'hā','و':'wāw','ي':'yā','ء':'hamza'};
+  var formes=[['debut','début',function(b){return b+T;}],
+              ['milieu','milieu',function(b){return T+b+T;}],
+              ['fin','fin',function(b){return T+b;}],
+              ['seule','isolée',function(b){return b;}]];
+  Object.keys(_TRACE_MODELE).forEach(function(base){
+    if(choix.length&&choix.indexOf(base)<0)return;
+    formes.forEach(function(f){
+      if(!_TRACE_MODELE[base][f[0]])return;
+      var ch=f[2](base);
       var b=document.createElement('div');b.className='case';
       var lb=document.createElement('div');lb.className='lbl';
-      lb.textContent=L[0]+' · '+['début','milieu','fin','isolée'][k];
+      lb.textContent=(noms[base]||base)+' · '+f[1];
       b.appendChild(lb);
       var cv=document.createElement('canvas');cv.width=W;cv.height=H;
       b.appendChild(cv);g.appendChild(b);
