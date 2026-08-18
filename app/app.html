@@ -7578,7 +7578,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v79';
+var _VERSION_REPLI='v80';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9930,10 +9930,20 @@ var _TRACE_MODELE={
        triangle se ferme dans le sens des aiguilles d'une montre, et la sortie
        vient après — à gauche pour le milieu, en boucle sous la ligne pour la
        fin. */
-    milieu:[[[0.31,-0.05],[0.18,-0.05],[0.12,-0.12],[0.02,-0.28],[-0.10,-0.26],
-             [-0.12,-0.12],[-0.05,-0.05],[-0.20,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.35,-0.05],[0.22,-0.05],[0.16,-0.12],[0.05,-0.29],[-0.07,-0.27],
-          [-0.09,-0.13],[-0.02,-0.06],
+    /* Le triangle tourne DANS LE SENS DES AIGUILLES D'UNE MONTRE. Il était
+       écrit à l'envers dans la table — aire signée −0,088, donc sens
+       inverse — et le moteur le dessinait donc fidèlement à l'envers : la
+       branche DROITE sortait avant la gauche, ce que le client voit.
+       Depuis l'entrée, en bas à droite, les aiguilles d'une montre passent
+       d'abord par le BAS vers la gauche, remontent par la GAUCHE, passent
+       au sommet, et redescendent par la DROITE. */
+    milieu:[[[0.31,-0.05],[0.18,-0.05],[0.12,-0.07],
+             [0.00,-0.07],[-0.10,-0.13],[-0.10,-0.23],[0.01,-0.28],[0.11,-0.22],
+             [0.12,-0.12],[0.05,-0.06],
+             [-0.12,-0.05],[-0.22,-0.05],[-0.32,-0.05]]],
+    fin:[[[0.35,-0.05],[0.22,-0.05],[0.16,-0.07],
+          [0.03,-0.07],[-0.07,-0.13],[-0.07,-0.24],[0.05,-0.29],[0.15,-0.23],
+          [0.16,-0.12],[0.08,-0.06],
           [-0.05,0.10],[-0.14,0.30],[-0.06,0.46],[0.14,0.50],[0.30,0.42]]]
   },
   /* ف — le petit cercle dans le sens des aiguilles d'une montre, puis le
