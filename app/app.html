@@ -3129,25 +3129,42 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 (function(){
   var el=document.getElementById('app-version');
   if(!el)return;
-  var pose=false;
-  function met(v){if(pose)return;pose=true;el.textContent=v;}
-  try{
-    if(window.caches&&caches.keys){
+  /* ── Ce qui TOURNE, pas ce qui est téléchargé ──
+     Première version de ce compteur : il lisait le nom du cache du service
+     worker. C'était faux, et trompeur. Ce cache se renomme dès que le
+     nouveau sw.js est récupéré, alors que la page déjà ouverte continue de
+     faire tourner l'ANCIEN app.html. On pouvait donc lire « v81 » à l'écran
+     tout en exécutant le code de v79 — et croire qu'une correction n'avait
+     rien donné alors qu'elle n'était simplement pas encore chargée.
+     On affiche donc le numéro gravé dans CE fichier-ci. Et si le cache en
+     annonce un plus récent, on le dit : il suffit de recharger. */
+  function courante(){
+    return (typeof _VERSION_REPLI!=='undefined')?_VERSION_REPLI:'';
+  }
+  function pose(){
+    var v=courante();
+    if(!v)return;
+    el.textContent=v;
+    try{
+      if(!(window.caches&&caches.keys))return;
       caches.keys().then(function(cles){
         var n=-1;
         cles.forEach(function(k){
           var m=/^arab-v(\d+)$/.exec(k);
           if(m&&+m[1]>n)n=+m[1];
         });
-        if(n>=0)met('v'+n);
+        var moi=parseInt(String(v).replace(/[^0-9]/g,''),10);
+        if(n>moi){
+          el.textContent=v+' · v'+n+' prête, recharge';
+          el.style.opacity='.9';el.style.color='#f5c842';
+        }
       })['catch'](function(){});
-    }
-  }catch(e){}
-  /* Pas de cache lisible (navigation privée, première visite avant que le
-     service worker ait pris la main) : on affiche le numéro du fichier. */
-  setTimeout(function(){
-    met(typeof _VERSION_REPLI!=='undefined'?_VERSION_REPLI:'');
-  },1500);
+    }catch(e){}
+  }
+  pose();
+  /* Le fichier principal peut n'être pas encore exécuté quand ce script-ci
+     s'exécute : on repasse une fois. */
+  setTimeout(pose,1500);
 })();
 </script>
 
@@ -7582,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v81';
+var _VERSION_REPLI='v82';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
