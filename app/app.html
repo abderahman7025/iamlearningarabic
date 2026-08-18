@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v84';
+var _VERSION_REPLI='v85';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9948,8 +9948,14 @@ var _TRACE_MODELE={
        remonte par la gauche, on passe au sommet et on finit au bout droit —
        aire +0,140. La grande boucle est un geste à part : le crayon se lève
        entre les deux, comme le client les a dessinés. */
-    seule:[[[-0.06,-0.13],[-0.16,-0.16],[-0.25,-0.26],[-0.24,-0.38],
-            [-0.13,-0.45],[-0.01,-0.42],[0.08,-0.30]],
+    /* Le « c » du haut se trace DU HAUT VERS LE BAS : on part de son bout le
+       plus haut, à droite, on passe par le sommet, on descend par la gauche
+       et on finit au bout du bas. C'est l'ordre d'origine, celui que le
+       client trouvait juste — je l'avais retourné en croyant corriger un
+       sens, alors que le défaut venait du moteur, réparé depuis. La grande
+       boucle reste un geste à part, crayon levé. */
+    seule:[[[0.08,-0.30],[-0.02,-0.42],[-0.16,-0.45],[-0.25,-0.36],
+            [-0.24,-0.24],[-0.14,-0.16],[-0.06,-0.13]],
            [[-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]],
     debut:[[[0.14,-0.36],[-0.02,-0.41],[-0.12,-0.28],[-0.02,-0.14],[0.10,-0.10],
             [-0.10,-0.05],[-0.33,-0.05]]],
@@ -9995,8 +10001,13 @@ var _TRACE_MODELE={
        partait d'ailleurs et se lisait donc à l'envers, alors même que son
        aire était du bon signe : ce n'est pas le sens seul qui compte, c'est
        aussi PAR OÙ l'on entre dans la boucle. */
-    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06],
-          [0.35,-0.08],[0.27,-0.08],[0.21,-0.15],[0.21,-0.29],[0.28,-0.40],
+    /* Trait de liaison, ON LÈVE LE CRAYON, puis la boucle et la suite — la
+       règle que le client a dictée pour le ṣād, et qui vaut ici. D'un seul
+       tenant, le pinceau arrivait sur le flanc DROIT de la boucle en
+       finissant la liaison, et la droite sortait donc avant la gauche
+       malgré un sens de rotation juste. */
+    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06]],
+         [[0.35,-0.08],[0.27,-0.08],[0.21,-0.15],[0.21,-0.29],[0.28,-0.40],
           [0.35,-0.29],[0.37,-0.13],[0.34,-0.05],
           [0.14,0.01],[-0.10,0.05],[-0.34,0.05],[-0.46,-0.02],[-0.50,-0.11]]]
   },
