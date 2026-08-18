@@ -2554,6 +2554,27 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-step i{width:7px;height:7px;border-radius:50%;background:#0277bd;animation:bBlink 1.4s infinite;font-style:normal}
 .boy-titre{font-size:1.28rem;font-weight:900;color:#01579b;line-height:1.9;letter-spacing:.01em;
   text-align:center;margin:0 auto 18px;max-width:22em}
+/* ── Deux colonnes, en paysage ──
+   La phrase à gauche, ce qu'elle montre à droite, les boutons en bas sur
+   toute la largeur. La hauteur ainsi gagnée sert à écrire BEAUCOUP plus
+   gros, sur des lignes bien plus longues : en paysage, le texte tenait sur
+   quatre mots par ligne au milieu d'un écran vide. */
+.boy-2col{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+  column-gap:26px;align-items:center;margin-bottom:6px}
+.boy-2col .boy-col-d{display:flex;flex-direction:column;
+  align-items:center;justify-content:center;min-width:0}
+.boy-2col .boy-col-g{min-width:0}
+.boy-2col .boy-titre{max-width:none;margin:0;font-size:1.95rem;line-height:1.6}
+.boy-2col .boy-hublot{margin:0 auto}
+/* La page de déduction : ses deux lignes doivent tomber en face des deux
+   rangées du tableau, on les écarte donc autant que lui. */
+.boy-2col .boy-titre.dedu{line-height:2.9;font-size:1.7rem}
+/* Un écran de texte seul n'a pas de deuxième colonne : il garde sa pleine
+   largeur, mais il doit lui aussi s'écrire gros et sur de longues lignes.
+   Sans cela il restait à quatre mots par ligne au milieu d'un écran vide. */
+@media(orientation:landscape) and (min-width:640px){
+  .boy-titre{font-size:1.75rem;line-height:1.6;max-width:34em}
+}
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
 .ar-air{display:inline-block;margin:0 .34em;line-height:1}
@@ -10935,6 +10956,48 @@ function _boyScene(ca,reprise){
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
+  /* ── Deux colonnes en paysage ─────────────────────────────────────────
+     En paysage la hauteur manque et la largeur est perdue. On range donc le
+     panneau en deux colonnes — la phrase à gauche, ce qu'elle montre à
+     droite — et les boutons en bas, sur toute la largeur. La hauteur gagnée
+     sert au grossissement du cadre : la phrase s'écrit alors beaucoup plus
+     gros, sur des lignes bien plus longues.
+
+     Fait en JS et non en CSS : les scènes n'ont pas les mêmes enfants d'une
+     à l'autre, et une grille CSS seule les empilerait toutes dans la même
+     case. On ne range que ce qu'on sait nommer, et on ne touche à rien
+     quand il n'y a rien à répartir — un écran de texte seul, par exemple,
+     garde sa pleine largeur. */
+  function estPaysage(){
+    var vv=window.visualViewport;
+    var l=(vv&&vv.width)||window.innerWidth||0;
+    var h=(vv&&vv.height)||window.innerHeight||0;
+    return l>h&&l>=640;
+  }
+  function deuxColonnes(){
+    if(!estPaysage())return;
+    var p=wrap.querySelector('.boy-panel');
+    if(!p||p.getAttribute('data-col2'))return;
+    var titre=null,droite=[],bas=[];
+    [].slice.call(p.children).forEach(function(el){
+      if(el.classList.contains('boy-step'))return;          /* reste en tête */
+      if(el.classList.contains('boy-titre')){titre=el;return;}
+      /* Un bouton, ou la rangée qui en contient un : ça va en bas. */
+      if(el.classList.contains('boy-btn')
+         ||(el.querySelector&&el.querySelector('.boy-btn'))){bas.push(el);return;}
+      droite.push(el);
+    });
+    if(!titre||!droite.length)return;
+    var g=document.createElement('div');g.className='boy-2col';
+    var cg=document.createElement('div');cg.className='boy-col-g';
+    var cd=document.createElement('div');cd.className='boy-col-d';
+    g.appendChild(cg);g.appendChild(cd);
+    cg.appendChild(titre);
+    droite.forEach(function(el){cd.appendChild(el);});
+    if(bas.length)p.insertBefore(g,bas[0]);else p.appendChild(g);
+    p.setAttribute('data-col2','1');
+  }
+
   /* ── Le cadre REMPLIT l'écran ─────────────────────────────────────────
      Le client veut voir l'écran de cours en entier — le cadre et son bouton
      — et il veut qu'il occupe TOUTE la hauteur disponible, du haut au bas.
@@ -11012,7 +11075,7 @@ function _boyScene(ca,reprise){
   window.addEventListener('resize',relanceAjuste);
   window.addEventListener('orientationchange',relanceAjuste);
   if(window.visualViewport)window.visualViewport.addEventListener('resize',relanceAjuste);
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;ajusteEcran();ajusteBientot();if(_repriseSuivie)repriseScene(i);}
+  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;deuxColonnes();ajusteEcran();ajusteBientot();if(_repriseSuivie)repriseScene(i);}
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
@@ -11252,6 +11315,9 @@ function _boyScene(ca,reprise){
          morceau déclenche son bout d'animation. Le titre se tait donc ici,
          c'est la séquence plus bas qui parle. */
       var p=panneau(etape);titre(p,html,false);
+      /* Ses deux lignes doivent tomber en face des deux rangées du tableau :
+         la classe leur donne l'interligne qu'il faut, en paysage. */
+      var _t=p.querySelector('.boy-titre');if(_t)_t.classList.add('dedu');
       /* Deux lignes de deux, dans le sens de lecture arabe : isolée en haut
          à droite, fin en haut à gauche, début en bas à droite, milieu en bas
          à gauche. Chaque forme se retrouve ainsi à côté de celle dont elle
@@ -11326,14 +11392,18 @@ function _boyScene(ca,reprise){
         if(!liens[k])return;
         liens[k].style.opacity='1';liens[k].style.transform='translateX(0)';
       }
+      /* La FIN d'abord, le MILIEU ensuite : c'est l'ordre des rangées du
+         tableau — isolée et fin en haut, début et milieu en bas — et donc
+         celui des deux lignes du titre. Dans l'autre sens, la voix nommait
+         une ligne pendant que l'autre s'animait. */
       var pas=[];
-      if(corps[2]){
-        pas.push(['La forme du milieu, c\'est celle du début',function(){paraitre(2);}]);
-        pas.push(['en ajoutant un trait devant',function(){coller(2);}]);
-      }
       if(corps[3]){
-        pas.push(['Et la forme de la fin, c\'est celle de l\'isolée',function(){paraitre(3);}]);
+        pas.push(['La forme de la fin, c\'est celle de l\'isolée',function(){paraitre(3);}]);
         pas.push(['en ajoutant un trait devant',function(){coller(3);}]);
+      }
+      if(corps[2]){
+        pas.push(['Et la forme du milieu, c\'est celle du début',function(){paraitre(2);}]);
+        pas.push(['en ajoutant un trait devant',function(){coller(2);}]);
       }
       if(!pas.length){N.plusTard(function(){N.dire(fr);},420);return;}
       /* Le bouton n'appelle pas avant la fin du tableau : il bat déjà tout
@@ -11686,10 +11756,15 @@ function _boyLetterCourse(ca,idx,premiere){
      à un trait droit, alors que c'est le trait de liaison arabe. C'est
      l'animation du tableau qui le montre, collé à la lettre. */
   if(!sansDeduction){
+    /* Les deux lignes suivent l'ordre des RANGÉES du tableau : isolée et fin
+       en haut, début et milieu en bas. « Fin = isolée + — » se lit donc en
+       premier, en face de sa rangée, et « Milieu = début + — » en dessous,
+       en face de la sienne. La phrase dite suit le même ordre, sans quoi la
+       voix nommerait une ligne pendant que l'autre s'anime. */
     sc.push(B.tableau('ÉTAPE · DÉDUCTION',
-      B.deb('Milieu')+' = '+B.deb('début')+' + '+b('—')+'<br>'
-        +B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('—'),
-      'La forme du milieu, c\'est celle du début avec un trait devant. La forme de la fin, c\'est l\'isolée avec un trait devant.',
+      B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('—')+'<br>'
+        +B.deb('Milieu')+' = '+B.deb('début')+' + '+b('—'),
+      'La forme de la fin, c\'est l\'isolée avec un trait devant. La forme du milieu, c\'est celle du début avec un trait devant.',
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
   }
   if(premiereLettre&&!sansDeduction){
