@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v89';
+var _VERSION_REPLI='v90';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9991,8 +9991,16 @@ var _TRACE_MODELE={
     /* Même principe que le wāw : on part du bas à droite du petit cercle, on
        le fait dans le sens des aiguilles d'une montre, et une fois revenu au
        départ on file vers la gauche — sans passer sous la ligne, elle. */
-    seule:[[[0.40,-0.10],[0.30,-0.08],[0.18,-0.12],[0.15,-0.20],[0.23,-0.31],
-            [0.36,-0.31],[0.44,-0.21],[0.42,-0.10],[0.31,-0.05],
+    /* La boucle de l'ISOLÉE reprend celle du DÉBUT, que le client valide :
+       ses huit points DÉPLACÉS TELS QUELS (+0,235 en x, +0,045 en y), sans
+       être étirés. Un premier essai les avait dilatés de 1,81 en x pour
+       épouser une boucle plus large : la mesure a montré que le parcours
+       s'en trouvait retourné — l'isolée partait vers la droite quand le
+       début part vers la gauche. Déplacer garde le geste ; étirer le
+       défait. C'est ainsi que la fin a repris le milieu, et ça marche. */
+    seule:[[[0.37,-0.08],[0.29,-0.06],[0.22,-0.13],[0.22,-0.26],[0.29,-0.36],
+            [0.36,-0.27],[0.38,-0.11],[0.36,-0.04],
+            [0.24,-0.03],
             [0.10,-0.03],[-0.14,-0.03],[-0.32,-0.07],[-0.42,-0.18],[-0.43,-0.31]]],
     debut:[[[0.13,-0.12],[0.05,-0.10],[-0.02,-0.17],[-0.02,-0.30],[0.05,-0.40],
             [0.12,-0.31],[0.14,-0.15],[0.12,-0.08],
@@ -10012,8 +10020,14 @@ var _TRACE_MODELE={
        tenant, le pinceau arrivait sur le flanc DROIT de la boucle en
        finissant la liaison, et la droite sortait donc avant la gauche
        malgré un sens de rotation juste. */
-    fin:[[[0.58,-0.03],[0.44,-0.03],[0.36,-0.06]],
-         [[0.35,-0.08],[0.27,-0.08],[0.21,-0.15],[0.21,-0.29],[0.28,-0.40],
+    /* La FIN reprend le geste du MILIEU jusque dans sa STRUCTURE : un seul
+       trait continu, liaison puis boucle puis la suite. Je l'avais coupé en
+       deux, crayon levé — le milieu ne le fait pas, et s'en écarter c'était
+       déjà ne plus copier le modèle. Les dix premiers points sont ceux du
+       milieu, décalés de +0,22 en x et +0,03 en y ; seule la queue est
+       celle de la fin, qui passe sous la ligne. */
+    fin:[[[0.54,-0.02],[0.42,-0.02],
+          [0.35,-0.08],[0.27,-0.08],[0.21,-0.15],[0.21,-0.29],[0.28,-0.40],
           [0.35,-0.29],[0.37,-0.13],[0.34,-0.05],
           [0.14,0.01],[-0.10,0.05],[-0.34,0.05],[-0.46,-0.02],[-0.50,-0.11]]]
   },
