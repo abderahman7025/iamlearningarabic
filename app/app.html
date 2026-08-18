@@ -10203,23 +10203,32 @@ function _cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px){
      boucle était juste au milieu. */
   function parEncre(a,b,ax,ay,bx,by,D){
     var ux=bx-ax,uy=by-ay,uu=ux*ux+uy*uy;
+    function avance(x,y){return uu?((x-ax)*ux+(y-ay)*uy)/uu:0;}
     function auLarge(x,y){
-      var t=uu?((x-ax)*ux+(y-ay)*uy)/uu:0;
+      var t=avance(x,y);
       if(t<0)t=0;else if(t>1)t=1;
       var dx=x-(ax+ux*t),dy=y-(ay+uy*t);
       return dx*dx+dy*dy>D*D;
     }
+    /* ON N'AVANCE QUE VERS B. Sans cette règle, le chemin le plus court
+       contournait une petite boucle par le mauvais côté : le couloir ne
+       suffit pas, car sur une boucle de la taille de la tête du ʿayn les
+       DEUX côtés tiennent dedans. C'est ce qui retournait le sens que le
+       client avait dicté — et qui remettait le fā et le qāf à l'envers
+       pendant que ça réparait d'autres formes. */
+    var TOL=2/Math.max(1,Math.sqrt(uu));
     marque++;
     var tete=0,queue=0;file[queue++]=a;vu[a]=marque;vient[a]=-1;
     while(tete<queue){
       var j=file[tete++];
       if(j===b)break;
-      var x=j%w,y=(j-x)/w,v;
+      var x=j%w,y=(j-x)/w,v,tj=avance(x,y);
       for(var d=0;d<4;d++){
         v=d===0?(x>0?j-1:-1):d===1?(x<w-1?j+1:-1):d===2?(y>0?j-w:-1):(y<h-1?j+w:-1);
         if(v<0||!encre[v]||vu[v]===marque)continue;
         var xv=v%w,yv=(v-xv)/w;
         if(v!==b&&auLarge(xv,yv))continue;
+        if(v!==b&&avance(xv,yv)<tj-TOL)continue;
         vu[v]=marque;vient[v]=j;file[queue++]=v;
       }
     }
