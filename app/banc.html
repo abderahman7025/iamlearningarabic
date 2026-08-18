@@ -61,10 +61,19 @@ fetch('/app?f='+Date.now(),{credentials:'same-origin',cache:'no-store'})
     var aire=0;
     if(ay){var p=ay[0].slice(2,10);
       for(var i=0;i<p.length-1;i++)aire+=p[i][0]*p[i+1][1]-p[i+1][0]*p[i][1];}
+    /* On affiche les COORDONNÉES elles-mêmes, pas seulement un verdict.
+       C'est le seul moyen de trancher entre « la table est vieille » et
+       « la table est bonne mais le rendu l'ignore » : si ces chiffres sont
+       les bons et que le geste est faux, le défaut est dans le moteur. */
+    var s=_TRACE_MODELE['ع']&&_TRACE_MODELE['ع'].seule;
+    var ff=_TRACE_MODELE['ف']&&_TRACE_MODELE['ف'].fin;
     dit('app.html reçu : '+(v?v[1]:'version inconnue')
       +'\n'+n+' blocs de script chargés'
       +'\ntriangle du ʿayn milieu : aire '+aire.toFixed(4)
-      +(aire>0?'  → sens des AIGUILLES D\'UNE MONTRE':'  → sens INVERSE'));
+      +(aire>0?'  → sens des AIGUILLES':'  → sens INVERSE')
+      +'\nʿayn isolé : '+(s?s.length+' geste(s), départ '+JSON.stringify(s[0][0])
+          +' → arrivée '+JSON.stringify(s[0][s[0].length-1]):'?')
+      +'\nfā fin : '+(ff?ff.length+' geste(s), 1er geste '+ff[0].length+' point(s)':'?'));
     dessine();
   })
   .catch(function(e){
