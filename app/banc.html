@@ -29,7 +29,16 @@
 var etat=document.getElementById('etat');
 function dit(s){etat.textContent=s;}
 
-fetch('/app',{credentials:'same-origin',cache:'no-store'})
+/* Le paramètre est indispensable, il ne décore pas.
+   Le service worker sert « cache d'abord » tout ce qui n'est pas une
+   navigation. Or ceci est un fetch, pas une navigation : /app lui était
+   donc rendu DEPUIS LE CACHE, et le banc affichait fidèlement une vieille
+   application en annonçant sa vieille version. Un paramètre différent à
+   chaque appel ne correspond à aucune entrée du cache : la requête part
+   forcément sur le réseau.
+   Surtout PAS « banc » comme nom : c'est lui qui, côté serveur, fait servir
+   cette page-ci — le banc se serait chargé lui-même au lieu du cours. */
+fetch('/app?f='+Date.now(),{credentials:'same-origin',cache:'no-store'})
   .then(function(r){
     if(!r.ok)throw new Error('réponse '+r.status);
     return r.text();
