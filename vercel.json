@@ -150,6 +150,10 @@
       "destination": "/api/app?suite=/app"
     },
     {
+      "source": "/banc",
+      "destination": "/api/app?suite=/banc&banc=1"
+    },
+    {
       "source": "/interface",
       "destination": "/api/app?suite=/interface"
     },

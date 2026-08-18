@@ -19,25 +19,42 @@ const { applyMiddleware, verifyToken, rateLimit, getClientIp, logEvent } = requi
  */
 
 // app/app.html n'est jamais servi en statique : c'est tout l'intérêt.
-const CHEMINS = [
-  path.join(process.cwd(), 'app', 'app.html'),
-  path.join(__dirname, '..', 'app', 'app.html'),
-];
+function chemins(fichier) {
+  return [
+    path.join(process.cwd(), 'app', fichier),
+    path.join(__dirname, '..', 'app', fichier),
+  ];
+}
 
-let _cacheHtml = null;
-
-function lireApplication() {
-  if (_cacheHtml) return _cacheHtml;
-  for (const p of CHEMINS) {
+/**
+ * Le fichier est relu à chaque requête, volontairement.
+ *
+ * Il était auparavant gardé en mémoire dans l'instance (`_cacheHtml`). Sur
+ * une plateforme sans serveur, une instance encore chaude d'un déploiement
+ * PRÉCÉDENT continue de répondre un moment après la mise en ligne suivante :
+ * elle resservait alors l'ancienne application, indéfiniment tant qu'elle
+ * restait chaude. Une correction poussée pouvait donc n'arriver sur
+ * l'appareil que bien plus tard, ou pas du tout — sans que rien ne le
+ * signale. Une lecture de fichier par requête ne coûte rien à côté de ça.
+ */
+function lireFichier(fichier) {
+  for (const p of chemins(fichier)) {
     try {
-      if (fs.existsSync(p)) {
-        _cacheHtml = fs.readFileSync(p, 'utf8');
-        return _cacheHtml;
-      }
+      if (fs.existsSync(p)) return fs.readFileSync(p, 'utf8');
     } catch (e) { /* on essaie le suivant */ }
   }
   return null;
 }
+
+/**
+ * Banc d'essai des gestes de lettres, réservé au compte du client.
+ *
+ * Il charge l'application réellement servie et rejoue ses animations côte à
+ * côte : c'est le seul moyen de voir, SUR L'APPAREIL, ce que le moteur
+ * dessine vraiment — sans quoi la vérification d'un geste repose sur une
+ * capture d'écran et une description.
+ */
+const BANC_AUTORISE = ['abder.jah@hotmail.com'];
 
 function jetonDeLaRequete(req) {
   const auth = req.headers && req.headers.authorization;
@@ -115,15 +132,20 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'Vérification impossible.' });
   }
 
-  const html = lireApplication();
+  // Le banc d'essai : même porte, même vérification, un seul compte.
+  const veutLeBanc = !!(req.query && req.query.banc);
+  const fichier = (veutLeBanc && BANC_AUTORISE.indexOf(email.toLowerCase()) >= 0)
+    ? 'banc.html' : 'app.html';
+
+  const html = lireFichier(fichier);
   if (!html) {
-    console.error('[App] Fichier applicatif introuvable');
+    console.error('[App] Fichier introuvable :', fichier);
     return res.status(500).json({ error: 'Application indisponible.' });
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   // jamais mis en cache par un intermédiaire : le contenu est réservé
   res.setHeader('Cache-Control', 'private, no-store');
-  logEvent('app_served', { ip, email });
+  logEvent('app_served', { ip, email, fichier });
   return res.status(200).send(html);
 };
