@@ -7599,7 +7599,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v96';
+var _VERSION_REPLI='v97';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9911,12 +9911,18 @@ var _TRACE_MODELE={
        client, mot pour mot. D'où DEUX gestes et non un seul : d'un seul
        tenant, le crayon repartait de la fin du trait de liaison au lieu de
        repartir du départ de l'œil. */
-    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.16,-0.04],[0.02,-0.04]],
-            [[0.02,-0.04],[0.16,-0.26],[0.30,-0.32],[0.38,-0.20],[0.28,-0.06],[0.06,-0.04],
-             [-0.20,-0.05],[-0.54,-0.05]]],
-    fin:[[[0.62,-0.05],[0.44,-0.05],[0.24,-0.04],[0.08,-0.03]],
-         [[0.08,-0.03],[0.22,-0.26],[0.36,-0.32],[0.44,-0.20],[0.34,-0.06],[0.12,-0.03],
-          [-0.05,0.06],[-0.24,0.28],[-0.44,0.32],[-0.58,0.18]]]
+    /* Trait de liaison, crayon levé, puis EXACTEMENT les points du début
+       (milieu) ou de l'isolée (fin) — recopiés, pas adaptés. Ils étaient
+       jusqu'ici réécrits « à la bonne place », et l'animation sautait : le
+       chemin ne collait plus au trait, et la forme se découvrait d'un bloc.
+       C'est ce que le client décrit par « ça bugue et ça affiche d'un
+       coup ». */
+    milieu:[[[0.53,-0.05],[0.34,-0.05],[0.16,-0.04]],
+            [[-0.02,-0.02],[0.14,-0.26],[0.28,-0.33],[0.38,-0.20],[0.26,-0.05],
+             [0.05,-0.03],[-0.20,-0.05],[-0.50,-0.05]]],
+    fin:[[[0.62,-0.05],[0.44,-0.05],[0.24,-0.04]],
+         [[-0.02,-0.02],[0.20,-0.28],[0.40,-0.33],[0.50,-0.20],[0.36,-0.05],
+          [0.10,-0.02],[-0.05,0.02],[-0.20,0.26],[-0.40,0.31],[-0.54,0.17]]]
   },
   /* ط ظ — l'œil, puis le crayon se lève et la barre verticale descend du haut */
   'ط':{
