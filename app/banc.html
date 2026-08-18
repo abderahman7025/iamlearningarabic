@@ -89,6 +89,24 @@ function dessine(){
      doit jamais obliger à redemander « et telle lettre ? ». Une adresse du
      genre /banc?l=و,ك n'en montre que celles-là, quand on veut regarder de
      près. */
+  /* Par défaut, UNIQUEMENT les formes que le client a signalées, dans son
+     ordre, avec à côté la forme qui sert de modèle quand il en a nommé une.
+     Le reste de l'alphabet ne l'intéresse pas ici et l'oblige à faire
+     défiler pour rien. `/banc?tout=1` remet l'alphabet entier. */
+  var AREVOIR=[
+    ['و','fin'],['و','seule','modèle'],
+    ['ي','debut'],['ي','milieu'],
+    ['ب','milieu'],['ب','fin','modèle'],
+    ['ع','seule'],['ع','milieu'],['ع','fin'],
+    ['ر','seule'],
+    ['د','fin'],['د','seule','modèle'],
+    ['ص','seule'],['ص','debut'],['ص','milieu'],['ص','fin'],['ط','seule','modèle'],
+    ['ه','milieu'],
+    ['ف','debut'],['ف','milieu'],['ف','fin'],['ف','seule'],
+    ['ق','debut'],['ق','milieu'],['ق','fin'],['ق','seule'],
+    ['ك','debut'],['ك','milieu']
+  ];
+  var tout=!!new URLSearchParams(location.search).get('tout');
   var choix=(new URLSearchParams(location.search).get('l')||'').split(',')
               .map(function(s){return s.trim();}).filter(Boolean);
   var noms={'ا':'alif','ب':'bā','ج':'djīm','د':'dāl','ر':'rā','س':'sīn',
@@ -98,19 +116,29 @@ function dessine(){
               ['milieu','milieu',function(b){return T+b+T;}],
               ['fin','fin',function(b){return T+b;}],
               ['seule','isolée',function(b){return b;}]];
-  Object.keys(_TRACE_MODELE).forEach(function(base){
-    if(choix.length&&choix.indexOf(base)<0)return;
-    formes.forEach(function(f){
-      if(!_TRACE_MODELE[base][f[0]])return;
-      var ch=f[2](base);
-      var b=document.createElement('div');b.className='case';
-      var lb=document.createElement('div');lb.className='lbl';
-      lb.textContent=(noms[base]||base)+' · '+f[1];
-      b.appendChild(lb);
-      var cv=document.createElement('canvas');cv.width=W;cv.height=H;
-      b.appendChild(cv);g.appendChild(b);
-      vues.push({cx:cv.getContext('2d'),rev:_revelateur(ch,AX,AY,PX,0,0,W,H)});
+  var parCle={};formes.forEach(function(f){parCle[f[0]]=f;});
+  var liste=[];
+  if(tout||choix.length){
+    Object.keys(_TRACE_MODELE).forEach(function(base){
+      if(choix.length&&choix.indexOf(base)<0)return;
+      formes.forEach(function(f){
+        if(_TRACE_MODELE[base][f[0]])liste.push([base,f[0]]);
+      });
     });
+  }else{
+    liste=AREVOIR;
+  }
+  liste.forEach(function(e){
+    var base=e[0],f=parCle[e[1]];
+    if(!f||!_TRACE_MODELE[base]||!_TRACE_MODELE[base][e[1]])return;
+    var b=document.createElement('div');b.className='case';
+    var lb=document.createElement('div');lb.className='lbl';
+    lb.textContent=(noms[base]||base)+' · '+f[1];
+    if(e[2]){lb.textContent+='  — '+e[2];lb.style.color='#7a8a99';}
+    b.appendChild(lb);
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    b.appendChild(cv);g.appendChild(b);
+    vues.push({cx:cv.getContext('2d'),rev:_revelateur(f[2](base),AX,AY,PX,0,0,W,H)});
   });
   /* Une seule horloge pour les douze : 2 s de geste, puis une pause, et on
      recommence. Toutes partent ensemble, on peut donc les comparer. */
