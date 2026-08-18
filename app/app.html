@@ -10325,7 +10325,23 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   /* Rayon du pinceau. Large, il découvrait d'un coup tout un trait de
      liaison — le client l'a vu sur l'alif attaché. Juste au-dessus de
      l'épaisseur du trait, il avance vraiment de droite à gauche. */
-  var R=Math.max(2,Math.round(0.055*px));
+  /* ── Pourquoi le pinceau a MINCI ──
+     Mesuré à la taille réelle d'une case (104 px) : le trou de la boucle du
+     fā fait 32 pixels, celui du qāf 22, celui du wāw 16 — soit 4 à 6 pixels
+     de large. Le pinceau, lui, faisait 0,055 em de RAYON, donc 12 pixels de
+     large : il couvrait le trou et les deux bords de la boucle d'un coup.
+     Aucun chemin, si juste soit-il, ne pouvait alors donner un sens de
+     rotation. Même chose sur la tête du ʿayn, qui n'a aucun trou du tout
+     (0 pixel enfermé, même à 300 px) : ses deux branches ne sont qu'à
+     0,06 em l'une de l'autre, et le pinceau les allumait ensemble — c'est
+     l'effet « feuille qu'on fait glisser » que le client décrit.
+     Le pinceau est donc réduit à 0,026 em. Il devient plus fin que le
+     trait, ce qui n'est plus un problème depuis que les pixels non touchés
+     se rattachent DE PROCHE EN PROCHE À TRAVERS L'ENCRE : ils prennent le
+     rang de leur voisin d'encre le plus proche, en suivant le trait, et non
+     celui d'un trait qui passe à côté. La lettre reste donc révélée en
+     entier, mais la pointe du crayon est enfin plus fine que la lettre. */
+  var R=Math.max(2,Math.round(0.026*px));
   /* Le pinceau ne suit plus les cordes du geste mais le chemin plaqué sur
      l'encre : il épouse le trait au lieu de le traverser. */
   var routes=_cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px);
