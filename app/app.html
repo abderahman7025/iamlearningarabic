@@ -2349,28 +2349,44 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
   0%,100%{opacity:.25;transform:scale(.7)}
   50%    {opacity:1;transform:scale(1.15)}
 }
-/* Une etoile filante : elle traverse en diagonale, traîne derriere elle,
-   et passe le plus clair du temps invisible — sinon elle deviendrait un
-   decor permanent au lieu d'un evenement. */
+/* ── CE QUI FILE DANS LE CIEL ──────────────────────────────────────────
+   Une trainee doit etre DANS L'AXE du mouvement. La premiere version la
+   dessinait a l'horizontale alors que l'astre partait en diagonale : la
+   queue trainait de travers, ce que le client a vu tout de suite.
+
+   La correction tient a l'ordre des transformations : on tourne d'abord
+   l'element de son cap, PUIS on le fait avancer le long de son propre axe
+   des x. La queue, dessinee vers l'arriere de cet axe, est donc parallele
+   au trajet par construction — quel que soit le cap, et sans un seul
+   calcul dans le keyframe.
+
+   Le cap et la longueur du trajet arrivent par `--cap` et `--course`, poses
+   a la creation : chacun part donc dans SA direction, au lieu que tous
+   descendent du nord-est vers le sud-ouest. */
 #boy-bg-anim .bg-filante{
   position:fixed;width:3px;height:3px;border-radius:50%;background:#fff;
   box-shadow:0 0 10px 3px rgba(180,220,255,.9);
   animation:etoileFilante 9s linear infinite backwards;
   animation-delay:var(--del,0s);
 }
+/* La queue part vers l'ARRIERE de l'axe local : le degrade s'eteint loin
+   de la tete et s'allume juste derriere elle. */
 #boy-bg-anim .bg-filante::after{
-  content:'';position:absolute;right:2px;top:50%;width:120px;height:2px;
+  content:'';position:absolute;right:2px;top:50%;width:var(--queue,120px);height:2px;
   transform:translateY(-50%);
   background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(190,225,255,.9) 100%);
 }
 @keyframes etoileFilante{
-  0%   {transform:translate(0,0);opacity:0}
+  0%   {transform:rotate(var(--cap,140deg)) translateX(0);opacity:0}
   4%   {opacity:1}
   22%  {opacity:1}
-  26%  {transform:translate(70vw,52vh);opacity:0}
-  100% {transform:translate(70vw,52vh);opacity:0}
+  26%  {transform:rotate(var(--cap,140deg)) translateX(var(--course,115vmax));opacity:0}
+  100% {transform:rotate(var(--cap,140deg)) translateX(var(--course,115vmax));opacity:0}
 }
-/* Un asteroide : un caillou qui derive lentement en tournant */
+/* Un asteroide : un caillou qui derive lentement en tournant sur lui-meme.
+   Il n'a pas de trainee, mais il part lui aussi dans sa propre direction.
+   Sa rotation propre vient APRES le deplacement : elle tourne le caillou,
+   pas sa route. */
 #boy-bg-anim .bg-asteroide{
   position:fixed;border-radius:46% 54% 52% 48%/54% 46% 52% 48%;
   background:radial-gradient(circle at 34% 30%,#9aa4b4 0%,#6b7486 52%,#3d4453 100%);
@@ -2380,8 +2396,8 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
   animation-delay:var(--del,0s);
 }
 @keyframes asteroideDerive{
-  0%  {transform:translate(-14vw,0) rotate(0deg)}
-  100%{transform:translate(114vw,-16vh) rotate(300deg)}
+  0%  {transform:rotate(var(--cap,10deg)) translateX(0) rotate(0deg)}
+  100%{transform:rotate(var(--cap,10deg)) translateX(var(--course,130vmax)) rotate(300deg)}
 }
 @media (prefers-reduced-motion:reduce){
   #boy-bg-anim .bg-etoile,#boy-bg-anim .bg-filante,#boy-bg-anim .bg-asteroide{
@@ -5738,6 +5754,7 @@ function _equipage(taille){
       v.appendChild(fl);eq.flamme=fl;
     }
     var vi=document.createElement('img');vi.src=_HAB.vaisseau;vi.alt='';
+    eq.image=vi;
     vi.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;'
       +'animation:volFlotte 2.8s ease-in-out infinite';
     v.appendChild(vi);
@@ -5745,10 +5762,10 @@ function _equipage(taille){
     /* L'enfant se tient DEVANT la fusee posee, pas a sa place : il est plus
        petit qu'elle, un peu decale, et pose sur le meme bas de boite —
        c'est ce bas-la qui touche l'etape. */
-    /* Decale vers la droite : centre, il masquait la fusee au lieu de se
-       tenir devant elle. Ainsi les deux se voient — la fusee garee, et lui
-       debout a cote d'elle. */
-    p.style.cssText='position:absolute;left:41%;bottom:0;width:44%;height:54%;object-fit:contain;'
+    /* DEVANT la fusee, centre sur elle. Il avait ete decale a droite pour
+       qu'on la voie encore : ce n'est plus utile, la fusee posee est la
+       fusee VIDE, et un enfant debout devant un hublot vide se comprend. */
+    p.style.cssText='position:absolute;left:26%;bottom:0;width:48%;height:56%;object-fit:contain;'
       +'object-position:bottom;transition:opacity .5s ease,transform 1.1s cubic-bezier(.32,1.1,.5,1)';
     el.appendChild(v);el.appendChild(p);
     eq.vaisseau=v;eq.pilote=p;eq.aVaisseau=true;
@@ -5846,8 +5863,13 @@ function _sommetEtape(carte){
   /* `object-fit:contain` : meme reduction dans les deux sens, et centrage. */
   var e=Math.min(bw/img.naturalWidth,bh/img.naturalHeight);
   var vw=img.naturalWidth*e,vh=img.naturalHeight*e;
+  var haut=_hautDuDessin(img);
+  /* Le RAYON du corps, en pixels. Nos astres sont dessines centres dans
+     leur image : du sommet au milieu, il y a le rayon. Il sert a asseoir le
+     vaisseau DANS la courbure — voir `ouSePoser`. */
   return {x:carte.offsetLeft+img.offsetLeft+(bw-vw)/2+vw/2,
-          y:carte.offsetTop+img.offsetTop+(bh-vh)/2+vh*_hautDuDessin(img)};
+          y:carte.offsetTop+img.offsetTop+(bh-vh)/2+vh*haut,
+          r:Math.max(1,(0.5-haut)*vh)};
 }
 
 function _volCarte(o){
@@ -5865,12 +5887,21 @@ function _volCarte(o){
   /* Quel enfant descend ici : sur la Terre il n'a pas besoin de sa
      combinaison. L'habillage le dit etape par etape. */
   function habillePilote(){
-    if(!eq.aVaisseau||!o.pilotePour)return;
-    var src=o.pilotePour(idx)||_HAB.pilote;
+    if(!eq.aVaisseau)return;
+    var src=(o.pilotePour&&o.pilotePour(idx))||_HAB.pilote;
     if(eq.pilote.getAttribute('src')!==src)eq.pilote.setAttribute('src',src);
+  }
+  /* L'enfant ne peut pas etre a la fois DANS la fusee et DEVANT elle. En
+     vol, c'est la fusee avec lui au hublot ; posee et l'enfant sorti, c'est
+     la fusee VIDE. Deux dessins du client, un pour chaque situation. */
+  function vaisseauHabite(oui){
+    if(!eq.aVaisseau||!eq.image)return;
+    var src=oui?_HAB.vaisseau:(_HAB.vaisseauVide||_HAB.vaisseau);
+    if(eq.image.getAttribute('src')!==src)eq.image.setAttribute('src',src);
   }
   function enVol(){
     if(!eq.aVaisseau)return;
+    vaisseauHabite(true);
     eq.vaisseau.style.opacity='1';
     eq.vaisseau.style.transform='';
     eq.pilote.style.opacity='0';
@@ -5887,6 +5918,7 @@ function _volCarte(o){
        dans sa fusee, pas debout dans le vide. */
     var debout=(pose===undefined)?(idx>=1):pose;
     habillePilote();
+    vaisseauHabite(!debout);
     eq.vaisseau.style.transform='';
     eq.vaisseau.style.opacity='1';
     eq.pilote.style.opacity=debout?'1':'0';
@@ -5894,6 +5926,25 @@ function _volCarte(o){
   }
   /* L'arrivee, en trois temps : la fusee tient au-dessus de l'etape et
      coupe le feu, le pilote sort et descend seul, la fusee s'efface. */
+  /* Le vol en ligne droite, d'un bout a l'autre d'un long saut. La duree
+     suit la distance — on ne met pas le meme temps pour traverser deux
+     etapes que dix — mais elle reste bornee : il faut que ce soit
+     regardable sans etre interminable. */
+  function volDroit(de,vers,fini){
+    var dist=Math.sqrt((vers.x-de.x)*(vers.x-de.x)+(vers.y-de.y)*(vers.y-de.y));
+    var D=Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
+    var cap=Math.atan2(vers.y-de.y,vers.x-de.x)*180/Math.PI;
+    var t0=Date.now();
+    function tic(){
+      var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
+      var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
+      poser(x,y,cap,Math.min(1,u/0.14,(1-u)/0.14));
+      grain(x,y);camera(y);
+      if(u>=1){fini();return;}
+      raf=requestAnimationFrame(tic);
+    }
+    tic();
+  }
   /* L'approche : la courbe s'arrete la ou elle traverse la carte de
      l'etape ; il reste a rejoindre le sommet du decor. La fusee s'y rend
      en glissant, feu encore allume — elle vole toujours. */
@@ -5932,7 +5983,8 @@ function _volCarte(o){
     setTimeout(function(){
       eq.vaisseau.style.transform='';          /* elle se pose */
       setTimeout(function(){
-        eq.pilote.style.opacity='1';           /* il parait devant elle */
+        vaisseauHabite(false);                 /* il quitte le hublot */
+        eq.pilote.style.opacity='1';           /* et parait devant elle */
         eq.pilote.style.transform='translateY(0) scale(1)';
         setTimeout(function(){if(fini)fini();},900);
       },780);
@@ -5996,9 +6048,22 @@ function _volCarte(o){
      demande (le garcon se tient DEBOUT sur sa planete), sinon le point de
      la trajectoire — c'est ce que fait la fille, dont la mascotte marche
      dans le decor de son ile. */
+  /* ── S'ASSEOIR DANS LA COURBURE ──
+     Viser le sommet exact ne suffit pas : le vaisseau a une base LARGE, et
+     un astre a une surface COURBE. Pose au sommet, sa base ne touche qu'en
+     un point et ses bords surplombent le vide — c'est ce que le client
+     voyait sur la comete, dont le noyau est le plus petit de tous.
+     On l'enfonce donc de la fleche de l'arc sur la largeur de sa base :
+     pour un demi-appui `w` sur un astre de rayon `R`, la surface descend de
+     R - racine(R² - w²). Sur la comete cela fait une douzaine de pixels,
+     sur la Terre cinq — l'enfoncement suit la taille de l'astre tout seul. */
   function ouSePoser(i){
     var p=o.pose&&o.pose(i);
-    if(p)return p;
+    if(p){
+      if(!p.r)return p;
+      var w=Math.min(p.r*0.92,(o.demiAssise||0));
+      return {x:p.x,y:p.y+(p.r-Math.sqrt(Math.max(0,p.r*p.r-w*w))),r:p.r};
+    }
     if(i>=segs.length){var f=segs[segs.length-1];return{x:f.x3,y:f.y3};}
     var s=segs[i];return{x:s.x0,y:s.y0};
   }
@@ -6031,6 +6096,21 @@ function _volCarte(o){
     var pas=idx<cible?1:-1,file=[];
     for(var i=idx;i!==cible;i+=pas){
       if(pas>0)file.push({seg:segs[i],sens:1});else file.push({seg:segs[i-1],sens:-1});
+    }
+    /* ── UN SAUT LOINTAIN SE FAIT EN LIGNE DROITE ──
+       D'une etape a sa voisine, on suit la courbe : elle contourne
+       joliment. Mais enchainer huit courbes pour traverser la carte fait
+       serpenter le vaisseau d'un bord a l'autre, alors qu'il va tout droit
+       quelque part. Le client veut une ligne. Le decollage et l'approche,
+       eux, ne changent pas : ce sont des phases a part. */
+    if(file.length>1){
+      var der=file[file.length-1];
+      var but={x:der.sens>0?der.seg.x3:der.seg.x0,
+               y:der.sens>0?der.seg.y3:der.seg.y0};
+      var ici={x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
+      idx=cible;
+      volDroit(ici,but,function(){arriver(fini,but);});
+      return;
     }
     var n=0,u=0;
     /* Un saut dure le même temps quelle que soit sa longueur : c'est
@@ -6422,7 +6502,7 @@ var islandDefs=[
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
-          equipage:eqMob,decalageX:56,decalageY:118,depart:charIdxM,
+          equipage:eqMob,decalageX:56,decalageY:112,demiAssise:31,depart:charIdxM,
           trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
           dureeTotale:9000,camera:true,
           pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null,
@@ -6533,7 +6613,7 @@ var islandDefs=[
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
-        equipage:eq,decalageX:70,decalageY:146,depart:charIdx,
+        equipage:eq,decalageX:70,decalageY:140,demiAssise:39,depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
         dureeTotale:9000,camera:true,
         pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null,
@@ -7202,7 +7282,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v106';
+var _VERSION_REPLI='v107';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8623,6 +8703,8 @@ var _HABILLAGES={
        ce sont deux dessins differents, pas une mascotte unique. Les deux
        viennent du client, detoures de leur fond vert. */
     vaisseau:'/images/fusee-garcon.png',
+    /* La meme fusee, hublot vide : celle qu'on voit une fois l'enfant sorti. */
+    vaisseauVide:'/images/fusee-vide.png',
     pilote:'/images/astronaute-garcon.png',
     flamme:true,
     /* L'astronaute se tient DEBOUT sur le sommet de sa planete. La fille,
@@ -8673,7 +8755,8 @@ var _HABILLAGES={
     /* Les iles de la fille gardent leur taille : elles sont validees. Et
        elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
        descente : c'est sa mascotte qui se pose. */
-    decor:1,vaisseau:null,pilote:null,flamme:false,poseSommet:false,fond:null,
+    decor:1,vaisseau:null,vaisseauVide:null,pilote:null,flamme:false,
+    poseSommet:false,fond:null,
     aligne:false,sommets:null,pilotesEtape:null,
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
@@ -11660,28 +11743,44 @@ function initChildBgAnim() {
       boyBg.appendChild(et);
     }
 
-    /* 3 etoiles filantes, decalees : il n'y en a jamais deux en meme temps,
-       et le ciel reste calme entre deux passages. */
-    var filDep = [[6, 4], [48, 2], [24, 30]];
-    var filDel = [0, 3.4, 6.2];
-    for (var q = 0; q < 3; q++) {
+    /* 4 etoiles filantes, decalees pour qu'il n'y en ait jamais deux en
+       meme temps, et chacune dans SA direction. Le point de depart est
+       choisi pour que le trajet traverse l'ecran : on part du bord d'ou
+       l'on vient. */
+    var fil = [
+      { cap: 34,  x: -6,  y: 4  },   /* vers le bas a droite */
+      { cap: 146, x: 104, y: 8  },   /* vers le bas a gauche */
+      { cap: 8,   x: -6,  y: 62 },   /* presque a l'horizontale, vers la droite */
+      { cap: 118, x: 92,  y: -4 }    /* plongee vers le bas a gauche */
+    ];
+    var filDel = [0, 2.6, 5.1, 7.3];
+    for (var q = 0; q < fil.length; q++) {
       var fi = document.createElement('span');
       fi.className = 'bg-filante';
-      fi.style.left = filDep[q][0] + '%';
-      fi.style.top = filDep[q][1] + '%';
+      fi.style.left = fil[q].x + '%';
+      fi.style.top = fil[q].y + '%';
+      fi.style.setProperty('--cap', fil[q].cap + 'deg');
+      fi.style.setProperty('--queue', (90 + q * 22) + 'px');
       fi.style.setProperty('--del', filDel[q] + 's');
       boyBg.appendChild(fi);
     }
 
-    /* 3 asteroides, de tailles differentes, qui derivent en tournant */
-    var astTop = [16, 58, 84], astTaille = [26, 16, 34], astDel = [0, 9, 17];
-    for (var a2 = 0; a2 < 3; a2++) {
+    /* 3 asteroides, de tailles et de caps differents, qui derivent en
+       tournant sur eux-memes. */
+    var ast = [
+      { cap: -12, x: -8,  y: 18, t: 26 },
+      { cap: 166, x: 104, y: 52, t: 16 },
+      { cap: 26,  x: -8,  y: 76, t: 34 }
+    ];
+    var astDel = [0, 9, 17];
+    for (var a2 = 0; a2 < ast.length; a2++) {
       var as = document.createElement('span');
       as.className = 'bg-asteroide';
-      as.style.width = astTaille[a2] + 'px';
-      as.style.height = Math.round(astTaille[a2] * 0.86) + 'px';
-      as.style.left = '0';
-      as.style.top = astTop[a2] + '%';
+      as.style.width = ast[a2].t + 'px';
+      as.style.height = Math.round(ast[a2].t * 0.86) + 'px';
+      as.style.left = ast[a2].x + '%';
+      as.style.top = ast[a2].y + '%';
+      as.style.setProperty('--cap', ast[a2].cap + 'deg');
       as.style.setProperty('--del', astDel[a2] + 's');
       boyBg.appendChild(as);
     }

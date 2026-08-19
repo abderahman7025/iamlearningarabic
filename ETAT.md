@@ -578,9 +578,24 @@ sur un `transform` posé à la main.
 pose 0,78 s, puis l'enfant paraît, 0,9 s.
 
 **La fusée se GARE, l'enfant paraît devant elle.** Elle ne s'efface plus :
-elle reste posée sur l'étape, et c'est de là qu'elle redécollera. L'enfant
-est décalé vers la droite — centré, il la masquait au lieu de se tenir
-devant elle.
+elle reste posée sur l'étape, et c'est de là qu'elle redécollera.
+
+**Deux dessins de fusée, pas un.** En vol, celle où l'enfant est au hublot ;
+posée et l'enfant sorti, la fusée **vide**. Il ne peut pas être à la fois
+dedans et devant. C'est `vaisseau` et `vaisseauVide` dans l'habillage, et
+`vaisseauHabite()` qui bascule de l'un à l'autre.
+
+**S'ASSEOIR DANS LA COURBURE.** Viser le sommet exact ne suffit pas : le
+vaisseau a une base LARGE, un astre une surface COURBE. Posé pile au
+sommet, sa base ne touche qu'en un point et ses bords surplombent le vide —
+c'est ce que le client voyait sur la comète, dont le noyau est le plus
+petit de tous, et que trois corrections du *sommet* n'ont pas réglé parce
+que le sommet, lui, était juste.
+On l'enfonce donc de la flèche de l'arc sur la largeur de son appui : pour
+un demi-appui `w` sur un astre de rayon `R`, la surface descend de
+`R − √(R² − w²)`. Mesuré : 4,3 px sur Jupiter, 10,7 px sur la comète —
+l'enfoncement suit la taille de l'astre tout seul, sans rien régler à la
+main.
 
 **Sur la Terre, il descend sans combinaison** : il y a de l'air. C'est
 `pilotesEtape`, dans l'habillage, une image par rang d'étape.
@@ -590,20 +605,36 @@ l'étape juste avant la visée, ce qui la faisait apparaître d'un coup à
 l'autre bout de la carte. Elle fait maintenant tout le trajet, et **la
 caméra la suit** — sans ce défilement, un long voyage se joue hors de
 l'écran : on clique, rien ne bouge, le cours s'ouvre.
-Pour qu'un long voyage reste regardable, ce n'est pas le trajet qu'on
-raccourcit mais le temps de chaque saut : le voyage entier tient dans
-`dureeTotale` (9 s), réparti sur les sauts. Un saut seul garde son allure
-pleine ; traverser tout le système solaire prend dix sauts de 0,9 s, et on
-les voit tous.
+**Un saut LOINTAIN se fait en ligne droite** (`volDroit`). D'une étape à sa
+voisine on suit la courbe : elle contourne joliment. Mais enchaîner huit
+courbes pour traverser la carte fait serpenter le vaisseau d'un bord à
+l'autre, alors qu'il va tout droit quelque part. Le décollage et l'approche
+ne changent pas — ce sont des phases à part. La durée suit la distance,
+bornée entre 1,6 s et 9 s.
 
 **La trajectoire ne se dessine plus.** Elle a été un sentier de terre, puis
 un pointillé clair ; le client n'en veut plus rien voir. Les courbes
 restent — ce sont elles qui portent le vol — mais `_traceVol` est vide.
 
 **Le fond d'espace** (`.fond-espace`, `_fondEnfant`). Un dégradé de bleu
-très foncé vers un bleu plus clair, avec un champ de 46 étoiles, 3 étoiles
-filantes et 3 astéroïdes qui dérivent — les ballons de foot et les éclairs
-ont disparu, ils n'avaient rien à faire dans l'espace.
+très foncé vers un bleu plus clair, avec un champ de 46 étoiles, 4 étoiles
+filantes et 3 astéroïdes — les ballons de foot et les éclairs ont disparu,
+ils n'avaient rien à faire dans l'espace.
+
+**Une traînée doit être DANS L'AXE du mouvement.** La première version la
+dessinait à l'horizontale alors que l'astre partait en diagonale : la queue
+traînait de travers, et le client l'a vu tout de suite. La correction tient
+à l'ORDRE des transformations — on tourne l'élément de son cap, PUIS on le
+fait avancer le long de son propre axe des x :
+
+```css
+transform: rotate(var(--cap)) translateX(var(--course));
+```
+
+La queue, dessinée vers l'arrière de cet axe, est alors parallèle au trajet
+par construction, quel que soit le cap, sans un seul calcul dans le
+keyframe. Le cap est posé élément par élément, ce qui donne du même coup
+des directions variées au lieu d'un défilé nord-est → sud-ouest.
 Deux précautions :
 - il est posé sur le **body**, pas sur le conteneur qui défile. Le fond
   d'un élément qui défile s'étire sur toute sa longueur — des milliers de
