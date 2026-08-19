@@ -761,35 +761,48 @@ Détourées de leur fond et installées dans `public/images/` :
 | `licorne-fille.png` | 800×1024 | la fille et sa licorne, sans couronne |
 | `licorne-couronne-gd.png` | 800×1194 | avec couronne, sens **gauche → droite** |
 | `licorne-couronne-dg.png` | 800×1194 | avec couronne, sens **droite → gauche** |
+| `licorne-seule-gd.png` | 799×839 | la licorne seule, tournée **vers la droite** |
+| `licorne-seule-dg.png` | 799×840 | la licorne seule, tournée **vers la gauche** |
+
+La correspondance avec le garçon est donc complète :
+
+| rôle | garçon | fille |
+|---|---|---|
+| monture en vol | `fusee-garcon.png` | `licorne-couronne-gd/dg.png`, et `licorne-fille.png` avant la couronne |
+| monture posée | `fusee-vide.png` | `licorne-seule-gd/dg.png` |
+| personnage descendu | `astronaute-garcon.png` (`enfant-garcon.png` sur la Terre) | `fille-seule.png`, puis `fille-couronne.png` dès le monde 2 |
 
 Le détourage se fait au navigateur, par le serveur local : dominante verte
 quand le fond est vert, remplissage depuis les bords quand il est clair
 (deux des images l'étaient), puis rognage des marges vides pour que la
 boîte colle au dessin. La recette est dans l'historique de la session.
 
-#### LA QUESTION À POSER AVANT DE COMMENCER
+#### La pose, une fois le monde atteint
 
-**Il manque la licorne SEULE.** Le client en avait déposé une, puis l'a
-retirée. Or « elle se retrouve devant la licorne » demande, côté garçon,
-deux dessins : le véhicule seul une fois posé (`vaisseauVide`) et le
-personnage devant. Deux lectures possibles, et il ne faut pas trancher à sa
-place :
+Le client a fourni la **licorne seule** dans les deux sens : la composition
+est donc exactement celle du garçon, et il n'y a plus rien à deviner.
+La licorne posée reste sur le monde, la fille paraît **devant** elle —
+`vaisseauVide` / `pilote` dans l'habillage, `vaisseauHabite()` bascule.
+La seule contrainte propre à elle : **on doit voir la tête de la licorne**.
+Sa tête est à l'AVANT de l'image, du côté où elle regarde ; c'est donc en
+décalant la fille vers l'arrière de la monture qu'on la dégage, et le
+décalage change de côté avec le sens — contrairement au garçon, dont la
+fusée est symétrique et l'enfant simplement centré.
 
-1. il fournit une **licorne seule** : on compose alors comme le garçon —
-   licorne posée, fille devant, tête bien dégagée ;
-2. on garde l'image **licorne + fille** telle quelle une fois posée : la
-   tête de la licorne y est déjà visible et la fille déjà devant, mais il
-   n'y a alors plus de distinction entre voler et être posé.
+#### Ce qui reste à demander au client
 
-Sans sa réponse, on invente — et c'est exactement ce qui a coûté cher sur
-le hā milieu.
+Deux points seulement, à régler avant de commencer :
 
-Deux autres points à lui confirmer au passage : la fille **sans couronne**
-n'a qu'UNE image de vol (`licorne-fille.png`), sans variante de sens —
-faut-il la mirroiter, en refaire une, ou n'est-ce pas gênant puisqu'elle ne
-sert qu'au tout premier vol ? Et les douze décors de mondes n'existent pas
-encore : les dessine-t-on comme les planètes (`outils/planetes.js`), ou
-les fournit-il ?
+1. la fille **sans couronne** n'a qu'UNE image de vol (`licorne-fille.png`),
+   sans variante de sens, alors que les versions couronnées en ont deux.
+   Faut-il en refaire une, ou est-ce sans importance puisqu'elle ne sert
+   qu'au tout premier vol, celui qui part du monde 1 ?
+2. les **douze décors de mondes n'existent pas encore**. On les dessine
+   comme les planètes (`outils/planetes.js`), ou il les fournit ?
+
+Et la consigne qui vaut toujours : sur ce qui n'est pas écrit ici, **on
+demande, on n'invente pas**. C'est ce qui a coûté le plus cher sur le
+hā milieu.
 
 ### Chantier 2 — Traductions : tout, partout
 Décision du client : **tout doit être traduit dans les 13 langues**.
