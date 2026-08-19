@@ -488,6 +488,37 @@ Piège : l'inclinaison vit sur le **conteneur**, le flottement sur l'**image**
 qu'il contient. Une seule balise ne peut pas porter les deux — une animation
 CSS écrase le `transform` posé à la main à chaque image.
 
+**L'équipage du garçon** (`_equipage`). Ce qui se déplace n'est plus une
+mascotte unique : la photo du personnage a été retirée de la carte. Il y a
+maintenant **deux dessins du client**, détourés de leur fond vert, et une
+flamme dessinée en CSS :
+
+| | |
+|---|---|
+| `vaisseau` | sa fusée, avec le feu dessous. Elle voyage, et c'est elle seule qui s'incline dans le sens du vol. |
+| `pilote` | l'enfant en scaphandre. Il se pose **seul** sur la planète, et l'attend debout entre deux voyages. |
+
+L'arrivée se joue en trois temps, et c'est ce que le client a demandé :
+la fusée atteint sa destination et **coupe le feu**, elle **monte au-dessus**
+de la planète et s'y tient, puis l'enfant sort et **descend seul** pendant
+qu'elle s'efface. Mesuré : vol 0 → 975 ms, vol stationnaire 975 → 1 400 ms,
+descente 1 400 → 1 960 ms, et le cours s'ouvre ensuite.
+
+Côté fille, l'habillage ne donne **ni vaisseau ni flamme** : sa mascotte
+vole et se pose d'un bloc, exactement comme avant. Tout ce mécanisme est
+donc neutre pour elle.
+
+Deux réglages trouvés en REGARDANT, pas en devinant :
+- **la flamme sort bas et étroite** (`bottom:-36%`, hauteur 48 %, largeur
+  26 %). Les ailerons de la fusée descendent jusqu'au bas de sa boîte : une
+  flamme qui ne dépassait que d'un cinquième restait cachée derrière eux ;
+- **le décor du garçon est à 1,5** (`_HAB.decor`, variable CSS `--decor`).
+  Une planète est dessinée dans un carré, elle occupait donc bien moins de
+  place qu'une île peinte en paysage. Le facteur s'applique aux DEUX
+  endroits qui fixent la hauteur : la règle CSS et le calcul en paysage —
+  sinon les planètes redeviennent petites dès que l'écran est large.
+  Les îles de la fille restent à 1 : elles sont validées.
+
 **Les planètes.** Huit ne suffisent pas pour douze étapes : la Lune et le
 Soleil complètent, comme prévu, puis Pluton et une comète. Elles sont
 fabriquées par `outils/planetes.js`, qui écrit douze **SVG** dans

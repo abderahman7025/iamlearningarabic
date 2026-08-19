@@ -972,6 +972,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 @media (prefers-reduced-motion:reduce){
   [style*="volFlotte"]{animation:none !important}
 }
+/* Le feu sous la fusee. Il vit DERRIERE l'image — pose avant elle dans le
+   meme calque — et n'en sort que par le bas, entre les ailerons. Deux
+   animations decalees : la langue de feu bat vite, la lueur respire plus
+   lentement, sinon le tout clignote comme une ampoule. */
+/* Elle sort BAS et ETROITE : les ailerons de la fusee descendent jusqu'au
+   bas de la boite, une flamme qui ne depasse que d'un cinquieme restait
+   cachee derriere eux — vu sur capture, pas devine. */
+.vol-flamme{position:absolute;left:50%;bottom:-36%;width:26%;height:48%;
+  margin-left:-13%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 12%,
+    #fffbe6 0%,#ffd54f 26%,#ffa726 54%,#f4511e 78%,rgba(244,81,30,0) 100%);
+  border-radius:52% 48% 46% 54%/30% 30% 70% 70%;
+  animation:volFlamme .13s ease-in-out infinite alternate}
+.vol-flamme::after{content:'';position:absolute;left:24%;top:4%;width:52%;height:52%;
+  border-radius:50% 50% 46% 54%/34% 34% 66% 66%;
+  background:radial-gradient(ellipse at 50% 20%,#ffffff 0%,#fff59d 45%,rgba(255,245,157,0) 100%);
+  animation:volFlamme .09s ease-in-out infinite alternate-reverse}
+@keyframes volFlamme{
+  from{transform:scaleY(.86) scaleX(1.06);opacity:.92}
+  to  {transform:scaleY(1.16) scaleX(.9);opacity:.75}}
+@media (prefers-reduced-motion:reduce){
+  .vol-flamme,.vol-flamme::after{animation:none !important}
+}
 @keyframes mascotSpin {
   0% { transform: translateY(-20px) scale(1.2) rotate(0deg); }
   100% { transform: translateY(-20px) scale(1.2) rotate(360deg); }
@@ -2369,7 +2392,11 @@ body.profile-boy #boy-bg-anim {
 .sess-island.sea,.sess-island.beach,.sess-island.forest,.sess-island.desert,.sess-island.palace{background:transparent;border:none;box-shadow:none}
 .sess-island.boss-isle{background:transparent;border:none;box-shadow:none;animation:bossFloat 3s ease-in-out infinite}
 @keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.isle-img{width:100%;height:220px;display:block;margin:0 auto;object-fit:contain}
+/* La hauteur du decor d'une etape. `--decor` vient de l'habillage : les
+   planetes sont dessinees dans un carre, elles occupent donc bien moins
+   de place qu'une ile peinte en paysage — le garcon les veut une fois et
+   demie plus grandes. Les iles de la fille, elles, ne bougent pas. */
+.isle-img{width:100%;height:calc(220px * var(--decor,1));display:block;margin:0 auto;object-fit:contain}
 .isle-ico{display:none}
 .isle-name{font-size:1.1rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.95);text-align:center;letter-spacing:.02em;position:absolute;bottom:0;left:0;right:0;padding:8px 8px 10px;background:none;margin:0}
 .isle-sub{display:none}
@@ -2711,7 +2738,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* Boutons */
 .rbtn{white-space:normal;word-break:break-word}
 /* Island map */
-.isle-img{height:clamp(140px,28vw,220px)}
+.isle-img{height:calc(clamp(140px,28vw,220px) * var(--decor,1))}
 /* Breakpoint medium (tablette landscape / petit desktop) */
 @media(max-width:900px){
   .mg-list-wrap{max-width:100%}
@@ -5605,11 +5632,110 @@ function _inclinaison(deg){
   var pente=vaGauche?(deg>0?180-deg:-180-deg):deg;
   return{deg:Math.max(-24,Math.min(24,pente*0.35)),gauche:vaGauche};
 }
+/* ── L'EQUIPAGE ───────────────────────────────────────────────────────
+   Ce qui se deplace sur la carte n'est plus une mascotte unique. Cote
+   garcon il y a DEUX dessins et une flamme :
+     le vaisseau — la fusee du client, avec du feu dessous — pour le
+       voyage, et lui seul est incline dans le sens du vol ;
+     le pilote   — l'enfant en scaphandre — qui se pose SEUL sur la
+       planete a l'arrivee, et qui l'attend debout entre deux voyages.
+   Cote fille, l'habillage ne donne pas de vaisseau : c'est sa mascotte
+   qui vole et qui se pose, exactement comme avant.
+   La flamme est posee AVANT l'image dans le meme calque : elle passe donc
+   derriere la fusee, et n'en sort que par le bas. */
+function _equipage(taille){
+  var el=document.createElement('div');
+  el.style.cssText='position:absolute;z-index:20;pointer-events:none;'
+    +'width:'+taille+'px;height:'+taille+'px;will-change:transform,left,top;'
+    +'filter:drop-shadow(0 10px 16px rgba(0,0,0,0.45))';
+  var eq={el:el,vaisseau:null,pilote:null,flamme:null,aVaisseau:false};
+  if(_HAB.vaisseau&&_HAB.pilote){
+    var v=document.createElement('div');
+    v.style.cssText='position:absolute;left:0;top:0;right:0;bottom:0;'
+      +'transition:opacity .34s ease,transform .42s ease-out';
+    if(_HAB.flamme){
+      var fl=document.createElement('div');fl.className='vol-flamme';
+      v.appendChild(fl);eq.flamme=fl;
+    }
+    var vi=document.createElement('img');vi.src=_HAB.vaisseau;vi.alt='';
+    vi.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;'
+      +'animation:volFlotte 2.8s ease-in-out infinite';
+    v.appendChild(vi);
+    var p=document.createElement('img');p.src=_HAB.pilote;p.alt='';
+    /* Le pilote est plus petit que la fusee et pose sur le meme bas de
+       boite : c'est ce bas-la qui touche l'etape. */
+    p.style.cssText='position:absolute;left:22%;bottom:0;width:56%;height:74%;object-fit:contain;'
+      +'object-position:bottom;transition:opacity .28s ease,transform .5s cubic-bezier(.34,1.3,.64,1)';
+    el.appendChild(v);el.appendChild(p);
+    eq.vaisseau=v;eq.pilote=p;eq.aVaisseau=true;
+  }else{
+    var src=document.querySelector('#'+(st.profile==='girl'?'girl':'boy')+'-mascot img');
+    var m=document.createElement('img');m.alt='';
+    if(src)m.src=src.src;
+    m.style.cssText='width:100%;height:100%;object-fit:contain;'
+      +'animation:volFlotte 2.8s ease-in-out infinite';
+    el.appendChild(m);
+    eq.pilote=m;
+  }
+  return eq;
+}
+
 function _volCarte(o){
   var segs=o.segments,el=o.charEl,globe=o.globe;
+  var eq=o.equipage||{};
   var dx=o.decalageX||0,dy=o.decalageY||0;
   var idx=o.depart||0,raf=null,grains=[],dernierGrain=0;
-  var img=el.firstChild;
+  /* Ce qu'on retourne horizontalement quand on part vers la gauche : le
+     vaisseau s'il y en a un, sinon la mascotte. Le pilote, lui, ne vole
+     pas — il n'a pas a etre retourne. */
+  var img=eq.vaisseau||eq.pilote||el.firstChild;
+
+  /* ── Les trois etats de l'equipage ──
+     au repos : le pilote, debout sur l'etape ;
+     en vol   : le vaisseau, flamme allumee ;
+     a l'arrivee : la flamme s'eteint, le pilote descend seul et le
+     vaisseau s'efface. Sans vaisseau (la fille), rien de tout cela ne
+     s'applique : sa mascotte vole et se pose d'un bloc. */
+  function enVol(){
+    if(!eq.aVaisseau)return;
+    eq.vaisseau.style.opacity='1';
+    eq.vaisseau.style.transform='';
+    eq.pilote.style.opacity='0';
+    eq.pilote.style.transform='translateY(-26%) scale(.7)';
+    if(eq.flamme)eq.flamme.style.display='block';
+  }
+  function auRepos(pose){
+    if(!eq.aVaisseau)return;
+    if(eq.flamme)eq.flamme.style.display='none';
+    /* Au tout debut du parcours l'enfant n'a encore atterri nulle part :
+       il est dans sa fusee, pas debout dans le vide. */
+    var debout=(pose===undefined)?(idx>=1):pose;
+    eq.vaisseau.style.transform='';
+    eq.vaisseau.style.opacity=debout?'0':'1';
+    eq.pilote.style.opacity=debout?'1':'0';
+    eq.pilote.style.transform=debout?'translateY(0) scale(1)':'translateY(-26%) scale(.7)';
+  }
+  /* L'arrivee, en trois temps : la fusee tient au-dessus de l'etape et
+     coupe le feu, le pilote sort et descend seul, la fusee s'efface. */
+  function poserPilote(fini){
+    if(!eq.aVaisseau){if(fini)fini();return;}
+    /* 1. le feu se coupe et la fusee MONTE au-dessus de l'etape : elle
+          tient en vol stationnaire, c'est de la que l'enfant descend. */
+    if(eq.flamme)eq.flamme.style.display='none';
+    eq.vaisseau.style.transform='translateY(-56%)';
+    eq.pilote.style.transform='translateY(-56%) scale(.72)';
+    setTimeout(function(){
+      /* 2. l'enfant sort et descend SEUL sur la planete, la fusee s'efface */
+      eq.pilote.style.opacity='1';
+      eq.pilote.style.transform='translateY(0) scale(1)';
+      eq.vaisseau.style.opacity='0';
+      setTimeout(function(){
+        /* remise a plat, pour que le prochain depart reparte d'aplomb */
+        eq.vaisseau.style.transform='';
+        if(fini)fini();
+      },560);
+    },420);
+  }
   /* `part` : de 0 à 1, la part d'inclinaison qu'on applique. Elle vaut 0 au
      décollage et à l'atterrissage — le personnage y est droit — et 1 en
      vol. Le sens de l'image, lui, ne s'atténue pas : on regarde toujours
@@ -5649,11 +5775,13 @@ function _volCarte(o){
     if(i>=segs.length){var f=segs[segs.length-1];poser(f.x3,f.y3,null);}
     else{var s=segs[i];poser(s.x0,s.y0,null);}
     idx=i;
+    auRepos();
   }
   placerA(idx);
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
     if(idx===cible){if(fini)fini();return;}
+    enVol();
     /* Revenir de dix îles en arrière était interminable à regarder : on se
        pose directement sur celle qui suit la visée, il ne reste qu'un vol. */
     if(cible<idx-1){idx=cible+1;var r=segs[idx-1];poser(r.x3,r.y3,null);}
@@ -5667,7 +5795,7 @@ function _volCarte(o){
     var DUREE=o.duree||900,debut=Date.now();
     function tic(){
       var item=file[n];
-      if(!item){idx=cible;if(fini)fini();return;}
+      if(!item){idx=cible;poserPilote(fini);return;}
       u=Math.min(1,(Date.now()-debut)/DUREE);
       var t=item.sens>0?adouci(u):1-adouci(u);
       var p=_bezier(t,item.seg);
@@ -5680,7 +5808,7 @@ function _volCarte(o){
       if(u>=1){
         n++;u=0;debut=Date.now();
         if(pas>0)idx++;else idx--;
-        if(n>=file.length){idx=cible;poser(p.x,p.y,null);if(fini)fini();return;}
+        if(n>=file.length){idx=cible;poser(p.x,p.y,null);poserPilote(fini);return;}
       }
       raf=requestAnimationFrame(tic);
     }
@@ -5709,6 +5837,9 @@ function renderSessionsMap(ca){
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}  
   var wrap=document.createElement('div');
   wrap.className='sess-map-wrap';
+  /* Le facteur de taille du decor descend par une variable CSS : les regles
+     de `.isle-img` s'en servent, y compris celle du responsive. */
+  wrap.style.setProperty('--decor',String(_HAB.decor||1));
   /* Cachée le temps de poser le personnage et de faire défiler jusqu'à lui :
      l'enfant doit trouver son île déjà à l'écran, sans voir le haut du chemin
      puis un saut. */
@@ -5994,18 +6125,12 @@ var islandDefs=[
       globeDiv.style.position='relative';
       globeDiv.style.gap='28px';
       // Avatar en haut au centre
-      var isGirlMob=(st.profile==='girl');
-      var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
-      var charElMob=document.createElement('div');
-      /* Le conteneur porte la POSITION et l'inclinaison du vol, l'image
-         qu'il contient porte le flottement : une même balise ne peut pas
-         faire les deux, l'animation CSS écraserait le `transform` posé à
-         la main à chaque image. */
-      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;'
-        +'will-change:transform,left,top;filter:drop-shadow(0 8px 14px rgba(0,0,0,0.45))';
-      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;
-        aImgMob.style.cssText='width:100%;height:100%;object-fit:contain;animation:volFlotte 2.8s ease-in-out infinite';
-        charElMob.appendChild(aImgMob);}
+      /* Le conteneur porte la POSITION et l'inclinaison du vol ; les images
+         qu'il contient portent le flottement. Une meme balise ne peut pas
+         faire les deux : l'animation CSS ecraserait le `transform` pose a
+         la main a chaque image. */
+      var eqMob=_equipage(84);
+      var charElMob=eqMob.el;
       globeDiv.appendChild(charElMob);
       _quandCartePrete(ca,1500,function(){
         var gW=globeDiv.offsetWidth;
@@ -6048,7 +6173,8 @@ var islandDefs=[
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
-          decalageX:34,decalageY:80,depart:charIdxM,trainee:_HAB.trainee,duree:820});
+          equipage:eqMob,decalageX:42,decalageY:88,depart:charIdxM,
+          trainee:_HAB.trainee,duree:820});
         /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
            cours est là dès la première image affichée. */
         if(segsMob.length>0){
@@ -6077,7 +6203,14 @@ var islandDefs=[
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
       el.onclick=null;
-      var bigI=[2,6,7,8];var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);el.style.width=IWi+'px';var imgI=el.querySelector('.isle-img');if(imgI)imgI.style.height=Math.min(bigI.indexOf(i)>=0?440:330,Math.round(DH*0.5))+'px';
+      /* En paysage, la hauteur du decor est posee en dur : le facteur de
+         l'habillage doit donc s'appliquer ici aussi, sinon les planetes
+         retrouvent la taille des iles des que l'ecran est large. */
+      var bigI=[2,6,7,8];
+      var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);
+      el.style.width=Math.round(IWi*_HAB.decor)+'px';
+      var imgI=el.querySelector('.isle-img');
+      if(imgI)imgI.style.height=Math.round(Math.min(bigI.indexOf(i)>=0?440:330,Math.round(DH*0.5))*_HAB.decor)+'px';
       el.style.flexShrink='0';
       el.style.position='relative';
       el.style.zIndex='5';
@@ -6140,23 +6273,15 @@ var islandDefs=[
       }
 
       // Avatar
-      var isGirl=(st.profile==='girl');
-      var srcEl=document.querySelector('#'+(isGirl?'girl':'boy')+'-mascot img');
-      var charEl=document.createElement('div');
-      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;'+
-        'will-change:transform,left,top;filter:drop-shadow(0 10px 16px rgba(0,0,0,0.45))';
-      if(srcEl){
-        var aImg=document.createElement('img');
-        aImg.src=srcEl.src;
-        aImg.style.cssText='width:100%;height:100%;object-fit:contain;animation:volFlotte 2.8s ease-in-out infinite';
-        charEl.appendChild(aImg);
-      }
+      var eq=_equipage(104);
+      var charEl=eq.el;
       globeDiv.appendChild(charEl);
 
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
-        decalageX:40,decalageY:90,depart:charIdx,trainee:_HAB.trainee,duree:950});
+        equipage:eq,decalageX:52,decalageY:110,depart:charIdx,
+        trainee:_HAB.trainee,duree:950});
 
       /* Défilement AVANT de montrer la carte : l'étape en cours doit être à
          l'écran dès la première image affichée, sans saut. */
@@ -6820,7 +6945,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v102';
+var _VERSION_REPLI='v103';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8233,6 +8358,16 @@ var _HABILLAGES={
     slugs:['soleil','mercure','venus','terre','lune','mars',
            'jupiter','saturne','uranus','neptune','pluton','comete'],
     trainee:'rgba(255,183,77,.92)',
+    /* Le decor du garcon est dessine dans un carre : une planete occupe
+       bien moins de place qu'une ile peinte en paysage. Le client la veut
+       une fois et demie plus grande. */
+    decor:1.5,
+    /* Le voyage se fait EN FUSEE, et l'enfant descend seul sur la planete :
+       ce sont deux dessins differents, pas une mascotte unique. Les deux
+       viennent du client, detoures de leur fond vert. */
+    vaisseau:'/images/fusee-garcon.png',
+    pilote:'/images/astronaute-garcon.png',
+    flamme:true,
     noteBulle:'🔊 Appuie sur le hublot pour écouter',
     noteMot:'🔊 Appuie sur le hublot pour écouter le mot',
     notePiste:'✈️ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
@@ -8260,6 +8395,10 @@ var _HABILLAGES={
        `etapes` reste vide, la carte prend alors ses libellés traduits. */
     etapes:null,slugs:null,
     trainee:'rgba(255,255,255,.95)',
+    /* Les iles de la fille gardent leur taille : elles sont validees. Et
+       elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
+       descente : c'est sa mascotte qui se pose. */
+    decor:1,vaisseau:null,pilote:null,flamme:false,
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
     notePiste:'✨ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
