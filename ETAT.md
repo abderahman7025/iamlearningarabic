@@ -435,9 +435,15 @@ voix. Inversé, chaque étape jette le travail de la précédente — traduire
 95 phrases × 13 langues sur une interface qu'on va refaire, puis enregistrer
 les voix sur des textes qui vont changer.
 
-**Les deux premières étapes sont faites.** Le chantier ouvert est celui des
-traductions ; l'arabe des enregistrements peut partir en parallèle, il ne
-dépend de rien (voir chantier 3).
+**Où on en est.** Le garçon est fini et validé : moteur, habillage,
+planètes, vol, atterrissage. La fille tourne sur le même moteur mais garde
+encore les îles et la mascotte d'avant.
+
+**LE CHANTIER OUVERT est le 1 ter, juste en dessous** : ses douze mondes,
+son fond pastel, sa licorne. Le client l'a dicté le 19 août et attend qu'on
+le prenne. Les traductions (chantier 2) viennent après ; l'arabe des
+enregistrements peut partir en parallèle, il ne dépend de rien
+(voir chantier 3).
 
 ### FAIT — Chantier 1 bis : la fille sur le moteur du garçon, univers licorne
 
@@ -685,7 +691,107 @@ une carte vierge.
 Piège gardé : l'arc-en-ciel ferait une mauvaise ligne d'écriture, il est
 courbe. La ligne doit rester droite, c'est celle du cours adulte.
 
-### Chantier 2 — Traductions : tout, partout — LE CHANTIER OUVERT
+### À FAIRE — Chantier 1 ter : le PARCOURS DE LA FILLE, ses douze mondes
+
+**Dicté par le client le 19 août 2026, à faire dans la prochaine session.**
+Le côté garçon est fini et validé ; c'est au tour de la fille. Toute la
+mécanique existe déjà et est neutre pour elle : il n'y a **rien à
+réécrire**, seulement à remplir son habillage (`_HABILLAGES.licorne`) comme
+celui du garçon a été rempli.
+
+#### Les douze mondes, à la place des îles
+
+| # | monde |
+|---|---|
+| 1 | le monde des **licornes** — plusieurs licornes dedans |
+| 2 | le monde de la **couronne** — **c'est de là que la fille porte la couronne** |
+| 3 | le monde des **nuages** |
+| 4 | le monde des **fleurs** |
+| 5 | le monde des **cœurs** — rose, rouge… |
+| 6 | le monde des **pingouins** — banquise |
+| 7 | le monde des **papillons** |
+| 8 | l'**île de la tortue** |
+| 9 | le monde des **chats et des chiens** |
+| 10 | le monde des **ours bruns** |
+| 11 | le monde des **sucreries** |
+| 12 | le **château de la princesse** — la fille retrouve son château |
+
+Ce sont les libellés ET les décors : ils remplacent les îles actuelles.
+Comme pour les planètes, ils vont dans `etapes`, `slugs` et `images` de
+l'habillage. Le douzième clôt l'histoire — elle rentre chez elle — de la
+même façon que la dernière étape du garçon clôt la sienne.
+
+#### Le fond
+
+Un dégradé **du bleu en haut, au jaune au milieu, au rose en bas**, dans
+des **couleurs bien pastel**, avec des dégradés francs entre les trois. Il
+se pose exactement comme celui du garçon : une classe `.fond-*` allumée par
+`_fondEnfant`, **sur le body** et non sur le conteneur qui défile (voir le
+piège plus haut), et seulement sur la carte et le cours.
+
+#### Les déplacements : les mêmes que le garçon
+
+Rien à inventer, tout est déjà écrit et se déclenche par l'habillage :
+saut court en courbe, **saut lointain en ligne droite**, caméra qui suit,
+pose sur le sommet du décor avec enfoncement dans la courbure, rythme.
+Il suffit de mettre `poseSommet:true`, `aligne` (voir ci-dessous),
+`sommets` si les décors sont dessinés, et les durées.
+
+#### Le personnage : ce qui change vraiment
+
+- **En vol** : la fille SUR sa licorne. Deux images selon le sens de la
+  marche — c'est le client qui les a faites, il ne faut donc PAS retomber
+  sur le retournement horizontal, qui a déjà été refusé côté garçon.
+  Le moteur choisit aujourd'hui son inclinaison avec `aligne` ; il faudra
+  y ajouter le choix de l'image selon le signe de la direction.
+- **La couronne** : la fille la porte **à partir du monde 2**. Un vol qui
+  PART du monde 1 se fait donc sans couronne ; tous les autres avec.
+- **À l'arrivée** : elle se retrouve **devant la licorne**, et **on doit
+  voir la tête de la licorne** — c'est la contrainte à respecter en posant
+  les deux.
+
+#### Les images sont déjà prêtes
+
+Détourées de leur fond et installées dans `public/images/` :
+
+| fichier | taille | ce que c'est |
+|---|---|---|
+| `fille-seule.png` | 427×614 | la fille seule, sans couronne |
+| `fille-couronne.png` | 316×707 | la fille seule, avec la couronne |
+| `licorne-fille.png` | 800×1024 | la fille et sa licorne, sans couronne |
+| `licorne-couronne-gd.png` | 800×1194 | avec couronne, sens **gauche → droite** |
+| `licorne-couronne-dg.png` | 800×1194 | avec couronne, sens **droite → gauche** |
+
+Le détourage se fait au navigateur, par le serveur local : dominante verte
+quand le fond est vert, remplissage depuis les bords quand il est clair
+(deux des images l'étaient), puis rognage des marges vides pour que la
+boîte colle au dessin. La recette est dans l'historique de la session.
+
+#### LA QUESTION À POSER AVANT DE COMMENCER
+
+**Il manque la licorne SEULE.** Le client en avait déposé une, puis l'a
+retirée. Or « elle se retrouve devant la licorne » demande, côté garçon,
+deux dessins : le véhicule seul une fois posé (`vaisseauVide`) et le
+personnage devant. Deux lectures possibles, et il ne faut pas trancher à sa
+place :
+
+1. il fournit une **licorne seule** : on compose alors comme le garçon —
+   licorne posée, fille devant, tête bien dégagée ;
+2. on garde l'image **licorne + fille** telle quelle une fois posée : la
+   tête de la licorne y est déjà visible et la fille déjà devant, mais il
+   n'y a alors plus de distinction entre voler et être posé.
+
+Sans sa réponse, on invente — et c'est exactement ce qui a coûté cher sur
+le hā milieu.
+
+Deux autres points à lui confirmer au passage : la fille **sans couronne**
+n'a qu'UNE image de vol (`licorne-fille.png`), sans variante de sens —
+faut-il la mirroiter, en refaire une, ou n'est-ce pas gênant puisqu'elle ne
+sert qu'au tout premier vol ? Et les douze décors de mondes n'existent pas
+encore : les dessine-t-on comme les planètes (`outils/planetes.js`), ou
+les fournit-il ?
+
+### Chantier 2 — Traductions : tout, partout
 Décision du client : **tout doit être traduit dans les 13 langues**.
 - L'interface adulte est à 95–98 % (audit fait, trous comblés).
 - **L'interface enfant est 100 % en français codé en dur** : ~86 phrases
