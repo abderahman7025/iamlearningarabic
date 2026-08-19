@@ -6820,7 +6820,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v101';
+var _VERSION_REPLI='v102';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -7421,15 +7421,26 @@ var _TRACE_MODELE={
     debut:[[[0.08,-0.40],[0.17,-0.31],[0.19,-0.17],[0.11,-0.06],[0.00,-0.11],
             [-0.02,-0.27],[0.06,-0.39],
             [0.02,-0.06],[-0.12,-0.05],[-0.24,-0.05],[-0.33,-0.05]]],
-    /* Milieu : le trait de liaison, puis les deux ventres, celui du haut
-       d'abord, celui du bas ensuite, et la sortie à gauche.
-       LES DEUX VENTRES TOURNENT DANS L'AUTRE SENS qu'avant : le client les
-       a repris tous les deux. Celui du haut part donc vers la GAUCHE en
-       longeant le bas, remonte par la gauche, passe au sommet et redescend
-       par la droite ; celui du bas fait de même, dans son propre sens. */
-    milieu:[[[0.35,-0.05],[0.20,-0.05],[0.10,-0.14],
-             [-0.06,-0.10],[-0.08,-0.24],[0.02,-0.30],[0.09,-0.17],
-             [0.02,0.02],[-0.12,-0.02],[-0.13,0.12],[-0.04,0.23],[0.05,0.15],[0.02,0.03],
+    /* Milieu — DICTÉ PAR LE CLIENT (19 août 2026), après plusieurs tours
+       perdus à deviner. Un seul trait, sans lever le crayon :
+         le trait de liaison arrive de la droite,
+         puis le ventre du BAS en entier,
+         puis le ventre du HAUT,
+         puis la sortie à gauche sur la ligne.
+       LES DEUX VENTRES TOURNENT DANS LE MÊME SENS. Lequel : celui du hā
+       ISOLÉ, que le client a validé — on recopie, on n'adapte pas. Mesuré
+       sur sa table, aire signée en coordonnées écran : +0,044, donc SENS
+       DES AIGUILLES D'UNE MONTRE. (Le commentaire du « début » disait
+       l'inverse ; il se trompait, sa boucle mesure +0,049 elle aussi. Le
+       sens se calcule, il ne se relit pas.)
+       Ici : ventre du bas +0,062, ventre du haut +0,020 — les deux dans le
+       sens des aiguilles, comme demandé.
+       Avant, ils tournaient en sens CONTRAIRES (+0,020 et −0,030) et le
+       haut passait le premier : la lettre se révélait par plaques, les
+       deux ventres poussant ensemble. */
+    milieu:[[[0.35,-0.05],[0.22,-0.05],[0.12,-0.04],
+             [0.04,0.02],[0.05,0.15],[-0.04,0.23],[-0.13,0.12],[-0.12,-0.02],[0.02,0.02],
+             [-0.06,-0.10],[-0.08,-0.24],[0.02,-0.30],[0.09,-0.17],[-0.06,-0.10],
              [-0.14,-0.03],[-0.24,-0.05],[-0.36,-0.05]]],
     fin:[[[0.26,-0.05],[0.08,-0.06],[0.00,-0.34],[-0.12,-0.26],[-0.14,-0.12],[-0.04,-0.10]]]
   },

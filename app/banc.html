@@ -94,11 +94,15 @@ function dessine(){
      Le reste de l'alphabet ne l'intéresse pas ici et l'oblige à faire
      défiler pour rien. `/banc?tout=1` remet l'alphabet entier. */
   var AREVOIR=[
+    /* Les deux formes réglées le 19 août, à faire valider par le client,
+       chacune à côté de celle qui lui a servi de modèle. */
+    ['ه','milieu'],['ه','seule','modèle — le sens vient de lui'],
+    ['ي','seule'],['ي','fin'],
+    ['ك','seule','le petit kāf doit rester DANS la lettre'],
+    /* Restes de la session précédente, tant qu'ils ne sont pas revalidés. */
     ['ب','milieu'],['ب','fin','modèle'],
     ['ر','seule'],
-    ['د','fin'],['د','seule','modèle'],
-    ['ي','debut'],['ي','milieu'],
-    ['ه','milieu']
+    ['د','fin'],['د','seule','modèle']
   ];
   var tout=!!new URLSearchParams(location.search).get('tout');
   var choix=(new URLSearchParams(location.search).get('l')||'').split(',')

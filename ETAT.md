@@ -395,18 +395,36 @@ part couverte, pas de pointe, verdict). Sans lui, « le point sort trop
 tôt » ne dit pas si la tache est mal classée ou si l'ordre du geste est
 faux — et on repart pour un tour.
 
+### FAIT — Le hā milieu, dicté par le client
+
+Il traînait depuis le début, et il a été réglé en **demandant**, pas en
+devinant. La question posée le 19 août, et la réponse :
+
+> **Par où entre le crayon, et dans quel sens tourne chaque ventre ?**
+> Le trait de liaison arrive de la droite, puis le ventre du **BAS** en
+> entier, puis le ventre du **HAUT**, puis la sortie à gauche sur la
+> ligne. Un seul trait, sans lever le crayon. **Les deux ventres tournent
+> dans le même sens.**
+
+Le client n'a pas nommé le sens : il a été **repris du hā isolé**, qu'il
+avait validé — recopier, jamais adapter. Mesuré sur sa table, aire signée
+en coordonnées écran : **+0,044, donc sens des aiguilles d'une montre**.
+
+Avant, les deux ventres tournaient en sens contraires (+0,020 et −0,030)
+et celui du haut passait le premier : la lettre se révélait par plaques,
+les deux ventres poussant ensemble, avec un fragment détaché qui
+apparaissait tout seul en haut à 45 % du geste.
+
+**Piège relevé au passage** : le commentaire du hā *début* annonçait
+« sens inverse des aiguilles » alors que sa boucle mesure +0,049 — donc
+l'inverse. Le sens **se calcule**, il ne se relit pas dans un commentaire.
+
 ### Ce qui reste ouvert sur les gestes
 
-- **Le hā milieu.** Le client le signale depuis le début et ne nomme
-  aucune forme modèle — ses deux ventres n'existent nulle part ailleurs.
-  Il faut lui demander par où entre le crayon et dans quel sens tourne
-  chaque ventre. Ne rien inventer : c'est là que tout a dérapé.
-  **Regardé sur le banc (19 août 2026)** : le défaut est visible et net.
-  Le geste part bien du trait de liaison, mais les deux ventres poussent
-  ENSEMBLE et par morceaux — à 45 % un fragment détaché apparaît en haut,
-  à 60 % le ventre du bas commence alors que celui du haut n'est pas fini.
-  Ce n'est donc pas un défaut de rendu : la table donne un ordre qui ne
-  suit aucun tracé continu. Le hā **isolé**, lui, se déroule proprement.
+Rien de signalé. Les deux points laissés ouverts par la session
+précédente — le point du yā et le hā milieu — sont réglés et regardés sur
+le banc. `AREVOIR`, en tête de `app/banc.html`, liste encore les formes de
+la session d'avant : à vider quand le client aura revalidé.
 
 ---
 
