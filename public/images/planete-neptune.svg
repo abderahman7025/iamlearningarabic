@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-neptune" cx="34%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#cfe0ff"/>
+      <stop offset="52%" stop-color="#4a7fe0"/>
+      <stop offset="100%" stop-color="#1b3f96"/>
+    </radialGradient>
+    <radialGradient id="h-neptune" cx="50%" cy="50%" r="50%">
+      <stop offset="62%" stop-color="#6d9bf0" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#6d9bf0" stop-opacity=".30"/>
+      <stop offset="100%" stop-color="#6d9bf0" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-neptune"><circle cx="200" cy="200" r="114"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="160" fill="url(#h-neptune)"/>
+  
+  <circle cx="200" cy="200" r="114" fill="url(#c-neptune)"/>
+  <g clip-path="url(#d-neptune)"><ellipse cx="200" cy="158" rx="126" ry="12" fill="#ffffff2e"/><ellipse cx="200" cy="226" rx="128" ry="14" fill="#12307a33"/><ellipse cx="200" cy="268" rx="110" ry="11" fill="#ffffff26"/><ellipse cx="164" cy="234" rx="30" ry="18" fill="#0f2a66" opacity=".38"/></g>
+  <circle cx="200" cy="200" r="114" fill="none" stroke="#1b3f96" stroke-opacity=".35" stroke-width="3"/>
+  <ellipse cx="158.96" cy="152.12" rx="29.64" ry="19.380000000000003"
+     fill="#ffffff" opacity=".33" transform="rotate(-28 158.96 152.12)"/>
+  
+  <path d="M 76 109 Q 76 122 89 122 Q 76 122 76 135 Q 76 122 63 122 Q 76 122 76 109 Z" fill="#ffffff" opacity=".85"/><path d="M 328 260 Q 328 272 340 272 Q 328 272 328 284 Q 328 272 316 272 Q 328 272 328 260 Z" fill="#ffffff" opacity=".85"/>
+</svg>

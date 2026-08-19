@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -961,6 +961,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 @keyframes mascotBob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
   50% { transform: translateY(-12px) rotate(2deg); }
+}
+/* Le flottement du personnage qui vole au-dessus de la carte. Il vit sur
+   l'IMAGE, jamais sur le conteneur : celui-ci porte la position et
+   l'inclinaison du vol, qu'une animation CSS écraserait. */
+@keyframes volFlotte {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+@media (prefers-reduced-motion:reduce){
+  [style*="volFlotte"]{animation:none !important}
 }
 @keyframes mascotSpin {
   0% { transform: translateY(-20px) scale(1.2) rotate(0deg); }
@@ -2546,22 +2556,39 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   50%{transform:translate(-14px,-7px)}75%{transform:translate(7px,-13px)}100%{transform:translate(12px,9px)}}
 @keyframes bFlotte3{0%{transform:translate(-3px,14px)}25%{transform:translate(14px,3px)}
   50%{transform:translate(3px,-14px)}75%{transform:translate(-14px,-2px)}100%{transform:translate(-3px,14px)}}
-.boy-flotte{position:absolute;font-family:'Scheherazade New',serif;font-size:2.5rem;color:#01579b;
+.boy-flotte{position:absolute;font-family:'Scheherazade New',serif;font-size:2.5rem;color:var(--sk-fonce,#01579b);
   cursor:pointer;line-height:1;text-shadow:0 2px 6px rgba(255,255,255,.9)}
 /* La barre du haut est déjà compensée par le padding de #ca : en ajouter 70
    de plus laissait un grand vide au-dessus du panneau, et poussait le bouton
    hors de l'écran sur les textes longs. */
+/* ══ LES DEUX HABILLAGES ══════════════════════════════════════════════
+   Un seul moteur de scènes, un seul jeu de classes, deux univers. Tout ce
+   qui distingue la fusée du garçon de la licorne de la fille tient dans ces
+   deux blocs de variables et dans le lexique de `_HABILLAGES` (en bas, dans
+   le script). Aucune règle plus bas ne doit écrire une couleur en dur :
+   sinon la licorne repasse au bleu sans qu'on comprenne pourquoi.
+   Le calque plein écran du tracé vit hors de `.boy-wrap` — d'où sa classe. */
+.boy-wrap,.boy-plein{
+  --sk-fonce:#01579b;--sk-moyen:#0277bd;--sk-vif:#0288d1;--sk-clair:#039be5;
+  --sk-pale:#e8f6ff;--sk-rgb:2,136,209;--sk-rgb-f:1,87,155;
+  --sk-bulle-a:#ffffff;--sk-bulle-b:#cdeafc;--sk-bulle-c:#9ad4f5;
+  --sk-jauge:#4fc3f7;--sk-doux:#f2fafe;--sk-doux-actif:#dcf0fb}
+.boy-wrap.licorne,.boy-plein.licorne{
+  --sk-fonce:#7b1747;--sk-moyen:#b3195f;--sk-vif:#d81b78;--sk-clair:#f0629f;
+  --sk-pale:#fff0f7;--sk-rgb:216,27,120;--sk-rgb-f:123,23,71;
+  --sk-bulle-a:#ffffff;--sk-bulle-b:#ffd9ec;--sk-bulle-c:#f7b6dc;
+  --sk-jauge:#f9a8d4;--sk-doux:#fff6fb;--sk-doux-actif:#ffe3f1}
 .boy-wrap{padding:14px 8px 40px;max-width:none;margin:0 auto}
-.boy-panel{position:relative;overflow:hidden;text-align:center;background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%);
-  border:3px solid rgba(2,136,209,.30);border-radius:22px;padding:26px 18px;margin-bottom:14px;
-  box-shadow:0 10px 26px rgba(1,87,155,.16);animation:bAppear .38s ease both}
+.boy-panel{position:relative;overflow:hidden;text-align:center;background:linear-gradient(158deg,#ffffff 0%,var(--sk-pale) 100%);
+  border:3px solid rgba(var(--sk-rgb),.30);border-radius:22px;padding:26px 18px;margin-bottom:14px;
+  box-shadow:0 10px 26px rgba(var(--sk-rgb-f),.16);animation:bAppear .38s ease both}
 .boy-panel::before{content:'';position:absolute;left:0;right:0;height:34%;
-  background:linear-gradient(180deg,rgba(2,136,209,0),rgba(2,136,209,.10),rgba(2,136,209,0));
+  background:linear-gradient(180deg,rgba(var(--sk-rgb),0),rgba(var(--sk-rgb),.10),rgba(var(--sk-rgb),0));
   animation:bScan 4.5s linear infinite;pointer-events:none}
 .boy-step{display:flex;align-items:center;gap:8px;justify-content:center;font-size:.66rem;font-weight:900;
-  letter-spacing:.16em;text-transform:uppercase;color:#0277bd;margin-bottom:10px}
-.boy-step i{width:7px;height:7px;border-radius:50%;background:#0277bd;animation:bBlink 1.4s infinite;font-style:normal}
-.boy-titre{font-size:1.28rem;font-weight:900;color:#01579b;line-height:1.9;letter-spacing:.01em;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--sk-moyen);margin-bottom:10px}
+.boy-step i{width:7px;height:7px;border-radius:50%;background:var(--sk-moyen);animation:bBlink 1.4s infinite;font-style:normal}
+.boy-titre{font-size:1.28rem;font-weight:900;color:var(--sk-fonce);line-height:1.9;letter-spacing:.01em;
   text-align:center;margin:0 auto 18px;max-width:22em}
 /* ── Deux colonnes, en paysage ──
    La phrase à gauche, ce qu'elle montre à droite, les boutons en bas sur
@@ -2588,42 +2615,42 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
 .ar-air{display:inline-block;margin:0 .34em;line-height:1}
 /* Un mot sur lequel on peut appuyer, au fil d'une phrase du cours. */
-.boy-lien{color:#0288d1;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.boy-lien{color:var(--sk-vif);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .boy-lien:active{opacity:.6}
 .boy-hublot{width:174px;height:174px;border-radius:50%;margin:6px auto 22px;position:relative;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#ffffff,#cdeafc 58%,#9ad4f5);
-  border:7px solid #0277bd;box-shadow:0 0 0 5px rgba(2,136,209,.20),inset 0 8px 22px rgba(1,87,155,.22);
+  background:radial-gradient(circle at 32% 26%,var(--sk-bulle-a),var(--sk-bulle-b) 58%,var(--sk-bulle-c));
+  border:7px solid var(--sk-moyen);box-shadow:0 0 0 5px rgba(var(--sk-rgb),.20),inset 0 8px 22px rgba(var(--sk-rgb-f),.22);
   transition:transform .18s}
 .boy-hublot:active{transform:scale(.94)}
 .boy-hublot::after{content:'';position:absolute;inset:-15px;border-radius:50%;
-  border:3px dashed rgba(1,87,155,.30);animation:bAnneau 16s linear infinite}
-.boy-hublot span{font-family:'Scheherazade New',serif;font-size:4.6rem;color:#01579b;line-height:1.5;padding-bottom:.1em}
+  border:3px dashed rgba(var(--sk-rgb-f),.30);animation:bAnneau 16s linear infinite}
+.boy-hublot span{font-family:'Scheherazade New',serif;font-size:4.6rem;color:var(--sk-fonce);line-height:1.5;padding-bottom:.1em}
 /* La ligne d'écriture, à l'intérieur du hublot : elle s'arrête avant les
    parois, sinon elle déborderait du cercle. */
 .boy-hublot.apesanteur{margin-bottom:52px}
 .boy-hublot.ligne::before{content:'';position:absolute;left:26px;right:26px;top:62%;
-  border-top:3px dashed rgba(1,87,155,.42);z-index:0}
+  border-top:3px dashed rgba(var(--sk-rgb-f),.42);z-index:0}
 .boy-hublot.ligne span{position:relative;z-index:1}
 /* Piste d'atterrissage : la ligne d'écriture du cours adulte, en piste */
 .boy-piste{position:relative;margin:14px 0 6px;padding:34px 0}
-.boy-piste .sol{position:absolute;left:0;right:0;top:50%;height:0;border-top:4px dashed rgba(1,87,155,.45)}
+.boy-piste .sol{position:absolute;left:0;right:0;top:50%;height:0;border-top:4px dashed rgba(var(--sk-rgb-f),.45)}
 .boy-piste .haut,.boy-piste .bas{display:flex;justify-content:center;gap:26px;direction:rtl}
 .boy-piste .haut{align-items:flex-end;min-height:52px}
 .boy-piste .bas{align-items:flex-start;min-height:52px}
-.boy-piste .marque{font-family:'Scheherazade New',serif;font-size:2.6rem;color:#0277bd;cursor:pointer;
+.boy-piste .marque{font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--sk-moyen);cursor:pointer;
   line-height:1;transition:transform .15s}
 .boy-piste .marque:active{transform:scale(1.25)}
 .boy-piste .etiq{display:block;font-family:Outfit,sans-serif;font-size:.62rem;font-weight:800;
-  color:rgba(1,87,155,.65);letter-spacing:.08em;text-align:center;direction:ltr}
+  color:rgba(var(--sk-rgb-f),.65);letter-spacing:.08em;text-align:center;direction:ltr}
 /* Jauge de décollage : la progression du cours */
 .boy-jauge{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.boy-jauge .rail{flex:1;height:10px;border-radius:6px;background:rgba(2,136,209,.16);overflow:hidden}
-.boy-jauge .feu{height:100%;border-radius:6px;background:linear-gradient(90deg,#4fc3f7,#0277bd);transition:width .45s}
+.boy-jauge .rail{flex:1;height:10px;border-radius:6px;background:rgba(var(--sk-rgb),.16);overflow:hidden}
+.boy-jauge .feu{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--sk-jauge),var(--sk-moyen));transition:width .45s}
 .boy-jauge .fusee{font-size:1.35rem;animation:bFusee 2.2s ease-in-out infinite}
 .boy-btn{display:block;width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
   font-family:Outfit,sans-serif;font-size:1.02rem;font-weight:900;letter-spacing:.06em;color:#fff;
-  background:linear-gradient(135deg,#039be5,#01579b);box-shadow:0 6px 16px rgba(1,87,155,.35);
+  background:linear-gradient(135deg,var(--sk-clair),var(--sk-fonce));box-shadow:0 6px 16px rgba(var(--sk-rgb-f),.35);
   margin-top:20px;transition:transform .15s,opacity .3s}
 .boy-btn:active{transform:translateY(2px)}
 .boy-btn.sec{background:linear-gradient(135deg,#78909c,#455a64);box-shadow:0 6px 16px rgba(69,90,100,.3)}
@@ -2631,21 +2658,21 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    à dessein — c'est un recours, pas la marche à suivre. Le sélecteur porte
    deux classes : sans cela, .boy-btn.sec lui repassait son fond gris foncé. */
 .boy-btn.boy-retour{width:52px;flex:0 0 52px;padding:0;margin-top:0;font-size:1.7rem;font-weight:400;
-  line-height:1;background:#f2fafe;color:#0277bd;border:2px solid rgba(2,136,209,.35);box-shadow:none}
-.boy-btn.boy-retour:active{background:#dcf0fb}
+  line-height:1;background:var(--sk-doux);color:var(--sk-moyen);border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
+.boy-btn.boy-retour:active{background:var(--sk-doux-actif)}
 /* Le bouton qui fait avancer respire, pour rester l'évidence de l'écran. */
 .boy-btn.bat{animation:bBat 2.2s ease-in-out infinite}
 @keyframes bBat{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
 @media (prefers-reduced-motion:reduce){.boy-btn.bat{animation:none}}
-.boy-cible{border:3px solid rgba(2,136,209,.35);background:#fff;cursor:pointer;
+.boy-cible{border:3px solid rgba(var(--sk-rgb),.35);background:#fff;cursor:pointer;
   width:104px;height:104px;display:flex;align-items:center;justify-content:center;
-  font-family:'Scheherazade New',serif;font-size:2.6rem;color:#01579b;line-height:1;
+  font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--sk-fonce);line-height:1;
   border-radius:46% 54% 52% 48%/50% 46% 54% 50%;
   animation:bNuage 6s ease-in-out infinite;
   transition:transform .18s,background .18s,border-color .18s;box-shadow:0 6px 16px rgba(1,87,155,.14)}
 .boy-cible.ok{background:rgba(38,166,154,.18);border-color:#00897b;color:#00695c;transform:scale(1.08)}
 .boy-cible.ko{background:rgba(239,83,80,.14);border-color:#e53935;color:#c62828}
-.boy-note{font-size:.82rem;color:rgba(1,87,155,.75);font-weight:700;margin-top:8px}
+.boy-note{font-size:.82rem;color:rgba(var(--sk-rgb-f),.75);font-weight:700;margin-top:8px}
 
 /* ============================================================
    RESPONSIVE — adapte toutes les pages à la largeur d'écran
@@ -3964,7 +3991,28 @@ function _appliqueThemeEnfant(){
 
 function _getProfile(){var p=(st&&st.profile)||'girl';return p==='girl'?'fille':p==='boy'?'garcon':'adulte';}
 /* Reverse slug lookup : 'mont-sinai' → 'Le Mont Sinaï' */
-function _slugToLabel(slug){var r={};Object.keys(_ISLE_SLUGS).forEach(function(l){r[_ISLE_SLUGS[l]]=l;});return r[slug]||null;}
+/* Le garçon a ses propres noms d'étapes — des planètes — et donc ses
+   propres adresses. On cherche donc d'abord dans l'habillage courant, et
+   on retombe sur les noms de lieux, qui sont ceux de la fille. */
+function _slugToLabel(slug){
+  try{
+    var h=(typeof _HAB!=='undefined')?_HAB:null;
+    if(h&&h.slugs){var i=h.slugs.indexOf(slug);if(i>=0)return h.etapes[i];}
+  }catch(e){}
+  var r={};Object.keys(_ISLE_SLUGS).forEach(function(l){r[_ISLE_SLUGS[l]]=l;});return r[slug]||null;
+}
+/* Le slug d'une étape, par son rang. Le libellé ne suffit plus : il change
+   d'un univers à l'autre, et il est traduit du côté de la fille. */
+function _slugEtape(i,label){
+  try{
+    var h=(typeof _HAB!=='undefined')?_HAB:null;
+    if(h&&h.slugs&&h.slugs[i])return h.slugs[i];
+  }catch(e){}
+  return _ISLE_SLUGS[label]||(label||'lecon').toLowerCase()
+    .replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u')
+    .replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
 /* Applique le profil sans crasher (version légère de chooseProfile) */
 function _applyProfileSafe(p){
   st.profile=p;_appliqueThemeEnfant();
@@ -4795,7 +4843,9 @@ function renderPage(page,fwd){
   repriseNoter({type:'page',page:page});
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   if(page==='intro')renderIntro(ca);
-  else if(page==='sessions'){if(st.profile==='girl')renderChildIslandMap(ca);else if(st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
+  /* Fille et garçon partagent la MÊME carte, habillée différemment.
+     L'adulte garde la sienne. */
+  else if(page==='sessions'){if(st.profile==='girl'||st.profile==='boy')renderSessionsMap(ca);else renderSessions(ca);}
   else if(page==='exercises')renderExPage(ca);
   else if(page==='contact')renderContact(ca);
   else if(page==='bonus')renderBonus(ca);
@@ -5423,6 +5473,40 @@ function _centreDeuxIles(ca,cartes,idx,repli){
   if(bas<haut)return;
   ca.scrollTop=Math.max(0,(haut+bas)/2-ca.clientHeight/2);
 }
+/* ── La progression de la fille, reprise une fois pour toutes ─────────
+   La fille comptait ses lettres dans un simple numéro, `child_girl_day`,
+   de 0 à 30. Le garçon, lui, retient île par île les lettres faites
+   (`boy_lettres_<id>`), et c'est ce que la carte lit pour déverrouiller la
+   suite. En passant la fille sur la structure du garçon, ce compteur n'est
+   plus lu par personne : sans cette reprise, une enfant qui avait appris
+   douze lettres retrouvait une carte vierge et tout à recommencer.
+
+   La conversion ne se fait qu'UNE fois, et jamais dans l'autre sens : ce
+   qui est ensuite gagné l'est dans le nouveau compte. */
+function _migreProgressionFille(){
+  try{
+    if(localStorage.getItem('arab_migr_fille')==='1')return;
+    var jour=parseInt(localStorage.getItem('child_girl_day')||'0',10);
+    if(!(jour>0)){localStorage.setItem('arab_migr_fille','1');return;}
+    /* Les îles de voyelles et de prolongations : l'enfant les a forcément
+       traversées pour en arriver là — c'est la règle qu'appliquait déjà
+       l'ancienne carte. */
+    _boyValideSession(0);                    /* île 0 : les voyelles */
+    if(jour>=4)_boyValideSession(2);         /* île 2 : les prolongations */
+    /* Les autres îles n'ont rien de spécial : leurs lettres suffisent. */
+    CHILD_ISLAND_LETTERS.forEach(function(lettres,i){
+      if(!lettres||!lettres.length)return;
+      var faites=lettres.filter(function(n){return n<jour;});
+      if(!faites.length)return;
+      var cle='boy_lettres_'+i,deja=[];
+      try{deja=JSON.parse(localStorage.getItem(cle)||'[]');}catch(e){}
+      faites.forEach(function(n){if(deja.indexOf(n)<0)deja.push(n);});
+      localStorage.setItem(cle,JSON.stringify(deja));
+      if(faites.length===lettres.length)_boyValideSession(i);
+    });
+    localStorage.setItem('arab_migr_fille','1');
+  }catch(e){}
+}
 function _ileDepart(islandDefs){
   var derniere=-1;
   try{
@@ -5466,7 +5550,158 @@ function _quandCartePrete(el,max,fn){
     i.addEventListener('error',un,{once:true});
   });
 }
+
+/* ── LE VOL ───────────────────────────────────────────────────────────
+   Le personnage ne MARCHE plus le long d'un sentier : il vole d'un point
+   au suivant. La courbe de Bézier reste la trajectoire — elle a la bonne
+   forme et passe par les bons points — mais elle n'est plus dessinée comme
+   un chemin de terre : il n'en reste qu'une traînée discrète.
+
+   Trois choses distinguent un vol d'une marche, et il faut les trois,
+   sinon on voit un personnage qui glisse au sol :
+   - la vitesse n'est pas constante. On décolle, on file, on se pose. Une
+     vitesse fixe, c'est exactement ce que faisait l'ancienne marche ;
+   - le personnage s'incline vers là où il va, comme un oiseau qui vire.
+     L'angle se prend sur la TANGENTE de la courbe, pas sur la droite qui
+     joint les deux îles : dans un virage, les deux n'ont rien à voir ;
+   - il laisse une traînée qui s'efface derrière lui.
+
+   L'inclinaison vit sur le conteneur, le flottement sur l'image qu'il
+   contient : une seule et même balise ne peut pas porter les deux, une
+   animation CSS écrase le `transform` qu'on lui pose à la main. */
+/* La trajectoire, montrée sans être un chemin. L'ancienne carte peignait un
+   sentier de terre en trois couches — un sol, une chose sur laquelle on
+   marche. Il n'en reste qu'un pointillé clair : la route du vol. */
+function _traceVol(svg,d,verrou,epais){
+  var e=epais||3;
+  var l=document.createElementNS('http://www.w3.org/2000/svg','path');
+  l.setAttribute('d',d);
+  l.setAttribute('stroke',verrou?'rgba(160,160,160,.28)':'rgba(255,255,255,.55)');
+  l.setAttribute('stroke-width',String(e));
+  l.setAttribute('stroke-dasharray',(e*0.9).toFixed(1)+' '+(e*3).toFixed(1));
+  l.setAttribute('stroke-linecap','round');
+  l.setAttribute('fill','none');
+  svg.appendChild(l);
+}
+function _bezier(t,s){
+  var m=1-t;
+  return{x:m*m*m*s.x0+3*m*m*t*s.cpx1+3*m*t*t*s.cpx2+t*t*t*s.x3,
+         y:m*m*m*s.y0+3*m*m*t*s.cpy1+3*m*t*t*s.cpy2+t*t*t*s.y3};
+}
+/* Tangente : la dérivée de la courbe. Aux deux extrémités elle peut être
+   nulle (points de contrôle confondus avec l'extrémité) — on regarde alors
+   un cheveu plus loin, sinon l'angle saute à zéro juste à l'arrivée. */
+function _penteBezier(t,s){
+  function d(u){
+    var m=1-u;
+    return{x:3*m*m*(s.cpx1-s.x0)+6*m*u*(s.cpx2-s.cpx1)+3*u*u*(s.x3-s.cpx2),
+           y:3*m*m*(s.cpy1-s.y0)+6*m*u*(s.cpy2-s.cpy1)+3*u*u*(s.y3-s.cpy2)};
+  }
+  var v=d(t);
+  if(Math.abs(v.x)<0.01&&Math.abs(v.y)<0.01)v=d(Math.min(0.98,Math.max(0.02,t+0.02)));
+  return Math.atan2(v.y,v.x)*180/Math.PI;
+}
+/* Le personnage vole vers la gauche ou vers la droite selon le segment.
+   On ne le fait pas tourner à 180° — une licorne sur le dos — mais on le
+   penche du quart de l'angle, et on le retourne horizontalement quand il
+   part vers la gauche. */
+function _inclinaison(deg){
+  var vaGauche=Math.abs(deg)>90;
+  var pente=vaGauche?(deg>0?180-deg:-180-deg):deg;
+  return{deg:Math.max(-24,Math.min(24,pente*0.35)),gauche:vaGauche};
+}
+function _volCarte(o){
+  var segs=o.segments,el=o.charEl,globe=o.globe;
+  var dx=o.decalageX||0,dy=o.decalageY||0;
+  var idx=o.depart||0,raf=null,grains=[],dernierGrain=0;
+  var img=el.firstChild;
+  /* `part` : de 0 à 1, la part d'inclinaison qu'on applique. Elle vaut 0 au
+     décollage et à l'atterrissage — le personnage y est droit — et 1 en
+     vol. Le sens de l'image, lui, ne s'atténue pas : on regarde toujours
+     là où l'on va. */
+  function poser(x,y,deg,part){
+    el.style.left=(x-dx)+'px';el.style.top=(y-dy)+'px';
+    if(deg===undefined||deg===null){el.style.transform='';return;}
+    var i=_inclinaison(deg);
+    var a=i.deg*(part===undefined?1:Math.max(0,Math.min(1,part)));
+    el.style.transform='rotate('+a.toFixed(1)+'deg)';
+    if(img&&img.style)img.style.transform=i.gauche?'scaleX(-1)':'';
+  }
+  /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
+     conteneur de la carte, sous le personnage, et se retirent tout seuls. */
+  function grain(x,y){
+    var T=Date.now();
+    if(T-dernierGrain<55)return;
+    dernierGrain=T;
+    var g=document.createElement('div');
+    g.style.cssText='position:absolute;left:'+(x-5)+'px;top:'+(y-5)+'px;width:10px;height:10px;'
+      +'border-radius:50%;pointer-events:none;z-index:19;background:'+(o.trainee||'rgba(255,255,255,.85)')
+      +';transition:opacity .7s ease,transform .7s ease';
+    globe.appendChild(g);grains.push(g);
+    requestAnimationFrame(function(){
+      g.style.opacity='0';g.style.transform='scale(.3)';
+    });
+    setTimeout(function(){
+      if(g.parentNode)g.parentNode.removeChild(g);
+      grains=grains.filter(function(k){return k!==g;});
+    },780);
+  }
+  /* Décollage, croisière, atterrissage : lent aux deux bouts, rapide au
+     milieu. C'est ce que la vitesse constante d'avant ne donnait pas. */
+  function adouci(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+  function placerA(i){
+    if(!segs.length)return;
+    if(i>=segs.length){var f=segs[segs.length-1];poser(f.x3,f.y3,null);}
+    else{var s=segs[i];poser(s.x0,s.y0,null);}
+    idx=i;
+  }
+  placerA(idx);
+  function allerA(cible,fini){
+    if(raf){cancelAnimationFrame(raf);raf=null;}
+    if(idx===cible){if(fini)fini();return;}
+    /* Revenir de dix îles en arrière était interminable à regarder : on se
+       pose directement sur celle qui suit la visée, il ne reste qu'un vol. */
+    if(cible<idx-1){idx=cible+1;var r=segs[idx-1];poser(r.x3,r.y3,null);}
+    var pas=idx<cible?1:-1,file=[];
+    for(var i=idx;i!==cible;i+=pas){
+      if(pas>0)file.push({seg:segs[i],sens:1});else file.push({seg:segs[i-1],sens:-1});
+    }
+    var n=0,u=0;
+    /* Un vol dure le même temps quelle que soit la longueur du saut : c'est
+       l'allure d'un déplacement en l'air, pas d'un pas qui s'allonge. */
+    var DUREE=o.duree||900,debut=Date.now();
+    function tic(){
+      var item=file[n];
+      if(!item){idx=cible;if(fini)fini();return;}
+      u=Math.min(1,(Date.now()-debut)/DUREE);
+      var t=item.sens>0?adouci(u):1-adouci(u);
+      var p=_bezier(t,item.seg);
+      var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
+      /* On se penche en décollant, on se redresse en se posant. Sans ce
+         redressement, le personnage arrivait sur l'étape encore couché à
+         24° et y restait planté de travers le temps d'un battement. */
+      poser(p.x,p.y,deg,Math.min(1,u/0.18,(1-u)/0.18));
+      grain(p.x,p.y);
+      if(u>=1){
+        n++;u=0;debut=Date.now();
+        if(pas>0)idx++;else idx--;
+        if(n>=file.length){idx=cible;poser(p.x,p.y,null);if(fini)fini();return;}
+      }
+      raf=requestAnimationFrame(tic);
+    }
+    tic();
+  }
+  return{allerA:allerA,placerA:placerA,ou:function(){return idx;}};
+}
+
+/* La carte du parcours — UNE seule, pour la fille comme pour le garçon.
+   Il y en avait deux, copiées ligne à ligne (`renderChildIslandMap` faisait
+   exactement la même chose en rose), et chaque correction était donc à
+   faire deux fois. Ce qui les distingue tient maintenant dans l'habillage :
+   les images du décor, la couleur de la traînée, le titre. */
 function renderSessionsMap(ca){
+  _HAB=_habDuProfil();
+  _migreProgressionFille();
   ca.innerHTML='';
   ca.style.cssText='';
   ca.style.paddingTop='64px';
@@ -5487,26 +5722,20 @@ function renderSessionsMap(ca){
   // Titre carte
   var titleDiv=document.createElement('div');
   titleDiv.className='sess-map-title';
-  titleDiv.textContent='🗺️ '+({'fr':'Ta carte d\'apprentissage','en':'Your learning map','es':'Tu mapa de aprendizaje','de':'Deine Lernkarte','nl':'Je leerkaart','it':'La tua mappa','pt':'Seu mapa','ru':'Твоя карта','tr':'Haritanı','zh':'你的学习地图','id':'Peta belajarmu','ur':'تمہارا نقشہ','hi':'तुम्हारा नक्शा'}[st.lang]||'Ta carte d\'apprentissage');
+  /* Le titre nomme le décor : des îles pour la fille, des planètes pour le
+     garçon. L'ancien titre traduit servait la carte de l'adulte, qui a la
+     sienne (`renderSessions`) — celle-ci n'est plus vue que par les
+     enfants, dont l'interface est encore entièrement en français
+     (voir ETAT.md, chantier des traductions). */
+  titleDiv.textContent=_HAB.titreCarte;
   wrap.appendChild(titleDiv);
 
   // Définition des îles — 1 île = 1 cours
   var _L=st.lang;
-  // Images des iles (index = isleIdx)
-var islandImgs=[
-  '/images/island-0.png?v=2',
-  '/images/island-1.png?v=2',
-  '/images/island-2.png?v=2',
-  '/images/island-3.png?v=2',
-  '/images/island-4.png?v=2',
-  '/images/20260518_195724_0000.png',
-  '/images/island-pyramids.png',
-  '/images/island-7.png?v=2',
-  '/images/island-8.png?v=2',
-  '/images/island-9.png?v=2',
-  '/images/island-10.png?v=2',
-  '/images/island-11.png?v=2',
-];
+  /* Le décor, étape par étape : c'est la SEULE chose qui distingue les deux
+     univers ici. Les libellés, eux, ne bougent pas — ce sont les mêmes
+     lieux, les mêmes adresses et le même cours des deux côtés. */
+  var islandImgs=_HAB.images;
 var islandDefs=[
     {key:'sea',    icon:'💧', theme:'sea',
      label:{'fr':'La Source de l\'Humanité','en':'The Source of Humanity','es':'La Fuente de la Humanidad','de':'Die Quelle der Menschheit','nl':'De Bron van de Mensheid','it':'La Fonte dell\'Umanità','pt':'A Fonte da Humanidade','ru':'Источник Человечества','tr':'İnsanlığın Kaynağı','zh':'人类之源','id':'Sumber Kemanusiaan','ur':'انسانیت کا سرچشمہ','hi':'मानवता का स्रोत'}[_L]||'La Source de l\'Humanité',
@@ -5560,9 +5789,10 @@ var islandDefs=[
 
   function openSession(s){
     /* _currentIsleSlug est déjà défini par le onclick de la carte */
-    /* Profil garçon : mêmes cours narrés que la fille (moteur _kidScene),
-       en thème bleu. L'adulte garde les leçons détaillées d'origine. */
-    if(st.profile==='boy'){
+    /* Fille ET garçon : la MÊME structure, le même moteur de scènes, les
+       mêmes écrans dans le même ordre. Seul l'habillage change — fusée ou
+       licorne (voir `_HABILLAGES`). L'adulte garde ses leçons détaillées. */
+    if(st.profile==='boy'||st.profile==='girl'){
       _boySession=s;
       if(s.type==='vowels'){_boyVowelCourse(domContainer);return;}
       if(s.type==='prolong'){_boyProlongCourse(domContainer);return;}
@@ -5608,6 +5838,14 @@ var islandDefs=[
   var prevIslandDone=true;
   var _firstActivCard=null; // première île toujours débloquée
 
+  /* Le décor du garçon a ses propres noms d'étapes : ce sont des planètes,
+     pas des lieux. On les pose ici, une fois, plutôt que de doubler tout le
+     tableau `islandDefs` — le reste (les lettres, les cours, l'ordre) est
+     rigoureusement le même des deux côtés. */
+  if(_HAB.etapes)islandDefs.forEach(function(isle,i){
+    if(_HAB.etapes[i])isle.label=_HAB.etapes[i];
+  });
+
   islandDefs.forEach(function(isle,isleIdx){
     // Statut des sessions de cette île
     var isleSessions=isle.sids.map(function(sid){
@@ -5650,7 +5888,7 @@ var islandDefs=[
     card.appendChild(nm);
     card.appendChild(sub);
     card.appendChild(badge);
-    if(!isLocked){card.onclick=(function(ss,lbl,ii){return function(){_lessonPushed=false;_currentIsleSlug=_ISLE_SLUGS[lbl]||(lbl||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    if(!isLocked){card.onclick=(function(ss,lbl,ii){return function(){_lessonPushed=false;_currentIsleSlug=_slugEtape(ii,lbl);
       /* On retient l'île ouverte : en revenant sur la carte, le personnage
          doit être POSÉ dessus, pas refaire le chemin depuis le coin. */
       try{localStorage.setItem('arab_ile',String(ii));}catch(e){}
@@ -5725,7 +5963,7 @@ var islandDefs=[
       if(st._curPage!=='sessions-map')return;
       var _rca=document.getElementById('ca');
       if(!_rca)return;
-      if(st.profile==='girl')renderChildIslandMap(_rca);else renderSessionsMap(_rca);
+      renderSessionsMap(_rca);
     };
     window.addEventListener('resize',window._sessMapResizeFn);
     /* Android ne déclenche pas toujours « resize » en tournant l'appareil. */
@@ -5764,8 +6002,15 @@ var islandDefs=[
       var isGirlMob=(st.profile==='girl');
       var srcElMob=document.querySelector('#'+(isGirlMob?'girl':'boy')+'-mascot img');
       var charElMob=document.createElement('div');
-      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6))';
-      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
+      /* Le conteneur porte la POSITION et l'inclinaison du vol, l'image
+         qu'il contient porte le flottement : une même balise ne peut pas
+         faire les deux, l'animation CSS écraserait le `transform` posé à
+         la main à chaque image. */
+      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;'
+        +'will-change:transform,left,top;filter:drop-shadow(0 8px 14px rgba(0,0,0,0.45))';
+      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;
+        aImgMob.style.cssText='width:100%;height:100%;object-fit:contain;animation:volFlotte 2.8s ease-in-out infinite';
+        charElMob.appendChild(aImgMob);}
       globeDiv.appendChild(charElMob);
       _quandCartePrete(ca,1500,function(){
         var gW=globeDiv.offsetWidth;
@@ -5774,19 +6019,9 @@ var islandDefs=[
         svg.setAttribute('width',gW);svg.setAttribute('height',gH);
         svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
         globeDiv.insertBefore(svg,globeDiv.firstChild);
-        function drawMobPath(d,lk){
-          var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','14');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
-          var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','10');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
-          var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(195,140,65,0.85)');dp.setAttribute('stroke-width','4');dp.removeAttribute('stroke-dasharray');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
-        }
-        var MG=8;
+        function drawMobPath(d,lk){_traceVol(svg,d,lk,3);}
         var segsMob=[];
         var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight*0.75};});
-        var hWM=isleCardsMob.map(function(el){return el.offsetWidth/2;});
-        var hHM=isleCardsMob.map(function(el){return el.offsetHeight/2;});
         // Segment 0 : coin haut-gauche → île 0 — courbe douce
         var maxMX=centersM.length?Math.max.apply(null,centersM.map(function(c){return c.x;})):gW*0.9;
         var minMX=centersM.length?Math.min.apply(null,centersM.map(function(c){return c.x;})):gW*0.1;
@@ -5817,50 +6052,20 @@ var islandDefs=[
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey, segLkM);
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
-        function placeCharMob(x,y){charElMob.style.transform='none';charElMob.style.left=(x-34)+'px';charElMob.style.top=(y-80)+'px';}
-        function bezierPtM(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
-        // Placement initial + scroll vers gugus
+        var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
+          decalageX:34,decalageY:80,depart:charIdxM,trainee:_HAB.trainee,duree:820});
+        /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
+           cours est là dès la première image affichée. */
         if(segsMob.length>0){
-          if(charIdxM>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
-          else{var ip=bezierPtM(0,segsMob[charIdxM]);placeCharMob(ip.x,ip.y);}
-          /* Défilement AVANT de montrer la carte, et sans animation : l'île en
-             cours est là dès la première image affichée. */
           var _ca=document.getElementById('ca');
           if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxM,charElMob);
         }
         wrap.style.visibility='';
-        var animFrameM=null,currentIdxM=charIdxM;
-        function animateToM(targetIdx,onDone){
-          if(animFrameM){cancelAnimationFrame(animFrameM);animFrameM=null;}
-          if(currentIdxM===targetIdx){if(onDone)onDone();return;}
-          /* Revenir en arrière de dix îles prenait un temps fou à regarder :
-             on se pose directement sur l'île qui suit la visée, et il ne
-             reste qu'un pas à faire. */
-          if(targetIdx<currentIdxM-1){
-            currentIdxM=targetIdx+1;
-            var rp=bezierPtM(1,segsMob[currentIdxM-1]);placeCharMob(rp.x,rp.y);
-          }
-          var step=currentIdxM<targetIdx?1:-1;
-          var queue=[];
-          for(var i=currentIdxM;i!==targetIdx;i+=step){
-            if(step>0)queue.push({seg:segsMob[i],dir:1});
-            else queue.push({seg:segsMob[i-1],dir:-1});
-          }
-          var qi=0,prog=0,SPEED=0.014;
-          function tickM(){
-            if(qi>=queue.length){currentIdxM=targetIdx;var fp=bezierPtM(queue[queue.length-1].dir>0?1:0,queue[queue.length-1].seg);placeCharMob(fp.x,fp.y);if(onDone)onDone();return;}
-            var item=queue[qi];var pt=bezierPtM(item.dir>0?prog:1-prog,item.seg);placeCharMob(pt.x,pt.y);
-            prog+=SPEED;
-            if(prog>=1){var ep=bezierPtM(item.dir>0?1:0,item.seg);placeCharMob(ep.x,ep.y);prog=0;qi++;if(step>0)currentIdxM++;else currentIdxM--;}
-            animFrameM=requestAnimationFrame(tickM);
-          }
-          tickM();
-        }
-        // Clic : animer puis ouvrir le cours
+        // Clic : voler jusqu'à l'étape, puis ouvrir le cours
         isleCardsMob.forEach(function(card,idx){
           var origFnM=card._mobOrigClick;
           if(card.classList.contains('locked-isle'))return;
-          card.addEventListener('click',function(){animateToM(idx+1,function(){if(origFnM)origFnM.call(card);});});
+          card.addEventListener('click',function(){volM.allerA(idx+1,function(){if(origFnM)origFnM.call(card);});});
         });
       });
       return;
@@ -5914,22 +6119,8 @@ var islandDefs=[
       var cpRight=Math.min(gW*0.95,maxCenterX+120);
       var cpLeft=Math.max(gW*0.05,minCenterX-120);
 
-      // Grand serpentin desktop — épaisseur réduite de moitié
-      function drawPath(d,lk){
-        var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-        sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');
-        sh.setAttribute('stroke-width','27');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');
-        svg.appendChild(sh);
-        var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');
-        mp.setAttribute('stroke-width','20');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');
-        svg.appendChild(mp);
-        var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(155,95,32,0.7)');
-        dp.setAttribute('stroke-width','8');dp.removeAttribute('stroke-dasharray');
-        dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');
-        svg.appendChild(dp);
-      }
+      // La trajectoire du vol, en grand : un pointillé, pas un sentier
+      function drawPath(d,lk){_traceVol(svg,d,lk,5);}
 
       // Segment 0 : coin haut-gauche → île 0 — arc doux (pas de ligne horizontale)
       if(centers.length>0){
@@ -5958,94 +6149,33 @@ var islandDefs=[
       var srcEl=document.querySelector('#'+(isGirl?'girl':'boy')+'-mascot img');
       var charEl=document.createElement('div');
       charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;'+
-        'filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55))';
+        'will-change:transform,left,top;filter:drop-shadow(0 10px 16px rgba(0,0,0,0.45))';
       if(srcEl){
         var aImg=document.createElement('img');
         aImg.src=srcEl.src;
-        aImg.style.cssText='width:100%;height:100%;object-fit:contain';
+        aImg.style.cssText='width:100%;height:100%;object-fit:contain;animation:volFlotte 2.8s ease-in-out infinite';
         charEl.appendChild(aImg);
       }
       globeDiv.appendChild(charEl);
 
-      /* charIdx : 0 = le coin, i+1 = posé sur l'île i */
+      /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
+      var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
+        decalageX:40,decalageY:90,depart:charIdx,trainee:_HAB.trainee,duree:950});
 
-      function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
-
-      function bezierPt(t,s){
-        var mt=1-t;
-        return{
-          x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,
-          y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3
-        };
-      }
-
-      // Placement initial
-      var initX,initY;
-      if(charIdx>=segments.length){
-        initX=segments[segments.length-1].x3;
-        initY=segments[segments.length-1].y3;
-      } else {
-        initX=segments[charIdx].x0;
-        initY=segments[charIdx].y0;
-      }
-      placeCharAt(initX,initY);
-      /* Défilement AVANT de montrer la carte : l'île en cours doit être à
+      /* Défilement AVANT de montrer la carte : l'étape en cours doit être à
          l'écran dès la première image affichée, sans saut. */
       var _cad=document.getElementById('ca');
       if(_cad)_centreDeuxIles(_cad,isleCards,charIdx,charEl);
       wrap.style.visibility='';
 
-      var animFrame=null,currentIdx=charIdx;
-
-      function animateTo(targetIdx,onDone){
-        if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
-        if(currentIdx===targetIdx){if(onDone)onDone();return;}
-        /* Voir le personnage refaire dix îles en arrière est interminable :
-           on se pose sur l'île qui suit la visée, il ne reste qu'un pas. */
-        if(targetIdx<currentIdx-1){
-          currentIdx=targetIdx+1;
-          var rp=bezierPt(1,segments[currentIdx-1]);placeCharAt(rp.x,rp.y);
-        }
-        var step=currentIdx<targetIdx?1:-1;
-        var queue=[];
-        for(var i=currentIdx;i!==targetIdx;i+=step){
-          if(step>0)queue.push({seg:segments[i],dir:1});
-          else queue.push({seg:segments[i-1],dir:-1});
-        }
-        var qi=0,prog=0,SPEED=0.0125;
-        function tick(){
-          if(qi>=queue.length){
-            currentIdx=targetIdx;
-            var lastSeg=queue[queue.length-1];
-            var finalPt=bezierPt(lastSeg.dir>0?1:0,lastSeg.seg);
-            placeCharAt(finalPt.x,finalPt.y);
-            if(onDone)onDone();
-            return;
-          }
-          var item=queue[qi];
-          var t=item.dir>0?prog:1-prog;
-          var pt=bezierPt(t,item.seg);
-          placeCharAt(pt.x,pt.y);
-          prog+=SPEED;
-          if(prog>=1){
-            var endPt=bezierPt(item.dir>0?1:0,item.seg);
-            placeCharAt(endPt.x,endPt.y);
-            prog=0;qi++;
-            if(step>0)currentIdx++;else currentIdx--;
-          }
-          animFrame=requestAnimationFrame(tick);
-        }
-        tick();
-      }
-
-      // Clic : animer PUIS ouvrir le cours
-      // idx+1 car segments[0]=home, segments[1]=Ã®le 0â†’1, etc.
+      // Clic : voler jusqu'à l'étape PUIS ouvrir le cours
+      // idx+1 car segments[0]=le coin, segments[1]=étape 0→1, etc.
       isleCards.forEach(function(card,idx){
         var origFn=card._desktopOrigClick;
         if(card.classList.contains('locked-isle'))return;
         card.addEventListener('click',function(){
-          animateTo(idx+1,function(){
+          vol.allerA(idx+1,function(){
             if(origFn)origFn.call(card);
           });
         });
@@ -6885,7 +7015,7 @@ function _boyLetterPicker(ca,session){
     var carte=document.createElement('div');carte.className='child-card';
     carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;'
       +'text-align:left;'+(ouverte?'cursor:pointer;':'opacity:.45;')
-      +(aFaire?'border:3px solid #0288d1;box-shadow:0 0 0 0 rgba(2,136,209,.5);animation:kidPulse 1.8s infinite;':'');
+      +(aFaire?'border:3px solid var(--k1);box-shadow:0 0 0 0 rgba(var(--kA),.5);animation:kidPulse 1.8s infinite;':'');
     var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';
     em.textContent=ouverte?L.emoji:'🔒';carte.appendChild(em);
     var lettre=document.createElement('div');
@@ -6974,366 +7104,12 @@ function _childLetterPicker(ca,isle){
   ca.appendChild(wrap);
 }
 
-function renderChildIslandMap(ca){
-  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='0';
-  st._curPage='sessions-map';
-  var _stb=document.getElementById('topbar');
-  if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
-
-  var dayIdx=Math.min(Math.max(parseInt(localStorage.getItem('child_girl_day')||'0'),0),CHILD_LETTERS.length);
-
-  var wrap=document.createElement('div');wrap.className='sess-map-wrap';
-
-  /* ── Titre ── */
-  var titleDiv=document.createElement('div');titleDiv.className='sess-map-title';
-  titleDiv.textContent='🗺️ Ma carte des lettres';
-  wrap.appendChild(titleDiv);
-
-  /* ── Barre de progression globale ── */
-  var progPct=Math.round(dayIdx/CHILD_LETTERS.length*100);
-  var gpWrap=document.createElement('div');gpWrap.style.cssText='margin-bottom:18px;padding:0 4px';
-  var gpLbl=document.createElement('div');
-  gpLbl.style.cssText='display:flex;justify-content:space-between;font-size:1rem;color:rgba(255,255,255,.92);margin-bottom:6px;font-weight:700';
-  gpLbl.innerHTML='<span>Lettres apprises</span><span>'+dayIdx+' / '+CHILD_LETTERS.length+'</span>';
-  var gpBar=document.createElement('div');
-  gpBar.style.cssText='height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden';
-  var gpFill=document.createElement('div');
-  gpFill.style.cssText='height:100%;border-radius:6px;background:linear-gradient(90deg,#f9a8d4,#ec4899);width:0%;transition:width .8s cubic-bezier(.34,1.56,.64,1)';
-  gpBar.appendChild(gpFill);gpWrap.appendChild(gpLbl);gpWrap.appendChild(gpBar);
-  wrap.appendChild(gpWrap);
-  setTimeout(function(){gpFill.style.width=progPct+'%';},80);
-
-  /* ── Définitions des îles (identiques au garçon) ── */
-  var islandImgs=[
-    '/images/island-0.png?v=2','/images/island-1.png?v=2','/images/island-2.png?v=2',
-    '/images/island-3.png?v=2','/images/island-4.png?v=2','/images/20260518_195724_0000.png',
-    '/images/island-pyramids.png','/images/island-7.png?v=2','/images/island-8.png?v=2',
-    '/images/island-9.png?v=2','/images/island-10.png?v=2','/images/island-11.png?v=2',
-  ];
-  var childIslandDefs=[
-    {label:CHILD_ISLAND_LABELS[0],  ar:'َ · ُ · ِ',       type:'vowels',  letters:[]},
-    {label:CHILD_ISLAND_LABELS[1],  ar:'ا · و · ي',       type:'letters', letters:CHILD_ISLAND_LETTERS[1]},
-    {label:CHILD_ISLAND_LABELS[2],  ar:'بَا · بُو · بِي', type:'prolong', letters:[]},
-    {label:CHILD_ISLAND_LABELS[3],  ar:'ب · ت · ث',       type:'letters', letters:CHILD_ISLAND_LETTERS[3]},
-    {label:CHILD_ISLAND_LABELS[4],  ar:'ج · ح · خ',       type:'letters', letters:CHILD_ISLAND_LETTERS[4]},
-    {label:CHILD_ISLAND_LABELS[5],  ar:'د · ذ · ر · ز',   type:'letters', letters:CHILD_ISLAND_LETTERS[5]},
-    {label:CHILD_ISLAND_LABELS[6],  ar:'س · ش',            type:'letters', letters:CHILD_ISLAND_LETTERS[6]},
-    {label:CHILD_ISLAND_LABELS[7],  ar:'ص · ض · ط · ظ',   type:'letters', letters:CHILD_ISLAND_LETTERS[7]},
-    {label:CHILD_ISLAND_LABELS[8],  ar:'ع · غ',            type:'letters', letters:CHILD_ISLAND_LETTERS[8]},
-    {label:CHILD_ISLAND_LABELS[9],  ar:'ف · ق · ك',        type:'letters', letters:CHILD_ISLAND_LETTERS[9]},
-    {label:CHILD_ISLAND_LABELS[10], ar:'ل · م · ن',        type:'letters', letters:CHILD_ISLAND_LETTERS[10]},
-    {label:CHILD_ISLAND_LABELS[11], ar:'ه · ء · ة',        type:'letters', letters:CHILD_ISLAND_LETTERS[11]},
-  ];
-
-  /* ── Fonction d'ouverture d'une île ── */
-  var domContainer=ca;
-  function openChildIsland(isle,isComplete){
-    _lessonPushed=false;
-    _currentIsleSlug=_ISLE_SLUGS[isle.label]||(isle.label||'lecon').toLowerCase().replace(/[éèê]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[îï]/g,'i').replace(/[ôö]/g,'o').replace(/ç/g,'c').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    if(isle.type==='vowels'){_vowelCourse(domContainer);}
-    else if(isle.type==='prolong'){_prolongCourse(domContainer);}
-    /* Île déjà terminée → on choisit la lettre à revoir.
-       Île en cours → on enchaîne les lettres dans l'ordre, sans rien demander :
-       la 2e arrive après la 1re, la 3e après la 2e. */
-    else if(isComplete){_childLetterPicker(domContainer,isle);}
-    else if(localStorage.getItem('child_seen_forms_intro')==='1'){
-      renderChildWarmup(domContainer);
-    }
-    else{_showLettersIntro(domContainer,isle.label,function(){
-      /* l'explication des 4 formes n'est montrée qu'une fois */
-      try{localStorage.setItem('child_seen_forms_intro','1');}catch(e){}
-      renderChildWarmup(domContainer);
-    });}
-  }
-
-  var globeDiv=document.createElement('div');
-  globeDiv.style.cssText='display:flex;flex-direction:column;gap:12px;align-items:stretch';
-
-  /* ── Complétion par île (déverrouillage séquentiel) ── */
-  function _isleComplete(isle){
-    /* Migration douce : si l'utilisateur a déjà appris des lettres, les îles
-       voyelles/prolongations qu'il a forcément traversées sont considérées faites. */
-    if(isle.type==='vowels')return localStorage.getItem('child_isle_vowels')==='1'||dayIdx>0;
-    if(isle.type==='prolong')return localStorage.getItem('child_isle_prolong')==='1'||dayIdx>=4;
-    if(!isle.letters.length)return false;
-    return dayIdx>isle.letters[isle.letters.length-1];
-  }
-  var _isleDone=childIslandDefs.map(_isleComplete);
-
-  /* Mascotte = première île non terminée (tout en haut du chemin si rien n'est fait) */
-  var charIdxC=0;
-  for(var _ci=0;_ci<childIslandDefs.length;_ci++){
-    if(_isleDone[_ci]){charIdxC=_ci+1;}else{break;}
-  }
-
-  childIslandDefs.forEach(function(isle,isleIdx){
-    /* Une île est déverrouillée seulement si la précédente est terminée */
-    var isComplete=_isleDone[isleIdx];
-    var isLocked=(isleIdx>0)&&!_isleDone[isleIdx-1];
-
-    var card=document.createElement('div');
-    card.className='sess-island'+(isLocked?' locked-isle':'');
-
-    var ico=document.createElement('img');ico.className='isle-img';
-    ico.src=islandImgs[isleIdx]||'';ico.alt=isle.label;
-
-    var nm=document.createElement('div');nm.className='isle-name';nm.textContent=isle.label;
-    var sub=document.createElement('div');sub.className='isle-sub';sub.textContent=isle.ar;
-
-    var badge=document.createElement('div');badge.className='isle-badge';
-    if(isLocked){
-      badge.textContent='🔒';
-    } else if(isComplete){
-      badge.textContent='✅ Terminé';
-      badge.style.color='#4ade80';badge.style.borderColor='rgba(34,197,94,.3)';
-    } else if(isle.type==='vowels'||isle.type==='prolong'){
-      badge.textContent='▶ Découvrir';
-    } else {
-      badge.textContent='▶ Commencer';
-    }
-
-    card.appendChild(ico);card.appendChild(nm);card.appendChild(sub);card.appendChild(badge);
-    /* isComplete était figé à false : une île terminée était donc rouverte
-       comme une île en cours, et le mode révision n'était jamais atteint. */
-    if(!isLocked){card.onclick=(function(i2,fini){return function(){openChildIsland(i2,fini);};})(isle,isComplete);}
-
-    globeDiv.appendChild(card);
-
-    if(isleIdx<childIslandDefs.length-1){
-      var conn=document.createElement('div');conn.className='isle-connector';conn.textContent='↓';
-      globeDiv.appendChild(conn);
-    }
-  });
-
-  /* ── Boss final ── */
-  var allDone=(dayIdx>=CHILD_LETTERS.length);
-  var conn2=document.createElement('div');conn2.className='isle-connector';conn2.textContent='↓';
-  globeDiv.appendChild(conn2);
-  var boss=document.createElement('div');
-  boss.className='sess-island boss-isle'+(allDone?'':' locked-isle');
-  boss.innerHTML='<div class="isle-hd"><div class="isle-ico">🏆</div>'
-    +'<div class="isle-info"><div class="isle-name" style="font-size:1rem">Le Grand Quiz Final</div>'
-    +'<div class="isle-sub" style="font-family:inherit;font-size:.72rem">'+(allDone?'Tu as appris toutes les lettres !':'Termine toutes les îles')+'</div></div>'
-    +'<div class="isle-badge" style="color:'+(allDone?'#f5c842':'rgba(255,255,255,.3)')+'">'+(allDone?'⚡ START':'🔒')+'</div></div>';
-  globeDiv.appendChild(boss);
-
-  wrap.appendChild(globeDiv);
-  ca.appendChild(wrap);
-
-  /* ══════════════════════════════════════════════════════
-     LAYOUT SERPENTIN + AVATAR ANIMÉ (identique garçon)
-     ══════════════════════════════════════════════════════ */
-  setTimeout(function(){
-    var DW=window.innerWidth,DH=window.innerHeight;
-    var isLandscape=DW>DH;
-
-    /* Listener resize/orientation — relance la carte si mode change */
-    if(window._childMapResizeFn)window.removeEventListener('resize',window._childMapResizeFn);
-    window._childMapWasLandscape=isLandscape;
-    window._childMapResizeFn=function(){
-      var nowL=window.innerWidth>window.innerHeight;
-      if(nowL!==window._childMapWasLandscape){
-        window._childMapWasLandscape=nowL;
-        if(st._curPage==='sessions-map'&&st.profile==='girl'){
-          var _rca=document.getElementById('ca');
-          if(_rca)renderChildIslandMap(_rca);
-        }
-      }
-    };
-    window.addEventListener('resize',window._childMapResizeFn);
-
-    /* ──────── PORTRAIT (mobile) ──────── */
-    if(!isLandscape){
-      var _gmMob=document.getElementById('girl-mascot');
-      var _bmMob=document.getElementById('boy-mascot');
-      if(_gmMob)_gmMob.style.visibility='hidden';
-      if(_bmMob)_bmMob.style.visibility='hidden';
-      Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
-      var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-      var bossElMob=globeDiv.querySelector('.boss-isle');
-      var IWmob=Math.floor(DW*0.50);
-      isleCardsMob.forEach(function(el,i){
-        el._mobOrigClick=el.onclick;el.onclick=null;
-        el.style.width=IWmob+'px';el.style.flexShrink='0';el.style.position='relative';el.style.zIndex='5';
-        el.style.alignSelf=(i%2===0)?'flex-end':'flex-start';
-      });
-      if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
-      /* 110px : place pour la mascotte, dessinée 80px au-dessus du point du chemin */
-      globeDiv.style.paddingTop='110px';globeDiv.style.position='relative';globeDiv.style.gap='28px';
-      var srcElMob=document.querySelector('#girl-mascot img');
-      var charElMob=document.createElement('div');
-      charElMob.style.cssText='position:absolute;top:0;left:0;z-index:20;width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6));animation:mascotBob 2.4s ease-in-out infinite';
-      if(srcElMob){var aImgMob=document.createElement('img');aImgMob.src=srcElMob.src;aImgMob.style.cssText='width:100%;height:100%;object-fit:contain';charElMob.appendChild(aImgMob);}
-      globeDiv.appendChild(charElMob);
-      setTimeout(function(){
-        var gW=globeDiv.offsetWidth,gH=globeDiv.scrollHeight;
-        var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-        svg.setAttribute('width',gW);svg.setAttribute('height',gH);
-        svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
-        globeDiv.insertBefore(svg,globeDiv.firstChild);
-        function drawMobPath(d,lk){
-          var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-          sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','14');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
-          var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','10');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
-          var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-          dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(195,140,65,0.85)');dp.setAttribute('stroke-width','4');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
-        }
-        var segsMob=[];
-        var centersM=isleCardsMob.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight*0.75};});
-        var maxMX=centersM.length?Math.max.apply(null,centersM.map(function(c){return c.x;})):gW*0.9;
-        var minMX=centersM.length?Math.min.apply(null,centersM.map(function(c){return c.x;})):gW*0.1;
-        var cpMRight=Math.min(gW*0.95,maxMX+80);
-        var cpMLeft=Math.max(gW*0.05,minMX-80);
-        if(isleCardsMob.length>0){
-          /* min. 42px : la mascotte est dessinée 34px à gauche du point, sinon elle déborde */
-          var avX=Math.max(gW*0.08,42),avY=100,t0x=centersM[0].x,t0y=centersM[0].y;
-          var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
-          var mid0mx=(avX+t0x)*0.5;
-          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y,lk0);
-        }
-        for(var i=0;i<isleCardsMob.length-1;i++){
-          var c0m=centersM[i],c1m=centersM[i+1];
-          var sx=c0m.x,sy=c0m.y,ex=c1m.x,ey=c1m.y;
-          var cp1x=(i%2===0)?cpMLeft:cpMRight;var cp2x=cp1x;
-          var segLkM=(isleCardsMob[i]&&isleCardsMob[i].classList.contains('locked-isle'))||(isleCardsMob[i+1]&&isleCardsMob[i+1].classList.contains('locked-isle'));
-          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
-          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey,segLkM);
-        }
-        function placeCharMob(x,y){charElMob.style.left=(x-34)+'px';charElMob.style.top=(y-80)+'px';}
-        function bezierPtM(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
-        if(segsMob.length>0){
-          if(charIdxC>=segsMob.length){placeCharMob(segsMob[segsMob.length-1].x3,segsMob[segsMob.length-1].y3);}
-          else{var ip=bezierPtM(0,segsMob[charIdxC]);placeCharMob(ip.x,ip.y);}
-          setTimeout(function(){var _ca=document.getElementById('ca');
-            if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxC,charElMob);},60);
-        }
-        var animFrameM=null,currentIdxM=charIdxC;
-        function animateToM(targetIdx,onDone){
-          if(animFrameM){cancelAnimationFrame(animFrameM);animFrameM=null;}
-          if(currentIdxM===targetIdx){if(onDone)onDone();return;}
-          var step=currentIdxM<targetIdx?1:-1,queue=[];
-          for(var i=currentIdxM;i!==targetIdx;i+=step){if(step>0)queue.push({seg:segsMob[i],dir:1});else queue.push({seg:segsMob[i-1],dir:-1});}
-          var qi=0,prog=0,SPEED=0.014;
-          function tickM(){
-            if(qi>=queue.length){currentIdxM=targetIdx;var fp=bezierPtM(queue[queue.length-1].dir>0?1:0,queue[queue.length-1].seg);placeCharMob(fp.x,fp.y);if(onDone)onDone();return;}
-            var item=queue[qi];var pt=bezierPtM(item.dir>0?prog:1-prog,item.seg);placeCharMob(pt.x,pt.y);
-            prog+=SPEED;
-            if(prog>=1){var ep=bezierPtM(item.dir>0?1:0,item.seg);placeCharMob(ep.x,ep.y);prog=0;qi++;if(step>0)currentIdxM++;else currentIdxM--;}
-            animFrameM=requestAnimationFrame(tickM);
-          }
-          tickM();
-        }
-        isleCardsMob.forEach(function(card,idx){
-          var origFnM=card._mobOrigClick;
-          if(card.classList.contains('locked-isle'))return;
-          card.addEventListener('click',function(){animateToM(idx+1,function(){if(origFnM)origFnM.call(card);});});
-        });
-      },1500);
-      return;
-    }
-
-    /* ──────── PAYSAGE / DESKTOP ──────── */
-    wrap.style.maxWidth='none';wrap.style.padding='0 0 80px';
-    globeDiv.style.alignItems='flex-start';
-    var posPattern=['center','right','center','left'];
-    var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-    var IW=Math.min(Math.round(DW*0.28),260);
-    globeDiv.style.gap='40px';
-    isleCards.forEach(function(el,i){
-      el._desktopOrigClick=el.onclick;el.onclick=null;
-      var bigI=[2,6,7,8];var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);el.style.width=IWi+'px';
-      var imgI=el.querySelector('.isle-img');if(imgI)imgI.style.height=Math.min(bigI.indexOf(i)>=0?440:330,Math.round(DH*0.5))+'px';
-      el.style.flexShrink='0';el.style.position='relative';el.style.zIndex='5';
-      var pos=posPattern[i%4];
-      if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';}
-      else if(pos==='left'){el.style.marginLeft='0';el.style.marginRight='auto';}
-      else{el.style.marginLeft='';el.style.marginRight='';el.style.alignSelf='center';}
-    });
-    var bossEl=globeDiv.querySelector('.boss-isle');
-    if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
-    Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
-    setTimeout(function(){
-      globeDiv.style.position='relative';
-      /* Marge en haut : la mascotte est dessinée 90px au-dessus du point du
-         chemin (elle se tient dessus). Sans cette place, le départ du chemin
-         la ferait déborder hors de la carte et elle deviendrait invisible. */
-      globeDiv.style.paddingTop='110px';
-      var gW=globeDiv.offsetWidth,gH=globeDiv.scrollHeight;
-      var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('width',gW);svg.setAttribute('height',gH);
-      svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:'+gH+'px;pointer-events:none;z-index:0;overflow:visible';
-      globeDiv.insertBefore(svg,globeDiv.firstChild);
-      var centers=isleCards.map(function(el){return{x:el.offsetLeft+el.offsetWidth/2,y:el.offsetTop+el.offsetHeight*0.75};});
-      var segments=[];
-      var maxCX=centers.length?Math.max.apply(null,centers.map(function(c){return c.x;})):gW*0.9;
-      var minCX=centers.length?Math.min.apply(null,centers.map(function(c){return c.x;})):gW*0.1;
-      var cpRight=Math.min(gW*0.95,maxCX+120);
-      var cpLeft=Math.max(gW*0.05,minCX-120);
-      function drawPath(d,lk){
-        var sh=document.createElementNS('http://www.w3.org/2000/svg','path');
-        sh.setAttribute('d',d);sh.setAttribute('stroke',lk?'rgba(120,120,120,0.4)':'rgba(15,8,2,0.72)');sh.setAttribute('stroke-width','27');sh.setAttribute('fill','none');sh.setAttribute('stroke-linecap','round');svg.appendChild(sh);
-        var mp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        mp.setAttribute('d',d);mp.setAttribute('stroke',lk?'rgba(160,160,160,0.35)':'rgba(110,65,20,0.95)');mp.setAttribute('stroke-width','20');mp.setAttribute('fill','none');mp.setAttribute('stroke-linecap','round');svg.appendChild(mp);
-        var dp=document.createElementNS('http://www.w3.org/2000/svg','path');
-        dp.setAttribute('d',d);dp.setAttribute('stroke',lk?'rgba(190,190,190,0.25)':'rgba(155,95,32,0.7)');dp.setAttribute('stroke-width','8');dp.setAttribute('fill','none');dp.setAttribute('stroke-linecap','round');svg.appendChild(dp);
-      }
-      if(centers.length>0){
-        /* min. 48px : la mascotte est dessinée 40px à gauche du point, sinon elle déborde */
-        var avX=Math.max(gW*0.05,48),avY=110,t0x=centers[0].x,t0y=centers[0].y;
-        var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
-        var mid0x=(avX+t0x)*0.5;
-        segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-        drawPath('M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y,lk0);
-      }
-      for(var i=0;i<centers.length-1;i++){
-        var c0=centers[i],c1=centers[i+1];
-        var sx=c0.x,sy=c0.y,ex=c1.x,ey=c1.y;
-        var cpX=(i%2===0)?cpRight:cpLeft;
-        var d='M '+sx+','+sy+' C '+cpX+','+sy+' '+cpX+','+ey+' '+ex+','+ey;
-        segments.push({x0:sx,y0:sy,cpx1:cpX,cpy1:sy,cpx2:cpX,cpy2:ey,x3:ex,y3:ey});
-        var segLk=(isleCards[i]&&isleCards[i].classList.contains('locked-isle'))||(isleCards[i+1]&&isleCards[i+1].classList.contains('locked-isle'));
-        drawPath(d,segLk);
-      }
-      /* Avatar */
-      var srcEl=document.querySelector('#girl-mascot img');
-      var charEl=document.createElement('div');
-      charEl.style.cssText='position:absolute;z-index:20;pointer-events:none;width:80px;height:80px;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.55));animation:mascotBob 2.4s ease-in-out infinite';
-      if(srcEl){var aImg=document.createElement('img');aImg.src=srcEl.src;aImg.style.cssText='width:100%;height:100%;object-fit:contain';charEl.appendChild(aImg);}
-      globeDiv.appendChild(charEl);
-      function placeCharAt(x,y){charEl.style.left=(x-40)+'px';charEl.style.top=(y-90)+'px';}
-      function bezierPt(t,s){var mt=1-t;return{x:mt*mt*mt*s.x0+3*mt*mt*t*s.cpx1+3*mt*t*t*s.cpx2+t*t*t*s.x3,y:mt*mt*mt*s.y0+3*mt*mt*t*s.cpy1+3*mt*t*t*s.cpy2+t*t*t*s.y3};}
-      var initX,initY;
-      if(charIdxC>=segments.length){initX=segments[segments.length-1].x3;initY=segments[segments.length-1].y3;}
-      else{initX=segments[charIdxC].x0;initY=segments[charIdxC].y0;}
-      placeCharAt(initX,initY);
-      setTimeout(function(){var _ca=document.getElementById('ca');
-        if(_ca)_centreDeuxIles(_ca,isleCards,charIdxC,charEl);},60);
-      var animFrame=null,currentIdx=charIdxC;
-      function animateTo(targetIdx,onDone){
-        if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;}
-        if(currentIdx===targetIdx){if(onDone)onDone();return;}
-        var step=currentIdx<targetIdx?1:-1,queue=[];
-        for(var i=currentIdx;i!==targetIdx;i+=step){if(step>0)queue.push({seg:segments[i],dir:1});else queue.push({seg:segments[i-1],dir:-1});}
-        var qi=0,prog=0,SPEED=0.0125;
-        function tick(){
-          if(qi>=queue.length){currentIdx=targetIdx;var fp=bezierPt(queue[queue.length-1].dir>0?1:0,queue[queue.length-1].seg);placeCharAt(fp.x,fp.y);if(onDone)onDone();return;}
-          var item=queue[qi];placeCharAt(bezierPt(item.dir>0?prog:1-prog,item.seg).x,bezierPt(item.dir>0?prog:1-prog,item.seg).y);
-          prog+=SPEED;
-          if(prog>=1){var ep=bezierPt(item.dir>0?1:0,item.seg);placeCharAt(ep.x,ep.y);prog=0;qi++;if(step>0)currentIdx++;else currentIdx--;}
-          animFrame=requestAnimationFrame(tick);
-        }
-        tick();
-      }
-      isleCards.forEach(function(card,idx){
-        var origFn=card._desktopOrigClick;
-        if(card.classList.contains('locked-isle'))return;
-        card.addEventListener('click',function(){animateTo(idx+1,function(){if(origFn)origFn.call(card);});});
-      });
-    },1500);
-  },0);
-}
+/* La carte de la fille et celle du garcon etaient deux copies de la meme
+   chose : meme serpentin, memes etapes, meme code recopie a la ligne pres.
+   Il n'y en a plus qu'une, habillee (voir renderSessionsMap). Le nom reste
+   le temps que les derniers appels de l'ancienne interface fille aient
+   disparu. */
+function renderChildIslandMap(ca){renderSessionsMap(ca);}
 
 /* Récapitulatif d'une île déjà terminée (clic sur île complète) */
 /* Récapitulatif d'une île déjà terminée — format scènes narrées :
@@ -7599,7 +7375,7 @@ function _clStep0(wrap,letter,af,goNext){
    ا د ذ ر ز و → isolée=début et milieu=fin, donc 2 formes au lieu de 4). */
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v98';
+var _VERSION_REPLI='v99';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10738,7 +10514,7 @@ function _blocEcriture(hote,o){
   var el=document.createElement('div');el.style.cssText='width:100%';
   var boite=document.createElement('div');
   boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
-    +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba(2,136,209,.30)';
+    +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba('+_HAB.rgb+',.30)';
   var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
   cvM.style.cssText='display:block;width:100%;height:auto';
   var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
@@ -10774,7 +10550,7 @@ function _blocEcriture(hote,o){
     }
     if(o.nomme){
       cx.save();cx.font='600 '+Math.round(12*k)+'px Outfit,sans-serif';cx.textAlign='center';
-      cx.fillStyle='rgba(1,87,155,.55)';
+      cx.fillStyle='rgba('+_HAB.rgbF+',.55)';
       /* Deux cases : la lettre suivie d'une prolongation ne peut être
          qu'en début ou au milieu d'un mot. */
       var noms=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
@@ -10782,7 +10558,7 @@ function _blocEcriture(hote,o){
       cx.restore();
     }
     cx.save();
-    cx.strokeStyle='rgba(2,136,209,0.32)';cx.lineWidth=2*k;cx.setLineDash([9*k,6*k]);
+    cx.strokeStyle='rgba('+_HAB.rgb+',0.32)';cx.lineWidth=2*k;cx.setLineDash([9*k,6*k]);
     cx.beginPath();cx.moveTo(10*k,baseY);cx.lineTo(CW-10*k,baseY);cx.stroke();
     cx.restore();
   }
@@ -10900,11 +10676,96 @@ function _blocEcriture(hote,o){
   };
 }
 
+/* ══ LES DEUX HABILLAGES ══════════════════════════════════════════════
+   Le moteur de scènes est UNIQUE. Ce qui change d'un univers à l'autre
+   tient ici et dans les deux blocs de variables CSS (`.boy-wrap.licorne`) :
+   des mots et des emblèmes, rien de plus. Aucune scène, aucun cours ne doit
+   écrire « fusée », « hublot » ou « décollage » en dur — sinon la licorne se
+   remet à parler de vaisseau spatial, et la correction est à faire deux fois.
+
+   `veh`     l'emblème du voyage, celui qui bat dans la jauge
+   `mission` le mot qui nomme une leçon entière
+   `depart`  ce qu'on appelle son premier écran
+   `partir`  le bouton qui lance la toute première leçon
+   `bulle`   le cadre rond où la lettre se montre
+   `carte`   le retour vers la carte du parcours */
+var _HABILLAGES={
+  garcon:{
+    cle:'garcon',classe:'',veh:'🚀',
+    mission:'MISSION',missionMin:'Mission',depart:'BRIEFING',partir:'▶ DÉCOLLAGE',
+    accompli:'MISSION ACCOMPLIE',retour:'▸ RETOUR À LA BASE',
+    /* Le garçon voyage de planète en planète, la fille d'île en île : le mot
+       du lieu change donc partout où le cours s'adresse à l'enfant. */
+    lieu:'planète',monLieu:'▸ MA PLANÈTE',carte:'▸ LA CARTE DES PLANÈTES',
+    /* Le décor du parcours. Les LIBELLÉS des étapes ne changent pas d'un
+       univers à l'autre — ce sont les mêmes lieux, les mêmes adresses, le
+       même cours : seule l'image change. */
+    titreCarte:'🗺️ Ta carte des planètes',
+    images:['/images/planete-soleil.png','/images/planete-mercure.png',
+            '/images/planete-venus.png','/images/planete-terre.png',
+            '/images/planete-lune.png','/images/planete-mars.png',
+            '/images/planete-jupiter.png','/images/planete-saturne.png',
+            '/images/planete-uranus.png','/images/planete-neptune.png',
+            '/images/planete-pluton.png','/images/planete-comete.png'],
+    /* Huit planètes ne suffisent pas pour douze étapes : la Lune et le
+       Soleil complètent, comme prévu, puis Pluton et une comète. */
+    etapes:['Le Soleil','Mercure','Vénus','La Terre','La Lune','Mars',
+            'Jupiter','Saturne','Uranus','Neptune','Pluton','La Comète'],
+    slugs:['soleil','mercure','venus','terre','lune','mars',
+           'jupiter','saturne','uranus','neptune','pluton','comete'],
+    trainee:'rgba(255,183,77,.92)',
+    noteBulle:'🔊 Appuie sur le hublot pour écouter',
+    noteMot:'🔊 Appuie sur le hublot pour écouter le mot',
+    notePiste:'✈️ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
+    noteCible:'🎯 Vise la bonne cible',
+    /* Le fond du calque plein écran du tracé, qui vit hors de .boy-wrap. */
+    fondPlein:'linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%)',
+    /* Les couleurs que les canvas peignent eux-mêmes : un contexte 2D ne
+       sait pas lire une variable CSS. Elles doublent donc `--sk-*`, et
+       doivent bouger avec elles. */
+    fonce:'#01579b',moyen:'#0277bd',rgbF:'1,87,155',rgb:'2,136,209'
+  },
+  licorne:{
+    cle:'licorne',classe:'licorne',veh:'🦄',
+    mission:'AVENTURE',missionMin:'Aventure',depart:'DÉPART',partir:'▶ ENVOL',
+    accompli:'AVENTURE RÉUSSIE',retour:'▸ RETOUR À LA CARTE',
+    lieu:'île',monLieu:'▸ MON ÎLE',carte:'▸ LA CARTE DES ÎLES',
+    /* La fille GARDE ses îles : ce sont celles d'aujourd'hui, image par
+       image. Rien à refaire de ce côté. */
+    titreCarte:'🗺️ Ma carte des îles',
+    images:['/images/island-0.png?v=2','/images/island-1.png?v=2','/images/island-2.png?v=2',
+            '/images/island-3.png?v=2','/images/island-4.png?v=2','/images/20260518_195724_0000.png',
+            '/images/island-pyramids.png','/images/island-7.png?v=2','/images/island-8.png?v=2',
+            '/images/island-9.png?v=2','/images/island-10.png?v=2','/images/island-11.png?v=2'],
+    /* La fille garde les noms de lieux d'aujourd'hui, et donc ses adresses :
+       `etapes` reste vide, la carte prend alors ses libellés traduits. */
+    etapes:null,slugs:null,
+    trainee:'rgba(255,255,255,.95)',
+    noteBulle:'🔊 Appuie sur la bulle pour écouter',
+    noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
+    notePiste:'✨ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
+    noteCible:'🎯 Touche le bon nuage',
+    fondPlein:'linear-gradient(158deg,#ffffff 0%,#fff0f7 100%)',
+    fonce:'#7b1747',moyen:'#b3195f',rgbF:'123,23,71',rgb:'216,27,120'
+  }
+};
+/* L'habillage courant. Un seul cours tourne à la fois : le tenir ici évite
+   de le passer en paramètre à travers tout le moteur, y compris dans
+   `_blocEcriture`, appelé de loin. */
+var _HAB=_HABILLAGES.garcon;
+/* L'univers découle du profil : le garçon vole en fusée, la fille en
+   licorne. C'est le SEUL endroit où le profil décide de l'habillage. */
+function _habDuProfil(){
+  return (st&&st.profile==='girl')?_HABILLAGES.licorne:_HABILLAGES.garcon;
+}
+
 function _boyScene(ca,reprise){
+  _HAB=_habDuProfil();
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
   var _repriseSuivie=!!reprise;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
-  var wrap=document.createElement('div');wrap.className='boy-wrap';ca.appendChild(wrap);
+  var wrap=document.createElement('div');
+  wrap.className='boy-wrap'+(_HAB.classe?' '+_HAB.classe:'');ca.appendChild(wrap);
   /* Le cours entier se joue en plein écran paysage, dès l'arrivée sur la
      lettre — pas seulement sur les écrans de tracé. */
   _armePleinEcran(ca);
@@ -10917,7 +10778,7 @@ function _boyScene(ca,reprise){
     var j=document.createElement('div');j.className='boy-jauge';
     var pct=Math.round(100*i/Math.max(1,scenes.length-1));
     j.innerHTML='<div class="rail"><div class="feu" style="width:'+pct+'%"></div></div>'
-      +'<div class="fusee">🚀</div>';
+      +'<div class="fusee">'+_HAB.veh+'</div>';
     wrap.appendChild(j);
   }
   /* Dernier panneau construit : sert à y accrocher le retour en arrière,
@@ -10986,7 +10847,9 @@ function _boyScene(ca,reprise){
     if(fr!==false)N.plusTard(function(){N.dire(fr||html);},420);
     return t;
   }
-  function bleu(s){return '<span style="color:#0288d1">'+s+'</span>';}
+  /* Le mot mis en avant dans une phrase. Il s'appelle encore « bleu » dans
+     les cours, par habitude : sa couleur, elle, vient de l'habillage. */
+  function bleu(s){return '<span style="color:var(--sk-vif)">'+s+'</span>';}
   api.bleu=bleu;
   /* Les deux formes de référence gardent leur couleur partout : orange pour
      l'isolée et ce qui en dérive, violet pour le début et ce qui en dérive. */
@@ -11035,9 +10898,9 @@ function _boyScene(ca,reprise){
         cxH.clearRect(0,0,320,320);
         cxH.font="150px 'Scheherazade New',serif";cxH.textBaseline='alphabetic';
         var bY=200;
-        cxH.save();cxH.strokeStyle='rgba(1,87,155,.42)';cxH.lineWidth=5;cxH.setLineDash([14,10]);
+        cxH.save();cxH.strokeStyle='rgba('+_HAB.rgbF+',.42)';cxH.lineWidth=5;cxH.setLineDash([14,10]);
         cxH.beginPath();cxH.moveTo(46,bY);cxH.lineTo(274,bY);cxH.stroke();cxH.restore();
-        _dessineDeuxCouleurs(cxH,_sansCercle(glyph),socle,160,bY,150,'#01579b',accent||'#e65100');
+        _dessineDeuxCouleurs(cxH,_sansCercle(glyph),socle,160,bY,150,_HAB.fonce,accent||'#e65100');
       }
       peint();
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
@@ -11075,7 +10938,7 @@ function _boyScene(ca,reprise){
     p.appendChild(h);
     if(note!==null){
       var n=document.createElement('div');n.className='boy-note';
-      n.textContent=note||'🔊 Appuie sur le hublot pour écouter';p.appendChild(n);
+      n.textContent=note||_HAB.noteBulle;p.appendChild(n);
     }
     if(son)N.plusTard(function(){N.dire(son);},600);
     return h;
@@ -11100,7 +10963,7 @@ function _boyScene(ca,reprise){
     function dessine(){
       cx.clearRect(0,0,CW,CH);
       cx.save();
-      cx.strokeStyle='rgba(2,136,209,.40)';cx.lineWidth=3;cx.setLineDash([10,7]);
+      cx.strokeStyle='rgba('+_HAB.rgb+',.40)';cx.lineWidth=3;cx.setLineDash([10,7]);
       cx.beginPath();cx.moveTo(12,baseY);cx.lineTo(CW-12,baseY);cx.stroke();
       cx.restore();
       cx.save();
@@ -11109,9 +10972,9 @@ function _boyScene(ca,reprise){
       items.forEach(function(o,k){
         var g=_sansCercle(o[0]);
         if(o[3]&&o[4]){
-          _dessineDeuxCouleurs(cx,g,o[4],xCase(k),baseY,PX,'#0277bd',o[3]);
+          _dessineDeuxCouleurs(cx,g,o[4],xCase(k),baseY,PX,_HAB.moyen,o[3]);
         }else{
-          cx.fillStyle=o[3]||'#0277bd';
+          cx.fillStyle=o[3]||_HAB.moyen;
           _dessineSurLigne(cx,g,xCase(k),baseY,PX);
         }
       });
@@ -11120,7 +10983,7 @@ function _boyScene(ca,reprise){
       cx.font='600 13px Outfit,sans-serif';cx.textAlign='center';
       items.forEach(function(o,k){
         if(!o[1])return;
-        cx.fillStyle=o[3]||'rgba(1,87,155,.7)';
+        cx.fillStyle=o[3]||('rgba('+_HAB.rgbF+',.7)');
         cx.fillText(o[1],xCase(k),CH-10);
       });
       cx.restore();
@@ -11137,7 +11000,7 @@ function _boyScene(ca,reprise){
     };
     p.appendChild(cv);
     var lbl=document.createElement('div');lbl.className='boy-note';
-    lbl.textContent='✈️ La ligne d\'écriture — appuie sur un signe pour l\'écouter';p.appendChild(lbl);
+    lbl.textContent=_HAB.notePiste;p.appendChild(lbl);
     return cv;
   }
   function bouton(p,label,fn,sec){
@@ -11345,10 +11208,13 @@ function _boyScene(ca,reprise){
         if(plein)return;
         _boyPleinEcran=true;
         var ov=document.createElement('div');
+        /* `boy-plein` porte les variables de l'habillage : le calque est posé
+           sur le body, hors de `.boy-wrap`, il n'en hérite donc rien. */
+        ov.className='boy-plein'+(_HAB.classe?' '+_HAB.classe:'');
         ov.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;z-index:9000;'
           +'display:flex;flex-direction:column;align-items:center;justify-content:center;'
           +'padding:8px;overscroll-behavior:contain;touch-action:none;'
-          +'background:linear-gradient(158deg,#ffffff 0%,#e8f6ff 100%)';
+          +'background:'+_HAB.fondPlein;
         var corps=document.createElement('div');
         corps.style.cssText='width:100%;display:flex;flex-direction:column;align-items:center';
         ov.appendChild(corps);document.body.appendChild(ov);
@@ -11390,7 +11256,7 @@ function _boyScene(ca,reprise){
              de tour. Un écran large en portrait — une tablette — passe. */
           if(d.l<560){
             var c=document.createElement('div');
-            c.style.cssText='text-align:center;color:#01579b;font-weight:900;padding:24px 16px';
+            c.style.cssText='text-align:center;color:'+_HAB.fonce+';font-weight:900;padding:24px 16px';
             c.innerHTML='<div style="font-size:4.2rem;line-height:1.2">📱↻</div>'
               +'<div style="font-size:1.15rem;margin-top:12px;line-height:1.5">'
               +'Tourne ton téléphone<br>pour écrire en grand !</div>';
@@ -11492,7 +11358,7 @@ function _boyScene(ca,reprise){
       });
       p.appendChild(r);
       var n=document.createElement('div');n.className='boy-note';
-      n.textContent='🎯 Vise la bonne cible';p.appendChild(n);
+      n.textContent=_HAB.noteCible;p.appendChild(n);
     };
   };
   /* Tableau des 4 positions.
@@ -11619,13 +11485,13 @@ function _boyScene(ca,reprise){
   /* Fin de mission */
   api.mission=function(html,fr,onRetour,label){
     return function(){
-      if(typeof launchConfetti==='function')try{launchConfetti('boy');}catch(e){}
-      var p=panneau('MISSION ACCOMPLIE');
+      if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+      var p=panneau(_HAB.accompli);
       var f=document.createElement('div');
       f.style.cssText='font-size:3.6rem;animation:bFusee 1.6s ease-in-out infinite';
-      f.textContent='🚀';p.appendChild(f);
+      f.textContent=_HAB.veh;p.appendChild(f);
       titre(p,html,fr);
-      bouton(p,label||'▸ RETOUR À LA BASE',onRetour||function(){renderSessionsMap(ca);});
+      bouton(p,label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});
     };
   };
   /* Contrôle à plusieurs bonnes réponses. « Lequel est prolongé ? » n'en
@@ -11648,7 +11514,7 @@ function _boyScene(ca,reprise){
             reste=reste.filter(function(x){return x!==o.g;});
             if(typeof playBravo==='function')playBravo();
             if(!reste.length){
-              if(typeof launchConfetti==='function')try{launchConfetti('boy');}catch(e){}
+              if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
               N.plusTard(suivant,900);
             }
           }else{
@@ -11679,8 +11545,8 @@ function _boyVowelCourse(ca){
   function q(s){return b('« '+s+' »');}
 
   B.run([
-    B.brief('MISSION 1 · BRIEFING','Aujourd\'hui :<br>les '+b('voyelles')+' 🎯',
-      'Mission du jour : les voyelles.','▶ DÉCOLLAGE'),
+    B.brief(_HAB.mission+' 1 · '+_HAB.depart,'Aujourd\'hui :<br>les '+b('voyelles')+' 🎯',
+      _HAB.missionMin+' du jour : les voyelles.',_HAB.partir),
     B.obs('ÉTAPE 1 · REPÉRAGE',[[F,'a'],[D,'ou'],[K,'i']],null,
       'Une voyelle,<br>c\'est un petit '+b('signe')+'.',
       'Une voyelle, c\'est un petit signe.',null),
@@ -11738,7 +11604,8 @@ function _boyVowelCourse(ca){
     B.tracer('ÉTAPE 15 · TRACÉ',SK,'Trace le '+b('soukoun')+' ✍️','Trace le soukoun.'),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission('Voyelles '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les voyelles.')(api);}
+      B.mission('Voyelles '+b('maîtrisées')+' !<br>🎖️',
+        _HAB.missionMin+' accomplie ! Tu maîtrises les voyelles.')(api);}
   ]);
 }
 
@@ -11762,8 +11629,8 @@ function _boyProlongCourse(ca){
   /* Un signe seul est minuscule au fil du texte : on le grossit. */
   function gros(s){return '<span style="font-size:1.9em;line-height:.7;vertical-align:-.15em">'+s+'</span>';}
   B.run([
-    B.brief('MISSION · BRIEFING','Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
-      'Mission du jour : les prolongations.','▶ DÉCOLLAGE'),
+    B.brief(_HAB.mission+' · '+_HAB.depart,'Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
+      _HAB.missionMin+' du jour : les prolongations.',_HAB.partir),
     B.brief('ÉTAPE 1 · PRINCIPE','En arabe, la '+b('durée')+'<br>d\'une voyelle compte.',
       'En arabe, le temps passé sur une voyelle est très important.'),
     B.obs('ÉTAPE 2 · COURT','بَ','بَ','Ici c\'est '+b('court')+' :<br>'+q('ba')+' ⏱️','Ici c\'est court.'),
@@ -11829,7 +11696,8 @@ function _boyProlongCourse(ca){
     B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on insiste<br>sur la '+b('lettre')+'.<br>Prolongation = on insiste<br>sur la '+b('voyelle')+'.',
       'Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.'),
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️','Mission accomplie ! Tu maîtrises les prolongations.')(api);}
+      B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️',
+        _HAB.missionMin+' accomplie ! Tu maîtrises les prolongations.')(api);}
   ]);
 }
 
@@ -11859,8 +11727,8 @@ function _boyLetterCourse(ca,idx,premiere){
   var A=L.ar,S=A+'ْ';
   var sc=[];
 
-  sc.push(B.brief('MISSION · BRIEFING','Nouvelle lettre :<br>'+b(L.name)+' 🎯',
-    'Mission du moment : la lettre '+L.name,premiere?'▶ DÉCOLLAGE':'SUIVANT ▸'));
+  sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,'Nouvelle lettre :<br>'+b(L.name)+' 🎯',
+    _HAB.missionMin+' du moment : la lettre '+L.name,premiere?_HAB.partir:'SUIVANT ▸'));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
@@ -11868,7 +11736,7 @@ function _boyLetterCourse(ca,idx,premiere){
   if(jumelle){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
     if(ref){
-      sc.push(B.brief('MISSION · UN AIR CONNU',
+      sc.push(B.brief(_HAB.mission+' · UN AIR CONNU',
         b(L.name)+' s\'écrit exactement<br>comme '+b(ref.name)+',<br>'+b(jumelle.point)+' 👀',
         'La lettre '+L.name+' s\'écrit exactement comme la lettre '+ref.name+', '+jumelle.point+'.'));
     }
@@ -12085,7 +11953,7 @@ function _boyLetterCourse(ca,idx,premiere){
     var p=api.panneau('ÉTAPE FINALE · LE MOT');
     api.titre(p,'Un mot avec '+b(L.name)+' '+L.emoji,'Voici un mot avec cette lettre.');
     var e=document.createElement('div');e.style.cssText='font-size:4rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
-    api.hublot(p,L.wordAr,L.wordAr,'🔊 Appuie pour écouter le mot');
+    api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     api.bouton(p,'SUIVANT ▸',api.suivant);
   });
@@ -12105,22 +11973,22 @@ function _boyLetterCourse(ca,idx,premiere){
     if(ile.finie&&ile.deja&&_boySession){
       B.mission('Bravo ! 🎉<br>Tu as revu '+b(L.name)+' 🎖️<br>Tu la connais bien !',
         'Bravo ! Tu as revu cette lettre. Tu la connais bien !',
-        function(){_boyLetterPicker(ca,_boySession);},'▸ MON ÎLE')(api);
+        function(){_boyLetterPicker(ca,_boySession);},_HAB.monLieu)(api);
     }else if(ile.finie&&derniereIle){
       /* La toute dernière île : il n'y a plus d'aventure à annoncer, on
          envoie l'enfant s'entraîner. */
-      B.mission('Bravo ! 🎉<br>Tu as validé<br>'+b('toutes les missions')+' !<br>'
+      B.mission('Bravo ! 🎉<br>Tu as validé<br>'+b('toutes les '+_HAB.missionMin.toLowerCase()+'s')+' !<br>'
         +'Teste tes connaissances<br>dans la rubrique '
         +'<span class="boy-lien" onclick="navToPage(\'exercises\')">Exercices</span> 🏅',
-        'Bravo ! Tu as validé toutes les missions ! Teste tes connaissances dans la rubrique Exercices.',
+        'Bravo ! Tu as validé toutes les '+_HAB.missionMin.toLowerCase()+'s ! Teste tes connaissances dans la rubrique Exercices.',
         function(){showS('s-menu',true,true);},'▸ MENU PRINCIPAL')(api);
     }else if(ile.finie){
       /* Île terminée : on annonce la mission finie et on ramène l'enfant à la
          carte sans qu'il ait à appuyer — le temps de lire, pas plus. */
-      B.mission('Bravo ! 🎉<br>Tu as fini ta '+b('mission')+' !<br>'
-        +'À très vite pour une<br>'+b('prochaine aventure')+' ! 🚀',
-        'Bravo ! Tu as fini ta mission ! À très vite pour une prochaine aventure !',
-        function(){renderSessionsMap(ca);},'▸ LA CARTE DES ÎLES')(api);
+      B.mission('Bravo ! 🎉<br>Tu as fini ta '+b(_HAB.missionMin.toLowerCase())+' !<br>'
+        +'À très vite pour une<br>'+b('prochaine aventure')+' ! '+_HAB.veh,
+        'Bravo ! Tu as fini ta '+_HAB.missionMin.toLowerCase()+' ! À très vite pour une prochaine aventure !',
+        function(){renderSessionsMap(ca);},_HAB.carte)(api);
       /* Le retour automatique ne doit valoir QUE pour cet écran-là : si
          l'enfant a déjà ouvert une autre île entre-temps, son cours se
          faisait renvoyer à la carte tout seul. On vérifie donc que l'écran

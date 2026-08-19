@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-saturne" cx="34%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#fff4d9"/>
+      <stop offset="52%" stop-color="#e8c98c"/>
+      <stop offset="100%" stop-color="#a8823f"/>
+    </radialGradient>
+    <radialGradient id="h-saturne" cx="50%" cy="50%" r="50%">
+      <stop offset="62%" stop-color="#f0d69f" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#f0d69f" stop-opacity=".30"/>
+      <stop offset="100%" stop-color="#f0d69f" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-saturne"><circle cx="200" cy="200" r="108"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="154" fill="url(#h-saturne)"/>
+  <ellipse cx="200" cy="212" rx="182" ry="46" fill="none" stroke="#e5c07a" stroke-opacity=".85" stroke-width="15" transform="rotate(-17 200 212)"/><ellipse cx="200" cy="212" rx="152" ry="38" fill="none" stroke="#c99a4e" stroke-opacity=".6" stroke-width="7" transform="rotate(-17 200 212)"/>
+  <circle cx="200" cy="200" r="108" fill="url(#c-saturne)"/>
+  <g clip-path="url(#d-saturne)"><ellipse cx="200" cy="168" rx="116" ry="12" fill="#fff6e055"/><ellipse cx="200" cy="212" rx="118" ry="14" fill="#c9a05c4d"/><ellipse cx="200" cy="250" rx="104" ry="11" fill="#fff6e04d"/></g>
+  <circle cx="200" cy="200" r="108" fill="none" stroke="#a8823f" stroke-opacity=".35" stroke-width="3"/>
+  <ellipse cx="161.12" cy="154.64" rx="28.080000000000002" ry="18.360000000000003"
+     fill="#ffffff" opacity=".33" transform="rotate(-28 161.12 154.64)"/>
+  <path d="M 42 246 A 182 46 -17 0 0 358 178" fill="none" stroke="#f0d9a4" stroke-opacity=".95" stroke-width="15"/><path d="M 66 238 A 152 38 -17 0 0 334 182" fill="none" stroke="#d3a659" stroke-opacity=".7" stroke-width="7"/>
+  <path d="M 64 79 Q 64 92 77 92 Q 64 92 64 105 Q 64 92 51 92 Q 64 92 64 79 Z" fill="#ffffff" opacity=".85"/><path d="M 344 294 Q 344 306 356 306 Q 344 306 344 318 Q 344 306 332 306 Q 344 306 344 294 Z" fill="#ffffff" opacity=".85"/>
+</svg>

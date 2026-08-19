@@ -1,5 +1,5 @@
-// iamlearningarabic — Service Worker v98
-const CACHE = 'arab-v98';
+﻿// iamlearningarabic â€” Service Worker v99
+const CACHE = 'arab-v99';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -35,21 +35,21 @@ self.addEventListener('fetch', function(e) {
       url.hostname.includes('anthropic') ||
       url.pathname.includes('/api/')) return;
 
-  // TOUTE navigation (page HTML) → TOUJOURS réseau en premier.
-  // Les URL /fille/..., /garcon/..., /adulte/..., /cours/... sont réécrites
-  // vers index.html côté serveur (voir vercel.json). Elles ne correspondent
-  // donc à aucun des chemins listés ci-dessous et tombaient dans le
-  // "cache first" : l'application restait bloquée sur une version périmée
-  // jusqu'à ce qu'un changement de version du cache la supprime.
-  // On teste le type de requête plutôt que le chemin : ça couvre toutes les
-  // réécritures, présentes et futures.
+  // TOUTE navigation (page HTML) â†’ TOUJOURS rÃ©seau en premier.
+  // Les URL /fille/..., /garcon/..., /adulte/..., /cours/... sont rÃ©Ã©crites
+  // vers index.html cÃ´tÃ© serveur (voir vercel.json). Elles ne correspondent
+  // donc Ã  aucun des chemins listÃ©s ci-dessous et tombaient dans le
+  // "cache first" : l'application restait bloquÃ©e sur une version pÃ©rimÃ©e
+  // jusqu'Ã  ce qu'un changement de version du cache la supprime.
+  // On teste le type de requÃªte plutÃ´t que le chemin : Ã§a couvre toutes les
+  // rÃ©Ã©critures, prÃ©sentes et futures.
   if (e.request.mode === 'navigate' || e.request.destination === 'document' ||
       url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '') {
     e.respondWith(
       fetch(e.request, {cache: 'no-store'}).then(function(response) {
-        // Une page d'application demandée sans session valide est redirigée
-        // vers la page publique : Cache.put refuse ces réponses, et les
-        // mettre en cache reviendrait à ranger la page de connexion sous
+        // Une page d'application demandÃ©e sans session valide est redirigÃ©e
+        // vers la page publique : Cache.put refuse ces rÃ©ponses, et les
+        // mettre en cache reviendrait Ã  ranger la page de connexion sous
         // l'adresse d'un cours.
         if (response && response.status === 200 && !response.redirected) {
           var clone = response.clone();
@@ -63,7 +63,7 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // Reste → cache first
+  // Reste â†’ cache first
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;

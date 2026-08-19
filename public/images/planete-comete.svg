@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-comete" cx="34%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="52%" stop-color="#9fe4f5"/>
+      <stop offset="100%" stop-color="#3f9ec4"/>
+    </radialGradient>
+    <radialGradient id="h-comete" cx="50%" cy="50%" r="50%">
+      <stop offset="62%" stop-color="#8fdcf2" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#8fdcf2" stop-opacity=".30"/>
+      <stop offset="100%" stop-color="#8fdcf2" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-comete"><circle cx="200" cy="200" r="62"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="108" fill="url(#h-comete)"/>
+  <path d="M232 168 L392 40 Q330 150 250 226 Z" fill="#bdeeff" opacity=".55"/><path d="M240 196 L396 128 Q320 200 254 230 Z" fill="#ffffff" opacity=".42"/><path d="M226 152 L352 26 Q318 128 246 200 Z" fill="#7fd6f0" opacity=".45"/>
+  <circle cx="200" cy="200" r="62" fill="url(#c-comete)"/>
+  <g clip-path="url(#d-comete)"><ellipse cx="184" cy="210" rx="12" ry="10.32" fill="#00000022"/><ellipse cx="222" cy="232" rx="8" ry="6.88" fill="#00000022"/></g>
+  <circle cx="200" cy="200" r="62" fill="none" stroke="#3f9ec4" stroke-opacity=".35" stroke-width="3"/>
+  <ellipse cx="177.68" cy="173.96" rx="16.12" ry="10.540000000000001"
+     fill="#ffffff" opacity=".33" transform="rotate(-28 177.68 173.96)"/>
+  
+  <path d="M 112 102 Q 112 116 126 116 Q 112 116 112 130 Q 112 116 98 116 Q 112 116 112 102 Z" fill="#ffffff" opacity=".85"/><path d="M 318 307 Q 318 320 331 320 Q 318 320 318 333 Q 318 320 305 320 Q 318 320 318 307 Z" fill="#ffffff" opacity=".85"/><path d="M 96 289 Q 96 300 107 300 Q 96 300 96 311 Q 96 300 85 300 Q 96 300 96 289 Z" fill="#ffffff" opacity=".85"/>
+</svg>

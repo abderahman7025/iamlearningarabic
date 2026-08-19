@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-pluton" cx="34%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#fdeee4"/>
+      <stop offset="52%" stop-color="#d6b8a4"/>
+      <stop offset="100%" stop-color="#9c7a66"/>
+    </radialGradient>
+    <radialGradient id="h-pluton" cx="50%" cy="50%" r="50%">
+      <stop offset="62%" stop-color="#e6cdba" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#e6cdba" stop-opacity=".30"/>
+      <stop offset="100%" stop-color="#e6cdba" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-pluton"><circle cx="200" cy="200" r="94"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="140" fill="url(#h-pluton)"/>
+  
+  <circle cx="200" cy="200" r="94" fill="url(#c-pluton)"/>
+  <g clip-path="url(#d-pluton)"><path d="M172 224 q26-30 52-8 t34 30 q-16 30-48 28 t-44-24 q-8-16 6-26z" fill="#fff6ee" opacity=".85"/><ellipse cx="236" cy="166" rx="12" ry="10.32" fill="#00000022"/><ellipse cx="166" cy="168" rx="9" ry="7.74" fill="#00000022"/></g>
+  <circle cx="200" cy="200" r="94" fill="none" stroke="#9c7a66" stroke-opacity=".35" stroke-width="3"/>
+  <ellipse cx="166.16" cy="160.52" rx="24.44" ry="15.98"
+     fill="#ffffff" opacity=".33" transform="rotate(-28 166.16 160.52)"/>
+  
+  <path d="M 92 110 Q 92 122 104 122 Q 92 122 92 134 Q 92 122 80 122 Q 92 122 92 110 Z" fill="#ffffff" opacity=".85"/><path d="M 312 265 Q 312 276 323 276 Q 312 276 312 287 Q 312 276 301 276 Q 312 276 312 265 Z" fill="#ffffff" opacity=".85"/>
+</svg>

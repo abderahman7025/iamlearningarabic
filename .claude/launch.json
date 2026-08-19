@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "arab-learn",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "public", "-l", "3456", "--no-clipboard"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["outils/serveur-local.js"],
       "port": 3456
     }
   ]

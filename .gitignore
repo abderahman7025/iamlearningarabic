@@ -1,0 +1,9 @@
+node_modules/
+.vercel/
+.env
+.env.local
+
+# Captures d'écran du serveur local (outils/serveur-local.js) : elles servent
+# à regarder soi-même une animation ou une mise en page pendant qu'on
+# travaille, elles n'ont rien à faire dans l'historique.
+outils/captures/
