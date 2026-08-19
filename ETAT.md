@@ -310,6 +310,21 @@ ouvre. Trois pièges levés d'un coup de cette façon dans la session du
 l'anneau d'Uranus qui ressemblait à deux rayures, et le hā milieu qui se
 révèle par plaques.
 
+**DÉSINSCRIRE LE SERVICE WORKER NE SUFFIT PAS.** Le serveur local le
+désinscrit à chaque page, et pourtant on peut passer une demi-heure à
+regarder une version d'avant : une page DÉJÀ contrôlée par un service
+worker continue d'être servie par son cache, et l'application le
+réinstalle au chargement suivant. Le symptôme est reconnaissable :
+`curl` montre le fichier neuf, le navigateur montre l'ancien. Il faut
+vider les caches EN PLUS de désinscrire, puis recharger :
+
+```js
+Promise.all([
+  navigator.serviceWorker.getRegistrations().then(l=>Promise.all(l.map(r=>r.unregister()))),
+  caches.keys().then(k=>Promise.all(k.map(n=>caches.delete(n))))
+]).then(()=>location.reload());
+```
+
 **Un onglet caché ne bat pas** : `requestAnimationFrame` ne se déclenche
 pas tant que la fenêtre n'est pas affichée. Pour mesurer une animation
 depuis un onglet en arrière-plan, remplacer l'horloge avant toute chose :
@@ -721,13 +736,36 @@ Comme pour les planètes, ils vont dans `etapes`, `slugs` et `images` de
 l'habillage. Le douzième clôt l'histoire — elle rentre chez elle — de la
 même façon que la dernière étape du garçon clôt la sienne.
 
-#### Le fond
+#### Le fond — FAIT
 
 Un dégradé **du bleu en haut, au jaune au milieu, au rose en bas**, dans
 des **couleurs bien pastel**, avec des dégradés francs entre les trois. Il
-se pose exactement comme celui du garçon : une classe `.fond-*` allumée par
-`_fondEnfant`, **sur le body** et non sur le conteneur qui défile (voir le
-piège plus haut), et seulement sur la carte et le cours.
+se pose exactement comme celui du garçon : la classe `.fond-licorne`,
+allumée par `_fondEnfant` depuis `_HABILLAGES.licorne.fond`, **sur le body**
+et non sur le conteneur qui défile (voir le piège plus haut), et seulement
+sur la carte et le cours.
+
+Trois choses apprises en le posant :
+
+- **Le bleu ne passe pas directement au jaune** : mélangés, les deux
+  donnent un vert d'eau qui barrait le ciel en travers, vu tout de suite
+  sur la capture. Ils se croisent donc par un blanc très pâle, et le jaune
+  rejoint le rose par une pêche pâle. Chaque couleur tient sa bande avant
+  de passer à la suivante — un dégradé à trois arrêts seulement les
+  mélangerait du haut en bas.
+- **`_fondEnfant` ne connaissait que l'espace** : il retirait `fond-espace`,
+  écrit en dur. Il parcourt maintenant `_HABILLAGES` et retire le fond de
+  tous les univers, sinon un enfant qui change de profil garde celui de
+  l'autre.
+- **Ce qui est écrit sur le fond, sans rien derrière, était blanc** — le
+  titre de la carte et la ligne de progression, dessinés pour l'espace du
+  garçon. Sur le pastel, ils disparaissent. Côté fille seulement, ils
+  passent en prune (`#4a1040`) sur un halo blanc, et la barre de
+  progression, un blanc à 8 %, passe en prune très pâle. Ces couleurs-là
+  sont posées EN LIGNE par le rendu : il faut `!important` pour les
+  reprendre, et deux classes (`sess-gp-lbl`, `sess-gp-bar`) pour les
+  attraper. **Les noms des mondes ne bougent pas** : ils sont posés SUR le
+  décor, et leur ombre noire les tient sur n'importe quelle illustration.
 
 #### Les déplacements : les mêmes que le garçon
 
@@ -860,6 +898,20 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le ciel de la fille : nuages et cœurs** (). Cinq nuages
+  qui dérivent et neuf cœurs qui montent en se balançant, en plus des
+  étoiles, papillons et licornes déjà posés. Ils sont **dessinés en CSS**,
+  pas écrits en emoji : un emoji nuage arrive avec le gris de sa police et
+  se lit comme un pictogramme. Trois choses trouvées en REGARDANT une
+  capture, pas en devinant : le blanc doit être **plein** avec la
+  transparence sur l'élément entier — l'alpha dans la couleur fait
+  s'additionner le corps et les bosses, et on voit les coutures du nuage ;
+  un blanc sur le rose pâle a besoin d'une **ombre mauve** pour avoir un
+  contour ; et les cœurs à 14–28 px se perdaient, ils sont à 20–38 px. Les
+  délais d'animation sont **négatifs** : le ciel est peuplé dès la première
+  image au lieu de se remplir pendant une demi-minute. Ils vivent sur le
+  fond pastel bleu → jaune → rose, posé dans la foulée (voir
+  « Le fond — FAIT » du chantier 1 ter).
 - **Interface garçon en paysage** : plein écran demandé dès l'ouverture
   d'un cours de lettre (et non plus au seul écran de tracé) ; panneau en
   **deux colonnes** — la phrase à gauche, ce qu'elle montre à droite, les

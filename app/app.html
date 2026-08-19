@@ -2317,6 +2317,74 @@ body.profile-boy #boy-bg-anim {
   animation:lightningStrike 5s linear infinite;
   animation-delay:var(--del,0s);
 }
+/* ══ LE CIEL DE LA FILLE ═══════════════════════════════════════════════
+   Des nuages qui derivent et des coeurs qui montent, en plus des etoiles,
+   des papillons et des licornes deja poses. Ils sont DESSINES en CSS, pas
+   ecrits en emoji : un emoji nuage arrive avec le gris de la police et se
+   voit comme un pictogramme, alors qu'on veut du decor pastel derriere la
+   page. Ils vivent dans `#girl-bg-anim`, donc uniquement sur le profil
+   fille, et ne recoivent aucun clic (`pointer-events:none` du calque). */
+
+/* Un nuage : un corps allonge et deux bosses. Le corps porte le
+   deplacement, les bosses n'ont que leur place — un `transform` pose sur
+   l'element serait ecrase par l'animation. */
+#girl-bg-anim .bg-nuage{
+  position:fixed;
+  width:var(--l,140px);height:calc(var(--l,140px) * .30);
+  /* Le blanc est PLEIN et la transparence posee sur l'element entier : en
+     mettant l'alpha dans la couleur, le corps et les bosses s'additionnent
+     la ou ils se recouvrent, et on voit les coutures du nuage. */
+  background:#ffffff;
+  opacity:var(--o,.72);
+  border-radius:999px;
+  /* Un nuage blanc sur un fond rose pale se devine a peine : une ombre
+     douce, mauve plutot que grise, lui rend son contour sans le salir. */
+  filter:drop-shadow(0 3px 5px rgba(186,104,200,.20));
+  animation:nuageDerive var(--dur,72s) linear infinite backwards;
+  animation-delay:var(--del,0s);
+}
+#girl-bg-anim .bg-nuage::before,
+#girl-bg-anim .bg-nuage::after{
+  content:'';position:absolute;background:inherit;border-radius:50%;
+}
+#girl-bg-anim .bg-nuage::before{width:46%;height:150%;left:14%;bottom:26%}
+#girl-bg-anim .bg-nuage::after {width:32%;height:112%;right:16%;bottom:34%}
+/* Il traverse l'ecran de bord a bord : la course est donnee en vw, la
+   duree change d'un nuage a l'autre, donc ils ne defilent pas en rang. */
+@keyframes nuageDerive{
+  0%  {transform:translateX(0)}
+  100%{transform:translateX(var(--course,128vw))}
+}
+
+/* Un coeur : deux lobes arrondis, chacun tourne d'un quart de tour autour
+   de sa base. La rotation vit donc sur les lobes, et l'element garde son
+   `transform` pour monter. */
+#girl-bg-anim .bg-coeur{
+  position:fixed;
+  width:var(--t,20px);height:var(--t,20px);
+  opacity:0;
+  animation:coeurMonte var(--dur,17s) ease-in-out infinite backwards;
+  animation-delay:var(--del,0s);
+}
+#girl-bg-anim .bg-coeur::before,
+#girl-bg-anim .bg-coeur::after{
+  content:'';position:absolute;top:0;
+  width:50%;height:80%;
+  background:var(--c,#ff8ec4);
+  border-radius:50% 50% 0 0;
+}
+#girl-bg-anim .bg-coeur::before{left:50%;transform:rotate(-45deg);transform-origin:0 100%}
+#girl-bg-anim .bg-coeur::after {left:0;  transform:rotate(45deg); transform-origin:100% 100%}
+/* Il monte d'un ecran et demi en se balancant, parait et s'efface aux deux
+   bouts : un coeur qui disparait net en haut de l'ecran se remarque. */
+@keyframes coeurMonte{
+  0%  {transform:translate(0,0) scale(.85);opacity:0}
+  12% {opacity:var(--o,.7)}
+  50% {transform:translate(var(--drift,14px),-55vh) scale(1)}
+  88% {opacity:var(--o,.7)}
+  100%{transform:translate(0,-112vh) scale(.9);opacity:0}
+}
+
 /* ══ L'ESPACE ══════════════════════════════════════════════════════════
    Le fond des ecrans enfant du garcon : un degrade de bleu tres fonce vers
    un bleu plus clair, pose derriere la carte et derriere le cours. Il ne
@@ -2338,6 +2406,44 @@ body.profile-boy.fond-espace,#root.profile-boy.fond-espace{
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* ══ LE CIEL PASTEL DE LA FILLE ════════════════════════════════════════
+   Dicte par le client : du BLEU en haut, du JAUNE au milieu, du ROSE en
+   bas, en couleurs bien pastel, avec des degrades francs entre les trois.
+   Chaque couleur tient donc sa bande avant de passer a la suivante — un
+   degrade a trois arrets seulement les melangerait du haut en bas et on ne
+   verrait plus qu'une bouillie beige au milieu.
+   Le bleu ne passe PAS directement au jaune : melanges, les deux donnent
+   un vert d'eau qu'on voyait tout de suite en travers du ciel. Ils se
+   croisent donc par un blanc tres pale, et le jaune par une peche pale
+   avant le rose.
+   Il se pose comme celui du garcon : sur le BODY, et seulement sur la
+   carte et le cours (voir `_fondEnfant`). */
+body.profile-girl.fond-licorne,#root.profile-girl.fond-licorne{
+  background:linear-gradient(178deg,
+    #b8e2ff 0%,  #cfeeff 17%,
+    #eef9ff 27%, #fffbe6 38%,
+    #fff6c2 47%, #fff3cc 60%,
+    #ffe7e3 71%, #ffd2e8 84%, #ffbeda 100%) !important;
+}
+/* Les voiles roses poses par-dessus le fond de la fille eteindraient le
+   pastel : on les retire sur ces ecrans-la, comme pour le garcon. */
+body.fond-licorne #root.profile-girl::before,
+body.fond-licorne #root.profile-girl::after{background:none !important;opacity:0 !important}
+/* Ce qui est ecrit SUR le fond, sans rien derriere, etait blanc : dessine
+   pour l'espace du garcon, il s'efface sur le pastel. Cote fille, prune
+   sur un halo blanc. Les noms des mondes, eux, ne changent pas : ils sont
+   poses sur le DECOR, et leur ombre noire les tient sur n'importe quelle
+   illustration — c'est deja valide. La barre de progression, elle, etait
+   un blanc a 8 % : invisible sur clair, elle passe en prune tres pale.
+   Les couleurs de la ligne sont posees EN LIGNE par le rendu : il faut
+   donc `!important` pour les reprendre. */
+body.fond-licorne .sess-map-title{
+  color:#4a1040 !important;
+  text-shadow:0 1px 0 rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.9) !important;
+}
+body.fond-licorne .sess-gp-lbl{color:#4a1040 !important;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+body.fond-licorne .sess-gp-bar{background:rgba(74,16,64,.14) !important}
+
 /* Une etoile fixe qui scintille */
 #boy-bg-anim .bg-etoile{
   position:absolute;border-radius:50%;background:#ffffff;
@@ -2400,9 +2506,14 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
   100%{transform:rotate(var(--cap,10deg)) translateX(var(--course,130vmax)) rotate(300deg)}
 }
 @media (prefers-reduced-motion:reduce){
-  #boy-bg-anim .bg-etoile,#boy-bg-anim .bg-filante,#boy-bg-anim .bg-asteroide{
+  #boy-bg-anim .bg-etoile,#boy-bg-anim .bg-filante,#boy-bg-anim .bg-asteroide,
+  #girl-bg-anim .bg-nuage,#girl-bg-anim .bg-coeur{
     animation:none !important}
   #boy-bg-anim .bg-filante{opacity:0}
+  /* Un coeur nait invisible (opacity:0) et ne se montre que par son
+     animation : sans elle, il faut le rallumer, sinon le ciel de la fille
+     perd ses coeurs des que l'appareil demande moins de mouvement. */
+  #girl-bg-anim .bg-coeur{opacity:var(--o,.7)}
 }
 
 /* F. Boutons plus grands et arrondis pour enfants */
@@ -5789,8 +5900,15 @@ function _equipage(taille){
 function _fondEnfant(actif){
   var b=document.body,r=document.getElementById('root');
   if(!b)return;
-  b.classList.remove('fond-espace');
-  if(r)r.classList.remove('fond-espace');
+  /* On retire le fond de TOUS les univers, pas seulement celui du garcon :
+     avec un seul nom ecrit en dur, un enfant qui change de profil garde le
+     fond de l'autre, et le pastel se retrouve sous l'espace. */
+  for(var u in _HABILLAGES){
+    var f=_HABILLAGES[u]&&_HABILLAGES[u].fond;
+    if(!f)continue;
+    b.classList.remove(f);
+    if(r)r.classList.remove(f);
+  }
   if(actif&&_HAB&&_HAB.fond){
     b.classList.add(_HAB.fond);
     if(r)r.classList.add(_HAB.fond);
@@ -6271,10 +6389,14 @@ var islandDefs=[
   var gpWrap=document.createElement('div');
   gpWrap.style.cssText='margin-bottom:18px;padding:0 4px';
   var gpLbl=document.createElement('div');
+  /* Une classe, pour que le fond pastel de la fille puisse rattraper cette
+     couleur : elle est posee EN LIGNE, et seul un `!important` la reprend. */
+  gpLbl.className='sess-gp-lbl';
   gpLbl.style.cssText='display:flex;justify-content:space-between;font-size:1rem;color:rgba(255,255,255,.92);margin-bottom:6px;font-weight:700';
   var progPct=Math.round(doneSessions/totalSessions*100);
   gpLbl.innerHTML='<span>'+(({'fr':'Progression globale','en':'Global progress','es':'Progreso global','de':'Gesamtfortschritt','nl':'Totale voortgang','it':'Progresso globale','pt':'Progresso global','ru':'Общий прогресс','tr':'Genel ilerleme','zh':'总体进度','id':'Kemajuan global','ur':'مجموعی ترقی','hi':'समग्र प्रगति'}[st.lang]||'Progression globale'))+'</span><span>'+doneSessions+'/'+totalSessions+'</span>';
   var gpBar=document.createElement('div');
+  gpBar.className='sess-gp-bar';
   gpBar.style.cssText='height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden';
   var gpFill=document.createElement('div');
   gpFill.style.cssText='height:100%;border-radius:6px;background:linear-gradient(90deg,var(--gold),#fb923c);width:0%;transition:width .8s cubic-bezier(.34,1.56,.64,1)';
@@ -7282,7 +7404,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v107';
+var _VERSION_REPLI='v108';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8756,7 +8878,10 @@ var _HABILLAGES={
        elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
        descente : c'est sa mascotte qui se pose. */
     decor:1,vaisseau:null,vaisseauVide:null,pilote:null,flamme:false,
-    poseSommet:false,fond:null,
+    /* Le fond pastel de la fille : bleu en haut, jaune au milieu, rose en
+       bas. Comme l'espace du garcon, il ne vaut que pour la carte et le
+       cours. */
+    poseSommet:false,fond:'fond-licorne',
     aligne:false,sommets:null,pilotesEtape:null,
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
@@ -11709,6 +11834,62 @@ function initChildBgAnim() {
       un.style.top = unicornTops[u] + '%';
       un.style.setProperty('--del', unicornDelays[u] + 's');
       girlBg.appendChild(un);
+    }
+
+    /* Les nuages. Cinq, de tailles et de hauteurs differentes, qui
+       traversent l'ecran de gauche a droite. Ils partent hors champ (left
+       negatif) et leur duree change de l'un a l'autre : sans cela ils
+       defilent en rang, et on voit la grille. Le plus gros est aussi le
+       plus lent et le plus pale — c'est ce qui donne la profondeur. */
+    var nuages = [
+      { l:170, top:  8, dur: 78, del: 20, o:.82 },
+      { l:110, top: 26, dur: 62, del: 44, o:.70 },
+      { l:210, top: 44, dur: 96, del:  6, o:.62 },
+      { l:130, top: 63, dur: 70, del: 52, o:.78 },
+      { l: 90, top: 81, dur: 54, del: 30, o:.68 }
+    ];
+    for (var n = 0; n < nuages.length; n++) {
+      var nu = document.createElement('span');
+      nu.className = 'bg-nuage';
+      nu.style.left = '-' + (nuages[n].l + 20) + 'px';
+      nu.style.top = nuages[n].top + '%';
+      nu.style.setProperty('--l', nuages[n].l + 'px');
+      nu.style.setProperty('--dur', nuages[n].dur + 's');
+      nu.style.setProperty('--del', '-' + nuages[n].del + 's');
+      nu.style.setProperty('--o', nuages[n].o);
+      /* La course part du bord gauche : il faut la largeur de l'ecran plus
+         celle du nuage, sinon il s'efface avant d'etre sorti. */
+      nu.style.setProperty('--course', 'calc(100vw + ' + (nuages[n].l + 40) + 'px)');
+      girlBg.appendChild(nu);
+    }
+
+    /* Les coeurs. Neuf, du rose pale au rose vif, qui montent en se
+       balancant. Les delais sont NEGATIFS : l'animation demarre deja
+       commencee, donc le ciel est peuple des la premiere image au lieu de
+       se remplir pendant une demi-minute. */
+    var coeurs = [
+      { x:  7, top: 92, t: 24, dur: 19, del:  0, c:'#ffb3d1', drift:  16, o:.72 },
+      { x: 19, top: 98, t: 34, dur: 24, del:  9, c:'#ff8ec4', drift: -18, o:.80 },
+      { x: 31, top: 88, t: 20, dur: 16, del: 14, c:'#ff6fae', drift:  12, o:.66 },
+      { x: 44, top: 96, t: 38, dur: 27, del:  4, c:'#ff9aa8', drift:  22, o:.74 },
+      { x: 55, top: 90, t: 26, dur: 21, del: 18, c:'#ff5f9e', drift: -14, o:.62 },
+      { x: 67, top: 99, t: 32, dur: 25, del: 11, c:'#ff8ec4', drift:  18, o:.70 },
+      { x: 76, top: 87, t: 22, dur: 17, del: 22, c:'#ff6fae', drift: -20, o:.68 },
+      { x: 87, top: 95, t: 36, dur: 28, del:  7, c:'#ffb3d1', drift:  14, o:.76 },
+      { x: 95, top: 91, t: 25, dur: 20, del: 16, c:'#ff9aa8', drift: -12, o:.64 }
+    ];
+    for (var c2 = 0; c2 < coeurs.length; c2++) {
+      var co = document.createElement('span');
+      co.className = 'bg-coeur';
+      co.style.left = coeurs[c2].x + '%';
+      co.style.top = coeurs[c2].top + '%';
+      co.style.setProperty('--t', coeurs[c2].t + 'px');
+      co.style.setProperty('--dur', coeurs[c2].dur + 's');
+      co.style.setProperty('--del', '-' + coeurs[c2].del + 's');
+      co.style.setProperty('--c', coeurs[c2].c);
+      co.style.setProperty('--drift', coeurs[c2].drift + 'px');
+      co.style.setProperty('--o', coeurs[c2].o);
+      girlBg.appendChild(co);
     }
   }
 
