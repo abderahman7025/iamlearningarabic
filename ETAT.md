@@ -508,6 +508,37 @@ Côté fille, l'habillage ne donne **ni vaisseau ni flamme** : sa mascotte
 vole et se pose d'un bloc, exactement comme avant. Tout ce mécanisme est
 donc neutre pour elle.
 
+**Il se pose sur le SOMMET de la planète**, pas là où la trajectoire
+traverse sa carte — sinon l'astronaute a les pieds au milieu du globe. Le
+vol se termine donc par une **approche** : la courbe s'arrête où elle
+s'arrêtait, et la fusée rejoint le sommet en glissant, feu encore allumé.
+
+Le sommet, c'est celui du DISQUE, pas de l'image : une planète est peinte
+au milieu d'un carré, entourée d'un halo. Il est **mesuré sur les pixels**
+(`_hautDuDessin`), avec un seuil d'opacité haut — c'est ce qui fait ignorer
+le halo, justement peint en transparence. Mesuré : Soleil 18 %, Mercure
+24 %, Vénus 21 %, Terre 19 %, Lune 25 %, Mars 22 % — soit exactement les
+rayons de `outils/planetes.js`. Le jour où le client remplace un décor, la
+mesure suit toute seule ; rien à noter planète par planète.
+
+**Le rythme** a été rallongé à sa demande : vol 1,85 s par saut (1,65 s en
+portrait), approche 0,78 s, vol stationnaire 0,9 s, descente 1,25 s.
+
+**Le fond d'espace** (`.fond-espace`, `_fondEnfant`). Un dégradé de bleu
+très foncé vers un bleu plus clair, avec un champ de 46 étoiles, 3 étoiles
+filantes et 3 astéroïdes qui dérivent — les ballons de foot et les éclairs
+ont disparu, ils n'avaient rien à faire dans l'espace.
+Deux précautions :
+- il est posé sur le **body**, pas sur le conteneur qui défile. Le fond
+  d'un élément qui défile s'étire sur toute sa longueur — des milliers de
+  pixels ici — et le dégradé devient un aplat qui glisse pendant qu'on
+  descend ;
+- il ne vaut **que pour la carte et le cours**, et se retire à chaque
+  changement de page. Le menu et les réglages du garçon sont écrits en bleu
+  sombre sur clair : les passer au noir demanderait de refaire tout son
+  thème, ce qui n'a pas été demandé. Les libellés des étapes, eux, étaient
+  déjà en blanc avec une ombre portée — ils n'attendaient que ce fond.
+
 Deux réglages trouvés en REGARDANT, pas en devinant :
 - **la flamme sort bas et étroite** (`bottom:-36%`, hauteur 48 %, largeur
   26 %). Les ailerons de la fusée descendent jusqu'au bas de sa boîte : une
