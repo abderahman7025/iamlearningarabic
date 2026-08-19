@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-coeurs" cx="36%" cy="26%" r="80%">
+      <stop offset="0%" stop-color="#fff2f7"/>
+      <stop offset="54%" stop-color="#ffd0e4"/>
+      <stop offset="100%" stop-color="#f07aae"/>
+    </radialGradient>
+    <radialGradient id="h-coeurs" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="#ff9ecf" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#ff9ecf" stop-opacity=".34"/>
+      <stop offset="100%" stop-color="#ff9ecf" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-coeurs"><circle cx="200" cy="200" r="128"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="172" fill="url(#h-coeurs)"/>
+  <circle cx="200" cy="200" r="128" fill="url(#c-coeurs)"/>
+  <g clip-path="url(#d-coeurs)"><path d="M 196 248.64 C 124.7 194.7 163.76 145.1 196 186.64 C 228.24 145.1 267.3 194.7 196 248.64 Z" fill="#ff5f8f"/><path d="M 126 196.48 C 86.9 166.9 108.32 139.7 126 162.48 C 143.68 139.7 165.1 166.9 126 196.48 Z" fill="#ff9ec4"/><path d="M 272 195.6 C 237.5 169.5 256.4 145.5 272 165.6 C 287.6 145.5 306.5 169.5 272 195.6 Z" fill="#ffb3d1"/><path d="M 140 309.04 C 103.2 281.2 123.36 255.6 140 277.04 C 156.64 255.6 176.8 281.2 140 309.04 Z" fill="#ff85b5"/><path d="M 266 309.36 C 222.3 276.3 246.24 245.9 266 271.36 C 285.76 245.9 309.7 276.3 266 309.36 Z" fill="#ff2e6b" opacity=".9"/><path d="M 206 317.28 C 178.4 296.4 193.52 277.2 206 293.28 C 218.48 277.2 233.6 296.4 206 317.28 Z" fill="#ffc9df"/></g>
+  <circle cx="200" cy="200" r="128" fill="none" stroke="#d4568f" stroke-opacity=".38" stroke-width="3"/>
+  <ellipse cx="153.92000000000002" cy="143.68" rx="33.28" ry="20.48" fill="#ffffff" opacity=".30" transform="rotate(-28 153.92000000000002 143.68)"/>
+  <path d="M 92 220 Q 92 232 104 232 Q 92 232 92 244 Q 92 232 80 232 Q 92 232 92 220 Z" fill="#ffffff" opacity=".85"/><path d="M 306 223 Q 306 234 317 234 Q 306 234 306 245 Q 306 234 295 234 Q 306 234 306 223 Z" fill="#ffffff" opacity=".85"/><path d="M 200 96 Q 200 108 212 108 Q 200 108 200 120 Q 200 108 188 108 Q 200 108 200 96 Z" fill="#ffffff" opacity=".85"/>
+</svg>

@@ -451,14 +451,15 @@ voix. Inversé, chaque étape jette le travail de la précédente — traduire
 les voix sur des textes qui vont changer.
 
 **Où on en est.** Le garçon est fini et validé : moteur, habillage,
-planètes, vol, atterrissage. La fille tourne sur le même moteur mais garde
-encore les îles et la mascotte d'avant.
+planètes, vol, atterrissage. La fille a maintenant les siens : douze
+mondes, fond pastel, licorne, couronne à partir du monde 2 — chantier
+1 ter fait le 19 août, **en attente de la validation du client**.
 
-**LE CHANTIER OUVERT est le 1 ter, juste en dessous** : ses douze mondes,
-son fond pastel, sa licorne. Le client l'a dicté le 19 août et attend qu'on
-le prenne. Les traductions (chantier 2) viennent après ; l'arabe des
-enregistrements peut partir en parallèle, il ne dépend de rien
-(voir chantier 3).
+**LE CHANTIER OUVERT est donc le 2, les traductions.** L'arabe des
+enregistrements peut partir en parallèle, il ne dépend de rien (voir
+chantier 3). Ce que le client dira des douze mondes dessinés passe avant :
+s'il veut de vraies illustrations, elles se déposent dans `public/images/`
+sans toucher au code.
 
 ### FAIT — Chantier 1 bis : la fille sur le moteur du garçon, univers licorne
 
@@ -706,13 +707,12 @@ une carte vierge.
 Piège gardé : l'arc-en-ciel ferait une mauvaise ligne d'écriture, il est
 courbe. La ligne doit rester droite, c'est celle du cours adulte.
 
-### À FAIRE — Chantier 1 ter : le PARCOURS DE LA FILLE, ses douze mondes
+### FAIT — Chantier 1 ter : le PARCOURS DE LA FILLE, ses douze mondes
 
-**Dicté par le client le 19 août 2026, à faire dans la prochaine session.**
-Le côté garçon est fini et validé ; c'est au tour de la fille. Toute la
-mécanique existe déjà et est neutre pour elle : il n'y a **rien à
-réécrire**, seulement à remplir son habillage (`_HABILLAGES.licorne`) comme
-celui du garçon a été rempli.
+**Dicté par le client le 19 août 2026, fait le même jour.** Les douze
+mondes, le fond pastel, les vols, la pose sur le monde : tout est en place
+et regardé sur des captures. Ce qui suit décrit ce qui a été demandé, puis
+ce qu'il a fallu corriger.
 
 #### Les douze mondes, à la place des îles
 
@@ -827,16 +827,52 @@ décalant la fille vers l'arrière de la monture qu'on la dégage, et le
 décalage change de côté avec le sens — contrairement au garçon, dont la
 fusée est symétrique et l'enfant simplement centré.
 
-#### Ce qui reste à demander au client
+#### Ce qui a été fait, et comment
 
-Deux points seulement, à régler avant de commencer :
+- **Les douze décors** sont dessinés par `outils/mondes.js`, le pendant
+  exact de `planetes.js` : un disque pastel par monde, ses motifs dedans,
+  et le tableau des sommets imprimé à la fin, à recopier dans l'habillage.
+  Ils se remplacent en déposant `public/images/monde-<nom>.png` et en
+  changeant l'extension dans `images` — rien d'autre.
+  Deux motifs ont dû être refaits **après les avoir regardés** : les
+  licornes n'étaient que des taches blanches (il leur fallait un cerne, une
+  crinière posée DERRIÈRE la tête et une corne large), et les papillons ne
+  ressemblaient à rien (corps trop long, ailes trop serrées).
+- **La fille sans couronne** garde son unique image de vol : elle ne sert
+  qu'au premier vol, celui qui part du monde 1, et personne n'y a vu de
+  manque. `couronneDes:2` dans l'habillage porte la règle.
+- **Les vols** : rien à écrire, tout venait de l'habillage — saut court en
+  courbe, saut lointain en ligne droite, caméra qui suit, pose sur le
+  sommet avec enfoncement dans la courbure. Vérifié sur un vol du monde 12
+  au monde 1 : trajet droit, inclinaison plafonnée à 24°, `licorne-couronne-gd`
+  en vol, `licorne-seule-gd` posée, `fille-seule` à l'arrivée sur le
+  monde 1 (pas encore la couronne), écart au sommet de −5 px.
+- **Le sens de la marche** choisit le dessin (`vaisseauSens`,
+  `vaisseauVideSens`), et la fille se décale vers l'ARRIÈRE de la monture
+  (`piloteDecale`, 24 points de pourcentage) pour qu'on voie la tête de la
+  licorne — la contrainte du client. Réglé en regardant quatre poses côte
+  à côte : à 19 elle mordait sur le museau.
 
-1. la fille **sans couronne** n'a qu'UNE image de vol (`licorne-fille.png`),
-   sans variante de sens, alors que les versions couronnées en ont deux.
-   Faut-il en refaire une, ou est-ce sans importance puisqu'elle ne sert
-   qu'au tout premier vol, celui qui part du monde 1 ?
-2. les **douze décors de mondes n'existent pas encore**. On les dessine
-   comme les planètes (`outils/planetes.js`), ou il les fournit ?
+#### Trois pièges qui ont coûté du temps
+
+1. **`_hautDuDessin` ne reconnaissait que `planete-…`.** Son expression
+   régulière était `/planete-([a-z]+)\./` : aucun `monde-…` n'y répondait,
+   la table des sommets était ignorée, et la mesure sur les pixels prenait
+   le HALO pour le corps — la licorne se posait soixante pixels au-dessus
+   de son monde. Elle lit maintenant le nom du fichier quel que soit son
+   préfixe, et retente sans le préfixe (`monde-tortue` → `tortue`). Un nom
+   à tiret (`chats-chiens`) passait déjà à la trappe avec l'ancienne.
+2. **NE PAS MESURER PENDANT UNE TRANSITION D'ÉCRAN.** `#ca` porte un
+   `matrix3d` le temps du basculement de page. Toutes les mesures prises
+   pendant ce temps sont fausses — une boîte de 140×140 se mesurait
+   88×148, et la licorne paraissait flotter très haut au-dessus de son
+   monde. J'ai corrigé un défaut qui n'existait pas avant de m'en
+   apercevoir. Retirer les classes `tx-*` (ou attendre) avant toute
+   mesure.
+3. **Un onglet caché ne bat pas**, déjà noté plus haut, mais il faut le
+   relire : sans l'horloge `MessageChannel`, un vol lancé depuis un onglet
+   en arrière-plan reste figé à son point de départ, et on croit que le
+   moteur est cassé.
 
 Et la consigne qui vaut toujours : sur ce qui n'est pas écrit ici, **on
 demande, on n'invente pas**. C'est ce qui a coûté le plus cher sur le

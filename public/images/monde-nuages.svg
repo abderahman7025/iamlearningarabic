@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="c-nuages" cx="36%" cy="26%" r="80%">
+      <stop offset="0%" stop-color="#f2fbff"/>
+      <stop offset="54%" stop-color="#c5e9ff"/>
+      <stop offset="100%" stop-color="#79b8e8"/>
+    </radialGradient>
+    <radialGradient id="h-nuages" cx="50%" cy="50%" r="50%">
+      <stop offset="60%" stop-color="#a8dcff" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#a8dcff" stop-opacity=".34"/>
+      <stop offset="100%" stop-color="#a8dcff" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="d-nuages"><circle cx="200" cy="200" r="128"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="172" fill="url(#h-nuages)"/>
+  <circle cx="200" cy="200" r="128" fill="url(#c-nuages)"/>
+  <g clip-path="url(#d-nuages)"><g opacity="0.95"><rect x="106" y="151.8" width="108" height="32.4" rx="16.2" fill="#ffffff"/><circle cx="141.64" cy="150.72" r="27" fill="#ffffff"/><circle cx="177.28" cy="158.28" r="19.439999999999998" fill="#ffffff"/></g><g opacity="0.9"><rect x="218" y="212.8" width="88" height="26.4" rx="13.2" fill="#ffffff"/><circle cx="247.04" cy="211.92" r="22" fill="#ffffff"/><circle cx="276.08" cy="218.08" r="15.84" fill="#ffffff"/></g><g opacity="0.85"><rect x="92" y="254" width="120" height="36" rx="18" fill="#ffffff"/><circle cx="131.6" cy="252.8" r="30" fill="#ffffff"/><circle cx="171.2" cy="261.2" r="21.599999999999998" fill="#ffffff"/></g><g opacity="0.8"><rect x="236" y="124.4" width="64" height="19.2" rx="9.6" fill="#ffffff"/><circle cx="257.12" cy="123.76" r="16" fill="#ffffff"/><circle cx="278.24" cy="128.24" r="11.52" fill="#ffffff"/></g></g>
+  <circle cx="200" cy="200" r="128" fill="none" stroke="#5f9fd0" stroke-opacity=".38" stroke-width="3"/>
+  <ellipse cx="153.92000000000002" cy="143.68" rx="33.28" ry="20.48" fill="#ffffff" opacity=".30" transform="rotate(-28 153.92000000000002 143.68)"/>
+  <path d="M 92 108 Q 92 120 104 120 Q 92 120 92 132 Q 92 120 80 120 Q 92 120 92 108 Z" fill="#ffffff" opacity=".85"/><path d="M 318 284 Q 318 296 330 296 Q 318 296 318 308 Q 318 296 306 296 Q 318 296 318 284 Z" fill="#ffffff" opacity=".85"/><path d="M 110 306 Q 110 316 120 316 Q 110 316 110 326 Q 110 316 100 316 Q 110 316 110 306 Z" fill="#ffffff" opacity=".85"/>
+</svg>

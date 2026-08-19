@@ -5870,14 +5870,21 @@ function _equipage(taille){
       +'animation:volFlotte 2.8s ease-in-out infinite';
     v.appendChild(vi);
     var p=document.createElement('img');p.src=_HAB.pilote;p.alt='';
-    /* L'enfant se tient DEVANT la fusee posee, pas a sa place : il est plus
-       petit qu'elle, un peu decale, et pose sur le meme bas de boite —
+    /* L'enfant se tient DEVANT la monture posee, pas a sa place : il est
+       plus petit qu'elle, un peu decale, et pose sur le meme bas de boite —
        c'est ce bas-la qui touche l'etape. */
     /* DEVANT la fusee, centre sur elle. Il avait ete decale a droite pour
        qu'on la voie encore : ce n'est plus utile, la fusee posee est la
-       fusee VIDE, et un enfant debout devant un hublot vide se comprend. */
-    p.style.cssText='position:absolute;left:26%;bottom:0;width:48%;height:56%;object-fit:contain;'
-      +'object-position:bottom;transition:opacity .5s ease,transform 1.1s cubic-bezier(.32,1.1,.5,1)';
+       fusee VIDE, et un enfant debout devant un hublot vide se comprend.
+       La FILLE, elle, ne peut pas etre centree : la tete de sa licorne est
+       a l'avant du dessin, et une fille posee au milieu la masquerait. Sa
+       boite vient donc de l'habillage, et `_volCarte` la decale vers
+       l'ARRIERE de la monture, du cote oppose a son regard. */
+    var pb=_HAB.piloteBoite||{gauche:26,largeur:48,hauteur:56};
+    eq.piloteGauche=pb.gauche;
+    p.style.cssText='position:absolute;left:'+pb.gauche+'%;bottom:0;width:'+pb.largeur+'%;'
+      +'height:'+pb.hauteur+'%;object-fit:contain;'
+      +'object-position:bottom;transition:opacity .5s ease,transform 1.1s cubic-bezier(.32,1.1,.5,1),left .5s ease';
     el.appendChild(v);el.appendChild(p);
     eq.vaisseau=v;eq.pilote=p;eq.aVaisseau=true;
   }else{
@@ -5949,11 +5956,26 @@ function _hautDuDessin(img){
      pour la comete : sa queue ET son aureole montent plus haut que son
      noyau, et aucune regle de largeur ne les distingue proprement — le
      personnage se posait sur l'aureole. */
+  /* Le nom du decor se lit sur le FICHIER, quel que soit son prefixe :
+     `planete-saturne.svg` cote garcon, `monde-chats-chiens.svg` cote fille.
+     L'ancienne expression n'acceptait que `planete-` et des lettres sans
+     tiret : les douze mondes n'y correspondaient pas, la table etait donc
+     ignoree et la mesure sur les pixels prenait le HALO pour le corps —
+     la licorne se posait a soixante pixels au-dessus de son monde. */
   if(_HAB&&_HAB.sommets){
-    var m=/planete-([a-z]+)\./.exec(cle);
-    if(m&&_HAB.sommets[m[1]]!==undefined){
-      _HAUTS_DECOR[cle]=_HAB.sommets[m[1]];
-      return _HAUTS_DECOR[cle];
+    var m=/([a-z0-9-]+)\.[a-z0-9]+(?:[?#].*)?$/i.exec(cle);
+    if(m){
+      var nom=m[1];
+      if(_HAB.sommets[nom]!==undefined){
+        _HAUTS_DECOR[cle]=_HAB.sommets[nom];
+        return _HAUTS_DECOR[cle];
+      }
+      /* sans son prefixe d'univers : `monde-tortue` → `tortue` */
+      var sans=nom.replace(/^[a-z]+-/,'');
+      if(_HAB.sommets[sans]!==undefined){
+        _HAUTS_DECOR[cle]=_HAB.sommets[sans];
+        return _HAUTS_DECOR[cle];
+      }
     }
   }
   var N=100,r=0;
@@ -5995,6 +6017,21 @@ function _volCarte(o){
   var eq=o.equipage||{};
   var dx=o.decalageX||0,dy=o.decalageY||0;
   var idx=o.depart||0,raf=null,grains=[],dernierGrain=0;
+  /* Le SENS du voyage : +1 vers la droite, -1 vers la gauche. Il choisit le
+     dessin de la monture, et le cote ou se tient la fille une fois posee.
+     PAS de retournement horizontal : pose sur un element qui porte une
+     transition de transform, il passe par scaleX(0) — la monture s'aplatit
+     jusqu'a disparaitre. Le client l'a refuse cote garcon, et la fille a de
+     toute facon deux dessins, un par sens. */
+  var sensVol=1;
+  /* D'ou part le voyage en cours. La fille ne porte la couronne qu'a partir
+     du monde 2 : un vol qui PART du monde 1 se fait donc sans elle, et
+     cette image-la n'existe que dans un seul sens. */
+  var partiDe=idx;
+  function parSens(t){
+    if(!t)return null;
+    return (sensVol<0)?(t.dg||t.gd):(t.gd||t.dg);
+  }
 
   /* ── Les trois etats de l'equipage ──
      au repos : le pilote, debout sur l'etape ;
@@ -6008,14 +6045,35 @@ function _volCarte(o){
     if(!eq.aVaisseau)return;
     var src=(o.pilotePour&&o.pilotePour(idx))||_HAB.pilote;
     if(eq.pilote.getAttribute('src')!==src)eq.pilote.setAttribute('src',src);
+    placerPilote();
   }
   /* L'enfant ne peut pas etre a la fois DANS la fusee et DEVANT elle. En
      vol, c'est la fusee avec lui au hublot ; posee et l'enfant sorti, c'est
      la fusee VIDE. Deux dessins du client, un pour chaque situation. */
   function vaisseauHabite(oui){
     if(!eq.aVaisseau||!eq.image)return;
-    var src=oui?_HAB.vaisseau:(_HAB.vaisseauVide||_HAB.vaisseau);
+    var src;
+    if(oui){
+      /* En vol. Sans couronne au depart du monde 1, avec elle ensuite —
+         et dans le sens de la marche. */
+      src=(_HAB.vaisseauSansCouronne&&partiDe<(_HAB.couronneDes||99))
+        ? _HAB.vaisseauSansCouronne
+        : (parSens(_HAB.vaisseauSens)||_HAB.vaisseau);
+    }else{
+      src=parSens(_HAB.vaisseauVideSens)||_HAB.vaisseauVide||_HAB.vaisseau;
+    }
     if(eq.image.getAttribute('src')!==src)eq.image.setAttribute('src',src);
+  }
+  /* La fille se tient DEVANT sa licorne, decalee vers l'ARRIERE de celle-ci :
+     sa tete est a l'avant du dessin, du cote ou elle regarde, et une fille
+     posee au milieu la cacherait. Le decalage change donc de cote avec le
+     sens. Neutre pour le garcon : sa fusee est symetrique, l'habillage ne
+     donne pas de decalage. */
+  function placerPilote(){
+    if(!eq.aVaisseau||!eq.pilote)return;
+    var d=_HAB.piloteDecale;
+    if(!d)return;
+    eq.pilote.style.left=((eq.piloteGauche===undefined?26:eq.piloteGauche)-sensVol*d)+'%';
   }
   function enVol(){
     if(!eq.aVaisseau)return;
@@ -6202,6 +6260,12 @@ function _volCarte(o){
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
     if(idx===cible){if(fini)fini();return;}
+    /* D'ou l'on part, et vers ou : les deux se lisent AVANT que `idx` ne
+       bouge. Le sens vient des abscisses des deux etapes ; un trajet
+       rigoureusement vertical garde le sens precedent. */
+    partiDe=idx;
+    var _de=ouSePoser(idx),_vers=ouSePoser(cible);
+    if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
     /* La fusee part TOUJOURS de la ou elle se trouve vraiment, et fait tout
        le trajet — c'est la demande du client. Elle se posait avant sur
@@ -7404,7 +7468,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v108';
+var _VERSION_REPLI='v109';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8862,27 +8926,67 @@ var _HABILLAGES={
     cle:'licorne',classe:'licorne',veh:'🦄',
     mission:'AVENTURE',missionMin:'Aventure',depart:'DÉPART',partir:'▶ ENVOL',
     accompli:'AVENTURE RÉUSSIE',retour:'▸ RETOUR À LA CARTE',
-    lieu:'île',monLieu:'▸ MON ÎLE',carte:'▸ LA CARTE DES ÎLES',
-    /* La fille GARDE ses îles : ce sont celles d'aujourd'hui, image par
-       image. Rien à refaire de ce côté. */
-    titreCarte:'🗺️ Ma carte des îles',
-    images:['/images/island-0.png?v=2','/images/island-1.png?v=2','/images/island-2.png?v=2',
-            '/images/island-3.png?v=2','/images/island-4.png?v=2','/images/20260518_195724_0000.png',
-            '/images/island-pyramids.png','/images/island-7.png?v=2','/images/island-8.png?v=2',
-            '/images/island-9.png?v=2','/images/island-10.png?v=2','/images/island-11.png?v=2'],
-    /* La fille garde les noms de lieux d'aujourd'hui, et donc ses adresses :
-       `etapes` reste vide, la carte prend alors ses libellés traduits. */
-    etapes:null,slugs:null,
+    lieu:'monde',monLieu:'▸ MON MONDE',carte:'▸ LA CARTE DES MONDES',
+    /* Les DOUZE MONDES, dictés par le client le 19 août 2026 : ils
+       remplacent les îles, décor par décor et nom par nom. Le douzième
+       clôt l'histoire — elle rentre chez elle — comme la dernière étape
+       du garçon clôt la sienne. */
+    titreCarte:'🗺️ Ma carte des mondes',
+    images:['/images/monde-licornes.svg','/images/monde-couronne.svg','/images/monde-nuages.svg',
+            '/images/monde-fleurs.svg','/images/monde-coeurs.svg','/images/monde-pingouins.svg',
+            '/images/monde-papillons.svg','/images/monde-tortue.svg','/images/monde-chats-chiens.svg',
+            '/images/monde-ours.svg','/images/monde-sucreries.svg','/images/monde-chateau.svg'],
+    etapes:['Le monde des licornes','Le monde de la couronne','Le monde des nuages',
+            'Le monde des fleurs','Le monde des cœurs','Le monde des pingouins',
+            'Le monde des papillons','L\'île de la tortue','Le monde des chats et des chiens',
+            'Le monde des ours bruns','Le monde des sucreries','Le château de la princesse'],
+    slugs:['licornes','couronne','nuages','fleurs','coeurs','pingouins',
+           'papillons','tortue','chats-chiens','ours','sucreries','chateau'],
     trainee:'rgba(255,255,255,.95)',
-    /* Les iles de la fille gardent leur taille : elles sont validees. Et
-       elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
-       descente : c'est sa mascotte qui se pose. */
-    decor:1,vaisseau:null,vaisseauVide:null,pilote:null,flamme:false,
+    /* Un monde est dessiné dans un carré, comme une planète : il occupe donc
+       bien moins de place qu'une île peinte en paysage, et prend le même
+       facteur d'agrandissement que le garçon. */
+    decor:1.5,
+    /* LA MONTURE. Elle voyage avec la fille dessus, et reste garée sur le
+       monde une fois la fille descendue — exactement la fusée du garçon.
+       Deux dessins par situation, un par SENS de marche : c'est le client
+       qui les a faits, et il ne faut surtout pas retomber sur le
+       retournement horizontal, déjà refusé. */
+    vaisseau:'/images/licorne-couronne-gd.png',
+    vaisseauSens:{gd:'/images/licorne-couronne-gd.png',dg:'/images/licorne-couronne-dg.png'},
+    /* Avant la couronne, une seule image, sans variante de sens : elle ne
+       sert qu'au tout premier vol, celui qui part du monde 1. */
+    vaisseauSansCouronne:'/images/licorne-fille.png',
+    couronneDes:2,
+    vaisseauVide:'/images/licorne-seule-gd.png',
+    vaisseauVideSens:{gd:'/images/licorne-seule-gd.png',dg:'/images/licorne-seule-dg.png'},
+    /* La fille descendue. Elle porte la couronne à partir du monde 2 : au
+       monde 1 seulement, c'est la fille sans couronne. */
+    pilote:'/images/fille-couronne.png',
+    pilotesEtape:{0:'/images/fille-seule.png'},
+    /* Elle est plus étroite et plus haute qu'un astronaute, et se tient à
+       l'ARRIÈRE de sa licorne pour qu'on voie la tête de celle-ci — c'est
+       la contrainte du client. `piloteDecale` est en points de pourcentage,
+       et change de côté avec le sens de la marche. */
+    piloteBoite:{gauche:30,largeur:40,hauteur:66},
+    piloteDecale:24,
+    /* Une licorne n'a pas de réacteur. */
+    flamme:false,
+    /* Elle se pose sur le SOMMET du monde, comme l'astronaute sur sa
+       planète — et non plus au milieu du décor. */
+    poseSommet:true,
     /* Le fond pastel de la fille : bleu en haut, jaune au milieu, rose en
        bas. Comme l'espace du garcon, il ne vaut que pour la carte et le
        cours. */
-    poseSommet:false,fond:'fond-licorne',
-    aligne:false,sommets:null,pilotesEtape:null,
+    fond:'fond-licorne',
+    /* Une fusée a un nez qui doit pointer là où elle va ; une licorne, non :
+       elle se penche, et son inclinaison est plafonnée à 24°. */
+    aligne:false,
+    /* Le sommet de chaque monde, en fraction de la hauteur de son image.
+       Sorti par `node outils/mondes.js`, qui connaît les rayons. */
+    sommets:{'licornes':0.18,'couronne':0.185,'nuages':0.18,'fleurs':0.18,'coeurs':0.18,
+             'pingouins':0.18,'papillons':0.18,'tortue':0.18,'chats-chiens':0.18,
+             'ours':0.18,'sucreries':0.18,'chateau':0.18},
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
     notePiste:'✨ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
