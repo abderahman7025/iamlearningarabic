@@ -9,11 +9,17 @@ Deux fichiers, désormais :
 | Fichier | Qui le reçoit | Contenu |
 |---|---|---|
 | `public/index.html` (211 Ko) | tout le monde | vente, connexion, inscription, paiement |
-| `app/app.html` (≈ 1,0 Mo) | **comptes payants seulement**, via `api/app.js` | toute l'application |
+| `app/app.html` (≈ 0,86 Mo) | **comptes payants seulement**, via `api/app.js` | toute l'application |
 
 Après CHAQUE modification de `app/app.html` ou de `public/index.html` :
-incrémenter la version dans `public/sw.js`, committer, pousser. Vercel
-déploie tout seul.
+incrémenter la version dans `public/sw.js` — **aux deux endroits** — et
+dans `_VERSION_REPLI` de `app/app.html`, committer, pousser. Vercel
+déploie tout seul. Puis vérifier en ligne que `iamlearningarabic.com/sw.js`
+affiche bien le nouveau numéro.
+
+Pour regarder soi-même ce qu'on vient de changer, sans passer par la
+production ni par le client : `node outils/serveur-local.js`
+(voir « Le banc EN LOCAL » plus bas).
 
 ---
 
@@ -277,6 +283,41 @@ met celles que le client signale, et on en retire ce qu'il valide.
 correction partait en production et le client servait d'œil ; cinq tours
 ont été perdus sur des mesures qui disaient l'inverse de ce qu'il voyait.
 
+### Le banc EN LOCAL — `outils/serveur-local.js`
+
+En ligne, `/banc` est derrière `api/app.js` et n'est ouvert qu'au compte du
+client : on ne peut donc pas y regarder un geste soi-même. Ce petit serveur
+sert la même arborescence depuis la machine, sans aucune vérification :
+
+```
+node outils/serveur-local.js      → http://localhost:3456
+/banc  ·  /banc?tout=1  ·  /banc?l=ه
+/fille/accueil  ·  /garcon/accueil
+```
+
+Il pose lui-même un faux jeton dans `localStorage` (sinon l'application
+repart vers `/connexion`) et désinscrit le service worker, pour toujours
+servir le fichier qui vient d'être écrit. Rien de tout cela n'est en ligne :
+le fichier vit hors de `api/` et de `public/`, il ne compte donc pas dans
+les douze fonctions et Vercel ne le déploie pas.
+
+**Il accepte aussi une capture** : `POST /capture?f=nom.png` avec un
+`toDataURL()` en corps écrit l'image dans `outils/captures/` (ignoré par
+git). C'est ce qui permet de REGARDER une animation au lieu de la décrire
+— on peint les étapes d'un geste côte à côte dans un canvas, on dépose, on
+ouvre. Trois pièges levés d'un coup de cette façon dans la session du
+19 août : les planètes appelées en `.png` alors qu'elles sont en `.svg`,
+l'anneau d'Uranus qui ressemblait à deux rayures, et le hā milieu qui se
+révèle par plaques.
+
+**Un onglet caché ne bat pas** : `requestAnimationFrame` ne se déclenche
+pas tant que la fenêtre n'est pas affichée. Pour mesurer une animation
+depuis un onglet en arrière-plan, remplacer l'horloge avant toute chose :
+
+```js
+window.requestAnimationFrame=function(f){return setTimeout(function(){f(Date.now());},16);};
+```
+
 ---
 
 ## LEÇONS SUR LES GESTES — à lire avant d'y toucher
@@ -323,20 +364,49 @@ Deux réglages du moteur, trouvés par la mesure :
   l'épaisseur du trait délimite la boucle sans la queue ni la barre. La
   boîte de la lettre, elle, donne toute la largeur et fausse tout report.
 
+### FAIT — Le point du yā attend la fin du corps
+
+Ce n'était pas un seuil à déplacer, c'était le **critère** qui ne mesurait
+pas la bonne chose. « Quelle part de la tache le pinceau a-t-il couverte »
+a été essayé au quart, au tiers et à la moitié : au quart le point du yā
+passait pour un morceau de lettre — le crayon longe la ligne juste
+au-dessus de lui et l'effleure — et plus haut c'est le petit kāf logé dans
+le ك qui basculait du côté des points. Aucune valeur ne séparait les deux.
+
+Ce qui les sépare, c'est le **passage du crayon** : le petit kāf est
+traversé sur sa longueur, la pointe se pose dessus pas après pas ; le point
+du yā est détaché et hors du chemin, seule l'épaisseur du pinceau vient le
+mordre. `estCorps` compte donc les pas où la POINTE est sur la tache, plus
+les pixels que l'épaisseur a touchés. Deux pas suffisent ; la part couverte
+reste en filet, mais à 70 %, où une tache est peinte et non effleurée.
+
+Au passage, le rattrapage du centre hors encre cherche par **cercles** (un
+pixel, puis deux) au lieu de balayer un carré de cinq : le crayon
+s'accroche au trait le plus proche, donc à celui qu'il suit.
+
+Mesuré sur les 65 gestes à PX=104 : les points du yā (quatre formes)
+tombent à `pointe 0, couverte 0 %` ; le petit kāf du ك isolé est à
+`pointe 18` et celui du ك fin à `pointe 65`. Aucune tache n'est sauvée par
+le filet, aucune forme n'a plus de deux taches. Regardé image par image sur
+le banc : le yā écrit son corps entier avant qu'un point paraisse.
+
+**`_revelateur` renvoie `diag`**, le classement tache par tache (pixels,
+part couverte, pas de pointe, verdict). Sans lui, « le point sort trop
+tôt » ne dit pas si la tache est mal classée ou si l'ordre du geste est
+faux — et on repart pour un tour.
+
 ### Ce qui reste ouvert sur les gestes
 
-- **Le point du yā sort avant la fin du corps.** Cause trouvée : le
-  pinceau qui longe la ligne effleure le point posé dessous et en couvre
-  plus du quart, seuil à partir duquel une tache est comptée comme
-  morceau de lettre (`estCorps`). Remonter le seuil à la moitié puis au
-  tiers fait basculer **le petit kāf logé dans le ك** du côté des points,
-  alors qu'il fait vraiment partie de la lettre. Le seuil ne sait pas les
-  distinguer : il faudra un autre critère (le point est détaché ET hors
-  du passage du crayon ; le petit kāf est traversé sur sa longueur).
 - **Le hā milieu.** Le client le signale depuis le début et ne nomme
   aucune forme modèle — ses deux ventres n'existent nulle part ailleurs.
   Il faut lui demander par où entre le crayon et dans quel sens tourne
   chaque ventre. Ne rien inventer : c'est là que tout a dérapé.
+  **Regardé sur le banc (19 août 2026)** : le défaut est visible et net.
+  Le geste part bien du trait de liaison, mais les deux ventres poussent
+  ENSEMBLE et par morceaux — à 45 % un fragment détaché apparaît en haut,
+  à 60 % le ventre du bas commence alors que celui du haut n'est pas fini.
+  Ce n'est donc pas un défaut de rendu : la table donne un ordre qui ne
+  suit aucun tracé continu. Le hā **isolé**, lui, se déroule proprement.
 
 ---
 
@@ -347,63 +417,103 @@ voix. Inversé, chaque étape jette le travail de la précédente — traduire
 95 phrases × 13 langues sur une interface qu'on va refaire, puis enregistrer
 les voix sur des textes qui vont changer.
 
-### Chantier 1 bis — Interface fille : LICORNE, sur le moteur du garçon
+**Les deux premières étapes sont faites.** Le chantier ouvert est celui des
+traductions ; l'arabe des enregistrements peut partir en parallèle, il ne
+dépend de rien (voir chantier 3).
 
-**Décidé le 19 août 2026.** Le client ne veut plus rien changer à la
-structure du garçon : le seuil est franchi. La structure de la fille est
-donc **remplacée** par celle du garçon, à l'identique, avec l'univers
-**licorne** en habillage.
+### FAIT — Chantier 1 bis : la fille sur le moteur du garçon, univers licorne
 
-Ce qui change de chaque côté, et qu'il ne faut pas mélanger :
+**Décidé et fait le 19 août 2026.** Il n'y a plus qu'**un moteur de scènes,
+un jeu de cours et une carte**, pour la fille comme pour le garçon. Ce qui
+distingue les deux univers tient dans un seul objet, `_HABILLAGES`, et dans
+deux blocs de variables CSS (`.boy-wrap` / `.boy-wrap.licorne`).
 
 | | fille | garçon |
 |---|---|---|
-| décor du parcours | **les îles, gardées** | **planètes en 3D** (et lune, soleil si les planètes ne suffisent pas) |
-| déplacement | le personnage **vole** d'île en île | le personnage **en fusée**, vole de planète en planète |
+| habillage | **licorne** 🦄, rose | **fusée** 🚀, bleu |
+| décor du parcours | **les îles, gardées** | **les planètes** |
+| noms des étapes | les lieux (L'Arche de Nouh…) | les planètes (Saturne…) |
+| mots | aventure · départ · envol · bulle | mission · briefing · décollage · hublot |
+| déplacement | **vole** d'île en île | **vole** de planète en planète |
 
-Dans les deux cas, le personnage ne marche plus le long du chemin tracé :
-il **vole** d'un point au suivant. La courbe de Bézier qui sert
-aujourd'hui de chemin reste utile — c'est la trajectoire du vol — mais
-elle n'a plus à être dessinée comme un sentier.
+**Ce qu'il ne faut plus jamais refaire** : un second moteur. `_kidScene` et
+toute la chaîne de leçons de la fille — 49 fonctions, 2 600 lignes — ont
+été supprimées. Pour un troisième univers, il suffit d'ajouter une entrée à
+`_HABILLAGES` : rien d'autre.
 
-Rappel qui vaut toujours : le portage doit produire **un seul moteur de
-scènes avec deux habillages**, pas un second code recopié. Aujourd'hui
-`_kidScene` et `_boyScene` sont deux chemins séparés, et toute correction
-est à faire deux fois — c'est ce qui a coûté le plus cher jusqu'ici.
+**Où poser quoi**
+- un mot, un emblème, une couleur qui change d'un univers à l'autre →
+  `_HABILLAGES` ;
+- une couleur d'écran → une variable `--sk-*` dans les deux blocs CSS.
+  **Aucune couleur en dur dans les classes `.boy-*`** : sinon la licorne
+  repasse au bleu sans qu'on comprenne pourquoi ;
+- une couleur peinte dans un canvas → les champs `fonce`, `moyen`, `rgb`,
+  `rgbF` de l'habillage : un contexte 2D ne sait pas lire une variable CSS,
+  ces champs doublent donc les `--sk-*` et doivent bouger avec elles.
 
-### (Ancienne rédaction, gardée pour le contexte)
+**Le vol** (`_volCarte`, `_traceVol`). Le personnage ne marche plus le long
+d'un sentier. La courbe de Bézier reste la trajectoire — elle a la bonne
+forme et passe par les bons points — mais elle n'est plus peinte en chemin
+de terre à trois couches : il n'en reste qu'un pointillé clair. Trois
+choses distinguent un vol d'une marche, et il faut **les trois**, sinon on
+voit un personnage qui glisse au sol :
 
-Décision du client : ne pas toucher aux deux interfaces enfant en même
-temps. L'interface fille actuelle sert de repli tant que le garçon n'est pas
-validé. Une fois validé, la fille reprend **exactement** la mécanique du
-garçon, avec un autre univers que l'espace.
+1. la vitesse n'est pas constante — on décolle, on file, on se pose. Une
+   vitesse fixe, c'est exactement ce que faisait l'ancienne marche ;
+2. le personnage s'incline vers là où il va. L'angle se prend sur la
+   **tangente** de la courbe, pas sur la droite qui joint les deux étapes :
+   dans un virage, les deux n'ont rien à voir. Il se redresse en se posant,
+   sinon il reste planté de travers sur l'étape ;
+3. il laisse une traînée qui s'efface derrière lui.
 
-- Seuil de déclenchement : non pas « le garçon est parfait », mais « je ne
-  veux plus rien changer à sa **structure** » — découpage des écrans et leur
-  ordre, contenu de chaque écran, déblocage des lettres, rôle de la ligne
-  d'écriture. Les formulations, couleurs et animations peuvent encore bouger
-  après.
-- Le portage doit produire **un seul moteur de scènes avec deux habillages**,
-  pas un second code recopié : aujourd'hui `_kidScene` et `_boyScene` sont
-  deux chemins séparés, et toute correction est à faire deux fois.
-- Univers proposés pour la fille, avec la correspondance pièce par pièce
-  (hublot → cadre de la lettre, piste → ligne d'écriture, jauge de décollage
-  → progression) : licorne (chemin d'étoiles, corne qui s'allume — reprend
-  les licornes déjà présentes dans le décor animé), montgolfière (horizon,
-  brûleur), jardin (allée, arrosoir, fleur qui éclôt), pâtisserie. **Choix du
-  client en attente.**
-- Piège : l'arc-en-ciel ferait une mauvaise ligne d'écriture, il est courbe.
-  La ligne doit rester droite, c'est celle du cours adulte.
+Piège : l'inclinaison vit sur le **conteneur**, le flottement sur l'**image**
+qu'il contient. Une seule balise ne peut pas porter les deux — une animation
+CSS écrase le `transform` posé à la main à chaque image.
 
-### Chantier 2 — Traductions : tout, partout
+**Les planètes.** Huit ne suffisent pas pour douze étapes : la Lune et le
+Soleil complètent, comme prévu, puis Pluton et une comète. Elles sont
+fabriquées par `outils/planetes.js`, qui écrit douze **SVG** dans
+`public/images/` — des images rendues, décidées une fois pour toutes, pas
+une sphère calculée dans le navigateur. Le client voulait des illustrations
+générées ; son compte de génération est à zéro crédit sur forfait gratuit.
+**Pour les remplacer** : déposer les fichiers sous le même nom et changer
+l'extension dans le tableau `images` de l'habillage `garcon`. Rien d'autre.
+`rmBg` ne détoure pas les `.svg` : déjà transparents, ils n'y gagneraient
+rien et en ressortiraient rasterisés en 300 px.
+
+**La progression de la fille a été reprise** (`_migreProgressionFille`).
+Elle comptait ses lettres dans `child_girl_day`, un simple numéro ; le
+garçon retient île par île les lettres faites (`boy_lettres_<id>`), et
+c'est ce que la carte lit. Sans cette conversion — faite une fois, jamais
+dans l'autre sens — une enfant qui avait appris douze lettres retrouvait
+une carte vierge.
+
+**Ce qui reste à décider avec le client**
+- les douze planètes sont dessinées, pas illustrées : à remplacer le jour
+  où il veut le même rendu peint que les îles ;
+- la carte enfant n'est plus traduite (elle ne l'était qu'à moitié) — elle
+  rejoint le chantier 2, où l'interface enfant est de toute façon
+  entièrement en français.
+
+Piège gardé : l'arc-en-ciel ferait une mauvaise ligne d'écriture, il est
+courbe. La ligne doit rester droite, c'est celle du cours adulte.
+
+### Chantier 2 — Traductions : tout, partout — LE CHANTIER OUVERT
 Décision du client : **tout doit être traduit dans les 13 langues**.
 - L'interface adulte est à 95–98 % (audit fait, trous comblés).
-- **L'interface enfant (fille et garçon) est 100 % en français codé en dur** :
-  ~86 phrases narrées + les libellés, aucun appel à `t()`, et la narration
-  est forcée en `fr-FR`.
+- **L'interface enfant est 100 % en français codé en dur** : ~86 phrases
+  narrées + les libellés, aucun appel à `t()`, et la narration est forcée
+  en `fr-FR`.
 - Corpus mesuré : ~95 phrases par langue, ~4 800 caractères, ~62 000 pour
   les 13 langues.
 - À faire avant les enregistrements audio, sinon la génération est à refaire.
+- **Bonne nouvelle depuis le portage** : il n'y a plus qu'un jeu de phrases
+  à traduire au lieu de deux. Elles vivent dans `_boyVowelCourse`,
+  `_boyProlongCourse` et `_boyLetterCourse`, et les mots d'univers — fusée
+  ou licorne — sont déjà sortis dans `_HABILLAGES` : ce sont eux, et eux
+  seuls, qui diffèrent d'un profil à l'autre.
+- Le titre de la carte enfant et les libellés des étapes en français
+  passent par là aussi (`titreCarte`, `etapes`).
 
 ### Chantier 3 — Voix naturelles
 
@@ -415,10 +525,15 @@ laquelle :
 - **L'ARABE peut s'enregistrer tout de suite, sans risque.** Lettres,
   voyelles, syllabes, les 30 mots illustrés : ce corpus ne dépend ni de
   l'interface ni des traductions. Il ne changera pas.
-- **La narration FRANÇAISE des cours enfant doit attendre.** Ses ~86
-  phrases sont écrites en dur dans `_boyScene` et `_kidScene`, et le
-  portage de la fille sur le moteur du garçon va les remanier. Les
-  enregistrer avant, c'est les refaire après.
+- **La narration FRANÇAISE des cours enfant peut maintenant s'enregistrer.**
+  Elle devait attendre le portage de la fille, qui allait la remanier : le
+  portage est fait. Ses phrases sont dans `_boyVowelCourse`,
+  `_boyProlongCourse` et `_boyLetterCourse`, et elles ne bougeront plus que
+  sur demande du client. Réserve : les quelques mots d'univers
+  (« mission » / « aventure », « décollage » / « envol »…) diffèrent entre
+  la fille et le garçon — il faut donc DEUX prises pour ces phrases-là, ou
+  les enregistrer sans le mot d'univers. Elles sont listées dans
+  `_HABILLAGES` : il n'y en a qu'une poignée.
 
 - Arabe **et français** : la voix du client, avec son micro, via le studio
   d'enregistrement (panneau admin, 370 entrées).
@@ -557,6 +672,22 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Pièges connus
 
+- **Supprimer du code mort : deux précautions.** En retirant les 2 600
+  lignes du moteur fille, deux pièges se sont refermés d'un coup.
+  *Un* : un commentaire n'est pas un appel. Une simple note « voir
+  `_machin` » posée hors de toute fonction suffisait à faire passer
+  `_machin` pour vivant — il faut masquer les commentaires avant de
+  chercher les racines, sinon la moitié du code mort reste.
+  *Deux* : en absorbant les commentaires qui précèdent une fonction, ne
+  jamais prendre une ligne parce qu'elle SE TERMINE par `*/`. Une ligne
+  de code suivie d'une note de fin de ligne partait alors avec, et le
+  fichier ne parsait plus — sans que la suppression elle-même soit en
+  cause, ce qui coûte une heure à comprendre. **Contrôler la syntaxe de
+  chaque bloc `<script>` avant d'écrire le fichier.**
+- **Il reste six fonctions mortes**, antérieures à ce chantier et
+  laissées telles quelles : `_applyProfileSafe`, `_mkVerset`,
+  `_quitterPleinEcranPaysage`, `checkCompletion`, `showCompletionModal`,
+  `markPracticeToday`. 70 lignes en tout.
 - **Douze fonctions au maximum** dans `api/` (forfait Vercel Hobby ; les
   fichiers commençant par `_` ne comptent pas). On y est exactement : la
   treizième fera échouer la construction. Pour en ajouter une, il faudra en
