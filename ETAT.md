@@ -513,13 +513,42 @@ traverse sa carte — sinon l'astronaute a les pieds au milieu du globe. Le
 vol se termine donc par une **approche** : la courbe s'arrête où elle
 s'arrêtait, et la fusée rejoint le sommet en glissant, feu encore allumé.
 
-Le sommet, c'est celui du DISQUE, pas de l'image : une planète est peinte
-au milieu d'un carré, entourée d'un halo. Il est **mesuré sur les pixels**
-(`_hautDuDessin`), avec un seuil d'opacité haut — c'est ce qui fait ignorer
-le halo, justement peint en transparence. Mesuré : Soleil 18 %, Mercure
-24 %, Vénus 21 %, Terre 19 %, Lune 25 %, Mars 22 % — soit exactement les
-rayons de `outils/planetes.js`. Le jour où le client remplace un décor, la
-mesure suit toute seule ; rien à noter planète par planète.
+Le sommet, c'est celui du CORPS de l'astre, pas de l'image : une planète
+est peinte au milieu d'un carré, entourée d'un halo. Il est **mesuré sur
+les pixels** (`_hautDuDessin`) — rien à noter planète par planète, et une
+illustration remplacée est mesurée toute seule.
+
+**On ne cherche PAS le premier pixel opaque.** C'était la première version,
+et le client l'a prise en défaut sur deux astres : l'anneau d'Uranus monte
+plus haut que sa sphère, la queue de la comète aussi — l'astronaute
+atterrissait donc sur l'anneau, dans le vide. Mesure à l'appui : premier
+pixel opaque à **7 %** pour Uranus, alors que sa sphère commence à 22 %.
+
+Ce qu'on cherche est la première rangée assez **large** pour être le corps :
+un anneau ou une queue ne font que quelques pixels de large en haut, une
+sphère s'élargit tout de suite. Le seuil est pris en part de la rangée la
+plus large de l'image — donc sans rien connaître du dessin. Vérifié sur les
+douze, écart au rayon vrai : au plus 1,5 %, et Uranus, la Lune et Mercure
+exactement justes. Un écart positif fait enfoncer les pieds de quelques
+pixels dans la sphère : invisible, et bien mieux que de flotter.
+
+**PAS DE RETOURNEMENT HORIZONTAL.** Il y en avait un quand le trajet
+partait vers la gauche (`scaleX(-1)`). Posé sur un élément qui porte une
+*transition* de transform, il ne bascule pas d'un coup : il passe par
+`scaleX(0)`. La fusée s'aplatit jusqu'à disparaître puis se retourne —
+« elle fait un tour sur elle-même et devient très fine », et on voit que ce
+n'est pas un volume. Le client l'a refusé. Il ne servait de toute façon à
+rien côté fille : la mascotte porte une animation CSS, qui gagne toujours
+sur un `transform` posé à la main.
+
+À la place, deux façons de s'orienter, selon l'habillage :
+- `aligne:true` (garçon) — **le nez suit la trajectoire**. L'image de la
+  fusée pointe vers le haut : on tourne donc de l'angle de la tangente plus
+  un quart de tour. Piège : il faut **dérouler** l'angle (prendre toujours
+  le chemin le plus court d'une image à l'autre), sinon la fusée fait un
+  tour complet quand la tangente passe de +179° à −179° ;
+- `aligne:false` (fille) — une simple inclinaison plafonnée à 24° : une
+  licorne ne se met pas la tête en bas parce que le chemin descend.
 
 **Le rythme** a été rallongé à sa demande : vol 1,85 s par saut (1,65 s en
 portrait), approche 0,78 s, vol stationnaire 0,9 s, descente 1,25 s.

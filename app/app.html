@@ -5693,14 +5693,30 @@ function _penteBezier(t,s){
   if(Math.abs(v.x)<0.01&&Math.abs(v.y)<0.01)v=d(Math.min(0.98,Math.max(0.02,t+0.02)));
   return Math.atan2(v.y,v.x)*180/Math.PI;
 }
-/* Le personnage vole vers la gauche ou vers la droite selon le segment.
-   On ne le fait pas tourner à 180° — une licorne sur le dos — mais on le
-   penche du quart de l'angle, et on le retourne horizontalement quand il
-   part vers la gauche. */
+/* ── PENCHER, SANS RETOURNER ──────────────────────────────────────────
+   Il y avait un retournement horizontal quand le trajet partait vers la
+   gauche (`scaleX(-1)`). Deux raisons de l'avoir retire :
+   - pose sur un element qui porte une TRANSITION de transform, il ne
+     bascule pas d'un coup : il passe par `scaleX(0)`. La fusee s'aplatit
+     jusqu'a disparaitre puis se retourne — « elle fait un tour sur
+     elle-meme et devient tres fine », et on voit que ce n'est pas un
+     volume. Le client l'a refuse ;
+   - cote fille il n'a jamais rien fait : la mascotte porte une animation
+     CSS, qui gagne toujours sur un `transform` pose a la main.
+
+   Restent deux facons de s'orienter, selon l'habillage :
+
+   `aligne` — LE NEZ SUIT LA TRAJECTOIRE. L'image de la fusee pointe vers
+   le haut : pour mettre son nez dans le sens du vol, on tourne de l'angle
+   de la tangente PLUS un quart de tour. C'est un vrai alignement, pas une
+   inclinaison de politesse.
+
+   sinon — une simple inclinaison, plafonnee : une licorne ne se met pas
+   la tete en bas parce que le chemin descend. */
 function _inclinaison(deg){
   var vaGauche=Math.abs(deg)>90;
   var pente=vaGauche?(deg>0?180-deg:-180-deg):deg;
-  return{deg:Math.max(-24,Math.min(24,pente*0.35)),gauche:vaGauche};
+  return Math.max(-24,Math.min(24,pente*0.35));
 }
 /* ── L'EQUIPAGE ───────────────────────────────────────────────────────
    Ce qui se deplace sur la carte n'est plus une mascotte unique. Cote
@@ -5772,26 +5788,41 @@ function _fondEnfant(actif){
    DISQUE, sinon l'astronaute se retrouve les pieds au milieu du globe.
    `object-fit:contain` : l'image est reduite du meme facteur dans les deux
    sens, et centree — c'est ce facteur qu'on recalcule ici. */
-/* Le haut du DESSIN dans son image, en fraction de sa hauteur.
-   Une planete est peinte au milieu d'un carre, entouree d'un halo : son
-   image commence donc bien au-dessus de son disque. Poser l'astronaute au
-   bord de l'image le laisserait flotter au-dessus du globe.
-   On le mesure sur les pixels plutot que de le noter planete par planete :
-   le jour ou le client remplace un decor, la mesure suit toute seule.
-   Le seuil d'opacite est haut (150) EXPRES : c'est ce qui fait ignorer le
-   halo, qui est justement peint en transparence. */
+/* Le haut du CORPS de l'astre dans son image, en fraction de sa hauteur.
+   Une planete est peinte au milieu d'un carre : son image commence bien
+   au-dessus de son disque, et poser l'astronaute au bord de l'image le
+   laisserait flotter au-dessus du globe.
+
+   On ne cherche PAS le premier pixel opaque : c'etait la premiere version,
+   et elle se trompait sur deux astres — l'anneau d'Uranus monte plus haut
+   que sa sphere, la queue de la comete aussi. L'astronaute atterrissait
+   alors sur l'anneau, dans le vide. Mesure a l'appui : premier pixel
+   opaque a 7 % pour Uranus, alors que sa sphere commence a 22 %.
+
+   Ce qu'on cherche, c'est la premiere rangee assez LARGE pour etre le
+   corps : un anneau ou une queue ne font que quelques pixels de large en
+   haut, une sphere s'elargit tout de suite. Le seuil est pris en part de
+   la rangee la plus large de l'image — donc sans rien connaitre du dessin.
+   Verifie sur les douze : Soleil 19 % (rayon vrai 18), Uranus 22 % (22),
+   Saturne 24 % (23), comete 33 % (34,5).
+   Le seuil d'opacite, lui, fait ignorer le halo, peint en transparence. */
 var _HAUTS_DECOR={};
 function _hautDuDessin(img){
   var cle=img.getAttribute('src')||'';
   if(_HAUTS_DECOR[cle]!==undefined)return _HAUTS_DECOR[cle];
-  var N=72,r=0;
+  var N=100,r=0;
   try{
     var cv=document.createElement('canvas');cv.width=N;cv.height=N;
     var cx=cv.getContext('2d');cx.drawImage(img,0,0,N,N);
     var d=cx.getImageData(0,0,N,N).data;
-    for(var y=0;y<N&&!r;y++)
-      for(var x=0;x<N;x++)
-        if(d[(y*N+x)*4+3]>=150){r=y/N;break;}
+    var larg=new Int32Array(N),max=0;
+    for(var y=0;y<N;y++){
+      var c=0;
+      for(var x=0;x<N;x++)if(d[(y*N+x)*4+3]>=150)c++;
+      larg[y]=c;if(c>max)max=c;
+    }
+    var seuil=0.22*max;
+    for(var y2=0;y2<N;y2++)if(larg[y2]>=seuil){r=y2/N;break;}
   }catch(e){r=0;}
   _HAUTS_DECOR[cle]=r;
   return r;
@@ -5813,10 +5844,6 @@ function _volCarte(o){
   var eq=o.equipage||{};
   var dx=o.decalageX||0,dy=o.decalageY||0;
   var idx=o.depart||0,raf=null,grains=[],dernierGrain=0;
-  /* Ce qu'on retourne horizontalement quand on part vers la gauche : le
-     vaisseau s'il y en a un, sinon la mascotte. Le pilote, lui, ne vole
-     pas — il n'a pas a etre retourne. */
-  var img=eq.vaisseau||eq.pilote||el.firstChild;
 
   /* ── Les trois etats de l'equipage ──
      au repos : le pilote, debout sur l'etape ;
@@ -5851,12 +5878,15 @@ function _volCarte(o){
   function approche(de,vers,fini){
     if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-56%)';
     var t0=Date.now(),D=o.dureeApproche||750;
+    /* Elle vole encore : son nez reste dans le sens de la marche, et elle
+       se redresse seulement en arrivant — on ne se pose pas couche. */
+    var capA=Math.atan2(vers.y-de.y,vers.x-de.x)*180/Math.PI;
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
-      poser(x,y,null);
+      poser(x,y,capA,Math.min(1,(1-u)/0.45));
       grain(x,y);
-      if(u>=1){fini();return;}
+      if(u>=1){poser(vers.x,vers.y,null);fini();return;}
       raf=requestAnimationFrame(tic);
     }
     tic();
@@ -5884,13 +5914,22 @@ function _volCarte(o){
      décollage et à l'atterrissage — le personnage y est droit — et 1 en
      vol. Le sens de l'image, lui, ne s'atténue pas : on regarde toujours
      là où l'on va. */
+  /* L'angle pose a l'image precedente, pour ne pas faire le tour du cadran
+     quand la tangente passe de +179 a -179 : on prend toujours le chemin
+     le plus court. Sans ce recalage, la fusee fait un tour complet sur
+     elle-meme au milieu d'un virage. */
+  var angleVu=0;
+  function _court(a){
+    while(a-angleVu>180)a-=360;
+    while(a-angleVu<-180)a+=360;
+    angleVu=a;return a;
+  }
   function poser(x,y,deg,part){
     el.style.left=(x-dx)+'px';el.style.top=(y-dy)+'px';
-    if(deg===undefined||deg===null){el.style.transform='';return;}
-    var i=_inclinaison(deg);
-    var a=i.deg*(part===undefined?1:Math.max(0,Math.min(1,part)));
+    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;return;}
+    var a=o.aligne?_court(deg+90):_inclinaison(deg);
+    a*=(part===undefined?1:Math.max(0,Math.min(1,part)));
     el.style.transform='rotate('+a.toFixed(1)+'deg)';
-    if(img&&img.style)img.style.transform=i.gauche?'scaleX(-1)':'';
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
      conteneur de la carte, sous le personnage, et se retirent tout seuls. */
@@ -5963,7 +6002,7 @@ function _volCarte(o){
       /* On se penche en décollant, on se redresse en se posant. Sans ce
          redressement, le personnage arrivait sur l'étape encore couché à
          24° et y restait planté de travers le temps d'un battement. */
-      poser(p.x,p.y,deg,Math.min(1,u/0.18,(1-u)/0.18));
+      poser(p.x,p.y,deg,Math.min(1,u/0.26,(1-u)/0.26));
       grain(p.x,p.y);
       if(u>=1){
         n++;u=0;debut=Date.now();
@@ -6335,7 +6374,7 @@ var islandDefs=[
         var charIdxM=_ileDepart(islandDefs);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
           equipage:eqMob,decalageX:42,decalageY:88,depart:charIdxM,
-          trainee:_HAB.trainee,duree:1650,dureeApproche:700,
+          trainee:_HAB.trainee,duree:1650,dureeApproche:700,aligne:_HAB.aligne,
           pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null});
         /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
            cours est là dès la première image affichée. */
@@ -6443,7 +6482,7 @@ var islandDefs=[
       var charIdx=_ileDepart(islandDefs);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
         equipage:eq,decalageX:52,decalageY:110,depart:charIdx,
-        trainee:_HAB.trainee,duree:1850,dureeApproche:780,
+        trainee:_HAB.trainee,duree:1850,dureeApproche:780,aligne:_HAB.aligne,
         pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null});
 
       /* Défilement AVANT de montrer la carte : l'étape en cours doit être à
@@ -7108,7 +7147,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v104';
+var _VERSION_REPLI='v105';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8535,6 +8574,9 @@ var _HABILLAGES={
        elle, marche dans le decor de son ile : sa mascotte reste sur la
        trajectoire. */
     poseSommet:true,
+    /* Une fusee a un nez : il doit pointer la ou elle va. Une licorne, non
+       — elle se penche, et c'est tout. */
+    aligne:true,
     /* Le fond des ecrans enfant : l'espace. Pose sur `#ca`, il ne sort pas
        de la carte ni du cours (voir `_fondEnfant`). */
     fond:'fond-espace',
@@ -8569,6 +8611,7 @@ var _HABILLAGES={
        elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
        descente : c'est sa mascotte qui se pose. */
     decor:1,vaisseau:null,pilote:null,flamme:false,poseSommet:false,fond:null,
+    aligne:false,
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
     notePiste:'✨ La ligne d\'écriture — appuie sur un signe pour l\'écouter',
