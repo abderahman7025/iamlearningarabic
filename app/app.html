@@ -6820,7 +6820,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v100';
+var _VERSION_REPLI='v101';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -7758,21 +7758,34 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
      reste intact tant que le crayon n'y est pas arrivé par le trait. */
   var vuP=new Int32Array(w*h),mqP=0,fileP=new Int32Array(w*h),profP=new Int32Array(w*h);
   var Rg=Math.round(R*1.6);
+  /* Combien de fois la POINTE du crayon — son centre, pas son épaisseur —
+     s'est posée sur chaque tache. C'est ce qui sépare un point d'un morceau
+     de lettre : voir `estCorps` plus bas. */
+  var pointe={};
   function peint(cxp,cyp,rg){
     if(cxp<0||cxp>=w||cyp<0||cyp>=h)return;
-    var s=cyp*w+cxp;
+    var s=cyp*w+cxp,ecart=0;
     /* Le centre est tombé juste à côté du trait : on le rattrape d'un pixel
-       ou deux, sinon ce pas de pinceau ne peindrait rien. */
+       ou deux, sinon ce pas de pinceau ne peindrait rien. On retient de
+       COMBIEN on l'a rattrapé — à deux pixels, le crayon n'est plus sur le
+       trait, il passe à côté. */
     if(!encre[s]){
       var pris=-1;
-      for(var dy=-2;dy<=2&&pris<0;dy++)for(var dx=-2;dx<=2;dx++){
-        var xx=cxp+dx,yy=cyp+dy;
-        if(xx<0||xx>=w||yy<0||yy>=h)continue;
-        if(encre[yy*w+xx]){pris=yy*w+xx;break;}
+      for(var r=1;r<=2&&pris<0;r++){
+        for(var dy=-r;dy<=r&&pris<0;dy++)for(var dx=-r;dx<=r;dx++){
+          if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;
+          var xx=cxp+dx,yy=cyp+dy;
+          if(xx<0||xx>=w||yy<0||yy>=h)continue;
+          if(encre[yy*w+xx]){pris=yy*w+xx;ecart=r;break;}
+        }
       }
       if(pris<0)return;
       s=pris;
     }
+    /* Un pixel rattrapé à deux de distance ne compte pas comme un passage :
+       c'est exactement ce qui arrive au point du yā, frôlé par le crayon qui
+       longe la ligne juste au-dessus de lui. */
+    if(ecart<=1){var lp=taches.lab[s];pointe[lp]=(pointe[lp]||0)+1;}
     mqP++;
     var t=0,q=0;fileP[q++]=s;vuP[s]=mqP;profP[s]=0;
     while(t<q){
@@ -7804,13 +7817,30 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
     tot[lb]=(tot[lb]||0)+1;
     if(rang[i]>=0)vus[lb]=(vus[lb]||0)+1;
   }
-  /* Le seuil reste au quart. Essayé à la moitié puis au tiers pour que le
-     point du yā, effleuré par le pinceau qui longe la ligne, cesse de
-     passer pour un morceau de lettre : dans les deux cas le petit kāf logé
-     dans le ك bascule lui aussi du côté des points, alors qu'il fait
-     vraiment partie de la lettre. Le seuil ne sait pas les distinguer — il
-     faudra les séparer autrement que par la part couverte. */
-  function estCorps(lb){return (vus[lb]||0)>=0.25*tot[lb];}
+  /* ── Corps ou point ? ────────────────────────────────────────────────
+     La question n'est PAS « quelle part de la tache le pinceau a-t-il
+     couverte ». Ce critère-là a été essayé au quart, au tiers et à la
+     moitié : au quart, le point du yā passait pour un morceau de lettre —
+     le crayon longe la ligne juste au-dessus de lui et l'effleure ; plus
+     haut, c'est le petit kāf logé dans le ك qui basculait du côté des
+     points, alors qu'il fait vraiment partie de la lettre. Aucune valeur
+     ne séparait les deux, parce que la part couverte ne mesure pas la
+     bonne chose.
+
+     Ce qui les sépare, c'est le PASSAGE DU CRAYON : le petit kāf est
+     traversé sur sa longueur, la pointe se pose dessus pas après pas ; le
+     point du yā, lui, est détaché et hors du chemin — seule l'épaisseur du
+     pinceau vient le mordre. On compte donc les pas où la POINTE est sur
+     la tache, pas les pixels que l'épaisseur a touchés.
+
+     Deux pas suffisent : un seul pourrait être un hasard de rattrapage.
+     La part couverte reste en filet de sécurité, mais haut — à ce
+     niveau-là une tache est peinte, pas effleurée : elle rattrape un
+     morceau de lettre qu'aucun geste ne traverse, sans jamais repêcher un
+     point frôlé au passage. */
+  function estCorps(lb){
+    return (pointe[lb]||0)>=2 || (vus[lb]||0)>=0.70*tot[lb];
+  }
   /* ── Ce que le pinceau a manqué ──
      De proche en proche, à travers l'encre : un pixel non touché prend le
      rang de son plus proche voisin déjà rangé, en suivant le trait.
@@ -7873,8 +7903,16 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h){
   }
   points=deDroiteAGauche(points);
   voyelle=voyelle.sort(function(a,b){return (b%w)-(a%w);});
+  /* Le classement de chaque tache, pour le banc d'essai. Sans lui, « le
+     point sort trop tôt » ne dit pas si la tache a été mal classée ou si
+     c'est l'ordre du geste qui est faux — et on repart pour un tour. */
+  var diag=Object.keys(tot).map(function(lb){
+    return {tache:+lb,pixels:tot[lb],couverts:vus[lb]||0,
+            pointe:pointe[lb]||0,corps:estCorps(lb)};
+  }).sort(function(a,b){return b.pixels-a.pixels;});
   return {cv:cv,ctx:c,img:img,tampon:c.createImageData(w,h),
-          ordre:ordre,points:points,voyelle:voyelle,x0:x0,y0:y0,fait:-1};
+          ordre:ordre,points:points,voyelle:voyelle,x0:x0,y0:y0,fait:-1,
+          diag:diag};
 }
 /* Peint la forme révélée. L'avancement va de 0 à 3, en TROIS temps — c'est
    l'ordre d'écriture voulu par le client :
