@@ -5661,20 +5661,14 @@ function _quandCartePrete(el,max,fn){
    L'inclinaison vit sur le conteneur, le flottement sur l'image qu'il
    contient : une seule et même balise ne peut pas porter les deux, une
    animation CSS écrase le `transform` qu'on lui pose à la main. */
-/* La trajectoire, montrée sans être un chemin. L'ancienne carte peignait un
-   sentier de terre en trois couches — un sol, une chose sur laquelle on
-   marche. Il n'en reste qu'un pointillé clair : la route du vol. */
-function _traceVol(svg,d,verrou,epais){
-  var e=epais||3;
-  var l=document.createElementNS('http://www.w3.org/2000/svg','path');
-  l.setAttribute('d',d);
-  l.setAttribute('stroke',verrou?'rgba(160,160,160,.28)':'rgba(255,255,255,.55)');
-  l.setAttribute('stroke-width',String(e));
-  l.setAttribute('stroke-dasharray',(e*0.9).toFixed(1)+' '+(e*3).toFixed(1));
-  l.setAttribute('stroke-linecap','round');
-  l.setAttribute('fill','none');
-  svg.appendChild(l);
-}
+/* La trajectoire ne se DESSINE PLUS. Elle a d'abord ete un sentier de terre
+   en trois couches — une chose sur laquelle on marche — puis un pointille
+   clair. Le client n'en veut plus du tout : la fusee vole, sa route ne se
+   trace pas dans le ciel. Les courbes restent, ce sont elles qui portent le
+   vol ; il n'en reste simplement rien a voir.
+   La fonction est gardee, vide : c'est le seul endroit ou remettre un trait
+   si l'envie revenait. */
+function _traceVol(){}
 function _bezier(t,s){
   var m=1-t;
   return{x:m*m*m*s.x0+3*m*m*t*s.cpx1+3*m*t*t*s.cpx2+t*t*t*s.x3,
@@ -5748,9 +5742,13 @@ function _equipage(taille){
       +'animation:volFlotte 2.8s ease-in-out infinite';
     v.appendChild(vi);
     var p=document.createElement('img');p.src=_HAB.pilote;p.alt='';
-    /* Le pilote est plus petit que la fusee et pose sur le meme bas de
-       boite : c'est ce bas-la qui touche l'etape. */
-    p.style.cssText='position:absolute;left:22%;bottom:0;width:56%;height:74%;object-fit:contain;'
+    /* L'enfant se tient DEVANT la fusee posee, pas a sa place : il est plus
+       petit qu'elle, un peu decale, et pose sur le meme bas de boite —
+       c'est ce bas-la qui touche l'etape. */
+    /* Decale vers la droite : centre, il masquait la fusee au lieu de se
+       tenir devant elle. Ainsi les deux se voient — la fusee garee, et lui
+       debout a cote d'elle. */
+    p.style.cssText='position:absolute;left:41%;bottom:0;width:44%;height:54%;object-fit:contain;'
       +'object-position:bottom;transition:opacity .5s ease,transform 1.1s cubic-bezier(.32,1.1,.5,1)';
     el.appendChild(v);el.appendChild(p);
     eq.vaisseau=v;eq.pilote=p;eq.aVaisseau=true;
@@ -5810,6 +5808,19 @@ var _HAUTS_DECOR={};
 function _hautDuDessin(img){
   var cle=img.getAttribute('src')||'';
   if(_HAUTS_DECOR[cle]!==undefined)return _HAUTS_DECOR[cle];
+  /* Quand on a DESSINE le decor soi-meme, on connait son rayon : on ne
+     mesure pas, on sait. La mesure ci-dessous reste pour les illustrations
+     que le client fournirait. Elle suffit pour une sphere nue, mais pas
+     pour la comete : sa queue ET son aureole montent plus haut que son
+     noyau, et aucune regle de largeur ne les distingue proprement — le
+     personnage se posait sur l'aureole. */
+  if(_HAB&&_HAB.sommets){
+    var m=/planete-([a-z]+)\./.exec(cle);
+    if(m&&_HAB.sommets[m[1]]!==undefined){
+      _HAUTS_DECOR[cle]=_HAB.sommets[m[1]];
+      return _HAUTS_DECOR[cle];
+    }
+  }
   var N=100,r=0;
   try{
     var cv=document.createElement('canvas');cv.width=N;cv.height=N;
@@ -5851,24 +5862,35 @@ function _volCarte(o){
      a l'arrivee : la flamme s'eteint, le pilote descend seul et le
      vaisseau s'efface. Sans vaisseau (la fille), rien de tout cela ne
      s'applique : sa mascotte vole et se pose d'un bloc. */
+  /* Quel enfant descend ici : sur la Terre il n'a pas besoin de sa
+     combinaison. L'habillage le dit etape par etape. */
+  function habillePilote(){
+    if(!eq.aVaisseau||!o.pilotePour)return;
+    var src=o.pilotePour(idx)||_HAB.pilote;
+    if(eq.pilote.getAttribute('src')!==src)eq.pilote.setAttribute('src',src);
+  }
   function enVol(){
     if(!eq.aVaisseau)return;
     eq.vaisseau.style.opacity='1';
     eq.vaisseau.style.transform='';
     eq.pilote.style.opacity='0';
-    eq.pilote.style.transform='translateY(-26%) scale(.7)';
+    eq.pilote.style.transform='translateY(14%) scale(.72)';
     if(eq.flamme)eq.flamme.style.display='block';
   }
+  /* Au repos, la fusee est POSEE sur l'etape et l'enfant se tient devant
+     elle : les deux se voient. Elle ne s'efface plus — le client veut la
+     voir garee sur sa planete. */
   function auRepos(pose){
     if(!eq.aVaisseau)return;
     if(eq.flamme)eq.flamme.style.display='none';
-    /* Au tout debut du parcours l'enfant n'a encore atterri nulle part :
-       il est dans sa fusee, pas debout dans le vide. */
+    /* Au tout debut du parcours il n'a encore atterri nulle part : il est
+       dans sa fusee, pas debout dans le vide. */
     var debout=(pose===undefined)?(idx>=1):pose;
+    habillePilote();
     eq.vaisseau.style.transform='';
-    eq.vaisseau.style.opacity=debout?'0':'1';
+    eq.vaisseau.style.opacity='1';
     eq.pilote.style.opacity=debout?'1':'0';
-    eq.pilote.style.transform=debout?'translateY(0) scale(1)':'translateY(-26%) scale(.7)';
+    eq.pilote.style.transform=debout?'translateY(0) scale(1)':'translateY(14%) scale(.72)';
   }
   /* L'arrivee, en trois temps : la fusee tient au-dessus de l'etape et
      coupe le feu, le pilote sort et descend seul, la fusee s'efface. */
@@ -5876,7 +5898,10 @@ function _volCarte(o){
      l'etape ; il reste a rejoindre le sommet du decor. La fusee s'y rend
      en glissant, feu encore allume — elle vole toujours. */
   function approche(de,vers,fini){
-    if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-56%)';
+    /* Elle s'eleve un peu : elle arrive AU-DESSUS du sommet, et c'est de
+       la qu'elle descendra se poser. Meme hauteur que la tenue en vol
+       stationnaire, sinon on la voit remonter avant d'atterrir. */
+    if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
     var t0=Date.now(),D=o.dureeApproche||750;
     /* Elle vole encore : son nez reste dans le sens de la marche, et elle
        se redresse seulement en arrivant — on ne se pose pas couche. */
@@ -5886,29 +5911,32 @@ function _volCarte(o){
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
       poser(x,y,capA,Math.min(1,(1-u)/0.45));
       grain(x,y);
+      camera(y);
       if(u>=1){poser(vers.x,vers.y,null);fini();return;}
       raf=requestAnimationFrame(tic);
     }
     tic();
   }
+  /* L'arrivee, en deux temps :
+     1. la fusee tient un instant au-dessus du sommet, coupe le feu, puis
+        DESCEND s'y poser ;
+     2. une fois posee, l'enfant parait DEVANT elle.
+     Elle ne repart pas et ne s'efface pas : elle reste garee la, et c'est
+     de la qu'elle redecollera. */
   function poserPilote(fini){
     if(!eq.aVaisseau){if(fini)fini();return;}
-    /* 1. le feu se coupe et la fusee MONTE au-dessus de l'etape : elle
-          tient en vol stationnaire, c'est de la que l'enfant descend. */
     if(eq.flamme)eq.flamme.style.display='none';
-    eq.vaisseau.style.transform='translateY(-56%)';
-    eq.pilote.style.transform='translateY(-56%) scale(.72)';
+    habillePilote();
+    eq.vaisseau.style.transform='translateY(-34%)';
+    eq.pilote.style.transform='translateY(-34%) scale(.72)';
     setTimeout(function(){
-      /* 2. l'enfant sort et descend SEUL sur la planete, la fusee s'efface */
-      eq.pilote.style.opacity='1';
-      eq.pilote.style.transform='translateY(0) scale(1)';
-      eq.vaisseau.style.opacity='0';
+      eq.vaisseau.style.transform='';          /* elle se pose */
       setTimeout(function(){
-        /* remise a plat, pour que le prochain depart reparte d'aplomb */
-        eq.vaisseau.style.transform='';
-        if(fini)fini();
-      },1250);
-    },900);
+        eq.pilote.style.opacity='1';           /* il parait devant elle */
+        eq.pilote.style.transform='translateY(0) scale(1)';
+        setTimeout(function(){if(fini)fini();},900);
+      },780);
+    },700);
   }
   /* `part` : de 0 à 1, la part d'inclinaison qu'on applique. Elle vaut 0 au
      décollage et à l'atterrissage — le personnage y est droit — et 1 en
@@ -5953,6 +5981,17 @@ function _volCarte(o){
   /* Décollage, croisière, atterrissage : lent aux deux bouts, rapide au
      milieu. C'est ce que la vitesse constante d'avant ne donnait pas. */
   function adouci(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+  /* La camera suit la fusee. Sans elle, un long voyage se joue hors de
+     l'ecran : on clique, il ne se passe rien de visible, et le cours
+     s'ouvre. On garde le vaisseau au milieu de la hauteur visible. */
+  function camera(y){
+    if(!o.camera)return;
+    var ca=document.getElementById('ca');
+    if(!ca)return;
+    var haut=(globe.getBoundingClientRect().top+ca.scrollTop)-ca.getBoundingClientRect().top;
+    var vise=haut+y-ca.clientHeight/2;
+    ca.scrollTop=Math.max(0,Math.min(ca.scrollHeight-ca.clientHeight,vise));
+  }
   /* Le point de repos de l'etape i : son sommet quand l'habillage le
      demande (le garcon se tient DEBOUT sur sa planete), sinon le point de
      la trajectoire — c'est ce que fait la fille, dont la mascotte marche
@@ -5981,17 +6020,24 @@ function _volCarte(o){
     if(raf){cancelAnimationFrame(raf);raf=null;}
     if(idx===cible){if(fini)fini();return;}
     enVol();
-    /* Revenir de dix îles en arrière était interminable à regarder : on se
-       pose directement sur celle qui suit la visée, il ne reste qu'un vol. */
-    if(cible<idx-1){idx=cible+1;var r=segs[idx-1];poser(r.x3,r.y3,null);}
+    /* La fusee part TOUJOURS de la ou elle se trouve vraiment, et fait tout
+       le trajet — c'est la demande du client. Elle se posait avant sur
+       l'etape juste avant la visee, ce qui la faisait apparaitre d'un coup
+       a l'autre bout de la carte.
+       Pour qu'un long voyage reste regardable, ce n'est pas le trajet qu'on
+       raccourcit mais le temps de chaque saut : le voyage entier tient dans
+       `dureeTotale`, reparti sur les sauts. Un saut seul garde son allure
+       pleine ; dix sauts defilent plus vite, mais on les voit tous. */
     var pas=idx<cible?1:-1,file=[];
     for(var i=idx;i!==cible;i+=pas){
       if(pas>0)file.push({seg:segs[i],sens:1});else file.push({seg:segs[i-1],sens:-1});
     }
     var n=0,u=0;
-    /* Un vol dure le même temps quelle que soit la longueur du saut : c'est
+    /* Un saut dure le même temps quelle que soit sa longueur : c'est
        l'allure d'un déplacement en l'air, pas d'un pas qui s'allonge. */
-    var DUREE=o.duree||900,debut=Date.now();
+    var DUREE=o.duree||900;
+    if(file.length>1)DUREE=Math.max(600,Math.min(DUREE,(o.dureeTotale||9000)/file.length));
+    var debut=Date.now();
     function tic(){
       var item=file[n];
       if(!item){idx=cible;arriver(fini);return;}
@@ -6004,6 +6050,7 @@ function _volCarte(o){
          24° et y restait planté de travers le temps d'un battement. */
       poser(p.x,p.y,deg,Math.min(1,u/0.26,(1-u)/0.26));
       grain(p.x,p.y);
+      camera(p.y);
       if(u>=1){
         n++;u=0;debut=Date.now();
         if(pas>0)idx++;else idx--;
@@ -6329,7 +6376,9 @@ var islandDefs=[
          qu'il contient portent le flottement. Une meme balise ne peut pas
          faire les deux : l'animation CSS ecraserait le `transform` pose a
          la main a chaque image. */
-      var eqMob=_equipage(84);
+      /* Plus grande qu'avant : la fusee reste garee sur l'etape et
+         l'enfant se tient devant elle — il faut la place pour les deux. */
+      var eqMob=_equipage(112);
       var charElMob=eqMob.el;
       globeDiv.appendChild(charElMob);
       _quandCartePrete(ca,1500,function(){
@@ -6373,9 +6422,12 @@ var islandDefs=[
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
-          equipage:eqMob,decalageX:42,decalageY:88,depart:charIdxM,
-          trainee:_HAB.trainee,duree:1650,dureeApproche:700,aligne:_HAB.aligne,
-          pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null});
+          equipage:eqMob,decalageX:56,decalageY:118,depart:charIdxM,
+          trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
+          dureeTotale:9000,camera:true,
+          pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null,
+          pilotePour:function(i){
+            return (_HAB.pilotesEtape&&_HAB.pilotesEtape[i-1])||null;}});
         /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
            cours est là dès la première image affichée. */
         if(segsMob.length>0){
@@ -6474,16 +6526,19 @@ var islandDefs=[
       }
 
       // Avatar
-      var eq=_equipage(104);
+      var eq=_equipage(140);
       var charEl=eq.el;
       globeDiv.appendChild(charEl);
 
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
-        equipage:eq,decalageX:52,decalageY:110,depart:charIdx,
-        trainee:_HAB.trainee,duree:1850,dureeApproche:780,aligne:_HAB.aligne,
-        pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null});
+        equipage:eq,decalageX:70,decalageY:146,depart:charIdx,
+        trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
+        dureeTotale:9000,camera:true,
+        pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null,
+        pilotePour:function(i){
+          return (_HAB.pilotesEtape&&_HAB.pilotesEtape[i-1])||null;}});
 
       /* Défilement AVANT de montrer la carte : l'étape en cours doit être à
          l'écran dès la première image affichée, sans saut. */
@@ -7147,7 +7202,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v105';
+var _VERSION_REPLI='v106';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8577,6 +8632,14 @@ var _HABILLAGES={
     /* Une fusee a un nez : il doit pointer la ou elle va. Une licorne, non
        — elle se penche, et c'est tout. */
     aligne:true,
+    /* Le sommet de chaque astre, en fraction de la hauteur de son image.
+       Sorti par `node outils/planetes.js`, qui connait les rayons. */
+    sommets:{'soleil':0.18,'mercure':0.24,'venus':0.21,'terre':0.195,'lune':0.25,
+             'mars':0.225,'jupiter':0.17,'saturne':0.23,'uranus':0.22,
+             'neptune':0.215,'pluton':0.265,'comete':0.345},
+    /* Sur la Terre, il y a de l'air : l'enfant y descend SANS combinaison.
+       Cle = rang de l'etape. */
+    pilotesEtape:{3:'/images/enfant-garcon.png'},
     /* Le fond des ecrans enfant : l'espace. Pose sur `#ca`, il ne sort pas
        de la carte ni du cours (voir `_fondEnfant`). */
     fond:'fond-espace',
@@ -8611,7 +8674,7 @@ var _HABILLAGES={
        elle vole par elle-meme — pas de vaisseau, donc pas de flamme ni de
        descente : c'est sa mascotte qui se pose. */
     decor:1,vaisseau:null,pilote:null,flamme:false,poseSommet:false,fond:null,
-    aligne:false,
+    aligne:false,sommets:null,pilotesEtape:null,
     noteBulle:'🔊 Appuie sur la bulle pour écouter',
     noteMot:'🔊 Appuie sur la bulle pour écouter le mot',
     notePiste:'✨ La ligne d\'écriture — appuie sur un signe pour l\'écouter',

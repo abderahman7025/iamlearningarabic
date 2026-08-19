@@ -159,3 +159,21 @@ PLANETES.forEach(function (p) {
   console.log('écrit : ' + path.relative(path.join(__dirname, '..'), f));
 });
 console.log(PLANETES.length + ' décors écrits.');
+
+/* Le SOMMET de chaque astre, en fraction de la hauteur de son image.
+ *
+ * Le personnage se pose dessus : il faut le connaître exactement. On sait
+ * ici le rayon de chaque corps, alors on le calcule plutôt que de le
+ * deviner. Le deviner sur les pixels marche pour une sphère nue, mais pas
+ * pour la comète — sa queue et son auréole montent plus haut que son
+ * noyau, et le personnage se retrouvait posé dans le vide.
+ *
+ * Ce tableau se recopie tel quel dans `_HABILLAGES.garcon.sommets`, dans
+ * app/app.html. Les décors que le client fournirait lui-même n'y sont pas :
+ * ceux-là sont mesurés au chargement (`_hautDuDessin`).
+ */
+console.log('');
+console.log('À recopier dans _HABILLAGES.garcon.sommets :');
+console.log('    sommets:{' + PLANETES.map(function (p) {
+  return "'" + p.nom + "':" + ((200 - p.r) / 400).toFixed(4).replace(/0+$/, '');
+}).join(',') + '},');

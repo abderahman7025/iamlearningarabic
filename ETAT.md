@@ -518,19 +518,42 @@ est peinte au milieu d'un carré, entourée d'un halo. Il est **mesuré sur
 les pixels** (`_hautDuDessin`) — rien à noter planète par planète, et une
 illustration remplacée est mesurée toute seule.
 
-**On ne cherche PAS le premier pixel opaque.** C'était la première version,
-et le client l'a prise en défaut sur deux astres : l'anneau d'Uranus monte
-plus haut que sa sphère, la queue de la comète aussi — l'astronaute
-atterrissait donc sur l'anneau, dans le vide. Mesure à l'appui : premier
-pixel opaque à **7 %** pour Uranus, alors que sa sphère commence à 22 %.
+**Deux versions ont échoué avant la bonne, gardées ici pour qu'on ne les
+refasse pas.**
 
-Ce qu'on cherche est la première rangée assez **large** pour être le corps :
-un anneau ou une queue ne font que quelques pixels de large en haut, une
-sphère s'élargit tout de suite. Le seuil est pris en part de la rangée la
-plus large de l'image — donc sans rien connaître du dessin. Vérifié sur les
-douze, écart au rayon vrai : au plus 1,5 %, et Uranus, la Lune et Mercure
-exactement justes. Un écart positif fait enfoncer les pieds de quelques
-pixels dans la sphère : invisible, et bien mieux que de flotter.
+*Le premier pixel opaque* : l'anneau d'Uranus monte plus haut que sa
+sphère, la queue de la comète aussi. Mesure à l'appui, premier pixel opaque
+à **7 %** pour Uranus quand sa sphère commence à 22 % : le personnage se
+posait sur l'anneau, dans le vide.
+
+*La première rangée assez large pour être le corps* : bonne pour onze
+astres, fausse pour la comète — sa queue est large, elle aussi. Le client
+l'a vue tout de suite : « sur la comète seulement, il se pose sur
+l'auréole ».
+
+**Ce qui marche : on ne mesure pas ce qu'on a dessiné soi-même.**
+`outils/planetes.js` connaît le rayon de chaque corps ; il imprime le
+tableau des sommets, qui se recopie dans `_HABILLAGES.garcon.sommets`.
+Exact par construction, pour les douze.
+
+La mesure sur les pixels reste, en second, pour une illustration que le
+client fournirait : `_hautDuDessin` cherche la première rangée assez large,
+avec un seuil d'opacité haut qui écarte le halo. Elle suffit pour une
+sphère nue ; pour un décor à queue ou à anneau, il faudra ajouter une
+entrée au tableau — c'est une ligne.
+
+**MESURER UNE ANIMATION DEPUIS UN ONGLET CACHÉ.** `requestAnimationFrame`
+ne bat pas, on le sait ; mais `setTimeout` et `setInterval` non plus au-delà
+de **cinq secondes** — Chrome les ralentit alors à un appel par minute. Une
+mesure de vol s'arrêtait donc net à 5 s, sans erreur, et donnait à croire
+que l'animation se figeait. La seule horloge qui tienne est un
+**`MessageChannel`** : ce n'est pas une minuterie, rien ne la bride.
+
+```js
+var mc=new MessageChannel(),file=[];
+mc.port1.onmessage=function(){var f=file.shift();if(f)f(Date.now());};
+window.requestAnimationFrame=function(f){file.push(f);mc.port2.postMessage(0);};
+```
 
 **PAS DE RETOURNEMENT HORIZONTAL.** Il y en avait un quand le trajet
 partait vers la gauche (`scaleX(-1)`). Posé sur un élément qui porte une
@@ -550,8 +573,32 @@ sur un `transform` posé à la main.
 - `aligne:false` (fille) — une simple inclinaison plafonnée à 24° : une
   licorne ne se met pas la tête en bas parce que le chemin descend.
 
-**Le rythme** a été rallongé à sa demande : vol 1,85 s par saut (1,65 s en
-portrait), approche 0,78 s, vol stationnaire 0,9 s, descente 1,25 s.
+**Le rythme**, rallongé deux fois à sa demande : vol **3,7 s** par saut
+(3,3 s en portrait), approche 1,56 s, tenue au-dessus du sommet 0,7 s,
+pose 0,78 s, puis l'enfant paraît, 0,9 s.
+
+**La fusée se GARE, l'enfant paraît devant elle.** Elle ne s'efface plus :
+elle reste posée sur l'étape, et c'est de là qu'elle redécollera. L'enfant
+est décalé vers la droite — centré, il la masquait au lieu de se tenir
+devant elle.
+
+**Sur la Terre, il descend sans combinaison** : il y a de l'air. C'est
+`pilotesEtape`, dans l'habillage, une image par rang d'étape.
+
+**La fusée part de là où elle est vraiment.** Elle se posait avant sur
+l'étape juste avant la visée, ce qui la faisait apparaître d'un coup à
+l'autre bout de la carte. Elle fait maintenant tout le trajet, et **la
+caméra la suit** — sans ce défilement, un long voyage se joue hors de
+l'écran : on clique, rien ne bouge, le cours s'ouvre.
+Pour qu'un long voyage reste regardable, ce n'est pas le trajet qu'on
+raccourcit mais le temps de chaque saut : le voyage entier tient dans
+`dureeTotale` (9 s), réparti sur les sauts. Un saut seul garde son allure
+pleine ; traverser tout le système solaire prend dix sauts de 0,9 s, et on
+les voit tous.
+
+**La trajectoire ne se dessine plus.** Elle a été un sentier de terre, puis
+un pointillé clair ; le client n'en veut plus rien voir. Les courbes
+restent — ce sont elles qui portent le vol — mais `_traceVol` est vide.
 
 **Le fond d'espace** (`.fond-espace`, `_fondEnfant`). Un dégradé de bleu
 très foncé vers un bleu plus clair, avec un champ de 46 étoiles, 3 étoiles
