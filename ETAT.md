@@ -878,9 +878,9 @@ Et la consigne qui vaut toujours : sur ce qui n'est pas écrit ici, **on
 demande, on n'invente pas**. C'est ce qui a coûté le plus cher sur le
 hā milieu.
 
-### Chantier 2 — Traductions : EN COURS (20 août 2026)
+### Chantier 2 — Traductions : FAIT (20 août 2026)
 
-**Le mécanisme est en place, et deux cours sur trois sont traduits.**
+**Tout l'enfant est traduit dans les treize langues : 302 phrases.**
 
 - Toutes les phrases des cours enfant passent par `te()` (le texte dit) ou
   `TB()` (le texte écrit). **La clé EST la phrase française** : rien à
@@ -899,11 +899,20 @@ hā milieu.
   treize langues. **On traduit dans le JSON, jamais dans le HTML.**
 - `node outils/phrases.js` relève ce qui reste en dur.
 
-**Fait** : voyelles (69 phrases) et prolongations (45) — 114 phrases × 13
-langues.
-**Reste** : le cours des LETTRES, 133 phrases (≈ 5 000 caractères de
-français). Même méthode : ajouter `outils/traductions-enfant-3.json` puis
-relancer l'injecteur.
+**Fait** : les trois cours (voyelles, prolongations, lettres), les libellés
+du moteur de scène, ET les mots d'univers — mission ou aventure, planète ou
+monde, les douze noms de mondes, les douze noms de planètes. Ces derniers
+passent par `_habTraduit`, qui traduit une COPIE de l'habillage : les
+`slugs` et les `sommets`, eux, ne bougent pas — ce sont des adresses et des
+mesures, pas du texte. Vérifié : en turc, la carte s'affiche traduite et
+`_slugEtape` répond toujours `licornes`.
+
+**Ce qui reste du chantier 2** : l'interface adulte, déjà à 95–98 %, et les
+quelques phrases qui se composent avec une variable (« Bravo ! Tu as fini
+ta {île} ! ») — traduites en morceaux, ce qui suffit en français, anglais,
+espagnol, allemand, mais reste perfectible en turc, en hindi et en ourdou,
+où l'ordre des mots diffère. Les reprendre demanderait un vrai gabarit à
+trous.
 
 ### Chantier 2 (rappel de la demande d'origine)
 Décision du client : **tout doit être traduit dans les 13 langues**.

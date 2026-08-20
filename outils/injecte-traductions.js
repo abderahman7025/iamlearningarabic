@@ -37,10 +37,16 @@ MORCEAUX.forEach(function (f) {
 });
 console.log('morceaux lus : ' + MORCEAUX.join(', '));
 
-/* Les phrases telles qu'elles sont appelées dans les cours. */
-const DEBUT = src.indexOf('function _boyVowelCourse');
-const FIN = src.indexOf('function renderSessions(ca){');
-const bloc = src.slice(DEBUT, FIN);
+/* Les phrases telles qu'elles sont appelées DANS TOUTE LA PAGE : `te()` ne
+   sert pas qu'aux cours, quelques libellés du moteur de scène et de
+   l'administration y passent aussi. On saute la table elle-même, dont les
+   clés seraient reprises pour des appels. */
+const AVANT_TABLE = src.indexOf('/* DEBUT TRADUCTIONS ENFANT */');
+const APRES_TABLE = src.indexOf('/* FIN TRADUCTIONS ENFANT */');
+/* Toute la page SAUF la table : ses propres clés ne doivent pas compter
+   comme des appels. L'habillage, lui, est écrit AVANT la table — il faut
+   donc les deux morceaux. */
+const bloc = src.slice(0, AVANT_TABLE) + src.slice(APRES_TABLE);
 const CLE = /\b(?:TB|te)\('((?:[^'\\]|\\.)*)'\)/g;
 const duCode = new Set();
 let m;
@@ -59,8 +65,15 @@ function enjs(s) {
 
 /* ── Les contrôles ────────────────────────────────────────────────────── */
 let soucis = 0;
+/* Une clé peut aussi venir de l'habillage — les mots d'univers et les noms
+   d'étapes passent par `_habTraduit`, pas par un `te('…')` écrit en clair.
+   On la cherche donc aussi telle quelle dans la page. */
+function connue(fr) {
+  if (duCode.has(fr)) return true;
+  return bloc.indexOf("'" + enjs(fr) + "'") >= 0;
+}
 Object.keys(trad).forEach(function (fr) {
-  if (!duCode.has(fr)) {
+  if (!connue(fr)) {
     console.log('CLE INCONNUE DU CODE : ' + fr.slice(0, 70));
     soucis++;
   }

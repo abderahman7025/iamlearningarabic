@@ -1,0 +1,307 @@
+{
+ "MISSION": {
+  "en": "MISSION", "es": "MISIÓN", "de": "MISSION", "nl": "MISSIE", "it": "MISSIONE",
+  "pt": "MISSÃO", "ru": "МИССИЯ", "tr": "GÖREV", "zh": "任务", "id": "MISI",
+  "ur": "مہم", "hi": "मिशन"
+ },
+ "Mission": {
+  "en": "Mission", "es": "Misión", "de": "Mission", "nl": "Missie", "it": "Missione",
+  "pt": "Missão", "ru": "Миссия", "tr": "Görev", "zh": "任务", "id": "Misi",
+  "ur": "مہم", "hi": "मिशन"
+ },
+ "BRIEFING": {
+  "en": "BRIEFING", "es": "INSTRUCCIONES", "de": "BRIEFING", "nl": "BRIEFING", "it": "BRIEFING",
+  "pt": "BRIEFING", "ru": "ИНСТРУКТАЖ", "tr": "BRİFİNG", "zh": "任务简报", "id": "PENGARAHAN",
+  "ur": "ہدایات", "hi": "ब्रीफ़िंग"
+ },
+ "▶ DÉCOLLAGE": {
+  "en": "▶ LIFT-OFF", "es": "▶ DESPEGUE", "de": "▶ START", "nl": "▶ LANCERING", "it": "▶ DECOLLO",
+  "pt": "▶ DESCOLAGEM", "ru": "▶ СТАРТ", "tr": "▶ KALKIŞ", "zh": "▶ 起飞", "id": "▶ LEPAS LANDAS",
+  "ur": "▶ روانگی", "hi": "▶ उड़ान"
+ },
+ "MISSION ACCOMPLIE": {
+  "en": "MISSION COMPLETE", "es": "MISIÓN CUMPLIDA", "de": "MISSION ERFÜLLT", "nl": "MISSIE VOLBRACHT",
+  "it": "MISSIONE COMPIUTA", "pt": "MISSÃO CUMPRIDA", "ru": "МИССИЯ ВЫПОЛНЕНА", "tr": "GÖREV TAMAM",
+  "zh": "任务完成", "id": "MISI SELESAI", "ur": "مہم مکمل", "hi": "मिशन पूरा"
+ },
+ "▸ RETOUR À LA CARTE": {
+  "en": "▸ BACK TO THE MAP", "es": "▸ VOLVER AL MAPA", "de": "▸ ZURÜCK ZUR KARTE", "nl": "▸ TERUG NAAR DE KAART",
+  "it": "▸ TORNA ALLA MAPPA", "pt": "▸ VOLTAR AO MAPA", "ru": "▸ НАЗАД К КАРТЕ", "tr": "▸ HARİTAYA DÖN",
+  "zh": "▸ 返回地图", "id": "▸ KEMBALI KE PETA", "ur": "▸ نقشے پر واپس", "hi": "▸ नक़्शे पर वापस"
+ },
+ "planète": {
+  "en": "planet", "es": "planeta", "de": "Planet", "nl": "planeet", "it": "pianeta",
+  "pt": "planeta", "ru": "планета", "tr": "gezegen", "zh": "行星", "id": "planet",
+  "ur": "سیارہ", "hi": "ग्रह"
+ },
+ "▸ MA PLANÈTE": {
+  "en": "▸ MY PLANET", "es": "▸ MI PLANETA", "de": "▸ MEIN PLANET", "nl": "▸ MIJN PLANEET",
+  "it": "▸ IL MIO PIANETA", "pt": "▸ O MEU PLANETA", "ru": "▸ МОЯ ПЛАНЕТА", "tr": "▸ GEZEGENİM",
+  "zh": "▸ 我的行星", "id": "▸ PLANETKU", "ur": "▸ میرا سیارہ", "hi": "▸ मेरा ग्रह"
+ },
+ "▸ LA CARTE DES PLANÈTES": {
+  "en": "▸ THE PLANET MAP", "es": "▸ EL MAPA DE PLANETAS", "de": "▸ DIE PLANETENKARTE", "nl": "▸ DE PLANETENKAART",
+  "it": "▸ LA MAPPA DEI PIANETI", "pt": "▸ O MAPA DOS PLANETAS", "ru": "▸ КАРТА ПЛАНЕТ", "tr": "▸ GEZEGEN HARİTASI",
+  "zh": "▸ 行星地图", "id": "▸ PETA PLANET", "ur": "▸ سیاروں کا نقشہ", "hi": "▸ ग्रहों का नक़्शा"
+ },
+ "🗺️ Ta carte des planètes": {
+  "en": "🗺️ Your planet map", "es": "🗺️ Tu mapa de planetas", "de": "🗺️ Deine Planetenkarte",
+  "nl": "🗺️ Jouw planetenkaart", "it": "🗺️ La tua mappa dei pianeti", "pt": "🗺️ O teu mapa dos planetas",
+  "ru": "🗺️ Твоя карта планет", "tr": "🗺️ Gezegen haritan", "zh": "🗺️ 你的行星地图",
+  "id": "🗺️ Peta planetmu", "ur": "🗺️ تمہارا سیاروں کا نقشہ", "hi": "🗺️ तुम्हारा ग्रह-नक़्शा"
+ },
+ "AVENTURE": {
+  "en": "ADVENTURE", "es": "AVENTURA", "de": "ABENTEUER", "nl": "AVONTUUR", "it": "AVVENTURA",
+  "pt": "AVENTURA", "ru": "ПРИКЛЮЧЕНИЕ", "tr": "MACERA", "zh": "冒险", "id": "PETUALANGAN",
+  "ur": "مہم جوئی", "hi": "साहसिक सफ़र"
+ },
+ "Aventure": {
+  "en": "Adventure", "es": "Aventura", "de": "Abenteuer", "nl": "Avontuur", "it": "Avventura",
+  "pt": "Aventura", "ru": "Приключение", "tr": "Macera", "zh": "冒险", "id": "Petualangan",
+  "ur": "مہم جوئی", "hi": "साहसिक सफ़र"
+ },
+ "DÉPART": {
+  "en": "SET OFF", "es": "SALIDA", "de": "AUFBRUCH", "nl": "VERTREK", "it": "PARTENZA",
+  "pt": "PARTIDA", "ru": "ОТПРАВЛЕНИЕ", "tr": "YOLA ÇIKIŞ", "zh": "出发", "id": "BERANGKAT",
+  "ur": "روانگی", "hi": "प्रस्थान"
+ },
+ "▶ ENVOL": {
+  "en": "▶ TAKE FLIGHT", "es": "▶ A VOLAR", "de": "▶ ABFLUG", "nl": "▶ OPSTIJGEN", "it": "▶ IN VOLO",
+  "pt": "▶ A VOAR", "ru": "▶ В ПОЛЁТ", "tr": "▶ UÇUŞA", "zh": "▶ 起飞", "id": "▶ TERBANG",
+  "ur": "▶ اڑان", "hi": "▶ उड़ान"
+ },
+ "AVENTURE RÉUSSIE": {
+  "en": "ADVENTURE COMPLETE", "es": "AVENTURA LOGRADA", "de": "ABENTEUER GESCHAFFT", "nl": "AVONTUUR GESLAAGD",
+  "it": "AVVENTURA RIUSCITA", "pt": "AVENTURA CONSEGUIDA", "ru": "ПРИКЛЮЧЕНИЕ УДАЛОСЬ", "tr": "MACERA BAŞARILI",
+  "zh": "冒险成功", "id": "PETUALANGAN BERHASIL", "ur": "مہم کامیاب", "hi": "सफ़र सफल"
+ },
+ "monde": {
+  "en": "world", "es": "mundo", "de": "Welt", "nl": "wereld", "it": "mondo",
+  "pt": "mundo", "ru": "мир", "tr": "dünya", "zh": "世界", "id": "dunia",
+  "ur": "دنیا", "hi": "दुनिया"
+ },
+ "▸ MON MONDE": {
+  "en": "▸ MY WORLD", "es": "▸ MI MUNDO", "de": "▸ MEINE WELT", "nl": "▸ MIJN WERELD",
+  "it": "▸ IL MIO MONDO", "pt": "▸ O MEU MUNDO", "ru": "▸ МОЙ МИР", "tr": "▸ DÜNYAM",
+  "zh": "▸ 我的世界", "id": "▸ DUNIAKU", "ur": "▸ میری دنیا", "hi": "▸ मेरी दुनिया"
+ },
+ "▸ LA CARTE DES MONDES": {
+  "en": "▸ THE WORLD MAP", "es": "▸ EL MAPA DE MUNDOS", "de": "▸ DIE WELTENKARTE", "nl": "▸ DE WERELDKAART",
+  "it": "▸ LA MAPPA DEI MONDI", "pt": "▸ O MAPA DOS MUNDOS", "ru": "▸ КАРТА МИРОВ", "tr": "▸ DÜNYALAR HARİTASI",
+  "zh": "▸ 世界地图", "id": "▸ PETA DUNIA", "ur": "▸ دنیاؤں کا نقشہ", "hi": "▸ दुनियाओं का नक़्शा"
+ },
+ "🗺️ Ma carte des mondes": {
+  "en": "🗺️ My world map", "es": "🗺️ Mi mapa de mundos", "de": "🗺️ Meine Weltenkarte",
+  "nl": "🗺️ Mijn wereldkaart", "it": "🗺️ La mia mappa dei mondi", "pt": "🗺️ O meu mapa dos mundos",
+  "ru": "🗺️ Моя карта миров", "tr": "🗺️ Dünyalar haritam", "zh": "🗺️ 我的世界地图",
+  "id": "🗺️ Peta duniaku", "ur": "🗺️ میری دنیاؤں کا نقشہ", "hi": "🗺️ मेरा दुनिया-नक़्शा"
+ },
+ "🔊 Appuie sur le hublot pour écouter": {
+  "en": "🔊 Tap the porthole to listen", "es": "🔊 Toca la escotilla para escuchar",
+  "de": "🔊 Tippe auf das Bullauge zum Hören", "nl": "🔊 Tik op het raampje om te luisteren",
+  "it": "🔊 Tocca l'oblò per ascoltare", "pt": "🔊 Toca na vigia para ouvir",
+  "ru": "🔊 Нажми на иллюминатор, чтобы послушать", "tr": "🔊 Dinlemek için pencereye dokun",
+  "zh": "🔊 点一下舷窗就能听", "id": "🔊 Sentuh jendela untuk mendengar",
+  "ur": "🔊 سننے کے لیے کھڑکی دبائیں", "hi": "🔊 सुनने के लिए खिड़की दबाओ"
+ },
+ "🔊 Appuie sur le hublot pour écouter le mot": {
+  "en": "🔊 Tap the porthole to hear the word", "es": "🔊 Toca la escotilla para oír la palabra",
+  "de": "🔊 Tippe auf das Bullauge, um das Wort zu hören", "nl": "🔊 Tik op het raampje om het woord te horen",
+  "it": "🔊 Tocca l'oblò per sentire la parola", "pt": "🔊 Toca na vigia para ouvir a palavra",
+  "ru": "🔊 Нажми на иллюминатор, чтобы услышать слово", "tr": "🔊 Kelimeyi duymak için pencereye dokun",
+  "zh": "🔊 点一下舷窗听这个词", "id": "🔊 Sentuh jendela untuk mendengar katanya",
+  "ur": "🔊 لفظ سننے کے لیے کھڑکی دبائیں", "hi": "🔊 शब्द सुनने के लिए खिड़की दबाओ"
+ },
+ "✈️ La ligne d'écriture — appuie sur un signe pour l'écouter": {
+  "en": "✈️ The writing line — tap a mark to hear it",
+  "es": "✈️ La línea de escritura: toca un signo para oírlo",
+  "de": "✈️ Die Schreiblinie – tippe auf ein Zeichen, um es zu hören",
+  "nl": "✈️ De schrijflijn — tik op een teken om het te horen",
+  "it": "✈️ La riga di scrittura: tocca un segno per sentirlo",
+  "pt": "✈️ A linha de escrita — toca num sinal para o ouvir",
+  "ru": "✈️ Строка письма — нажми на знак, чтобы услышать",
+  "tr": "✈️ Yazı satırı — duymak için bir işarete dokun",
+  "zh": "✈️ 书写线 —— 点一个符号就能听",
+  "id": "✈️ Garis tulisan — sentuh tanda untuk mendengarnya",
+  "ur": "✈️ لکھائی کی لکیر — سننے کے لیے علامت دبائیں",
+  "hi": "✈️ लेखन-रेखा — सुनने के लिए चिह्न दबाओ"
+ },
+ "✨ La ligne d'écriture — appuie sur un signe pour l'écouter": {
+  "en": "✨ The writing line — tap a mark to hear it",
+  "es": "✨ La línea de escritura: toca un signo para oírlo",
+  "de": "✨ Die Schreiblinie – tippe auf ein Zeichen, um es zu hören",
+  "nl": "✨ De schrijflijn — tik op een teken om het te horen",
+  "it": "✨ La riga di scrittura: tocca un segno per sentirlo",
+  "pt": "✨ A linha de escrita — toca num sinal para o ouvir",
+  "ru": "✨ Строка письма — нажми на знак, чтобы услышать",
+  "tr": "✨ Yazı satırı — duymak için bir işarete dokun",
+  "zh": "✨ 书写线 —— 点一个符号就能听",
+  "id": "✨ Garis tulisan — sentuh tanda untuk mendengarnya",
+  "ur": "✨ لکھائی کی لکیر — سننے کے لیے علامت دبائیں",
+  "hi": "✨ लेखन-रेखा — सुनने के लिए चिह्न दबाओ"
+ },
+ "🎯 Vise la bonne cible": {
+  "en": "🎯 Aim at the right target", "es": "🎯 Apunta al blanco correcto",
+  "de": "🎯 Ziele auf das richtige Ziel", "nl": "🎯 Mik op het juiste doel",
+  "it": "🎯 Mira al bersaglio giusto", "pt": "🎯 Aponta ao alvo certo",
+  "ru": "🎯 Целься в правильную мишень", "tr": "🎯 Doğru hedefe nişan al",
+  "zh": "🎯 瞄准正确的目标", "id": "🎯 Bidik sasaran yang benar",
+  "ur": "🎯 صحیح نشانہ لو", "hi": "🎯 सही निशाना लगाओ"
+ },
+ "🔊 Appuie sur la bulle pour écouter": {
+  "en": "🔊 Tap the bubble to listen", "es": "🔊 Toca la burbuja para escuchar",
+  "de": "🔊 Tippe auf die Blase zum Hören", "nl": "🔊 Tik op de bel om te luisteren",
+  "it": "🔊 Tocca la bolla per ascoltare", "pt": "🔊 Toca na bolha para ouvir",
+  "ru": "🔊 Нажми на пузырь, чтобы послушать", "tr": "🔊 Dinlemek için baloncuğa dokun",
+  "zh": "🔊 点一下泡泡就能听", "id": "🔊 Sentuh gelembung untuk mendengar",
+  "ur": "🔊 سننے کے لیے بلبلہ دبائیں", "hi": "🔊 सुनने के लिए बुलबुला दबाओ"
+ },
+ "🔊 Appuie sur la bulle pour écouter le mot": {
+  "en": "🔊 Tap the bubble to hear the word", "es": "🔊 Toca la burbuja para oír la palabra",
+  "de": "🔊 Tippe auf die Blase, um das Wort zu hören", "nl": "🔊 Tik op de bel om het woord te horen",
+  "it": "🔊 Tocca la bolla per sentire la parola", "pt": "🔊 Toca na bolha para ouvir a palavra",
+  "ru": "🔊 Нажми на пузырь, чтобы услышать слово", "tr": "🔊 Kelimeyi duymak için baloncuğa dokun",
+  "zh": "🔊 点一下泡泡听这个词", "id": "🔊 Sentuh gelembung untuk mendengar katanya",
+  "ur": "🔊 لفظ سننے کے لیے بلبلہ دبائیں", "hi": "🔊 शब्द सुनने के लिए बुलबुला दबाओ"
+ },
+ "🎯 Touche le bon nuage": {
+  "en": "🎯 Touch the right cloud", "es": "🎯 Toca la nube correcta",
+  "de": "🎯 Tippe auf die richtige Wolke", "nl": "🎯 Raak de juiste wolk aan",
+  "it": "🎯 Tocca la nuvola giusta", "pt": "🎯 Toca na nuvem certa",
+  "ru": "🎯 Коснись нужного облака", "tr": "🎯 Doğru buluta dokun",
+  "zh": "🎯 点对的那朵云", "id": "🎯 Sentuh awan yang benar",
+  "ur": "🎯 صحیح بادل کو چھوؤ", "hi": "🎯 सही बादल छुओ"
+ },
+ "Le monde des licornes": {
+  "en": "The unicorn world", "es": "El mundo de los unicornios", "de": "Die Einhornwelt",
+  "nl": "De eenhoornwereld", "it": "Il mondo degli unicorni", "pt": "O mundo dos unicórnios",
+  "ru": "Мир единорогов", "tr": "Tek boynuzlular dünyası", "zh": "独角兽世界",
+  "id": "Dunia unicorn", "ur": "یونیکارن کی دنیا", "hi": "यूनिकॉर्न की दुनिया"
+ },
+ "Le monde de la couronne": {
+  "en": "The crown world", "es": "El mundo de la corona", "de": "Die Kronenwelt",
+  "nl": "De kroonwereld", "it": "Il mondo della corona", "pt": "O mundo da coroa",
+  "ru": "Мир короны", "tr": "Taç dünyası", "zh": "王冠世界",
+  "id": "Dunia mahkota", "ur": "تاج کی دنیا", "hi": "मुकुट की दुनिया"
+ },
+ "Le monde des nuages": {
+  "en": "The cloud world", "es": "El mundo de las nubes", "de": "Die Wolkenwelt",
+  "nl": "De wolkenwereld", "it": "Il mondo delle nuvole", "pt": "O mundo das nuvens",
+  "ru": "Мир облаков", "tr": "Bulutlar dünyası", "zh": "云朵世界",
+  "id": "Dunia awan", "ur": "بادلوں کی دنیا", "hi": "बादलों की दुनिया"
+ },
+ "Le monde des fleurs": {
+  "en": "The flower world", "es": "El mundo de las flores", "de": "Die Blumenwelt",
+  "nl": "De bloemenwereld", "it": "Il mondo dei fiori", "pt": "O mundo das flores",
+  "ru": "Мир цветов", "tr": "Çiçekler dünyası", "zh": "花朵世界",
+  "id": "Dunia bunga", "ur": "پھولوں کی دنیا", "hi": "फूलों की दुनिया"
+ },
+ "Le monde des cœurs": {
+  "en": "The heart world", "es": "El mundo de los corazones", "de": "Die Herzenwelt",
+  "nl": "De hartjeswereld", "it": "Il mondo dei cuori", "pt": "O mundo dos corações",
+  "ru": "Мир сердечек", "tr": "Kalpler dünyası", "zh": "爱心世界",
+  "id": "Dunia hati", "ur": "دلوں کی دنیا", "hi": "दिलों की दुनिया"
+ },
+ "Le monde des pingouins": {
+  "en": "The penguin world", "es": "El mundo de los pingüinos", "de": "Die Pinguinwelt",
+  "nl": "De pinguïnwereld", "it": "Il mondo dei pinguini", "pt": "O mundo dos pinguins",
+  "ru": "Мир пингвинов", "tr": "Penguenler dünyası", "zh": "企鹅世界",
+  "id": "Dunia penguin", "ur": "پینگوئن کی دنیا", "hi": "पेंगुइन की दुनिया"
+ },
+ "Le monde des papillons": {
+  "en": "The butterfly world", "es": "El mundo de las mariposas", "de": "Die Schmetterlingswelt",
+  "nl": "De vlinderwereld", "it": "Il mondo delle farfalle", "pt": "O mundo das borboletas",
+  "ru": "Мир бабочек", "tr": "Kelebekler dünyası", "zh": "蝴蝶世界",
+  "id": "Dunia kupu-kupu", "ur": "تتلیوں کی دنیا", "hi": "तितलियों की दुनिया"
+ },
+ "L'île de la tortue": {
+  "en": "Turtle Island", "es": "La isla de la tortuga", "de": "Die Schildkröteninsel",
+  "nl": "Het schildpaddeneiland", "it": "L'isola della tartaruga", "pt": "A ilha da tartaruga",
+  "ru": "Черепаший остров", "tr": "Kaplumbağa adası", "zh": "海龟岛",
+  "id": "Pulau kura-kura", "ur": "کچھوے کا جزیرہ", "hi": "कछुआ द्वीप"
+ },
+ "Le monde des chats et des chiens": {
+  "en": "The cat and dog world", "es": "El mundo de gatos y perros", "de": "Die Katzen- und Hundewelt",
+  "nl": "De katten- en hondenwereld", "it": "Il mondo di cani e gatti", "pt": "O mundo dos gatos e cães",
+  "ru": "Мир кошек и собак", "tr": "Kediler ve köpekler dünyası", "zh": "猫狗世界",
+  "id": "Dunia kucing dan anjing", "ur": "بلیوں اور کتوں کی دنیا", "hi": "बिल्ली-कुत्तों की दुनिया"
+ },
+ "Le monde des ours bruns": {
+  "en": "The brown bear world", "es": "El mundo de los osos pardos", "de": "Die Braunbärenwelt",
+  "nl": "De bruine berenwereld", "it": "Il mondo degli orsi bruni", "pt": "O mundo dos ursos pardos",
+  "ru": "Мир бурых медведей", "tr": "Boz ayılar dünyası", "zh": "棕熊世界",
+  "id": "Dunia beruang cokelat", "ur": "بھورے ریچھوں کی دنیا", "hi": "भूरे भालुओं की दुनिया"
+ },
+ "Le monde des sucreries": {
+  "en": "The sweets world", "es": "El mundo de los dulces", "de": "Die Süßigkeitenwelt",
+  "nl": "De snoepwereld", "it": "Il mondo dei dolciumi", "pt": "O mundo dos doces",
+  "ru": "Мир сладостей", "tr": "Şekerler dünyası", "zh": "糖果世界",
+  "id": "Dunia permen", "ur": "مٹھائیوں کی دنیا", "hi": "मिठाइयों की दुनिया"
+ },
+ "Le château de la princesse": {
+  "en": "The princess's castle", "es": "El castillo de la princesa", "de": "Das Schloss der Prinzessin",
+  "nl": "Het kasteel van de prinses", "it": "Il castello della principessa", "pt": "O castelo da princesa",
+  "ru": "Замок принцессы", "tr": "Prensesin şatosu", "zh": "公主的城堡",
+  "id": "Istana sang putri", "ur": "شہزادی کا محل", "hi": "राजकुमारी का महल"
+ },
+ "Le Soleil": {
+  "en": "The Sun", "es": "El Sol", "de": "Die Sonne", "nl": "De Zon", "it": "Il Sole",
+  "pt": "O Sol", "ru": "Солнце", "tr": "Güneş", "zh": "太阳", "id": "Matahari",
+  "ur": "سورج", "hi": "सूर्य"
+ },
+ "Mercure": {
+  "en": "Mercury", "es": "Mercurio", "de": "Merkur", "nl": "Mercurius", "it": "Mercurio",
+  "pt": "Mercúrio", "ru": "Меркурий", "tr": "Merkür", "zh": "水星", "id": "Merkurius",
+  "ur": "عطارد", "hi": "बुध"
+ },
+ "Vénus": {
+  "en": "Venus", "es": "Venus", "de": "Venus", "nl": "Venus", "it": "Venere",
+  "pt": "Vénus", "ru": "Венера", "tr": "Venüs", "zh": "金星", "id": "Venus",
+  "ur": "زہرہ", "hi": "शुक्र"
+ },
+ "La Terre": {
+  "en": "Earth", "es": "La Tierra", "de": "Die Erde", "nl": "De Aarde", "it": "La Terra",
+  "pt": "A Terra", "ru": "Земля", "tr": "Dünya", "zh": "地球", "id": "Bumi",
+  "ur": "زمین", "hi": "पृथ्वी"
+ },
+ "La Lune": {
+  "en": "The Moon", "es": "La Luna", "de": "Der Mond", "nl": "De Maan", "it": "La Luna",
+  "pt": "A Lua", "ru": "Луна", "tr": "Ay", "zh": "月亮", "id": "Bulan",
+  "ur": "چاند", "hi": "चंद्रमा"
+ },
+ "Mars": {
+  "en": "Mars", "es": "Marte", "de": "Mars", "nl": "Mars", "it": "Marte",
+  "pt": "Marte", "ru": "Марс", "tr": "Mars", "zh": "火星", "id": "Mars",
+  "ur": "مریخ", "hi": "मंगल"
+ },
+ "Jupiter": {
+  "en": "Jupiter", "es": "Júpiter", "de": "Jupiter", "nl": "Jupiter", "it": "Giove",
+  "pt": "Júpiter", "ru": "Юпитер", "tr": "Jüpiter", "zh": "木星", "id": "Jupiter",
+  "ur": "مشتری", "hi": "बृहस्पति"
+ },
+ "Saturne": {
+  "en": "Saturn", "es": "Saturno", "de": "Saturn", "nl": "Saturnus", "it": "Saturno",
+  "pt": "Saturno", "ru": "Сатурн", "tr": "Satürn", "zh": "土星", "id": "Saturnus",
+  "ur": "زحل", "hi": "शनि"
+ },
+ "Uranus": {
+  "en": "Uranus", "es": "Urano", "de": "Uranus", "nl": "Uranus", "it": "Urano",
+  "pt": "Úrano", "ru": "Уран", "tr": "Uranüs", "zh": "天王星", "id": "Uranus",
+  "ur": "یورینس", "hi": "अरुण"
+ },
+ "Neptune": {
+  "en": "Neptune", "es": "Neptuno", "de": "Neptun", "nl": "Neptunus", "it": "Nettuno",
+  "pt": "Neptuno", "ru": "Нептун", "tr": "Neptün", "zh": "海王星", "id": "Neptunus",
+  "ur": "نیپچون", "hi": "वरुण"
+ },
+ "Pluton": {
+  "en": "Pluto", "es": "Plutón", "de": "Pluto", "nl": "Pluto", "it": "Plutone",
+  "pt": "Plutão", "ru": "Плутон", "tr": "Plüton", "zh": "冥王星", "id": "Pluto",
+  "ur": "پلوٹو", "hi": "यम"
+ },
+ "La Comète": {
+  "en": "The Comet", "es": "El Cometa", "de": "Der Komet", "nl": "De Komeet", "it": "La Cometa",
+  "pt": "O Cometa", "ru": "Комета", "tr": "Kuyruklu Yıldız", "zh": "彗星", "id": "Komet",
+  "ur": "دمدار ستارہ", "hi": "धूमकेतु"
+ }
+}
