@@ -13,20 +13,6 @@
   "ur": "آج:<br><b>حرکات</b> 🎯",
   "hi": "आज:<br><b>स्वर</b> 🎯"
  },
- " du jour : les voyelles.": {
-  "en": " of the day: the vowels.",
-  "es": " del día: las vocales.",
-  "de": " des Tages: die Vokale.",
-  "nl": " van vandaag: de klinkers.",
-  "it": " del giorno: le vocali.",
-  "pt": " do dia: as vogais.",
-  "ru": " дня: огласовки.",
-  "tr": " bugünkü konu: sesli harfler.",
-  "zh": "：今天学元音。",
-  "id": " hari ini: vokal.",
-  "ur": " آج کا سبق: حرکات۔",
-  "hi": " आज का: स्वर।"
- },
  "ÉTAPE 1 · REPÉRAGE": {
   "en": "STEP 1 · SPOTTING",
   "es": "PASO 1 · IDENTIFICAR",
@@ -950,19 +936,5 @@
   "id": "Vokal <b>dikuasai</b>!<br>🎖️",
   "ur": "حرکات <b>یاد ہو گئیں</b>!<br>🎖️",
   "hi": "स्वर <b>सीख लिए</b>!<br>🎖️"
- },
- " accomplie ! Tu maîtrises les voyelles.": {
-  "en": " complete! You know the vowels.",
-  "es": " ¡completada! Ya dominas las vocales.",
-  "de": " geschafft! Du kennst die Vokale.",
-  "nl": " voltooid! Je kent de klinkers.",
-  "it": " completata! Conosci le vocali.",
-  "pt": " concluída! Já dominas as vogais.",
-  "ru": " выполнено! Ты знаешь огласовки.",
-  "tr": " tamamlandı! Sesli harfleri öğrendin.",
-  "zh": "完成！你掌握了元音。",
-  "id": " selesai! Kamu sudah menguasai vokal.",
-  "ur": " مکمل! تم نے حرکات سیکھ لیں۔",
-  "hi": " पूरा हुआ! तुमने स्वर सीख लिए।"
  }
 }

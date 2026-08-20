@@ -979,6 +979,33 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Les phrases à trous — v123.** Les phrases fabriquées à la colle
+  (`'Bravo ! Tu as fini ta '+mission+' !'`) donnaient un résultat correct en
+  anglais ou en espagnol et bancal en turc, en hindi et en ourdou, où les
+  mots ne tombent pas dans cet ordre. Elles passent maintenant par `teF()` et
+  `TBF()` : la phrase entière est une clé, avec des trous `{mission}`,
+  `{lettre}`, `{n}`. Chaque langue place les trous où sa grammaire les veut.
+  Une soixantaine de sites de code réécrits, les morceaux devenus inutiles
+  retirés du corpus.
+- **Les derniers mots français du moteur enfant.** Quatre fuites que le
+  parcours automatique a débusquées, invisibles à la lecture :
+  - `NOMS=['ISOLÉE','DÉBUT','MILIEU','FIN']` s'affichait tel quel au milieu
+    du turc. Deux listes traduites maintenant, `NOMS` et `NOMSMIN` :
+    **ne jamais `toLowerCase()` un mot traduit** — en turc le İ perd son
+    point et devient un autre son.
+  - `nomForme()`, `OU[0]`, `combien` (« ses 4 formes ») et les étiquettes du
+    tableau de déduction : tous branchés sur `te()`.
+  - Le bouton **EFFACER** du canvas restait français dans les treize langues.
+  - Deux écrans des prolongations passaient `pa('au-dessus')` : `pa()` colore,
+    il ne traduit pas.
+- **La voix lisait du français dans toutes les langues.** Le texte affiché
+  passait par `t()`, mais l'argument de `speakText` était une phrase française
+  écrite en dur : la voix turque lisait du français avec un accent turc. Neuf
+  phrases, treize langues, dans `outils/voix-adulte.json`, posées dans la
+  table `T` par `node outils/injecte-voix.js` (rejouable, idempotent).
+- **`_maj()` remplace `charAt(0).toUpperCase()`** sur les mots traduits :
+  `toLocaleUpperCase(st.lang)` sait que le turc met un point sur le İ.
+
 - **La traînée de la licorne est un RUBAN, pas un chapelet de points.** Le
   client la voulait « comme celle d'un avion ». Chaque position est donc
   reliée à la précédente par un segment arrondi (`ruban`), assez épais pour
@@ -1332,6 +1359,24 @@ page et URL propres, indexables. Elles se rangent à côté de
   `controllerchange`).
 
 ## Pièges connus
+
+- **Un remplacement automatique large abîme les commentaires français.** Un
+  passage de `'…'` vers `te('…')` a mordu sur des apostrophes de
+  commentaires : `l'enfant` est devenu `lte('enfant`. Sans effet à
+  l'exécution — c'est du commentaire — mais dix-sept notes sont devenues
+  illisibles, et il a fallu les reconstituer. **Toujours restreindre la
+  portée d'un tel remplacement au code, jamais au fichier entier.**
+- **Le contrôle de syntaxe par `new Function` sur chaque `<script>` ment.**
+  Il a annoncé « 0 erreur » sur un fichier réellement cassé
+  (`onclick="navToPage('exercises')"` refermait la chaîne trop tôt) : la
+  découpe des blocs `<script>` par expression régulière ne suit pas les
+  chaînes. **La seule preuve est la console du navigateur, page rechargée.**
+  Et pour un `onclick` imbriqué, écrire `&quot;` dans l'attribut plutôt que
+  d'empiler les échappements.
+- **Les heredocs de Bash mangent les antislashs** et cassent au-delà d'une
+  certaine taille. Pour tout fichier un peu long, ou toute chaîne contenant
+  `'`, écrire le script avec l'outil Write et le lancer ensuite. Sinon,
+  choisir une ancre de remplacement sans antislash.
 
 - **Supprimer du code mort : deux précautions.** En retirant les 2 600
   lignes du moteur fille, deux pièges se sont refermés d'un coup.

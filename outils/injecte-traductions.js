@@ -47,7 +47,10 @@ const APRES_TABLE = src.indexOf('/* FIN TRADUCTIONS ENFANT */');
    comme des appels. L'habillage, lui, est écrit AVANT la table — il faut
    donc les deux morceaux. */
 const bloc = src.slice(0, AVANT_TABLE) + src.slice(APRES_TABLE);
-const CLE = /\b(?:TB|te)\('((?:[^'\\]|\\.)*)'\)/g;
+/* `te(…)` et `TB(…)` prennent la phrase seule ; `teF(…)` et `TBF(…)` la
+   prennent suivie de ses trous — la parenthèse fermante n'arrive donc pas
+   tout de suite. */
+const CLE = /\b(?:TB|te|teF|TBF)\('((?:[^'\\]|\\.)*)'/g;
 const duCode = new Set();
 let m;
 while ((m = CLE.exec(bloc))) duCode.add(dejs(m[1]));
