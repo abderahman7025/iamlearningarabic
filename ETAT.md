@@ -29,6 +29,38 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
+## OÙ ON EN EST — soir du 21 août 2026, production en v129
+
+La soirée a porté sur l'interface adulte. Sont **faits et en ligne** : le code
+couleur des formes (trait de liaison en blanc, coupe en L pour ne pas emporter
+les points), le ʿayn et le ġayn sans couleur, les lettres posées sur la ligne
+d'écriture dans les canvas, les voyelles seules écartées de la ligne, la page
+des cours devenue un parcours, le modèle qui s'écrit tout seul dans les canvas
+adulte, et la rangée de voyelles sous les formes avec ses deux règles.
+
+**Ce que le client doit trancher ou préciser :**
+
+1. **Les autres lettres.** Il a dit : « il reste quelques soucis sur les autres
+   lettres non citées, on verra demain. » Lesquelles, il ne l'a pas dit. Les
+   cinq familles déjà réglées sont dans `_LIAISON_EM` ; en ajouter une ne coûte
+   qu'une ligne. La règle de référence, tirée du nūn : **le blanc s'arrête au
+   pied de la dent**, la petite verticale qui remonte appartient à la lettre.
+2. **« Les spécificités de chaque lettre »**, au pluriel. Seul le tā marbūṭa
+   sans soukoun a été nommé et fait (`_SANS_SOUKOUN`). Lui demander la suite —
+   l'alif et la hamza sans son propre ? les lettres qui ne s'attachent pas ?
+3. **Voyelle impossible : éteinte ou cachée ?** Choix fait : éteinte, pour que
+   l'élève voie qu'elle existe et qu'elle ne va pas là. À confirmer.
+
+**Deux habitudes prises avec lui, à garder :**
+- Avant un gros chantier, annoncer le plan et attendre son avis. Les
+  corrections bornées, non : celles-là se font d'un trait.
+- Pour un réglage à l'œil, lui envoyer une planche d'images plutôt que de
+  deviner — c'est plus rapide qu'un aller-retour par la production. Et n'y
+  mettre QUE ce qu'il a demandé : les témoins « inchangés » l'ont agacé, une
+  phrase suffit à dire qu'on n'y a pas touché.
+
+---
+
 ## Déploiement — débloqué le 11 août 2026, après deux pannes empilées
 
 Pendant plusieurs sessions, la production est restée figée sur `c6206e0`
