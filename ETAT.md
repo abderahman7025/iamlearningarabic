@@ -934,6 +934,36 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Quatrième passe, 20 août 2026 — les retours du client, un par un.**
+
+  - **UN `position:fixed` DANS `#ca` N'EST PAS FIXE.** Le décor d'un monde y
+    était posé ; `#ca` défile et reçoit une animation de `transform` à
+    chaque changement d'écran, ce qui en fait le bloc conteneur de ses
+    descendants fixes. Résultat : en descendant dans un cours, le bas de la
+    page laissait voir le fond de la carte. Le décor et les bêtes vivent
+    maintenant sur le **body**. C'est le genre de défaut qu'on ne trouve
+    qu'en faisant défiler pour de vrai.
+  - **Le menu du garçon est dans l'espace**, comme sa carte. Ce que ETAT
+    disait « demanderait de refaire tout son thème » tient en fait dans une
+    poignée de règles : sur `body.fond-espace`, ses titres passent en clair
+    et ses cartes prennent un bleu de nuit. Vérifié : plus aucun texte
+    sombre posé directement sur l'espace.
+  - **La fusée CONTINUE son tour en se posant.** Elle amorçait sa rotation
+    puis repartait en sens inverse pour se remettre droite — visible en
+    arrivant sur une planète plus basse. Le redressement vise désormais le
+    tour complet SUIVANT dans le sens où elle tourne déjà, au lieu de
+    ramener l'angle vers zéro.
+  - **Une composition par monde** (`scenesBetes` est devenu un tableau de
+    placements) : un ours géant et cinq petits, les chiens-chats une fois
+    chacun mais énormes, les tortues posées en bas où on les voit, les
+    papillons qui traversent l'écran, les pingouins qui arrivent de loin en
+    grossissant et en se dandinant, les licornes qui vont dans tous les
+    sens. Les sucreries, elles, sont semées sur tout le paysage en trois
+    rangées régulières.
+  - Retirés à sa demande : les deux grandes fleurs du monde des papillons
+    (elles sont passées au monde des fleurs, en plus grand), et l'emblème
+    en emoji au bout de la jauge côté fille.
+
 - **Le monde devient le FOND D'ÉCRAN — 20 août 2026.** Entrer dans un monde
   ne change plus seulement un filigrane : le dégradé pastel de la carte
   laisse la place au **paysage du monde**, plein cadre. La banquise et ses

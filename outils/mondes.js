@@ -527,8 +527,13 @@ const MONDES = [
     ciel: ['#e8f8ff', '#f4ffe8', '#cfeeb0'], terre: '#8fce78',
     paysage: '<ellipse cx="700" cy="920" rx="900" ry="220" fill="#a8dc8c" opacity=".7"/>'
       + tige(180, 560, 900, '#5f9e4c') + tige(1220, 580, 900, '#5f9e4c')
-      + fleur('gg1', 180, 548, 78, '#ffc9e0', '#ff6fae', '#ffcf4e', 0)
-      + fleur('gg2', 1220, 568, 72, '#d8c8ff', '#9a6fd8', '#ffcf4e', 1.4)
+      + tige(430, 500, 900, '#5f9e4c') + tige(980, 520, 900, '#5f9e4c')
+      + tige(700, 600, 900, '#68a854')
+      + fleur('gg1', 180, 548, 92, '#ffc9e0', '#ff6fae', '#ffcf4e', 0)
+      + fleur('gg2', 1220, 568, 86, '#d8c8ff', '#9a6fd8', '#ffcf4e', 1.4)
+      + fleur('gg3', 430, 488, 104, '#ffffff', '#e8c0f4', '#ffbe3c', 0.7)
+      + fleur('gg4', 980, 508, 96, '#ffe0b8', '#f0a04c', '#ff8ec4', 2.1)
+      + fleur('gg5', 700, 588, 76, '#c8e8ff', '#4fa8e0', '#ffd34e', 2.8)
       + nuage(560, 190, 60, '#ffffff', .85, 0, true, 44), clair: '#f6ffef', moyen: '#d6f2c0', fonce: '#8fc879', halo: '#bfe8a8', trait: '#6aa858',
     sol: sol('#8fce78', 74, '#a8dc8c'),
     dedans: tige(106, 226, 322, '#5f9e4c') + tige(200, 206, 330, '#5f9e4c') + tige(294, 226, 322, '#5f9e4c')
@@ -592,10 +597,8 @@ const MONDES = [
     paysage: '<ellipse cx="700" cy="920" rx="900" ry="210" fill="#c9b0f0" opacity=".7"/>'
       + '<path d="M 120 900 v -120 M 260 900 v -150 M 420 900 v -110 M 980 900 v -140 M 1150 900 v -120 M 1300 900 v -100"'
       + ' stroke="#9a7fd0" stroke-width="9" stroke-linecap="round" opacity=".55"/>'
-      + tige(560, 660, 900, '#7f66b8') + tige(880, 690, 900, '#7f66b8')
-      + fleur('pp1', 560, 648, 62, '#ffd8ee', '#e86ab0', '#ffcf4e', 0.4)
-      + fleur('pp2', 880, 678, 54, '#d8e8ff', '#6a8ad8', '#ffcf4e', 1.6)
-      + nuage(340, 200, 54, '#ffffff', .75, 0, true, 46), clair: '#fdf4ff', moyen: '#e8d8ff', fonce: '#a98fd8', halo: '#c9b6ff', trait: '#8a6ec0',
+      + nuage(340, 200, 54, '#ffffff', .75, 0, true, 46)
+      + nuage(1000, 280, 44, '#ffffff', .7, -14, true, 38), clair: '#fdf4ff', moyen: '#e8d8ff', fonce: '#a98fd8', halo: '#c9b6ff', trait: '#8a6ec0',
     sol: sol('#c2a8ec', 56, '#d8c4ff'),
     /* Les papillons sont ceux du client, et ils volent : ici, le pre et le
        ciel qui les portent. */
@@ -677,15 +680,33 @@ const MONDES = [
 
   /* 11 — les sucreries : il en faut BEAUCOUP, et de toutes sortes. */
   { nom: 'sucreries', r: 128,
-    /* Un pays de sucre : ciel framboise et sol de glaçage. */
-    ciel: ['#fff0fa', '#ffd8ee', '#ffb3dc'], terre: '#ff9ed8',
+    /* Un pays de sucre : ciel framboise, sol de glaçage — et des sucreries
+       SEMÉES SUR TOUT L'ÉCRAN, régulièrement, comme le client l'a demandé :
+       elles s'entassaient en bas avec un donut perdu dans un coin. */
+    ciel: ['#fff0fa', '#ffd8ee', '#ffb3dc'], terre: '#ff9ed8', bouquetsCiel: false,
     paysage: '<ellipse cx="700" cy="920" rx="900" ry="200" fill="#ffc4e8" opacity=".8"/>'
       + '<path d="M 0 760 q 100 -60 200 0 t 200 0 t 200 0 t 200 0 t 200 0 t 200 0 t 200 0 L 1400 900 L 0 900 Z" fill="#ffffff" opacity=".7"/>'
-      + sucette(200, 560, 130, '#ffffff', '#ff6fae', 0)
-      + sucette(1180, 600, 110, '#fff3b8', '#7fd0f0', 1.2)
-      + donut(560, 300, 120, '#e8a86a', '#ff9ec4', 0.6)
-      + glace(980, 320, 118, '#a8e8d4', '#ffd34e', 1.8)
-      + canne(760, 660, 110, 2.4), clair: '#fff4fb', moyen: '#ffd8ee', fonce: '#f08acc', halo: '#ffabe0', trait: '#d466ac',
+      /* rangée haute */
+      + sucette(150, 130, 96, '#ffffff', '#ff6fae', 0)
+      + donut(430, 110, 96, '#e8a86a', '#ff9ec4', 0.7)
+      + glace(700, 125, 92, '#a8e8d4', '#ffd34e', 1.4)
+      + cupcake(980, 120, 92, '#ffb3d1', '#fff0f8', 2.1)
+      + canne(1260, 130, 84, 2.8)
+      /* rangée du milieu */
+      + bonbon(120, 360, 84, '#a8e8d4', '#e8fff8', 0.4)
+      + nounours(400, 350, 78, 1.1)
+      + sucette(690, 355, 88, '#fff3b8', '#7fd0f0', 1.8)
+      + donut(970, 345, 88, '#d8a86a', '#7fd0f0', 2.5)
+      + glace(1250, 360, 84, '#ffc9e0', '#fff3b8', 3.2)
+      /* rangée basse, posée sur le glaçage */
+      + cupcake(180, 620, 96, '#c9b6ff', '#fff6d8', 0.9)
+      + canne(450, 615, 92, 1.6)
+      + nounours(720, 625, 84, 2.3)
+      + bonbon(1000, 620, 90, '#ffe36a', '#fff8d8', 3.0)
+      + sucette(1270, 610, 92, '#ffd6e8', '#a86ad8', 3.7)
+      + coeur(280, 240, 26, '#ffffff', '.9', 'bat', 1.2)
+      + coeur(840, 250, 22, '#ffffff', '.9', 'bat', 2.4)
+      + coeur(1130, 480, 24, '#ffffff', '.9', 'bat', 0.6),
     /* DEUX FOIS PLUS de sucreries, demandees le 20 aout — et toutes DANS le
        disque : a y=320 il ne reste que 120 px de large, tout ce qui
        descendait plus bas etait rogne. */

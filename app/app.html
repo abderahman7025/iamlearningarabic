@@ -2431,6 +2431,32 @@ body.profile-boy #boy-bg-anim {
 body.profile-boy.fond-espace,#root.profile-boy.fond-espace{
   background:linear-gradient(178deg,#050a1a 0%,#0b1836 30%,#122b5c 64%,#1b4585 100%) !important;
 }
+/* SUR L'ESPACE, CE QUI ETAIT ECRIT EN SOMBRE PASSE EN CLAIR. Le menu du
+   garcon est desormais dans l'espace lui aussi : ses titres et ses libelles
+   etaient bleu fonce sur clair, ils disparaissaient. Les cartes, elles,
+   gardent leur fond propre — seul ce qui repose sur le vide est repris. */
+body.fond-espace #root.profile-boy .p-sec-title,
+body.fond-espace #root.profile-boy .menu-title,
+body.fond-espace #root.profile-boy h1,
+body.fond-espace #root.profile-boy h2,
+body.fond-espace #root.profile-boy #tb-title,
+body.fond-espace #root.profile-boy .sess-gp-lbl{
+  color:#eaf4ff !important;-webkit-text-fill-color:#eaf4ff !important;
+  text-shadow:0 2px 10px rgba(0,0,0,.55) !important;
+}
+body.fond-espace #root.profile-boy .nav-card,
+body.fond-espace #root.profile-boy .card{
+  background:linear-gradient(150deg,rgba(18,43,92,.86),rgba(11,24,54,.9)) !important;
+  border-color:rgba(140,200,255,.35) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.35) !important;
+}
+body.fond-espace #root.profile-boy .nav-card .nav-text,
+body.fond-espace #root.profile-boy .nav-card .nav-desc,
+body.fond-espace #root.profile-boy .card{
+  color:#eaf4ff !important;
+}
+body.fond-espace #root.profile-boy .nav-card .nav-desc{opacity:.85}
+
 /* Les voiles clairs poses par-dessus le fond du garcon eteindraient
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
@@ -2465,12 +2491,45 @@ body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
   50%    {transform:translateY(-9%) rotate(2.5deg)}
 }
 @keyframes beteVole{
-  0%   {transform:translate(0,0) rotate(-6deg)}
-  20%  {transform:translate(46%,-38%) rotate(5deg)}
-  42%  {transform:translate(104%,-8%) rotate(-4deg)}
-  60%  {transform:translate(72%,-52%) rotate(7deg)}
-  80%  {transform:translate(22%,-24%) rotate(-5deg)}
-  100% {transform:translate(0,0) rotate(-6deg)}
+  0%   {transform:translate(0,0) rotate(-8deg)}
+  18%  {transform:translate(70%,-46%) rotate(7deg)}
+  38%  {transform:translate(160%,-10%) rotate(-6deg)}
+  56%  {transform:translate(240%,-58%) rotate(9deg)}
+  76%  {transform:translate(120%,-30%) rotate(-7deg)}
+  100% {transform:translate(0,0) rotate(-8deg)}
+}
+/* UN PAPILLON TRAVERSE L'ECRAN. Il repart en sens inverse a mi-course : le
+   dessin n'est pas retourne — pas de `scaleX(-1)` dans ce projet — il
+   revient donc sur ses pas, comme un papillon qui butine. */
+@keyframes beteTraverse{
+  0%   {transform:translateX(0) translateY(0) rotate(-6deg)}
+  25%  {transform:translateX(38vw) translateY(-8vh) rotate(6deg)}
+  50%  {transform:translateX(74vw) translateY(4vh) rotate(-5deg)}
+  75%  {transform:translateX(36vw) translateY(-6vh) rotate(7deg)}
+  100% {transform:translateX(0) translateY(0) rotate(-6deg)}
+}
+/* Le vol d'un papillon SUR LA CARTE : il traverse son monde en diagonale et
+   revient, sans jamais en sortir — le disque est petit, les pourcentages
+   sont donc comptes sur la bete elle-meme. */
+@keyframes beteVolMonde{
+  0%   {transform:translate(0,0) rotate(-8deg)}
+  22%  {transform:translate(90%,-70%) rotate(9deg)}
+  44%  {transform:translate(180%,10%) rotate(-7deg)}
+  62%  {transform:translate(70%,90%) rotate(8deg)}
+  82%  {transform:translate(-40%,30%) rotate(-9deg)}
+  100% {transform:translate(0,0) rotate(-8deg)}
+}
+
+/* UN PINGOUIN ARRIVE DE LOIN : petit au fond, il grossit en avancant. */
+@keyframes beteApproche{
+  0%   {transform:translateY(-6vh) scale(.22);opacity:0}
+  10%  {opacity:1}
+  100% {transform:translateY(6vh) scale(1);opacity:1}
+}
+/* Sa DEMARCHE : il se balance d'un pied sur l'autre. */
+@keyframes beteDemarche{
+  0%,100%{transform:rotate(-7deg) translateX(-3%)}
+  50%    {transform:rotate(7deg) translateX(3%)}
 }
 @keyframes beteTrotte{
   0%,100%{transform:translateX(0) scaleX(1)}
@@ -4946,7 +5005,8 @@ function chooseProfile(p){
   if(boyBg)  boyBg.style.display=(p==='boy'?'block':'none');
   if(p==='girl'||p==='boy') setTimeout(initChildBgAnim, 200);
   document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
-  _fondEnfant(false);
+  /* Le garcon garde son espace jusque sur le menu. */
+  _fondEnfant(_fondMenuEnfant());
   buildMenu();showS('s-menu',true,true);
   /* URL propre selon le profil — sauf si appelé depuis tryAutoLogin */
   if(!window._skipProfileNav){
@@ -5156,9 +5216,10 @@ function navToPage(page){
 function renderPage(page,fwd){
   repriseNoter({type:'page',page:page});
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
-  /* Chaque page repart d'un fond neutre ; celles qui veulent l'espace le
-     rallument elles-memes. */
-  _fondEnfant(false);
+  /* Chaque page repart du fond de base de l'enfant : l'espace pour le
+     garcon, du bout en bout ; celles qui veulent autre chose le rallument
+     elles-memes. */
+  _fondEnfant(_fondMenuEnfant());
   if(page==='intro')renderIntro(ca);
   /* Fille et garçon partagent la MÊME carte, habillée différemment.
      L'adulte garde la sienne. */
@@ -6039,6 +6100,15 @@ function _equipage(taille,sansMonture){
    les passer au noir demanderait de refaire tout son theme. On le retire
    donc a chaque changement de page, pour qu'il ne suive pas l'enfant
    ailleurs — un fond oublie derriere un ecran clair est illisible. */
+/* Le fond de l'espace vaut AUSSI pour le menu du garcon : le client le veut
+   d'un bout a l'autre de son interface, carte comme accueil. Les libelles
+   qui y perdaient leur contraste sont rattrapes en CSS (voir
+   `body.fond-espace` plus haut). Cote fille, le menu garde le rose : elle a
+   son pastel sur la carte et le monde dans ses cours. */
+function _fondMenuEnfant(){
+  if(!_HAB)_HAB=_habDuProfil();
+  return (st&&st.profile==='boy');
+}
 function _fondEnfant(actif){
   var b=document.body,r=document.getElementById('root');
   if(!b)return;
@@ -6133,6 +6203,13 @@ function _hautDuDessin(img){
   _HAUTS_DECOR[cle]=r;
   return r;
 }
+/* Le decor d'un monde vit sur le BODY. Pose dans `#ca`, qui defile et qui
+   recoit une animation de transform a chaque changement d'ecran, un
+   `position:fixed` cesse d'etre fixe : il se rattache a ce conteneur, et
+   le bas de la page laissait voir le fond de la carte des mondes des qu'on
+   defilait un peu — vu par le client sur les cours voyelles et
+   prolongations. */
+
 /* Ce qui ATTEND la fille sur un monde : sa licorne au monde 1, la couronne
    au monde 2. L'image est posee sur le SOMMET du decor, comme le
    personnage, et retiree des que l'etape est finie — l'objet part alors
@@ -6191,7 +6268,9 @@ function _poserBetes(globe,cartes){
       el.style.cssText='z-index:6;left:'+Math.round(x0+vw*b.x/100)+'px;'
         +'top:'+Math.round(y0+vh*b.y/100)+'px;width:'+Math.round(vw*b.l/100)+'px;'
         +'filter:drop-shadow(0 6px 8px rgba(90,50,110,.28));'
-        +'animation:'+(b.vol?'beteVole':'beteBalance')+' '+(b.vol?11+i*2:3.2+i*0.7)+'s '
+        /* Ce qui vole va d'un bout a l'autre de son monde, et vite : le
+           client trouvait le premier vol trop sage. */
+        +'animation:'+(b.vol?'beteVolMonde':'beteBalance')+' '+(b.vol?7+i*1.4:3.2+i*0.7)+'s '
         +(b.vol?'linear':'ease-in-out')+' infinite;animation-delay:-'+(i*1.3)+'s';
       globe.appendChild(el);
     });
@@ -6396,6 +6475,9 @@ function _volCarte(o){
      le plus court. Sans ce recalage, la fusee fait un tour complet sur
      elle-meme au milieu d'un virage. */
   var angleVu=0;
+  /* Le SENS dans lequel la fusee tourne en ce moment, et le dernier angle
+     brut. Ils servent a la redresser en CONTINUANT son mouvement. */
+  var brutVu=null,sensRot=1;
   function _court(a){
     while(a-angleVu>180)a-=360;
     while(a-angleVu<-180)a+=360;
@@ -6403,9 +6485,27 @@ function _volCarte(o){
   }
   function poser(x,y,deg,part){
     el.style.left=(x-dx)+'px';el.style.top=(y-dy)+'px';
-    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;return;}
-    var a=o.aligne?_court(deg+90):_inclinaison(deg);
-    a*=(part===undefined?1:Math.max(0,Math.min(1,part)));
+    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;brutVu=null;return;}
+    var p=(part===undefined?1:Math.max(0,Math.min(1,part)));
+    var a;
+    if(o.aligne){
+      a=_court(deg+90);
+      /* Dans quel sens tourne-t-elle ? */
+      if(brutVu!==null&&Math.abs(a-brutVu)>0.05)sensRot=(a>brutVu)?1:-1;
+      brutVu=a;
+      /* LE REDRESSEMENT CONTINUE LE TOUR COMMENCE. En ramenant simplement
+         l'angle vers zero, la fusee amorçait sa rotation puis repartait en
+         sens inverse pour se remettre droite — c'est ce que le client
+         voyait en arrivant sur une planete plus basse. On vise donc le
+         quart de tour SUIVANT dans le sens ou elle tourne deja. */
+      if(p<1){
+        var tours=a/360;
+        var cible=(sensRot>0?Math.ceil(tours):Math.floor(tours))*360;
+        a=a+(cible-a)*(1-p);
+      }
+    }else{
+      a=_inclinaison(deg)*p;
+    }
     el.style.transform='rotate('+a.toFixed(1)+'deg)';
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
@@ -6491,6 +6591,7 @@ function _volCarte(o){
        bouge. Le sens vient des abscisses des deux etapes ; un trajet
        rigoureusement vertical garde le sens precedent. */
     partiDe=idx;
+    brutVu=null;sensRot=1;
     var _de=ouSePoser(idx),_vers=ouSePoser(cible);
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
@@ -7743,7 +7844,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v112';
+var _VERSION_REPLI='v113';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9210,10 +9311,10 @@ var _HABILLAGES={
     /* Le ?v= est indispensable : un decor retouche garderait sinon l'ancienne
        image dans le cache du navigateur et du service worker. Il monte avec
        la version du site. */
-    images:['/images/monde-licornes.svg?v=111','/images/monde-couronne.svg?v=111','/images/monde-nuages.svg?v=111',
-            '/images/monde-fleurs.svg?v=111','/images/monde-coeurs.svg?v=111','/images/monde-pingouins.svg?v=111',
-            '/images/monde-papillons.svg?v=111','/images/monde-tortue.svg?v=111','/images/monde-chats-chiens.svg?v=111',
-            '/images/monde-ours.svg?v=111','/images/monde-sucreries.svg?v=111','/images/monde-chateau.svg?v=111'],
+    images:['/images/monde-licornes.svg?v=113','/images/monde-couronne.svg?v=113','/images/monde-nuages.svg?v=113',
+            '/images/monde-fleurs.svg?v=113','/images/monde-coeurs.svg?v=113','/images/monde-pingouins.svg?v=113',
+            '/images/monde-papillons.svg?v=113','/images/monde-tortue.svg?v=113','/images/monde-chats-chiens.svg?v=113',
+            '/images/monde-ours.svg?v=113','/images/monde-sucreries.svg?v=113','/images/monde-chateau.svg?v=113'],
     etapes:['Le monde des licornes','Le monde de la couronne','Le monde des nuages',
             'Le monde des fleurs','Le monde des cœurs','Le monde des pingouins',
             'Le monde des papillons','L\'île de la tortue','Le monde des chats et des chiens',
@@ -9263,8 +9364,9 @@ var _HABILLAGES={
     /* Dans un monde, le fond d'écran EST ce monde : un paysage plein cadre
        par monde, `ciel-<slug>.svg`, écrit par `outils/mondes.js`. */
     scenesMonde:true,
-    /* Le monde des licornes montre LA licorne du client, pas un dessin. */
-    scenesImage:{'licornes':'/images/licorne-seule-gd.png'},
+    /* Pas d'emblème en emoji au bout de la jauge : ses licornes sont des
+       illustrations. */
+    vehJauge:false,
     /* LES BETES DU CLIENT, posées sur leur monde. Les places sont en
        pourcentage du dessin du monde : le disque occupe les deux tiers du
        milieu, donc tout tient entre 18 % et 74 %. */
@@ -9284,18 +9386,59 @@ var _HABILLAGES={
       9:[{img:'/images/bete-ours1.png',x:26,y:34,l:26},
          {img:'/images/bete-ours2.png',x:50,y:46,l:24}]
     },
-    /* LE COURS D'UN MONDE EN EST PLEIN. Chez les papillons, ils volent ;
-       ailleurs, les bêtes se balancent sur place. */
+    /* LE COURS D'UN MONDE EN EST PLEIN, et chaque monde a SA composition —
+       le client les a dictées une par une le 20 août.
+       `x`, `y`, `l` sont en pourcentage de l'écran ; `anim` porte le
+       déplacement, `anim2` le mouvement propre de la bête. Ce qui marche
+       reste dans le bas de l'écran, ce qui vole occupe toute la hauteur. */
     scenesBetes:{
-      'papillons':['/images/papillon1.gif','/images/papillon2.gif',
-                   '/images/papillon3.gif','/images/papillon4.gif'],
-      'pingouins':['/images/bete-pinguin1.png','/images/bete-pinguin2.png'],
-      'tortue':['/images/bete-tortue1.png','/images/bete-tortue2.png'],
-      'chats-chiens':['/images/bete-chienchat1.png','/images/bete-chienchat2.png'],
-      'ours':['/images/bete-ours1.png','/images/bete-ours2.png'],
-      'licornes':['/images/licorne-seule-gd.png','/images/licorne-seule-dg.png']
+      /* Les papillons TRAVERSENT l'écran, et ils sont gros. */
+      'papillons':[
+        {img:'/images/papillon3.gif',x:2,y:14,l:26,anim:'beteTraverse',dur:26,del:0},
+        {img:'/images/papillon1.gif',x:4,y:52,l:22,anim:'beteTraverse',dur:32,del:9},
+        {img:'/images/papillon2.gif',x:0,y:72,l:20,anim:'beteTraverse',dur:22,del:16},
+        {img:'/images/papillon4.gif',x:6,y:33,l:18,anim:'beteTraverse',dur:38,del:24},
+        {img:'/images/papillon2.gif',x:3,y:84,l:15,anim:'beteTraverse',dur:29,del:5}
+      ],
+      /* Les pingouins ARRIVENT DE LOIN : petits au fond, ils grossissent en
+         se dandinant. */
+      'pingouins':[
+        {img:'/images/bete-pinguin1.png',x:10,y:34,l:26,anim:'beteApproche',dur:15,del:0,
+         anim2:'beteDemarche',dur2:1.5},
+        {img:'/images/bete-pinguin2.png',x:66,y:30,l:24,anim:'beteApproche',dur:19,del:7,
+         anim2:'beteDemarche',dur2:1.8},
+        {img:'/images/bete-pinguin1.png',x:40,y:26,l:18,anim:'beteApproche',dur:24,del:13,
+         anim2:'beteDemarche',dur2:1.3}
+      ],
+      /* Les tortues sont POSÉES EN BAS, là où on les voit — plus rien en
+         suspension dans le vide. */
+      'tortue':[
+        {img:'/images/bete-tortue1.png',x:2,y:58,l:34,anim2:'beteBalance',dur2:4.2},
+        {img:'/images/bete-tortue2.png',x:64,y:62,l:32,anim2:'beteBalance',dur2:5.0},
+        {img:'/images/bete-tortue2.png',x:36,y:78,l:24,anim2:'beteBalance',dur2:3.6}
+      ],
+      /* UN TRÈS GROS OURS, et ses petits autour. */
+      'ours':[
+        {img:'/images/bete-ours1.png',x:26,y:10,l:44,anim2:'beteBalance',dur2:5.4},
+        {img:'/images/bete-ours2.png',x:1,y:54,l:11,anim2:'beteBalance',dur2:3.2},
+        {img:'/images/bete-ours2.png',x:82,y:50,l:12,anim2:'beteBalance',dur2:3.8},
+        {img:'/images/bete-ours2.png',x:72,y:76,l:10,anim2:'beteBalance',dur2:2.9},
+        {img:'/images/bete-ours2.png',x:12,y:78,l:10,anim2:'beteBalance',dur2:4.4},
+        {img:'/images/bete-ours2.png',x:44,y:84,l:9,anim2:'beteBalance',dur2:3.5}
+      ],
+      /* Une seule fois chaque image, mais TRÈS GROS. */
+      'chats-chiens':[
+        {img:'/images/bete-chienchat1.png',x:0,y:30,l:52,anim2:'beteBalance',dur2:4.6},
+        {img:'/images/bete-chienchat2.png',x:50,y:36,l:50,anim2:'beteBalance',dur2:5.2}
+      ],
+      /* Les licornes du client vont DANS TOUS LES SENS. */
+      'licornes':[
+        {img:'/images/licorne-seule-gd.png',x:2,y:20,l:26,anim:'beteVole',dur:30,del:0},
+        {img:'/images/licorne-seule-dg.png',x:62,y:56,l:24,anim:'beteVole',dur:26,del:8},
+        {img:'/images/licorne-seule-gd.png',x:22,y:70,l:20,anim:'beteVole',dur:34,del:17},
+        {img:'/images/licorne-seule-dg.png',x:70,y:14,l:18,anim:'beteVole',dur:23,del:25}
+      ]
     },
-    scenesVol:{'papillons':true},
     /* Elle est plus étroite et plus haute qu'un astronaute, et se tient à
        l'ARRIÈRE de sa licorne pour qu'on voie la tête de celle-ci — c'est
        la contrainte du client. `piloteDecale` est en points de pourcentage,
@@ -9346,67 +9489,46 @@ function _habDuProfil(){
    est pose au clic sur la carte : c'est lui qui dit dans quel monde on est.
    Sans habillage qui les fournisse (le garcon), il n'y a rien a poser. */
 function _decorMonde(ca,actif){
-  if(ca)Array.prototype.forEach.call(ca.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours'),function(v){
-    if(v.parentNode)v.parentNode.removeChild(v);
-  });
+  /* On nettoie partout : le decor a pu etre pose sur le body. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours'),
+    function(v){if(v.parentNode)v.parentNode.removeChild(v);});
   document.body.classList.remove('dans-un-monde');
   var r1=document.getElementById('root');if(r1)r1.classList.remove('dans-un-monde');
-  if(!actif||!ca||!_HAB||!_HAB.scenesMonde||!_currentIsleSlug)return;
+  if(!actif||!_HAB||!_HAB.scenesMonde||!_currentIsleSlug)return;
+
   document.body.classList.add('dans-un-monde');
   var r0=document.getElementById('root');if(r0)r0.classList.add('dans-un-monde');
+
+  /* LE PAYSAGE, plein cadre, derriere tout le reste. */
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=112')";
-  ca.appendChild(d);
-  /* Certains mondes tiennent a une image du client plutot qu'a un dessin :
-     le monde des licornes doit montrer SA licorne. Elle ne peut pas entrer
-     dans le fichier SVG — une image servie par une balise img ne charge
-     aucune image exterieure — elle est donc posee ici, en deux exemplaires. */
-  /* LE MONDE OU L'ON ENTRE DOIT ETRE PLEIN DE SES BETES : des papillons qui
-     volent chez les papillons, des ours chez les ours. Elles sont semees a
-     des places fixes — un tirage au sort changerait a chaque ecran — et
-     chacune part avec son propre retard. */
+  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=113')";
+  document.body.appendChild(d);
+
+  /* LES BETES DU MONDE. Chaque monde a SA composition — un tres gros ours
+     et ses petits, deux chiens-chats en grand, des tortues posees en bas,
+     des papillons qui traversent l'ecran : le client les a dictees une par
+     une. `x`, `y` et `l` sont en pourcentage de l'ecran. */
   var betes=_HAB.scenesBetes&&_HAB.scenesBetes[_currentIsleSlug];
-  if(betes&&betes.length){
-    /* Les places sont FIXES : un tirage au sort redistribuerait le decor a
-       chaque ecran, et cela se voit tout de suite. Elles longent les bords,
-       pour laisser le milieu au cours. */
-    /* Elles longent les bords — le milieu reste au cours — mais elles sont
-       GRANDES : le client veut voir ses pingouins, pas les deviner.
-       CE QUI MARCHE RESTE AU SOL : un ours accroché en plein ciel se voit
-       tout de suite. Seul ce qui vole occupe toute la hauteur. */
-    var AU_SOL=[[1,46,21],[75,42,22],[12,66,19],[68,68,20],[30,80,15],
-                [52,84,14],[86,62,13],[22,56,12],[62,56,12],[40,74,11],
-                [6,86,12],[78,86,11],[34,62,10],[46,50,10]];
-    var EN_VOL=[[2,10,17],[76,6,16],[38,2,13],[8,34,15],[82,30,14],[26,60,13],
-                [66,54,14],[14,78,12],[72,80,13],[44,86,11],[54,24,11],[30,30,10],
-                [90,60,10],[4,58,11]];
-    var VOLE=!!(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]);
-    var PLACES=VOLE?EN_VOL:AU_SOL;
-    var COMBIEN=Math.min(PLACES.length,betes.longueur||betes.length*3);
-    for(var i=0;i<COMBIEN;i++){
-      var pl=PLACES[i],b=betes[i%betes.length];
-      var im=document.createElement('img');
-      im.src=b;im.alt='';im.className='bete-cours';
-      im.style.cssText='z-index:0;opacity:.92;left:'+pl[0]+'%;top:'+pl[1]+'%;width:'+pl[2]+'%;'
-        +'filter:drop-shadow(0 10px 14px rgba(80,50,110,.22));'
-        +'animation:'+(VOLE?'beteVole':'beteBalance')+' '
-        +(VOLE?9+(i%5)*2.4:3.4+(i%4)*0.8)+'s '+(VOLE?'linear':'ease-in-out')
-        +' infinite;animation-delay:-'+(i*1.7)+'s';
-      ca.appendChild(im);
-    }
-  }
-  var extra=_HAB.scenesImage&&_HAB.scenesImage[_currentIsleSlug];
-  if(extra){
-    [[4,16,24],[70,58,18]].forEach(function(pos,i){
-      var im=document.createElement('img');
-      im.src=extra;im.alt='';im.className='decor-monde-img';
-      im.style.cssText='position:fixed;z-index:0;pointer-events:none;opacity:.5;'
-        +'left:'+pos[0]+'%;top:'+pos[1]+'%;width:'+pos[2]+'%;'
-        +'animation:volFlotte '+(3.6+i)+'s ease-in-out infinite';
-      ca.appendChild(im);
-    });
-  }
+  if(!betes||!betes.length)return;
+  betes.forEach(function(b,i){
+    var enveloppe=document.createElement('span');
+    enveloppe.className='bete-cours';
+    enveloppe.style.cssText='z-index:0;left:'+b.x+'%;top:'+b.y+'%;width:'+b.l+'%;'
+      +'opacity:'+(b.o||0.95)+';'
+      +(b.anim?('animation:'+b.anim+' '+(b.dur||14)+'s '
+        +(b.anim==='beteBalance'?'ease-in-out':'linear')+' infinite;'
+        +'animation-delay:-'+(b.del||i*1.7)+'s;'):'');
+    var im=document.createElement('img');
+    im.src=b.img;im.alt='';
+    im.style.cssText='width:100%;height:auto;display:block;'
+      +'filter:drop-shadow(0 10px 14px rgba(80,50,110,.22));'
+      +(b.anim2?('animation:'+b.anim2+' '+(b.dur2||3.2)+'s ease-in-out infinite;'
+        +'animation-delay:-'+(b.del2||i*0.6)+'s;'):'');
+    enveloppe.appendChild(im);
+    document.body.appendChild(enveloppe);
+  });
 }
 
 function _boyScene(ca,reprise){
@@ -9430,7 +9552,10 @@ function _boyScene(ca,reprise){
     var j=document.createElement('div');j.className='boy-jauge';
     var pct=Math.round(100*i/Math.max(1,scenes.length-1));
     j.innerHTML='<div class="rail"><div class="feu" style="width:'+pct+'%"></div></div>'
-      +'<div class="fusee">'+_HAB.veh+'</div>';
+      /* L'emblème au bout de la jauge : la fusée du garçon. Côté fille, le
+         client n'en veut pas — une licorne en emoji à côté des siennes,
+         dessinées, faisait tache. La barre suffit à dire où l'on en est. */
+      +(_HAB.vehJauge===false?'':'<div class="fusee">'+_HAB.veh+'</div>');
     wrap.appendChild(j);
   }
   /* Dernier panneau construit : sert à y accrocher le retour en arrière,
