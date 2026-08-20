@@ -985,6 +985,24 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **La coupe du trait de liaison est en L, plus verticale — v127.** Une coupe
+  droite ne sait pas séparer un POINT d'un trait : le point du bāʾ et les deux
+  du yāʾ, au milieu, se trouvent sous le trait de liaison et partaient en
+  blanc avec lui. Le trait n'est donc blanchi qu'AU-DESSUS de la ligne
+  d'écriture — c'est là qu'il vit, entre −0,09 et 0 em. Tout ce qui pend sous
+  la ligne reste à la lettre. `_basLigne(interligne)` dit où tombe la ligne de
+  base dans une boîte de texte : la police monte à 1,34 em et descend à 0,70,
+  donc la ligne est à `interligne/2 − 0,32` em du bas.
+- **Cinq familles ont une longueur de liaison imposée** (`_LIAISON_EM`), le
+  reste de l'alphabet garde la mesure automatique — le client a insisté :
+  ne pas toucher aux lettres qui sont justes. La clé de lecture est le nūn,
+  sa référence : il a la MÊME longueur sur ses deux formes. Le kāf en avait
+  28 px en finale et 23 au milieu, le ṭāʾ 23 et 26 — leur milieu reprend
+  maintenant la valeur de leur finale. Le jīm, le bāʾ et le yāʾ gardent un
+  segment plat sur la ligne après le trait, sans creux où la mesure puisse
+  s'arrêter : valeurs lues à l'œil (jīm 0,18/0,26 ; bāʾ 0,34/0,26 ;
+  yāʾ milieu 0,26).
+
 - **Le ʿayn et le ġayn n'ont plus de code couleur — v126.** Leurs quatre
   formes s'apprennent séparément (le cours enfant leur saute déjà le tableau
   de déduction) : les colorer annonçait une parenté qui n'existe pas. Toutes

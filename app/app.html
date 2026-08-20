@@ -8016,7 +8016,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v126';
+var _VERSION_REPLI='v127';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8803,11 +8803,50 @@ function _bandeLiaison(){
   _TL_BANDE={haut:h,bas:b};
   return _TL_BANDE;
 }
+/* ── Les cinq familles que la mesure rate ────────────────────────────────
+   La longueur du trait de liaison, en fraction de la taille du texte. Le
+   nūn — la référence du client — en a 0,18 sur ses DEUX formes, et c'est ce
+   qui le rend juste : les deux formes doivent s'accorder.
+
+   · kāf et ṭāʾ : leurs deux formes ne s'accordaient pas (28 px contre 23,
+     23 contre 26). Le milieu reprend la valeur de la finale, comme demandé.
+   · jīm, bāʾ, yāʾ : la mesure se trompe des deux côtés — leur forme garde un
+     segment PLAT sur la ligne après le trait, sans creux où s'arrêter. Elles
+     reçoivent leur propre valeur, lue à l'œil.
+
+   Tout le reste de l'alphabet garde la mesure automatique. */
+var _LIAISON_EM={
+  'ك|milieu':0.20, 'ك|fin':0.20,
+  'ط|milieu':0.164,'ظ|milieu':0.164,
+  'ج|fin':0.18,'ح|fin':0.18,'خ|fin':0.18,
+  'ج|milieu':0.26,'ح|milieu':0.26,'خ|milieu':0.26,
+  'ب|fin':0.34,'ت|fin':0.34,'ث|fin':0.34,
+  'ب|milieu':0.26,'ت|milieu':0.26,'ث|milieu':0.26,
+  'ي|milieu':0.26
+};
+/* La clé d'une forme : la lettre nue, et sa place lue sur ses tatweels. */
+function _cleForme(f){
+  var nue=f.split(_TATWEEL).join('');
+  if(nue.length!==1)return null;
+  var aDroite=f.charAt(0)===_TATWEEL;
+  var aGauche=f.charAt(f.length-1)===_TATWEEL;
+  if(!aDroite)return null;
+  return nue+'|'+(aGauche?'milieu':'fin');
+}
 function _partLiaison(forme){
   var f=String(forme);
   if(f.charAt(0)!==_TATWEEL)return 0;
   if(_TL_CACHE[f]!==undefined)return _TL_CACHE[f];
   var m=_encreForme(f), bande=_bandeLiaison();
+  /* Valeur imposée : on la convertit en pourcentage de la largeur de CETTE
+     forme, puisque c'est ainsi que la coupe est exprimée. */
+  var cle=_cleForme(f);
+  if(cle && _LIAISON_EM[cle] && m && m.W){
+    var impose=Math.max(0,Math.min(70,100*_LIAISON_EM[cle]*_TL_TAILLE/m.W));
+    var pretE=!document.fonts||document.fonts.check(_TL_TAILLE+"px 'Scheherazade New'");
+    if(pretE)_TL_CACHE[f]=impose;
+    return impose;
+  }
   if(!m||m.droite<0||!bande)return 0;
   var tol=Math.max(2,Math.round(_TL_TAILLE*0.03));
   var xs=m.droite;
@@ -8827,21 +8866,36 @@ function _partLiaison(forme){
 if(document.fonts&&document.fonts.ready){
   document.fonts.ready.then(function(){_TL_CACHE={};_TL_BANDE=null;});
 }
+/* ── Où tombe la ligne d'écriture dans une boîte de texte ────────────────
+   Mesuré sur la police : 1,34 em au-dessus de la ligne de base, 0,70 en
+   dessous. Avec un interligne `lh`, le demi-plomb vaut (lh − 1,34 − 0,70)/2,
+   et la ligne de base se trouve donc à `lh/2 − 0,32` em du BAS de la boîte.
+   Sert à ne blanchir le trait de liaison qu'au-dessus de cette ligne. */
+function _basLigne(lh){return Math.max(0.02,(lh||1.2)/2-0.32);}
 /* La forme attachée, corps coloré et trait de liaison à part, en HTML.
    Deux exemplaires superposés et découpés : couper la chaîne en deux
    morceaux casserait la liaison arabe et le trait redeviendrait un tiret
-   tout droit, ce qui n'est pas la même chose. */
-function _formeCoupee(forme,couleurCorps,couleurTrait){
+   tout droit, ce qui n'est pas la même chose.
+
+   La coupe est en L, pas verticale. Une coupe droite ne sait pas séparer un
+   POINT d'un trait : le point du bāʾ et les deux points du yāʾ, au milieu,
+   se trouvent sous le trait de liaison et partaient en blanc avec lui. Le
+   trait n'est donc blanchi qu'AU-DESSUS de la ligne d'écriture — c'est là
+   qu'il vit, entre −0,09 et 0 em. Tout ce qui pend sous la ligne reste à la
+   lettre : ses points, et la queue du jīm. */
+function _formeCoupee(forme,couleurCorps,couleurTrait,ligne){
   var f=String(forme), p=_partLiaison(f);
   if(!p)return '<span style="color:'+couleurCorps+'">'+f+'</span>';
-  /* Les marges haut et bas sont NÉGATIVES : `inset(0 …)` coupait aussi au
-     ras de la boîte, et les deux points du yāʾ final, qui pendent sous la
-     ligne, disparaissaient. Seule la coupe verticale nous intéresse. */
+  var coupe=(100-p).toFixed(1)+'%';
+  var base='calc(100% - '+_basLigne(ligne).toFixed(3)+'em)';
+  var corps='polygon(-60% -60%, '+coupe+' -60%, '+coupe+' '+base
+    +', 160% '+base+', 160% 160%, -60% 160%)';
+  var trait='polygon('+coupe+' -60%, 160% -60%, 160% '+base+', '+coupe+' '+base+')';
   return '<span style="position:relative;display:inline-block">'
     +'<span style="display:inline-block;color:'+couleurCorps
-      +';clip-path:inset(-60% '+p.toFixed(1)+'% -60% -60%)">'+f+'</span>'
+      +';clip-path:'+corps+'">'+f+'</span>'
     +'<span aria-hidden="true" style="position:absolute;left:0;top:0;color:'+couleurTrait
-      +';clip-path:inset(-60% -60% -60% '+(100-p).toFixed(1)+'%)">'+f+'</span>'
+      +';clip-path:'+trait+'">'+f+'</span>'
     +'</span>';
 }
 /* Les signes (voyelles, tanwīn) ne changent pas le geste : on cherche le
@@ -10866,16 +10920,23 @@ function _boyScene(ca,reprise){
              balises casse la liaison arabe, et le trait redevient un tiret
              tout droit, ce qui n'est pas la même chose. */
           var part=_partLiaison(g);
+          /* Coupe en L, comme dans l'interface adulte : le trait n'est pris
+             qu'au-dessus de la ligne d'écriture, sinon le point du bāʾ et
+             ceux du yāʾ partiraient avec lui. L'interligne de cette case
+             est 1,5. */
+          var _c=(100-part).toFixed(1)+'%';
+          var _b='calc(100% - '+_basLigne(1.5).toFixed(3)+'em)';
           var pile=document.createElement('span');
           pile.style.cssText='position:relative;display:inline-block';
           var sCorps=document.createElement('span');
           sCorps.style.cssText='display:inline-block;color:'+coul[k]
-            +';clip-path:inset(0 '+part.toFixed(1)+'% 0 0)'
+            +';clip-path:polygon(-60% -60%, '+_c+' -60%, '+_c+' '+_b
+              +', 160% '+_b+', 160% 160%, -60% 160%)'
             +';transition:opacity .4s,transform .4s cubic-bezier(.34,1.56,.64,1)';
           sCorps.textContent=g;
           var sLien=document.createElement('span');
           sLien.style.cssText='position:absolute;left:0;top:0;color:'+LIEN
-            +';clip-path:inset(0 0 0 '+(100-part).toFixed(1)+'%)'
+            +';clip-path:polygon('+_c+' -60%, 160% -60%, 160% '+_b+', '+_c+' '+_b+')'
             +';transition:opacity .35s,transform .35s';
           sLien.textContent=g;
           pile.appendChild(sCorps);pile.appendChild(sLien);gl.appendChild(pile);
