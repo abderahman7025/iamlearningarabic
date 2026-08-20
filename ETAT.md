@@ -934,6 +934,40 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Les mondes de la fille, troisième passe — 20 août 2026, ses images.**
+  Le client a fourni douze illustrations (`bete-*.png` détourées, et
+  **quatre GIF animés** de papillons) et demandé que les mondes s'en
+  servent. Ce qui a été fait :
+
+  - **Ses bêtes sont posées SUR leur monde** (`betesEtape`, `_poserBetes`),
+    en pourcentage du DESSIN du monde — pas de la carte, qui est plus
+    haute : le décor est peint dans un carré centré par `object-fit`, et
+    c'est ce carré qui compte. Les animaux dessinés de ces cinq mondes ont
+    été **retirés** : ils faisaient doublon derrière les siens. Le décor
+    garde son sol — banquise, sable, herbe, clairière.
+  - **Un monde où l'on entre en est PLEIN** (`scenesBetes`) : douze
+    papillons volent dans le monde des papillons, des ours chez les ours,
+    et ce **dès l'écran du choix de la lettre**, pas seulement dans le
+    cours. Les places sont fixes et longent les bords, le milieu restant au
+    cours. `#ca .boy-wrap{position:relative;z-index:1}` : sans cette règle,
+    un élément positionné à `z-index:0` se peint AU-DESSUS du contenu
+    ordinaire, et les papillons passaient devant la leçon.
+  - **Les GIF animés marchent en DOM, pas en SVG.** Un `<img>` qui charge un
+    GIF l'anime ; le même GIF encastré dans un SVG, non. C'est pour cela que
+    les bêtes sont des balises `<img>` posées par-dessus le décor, et non
+    des `<image>` dans le fichier SVG.
+  - **Les cœurs vivent** (`vitcoeur` : ils paraissent, grossissent, battent
+    et s'effacent), **les nuages traversent** leur monde et reviennent par
+    l'autre bord (`traverse` — le disque les découpe, ils disparaissent donc
+    tout seuls), et **les sucreries sont deux fois plus nombreuses**.
+  - **Le papillon a quitté le monde des fleurs et la fleur celui des
+    papillons**, à la demande du client.
+  - **Un décor retouché ne se voit pas sans `?v=`.** Les douze images sont
+    servies avec un numéro de version (`monde-*.svg?v=111`), sinon le cache
+    du navigateur ET du service worker continuent de servir l'ancienne : je
+    l'ai cru cassé deux fois avant de comprendre. **Il faut monter ce
+    numéro à chaque retouche des décors.**
+
 - **Le parcours de la fille, deuxième passe — 20 août 2026.** Le client a
   regardé le premier jet et a tout repris point par point. Ce qui a changé,
   et pourquoi :

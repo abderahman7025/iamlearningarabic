@@ -2435,6 +2435,39 @@ body.profile-boy.fond-espace,#root.profile-boy.fond-espace{
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* LES BETES DU CLIENT. Ses illustrations sont posees par-dessus le decor
+   d'un monde, et semees dans le cours de ce monde. Elles bougent : un
+   animal se balance sur place, un papillon vole d'un point a l'autre.
+   Les pourcentages d'un `translate` se comptent sur la taille de
+   l'element : le vol reste donc proportionne, quelle que soit la bete. */
+.bete-monde,.bete-cours{position:absolute;pointer-events:none;object-fit:contain}
+.bete-cours{position:fixed}
+/* Le cours passe DEVANT son decor. Un element positionne a z-index 0 se
+   peint au-dessus du contenu ordinaire : sans cette regle, les papillons
+   passeraient devant la lecon. */
+#ca .boy-wrap{position:relative;z-index:1}
+@keyframes beteBalance{
+  0%,100%{transform:translateY(0) rotate(-2.5deg)}
+  50%    {transform:translateY(-9%) rotate(2.5deg)}
+}
+@keyframes beteVole{
+  0%   {transform:translate(0,0) rotate(-6deg)}
+  20%  {transform:translate(46%,-38%) rotate(5deg)}
+  42%  {transform:translate(104%,-8%) rotate(-4deg)}
+  60%  {transform:translate(72%,-52%) rotate(7deg)}
+  80%  {transform:translate(22%,-24%) rotate(-5deg)}
+  100% {transform:translate(0,0) rotate(-6deg)}
+}
+@keyframes beteTrotte{
+  0%,100%{transform:translateX(0) scaleX(1)}
+  46%    {transform:translateX(38%) scaleX(1)}
+  50%    {transform:translateX(38%) scaleX(1)}
+  96%    {transform:translateX(0) scaleX(1)}
+}
+@media (prefers-reduced-motion:reduce){
+  .bete-monde,.bete-cours{animation:none !important}
+}
+
 /* LE DECOR DU COURS. Quand la fille entre dans un monde, le cours porte le
    MEME decor : des licornes chez les licornes, des papillons chez les
    papillons. C'est une image posee derriere la page, transparente et sans
@@ -6118,6 +6151,38 @@ function _poserObjets(globe,cartes,faites){
   });
 }
 
+/* Les betes posees SUR un monde : les pingouins sur la banquise, les ours
+   dans leur clairiere. Leurs places sont donnees en pourcentage du DESSIN
+   du monde (pas de la carte, qui est plus haute) : le decor est peint dans
+   un carre centre par `object-fit:contain`, c'est ce carre qui compte. */
+function _poserBetes(globe,cartes){
+  if(!globe||!_HAB||!_HAB.betesEtape)return;
+  Array.prototype.forEach.call(globe.querySelectorAll('.bete-monde'),function(b){
+    if(b.parentNode)b.parentNode.removeChild(b);
+  });
+  Object.keys(_HAB.betesEtape).forEach(function(cle){
+    var rang=parseInt(cle,10),carte=cartes[rang];
+    if(!carte)return;
+    var img=carte.querySelector('.isle-img');
+    if(!img||!img.naturalWidth)return;
+    var bw=img.offsetWidth,bh=img.offsetHeight;
+    var e=Math.min(bw/img.naturalWidth,bh/img.naturalHeight);
+    var vw=img.naturalWidth*e,vh=img.naturalHeight*e;
+    var x0=carte.offsetLeft+img.offsetLeft+(bw-vw)/2;
+    var y0=carte.offsetTop+img.offsetTop+(bh-vh)/2;
+    _HAB.betesEtape[cle].forEach(function(b,i){
+      var el=document.createElement('img');
+      el.className='bete-monde';el.src=b.img;el.alt='';
+      el.style.cssText='z-index:6;left:'+Math.round(x0+vw*b.x/100)+'px;'
+        +'top:'+Math.round(y0+vh*b.y/100)+'px;width:'+Math.round(vw*b.l/100)+'px;'
+        +'filter:drop-shadow(0 6px 8px rgba(90,50,110,.28));'
+        +'animation:'+(b.vol?'beteVole':'beteBalance')+' '+(b.vol?11+i*2:3.2+i*0.7)+'s '
+        +(b.vol?'linear':'ease-in-out')+' infinite;animation-delay:-'+(i*1.3)+'s';
+      globe.appendChild(el);
+    });
+  });
+}
+
 function _sommetEtape(carte){
   if(!carte)return null;
   var img=carte.querySelector('.isle-img');
@@ -6864,6 +6929,7 @@ var islandDefs=[
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
         _poserObjets(globeDiv,isleCardsMob,_etapeFaite);
+        _poserBetes(globeDiv,isleCardsMob);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
           equipage:eqMob,decalageX:56,decalageY:112,demiAssise:31,depart:charIdxM,
           trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
@@ -6985,6 +7051,7 @@ var islandDefs=[
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
       _poserObjets(globeDiv,isleCards,_etapeFaite);
+      _poserBetes(globeDiv,isleCards);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
         equipage:eq,decalageX:70,decalageY:140,demiAssise:39,depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
@@ -7597,7 +7664,12 @@ function _boyLettreFinie(session,idx){
 function _boyLetterPicker(ca,session){
   _boySession=session;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  /* On est DEJA dans le monde : son decor doit y etre des l'ecran du choix
+     de la lettre, pas seulement dans le cours. */
+  _fondEnfant(true);
+  _decorMonde(ca,true);
   var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+  wrap.style.position='relative';wrap.style.zIndex='1';
 
   var titre=document.createElement('div');
   titre.style.cssText='font-size:1.3rem;font-weight:900;color:var(--k2);margin-bottom:4px';
@@ -7656,7 +7728,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v110';
+var _VERSION_REPLI='v111';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9120,10 +9192,13 @@ var _HABILLAGES={
        clôt l'histoire — elle rentre chez elle — comme la dernière étape
        du garçon clôt la sienne. */
     titreCarte:'🗺️ Ma carte des mondes',
-    images:['/images/monde-licornes.svg','/images/monde-couronne.svg','/images/monde-nuages.svg',
-            '/images/monde-fleurs.svg','/images/monde-coeurs.svg','/images/monde-pingouins.svg',
-            '/images/monde-papillons.svg','/images/monde-tortue.svg','/images/monde-chats-chiens.svg',
-            '/images/monde-ours.svg','/images/monde-sucreries.svg','/images/monde-chateau.svg'],
+    /* Le ?v= est indispensable : un decor retouche garderait sinon l'ancienne
+       image dans le cache du navigateur et du service worker. Il monte avec
+       la version du site. */
+    images:['/images/monde-licornes.svg?v=111','/images/monde-couronne.svg?v=111','/images/monde-nuages.svg?v=111',
+            '/images/monde-fleurs.svg?v=111','/images/monde-coeurs.svg?v=111','/images/monde-pingouins.svg?v=111',
+            '/images/monde-papillons.svg?v=111','/images/monde-tortue.svg?v=111','/images/monde-chats-chiens.svg?v=111',
+            '/images/monde-ours.svg?v=111','/images/monde-sucreries.svg?v=111','/images/monde-chateau.svg?v=111'],
     etapes:['Le monde des licornes','Le monde de la couronne','Le monde des nuages',
             'Le monde des fleurs','Le monde des cœurs','Le monde des pingouins',
             'Le monde des papillons','L\'île de la tortue','Le monde des chats et des chiens',
@@ -9175,6 +9250,37 @@ var _HABILLAGES={
     scenesMonde:true,
     /* Le monde des licornes montre LA licorne du client, pas un dessin. */
     scenesImage:{'licornes':'/images/licorne-seule-gd.png'},
+    /* LES BETES DU CLIENT, posées sur leur monde. Les places sont en
+       pourcentage du dessin du monde : le disque occupe les deux tiers du
+       milieu, donc tout tient entre 18 % et 74 %. */
+    betesEtape:{
+      5:[{img:'/images/bete-pinguin1.png',x:28,y:40,l:26},
+         {img:'/images/bete-pinguin2.png',x:50,y:50,l:22}],
+      6:[{img:'/images/papillon1.gif',x:24,y:30,l:20,vol:true},
+         {img:'/images/papillon3.gif',x:46,y:40,l:22,vol:true},
+         {img:'/images/papillon2.gif',x:30,y:56,l:18,vol:true},
+         {img:'/images/papillon4.gif',x:52,y:22,l:16,vol:true},
+         {img:'/images/papillon2.gif',x:56,y:58,l:14,vol:true},
+         {img:'/images/papillon1.gif',x:38,y:68,l:13,vol:true}],
+      7:[{img:'/images/bete-tortue1.png',x:26,y:38,l:28},
+         {img:'/images/bete-tortue2.png',x:50,y:50,l:24}],
+      8:[{img:'/images/bete-chienchat1.png',x:24,y:36,l:30},
+         {img:'/images/bete-chienchat2.png',x:50,y:50,l:26}],
+      9:[{img:'/images/bete-ours1.png',x:26,y:34,l:26},
+         {img:'/images/bete-ours2.png',x:50,y:46,l:24}]
+    },
+    /* LE COURS D'UN MONDE EN EST PLEIN. Chez les papillons, ils volent ;
+       ailleurs, les bêtes se balancent sur place. */
+    scenesBetes:{
+      'papillons':['/images/papillon1.gif','/images/papillon2.gif',
+                   '/images/papillon3.gif','/images/papillon4.gif'],
+      'pingouins':['/images/bete-pinguin1.png','/images/bete-pinguin2.png'],
+      'tortue':['/images/bete-tortue1.png','/images/bete-tortue2.png'],
+      'chats-chiens':['/images/bete-chienchat1.png','/images/bete-chienchat2.png'],
+      'ours':['/images/bete-ours1.png','/images/bete-ours2.png'],
+      'licornes':['/images/licorne-seule-gd.png','/images/licorne-seule-dg.png']
+    },
+    scenesVol:{'papillons':true},
     /* Elle est plus étroite et plus haute qu'un astronaute, et se tient à
        l'ARRIÈRE de sa licorne pour qu'on voie la tête de celle-ci — c'est
        la contrainte du client. `piloteDecale` est en points de pourcentage,
@@ -9225,18 +9331,42 @@ function _habDuProfil(){
    est pose au clic sur la carte : c'est lui qui dit dans quel monde on est.
    Sans habillage qui les fournisse (le garcon), il n'y a rien a poser. */
 function _decorMonde(ca,actif){
-  if(ca)Array.prototype.forEach.call(ca.querySelectorAll('.decor-monde,.decor-monde-img'),function(v){
+  if(ca)Array.prototype.forEach.call(ca.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours'),function(v){
     if(v.parentNode)v.parentNode.removeChild(v);
   });
   if(!actif||!ca||!_HAB||!_HAB.scenesMonde||!_currentIsleSlug)return;
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/scene-"+_currentIsleSlug+".svg')";
+  d.style.backgroundImage="url('/images/scene-"+_currentIsleSlug+".svg?v=111')";
   ca.appendChild(d);
   /* Certains mondes tiennent a une image du client plutot qu'a un dessin :
      le monde des licornes doit montrer SA licorne. Elle ne peut pas entrer
      dans le fichier SVG — une image servie par une balise img ne charge
      aucune image exterieure — elle est donc posee ici, en deux exemplaires. */
+  /* LE MONDE OU L'ON ENTRE DOIT ETRE PLEIN DE SES BETES : des papillons qui
+     volent chez les papillons, des ours chez les ours. Elles sont semees a
+     des places fixes — un tirage au sort changerait a chaque ecran — et
+     chacune part avec son propre retard. */
+  var betes=_HAB.scenesBetes&&_HAB.scenesBetes[_currentIsleSlug];
+  if(betes&&betes.length){
+    /* Les places sont FIXES : un tirage au sort redistribuerait le decor a
+       chaque ecran, et cela se voit tout de suite. Elles longent les bords,
+       pour laisser le milieu au cours. */
+    var PLACES=[[2,10,13],[80,8,11],[40,3,9],[10,34,14],[86,30,12],[3,58,13],
+                [84,54,12],[16,76,11],[74,78,12],[44,86,10],[28,64,9],[62,66,10],
+                [8,88,10],[92,86,9]];
+    var COMBIEN=Math.min(PLACES.length,betes.longueur||betes.length*3);
+    for(var i=0;i<COMBIEN;i++){
+      var pl=PLACES[i],b=betes[i%betes.length];
+      var im=document.createElement('img');
+      im.src=b;im.alt='';im.className='bete-cours';
+      im.style.cssText='z-index:0;opacity:.7;left:'+pl[0]+'%;top:'+pl[1]+'%;width:'+pl[2]+'%;'
+        +'animation:'+(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]?'beteVole':'beteBalance')+' '
+        +(9+(i%5)*2.4)+'s '+(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]?'linear':'ease-in-out')
+        +' infinite;animation-delay:-'+(i*1.7)+'s';
+      ca.appendChild(im);
+    }
+  }
   var extra=_HAB.scenesImage&&_HAB.scenesImage[_currentIsleSlug];
   if(extra){
     [[4,16,24],[70,58,18]].forEach(function(pos,i){

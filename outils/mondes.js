@@ -53,6 +53,27 @@ const MOUVEMENT = `
     .dodeline{animation:dodeline 2.8s ease-in-out infinite;animation-delay:var(--d,0s);
              transform-box:fill-box;transform-origin:center bottom}
     .brille {animation:brille 2.6s ease-in-out infinite;animation-delay:var(--d,0s)}
+    /* Un cœur ne fait pas que battre : il paraît, il grossit, il s'efface,
+       et un autre prend sa place. */
+    .vitcoeur{animation:vitcoeur 6s ease-in-out infinite;animation-delay:var(--d,0s)}
+    /* Un nuage TRAVERSE son monde et revient par l'autre bord. Le disque
+       découpe l'image : il disparaît donc tout seul en sortant. */
+    .traverse{animation:traverse var(--t,22s) linear infinite;animation-delay:var(--d,0s)}
+    @keyframes vitcoeur{
+      0%   {opacity:0;transform:scale(.35)}
+      12%  {opacity:1;transform:scale(1.12)}
+      20%  {transform:scale(.96)}
+      30%  {transform:scale(1.08)}
+      40%  {transform:scale(.98)}
+      52%  {opacity:1;transform:scale(1.14)}
+      70%  {opacity:.85;transform:scale(1)}
+      88%  {opacity:0;transform:scale(.45)}
+      100% {opacity:0;transform:scale(.35)}
+    }
+    @keyframes traverse{
+      0%  {transform:translateX(-330px)}
+      100%{transform:translateX(330px)}
+    }
     @keyframes bat     {0%,100%{transform:scale(1)}18%{transform:scale(1.16)}30%{transform:scale(1.02)}45%{transform:scale(1.10)}}
     @keyframes respire {0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
     @keyframes flotte  {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -114,8 +135,12 @@ function tige(x, yHaut, yBas, c) {
 }
 
 /* Un nuage : un corps allongé et deux bosses. */
-function nuage(x, y, s, f, op, del) {
-  return '<g class="anim derive" opacity="' + (op || 1) + '"' + d(del || 0) + '>'
+function nuage(x, y, s, f, op, del, traverse, duree) {
+  var cls = traverse ? 'anim traverse' : 'anim derive';
+  var sty = traverse
+    ? ' style="--d:' + (del || 0) + 's;--t:' + (duree || 22) + 's"'
+    : d(del || 0);
+  return '<g class="' + cls + '" opacity="' + (op || 1) + '"' + sty + '>'
     + '<rect x="' + (x - s) + '" y="' + (y - s * 0.30) + '" width="' + (s * 2) + '" height="' + (s * 0.60)
     + '" rx="' + (s * 0.30) + '" fill="' + f + '"/>'
     + '<circle cx="' + (x - s * 0.34) + '" cy="' + (y - s * 0.32) + '" r="' + (s * 0.50) + '" fill="' + f + '"/>'
@@ -470,9 +495,11 @@ const MONDES = [
 
   /* 3 — les nuages, qui dérivent lentement. */
   { nom: 'nuages', r: 128, clair: '#f2fbff', moyen: '#c5e9ff', fonce: '#79b8e8', halo: '#a8dcff', trait: '#5f9fd0',
-    dedans: nuage(160, 162, 54, '#ffffff', .95, 0) + nuage(262, 224, 44, '#ffffff', .9, 4)
-      + nuage(152, 274, 60, '#ffffff', .85, 8) + nuage(272, 130, 30, '#ffffff', .8, 12)
-      + nuage(206, 200, 34, '#ffffff', .7, 6),
+    dedans: nuage(200, 150, 54, '#ffffff', .95, 0, true, 24)
+      + nuage(200, 208, 44, '#ffffff', .9, -7, true, 19)
+      + nuage(200, 262, 62, '#ffffff', .85, -14, true, 28)
+      + nuage(200, 122, 30, '#ffffff', .8, -4, true, 16)
+      + nuage(200, 310, 36, '#ffffff', .75, -18, true, 21),
     etincelles: [[92, 120, 12], [318, 296, 12], [110, 316, 10]] },
 
   /* 4 — les fleurs, en volume, qui dodelinent sur leurs tiges. */
@@ -485,80 +512,109 @@ const MONDES = [
       + fleur('f3', 294, 216, 32, '#d8c8ff', '#9a6fd8', '#ffcf4e', 1.2)
       + fleur('f4', 152, 266, 26, '#ffe0b8', '#f0a04c', '#ff8ec4', 1.8)
       + fleur('f5', 250, 262, 26, '#c8e8ff', '#4fa8e0', '#ffd34e', 2.4)
-      + papillon(296, 138, 38, '#ff9ec4', '#ffd6e8', 0.3),
+      + fleur('f6', 200, 300, 24, '#ffd8ee', '#e86ab0', '#ffcf4e', 3.0),
     etincelles: [[96, 122, 12], [312, 128, 11], [300, 306, 10]] },
 
   /* 5 — les cœurs, qui BATTENT. */
   { nom: 'coeurs', r: 128, clair: '#fff2f7', moyen: '#ffd0e4', fonce: '#f07aae', halo: '#ff9ecf', trait: '#d4568f',
     dedans: coeur(196, 204, 62, '#ff5f8f', null, 'bat', 0)
-      + coeur(126, 172, 34, '#ff9ec4', null, 'bat', 0.35)
-      + coeur(272, 174, 30, '#ffb3d1', null, 'bat', 0.7)
-      + coeur(140, 286, 32, '#ff85b5', null, 'bat', 1.05)
-      + coeur(266, 282, 38, '#ff2e6b', '.9', 'bat', 1.4)
-      + coeur(206, 302, 22, '#ffc9df', null, 'bat', 1.75)
-      + coeur(200, 118, 18, '#ffffff', '.9', 'bat', 2.1),
+      + coeur(126, 172, 34, '#ff9ec4', null, 'vitcoeur', 0)
+      + coeur(272, 174, 30, '#ffb3d1', null, 'vitcoeur', 0.9)
+      + coeur(140, 286, 32, '#ff85b5', null, 'vitcoeur', 1.8)
+      + coeur(266, 282, 38, '#ff2e6b', '.9', 'vitcoeur', 2.7)
+      + coeur(206, 302, 22, '#ffc9df', null, 'vitcoeur', 3.6)
+      + coeur(200, 118, 18, '#ffffff', '.9', 'vitcoeur', 4.5)
+      + coeur(158, 232, 20, '#ffffff', '.8', 'vitcoeur', 5.4)
+      + coeur(246, 236, 24, '#ff85b5', null, 'vitcoeur', 1.35)
+      + coeur(304, 226, 18, '#ffc9df', null, 'vitcoeur', 3.15),
     etincelles: [[92, 232, 12], [306, 234, 11], [150, 120, 12]] },
 
   /* 6 — les pingouins sur la banquise. */
   { nom: 'pingouins', r: 128, clair: '#fbfeff', moyen: '#dbf1ff', fonce: '#94c8e8', halo: '#bfe4ff', trait: '#6ea8cc',
     sol: sol('#eaf8ff', 84, '#ffffff'),
-    dedans: '<path d="M 92 300 L 132 258 L 176 300 Z" fill="#ffffff" opacity=".9"/>'
-      + '<path d="M 236 296 L 286 244 L 330 296 Z" fill="#f2fbff" opacity=".9"/>'
-      + pingouin(150, 246, 84, 0) + pingouin(252, 264, 66, 0.7) + pingouin(202, 300, 54, 1.4)
-      + nuage(276, 140, 28, '#ffffff', .8, 2),
+    /* Les pingouins sont ceux du client, poses par la carte : ici, la
+       banquise seule. */
+    dedans: '<path d="M 84 302 L 128 252 L 172 302 Z" fill="#ffffff" opacity=".9"/>'
+      + '<path d="M 232 298 L 286 240 L 336 298 Z" fill="#f2fbff" opacity=".9"/>'
+      + '<ellipse cx="200" cy="316" rx="86" ry="16" fill="#ffffff" opacity=".75"/>'
+      + nuage(150, 146, 34, '#ffffff', .85, 0, true, 26)
+      + nuage(260, 176, 26, '#ffffff', .8, -9, true, 20),
     etincelles: [[98, 128, 12], [306, 132, 11], [200, 104, 10]] },
 
   /* 7 — les papillons, qui battent des ailes en flottant. */
   { nom: 'papillons', r: 128, clair: '#fdf4ff', moyen: '#e8d8ff', fonce: '#a98fd8', halo: '#c9b6ff', trait: '#8a6ec0',
     sol: sol('#c2a8ec', 56, '#d8c4ff'),
-    dedans: papillon(154, 176, 60, '#ff9ec4', '#ffd6e8', 0)
-      + papillon(268, 214, 50, '#a8d8ff', '#d8eeff', 0.18)
-      + papillon(146, 274, 44, '#ffe36a', '#fff3b8', 0.34)
-      + papillon(258, 306, 38, '#ffffff', '#ffe8f4', 0.52)
-      + papillon(214, 132, 34, '#c9b6ff', '#e8dcff', 0.26)
-      + fleur('p1', 200, 300, 30, '#ffd8ee', '#e86ab0', '#ffcf4e', 0.8),
+    /* Les papillons sont ceux du client, et ils volent : ici, le pre et le
+       ciel qui les portent. */
+    dedans: nuage(180, 140, 30, '#ffffff', .8, 0, true, 24)
+      + nuage(230, 186, 24, '#ffffff', .7, -8, true, 18)
+      + '<path d="M 96 306 q 30 -20 58 -2 t 58 -2 t 58 4" stroke="#b49ae0" stroke-width="6" fill="none" opacity=".55"/>'
+      + '<path d="M 120 316 v -16 M 168 320 v -20 M 224 318 v -18 M 276 312 v -16"'
+      + ' stroke="#9a7fd0" stroke-width="5" stroke-linecap="round" opacity=".5"/>',
     etincelles: [[94, 122, 12], [312, 300, 11], [104, 306, 10]] },
 
   /* 8 — l'île de la tortue : plusieurs tortues, qui respirent. */
   { nom: 'tortue', r: 128, clair: '#f2fffb', moyen: '#c4f0e2', fonce: '#6fc0a8', halo: '#a8e8d4', trait: '#4f9c88',
     sol: sol('#ffe9b8', 66, '#fff3d4'),
-    dedans: '<path class="anim derive" d="M 60 300 q 34 -14 62 0 t 62 0 t 62 0 t 62 0" stroke="#8fdcc4" stroke-width="7" fill="none" opacity=".7"/>'
-      + tortue('t1', 156, 230, 96, '#8fe0b8', '#3f9c74', '#a5e2b8', 0)
-      + tortue('t2', 236, 274, 70, '#ffe08a', '#d89a3c', '#ffe9b0', 0.9)
-      + tortue('t3', 160, 300, 54, '#c8d8ff', '#5f7fd0', '#dce6ff', 1.8)
-      + '<ellipse cx="322" cy="324" rx="24" ry="7" fill="#ffdca8"/>',
+    /* Les tortues sont celles du client : ici, la plage et le ressac. */
+    dedans: '<path class="anim derive" d="M 60 296 q 34 -14 62 0 t 62 0 t 62 0 t 62 0" stroke="#8fdcc4" stroke-width="7" fill="none" opacity=".7"/>'
+      + '<path class="anim derive" style="--d:-6s" d="M 60 316 q 34 -12 62 0 t 62 0 t 62 0 t 62 0" stroke="#a8e8d4" stroke-width="6" fill="none" opacity=".6"/>'
+      + '<ellipse cx="286" cy="322" rx="26" ry="8" fill="#ffdca8"/>'
+      + '<ellipse cx="126" cy="326" rx="20" ry="6" fill="#ffdca8"/>'
+      + nuage(178, 148, 30, '#ffffff', .8, 0, true, 25),
     etincelles: [[96, 126, 12], [308, 134, 11], [312, 298, 10]] },
 
   /* 9 — les chats et les chiens, entiers, avec leurs queues qui remuent.
      Plus d'empreintes : le client n'en voulait pas. */
   { nom: 'chats-chiens', r: 128, clair: '#fff8f0', moyen: '#ffe2c4', fonce: '#e0a878', halo: '#ffcf9e', trait: '#c08a58',
     sol: sol('#a8dc8c', 66, '#bfe8a0'),
-    dedans: chien(150, 222, 96, '#c98a52', '#f0d0a8', 0)
-      + chat(272, 236, 84, '#8f7fa8', '#e0d8ec', 0.5)
-      + chat(190, 286, 66, '#f0a878', '#ffe0c4', 1.1)
-      + coeur(206, 140, 20, '#ff9ec4', '.85', 'bat', 0.3),
+    /* Le chien et les chats sont ceux du client : ici, le pre, sa balle et
+       ses coeurs. */
+    dedans: '<circle cx="300" cy="306" r="16" fill="#ff9ec4"/>'
+      + '<path d="M 286 300 q 14 -8 28 2 M 288 312 q 14 6 26 -4" stroke="#ffffff" stroke-width="4" fill="none"/>'
+      + '<path d="M 96 312 q 12 -20 24 0 M 130 318 q 10 -16 20 0" stroke="#5f9e4c" stroke-width="6" fill="none" stroke-linecap="round"/>'
+      + coeur(206, 140, 22, '#ff9ec4', '.85', 'vitcoeur', 0)
+      + coeur(128, 178, 16, '#ffb3d1', '.8', 'vitcoeur', 2.2),
     etincelles: [[92, 122, 12], [314, 296, 11], [300, 130, 10]] },
 
   /* 10 — les ours bruns, ENTIERS. */
   { nom: 'ours', r: 128, clair: '#fff6ea', moyen: '#f0d6b0', fonce: '#c99a68', halo: '#e8c096', trait: '#a87c4e',
     sol: sol('#8fc878', 70, '#a8dc8c'),
-    dedans: ours(154, 226, 100, '#a8714a', '#c99a70', '#e8c096', 0)
-      + ours(268, 272, 68, '#8f5c3c', '#b07a54', '#dcb088', 0.8)
-      + '<path d="M 92 300 q 12 -22 24 0 M 320 296 q 12 -20 22 0" stroke="#5f9e4c" stroke-width="6" fill="none" stroke-linecap="round"/>',
+    /* Les ours sont ceux du client : ici, la clairiere, ses sapins et son
+       petit pot de miel. */
+    dedans: '<path d="M 96 306 q 12 -24 24 0 M 316 300 q 12 -22 22 0 M 138 316 q 10 -18 20 0"'
+      + ' stroke="#5f9e4c" stroke-width="6" fill="none" stroke-linecap="round"/>'
+      + '<path d="M 116 250 l 18 -44 l 18 44 Z" fill="#4f8c46" opacity=".85"/>'
+      + '<path d="M 116 272 l 18 -40 l 18 40 Z" fill="#5f9e4c" opacity=".85"/>'
+      + '<rect x="130" y="270" width="8" height="16" fill="#8f6a44"/>'
+      + '<path d="M 268 300 q 22 -6 22 12 q 0 12 -22 12 q -22 0 -22 -12 q 0 -18 22 -12 Z" fill="#ffcf6a"/>'
+      + '<rect x="248" y="296" width="44" height="10" rx="5" fill="#e8a83c"/>'
+      + nuage(198, 146, 28, '#ffffff', .75, 0, true, 27),
     etincelles: [[94, 124, 12], [310, 130, 11], [304, 302, 10]] },
 
   /* 11 — les sucreries : il en faut BEAUCOUP, et de toutes sortes. */
   { nom: 'sucreries', r: 128, clair: '#fff4fb', moyen: '#ffd8ee', fonce: '#f08acc', halo: '#ffabe0', trait: '#d466ac',
-    dedans: sucette(124, 164, 78, '#ffffff', '#ff6fae', 0)
-      + sucette(214, 132, 58, '#fff3b8', '#7fd0f0', 0.5)
-      + donut(292, 186, 74, '#e8a86a', '#ff9ec4', 0.9)
-      + cupcake(152, 266, 74, '#ffb3d1', '#fff0f8', 1.3)
-      + glace(226, 248, 72, '#a8e8d4', '#ffd34e', 1.7)
-      + canne(286, 278, 60, 2.1)
-      + bonbon(150, 306, 52, '#a8e8d4', '#e8fff8', 2.5)
-      + bonbon(218, 312, 48, '#ffe36a', '#fff8d8', 2.9)
-      + nounours(258, 300, 48, 0.7)
-      + coeur(176, 202, 18, '#ffffff', '.9', 'bat', 1.5),
+    /* DEUX FOIS PLUS de sucreries, demandees le 20 aout — et toutes DANS le
+       disque : a y=320 il ne reste que 120 px de large, tout ce qui
+       descendait plus bas etait rogne. */
+    dedans: sucette(128, 150, 58, '#ffffff', '#ff6fae', 0)
+      + sucette(200, 128, 46, '#fff3b8', '#7fd0f0', 0.4)
+      + sucette(272, 152, 50, '#ffd6e8', '#a86ad8', 0.8)
+      + sucette(316, 214, 42, '#d8f4ff', '#ff9ec4', 1.2)
+      + donut(112, 214, 56, '#e8a86a', '#ff9ec4', 0.6)
+      + donut(288, 276, 52, '#d8a86a', '#7fd0f0', 1.6)
+      + cupcake(174, 206, 54, '#ffb3d1', '#fff0f8', 1.0)
+      + cupcake(244, 214, 50, '#c9b6ff', '#fff6d8', 2.0)
+      + glace(140, 276, 54, '#a8e8d4', '#ffd34e', 1.4)
+      + glace(210, 286, 50, '#ffc9e0', '#fff3b8', 2.4)
+      + canne(266, 172, 44, 1.8)
+      + canne(96, 158, 40, 2.8)
+      + bonbon(172, 320, 42, '#a8e8d4', '#e8fff8', 2.2)
+      + bonbon(252, 322, 40, '#ffe36a', '#fff8d8', 3.0)
+      + nounours(304, 122, 38, 0.7)
+      + nounours(100, 292, 38, 2.6)
+      + coeur(200, 172, 15, '#ffffff', '.9', 'bat', 1.5)
+      + coeur(330, 172, 13, '#ffffff', '.9', 'bat', 2.4),
     etincelles: [[96, 250, 12], [310, 130, 11], [110, 130, 10]] },
 
   /* 12 — le château de la princesse : elle rentre chez elle. */
