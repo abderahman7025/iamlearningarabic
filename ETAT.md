@@ -985,6 +985,39 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le trait de liaison ne prend plus la couleur de la lettre — v124.**
+  Le cours enseigne « fin = isolée + — » et « milieu = début + — », avec
+  l'isolée en bleu et le début en vert. Un bout du trait partait pourtant
+  en couleur, dans les deux interfaces.
+  Côté adulte le partage n'existait pas du tout : on colorait `p.g` dans la
+  chaîne, mais la forme attachée porte son trait d'entrée DANS son propre
+  dessin. Côté enfant le partage existait mais se calculait sur les largeurs
+  d'AVANCE — une mesure qui ne dit rien de l'encre : −12 % sur le ʿayn (rien
+  n'était gris) et +34 % sur le mīm (le gris mordait la lettre).
+  `_partLiaison` regarde maintenant l'ENCRE : le trait de liaison est une
+  barre posée sur la ligne d'écriture, la lettre quitte cette bande — vers le
+  haut pour le ʿayn, vers le bas pour le bāʾ. On part du bord droit tant que
+  la colonne tient dans la bande d'un tatweel seul. Repli pour le ʿayn et le
+  ġayn, qui plongent dès leur premier trait : la longueur d'un tatweel.
+  Vérifié à l'œil sur les 28 lettres, formes fin ET milieu.
+  `_formeCoupee(forme,couleurCorps,couleurTrait)` sert les deux interfaces.
+- **Les voyelles seules se posent contre la ligne d'écriture.** Dans le canvas
+  du cours des voyelles, les décalages étaient devinés — et les mêmes pour
+  tous les signes, alors que leur encre n'est pas à la même hauteur (à 120 px
+  la fatha monte à 104, la damma à 119, le soukoun à 110). Chacune tombait à
+  une distance différente de la ligne, et toutes trop loin. On demande
+  maintenant à la police où est son encre : les huit signes ont le même petit
+  jour de 8 % de la taille, au-dessus ou en dessous selon leur nature — et
+  c'est la MESURE qui dit de quel côté, plus une liste de codes à tenir.
+- **La page des cours de l'adulte est un parcours, plus une grille.** Douze
+  cartes identiques qui scintillaient toutes pareil ne disaient ni où l'on en
+  est, ni ce qu'il y a dans chacune. Les leçons sont enfilées sur un rail —
+  doré derrière soi, éteint devant —, groupées en deux chapitres, avec une
+  tête qui compte les leçons faites et les lettres apprises. Chaque carte dit
+  ses lettres en grand ET leurs noms (بَاء · تَاء · ثَاء). Seule la leçon en
+  cours respire : l'œil va là où il y a du travail. Six textes nouveaux dans
+  les treize langues (`outils/textes-adulte.json`).
+
 - **Les phrases à trous — v123.** Les phrases fabriquées à la colle
   (`'Bravo ! Tu as fini ta '+mission+' !'`) donnaient un résultat correct en
   anglais ou en espagnol et bancal en turc, en hindi et en ourdou, où les
@@ -1365,6 +1398,24 @@ page et URL propres, indexables. Elles se rangent à côté de
   `controllerchange`).
 
 ## Pièges connus
+
+- **On ne peut PAS voir la page depuis ici.** Le volet du navigateur n'est
+  pas affiché : il ne compose aucune image, donc la capture d'écran échoue
+  ET le décodage d'images est suspendu. Une capture DOM → SVG `foreignObject`
+  → canvas ne rend donc rien non plus : l'`<img>` reste muette, sans erreur,
+  et le code attend indéfiniment. Ce qui marche : **dessiner soi-même sur un
+  canvas** (`fetch('/capture?f=x.png',…)`) et **mesurer le DOM** (positions,
+  tailles, couleurs calculées, débordements). C'est ainsi qu'ont été
+  contrôlés le découpage du trait de liaison et le placement des voyelles.
+- **`requestAnimationFrame` ne tourne pas dans cet onglet** (même cause).
+  Tout ce qui doit se produire — remplir une barre, ouvrir une leçon après
+  une animation — passe par `setTimeout`, jamais par rAF. Deux endroits de la
+  page des cours en dépendaient : la barre restait à zéro et le clic
+  n'ouvrait jamais la leçon. C'est vrai aussi pour un vrai téléphone dont
+  l'onglet passe en arrière-plan.
+- **Un `::before` en `position:absolute` sans `left` se pose à sa place
+  statique**, pas au bord de son parent. Le rail du parcours passait huit
+  pixels à côté des nœuds. `left:50%;margin-left:-1px` pour le centrer.
 
 - **Un remplacement automatique large abîme les commentaires français.** Un
   passage de `'…'` vers `te('…')` a mordu sur des apostrophes de

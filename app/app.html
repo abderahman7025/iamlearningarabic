@@ -119,19 +119,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   0%{opacity:0;transform:translateX(-110%)}
   100%{opacity:1;transform:translateX(0)}
 }
-@keyframes sessGrow{
-  0%{opacity:0;transform:scale(.05);border-radius:50%}
-  60%{opacity:1;transform:scale(1.06);border-radius:20px}
-  80%{transform:scale(.97)}
-  100%{opacity:1;transform:scale(1);border-radius:18px}
-}
 @keyframes floatCard{
   0%,100%{transform:scale(1.09);box-shadow:0 20px 50px rgba(0,0,0,.55),0 0 0 1px rgba(245,200,66,.22)}
   50%{transform:scale(1.10) translateY(-4px);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 0 1px rgba(245,200,66,.3)}
-}
-@keyframes cardPulse{
-  from{transform:scale(1.05);}
-  to{transform:scale(1.09);}
 }
 @keyframes borderRotate{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
@@ -682,6 +672,76 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 .pos-c:hover{border-color:rgba(245,200,66,.3);transform:translateY(-3px);}
 .pos-lbl{font-size:.52rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;word-break:break-word;hyphens:auto}
 .pos-ar{font-family:var(--fa);font-size:2rem;line-height:1.2}
+
+/* ── La page des cours : un parcours, pas une grille ──────────────────
+   Douze cartes identiques qui scintillent toutes pareil ne disent rien.
+   Les leçons sont enfilées sur un rail — doré derrière soi, éteint
+   devant — et seule celle du moment respire. */
+.par-tete{
+  background:linear-gradient(135deg,rgba(245,200,66,.10),rgba(10,7,24,.55));
+  border:1px solid rgba(245,200,66,.18);
+  border-radius:18px;padding:14px 16px 15px;margin:2px 0 6px;
+}
+.par-sur{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);opacity:.9;font-weight:800}
+.par-barre{height:6px;border-radius:99px;background:rgba(255,255,255,.09);
+  margin:10px 0 8px;overflow:hidden}
+.par-remplie{height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),#ffe9a3);
+  transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.par-chiffres{display:flex;justify-content:space-between;gap:8px;
+  font-size:.68rem;color:var(--txt2)}
+.par-chiffres b{color:var(--txt);font-weight:800}
+
+.par-chap{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--txt2);font-weight:800;margin:18px 0 8px 44px}
+
+.par-ligne{display:flex;gap:12px;align-items:stretch}
+.par-rail{position:relative;width:32px;flex:0 0 32px;display:flex;justify-content:center}
+/* left:50% est indispensable : sans lui le trait se pose à sa place
+   statique, huit pixels à gauche des nœuds, et le rail passe à côté. */
+.par-rail::before{content:'';position:absolute;top:0;bottom:-2px;
+  left:50%;margin-left:-1px;width:2px;
+  background:rgba(255,255,255,.10);border-radius:2px}
+.par-ligne.faite .par-rail::before{background:var(--gold);opacity:.55}
+.par-ligne.en-cours .par-rail::before{
+  background:linear-gradient(180deg,var(--gold),rgba(245,200,66,.10))}
+.par-ligne.derniere .par-rail::before{bottom:auto;height:27px}
+.par-noeud{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;
+  margin-top:14px;display:flex;align-items:center;justify-content:center;
+  font:800 .7rem/1 Outfit,sans-serif;
+  background:#120e26;border:2px solid rgba(255,255,255,.16);color:var(--txt2)}
+.par-ligne.faite .par-noeud{background:var(--gold);border-color:var(--gold);color:#1a1206}
+.par-ligne.en-cours .par-noeud{border-color:var(--gold);color:var(--gold);
+  animation:parPouls 2.6s ease-in-out infinite}
+@keyframes parPouls{
+  0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.14)}
+  50%{box-shadow:0 0 0 10px rgba(245,200,66,.02)}}
+
+.par-carte{flex:1;min-width:0;margin-bottom:12px;
+  background:rgba(10,7,24,.72);border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;padding:11px 14px 12px;cursor:pointer;
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),border-color .28s,box-shadow .28s}
+.par-carte:active{transform:scale(.97)}
+.par-carte:hover{border-color:rgba(245,200,66,.28)}
+.par-ligne.en-cours .par-carte{
+  border-color:rgba(245,200,66,.35);
+  background:linear-gradient(120deg,rgba(10,7,24,.92) 0%,rgba(245,200,66,.08) 45%,rgba(10,7,24,.92) 100%);
+  background-size:230% auto;animation:shimmer 5.5s linear infinite;
+  box-shadow:0 6px 26px rgba(245,200,66,.10)}
+.par-num{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--txt3);font-weight:800}
+.par-titre{font-size:.92rem;font-weight:700;color:var(--txt);margin-top:1px}
+.par-ar{font-family:var(--fa);font-size:1.7rem;line-height:1.55;color:var(--gold);
+  direction:rtl;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.par-noms{font-family:var(--fa);font-size:.76rem;color:var(--txt2);direction:rtl;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.par-etat{margin-top:5px;font-size:.64rem;font-weight:800;letter-spacing:.04em}
+.par-etat.ok{color:var(--green)}
+.par-etat.cours{color:var(--gold)}
+/* entrée : chaque ligne monte à son tour, une seule fois */
+@keyframes parMonte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.par-ligne.entre{animation:parMonte .42s both cubic-bezier(.22,1,.36,1)}
 
 .badge-row{display:flex;gap:8px;flex-wrap:wrap}
 .bd-big{font-size:.74rem;padding:5px 14px;border-radius:50px;font-weight:700}
@@ -4321,7 +4381,13 @@ const T={
     say_prolong_warn:{fr:"Attention. Les trois lettres alif, waw et ya prolongent respectivement les voyelles fathah, dammah et kasrah, uniquement si aucune voyelle n'est présente sur ou sous elles. Si une de ces 3 lettres a une voyelle, alors il est une lettre à part entière.",en:"Careful. The three letters alif, waw and ya lengthen the fatha, the damma and the kasra only when they carry no vowel themselves. If one of these three letters has a vowel, it is a full letter in its own right.",es:"Atención. Las tres letras alif, waw y ya prolongan respectivamente la fatha, la damma y la kasra solo si no llevan ninguna vocal encima ni debajo. Si una de estas tres letras lleva una vocal, entonces es una letra por derecho propio.",de:"Achtung. Die drei Buchstaben Alif, Waw und Ya dehnen die Fatha, die Damma und die Kasra nur dann, wenn sie selbst keinen Vokal tragen. Trägt einer dieser drei Buchstaben einen Vokal, ist er ein vollwertiger Buchstabe.",nl:"Let op. De drie letters alif, waw en ya verlengen de fatha, de damma en de kasra alleen als ze zelf geen klinker dragen. Draagt een van deze drie letters wel een klinker, dan is het een volwaardige letter.",it:"Attenzione. Le tre lettere alif, waw e ya prolungano rispettivamente la fatha, la damma e la kasra solo se non portano alcuna vocale. Se una di queste tre lettere ha una vocale, allora è una lettera a pieno titolo.",pt:"Atenção. As três letras alif, waw e ya prolongam respetivamente a fatha, a damma e a kasra apenas se não tiverem nenhuma vogal. Se uma destas três letras tiver uma vogal, então é uma letra por direito próprio.",ru:"Внимание. Три буквы алиф, вав и йа удлиняют фатху, дамму и касру только тогда, когда сами не несут огласовки. Если у одной из этих трёх букв есть огласовка, она становится полноценной буквой.",tr:"Dikkat. Elif, vav ve ye harfleri üstünü, ötreyi ve esreyi ancak kendileri hareke taşımıyorsa uzatır. Bu üç harften biri hareke alırsa, o zaman başlı başına bir harftir.",zh:"注意。艾利夫、瓦乌和雅这三个字母，只有在它们本身不带任何元音符号时，才分别延长法特哈、达姆运和凯斯拉。如果这三个字母之一带了元音符号，它就是一个独立的字母。",id:"Perhatian. Tiga huruf alif, waw, dan ya memanjangkan fatha, damma, dan kasra hanya jika huruf itu sendiri tidak berharakat. Jika salah satu dari ketiga huruf ini berharakat, maka ia adalah huruf tersendiri.",ur:"دھیان دو۔ الف، واو اور یا یہ تین حرف زبر، پیش اور زیر کو صرف اسی وقت کھینچتے ہیں جب خود ان پر کوئی حرکت نہ ہو۔ اگر ان تینوں میں سے کسی پر حرکت ہو تو وہ ایک مکمل حرف ہے۔",hi:"ध्यान दो। अलिफ़, वाव और या — ये तीन अक्षर फ़तहा, दम्मा और कसरा को तभी खींचते हैं जब उन पर स्वयं कोई स्वर-चिह्न न हो। यदि इनमें से किसी पर स्वर-चिह्न हो, तो वह अपने आप में एक पूरा अक्षर है।"},
     say_chaddah:{fr:"La chaddah est une sorte de w que l'on retrouve uniquement au-dessus d'une lettre. Lorsqu'une chaddah est sur une lettre, on insiste légèrement sur la prononciation de la lettre, avant de prononcer la voyelle.",en:"The shadda is a kind of w found only above a letter. When a shadda sits on a letter, you press slightly on the sound of that letter before saying the vowel.",es:"La shadda es una especie de w que solo se encuentra encima de una letra. Cuando una shadda está sobre una letra, se insiste un poco en el sonido de esa letra antes de pronunciar la vocal.",de:"Die Schadda ist eine Art w, das nur über einem Buchstaben steht. Wenn eine Schadda auf einem Buchstaben sitzt, betont man den Laut dieses Buchstabens leicht, bevor man den Vokal spricht.",nl:"De sjadda is een soort w die je alleen boven een letter vindt. Als er een sjadda op een letter staat, druk je iets op de klank van die letter voordat je de klinker uitspreekt.",it:"La shadda è una specie di w che si trova solo sopra una lettera. Quando una shadda è su una lettera, si insiste leggermente sul suono di quella lettera prima di pronunciare la vocale.",pt:"A shadda é uma espécie de w que só aparece por cima de uma letra. Quando uma shadda está sobre uma letra, insiste-se ligeiramente no som dessa letra antes de pronunciar a vogal.",ru:"Шадда — это что-то вроде буквы w, которая ставится только над буквой. Когда шадда стоит на букве, звук этой буквы слегка удерживают, прежде чем произнести огласовку.",tr:"Şedde, yalnızca bir harfin üstünde bulunan bir tür w işaretidir. Bir harfin üstünde şedde varsa, harekeyi söylemeden önce o harfin sesine hafifçe basılır.",zh:"叠音符是一种只出现在字母上方的、形状像 w 的符号。当一个字母上有叠音符时，要先稍微加重这个字母的音，然后再读元音。",id:"Syadda adalah semacam huruf w yang hanya ditemukan di atas sebuah huruf. Ketika syadda berada di atas sebuah huruf, bunyi huruf itu ditekan sedikit sebelum harakatnya dibaca.",ur:"تشدید ایک طرح کی w جیسی علامت ہے جو صرف حرف کے اوپر آتی ہے۔ جب کسی حرف پر تشدید ہو تو حرکت پڑھنے سے پہلے اس حرف کی آواز پر ہلکا سا زور دیا جاتا ہے۔",hi:"शद्दा एक तरह का w जैसा चिह्न है जो केवल अक्षर के ऊपर आता है। जब किसी अक्षर पर शद्दा हो, तो स्वर बोलने से पहले उस अक्षर की ध्वनि पर हल्का ज़ोर दिया जाता है।"},
     say_chaddah_constat:{fr:"Comme tu peux le constater, on insiste sur la prononciation du ya et du waw avant de prononcer la fathah.",en:"As you can hear, the ya and the waw are pressed on before the fatha is said.",es:"Como puedes comprobar, se insiste en el sonido del ya y del waw antes de pronunciar la fatha.",de:"Wie du hören kannst, betont man das Ya und das Waw, bevor man die Fatha spricht.",nl:"Zoals je kunt horen, druk je op de ya en de waw voordat je de fatha uitspreekt.",it:"Come puoi sentire, si insiste sul ya e sul waw prima di pronunciare la fatha.",pt:"Como podes ouvir, insiste-se no ya e no waw antes de pronunciar a fatha.",ru:"Как слышно, на йа и вав слегка нажимают, прежде чем произнести фатху.",tr:"Duyduğun gibi, üstünü söylemeden önce ye ve vav sesine basılır.",zh:"正如你听到的，在读法特哈之前，要先加重雅和瓦乌的音。",id:"Seperti yang kamu dengar, bunyi ya dan waw ditekan sebelum fatha dibaca.",ur:"جیسا کہ تم سن سکتے ہو، زبر پڑھنے سے پہلے یا اور واو کی آواز پر زور دیا جاتا ہے۔",hi:"जैसा कि तुम सुन सकते हो, फ़तहा बोलने से पहले या और वाव की ध्वनि पर ज़ोर दिया जाता है।"},
-    say_chaddah_warn:{fr:"Il ne faut pas confondre la chaddah, qui permet d'insister sur la prononciation d'une lettre, avec la prolongation vue dans la première partie, qui permet d'insister sur la prononciation d'une voyelle.",en:"Do not mix up the shadda, which presses on the sound of a letter, with the lengthening seen in the first part, which stretches the sound of a vowel.",es:"No hay que confundir la shadda, que insiste en el sonido de una letra, con la prolongación vista en la primera parte, que alarga el sonido de una vocal.",de:"Verwechsle die Schadda, die den Laut eines Buchstabens betont, nicht mit der Dehnung aus dem ersten Teil, die den Laut eines Vokals dehnt.",nl:"Verwar de sjadda, die op de klank van een letter drukt, niet met de verlenging uit het eerste deel, die de klank van een klinker rekt.",it:"Non bisogna confondere la shadda, che insiste sul suono di una lettera, con il prolungamento visto nella prima parte, che allunga il suono di una vocale.",pt:"Não se deve confundir a shadda, que insiste no som de uma letra, com o prolongamento visto na primeira parte, que estica o som de uma vogal.",ru:"Не путай шадду, которая усиливает звук буквы, с долготой из первой части, которая тянет звук огласовки.",tr:"Bir harfin sesine basmayı sağlayan şeddeyi, birinci bölümde görülen ve bir harekenin sesini uzatan uzatma ile karıştırma.",zh:"不要把叠音符和第一部分学过的延长音混淆：叠音符加重的是字母的音，延长音拉长的是元音的音。",id:"Jangan mencampuradukkan syadda, yang menekan bunyi sebuah huruf, dengan pemanjangan pada bagian pertama, yang memanjangkan bunyi sebuah harakat.",ur:"تشدید کو، جو حرف کی آواز پر زور دیتی ہے، پہلے حصے میں دیکھی گئی مد کے ساتھ نہ ملاؤ، جو حرکت کی آواز کو کھینچتی ہے۔",hi:"शद्दा को, जो अक्षर की ध्वनि पर ज़ोर देता है, पहले भाग में देखी गई दीर्घता के साथ न मिलाओ, जो स्वर की ध्वनि को खींचती है।"}
+    say_chaddah_warn:{fr:"Il ne faut pas confondre la chaddah, qui permet d'insister sur la prononciation d'une lettre, avec la prolongation vue dans la première partie, qui permet d'insister sur la prononciation d'une voyelle.",en:"Do not mix up the shadda, which presses on the sound of a letter, with the lengthening seen in the first part, which stretches the sound of a vowel.",es:"No hay que confundir la shadda, que insiste en el sonido de una letra, con la prolongación vista en la primera parte, que alarga el sonido de una vocal.",de:"Verwechsle die Schadda, die den Laut eines Buchstabens betont, nicht mit der Dehnung aus dem ersten Teil, die den Laut eines Vokals dehnt.",nl:"Verwar de sjadda, die op de klank van een letter drukt, niet met de verlenging uit het eerste deel, die de klank van een klinker rekt.",it:"Non bisogna confondere la shadda, che insiste sul suono di una lettera, con il prolungamento visto nella prima parte, che allunga il suono di una vocale.",pt:"Não se deve confundir a shadda, que insiste no som de uma letra, com o prolongamento visto na primeira parte, que estica o som de uma vogal.",ru:"Не путай шадду, которая усиливает звук буквы, с долготой из первой части, которая тянет звук огласовки.",tr:"Bir harfin sesine basmayı sağlayan şeddeyi, birinci bölümde görülen ve bir harekenin sesini uzatan uzatma ile karıştırma.",zh:"不要把叠音符和第一部分学过的延长音混淆：叠音符加重的是字母的音，延长音拉长的是元音的音。",id:"Jangan mencampuradukkan syadda, yang menekan bunyi sebuah huruf, dengan pemanjangan pada bagian pertama, yang memanjangkan bunyi sebuah harakat.",ur:"تشدید کو، جو حرف کی آواز پر زور دیتی ہے، پہلے حصے میں دیکھی گئی مد کے ساتھ نہ ملاؤ، جو حرکت کی آواز کو کھینچتی ہے۔",hi:"शद्दा को, जो अक्षर की ध्वनि पर ज़ोर देता है, पहले भाग में देखी गई दीर्घता के साथ न मिलाओ, जो स्वर की ध्वनि को खींचती है।"},
+    path_title:{fr:"Mon parcours",en:"My path",es:"Mi recorrido",de:"Mein Weg",nl:"Mijn traject",it:"Il mio percorso",pt:"O meu percurso",ru:"Мой путь",tr:"Yolculuğum",zh:"我的学习路径",id:"Perjalanan saya",ur:"میرا سفر",hi:"मेरी राह"},
+    path_basics:{fr:"Les fondations",en:"The foundations",es:"Las bases",de:"Die Grundlagen",nl:"De basis",it:"Le basi",pt:"As bases",ru:"Основы",tr:"Temeller",zh:"基础",id:"Dasar-dasar",ur:"بنیادیں",hi:"बुनियाद"},
+    path_alphabet:{fr:"L'alphabet",en:"The alphabet",es:"El alfabeto",de:"Das Alphabet",nl:"Het alfabet",it:"L'alfabeto",pt:"O alfabeto",ru:"Алфавит",tr:"Alfabe",zh:"字母表",id:"Abjad",ur:"حروفِ تہجی",hi:"वर्णमाला"},
+    path_lessons:{fr:"leçons",en:"lessons",es:"lecciones",de:"Lektionen",nl:"lessen",it:"lezioni",pt:"lições",ru:"уроков",tr:"ders",zh:"课",id:"pelajaran",ur:"اسباق",hi:"पाठ"},
+    path_letters:{fr:"lettres",en:"letters",es:"letras",de:"Buchstaben",nl:"letters",it:"lettere",pt:"letras",ru:"букв",tr:"harf",zh:"字母",id:"huruf",ur:"حروف",hi:"अक्षर"},
+    path_current:{fr:"En cours",en:"In progress",es:"En curso",de:"Läuft",nl:"Bezig",it:"In corso",pt:"Em curso",ru:"В процессе",tr:"Devam ediyor",zh:"进行中",id:"Sedang berjalan",ur:"جاری",hi:"जारी"}
   };
   Object.keys(V).forEach(function(k){
     Object.keys(V[k]).forEach(function(l){
@@ -7950,7 +8016,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v123';
+var _VERSION_REPLI='v124';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8672,19 +8738,108 @@ function _aplati(l){
   (l||[]).forEach(function(x){if(Array.isArray(x))out=out.concat(_aplati(x));else out.push(x);});
   return out;
 }
-/* Quelle part de la largeur d'une forme attachée revient à son trait de
-   liaison de tête ? Sert à découper une forme en deux sans la couper en deux
-   chaînes — ce qui casserait la liaison arabe. */
-var _cxMesure=null;
+/* ── Où finit le trait de liaison, où commence la lettre ? ───────────────
+   La forme « fin » est la lettre isolée précédée d'un trait, la forme
+   « milieu » la forme début précédée du même trait : c'est la règle que le
+   cours enseigne. Pour colorer la lettre SANS colorer le trait, il faut
+   savoir où l'un s'arrête et où l'autre commence.
+
+   Comparer les largeurs d'AVANCE ne le dit pas — c'est ce que faisait la
+   première version, et elle se trompait franchement : −12 % sur le ʿayn
+   (aucun découpage, tout le trait partait en couleur) et +34 % sur le mīm
+   (le gris mordait la lettre). Mesuré sur les quinze lettres, jamais deux
+   fois la même erreur : la largeur d'avance ne dit rien de l'encre.
+
+   On regarde donc l'ENCRE. Le trait de liaison est une barre posée sur la
+   ligne d'écriture ; la lettre, elle, quitte cette bande — vers le haut
+   pour le ʿayn, vers le bas pour le bāʾ. On part du bord droit et on avance
+   tant que la colonne d'encre tient dans la bande d'un tatweel seul.
+
+   Repli : quelques finales (ʿayn, ġayn) plongent dès leur premier trait,
+   aucune colonne n'est une barre pure et le balayage rend 0. On prend alors
+   la longueur d'un tatweel, mesurée en ajoutant un tatweel de plus à la
+   forme et en regardant de combien l'encre s'allonge.
+
+   Le résultat est mis de côté par forme : la mesure rastérise, et le tableau
+   des formes la redemande quatre fois par lettre. Le cache est vidé quand la
+   police arrive — mesurer avec la police de repli donnerait n'importe quoi. */
+var _TL_TAILLE=96, _TL_CACHE={}, _TL_BANDE=null;
+function _encreForme(f){
+  var cx=document.createElement('canvas').getContext('2d');
+  cx.font=_TL_TAILLE+"px 'Scheherazade New',serif";
+  var W=cx.measureText(f).width;
+  if(!W)return null;
+  var marge=40, cw=Math.ceil(W)+marge*2, ch=Math.round(_TL_TAILLE*2.6);
+  var c=document.createElement('canvas');c.width=cw;c.height=ch;
+  var x=c.getContext('2d');
+  x.font=_TL_TAILLE+"px 'Scheherazade New',serif";
+  x.direction='rtl';x.textAlign='right';x.textBaseline='alphabetic';
+  x.fillStyle='#000';x.fillText(f,marge+W,Math.round(ch*0.62));
+  var d=x.getImageData(0,0,cw,ch).data;
+  var haut=new Int32Array(cw).fill(-1), bas=new Int32Array(cw).fill(-1);
+  var gauche=-1, droite=-1;
+  for(var px=0;px<cw;px++){
+    for(var py=0;py<ch;py++){
+      if(d[(py*cw+px)*4+3]>40){
+        if(haut[px]<0)haut[px]=py;
+        bas[px]=py;
+        if(gauche<0)gauche=px;
+        droite=px;
+      }
+    }
+  }
+  return {W:W,cw:cw,haut:haut,bas:bas,gauche:gauche,droite:droite};
+}
+/* La bande occupée par le trait de liaison seul, en hauteur. */
+function _bandeLiaison(){
+  if(_TL_BANDE)return _TL_BANDE;
+  var m=_encreForme(_TATWEEL+_TATWEEL+_TATWEEL);
+  if(!m||m.droite<0)return null;
+  var h=1e9,b=-1;
+  for(var i=0;i<m.cw;i++)if(m.haut[i]>=0){
+    if(m.haut[i]<h)h=m.haut[i];
+    if(m.bas[i]>b)b=m.bas[i];
+  }
+  _TL_BANDE={haut:h,bas:b};
+  return _TL_BANDE;
+}
 function _partLiaison(forme){
   var f=String(forme);
   if(f.charAt(0)!==_TATWEEL)return 0;
-  if(!_cxMesure)_cxMesure=document.createElement('canvas').getContext('2d');
-  _cxMesure.font="60px 'Scheherazade New',serif";
-  var W=_cxMesure.measureText(f).width;
-  if(!W)return 0;
-  var sans=_cxMesure.measureText(f.slice(1)).width;
-  return Math.max(0,Math.min(60,100*(W-sans)/W));
+  if(_TL_CACHE[f]!==undefined)return _TL_CACHE[f];
+  var m=_encreForme(f), bande=_bandeLiaison();
+  if(!m||m.droite<0||!bande)return 0;
+  var tol=Math.max(2,Math.round(_TL_TAILLE*0.03));
+  var xs=m.droite;
+  while(xs>0 && m.haut[xs]>=0
+        && m.haut[xs]>=bande.haut-tol && m.bas[xs]<=bande.bas+tol) xs--;
+  var liaison=m.droite-xs;
+  var plus=_encreForme(_TATWEEL+f);
+  var unTatweel=plus?((plus.droite-plus.gauche)-(m.droite-m.gauche)):0;
+  if(liaison<unTatweel*0.6)liaison=unTatweel;
+  var p=Math.max(0,Math.min(70,100*liaison/m.W));
+  /* Tant que la vraie police n'est pas là, on mesure la police de repli :
+     on rend la valeur sans la garder. */
+  var prete=!document.fonts||document.fonts.check(_TL_TAILLE+"px 'Scheherazade New'");
+  if(prete)_TL_CACHE[f]=p;
+  return p;
+}
+if(document.fonts&&document.fonts.ready){
+  document.fonts.ready.then(function(){_TL_CACHE={};_TL_BANDE=null;});
+}
+/* La forme attachée, corps coloré et trait de liaison à part, en HTML.
+   Deux exemplaires superposés et découpés : couper la chaîne en deux
+   morceaux casserait la liaison arabe et le trait redeviendrait un tiret
+   tout droit, ce qui n'est pas la même chose. */
+function _formeCoupee(forme,couleurCorps,couleurTrait){
+  var f=String(forme), p=_partLiaison(f);
+  if(!p)return '<span style="color:'+couleurCorps+'">'+f+'</span>';
+  return '<span style="position:relative;display:inline-block">'
+    +'<span style="display:inline-block;color:'+couleurCorps
+      +';clip-path:inset(0 '+p.toFixed(1)+'% 0 0)">'+f+'</span>'
+    +'<span aria-hidden="true" style="position:absolute;left:0;top:0;color:'+couleurTrait
+      +';clip-path:inset(0 0 0 '+(100-p).toFixed(1)+'%)">'+f+'</span>'
+    +'</span>';
 }
 /* Les signes (voyelles, tanwīn) ne changent pas le geste : on cherche le
    trait de la lettre nue, et sa forme — seule, début, milieu ou fin — se lit
@@ -11316,124 +11471,119 @@ function _boyLetterCourse(ca,idx,premiere){
 // SESSIONS
 function renderSessions(ca){
   ca.innerHTML='';
-  var alreadyAnimated=window._sessAnimDone||false;
-  var g=document.createElement('div');
-  g.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 2px;direction:rtl;position:relative;';
-  var cards=[];
-  var GROW_DUR=50;
+  var dejaAnime=window._sessAnimDone||false;
+
+  /* Ce que l'on sait du parcours : combien de leçons finies, combien de
+     lettres apprises, et où l'on en est. */
+  var faites=0, lettresFaites=0, lettresTotal=0;
+  ALL_S.forEach(function(s){
+    var n=(s.letters||[]).length;
+    lettresTotal+=n;
+    if(st.scores[s.id]!==undefined){faites++;lettresFaites+=n;}
+  });
+  var iCours=-1;
+  for(var i=0;i<ALL_S.length;i++){
+    if(st.scores[ALL_S[i].id]===undefined){iCours=i;break;}
+  }
+
+  var tete=document.createElement('div');
+  tete.className='par-tete';
+  tete.innerHTML='<div class="par-sur">'+t('path_title')+'</div>'
+    +'<div class="par-barre"><div class="par-remplie"></div></div>'
+    +'<div class="par-chiffres">'
+      +'<span><b>'+faites+'</b> / '+ALL_S.length+' '+t('path_lessons')+'</span>'
+      +'<span><b>'+lettresFaites+'</b> / '+lettresTotal+' '+t('path_letters')+'</span>'
+    +'</div>';
+  ca.appendChild(tete);
+  /* La barre part de zéro et se remplit : elle se voit se remplir, sinon
+     elle n'est qu'un trait de plus. */
+  var remplie=tete.querySelector('.par-remplie');
+  var pct=ALL_S.length?Math.round(100*faites/ALL_S.length):0;
+  /* Un simple délai, pas requestAnimationFrame : dans un onglet qui n'est
+     pas au premier plan, rAF ne tourne pas et la barre resterait à zéro. */
+  setTimeout(function(){ remplie.style.width=pct+'%'; },60);
+
+  function chapitre(txt){
+    var d=document.createElement('div');
+    d.className='par-chap';d.textContent=txt;
+    return d;
+  }
 
   ALL_S.forEach(function(s,idx){
-    var sc=st.scores[s.id];
-    var c=document.createElement('div');
-    var cardTitle='';
-    if(s.type==='vowels')cardTitle=t('vowels_name').split('·')[0].trim();
-    else if(s.type==='prolong')cardTitle=t('prolong_name').split('·')[0].trim();
-    else if(s.id===1)cardTitle=t('lesson_num')+' 2';
-    else cardTitle=t('lesson_num')+' '+(idx+1);
-    var prev='';
+    /* Deux chapitres : ce qui se pose avant les lettres, puis les lettres. */
+    if(idx===0)ca.appendChild(chapitre(t('path_basics')));
+    if(idx===3)ca.appendChild(chapitre(t('path_alphabet')));
+
+    var note=st.scores[s.id];
+    var etatCls=(note!==undefined)?'faite':(idx===iCours?'en-cours':'a-venir');
+
+    /* Le titre, les lettres, et le nom de chaque lettre : une carte doit
+       dire ce qu'il y a dedans. Pour les leçons de lettres, les lettres
+       SONT le titre — on ne leur en invente pas un autre. */
+    var titre='', arabe='', noms='';
     if(s.type==='vowels'){
-      prev='<div style="font-family:var(--fa);font-size:1.5rem;color:var(--gold);margin:8px 0;direction:rtl;display:flex;justify-content:space-around;align-items:center;width:100%;padding:0 4px">'
-        +'<span>\u064e</span><span>\u064f</span><span>\u0650</span>'
-        +'<span style="opacity:.6">\u064b</span><span style="opacity:.6">\u064c</span><span style="opacity:.6">\u064d</span>'
-        +'<span style="opacity:.5">\u0652</span></div>';
-    } else if(s.type==='prolong'){
-      prev='<div style="font-family:var(--fa);font-size:1.6rem;color:var(--gold);margin:8px 0">\u0627 \u0648 \u064a</div>';
-    } else {
-      var letters=s.letters.map(function(l){return l.ar;}).join(' ');
-      prev='<div style="font-family:var(--fa);font-size:1.6rem;color:var(--gold);margin:8px 0">'+letters+'</div>';
+      var v=String(t('vowels_name')).split('·');
+      titre=v[0].trim(); noms=(v[1]||'').trim();
+      arabe='َ ُ ِ ً ٌ ٍ ْ';
+    }else if(s.type==='prolong'){
+      var w=String(t('prolong_name')).split('·');
+      titre=w[0].trim(); noms=(w[1]||'').trim();
+      arabe='ا و ي';
+    }else{
+      arabe=(s.letters||[]).map(function(l){return l.ar;}).join(' ');
+      noms=(s.letters||[]).map(function(l){return l.name;}).join(' · ');
     }
 
-    c.className='sess-card';
-    c.style.cssText='min-height:116px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:1;transform:scale(1);transition:transform .4s cubic-bezier(.34,1.56,.64,1),box-shadow .4s,border-color .4s;will-change:transform;';
-    if(sc!==undefined) c.style.borderColor='rgba(34,211,160,.3)';
-    // \u00c9toiles enfant (girl/boy uniquement)
-    var starsHtml = '';
-    if((st.profile==='girl'||st.profile==='boy') && s.id!==undefined){
-      var csn=getChildStars(s.id);
-      if(csn>0){ starsHtml='<div class="child-stars">'+'\u2b50'.repeat(csn)+'</div>'; }
-      else { starsHtml='<div class="child-stars"></div>'; }
-    }
-    c.innerHTML='<div style="font-size:.95rem;font-weight:700;color:var(--txt);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:0 4px">'+cardTitle+'</div>'+prev+(sc!==undefined?'<div style="font-size:.65rem;color:var(--green);margin-top:3px">\u2705 '+sc+'%</div>':'')+starsHtml;
+    var etat='';
+    if(note!==undefined)etat='<div class="par-etat ok">✓ '+note+' %</div>';
+    else if(idx===iCours)etat='<div class="par-etat cours">'+t('path_current')+'</div>';
 
-    // Séquentiel strict — seulement si pas déjà joué
-    if(!alreadyAnimated){
-      setTimeout(function(){
-        c.style.animation='sessGrow '+GROW_DUR+'ms both cubic-bezier(.34,1.56,.64,1)';
-      }, idx * GROW_DUR);
-    } else {
-      c.style.opacity='1';
-      c.style.animation='none';
+    var ligne=document.createElement('div');
+    ligne.className='par-ligne '+etatCls+(idx===ALL_S.length-1?' derniere':'');
+    ligne.innerHTML='<div class="par-rail"><span class="par-noeud">'+(idx+1)+'</span></div>'
+      +'<div class="par-carte">'
+        +'<div class="par-num">'+t('lesson_num')+' '+(idx+1)+'</div>'
+        +(titre?'<div class="par-titre">'+titre+'</div>':'')
+        +'<div class="par-ar">'+arabe+'</div>'
+        +(noms?'<div class="par-noms">'+noms+'</div>':'')
+        +etat
+      +'</div>';
+
+    if(!dejaAnime){
+      ligne.classList.add('entre');
+      ligne.style.animationDelay=(idx*45)+'ms';
     }
 
-    c.onclick=function(){
-      var rect=c.getBoundingClientRect();
+    /* La carte s'ouvre en grand avant de laisser la place à la leçon :
+       le geste reliait déjà les deux écrans, on le garde. */
+    var carte=ligne.querySelector('.par-carte');
+    carte.onclick=function(){
+      var r=carte.getBoundingClientRect();
       var clone=document.createElement('div');
-      clone.style.cssText='position:fixed;top:'+rect.top+'px;left:'+rect.left+'px;width:'+rect.width+'px;height:'+rect.height+'px;z-index:600;border-radius:20px;background:rgba(10,7,24,.9);backdrop-filter:blur(20px);transition:all .38s cubic-bezier(.4,0,.2,1);overflow:hidden;';
-      clone.innerHTML=c.innerHTML;
+      clone.style.cssText='position:fixed;top:'+r.top+'px;left:'+r.left+'px;'
+        +'width:'+r.width+'px;height:'+r.height+'px;z-index:600;border-radius:16px;'
+        +'background:rgba(10,7,24,.95);border:1px solid rgba(245,200,66,.3);overflow:hidden;'
+        +'transition:all .36s cubic-bezier(.4,0,.2,1);pointer-events:none';
+      clone.innerHTML=carte.innerHTML;
       document.body.appendChild(clone);
-      requestAnimationFrame(function(){requestAnimationFrame(function(){
+      /* Une minuterie, pas requestAnimationFrame : rAF ne tourne pas dans un
+         onglet qui n'est pas au premier plan, et l'ouverture de la leçon
+         resterait alors bloquée derrière l'animation. */
+      setTimeout(function(){
         clone.style.top='0';clone.style.left='0';
         clone.style.width='100vw';clone.style.height='100vh';
         clone.style.borderRadius='0';clone.style.opacity='0.3';
-        setTimeout(function(){document.body.removeChild(clone);openLesson(s);},360);
-      });});
+        setTimeout(function(){
+          if(clone.parentNode)clone.parentNode.removeChild(clone);
+          openLesson(s);
+        },360);
+      },30);
     };
 
-    g.appendChild(c);
-    cards.push(c);
+    ca.appendChild(ligne);
   });
-  ca.appendChild(g);
 
-  var numCards=cards.length;
-  var numRows=Math.ceil(numCards/2);
-  var activeZoomRow=-1;
-
-  function updateZoom(){
-    var scrollTop=ca.scrollTop;
-    var maxScroll=ca.scrollHeight-ca.clientHeight;
-    var newRow;
-    if(maxScroll<=0||numRows<=1){
-      newRow=0;
-    } else {
-      var zoneSize=maxScroll/numRows;
-      newRow=Math.floor(scrollTop/zoneSize);
-      if(scrollTop>=maxScroll-2) newRow=numRows-1;
-      newRow=Math.max(0,Math.min(numRows-1,newRow));
-    }
-
-    if(newRow===activeZoomRow) return; // rien à faire
-    activeZoomRow=newRow;
-
-    // D'abord remettre TOUTES les cartes à scale(1) sans animation
-    cards.forEach(function(card){
-      card.style.animation='none';
-      card.style.transition='transform .35s ease,box-shadow .35s,border-color .35s';
-      card.style.transform='scale(1)';
-      card.style.zIndex='1';
-      card.style.boxShadow='';
-      card.style.borderColor='';
-      card.style.opacity='1';
-      card.style.borderRadius='18px';
-    });
-
-    // Puis zoomer uniquement la ligne active
-    cards.forEach(function(card,i){
-      if(Math.floor(i/2)===activeZoomRow){
-        card.style.zIndex='3';
-        card.style.boxShadow='0 16px 40px rgba(0,0,0,.5),0 0 0 1px rgba(245,200,66,.3)';
-        card.style.borderColor='rgba(245,200,66,.35)';
-        // Lancer la pulse CSS directement — pas de setTimeout
-        card.style.animation='cardPulse 1.4s ease-in-out infinite alternate';
-      }
-    });
-  }
-
-  var zoomDelay = alreadyAnimated ? 50 : numCards*GROW_DUR+200;
-  setTimeout(function(){
-    window._sessAnimDone=true;
-    updateZoom();
-    ca.addEventListener('scroll',updateZoom,{passive:true});
-  }, zoomDelay);
+  window._sessAnimDone=true;
 }
 
 // OPEN LESSON
@@ -11857,7 +12007,11 @@ function renderLLesson(ca,s,idx){
     sortedPos.forEach(p=>{
       const pc=document.createElement('div');pc.className='pos-c';
       const isFin=p.l==='fin';const gpColor=isFin?'var(--blue)':'var(--green)';
-      const arDisplay=p.ar.replace(p.g,`<span style="color:${gpColor}">${p.g}</span>`);
+      /* Le trait de liaison reste blanc : seul le CORPS de la lettre prend
+         la couleur, pour que « fin = isolée + — » se voie. Colorer p.g dans
+         la chaine ne suffisait pas — la forme attachee porte son trait
+         d'entree dans son propre dessin, et un bout partait en couleur. */
+      const arDisplay=_formeCoupee(p.ar,gpColor,'#f0ece4');
       pc.innerHTML=`<div class="pos-lbl">${posMap[p.l]||p.l}</div><div class="pos-ar" style="font-weight:400">${arDisplay}</div>`;
       posRowWrap.appendChild(pc);
     });
@@ -12548,14 +12702,34 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = '#f5c842';
       var fontSize2 = parseFloat(ctx.font);
-      // Pour les diacritiques seuls, décaler vers le bas pour qu'ils apparaissent près de la ligne
+      /* ── Une voyelle seule se pose CONTRE la ligne d'écriture ──────────
+         Un signe sans lettre n'a pas de largeur ni de hauteur d'avance :
+         posé à la même place qu'une lettre, il flotte n'importe où. Les
+         décalages étaient donc devinés — et les mêmes pour tous les signes,
+         alors que leur encre n'est pas à la même hauteur : à 120 px, la
+         fatha monte à 104, la damma à 119, le soukoun à 110. Chacune
+         tombait à une distance différente de la ligne, et toutes trop loin.
+
+         On demande donc à la police où est l'encre. Un signe qui vit
+         au-dessus de la ligne y pose son BAS ; un signe qui vit en dessous
+         (kasra, kasratan) y pose son HAUT. Le même petit jour pour tous.
+         Et comme un signe seul a une avance nulle, on centre son encre au
+         lieu de centrer son point d'origine. */
       var _dcp = currentLetterForm && currentLetterForm.codePointAt(0);
-      var _isDiac = currentLetterForm && currentLetterForm.length <= 2 && _dcp >= 0x064B && _dcp <= 0x065F;
-      var _isBelowLine = _dcp === 0x0650 || _dcp === 0x064D; // kasra, kasratan
-      var drawY = _isDiac
-        ? (_isBelowLine ? baseY - fontSize2 * 0.2 : baseY + fontSize2 * 0.55)
-        : baseY - fontSize2 * 0.08;
-      ctx.fillText(currentLetterForm, rect.width / 2, drawY);
+      var _isDiac = currentLetterForm && currentLetterForm.length <= 2
+                    && _dcp >= 0x064B && _dcp <= 0x065F;
+      var drawX = rect.width / 2, drawY = baseY - fontSize2 * 0.08;
+      if (_isDiac) {
+        var mes = ctx.measureText(currentLetterForm);
+        var monte = mes.actualBoundingBoxAscent, descend = mes.actualBoundingBoxDescent;
+        var jour = fontSize2 * 0.08;
+        /* sous la ligne : toute l'encre est sous la ligne de base */
+        var dessous = (monte < 0 && descend > 0);
+        drawY = dessous ? (baseY + jour + monte) : (baseY - jour - descend);
+        var g = mes.actualBoundingBoxLeft, d = mes.actualBoundingBoxRight;
+        if (isFinite(g) && isFinite(d)) drawX += (g - d) / 2;
+      }
+      ctx.fillText(currentLetterForm, drawX, drawY);
       ctx.restore();
     }
 

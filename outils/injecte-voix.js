@@ -16,7 +16,12 @@ const DEBUT = '/* DEBUT VOIX TRADUITE */';
 const FIN = '/* FIN VOIX TRADUITE */';
 const LANGUES = ['fr', 'en', 'es', 'de', 'nl', 'it', 'pt', 'ru', 'tr', 'zh', 'id', 'ur', 'hi'];
 
+/* Deux corpus, une seule table : les phrases DITES et les textes affiches
+   de l'interface adulte. Ils partagent le meme bloc et le meme controle des
+   treize langues. */
 const V = JSON.parse(fs.readFileSync(path.join(__dirname, 'voix-adulte.json'), 'utf8'));
+const TXT = JSON.parse(fs.readFileSync(path.join(__dirname, 'textes-adulte.json'), 'utf8'));
+Object.keys(TXT).forEach(function (k) { V[k] = TXT[k]; });
 let src = fs.readFileSync(HTML, 'utf8');
 
 /* ── 1. Vérifier le corpus avant d'y toucher ── */
@@ -81,7 +86,8 @@ if (a !== -1 && b !== -1) {
 }
 
 fs.writeFileSync(HTML, src);
-console.log(Object.keys(V).length + ' phrases dites, ' + LANGUES.length + ' langues chacune.');
+console.log(Object.keys(V).length + ' textes adulte (dits + affiches), '
+  + LANGUES.length + ' langues chacune.');
 console.log(remplaces + ' appels speakText branchés sur une clé.');
 if (inconnues.length) {
   console.log('ENCORE EN FRANÇAIS DANS speakText :');
