@@ -943,6 +943,19 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **La traînée de la licorne est un RUBAN, pas un chapelet de points.** Le
+  client la voulait « comme celle d'un avion ». Chaque position est donc
+  reliée à la précédente par un segment arrondi (`ruban`), assez épais pour
+  que deux voisins se chevauchent : un segment tous les neuf pixels pour
+  quinze à dix-huit d'épaisseur. Le trait est continu, change de couleur en
+  avançant, et s'efface par où il est venu. Mesuré en plein vol : écarts de
+  4 à 9 px pour 18 px de large — jamais de trou. La densité a été divisée
+  par deux après coup (175 éléments vivants d'un coup, c'est trop pour un
+  téléphone). Le feu de la fusée ne bouge pas : il est validé, et seul
+  l'habillage qui porte `traineeArc` passe au ruban.
+- `chienchat1` remplacé par **`chienchat3`**, l'image que le client a
+  redéposée.
+
 - **Quatre retouches demandées le 20 août au soir.**
   - **Les sucreries en pièces détachées** (`sucrerie-*.svg`, dix fichiers
     écrits par `outils/mondes.js`). Le paysage seul est recadré par

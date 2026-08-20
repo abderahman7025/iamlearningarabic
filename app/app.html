@@ -6515,7 +6515,7 @@ function _volCarte(o){
   }
   function poser(x,y,deg,part){
     el.style.left=(x-dx)+'px';el.style.top=(y-dy)+'px';
-    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;brutVu=null;return;}
+    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;brutVu=null;dernierPoint=null;return;}
     var p=(part===undefined?1:Math.max(0,Math.min(1,part)));
     var a;
     if(o.aligne){
@@ -6549,7 +6549,41 @@ function _volCarte(o){
     if(!arc||!arc.length)return o.trainee||'rgba(255,255,255,.85)';
     return arc[(rangArc++)%arc.length];
   }
+  /* LE RUBAN. Une suite de points laisse des perles ; le client veut une
+     TRAINEE, comme celle d'un avion. On relie donc chaque position a la
+     precedente par un segment arrondi, assez epais pour que deux segments
+     voisins se touchent : le trait est continu, et il change de couleur en
+     avancant — un arc-en-ciel qui se deroule derriere la licorne, puis
+     s'efface par ou il est venu. */
+  var dernierPoint=null;
+  function ruban(x,y){
+    if(!dernierPoint){dernierPoint={x:x,y:y};return;}
+    var ax=x-dernierPoint.x,ay=y-dernierPoint.y;
+    var d=Math.sqrt(ax*ax+ay*ay);
+    /* Un segment tous les neuf pixels : ils sont larges de quinze a dix-huit,
+       donc ils se chevauchent largement — le trait reste continu, et il y a
+       deux fois moins d'elements a animer sur un telephone. */
+    if(d<9)return;
+    var ep=(o.epaisseurTrainee||15);
+    var seg=document.createElement('div');
+    seg.style.cssText='position:absolute;left:'+dernierPoint.x+'px;top:'+(dernierPoint.y-ep/2)+'px;'
+      +'width:'+(d+ep*0.55)+'px;height:'+ep+'px;border-radius:'+ep+'px;'
+      +'transform-origin:'+(ep/2)+'px 50%;'
+      +'transform:translateX(-'+(ep/2)+'px) rotate('+(Math.atan2(ay,ax)*180/Math.PI).toFixed(1)+'deg);'
+      +'background:'+couleurGrain()+';filter:blur(2px);opacity:.85;'
+      +'pointer-events:none;z-index:19;transition:opacity 1s ease';
+    globe.appendChild(seg);grains.push(seg);
+    requestAnimationFrame(function(){seg.style.opacity='0';});
+    setTimeout(function(){
+      if(seg.parentNode)seg.parentNode.removeChild(seg);
+      grains=grains.filter(function(k){return k!==seg;});
+    },1050);
+    dernierPoint={x:x,y:y};
+  }
   function grain(x,y){
+    /* Un ruban continu quand l'habillage donne un arc-en-ciel ; les grains
+       d'avant sinon — le feu de la fusee est valide, on n'y touche pas. */
+    if(_HAB&&_HAB.traineeArc){ruban(x,y);return;}
     var T=Date.now();
     if(T-dernierGrain<70)return;
     dernierGrain=T;
@@ -6632,7 +6666,7 @@ function _volCarte(o){
        bouge. Le sens vient des abscisses des deux etapes ; un trajet
        rigoureusement vertical garde le sens precedent. */
     partiDe=idx;
-    brutVu=null;sensRot=1;
+    brutVu=null;sensRot=1;dernierPoint=null;
     var _de=ouSePoser(idx),_vers=ouSePoser(cible);
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
@@ -7092,6 +7126,7 @@ var islandDefs=[
         _poserObjets(globeDiv,isleCardsMob,_etapeFaite);
         _poserBetes(globeDiv,isleCardsMob);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
+          epaisseurTrainee:14,
           equipage:eqMob,decalageX:56,decalageY:112,demiAssise:31,depart:charIdxM,
           trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
           dureeTotale:9000,camera:true,
@@ -7214,6 +7249,7 @@ var islandDefs=[
       _poserObjets(globeDiv,isleCards,_etapeFaite);
       _poserBetes(globeDiv,isleCards);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
+        epaisseurTrainee:18,
         equipage:eq,decalageX:70,decalageY:140,demiAssise:39,depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
         dureeTotale:9000,camera:true,
@@ -7889,7 +7925,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v118';
+var _VERSION_REPLI='v119';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9429,7 +9465,7 @@ var _HABILLAGES={
          {img:'/images/papillon1.gif',x:38,y:68,l:13,vol:true}],
       7:[{img:'/images/bete-tortue1.png',x:26,y:38,l:28},
          {img:'/images/bete-tortue2.png',x:50,y:50,l:24}],
-      8:[{img:'/images/bete-chienchat1.png',x:24,y:36,l:30},
+      8:[{img:'/images/bete-chienchat3.png',x:24,y:36,l:30},
          {img:'/images/bete-chienchat2.png',x:50,y:50,l:26}],
       9:[{img:'/images/bete-ours1.png',x:26,y:34,l:26},
          {img:'/images/bete-ours2.png',x:50,y:46,l:24}]
@@ -9477,7 +9513,7 @@ var _HABILLAGES={
       ],
       /* Une seule fois chaque image, TRÈS GROS, et assis par terre. */
       'chats-chiens':[
-        {img:'/images/bete-chienchat1.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
+        {img:'/images/bete-chienchat3.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
         {img:'/images/bete-chienchat2.png',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
       ],
       /* Le paysage des sucreries est recadré par `cover` : on n'en voyait
