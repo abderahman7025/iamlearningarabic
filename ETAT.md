@@ -934,6 +934,24 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **LE PAYSAGE D'UN MONDE, ET LE PIÈGE DE LA SPÉCIFICITÉ.** Après l'avoir
+  fait repasser DERRIÈRE le cours (`z-index:-2`, inséré avant `#root`), il
+  ne se voyait plus du tout : `body`/`#root` peignaient toujours le dégradé
+  pastel par-dessus. La règle qui les rend transparents dans un monde avait
+  le MÊME poids que celle du pastel (`body.profile-girl.fond-licorne`,
+  `!important` des deux côtés) et était écrite AVANT elle dans la feuille —
+  à égalité, la dernière gagne. Il a fallu une classe de plus.
+  **La leçon** : une règle `!important` ajoutée plus haut dans le fichier ne
+  bat pas une règle `!important` de même poids écrite plus bas. Vérifier la
+  couleur CALCULÉE, pas la règle qu'on vient d'écrire.
+  Un `background-color` de repli est posé sur le calque : le paysage est un
+  fichier, et sans lui on voit le noir de la page pendant qu'il charge.
+- **La carte efface le paysage en revenant** (`_decorMonde(ca,false)` en
+  tête de `renderSessionsMap`) : `_fondEnfant` ne s'occupe que du dégradé,
+  le monde quitté serait reste derrière la carte.
+  Cycle vérifié d'un bout à l'autre : carte pastel → monde (fond du monde,
+  body transparent) → retour carte pastel → menu rose.
+
 - **Le décor d'un monde est un FOND, pas un premier plan — 20 août 2026.**
   En le déplaçant sur le `body` (pour qu'un `position:fixed` soit vraiment
   fixe), il est passé DEVANT le cours : `#root` est lui aussi positionné, et

@@ -2468,7 +2468,14 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
    DOCUMENT, et le décor, ajouté après, passait devant le cours — on ne
    voyait plus que lui. Il est donc inséré AVANT `#root` et posé en
    `z-index:-1`, et `#root` devient transparent pour le laisser voir. */
-body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne,
+/* Trois classes, pas deux : `body.profile-girl.fond-licorne` peint le
+   pastel avec `!important`, et cette règle-ci est écrite AVANT dans la
+   feuille — à égalité de poids, c'est la dernière qui gagne. Il faut donc
+   être PLUS précis qu'elle, sinon le paysage reste caché dessous et l'on
+   croit qu'il a disparu. */
+body.dans-un-monde.fond-licorne.profile-girl,
+#root.dans-un-monde.fond-licorne.profile-girl,
+body.dans-un-monde.profile-girl,#root.dans-un-monde.profile-girl,
 body.dans-un-monde,#root.dans-un-monde{
   background:transparent !important;
 }
@@ -2561,6 +2568,9 @@ body.dans-un-monde #ca .child-wrap{
    tout le reste : `z-index:0` et la scene entiere passe par-dessus. */
 .decor-monde{
   position:fixed;inset:0;z-index:-2;pointer-events:none;
+  /* Une couleur de repli : le paysage est un fichier, et tant qu'il charge
+     on verrait le noir de la page. */
+  background-color:#f2e6ff;
   background-repeat:no-repeat;background-position:center center;
   /* PLEIN CADRE : dans un monde, c'est le monde qu'on voit derrière le
      cours, pas le dégradé pastel de la carte. Le paysage est dessiné large
@@ -6690,6 +6700,10 @@ function renderSessionsMap(ca){
   _HAB=_habDuProfil();
   _migreProgressionFille();
   _fondEnfant(true);
+  /* La carte reprend SON fond : le paysage du monde qu'on vient de quitter
+     doit s'en aller, sinon il reste derriere la carte — `_fondEnfant(true)`
+     ne le retire pas, il ne s'occupe que du degrade. */
+  _decorMonde(ca,false);
   ca.innerHTML='';
   ca.style.cssText='';
   ca.style.paddingTop='64px';
@@ -7856,7 +7870,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v114';
+var _VERSION_REPLI='v115';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
