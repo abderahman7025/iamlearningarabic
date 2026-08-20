@@ -22,11 +22,20 @@ const path = require('path');
 
 const RACINE = path.join(__dirname, '..');
 const HTML = path.join(RACINE, 'app', 'app.html');
-const JSON_TRAD = path.join(__dirname, 'traductions-enfant.json');
+/* La table est découpée en morceaux — un par cours — pour rester lisible :
+   `traductions-enfant.json`, `-2.json`, `-3.json`… Tous sont fusionnés. */
+const MORCEAUX = fs.readdirSync(__dirname)
+  .filter(function (f) { return /^traductions-enfant.*\.json$/.test(f); })
+  .sort();
 const LANGUES = ['en', 'es', 'de', 'nl', 'it', 'pt', 'ru', 'tr', 'zh', 'id', 'ur', 'hi'];
 
 const src = fs.readFileSync(HTML, 'utf8');
-const trad = JSON.parse(fs.readFileSync(JSON_TRAD, 'utf8'));
+const trad = {};
+MORCEAUX.forEach(function (f) {
+  const part = JSON.parse(fs.readFileSync(path.join(__dirname, f), 'utf8'));
+  Object.keys(part).forEach(function (k) { trad[k] = part[k]; });
+});
+console.log('morceaux lus : ' + MORCEAUX.join(', '));
 
 /* Les phrases telles qu'elles sont appelées dans les cours. */
 const DEBUT = src.indexOf('function _boyVowelCourse');

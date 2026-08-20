@@ -878,7 +878,34 @@ Et la consigne qui vaut toujours : sur ce qui n'est pas écrit ici, **on
 demande, on n'invente pas**. C'est ce qui a coûté le plus cher sur le
 hā milieu.
 
-### Chantier 2 — Traductions : tout, partout
+### Chantier 2 — Traductions : EN COURS (20 août 2026)
+
+**Le mécanisme est en place, et deux cours sur trois sont traduits.**
+
+- Toutes les phrases des cours enfant passent par `te()` (le texte dit) ou
+  `TB()` (le texte écrit). **La clé EST la phrase française** : rien à
+  inventer, rien à décaler, et une phrase oubliée s'affiche en français au
+  lieu de disparaître.
+- Le mot mis en avant est marqué `<b>…</b>` dans la phrase et prend la
+  couleur de l'univers au dernier moment. Avant, il était collé par
+  concaténation (`'…'+b('mot')+'…'`) : impossible à traduire, l'ordre des
+  mots change d'une langue à l'autre.
+- **La voix suit la langue** (`_voixEnfant()`), au lieu d'être forcée en
+  `fr-FR`.
+- La table vit dans `outils/traductions-enfant*.json` — un fichier par
+  cours — et s'écrit dans la page par
+  `node outils/injecte-traductions.js`, qui vérifie que chaque clé existe
+  encore dans le code et que le balisage `<b>` est équilibré dans les
+  treize langues. **On traduit dans le JSON, jamais dans le HTML.**
+- `node outils/phrases.js` relève ce qui reste en dur.
+
+**Fait** : voyelles (69 phrases) et prolongations (45) — 114 phrases × 13
+langues.
+**Reste** : le cours des LETTRES, 133 phrases (≈ 5 000 caractères de
+français). Même méthode : ajouter `outils/traductions-enfant-3.json` puis
+relancer l'injecteur.
+
+### Chantier 2 (rappel de la demande d'origine)
 Décision du client : **tout doit être traduit dans les 13 langues**.
 - L'interface adulte est à 95–98 % (audit fait, trous comblés).
 - **L'interface enfant est 100 % en français codé en dur** : ~86 phrases
