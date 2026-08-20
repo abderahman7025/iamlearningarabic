@@ -1399,6 +1399,19 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Pièges connus
 
+- **Ne jamais faire décider un fait de LANGUE par une mesure de police.**
+  Le côté où vit une voyelle — la kasra et son tanwīn sous la ligne, les six
+  autres au-dessus — était déduit de `measureText`. Tant que Scheherazade New
+  n'est pas chargée, on mesure la police de repli, où la kasra seule remonte
+  au-dessus de la ligne de base (+9 au lieu de −47) : les deux seuls signes du
+  bas passaient en haut, et rien ne les redescendait. Le client l'a vu tout de
+  suite. Le côté se lit maintenant sur le CARACTÈRE (0650, 064D) ; la mesure ne
+  sert plus qu'à l'écart. Corollaire : **tout ce qui est dessiné à partir de
+  mesures de police doit être refait sur `document.fonts.ready`** — sinon le
+  premier tracé garde le mauvais glyphe et les mauvaises mesures. Attention,
+  dans le module d'écriture l'encre de l'enfant vit sur le MÊME canvas : ne
+  redessiner que si l'enfant n'a pas encore écrit.
+
 - **On ne peut PAS voir la page depuis ici.** Le volet du navigateur n'est
   pas affiché : il ne compose aucune image, donc la capture d'écran échoue
   ET le décodage d'images est suspendu. Une capture DOM → SVG `foreignObject`

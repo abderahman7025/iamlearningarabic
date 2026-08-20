@@ -8016,7 +8016,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v124';
+var _VERSION_REPLI='v125';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12720,12 +12720,25 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
                     && _dcp >= 0x064B && _dcp <= 0x065F;
       var drawX = rect.width / 2, drawY = baseY - fontSize2 * 0.08;
       if (_isDiac) {
+        /* De quel côté vit le signe est un fait de la LANGUE, pas une
+           mesure : la kasra et son tanwīn vivent SOUS la ligne, tous les
+           autres au-dessus. Le déduire de measureText était un piège —
+           tant que la police arabe n'est pas arrivée on mesure la police
+           de repli, où la kasra seule remonte au-dessus de la ligne de
+           base (+9 au lieu de −47) : les deux seuls signes du bas
+           passaient donc en haut, et rien ne les redescendait ensuite. */
+        var SOUS_LA_LIGNE = [0x0650, 0x064D, 0x0655, 0x0656];
+        var dessous = SOUS_LA_LIGNE.indexOf(_dcp) >= 0;
         var mes = ctx.measureText(currentLetterForm);
         var monte = mes.actualBoundingBoxAscent, descend = mes.actualBoundingBoxDescent;
         var jour = fontSize2 * 0.08;
-        /* sous la ligne : toute l'encre est sous la ligne de base */
-        var dessous = (monte < 0 && descend > 0);
-        drawY = dessous ? (baseY + jour + monte) : (baseY - jour - descend);
+        /* Le signe du dessous pose le HAUT de son encre contre la ligne,
+           celui du dessus y pose son BAS. Même petit jour pour tous. */
+        if (isFinite(monte) && isFinite(descend)) {
+          drawY = dessous ? (baseY + jour + monte) : (baseY - jour - descend);
+        } else {
+          drawY = dessous ? (baseY + jour) : (baseY - jour);
+        }
         var g = mes.actualBoundingBoxLeft, d = mes.actualBoundingBoxRight;
         if (isFinite(g) && isFinite(d)) drawX += (g - d) / 2;
       }
@@ -12738,6 +12751,19 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       ctx.clearRect(0, 0, rect.width, rect.height);
       ctx.beginPath();
       drawGuide();
+    }
+
+    /* Le modèle est dessiné, et mesuré, avec la police arabe. Si elle
+       arrive après le premier tracé du modèle, celui-ci reste dessiné avec
+       la police de repli — mauvais glyphe et mauvaises mesures. On le
+       refait dès qu'elle est là, mais JAMAIS par-dessus ce que l'enfant a
+       déjà écrit : l'encre vit sur ce même canvas. */
+    var _aEcrit = false;
+    ['mousedown', 'touchstart'].forEach(function (ev) {
+      canvas.addEventListener(ev, function () { _aEcrit = true; }, { passive: true });
+    });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { if (!_aEcrit) redraw(); });
     }
 
     function getPos(e) {
