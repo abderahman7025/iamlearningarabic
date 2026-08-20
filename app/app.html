@@ -8016,7 +8016,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v125';
+var _VERSION_REPLI='v126';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8834,11 +8834,14 @@ if(document.fonts&&document.fonts.ready){
 function _formeCoupee(forme,couleurCorps,couleurTrait){
   var f=String(forme), p=_partLiaison(f);
   if(!p)return '<span style="color:'+couleurCorps+'">'+f+'</span>';
+  /* Les marges haut et bas sont NÉGATIVES : `inset(0 …)` coupait aussi au
+     ras de la boîte, et les deux points du yāʾ final, qui pendent sous la
+     ligne, disparaissaient. Seule la coupe verticale nous intéresse. */
   return '<span style="position:relative;display:inline-block">'
     +'<span style="display:inline-block;color:'+couleurCorps
-      +';clip-path:inset(0 '+p.toFixed(1)+'% 0 0)">'+f+'</span>'
+      +';clip-path:inset(-60% '+p.toFixed(1)+'% -60% -60%)">'+f+'</span>'
     +'<span aria-hidden="true" style="position:absolute;left:0;top:0;color:'+couleurTrait
-      +';clip-path:inset(0 0 0 '+(100-p).toFixed(1)+'%)">'+f+'</span>'
+      +';clip-path:inset(-60% -60% -60% '+(100-p).toFixed(1)+'%)">'+f+'</span>'
     +'</span>';
 }
 /* Les signes (voyelles, tanwīn) ne changent pas le geste : on cherche le
@@ -12001,12 +12004,19 @@ function renderLLesson(ca,s,idx){
     const posMap={début:t('begin'),milieu:t('middle'),fin:t('end')};
     const sortedPos=['début','milieu','fin'].map(k=>letter.pos.find(p=>p.l===k)).filter(Boolean);
     const posRowWrap=document.createElement('div');posRowWrap.style.cssText='display:flex;gap:10px;direction:rtl;flex-wrap:wrap;';
+    /* Le ʿayn et le ġayn n'obéissent pas à « fin = isolée + trait » : leurs
+       quatre formes s'apprennent séparément, c'est ce que dit leur écran
+       d'exception. Leur mettre le code couleur annoncerait une parenté qui
+       n'existe pas — elles restent donc blanches, toutes les quatre. */
+    const sansCode=(letter.ar==='ع'||letter.ar==='غ');
     const isoBox=document.createElement('div');isoBox.className='pos-c';
-    isoBox.innerHTML=`<div class="pos-lbl" style="color:var(--blue)">${t('isolated')}</div><div class="pos-ar" style="color:var(--blue);font-weight:400">${letter.iso||letter.ar}</div>`;
+    const coulIso=sansCode?'var(--txt)':'var(--blue)';
+    isoBox.innerHTML=`<div class="pos-lbl" style="color:${coulIso}">${t('isolated')}</div><div class="pos-ar" style="color:${coulIso};font-weight:400">${letter.iso||letter.ar}</div>`;
     posRowWrap.appendChild(isoBox);
     sortedPos.forEach(p=>{
       const pc=document.createElement('div');pc.className='pos-c';
-      const isFin=p.l==='fin';const gpColor=isFin?'var(--blue)':'var(--green)';
+      const isFin=p.l==='fin';
+      const gpColor=sansCode?'#f0ece4':(isFin?'var(--blue)':'var(--green)');
       /* Le trait de liaison reste blanc : seul le CORPS de la lettre prend
          la couleur, pour que « fin = isolée + — » se voie. Colorer p.g dans
          la chaine ne suffisait pas — la forme attachee porte son trait
@@ -12718,7 +12728,12 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       var _dcp = currentLetterForm && currentLetterForm.codePointAt(0);
       var _isDiac = currentLetterForm && currentLetterForm.length <= 2
                     && _dcp >= 0x064B && _dcp <= 0x065F;
-      var drawX = rect.width / 2, drawY = baseY - fontSize2 * 0.08;
+      /* La lettre pose sa ligne de base SUR la ligne d'écriture, comme
+         dans l'interface enfant — la remonter de 8 % au jugé la faisait
+         flotter. _descenteGlyphe ne corrige que les jambages qui
+         descendent sous la ligne (jīm, ḥāʾ, khāʾ isolés). */
+      var drawX = rect.width / 2,
+          drawY = baseY + _descenteGlyphe(currentLetterForm, fontSize2);
       if (_isDiac) {
         /* De quel côté vit le signe est un fait de la LANGUE, pas une
            mesure : la kasra et son tanwīn vivent SOUS la ligne, tous les
@@ -12731,7 +12746,9 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         var dessous = SOUS_LA_LIGNE.indexOf(_dcp) >= 0;
         var mes = ctx.measureText(currentLetterForm);
         var monte = mes.actualBoundingBoxAscent, descend = mes.actualBoundingBoxDescent;
-        var jour = fontSize2 * 0.08;
+        /* 0,08 collait trop la voyelle à la ligne pointillée : elle doit
+           respirer comme si une lettre la portait. */
+        var jour = fontSize2 * 0.20;
         /* Le signe du dessous pose le HAUT de son encre contre la ligne,
            celui du dessus y pose son BAS. Même petit jour pour tous. */
         if (isFinite(monte) && isFinite(descend)) {

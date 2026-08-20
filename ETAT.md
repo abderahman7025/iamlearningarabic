@@ -985,6 +985,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le ʿayn et le ġayn n'ont plus de code couleur — v126.** Leurs quatre
+  formes s'apprennent séparément (le cours enfant leur saute déjà le tableau
+  de déduction) : les colorer annonçait une parenté qui n'existe pas. Toutes
+  blanches, dans les deux interfaces.
+- **Les points du yāʾ final revenus.** `clip-path:inset(0 …)` coupait aussi
+  au ras de la boîte, en haut et en bas : les deux points, qui pendent SOUS
+  la ligne, disparaissaient. Les marges sont maintenant négatives partout
+  sauf sur la coupe verticale, la seule qui nous intéresse.
+- **Les lettres des canvas adulte sont posées sur la ligne d'écriture.**
+  Elles étaient remontées de 8 % de leur taille, au jugé. L'adulte appelle
+  maintenant `_descenteGlyphe`, la fonction de l'interface enfant que le
+  client trouve juste : ligne de base sur la ligne, et seuls les jambages du
+  jīm, du ḥāʾ et du khāʾ isolés descendent (0,11 em).
+- **Les voyelles seules respirent** : le jour est passé de 0,08 à 0,20 em.
+
 - **Le trait de liaison ne prend plus la couleur de la lettre — v124.**
   Le cours enseigne « fin = isolée + — » et « milieu = début + — », avec
   l'isolée en bleu et le début en vert. Un bout du trait partait pourtant
