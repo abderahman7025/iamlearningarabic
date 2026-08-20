@@ -934,6 +934,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le décor d'un monde est un FOND, pas un premier plan — 20 août 2026.**
+  En le déplaçant sur le `body` (pour qu'un `position:fixed` soit vraiment
+  fixe), il est passé DEVANT le cours : `#root` est lui aussi positionné, et
+  **deux éléments positionnés sans `z-index` se peignent dans l'ordre du
+  document**. Le décor, ajouté après, gagnait — on ne voyait plus que lui.
+  Il est maintenant inséré AVANT `#root`, en `z-index:-2` (les bêtes en
+  `-1`), et `#root` devient transparent dans un monde pour le laisser voir.
+  Contrôlé en interrogeant cinq points de l'écran : c'est bien le cours qui
+  répond partout.
+- **Ce qui marche est ancré au BAS de l'écran** (`b:` au lieu de `y:` dans
+  les compositions). Placés à un pourcentage du HAUT, les ours, les chiens,
+  les chats et les pingouins se retrouvaient suspendus en l'air dès que
+  l'écran changeait de forme. Les pingouins arrivent toujours de loin, mais
+  leur `transform-origin` est au sol : ils grossissent en posant les pieds.
+
 - **Quatrième passe, 20 août 2026 — les retours du client, un par un.**
 
   - **UN `position:fixed` DANS `#ca` N'EST PAS FIXE.** Le décor d'un monde y

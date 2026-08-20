@@ -2461,6 +2461,18 @@ body.fond-espace #root.profile-boy .nav-card .nav-desc{opacity:.85}
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* LE DECOR EST UN FOND, PAS UN PREMIER PLAN.
+   Il vit sur le `body` (un `position:fixed` posé dans `#ca` cesse d'être
+   fixe, voir plus bas), mais `#root` est lui aussi positionné : deux
+   éléments positionnés sans `z-index` se peignent dans l'ORDRE DU
+   DOCUMENT, et le décor, ajouté après, passait devant le cours — on ne
+   voyait plus que lui. Il est donc inséré AVANT `#root` et posé en
+   `z-index:-1`, et `#root` devient transparent pour le laisser voir. */
+body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne,
+body.dans-un-monde,#root.dans-un-monde{
+  background:transparent !important;
+}
+
 /* Dans un monde, le fond pastel de la carte disparaît sous le paysage :
    c'est le paysage qui EST le fond d'écran. Et l'écran du choix de la
    lettre reçoit un voile clair : sans lui, ses titres se poseraient
@@ -2471,9 +2483,7 @@ body.dans-un-monde #ca .child-wrap{
   padding:18px 14px 22px;
   box-shadow:0 10px 30px rgba(120,70,150,.14);
 }
-body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
-  background:#f4e8ff !important;
-}
+
 
 /* LES BETES DU CLIENT. Ses illustrations sont posees par-dessus le decor
    d'un monde, et semees dans le cours de ce monde. Elles bougent : un
@@ -2481,7 +2491,9 @@ body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
    Les pourcentages d'un `translate` se comptent sur la taille de
    l'element : le vol reste donc proportionne, quelle que soit la bete. */
 .bete-monde,.bete-cours{position:absolute;pointer-events:none;object-fit:contain}
-.bete-cours{position:fixed}
+/* Les bêtes sont DERRIERE le cours, devant le paysage. */
+.bete-cours{position:fixed;z-index:-1}
+.bete-cours img{display:block;width:100%;height:auto}
 /* Le cours passe DEVANT son decor. Un element positionne a z-index 0 se
    peint au-dessus du contenu ordinaire : sans cette regle, les papillons
    passeraient devant la lecon. */
@@ -2522,9 +2534,9 @@ body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
 
 /* UN PINGOUIN ARRIVE DE LOIN : petit au fond, il grossit en avancant. */
 @keyframes beteApproche{
-  0%   {transform:translateY(-6vh) scale(.22);opacity:0}
+  0%   {transform:translateY(-16vh) scale(.22);opacity:0}
   10%  {opacity:1}
-  100% {transform:translateY(6vh) scale(1);opacity:1}
+  100% {transform:translateY(0) scale(1);opacity:1}
 }
 /* Sa DEMARCHE : il se balance d'un pied sur l'autre. */
 @keyframes beteDemarche{
@@ -2548,7 +2560,7 @@ body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
    Elle est posee sur le conteneur du cours (pas sur le body) et derriere
    tout le reste : `z-index:0` et la scene entiere passe par-dessus. */
 .decor-monde{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
   background-repeat:no-repeat;background-position:center center;
   /* PLEIN CADRE : dans un monde, c'est le monde qu'on voit derrière le
      cours, pas le dégradé pastel de la carte. Le paysage est dessiné large
@@ -7844,7 +7856,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v113';
+var _VERSION_REPLI='v114';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9401,35 +9413,34 @@ var _HABILLAGES={
         {img:'/images/papillon2.gif',x:3,y:84,l:15,anim:'beteTraverse',dur:29,del:5}
       ],
       /* Les pingouins ARRIVENT DE LOIN : petits au fond, ils grossissent en
-         se dandinant. */
+         se dandinant — et LES PIEDS AU SOL, jamais en l'air. */
       'pingouins':[
-        {img:'/images/bete-pinguin1.png',x:10,y:34,l:26,anim:'beteApproche',dur:15,del:0,
+        {img:'/images/bete-pinguin1.png',x:6,b:2,l:26,anim:'beteApproche',dur:15,del:0,
          anim2:'beteDemarche',dur2:1.5},
-        {img:'/images/bete-pinguin2.png',x:66,y:30,l:24,anim:'beteApproche',dur:19,del:7,
+        {img:'/images/bete-pinguin2.png',x:68,b:2,l:24,anim:'beteApproche',dur:19,del:7,
          anim2:'beteDemarche',dur2:1.8},
-        {img:'/images/bete-pinguin1.png',x:40,y:26,l:18,anim:'beteApproche',dur:24,del:13,
+        {img:'/images/bete-pinguin1.png',x:42,b:1,l:16,anim:'beteApproche',dur:24,del:13,
          anim2:'beteDemarche',dur2:1.3}
       ],
-      /* Les tortues sont POSÉES EN BAS, là où on les voit — plus rien en
-         suspension dans le vide. */
+      /* Les tortues, POSÉES EN BAS, là où on les voit. */
       'tortue':[
-        {img:'/images/bete-tortue1.png',x:2,y:58,l:34,anim2:'beteBalance',dur2:4.2},
-        {img:'/images/bete-tortue2.png',x:64,y:62,l:32,anim2:'beteBalance',dur2:5.0},
-        {img:'/images/bete-tortue2.png',x:36,y:78,l:24,anim2:'beteBalance',dur2:3.6}
+        {img:'/images/bete-tortue1.png',x:1,b:2,l:32,anim2:'beteBalance',dur2:4.2},
+        {img:'/images/bete-tortue2.png',x:66,b:2,l:30,anim2:'beteBalance',dur2:5.0},
+        {img:'/images/bete-tortue2.png',x:38,b:0,l:22,anim2:'beteBalance',dur2:3.6}
       ],
-      /* UN TRÈS GROS OURS, et ses petits autour. */
+      /* UN TRÈS GROS OURS, et ses petits autour — tous par terre. */
       'ours':[
-        {img:'/images/bete-ours1.png',x:26,y:10,l:44,anim2:'beteBalance',dur2:5.4},
-        {img:'/images/bete-ours2.png',x:1,y:54,l:11,anim2:'beteBalance',dur2:3.2},
-        {img:'/images/bete-ours2.png',x:82,y:50,l:12,anim2:'beteBalance',dur2:3.8},
-        {img:'/images/bete-ours2.png',x:72,y:76,l:10,anim2:'beteBalance',dur2:2.9},
-        {img:'/images/bete-ours2.png',x:12,y:78,l:10,anim2:'beteBalance',dur2:4.4},
-        {img:'/images/bete-ours2.png',x:44,y:84,l:9,anim2:'beteBalance',dur2:3.5}
+        {img:'/images/bete-ours1.png',x:28,b:1,l:42,anim2:'beteBalance',dur2:5.4},
+        {img:'/images/bete-ours2.png',x:1,b:2,l:13,anim2:'beteBalance',dur2:3.2},
+        {img:'/images/bete-ours2.png',x:84,b:2,l:14,anim2:'beteBalance',dur2:3.8},
+        {img:'/images/bete-ours2.png',x:71,b:1,l:11,anim2:'beteBalance',dur2:2.9},
+        {img:'/images/bete-ours2.png',x:16,b:1,l:11,anim2:'beteBalance',dur2:4.4},
+        {img:'/images/bete-ours2.png',x:57,b:0,l:9,anim2:'beteBalance',dur2:3.5}
       ],
-      /* Une seule fois chaque image, mais TRÈS GROS. */
+      /* Une seule fois chaque image, TRÈS GROS, et assis par terre. */
       'chats-chiens':[
-        {img:'/images/bete-chienchat1.png',x:0,y:30,l:52,anim2:'beteBalance',dur2:4.6},
-        {img:'/images/bete-chienchat2.png',x:50,y:36,l:50,anim2:'beteBalance',dur2:5.2}
+        {img:'/images/bete-chienchat1.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
+        {img:'/images/bete-chienchat2.png',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
       ],
       /* Les licornes du client vont DANS TOUS LES SENS. */
       'licornes':[
@@ -9503,8 +9514,8 @@ function _decorMonde(ca,actif){
   /* LE PAYSAGE, plein cadre, derriere tout le reste. */
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=113')";
-  document.body.appendChild(d);
+  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=114')";
+  document.body.insertBefore(d,document.body.firstChild);
 
   /* LES BETES DU MONDE. Chaque monde a SA composition — un tres gros ours
      et ses petits, deux chiens-chats en grand, des tortues posees en bas,
@@ -9515,19 +9526,25 @@ function _decorMonde(ca,actif){
   betes.forEach(function(b,i){
     var enveloppe=document.createElement('span');
     enveloppe.className='bete-cours';
-    enveloppe.style.cssText='z-index:0;left:'+b.x+'%;top:'+b.y+'%;width:'+b.l+'%;'
+    /* CE QUI MARCHE EST ANCRE AU BAS DE L'ECRAN (`b`), ce qui vole est posé
+       depuis le haut (`y`). Un ours accroché à un pourcentage du haut se
+       retrouve suspendu en l'air dès que l'écran change de forme — c'est ce
+       que le client a vu. */
+    var vertical=(b.b!==undefined)?('bottom:'+b.b+'%;'):('top:'+(b.y||0)+'%;');
+    enveloppe.style.cssText='left:'+b.x+'%;'+vertical+'width:'+b.l+'%;'
+      +'transform-origin:bottom center;'
       +'opacity:'+(b.o||0.95)+';'
       +(b.anim?('animation:'+b.anim+' '+(b.dur||14)+'s '
         +(b.anim==='beteBalance'?'ease-in-out':'linear')+' infinite;'
         +'animation-delay:-'+(b.del||i*1.7)+'s;'):'');
     var im=document.createElement('img');
     im.src=b.img;im.alt='';
-    im.style.cssText='width:100%;height:auto;display:block;'
+    im.style.cssText='width:100%;height:auto;display:block;transform-origin:bottom center;'
       +'filter:drop-shadow(0 10px 14px rgba(80,50,110,.22));'
       +(b.anim2?('animation:'+b.anim2+' '+(b.dur2||3.2)+'s ease-in-out infinite;'
         +'animation-delay:-'+(b.del2||i*0.6)+'s;'):'');
     enveloppe.appendChild(im);
-    document.body.appendChild(enveloppe);
+    document.body.insertBefore(enveloppe,document.body.firstChild);
   });
 }
 
