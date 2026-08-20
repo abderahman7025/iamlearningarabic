@@ -932,6 +932,15 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ---
 
+- **Le disque des sucreries était NOIR.** En réécrivant ce monde, ses cinq
+  couleurs (`clair`, `moyen`, `fonce`, `halo`, `trait`) avaient sauté : les
+  arrêts du dégradé sortaient en `stop-color="undefined"`, et un dégradé
+  invalide se peint en noir. Les motifs, eux, s'affichaient — c'est ce qui
+  rendait la panne trompeuse.
+  **Contrôle ajouté au réflexe** : après un `node outils/mondes.js`,
+  chercher `undefined` dans les vingt-quatre fichiers produits, et lire le
+  pixel du centre de chaque disque. Un monde noir se voit en une ligne.
+
 ## Fait récemment (ne pas refaire)
 
 - **Dans un monde, le ciel de la carte s'éteint.** Le calque d'ambiance de

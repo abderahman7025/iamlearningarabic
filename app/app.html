@@ -7878,7 +7878,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v116';
+var _VERSION_REPLI='v117';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9345,10 +9345,10 @@ var _HABILLAGES={
     /* Le ?v= est indispensable : un decor retouche garderait sinon l'ancienne
        image dans le cache du navigateur et du service worker. Il monte avec
        la version du site. */
-    images:['/images/monde-licornes.svg?v=113','/images/monde-couronne.svg?v=113','/images/monde-nuages.svg?v=113',
-            '/images/monde-fleurs.svg?v=113','/images/monde-coeurs.svg?v=113','/images/monde-pingouins.svg?v=113',
-            '/images/monde-papillons.svg?v=113','/images/monde-tortue.svg?v=113','/images/monde-chats-chiens.svg?v=113',
-            '/images/monde-ours.svg?v=113','/images/monde-sucreries.svg?v=113','/images/monde-chateau.svg?v=113'],
+    images:['/images/monde-licornes.svg?v=117','/images/monde-couronne.svg?v=117','/images/monde-nuages.svg?v=117',
+            '/images/monde-fleurs.svg?v=117','/images/monde-coeurs.svg?v=117','/images/monde-pingouins.svg?v=117',
+            '/images/monde-papillons.svg?v=117','/images/monde-tortue.svg?v=117','/images/monde-chats-chiens.svg?v=117',
+            '/images/monde-ours.svg?v=117','/images/monde-sucreries.svg?v=117','/images/monde-chateau.svg?v=117'],
     etapes:['Le monde des licornes','Le monde de la couronne','Le monde des nuages',
             'Le monde des fleurs','Le monde des cœurs','Le monde des pingouins',
             'Le monde des papillons','L\'île de la tortue','Le monde des chats et des chiens',
@@ -9536,7 +9536,7 @@ function _decorMonde(ca,actif){
   /* LE PAYSAGE, plein cadre, derriere tout le reste. */
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=114')";
+  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=117')";
   document.body.insertBefore(d,document.body.firstChild);
 
   /* LES BETES DU MONDE. Chaque monde a SA composition — un tres gros ours

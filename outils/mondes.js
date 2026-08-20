@@ -679,7 +679,8 @@ const MONDES = [
     etincelles: [[94, 124, 12], [310, 130, 11], [304, 302, 10]] },
 
   /* 11 — les sucreries : il en faut BEAUCOUP, et de toutes sortes. */
-  { nom: 'sucreries', r: 128,
+  { nom: 'sucreries', r: 128, clair: '#fff4fb', moyen: '#ffd8ee', fonce: '#f08acc',
+    halo: '#ffabe0', trait: '#d466ac',
     /* Un pays de sucre : ciel framboise, sol de glaçage — et des sucreries
        SEMÉES SUR TOUT L'ÉCRAN, régulièrement, comme le client l'a demandé :
        elles s'entassaient en bas avec un donut perdu dans un coin. */
