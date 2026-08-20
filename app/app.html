@@ -7874,7 +7874,7 @@ function _boyLetterPicker(ca,session){
   var sous=document.createElement('div');
   sous.style.cssText='font-size:.9rem;color:var(--k2);opacity:.75;margin-bottom:16px;font-weight:700';
   sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
-  try{speakText('Choisis ta lettre !','fr-FR',null);}catch(e){}
+  try{speakText('Choisis ta lettre !',_voixEnfant(),null);}catch(e){}
 
   /* Deverrouillage sequentiel : au depart seule la 1re lettre est ouverte.
      Chaque lettre terminee ouvre la suivante, et le reste ouverte a vie. */
@@ -7925,7 +7925,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v119';
+var _VERSION_REPLI='v120';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8024,7 +8024,7 @@ function _boyNarration(){
     if(busy||!q.length)return;
     busy=true;
     var txt=q.shift(),maxMs=estim(txt);
-    try{speakText(txt,'fr-FR',null);}catch(e){}
+    try{speakText(txt,_voixEnfant(),null);}catch(e){}
     var t0=Date.now(),quiet=0;
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
@@ -9465,7 +9465,7 @@ var _HABILLAGES={
          {img:'/images/papillon1.gif',x:38,y:68,l:13,vol:true}],
       7:[{img:'/images/bete-tortue1.png',x:26,y:38,l:28},
          {img:'/images/bete-tortue2.png',x:50,y:50,l:24}],
-      8:[{img:'/images/bete-chienchat3.png',x:24,y:36,l:30},
+      8:[{img:'/images/bete-chienchat4.png',x:24,y:36,l:30},
          {img:'/images/bete-chienchat2.png',x:50,y:50,l:26}],
       9:[{img:'/images/bete-ours1.png',x:26,y:34,l:26},
          {img:'/images/bete-ours2.png',x:50,y:46,l:24}]
@@ -9513,7 +9513,7 @@ var _HABILLAGES={
       ],
       /* Une seule fois chaque image, TRÈS GROS, et assis par terre. */
       'chats-chiens':[
-        {img:'/images/bete-chienchat3.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
+        {img:'/images/bete-chienchat4.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
         {img:'/images/bete-chienchat2.png',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
       ],
       /* Le paysage des sucreries est recadré par `cover` : on n'en voyait
@@ -9643,6 +9643,111 @@ function _decorMonde(ca,actif){
     document.body.insertBefore(enveloppe,document.body.firstChild);
   });
 }
+
+/* ══ LES PHRASES DE L'INTERFACE ENFANT, DANS LES TREIZE LANGUES ═══════════
+   L'interface adulte passe par `t()` et sa table `T` ; les cours des
+   enfants, eux, ont été écrits directement en français, phrase par phrase.
+   Le client veut tout le site dans les treize langues.
+
+   LA CLÉ EST LA PHRASE FRANÇAISE. Il n'y a donc aucune clé à inventer,
+   aucune à décaler, et une phrase qu'on oublierait de traduire s'affiche en
+   français au lieu de disparaître. La table est écrite par
+   `node outils/injecte-traductions.js` depuis `outils/traductions-enfant.json`
+   — on traduit dans le JSON, jamais ici.
+
+   `<b>…</b>` marque le mot mis en avant : il prend la couleur de l'univers
+   au dernier moment (bleu pour le garçon, rose pour la fille). Écrire la
+   couleur dans la phrase aurait obligé à la retraduire treize fois. */
+/* DEBUT TRADUCTIONS ENFANT */
+var _TE={
+'Aujourd\'hui :<br>les <b>voyelles</b> 🎯':{en:'Today:<br>the <b>vowels</b> 🎯',es:'Hoy:<br>las <b>vocales</b> 🎯',de:'Heute:<br>die <b>Vokale</b> 🎯',nl:'Vandaag:<br>de <b>klinkers</b> 🎯',it:'Oggi:<br>le <b>vocali</b> 🎯',pt:'Hoje:<br>as <b>vogais</b> 🎯',ru:'Сегодня:<br><b>огласовки</b> 🎯',tr:'Bugün:<br><b>sesli harfler</b> 🎯',zh:'今天：<br><b>元音</b> 🎯',id:'Hari ini:<br><b>vokal</b> 🎯',ur:'آج:<br><b>حرکات</b> 🎯',hi:'आज:<br><b>स्वर</b> 🎯'},
+' du jour : les voyelles.':{en:' of the day: the vowels.',es:' del día: las vocales.',de:' des Tages: die Vokale.',nl:' van vandaag: de klinkers.',it:' del giorno: le vocali.',pt:' do dia: as vogais.',ru:' дня: огласовки.',tr:' bugünkü konu: sesli harfler.',zh:'：今天学元音。',id:' hari ini: vokal.',ur:' آج کا سبق: حرکات۔',hi:' आज का: स्वर।'},
+'ÉTAPE 1 · REPÉRAGE':{en:'STEP 1 · SPOTTING',es:'PASO 1 · IDENTIFICAR',de:'SCHRITT 1 · ERKENNEN',nl:'STAP 1 · HERKENNEN',it:'TAPPA 1 · INDIVIDUARE',pt:'ETAPA 1 · IDENTIFICAR',ru:'ШАГ 1 · УЗНАЁМ',tr:'ADIM 1 · TANIMA',zh:'第 1 步 · 认一认',id:'LANGKAH 1 · MENGENALI',ur:'مرحلہ ۱ · پہچان',hi:'चरण 1 · पहचान'},
+'Une voyelle,<br>c\'est un petit <b>signe</b>.':{en:'A vowel<br>is a little <b>mark</b>.',es:'Una vocal<br>es un pequeño <b>signo</b>.',de:'Ein Vokal<br>ist ein kleines <b>Zeichen</b>.',nl:'Een klinker<br>is een klein <b>teken</b>.',it:'Una vocale<br>è un piccolo <b>segno</b>.',pt:'Uma vogal<br>é um pequeno <b>sinal</b>.',ru:'Огласовка —<br>это маленький <b>знак</b>.',tr:'Sesli harf,<br>küçük bir <b>işarettir</b>.',zh:'元音<br>是一个小<b>符号</b>。',id:'Vokal<br>adalah <b>tanda</b> kecil.',ur:'حرکت<br>ایک چھوٹی <b>علامت</b> ہے۔',hi:'स्वर<br>एक छोटा <b>चिह्न</b> है।'},
+'Une voyelle, c\'est un petit signe.':{en:'A vowel is a little mark.',es:'Una vocal es un pequeño signo.',de:'Ein Vokal ist ein kleines Zeichen.',nl:'Een klinker is een klein teken.',it:'Una vocale è un piccolo segno.',pt:'Uma vogal é um pequeno sinal.',ru:'Огласовка — это маленький знак.',tr:'Sesli harf küçük bir işarettir.',zh:'元音是一个小符号。',id:'Vokal adalah tanda kecil.',ur:'حرکت ایک چھوٹی علامت ہے۔',hi:'स्वर एक छोटा चिह्न है।'},
+'ÉTAPE 2 · POSITION':{en:'STEP 2 · POSITION',es:'PASO 2 · POSICIÓN',de:'SCHRITT 2 · POSITION',nl:'STAP 2 · PLAATS',it:'TAPPA 2 · POSIZIONE',pt:'ETAPA 2 · POSIÇÃO',ru:'ШАГ 2 · МЕСТО',tr:'ADIM 2 · KONUM',zh:'第 2 步 · 位置',id:'LANGKAH 2 · POSISI',ur:'مرحلہ ۲ · جگہ',hi:'चरण 2 · स्थान'},
+'Elle se place <b>sur</b>,<br>ou <b>sous</b> la lettre.':{en:'It goes <b>above</b><br>or <b>below</b> the letter.',es:'Se coloca <b>encima</b><br>o <b>debajo</b> de la letra.',de:'Es steht <b>über</b><br>oder <b>unter</b> dem Buchstaben.',nl:'Het staat <b>boven</b><br>of <b>onder</b> de letter.',it:'Si mette <b>sopra</b><br>o <b>sotto</b> la lettera.',pt:'Fica <b>acima</b><br>ou <b>abaixo</b> da letra.',ru:'Он ставится <b>над</b><br>или <b>под</b> буквой.',tr:'Harfin <b>üstüne</b><br>ya da <b>altına</b> gelir.',zh:'它写在字母的<b>上面</b><br>或<b>下面</b>。',id:'Ditulis di <b>atas</b><br>atau di <b>bawah</b> huruf.',ur:'یہ حرف کے <b>اوپر</b><br>یا <b>نیچے</b> آتی ہے۔',hi:'यह अक्षर के <b>ऊपर</b><br>या <b>नीचे</b> लगता है।'},
+'Elle se place sur, ou sous la lettre.':{en:'It goes above, or below the letter.',es:'Se coloca encima o debajo de la letra.',de:'Es steht über oder unter dem Buchstaben.',nl:'Het staat boven of onder de letter.',it:'Si mette sopra o sotto la lettera.',pt:'Fica acima ou abaixo da letra.',ru:'Он ставится над или под буквой.',tr:'Harfin üstüne ya da altına gelir.',zh:'它写在字母的上面或下面。',id:'Ditulis di atas atau di bawah huruf.',ur:'یہ حرف کے اوپر یا نیچے آتی ہے۔',hi:'यह अक्षर के ऊपर या नीचे लगता है।'},
+'ÉTAPE 3 · ORDRE':{en:'STEP 3 · ORDER',es:'PASO 3 · ORDEN',de:'SCHRITT 3 · REIHENFOLGE',nl:'STAP 3 · VOLGORDE',it:'TAPPA 3 · ORDINE',pt:'ETAPA 3 · ORDEM',ru:'ШАГ 3 · ПОРЯДОК',tr:'ADIM 3 · SIRA',zh:'第 3 步 · 顺序',id:'LANGKAH 3 · URUTAN',ur:'مرحلہ ۳ · ترتیب',hi:'चरण 3 · क्रम'},
+'On dit d\'abord la <b>lettre</b>,<br><b>PUIS</b> la voyelle.':{en:'Say the <b>letter</b> first,<br><b>THEN</b> the vowel.',es:'Primero se dice la <b>letra</b>,<br><b>LUEGO</b> la vocal.',de:'Zuerst der <b>Buchstabe</b>,<br><b>DANN</b> der Vokal.',nl:'Eerst de <b>letter</b>,<br><b>DAN</b> de klinker.',it:'Prima la <b>lettera</b>,<br><b>POI</b> la vocale.',pt:'Primeiro a <b>letra</b>,<br><b>DEPOIS</b> a vogal.',ru:'Сначала <b>буква</b>,<br><b>ПОТОМ</b> огласовка.',tr:'Önce <b>harf</b>,<br><b>SONRA</b> sesli.',zh:'先读<b>字母</b>，<br><b>再</b>读元音。',id:'Baca <b>huruf</b> dulu,<br><b>lalu</b> vokalnya.',ur:'پہلے <b>حرف</b>،<br><b>پھر</b> حرکت۔',hi:'पहले <b>अक्षर</b>,<br><b>फिर</b> स्वर।'},
+'Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.':{en:'Mind the order: say the letter first, then the vowel.',es:'Cuidado con el orden: primero la letra, luego la vocal.',de:'Achte auf die Reihenfolge: zuerst der Buchstabe, dann der Vokal.',nl:'Let op de volgorde: eerst de letter, dan de klinker.',it:'Attenzione all\'ordine: prima la lettera, poi la vocale.',pt:'Atenção à ordem: primeiro a letra, depois a vogal.',ru:'Следи за порядком: сначала буква, потом огласовка.',tr:'Sıraya dikkat: önce harf, sonra sesli.',zh:'注意顺序：先读字母，再读元音。',id:'Perhatikan urutannya: huruf dulu, baru vokal.',ur:'ترتیب کا خیال رکھو: پہلے حرف، پھر حرکت۔',hi:'क्रम का ध्यान रखो: पहले अक्षर, फिर स्वर।'},
+'ÉTAPE 4 · INVENTAIRE':{en:'STEP 4 · HOW MANY',es:'PASO 4 · CUÁNTAS',de:'SCHRITT 4 · WIE VIELE',nl:'STAP 4 · HOEVEEL',it:'TAPPA 4 · QUANTE',pt:'ETAPA 4 · QUANTAS',ru:'ШАГ 4 · СКОЛЬКО',tr:'ADIM 4 · KAÇ TANE',zh:'第 4 步 · 有几个',id:'LANGKAH 4 · BERAPA',ur:'مرحلہ ۴ · کتنی',hi:'चरण 4 · कितने'},
+'Il en existe<br>seulement <b>3</b> ! 🖐️':{en:'There are<br>only <b>3</b>! 🖐️',es:'¡Solo hay<br><b>3</b>! 🖐️',de:'Es gibt<br>nur <b>3</b>! 🖐️',nl:'Er zijn er<br>maar <b>3</b>! 🖐️',it:'Ce ne sono<br>solo <b>3</b>! 🖐️',pt:'Só existem<br><b>3</b>! 🖐️',ru:'Их всего<br><b>3</b>! 🖐️',tr:'Sadece<br><b>3</b> tane! 🖐️',zh:'一共只有<br><b>3</b> 个！🖐️',id:'Hanya ada<br><b>3</b>! 🖐️',ur:'صرف <b>۳</b><br>ہیں! 🖐️',hi:'केवल <b>3</b><br>हैं! 🖐️'},
+'Il existe seulement trois voyelles.':{en:'There are only three vowels.',es:'Solo hay tres vocales.',de:'Es gibt nur drei Vokale.',nl:'Er zijn maar drie klinkers.',it:'Ci sono solo tre vocali.',pt:'Só existem três vogais.',ru:'Огласовок всего три.',tr:'Sadece üç sesli vardır.',zh:'元音一共只有三个。',id:'Vokal hanya ada tiga.',ur:'حرکات صرف تین ہیں۔',hi:'स्वर केवल तीन हैं।'},
+'ÉTAPE 6 · FATḤA':{en:'STEP 6 · FATḤA',es:'PASO 6 · FATḤA',de:'SCHRITT 6 · FATḤA',nl:'STAP 6 · FATḤA',it:'TAPPA 6 · FATḤA',pt:'ETAPA 6 · FATḤA',ru:'ШАГ 6 · ФАТХА',tr:'ADIM 6 · FETHA',zh:'第 6 步 · 法特哈',id:'LANGKAH 6 · FATḤAH',ur:'مرحلہ ۶ · زبر',hi:'चरण 6 · फ़तहा'},
+'Un trait au-<b>dessus</b> :<br>ça fait <b>« a »</b> ☀️':{en:'A dash <b>above</b>:<br>it says <b>“a”</b> ☀️',es:'Una rayita <b>encima</b>:<br>suena <b>«a»</b> ☀️',de:'Ein Strich <b>darüber</b>:<br>das klingt wie <b>„a“</b> ☀️',nl:'Een streepje <b>erboven</b>:<br>dat klinkt als <b>“a”</b> ☀️',it:'Un trattino <b>sopra</b>:<br>suona <b>«a»</b> ☀️',pt:'Um traço <b>acima</b>:<br>soa <b>«a»</b> ☀️',ru:'Чёрточка <b>сверху</b>:<br>звучит <b>«а»</b> ☀️',tr:'<b>Üstte</b> bir çizgi:<br><b>“a”</b> sesi verir ☀️',zh:'字母<b>上面</b>一横：<br>读作 <b>“a”</b> ☀️',id:'Garis di <b>atas</b>:<br>bunyinya <b>“a”</b> ☀️',ur:'<b>اوپر</b> ایک لکیر:<br>آواز <b>«اَ»</b> ☀️',hi:'<b>ऊपर</b> एक रेखा:<br>ध्वनि <b>“अ”</b> ☀️'},
+'Un trait au-dessus, ça fait « a »':{en:'A dash above: it says “a”.',es:'Una rayita encima: suena «a».',de:'Ein Strich darüber: das klingt wie „a“.',nl:'Een streepje erboven: dat klinkt als “a”.',it:'Un trattino sopra: suona «a».',pt:'Um traço acima: soa «a».',ru:'Чёрточка сверху — звучит «а».',tr:'Üstte bir çizgi: “a” sesi verir.',zh:'上面一横，读作“a”。',id:'Garis di atas, bunyinya “a”.',ur:'اوپر ایک لکیر، آواز «اَ»۔',hi:'ऊपर एक रेखा, ध्वनि “अ”।'},
+'ÉTAPE 6 · TRACÉ':{en:'STEP 6 · WRITING',es:'PASO 6 · TRAZO',de:'SCHRITT 6 · SCHREIBEN',nl:'STAP 6 · SCHRIJVEN',it:'TAPPA 6 · TRACCIATO',pt:'ETAPA 6 · TRAÇADO',ru:'ШАГ 6 · ПИСЬМО',tr:'ADIM 6 · YAZMA',zh:'第 6 步 · 书写',id:'LANGKAH 6 · MENULIS',ur:'مرحلہ ۶ · لکھائی',hi:'चरण 6 · लेखन'},
+'À toi de tracer<br>la <b>fatḥa</b> ✍️':{en:'Your turn to write<br>the <b>fatḥa</b> ✍️',es:'Te toca trazar<br>la <b>fatḥa</b> ✍️',de:'Jetzt schreibst du<br>die <b>Fatḥa</b> ✍️',nl:'Nu jij:<br>schrijf de <b>fatḥa</b> ✍️',it:'Tocca a te tracciare<br>la <b>fatḥa</b> ✍️',pt:'Agora és tu:<br>traça a <b>fatḥa</b> ✍️',ru:'Теперь ты пишешь<br><b>фатху</b> ✍️',tr:'Sıra sende:<br><b>fethayı</b> yaz ✍️',zh:'轮到你写<br><b>法特哈</b> ✍️',id:'Giliranmu menulis<br><b>fatḥah</b> ✍️',ur:'اب تم <b>زبر</b><br>لکھو ✍️',hi:'अब तुम <b>फ़तहा</b><br>लिखो ✍️'},
+'À toi de tracer la fatha.':{en:'Your turn to write the fatḥa.',es:'Te toca trazar la fatḥa.',de:'Jetzt schreibst du die Fatḥa.',nl:'Nu jij: schrijf de fatḥa.',it:'Tocca a te tracciare la fatḥa.',pt:'Agora és tu: traça a fatḥa.',ru:'Теперь ты пишешь фатху.',tr:'Sıra sende: fethayı yaz.',zh:'轮到你写法特哈。',id:'Giliranmu menulis fatḥah.',ur:'اب تم زبر لکھو۔',hi:'अब तुम फ़तहा लिखो।'},
+'ÉTAPE 7 · ḌAMMA':{en:'STEP 7 · ḌAMMA',es:'PASO 7 · ḌAMMA',de:'SCHRITT 7 · ḌAMMA',nl:'STAP 7 · ḌAMMA',it:'TAPPA 7 · ḌAMMA',pt:'ETAPA 7 · ḌAMMA',ru:'ШАГ 7 · ДАММА',tr:'ADIM 7 · ÖTRE',zh:'第 7 步 · 达姆',id:'LANGKAH 7 · ḌAMMAH',ur:'مرحلہ ۷ · پیش',hi:'चरण 7 · ज़म्मा'},
+'Une boucle au-<b>dessus</b> :<br>ça fait <b>« ou »</b> 🌙':{en:'A loop <b>above</b>:<br>it says <b>“oo”</b> 🌙',es:'Un bucle <b>encima</b>:<br>suena <b>«u»</b> 🌙',de:'Eine Schleife <b>darüber</b>:<br>das klingt wie <b>„u“</b> 🌙',nl:'Een lusje <b>erboven</b>:<br>dat klinkt als <b>“oe”</b> 🌙',it:'Un ricciolo <b>sopra</b>:<br>suona <b>«u»</b> 🌙',pt:'Um laço <b>acima</b>:<br>soa <b>«u»</b> 🌙',ru:'Завиток <b>сверху</b>:<br>звучит <b>«у»</b> 🌙',tr:'<b>Üstte</b> bir kıvrım:<br><b>“u”</b> sesi verir 🌙',zh:'字母<b>上面</b>一个小圈：<br>读作 <b>“u”</b> 🌙',id:'Lengkungan di <b>atas</b>:<br>bunyinya <b>“u”</b> 🌙',ur:'<b>اوپر</b> ایک الٹا واؤ:<br>آواز <b>«اُ»</b> 🌙',hi:'<b>ऊपर</b> एक लूप:<br>ध्वनि <b>“उ”</b> 🌙'},
+'Une boucle au-dessus, ça fait « ou »':{en:'A loop above: it says “oo”.',es:'Un bucle encima: suena «u».',de:'Eine Schleife darüber: das klingt wie „u“.',nl:'Een lusje erboven: dat klinkt als “oe”.',it:'Un ricciolo sopra: suona «u».',pt:'Um laço acima: soa «u».',ru:'Завиток сверху — звучит «у».',tr:'Üstte bir kıvrım: “u” sesi verir.',zh:'上面一个小圈，读作“u”。',id:'Lengkungan di atas, bunyinya “u”.',ur:'اوپر ایک الٹا واؤ، آواز «اُ»۔',hi:'ऊपर एक लूप, ध्वनि “उ”।'},
+'ÉTAPE 7 · TRACÉ':{en:'STEP 7 · WRITING',es:'PASO 7 · TRAZO',de:'SCHRITT 7 · SCHREIBEN',nl:'STAP 7 · SCHRIJVEN',it:'TAPPA 7 · TRACCIATO',pt:'ETAPA 7 · TRAÇADO',ru:'ШАГ 7 · ПИСЬМО',tr:'ADIM 7 · YAZMA',zh:'第 7 步 · 书写',id:'LANGKAH 7 · MENULIS',ur:'مرحلہ ۷ · لکھائی',hi:'चरण 7 · लेखन'},
+'À toi de tracer<br>la <b>ḍamma</b> ✍️':{en:'Your turn to write<br>the <b>ḍamma</b> ✍️',es:'Te toca trazar<br>la <b>ḍamma</b> ✍️',de:'Jetzt schreibst du<br>die <b>Ḍamma</b> ✍️',nl:'Nu jij:<br>schrijf de <b>ḍamma</b> ✍️',it:'Tocca a te tracciare<br>la <b>ḍamma</b> ✍️',pt:'Agora és tu:<br>traça a <b>ḍamma</b> ✍️',ru:'Теперь ты пишешь<br><b>дамму</b> ✍️',tr:'Sıra sende:<br><b>ötreyi</b> yaz ✍️',zh:'轮到你写<br><b>达姆</b> ✍️',id:'Giliranmu menulis<br><b>ḍammah</b> ✍️',ur:'اب تم <b>پیش</b><br>لکھو ✍️',hi:'अब तुम <b>ज़म्मा</b><br>लिखो ✍️'},
+'À toi de tracer la damma.':{en:'Your turn to write the ḍamma.',es:'Te toca trazar la ḍamma.',de:'Jetzt schreibst du die Ḍamma.',nl:'Nu jij: schrijf de ḍamma.',it:'Tocca a te tracciare la ḍamma.',pt:'Agora és tu: traça a ḍamma.',ru:'Теперь ты пишешь дамму.',tr:'Sıra sende: ötreyi yaz.',zh:'轮到你写达姆。',id:'Giliranmu menulis ḍammah.',ur:'اب تم پیش لکھو۔',hi:'अब तुम ज़म्मा लिखो।'},
+'ÉTAPE 8 · KASRA':{en:'STEP 8 · KASRA',es:'PASO 8 · KASRA',de:'SCHRITT 8 · KASRA',nl:'STAP 8 · KASRA',it:'TAPPA 8 · KASRA',pt:'ETAPA 8 · KASRA',ru:'ШАГ 8 · КАСРА',tr:'ADIM 8 · ESRE',zh:'第 8 步 · 卡斯拉',id:'LANGKAH 8 · KASRAH',ur:'مرحلہ ۸ · زیر',hi:'चरण 8 · कसरा'},
+'Un trait en-<b>dessous</b> :<br>ça fait <b>« i »</b> ⭐':{en:'A dash <b>below</b>:<br>it says <b>“i”</b> ⭐',es:'Una rayita <b>debajo</b>:<br>suena <b>«i»</b> ⭐',de:'Ein Strich <b>darunter</b>:<br>das klingt wie <b>„i“</b> ⭐',nl:'Een streepje <b>eronder</b>:<br>dat klinkt als <b>“i”</b> ⭐',it:'Un trattino <b>sotto</b>:<br>suona <b>«i»</b> ⭐',pt:'Um traço <b>abaixo</b>:<br>soa <b>«i»</b> ⭐',ru:'Чёрточка <b>снизу</b>:<br>звучит <b>«и»</b> ⭐',tr:'<b>Altta</b> bir çizgi:<br><b>“i”</b> sesi verir ⭐',zh:'字母<b>下面</b>一横：<br>读作 <b>“i”</b> ⭐',id:'Garis di <b>bawah</b>:<br>bunyinya <b>“i”</b> ⭐',ur:'<b>نیچے</b> ایک لکیر:<br>آواز <b>«اِ»</b> ⭐',hi:'<b>नीचे</b> एक रेखा:<br>ध्वनि <b>“इ”</b> ⭐'},
+'Un trait en-dessous, ça fait « i »':{en:'A dash below: it says “i”.',es:'Una rayita debajo: suena «i».',de:'Ein Strich darunter: das klingt wie „i“.',nl:'Een streepje eronder: dat klinkt als “i”.',it:'Un trattino sotto: suona «i».',pt:'Um traço abaixo: soa «i».',ru:'Чёрточка снизу — звучит «и».',tr:'Altta bir çizgi: “i” sesi verir.',zh:'下面一横，读作“i”。',id:'Garis di bawah, bunyinya “i”.',ur:'نیچے ایک لکیر، آواز «اِ»۔',hi:'नीचे एक रेखा, ध्वनि “इ”।'},
+'ÉTAPE 8 · TRACÉ':{en:'STEP 8 · WRITING',es:'PASO 8 · TRAZO',de:'SCHRITT 8 · SCHREIBEN',nl:'STAP 8 · SCHRIJVEN',it:'TAPPA 8 · TRACCIATO',pt:'ETAPA 8 · TRAÇADO',ru:'ШАГ 8 · ПИСЬМО',tr:'ADIM 8 · YAZMA',zh:'第 8 步 · 书写',id:'LANGKAH 8 · MENULIS',ur:'مرحلہ ۸ · لکھائی',hi:'चरण 8 · लेखन'},
+'À toi de tracer<br>la <b>kasra</b> ✍️':{en:'Your turn to write<br>the <b>kasra</b> ✍️',es:'Te toca trazar<br>la <b>kasra</b> ✍️',de:'Jetzt schreibst du<br>die <b>Kasra</b> ✍️',nl:'Nu jij:<br>schrijf de <b>kasra</b> ✍️',it:'Tocca a te tracciare<br>la <b>kasra</b> ✍️',pt:'Agora és tu:<br>traça a <b>kasra</b> ✍️',ru:'Теперь ты пишешь<br><b>касру</b> ✍️',tr:'Sıra sende:<br><b>esreyi</b> yaz ✍️',zh:'轮到你写<br><b>卡斯拉</b> ✍️',id:'Giliranmu menulis<br><b>kasrah</b> ✍️',ur:'اب تم <b>زیر</b><br>لکھو ✍️',hi:'अब तुम <b>कसरा</b><br>लिखो ✍️'},
+'À toi de tracer la kasra.':{en:'Your turn to write the kasra.',es:'Te toca trazar la kasra.',de:'Jetzt schreibst du die Kasra.',nl:'Nu jij: schrijf de kasra.',it:'Tocca a te tracciare la kasra.',pt:'Agora és tu: traça a kasra.',ru:'Теперь ты пишешь касру.',tr:'Sıra sende: esreyi yaz.',zh:'轮到你写卡斯拉。',id:'Giliranmu menulis kasrah.',ur:'اب تم زیر لکھو۔',hi:'अब तुम कसरा लिखो।'},
+'Où est le son <b>« a »</b> ?':{en:'Where is the <b>“a”</b> sound?',es:'¿Dónde está el sonido <b>«a»</b>?',de:'Wo ist der <b>„a“</b>-Laut?',nl:'Waar is de <b>“a”</b>-klank?',it:'Dov\'è il suono <b>«a»</b>?',pt:'Onde está o som <b>«a»</b>?',ru:'Где звук <b>«а»</b>?',tr:'<b>“a”</b> sesi nerede?',zh:'<b>“a”</b> 的音在哪里？',id:'Mana bunyi <b>“a”</b>?',ur:'<b>«اَ»</b> کی آواز کہاں ہے؟',hi:'<b>“अ”</b> ध्वनि कहाँ है?'},
+'Où est le son « a » ?':{en:'Where is the “a” sound?',es:'¿Dónde está el sonido «a»?',de:'Wo ist der „a“-Laut?',nl:'Waar is de “a”-klank?',it:'Dov\'è il suono «a»?',pt:'Onde está o som «a»?',ru:'Где звук «а»?',tr:'“a” sesi nerede?',zh:'“a”的音在哪里？',id:'Mana bunyi “a”?',ur:'«اَ» کی آواز کہاں ہے؟',hi:'“अ” ध्वनि कहाँ है?'},
+'Où est le son <b>« i »</b> ?':{en:'Where is the <b>“i”</b> sound?',es:'¿Dónde está el sonido <b>«i»</b>?',de:'Wo ist der <b>„i“</b>-Laut?',nl:'Waar is de <b>“i”</b>-klank?',it:'Dov\'è il suono <b>«i»</b>?',pt:'Onde está o som <b>«i»</b>?',ru:'Где звук <b>«и»</b>?',tr:'<b>“i”</b> sesi nerede?',zh:'<b>“i”</b> 的音在哪里？',id:'Mana bunyi <b>“i”</b>?',ur:'<b>«اِ»</b> کی آواز کہاں ہے؟',hi:'<b>“इ”</b> ध्वनि कहाँ है?'},
+'Où est le son « i » ?':{en:'Where is the “i” sound?',es:'¿Dónde está el sonido «i»?',de:'Wo ist der „i“-Laut?',nl:'Waar is de “i”-klank?',it:'Dov\'è il suono «i»?',pt:'Onde está o som «i»?',ru:'Где звук «и»?',tr:'“i” sesi nerede?',zh:'“i”的音在哪里？',id:'Mana bunyi “i”?',ur:'«اِ» کی آواز کہاں ہے؟',hi:'“इ” ध्वनि कहाँ है?'},
+'Où est le son <b>« ou »</b> ?':{en:'Where is the <b>“oo”</b> sound?',es:'¿Dónde está el sonido <b>«u»</b>?',de:'Wo ist der <b>„u“</b>-Laut?',nl:'Waar is de <b>“oe”</b>-klank?',it:'Dov\'è il suono <b>«u»</b>?',pt:'Onde está o som <b>«u»</b>?',ru:'Где звук <b>«у»</b>?',tr:'<b>“u”</b> sesi nerede?',zh:'<b>“u”</b> 的音在哪里？',id:'Mana bunyi <b>“u”</b>?',ur:'<b>«اُ»</b> کی آواز کہاں ہے؟',hi:'<b>“उ”</b> ध्वनि कहाँ है?'},
+'Où est le son « ou » ?':{en:'Where is the “oo” sound?',es:'¿Dónde está el sonido «u»?',de:'Wo ist der „u“-Laut?',nl:'Waar is de “oe”-klank?',it:'Dov\'è il suono «u»?',pt:'Onde está o som «u»?',ru:'Где звук «у»?',tr:'“u” sesi nerede?',zh:'“u”的音在哪里？',id:'Mana bunyi “u”?',ur:'«اُ» کی آواز کہاں ہے؟',hi:'“उ” ध्वनि कहाँ है?'},
+'ÉTAPE 9 · NOMS':{en:'STEP 9 · NAMES',es:'PASO 9 · NOMBRES',de:'SCHRITT 9 · NAMEN',nl:'STAP 9 · NAMEN',it:'TAPPA 9 · NOMI',pt:'ETAPA 9 · NOMES',ru:'ШАГ 9 · НАЗВАНИЯ',tr:'ADIM 9 · İSİMLER',zh:'第 9 步 · 名称',id:'LANGKAH 9 · NAMA',ur:'مرحلہ ۹ · نام',hi:'चरण 9 · नाम'},
+'Elles ont un <b>nom</b>,<br>mais retiens le <b>SON</b> !':{en:'They have a <b>name</b>,<br>but remember the <b>SOUND</b>!',es:'Tienen un <b>nombre</b>,<br>¡pero recuerda el <b>SONIDO</b>!',de:'Sie haben einen <b>Namen</b>,<br>aber merk dir den <b>KLANG</b>!',nl:'Ze hebben een <b>naam</b>,<br>maar onthoud de <b>KLANK</b>!',it:'Hanno un <b>nome</b>,<br>ma ricorda il <b>SUONO</b>!',pt:'Têm um <b>nome</b>,<br>mas lembra-te do <b>SOM</b>!',ru:'У них есть <b>название</b>,<br>но запомни <b>ЗВУК</b>!',tr:'Bir <b>adı</b> var,<br>ama <b>SESİ</b> aklında tut!',zh:'它们有<b>名字</b>，<br>但要记住<b>读音</b>！',id:'Ada <b>namanya</b>,<br>tapi ingat <b>BUNYINYA</b>!',ur:'ان کا ایک <b>نام</b> ہے،<br>مگر <b>آواز</b> یاد رکھو!',hi:'इनका एक <b>नाम</b> है,<br>पर <b>ध्वनि</b> याद रखो!'},
+'Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.':{en:'They have names, but what matters most is remembering their sound, not their name.',es:'Tienen nombre, pero lo más importante es recordar su sonido, no su nombre.',de:'Sie haben Namen, aber am wichtigsten ist ihr Klang, nicht ihr Name.',nl:'Ze hebben namen, maar het belangrijkste is hun klank, niet hun naam.',it:'Hanno un nome, ma la cosa più importante è ricordare il suono, non il nome.',pt:'Têm nome, mas o mais importante é lembrar o som, não o nome.',ru:'У них есть названия, но важнее запомнить звук, а не название.',tr:'Adları var, ama önemli olan seslerini hatırlamak, adlarını değil.',zh:'它们有名字，但最重要的是记住读音，而不是名字。',id:'Ada namanya, tetapi yang penting mengingat bunyinya, bukan namanya.',ur:'ان کے نام ہیں، مگر اہم بات آواز یاد رکھنا ہے، نام نہیں۔',hi:'इनके नाम हैं, पर ज़रूरी है ध्वनि याद रखना, नाम नहीं।'},
+'ÉTAPE 10 · DOUBLEMENT':{en:'STEP 10 · DOUBLING',es:'PASO 10 · DUPLICACIÓN',de:'SCHRITT 10 · VERDOPPELUNG',nl:'STAP 10 · VERDUBBELING',it:'TAPPA 10 · RADDOPPIO',pt:'ETAPA 10 · DUPLICAÇÃO',ru:'ШАГ 10 · УДВОЕНИЕ',tr:'ADIM 10 · İKİLEME',zh:'第 10 步 · 双写',id:'LANGKAH 10 · PENGGANDAAN',ur:'مرحلہ ۱۰ · دوہرا',hi:'चरण 10 · दोहराव'},
+'Si on <b>double</b> une voyelle,<br>on ajoute le son <b>« n »</b> 👃':{en:'If you <b>double</b> a vowel,<br>you add an <b>“n”</b> sound 👃',es:'Si <b>duplicas</b> una vocal,<br>se añade el sonido <b>«n»</b> 👃',de:'Wenn man einen Vokal <b>verdoppelt</b>,<br>kommt ein <b>„n“</b> dazu 👃',nl:'Als je een klinker <b>verdubbelt</b>,<br>komt er een <b>“n”</b> bij 👃',it:'Se <b>raddoppi</b> una vocale,<br>si aggiunge il suono <b>«n»</b> 👃',pt:'Se <b>duplicares</b> uma vogal,<br>junta-se o som <b>«n»</b> 👃',ru:'Если огласовку <b>удвоить</b>,<br>добавляется звук <b>«н»</b> 👃',tr:'Sesliyi <b>ikilersen</b>,<br><b>“n”</b> sesi eklenir 👃',zh:'元音<b>写两次</b>，<br>就加上 <b>“n”</b> 音 👃',id:'Kalau vokal <b>digandakan</b>,<br>ada tambahan bunyi <b>“n”</b> 👃',ur:'حرکت <b>دوہری</b> ہو تو<br><b>«ن»</b> کی آواز آتی ہے 👃',hi:'स्वर <b>दोगुना</b> हो तो<br><b>“न”</b> ध्वनि जुड़ती है 👃'},
+'Si on double une voyelle, on ajoute le son « n »':{en:'If you double a vowel, you add an “n” sound.',es:'Si duplicas una vocal, se añade el sonido «n».',de:'Wenn man einen Vokal verdoppelt, kommt ein „n“ dazu.',nl:'Als je een klinker verdubbelt, komt er een “n” bij.',it:'Se raddoppi una vocale, si aggiunge il suono «n».',pt:'Se duplicares uma vogal, junta-se o som «n».',ru:'Если огласовку удвоить, добавляется звук «н».',tr:'Sesliyi ikilersen “n” sesi eklenir.',zh:'元音写两次，就加上“n”音。',id:'Kalau vokal digandakan, ada tambahan bunyi “n”.',ur:'حرکت دوہری ہو تو «ن» کی آواز آتی ہے۔',hi:'स्वर दोगुना हो तो “न” ध्वनि जुड़ती है।'},
+'ÉTAPE 12 · TANWĪN':{en:'STEP 12 · TANWĪN',es:'PASO 12 · TANWĪN',de:'SCHRITT 12 · TANWĪN',nl:'STAP 12 · TANWĪN',it:'TAPPA 12 · TANWĪN',pt:'ETAPA 12 · TANWĪN',ru:'ШАГ 12 · ТАНВИН',tr:'ADIM 12 · TENVİN',zh:'第 12 步 · 双元音',id:'LANGKAH 12 · TANWIN',ur:'مرحلہ ۱۲ · تنوین',hi:'चरण 12 · तनवीन'},
+'Deux traits au-dessus :<br><b>« a »</b> devient <b>« an »</b>':{en:'Two dashes above:<br><b>“a”</b> becomes <b>“an”</b>',es:'Dos rayitas encima:<br><b>«a»</b> pasa a <b>«an»</b>',de:'Zwei Striche darüber:<br>aus <b>„a“</b> wird <b>„an“</b>',nl:'Twee streepjes erboven:<br><b>“a”</b> wordt <b>“an”</b>',it:'Due trattini sopra:<br><b>«a»</b> diventa <b>«an»</b>',pt:'Dois traços acima:<br><b>«a»</b> passa a <b>«an»</b>',ru:'Две чёрточки сверху:<br><b>«а»</b> становится <b>«ан»</b>',tr:'Üstte iki çizgi:<br><b>“a”</b> olur <b>“an”</b>',zh:'上面两横：<br><b>“a”</b> 变成 <b>“an”</b>',id:'Dua garis di atas:<br><b>“a”</b> jadi <b>“an”</b>',ur:'اوپر دو لکیریں:<br><b>«اَ»</b> بنے <b>«اَن»</b>',hi:'ऊपर दो रेखाएँ:<br><b>“अ”</b> बने <b>“अन”</b>'},
+'Deux traits au-dessus : « a » devient « an »':{en:'Two dashes above: “a” becomes “an”.',es:'Dos rayitas encima: «a» pasa a «an».',de:'Zwei Striche darüber: aus „a“ wird „an“.',nl:'Twee streepjes erboven: “a” wordt “an”.',it:'Due trattini sopra: «a» diventa «an».',pt:'Dois traços acima: «a» passa a «an».',ru:'Две чёрточки сверху: «а» становится «ан».',tr:'Üstte iki çizgi: “a” olur “an”.',zh:'上面两横：“a”变成“an”。',id:'Dua garis di atas: “a” jadi “an”.',ur:'اوپر دو لکیریں: «اَ» بنے «اَن»۔',hi:'ऊपर दो रेखाएँ: “अ” बने “अन”।'},
+'ÉTAPE 12 · TRACÉ':{en:'STEP 12 · WRITING',es:'PASO 12 · TRAZO',de:'SCHRITT 12 · SCHREIBEN',nl:'STAP 12 · SCHRIJVEN',it:'TAPPA 12 · TRACCIATO',pt:'ETAPA 12 · TRAÇADO',ru:'ШАГ 12 · ПИСЬМО',tr:'ADIM 12 · YAZMA',zh:'第 12 步 · 书写',id:'LANGKAH 12 · MENULIS',ur:'مرحلہ ۱۲ · لکھائی',hi:'चरण 12 · लेखन'},
+'Trace les <b>deux traits</b> ✍️':{en:'Write the <b>two dashes</b> ✍️',es:'Traza las <b>dos rayitas</b> ✍️',de:'Schreibe die <b>zwei Striche</b> ✍️',nl:'Schrijf de <b>twee streepjes</b> ✍️',it:'Traccia i <b>due trattini</b> ✍️',pt:'Traça os <b>dois traços</b> ✍️',ru:'Напиши <b>две чёрточки</b> ✍️',tr:'<b>İki çizgiyi</b> yaz ✍️',zh:'写出<b>两横</b> ✍️',id:'Tulis <b>dua garisnya</b> ✍️',ur:'<b>دو لکیریں</b> لکھو ✍️',hi:'<b>दो रेखाएँ</b> लिखो ✍️'},
+'Trace les deux traits.':{en:'Write the two dashes.',es:'Traza las dos rayitas.',de:'Schreibe die zwei Striche.',nl:'Schrijf de twee streepjes.',it:'Traccia i due trattini.',pt:'Traça os dois traços.',ru:'Напиши две чёрточки.',tr:'İki çizgiyi yaz.',zh:'写出两横。',id:'Tulis dua garisnya.',ur:'دو لکیریں لکھو۔',hi:'दो रेखाएँ लिखो।'},
+'ÉTAPE 13 · TANWĪN':{en:'STEP 13 · TANWĪN',es:'PASO 13 · TANWĪN',de:'SCHRITT 13 · TANWĪN',nl:'STAP 13 · TANWĪN',it:'TAPPA 13 · TANWĪN',pt:'ETAPA 13 · TANWĪN',ru:'ШАГ 13 · ТАНВИН',tr:'ADIM 13 · TENVİN',zh:'第 13 步 · 双元音',id:'LANGKAH 13 · TANWIN',ur:'مرحلہ ۱۳ · تنوین',hi:'चरण 13 · तनवीन'},
+'Deux boucles au-dessus :<br><b>« ou »</b> devient <b>« oun »</b>':{en:'Two loops above:<br><b>“oo”</b> becomes <b>“oon”</b>',es:'Dos bucles encima:<br><b>«u»</b> pasa a <b>«un»</b>',de:'Zwei Schleifen darüber:<br>aus <b>„u“</b> wird <b>„un“</b>',nl:'Twee lusjes erboven:<br><b>“oe”</b> wordt <b>“oen”</b>',it:'Due riccioli sopra:<br><b>«u»</b> diventa <b>«un»</b>',pt:'Dois laços acima:<br><b>«u»</b> passa a <b>«un»</b>',ru:'Два завитка сверху:<br><b>«у»</b> становится <b>«ун»</b>',tr:'Üstte iki kıvrım:<br><b>“u”</b> olur <b>“un”</b>',zh:'上面两个小圈：<br><b>“u”</b> 变成 <b>“un”</b>',id:'Dua lengkungan di atas:<br><b>“u”</b> jadi <b>“un”</b>',ur:'اوپر دو الٹے واؤ:<br><b>«اُ»</b> بنے <b>«اُن»</b>',hi:'ऊपर दो लूप:<br><b>“उ”</b> बने <b>“उन”</b>'},
+'Deux boucles au-dessus : « ou » devient « oun »':{en:'Two loops above: “oo” becomes “oon”.',es:'Dos bucles encima: «u» pasa a «un».',de:'Zwei Schleifen darüber: aus „u“ wird „un“.',nl:'Twee lusjes erboven: “oe” wordt “oen”.',it:'Due riccioli sopra: «u» diventa «un».',pt:'Dois laços acima: «u» passa a «un».',ru:'Два завитка сверху: «у» становится «ун».',tr:'Üstte iki kıvrım: “u” olur “un”.',zh:'上面两个小圈：“u”变成“un”。',id:'Dua lengkungan di atas: “u” jadi “un”.',ur:'اوپر دو الٹے واؤ: «اُ» بنے «اُن»۔',hi:'ऊपर दो लूप: “उ” बने “उन”।'},
+'ÉTAPE 13 · TRACÉ':{en:'STEP 13 · WRITING',es:'PASO 13 · TRAZO',de:'SCHRITT 13 · SCHREIBEN',nl:'STAP 13 · SCHRIJVEN',it:'TAPPA 13 · TRACCIATO',pt:'ETAPA 13 · TRAÇADO',ru:'ШАГ 13 · ПИСЬМО',tr:'ADIM 13 · YAZMA',zh:'第 13 步 · 书写',id:'LANGKAH 13 · MENULIS',ur:'مرحلہ ۱۳ · لکھائی',hi:'चरण 13 · लेखन'},
+'Trace les <b>deux boucles</b> ✍️':{en:'Write the <b>two loops</b> ✍️',es:'Traza los <b>dos bucles</b> ✍️',de:'Schreibe die <b>zwei Schleifen</b> ✍️',nl:'Schrijf de <b>twee lusjes</b> ✍️',it:'Traccia i <b>due riccioli</b> ✍️',pt:'Traça os <b>dois laços</b> ✍️',ru:'Напиши <b>два завитка</b> ✍️',tr:'<b>İki kıvrımı</b> yaz ✍️',zh:'写出<b>两个小圈</b> ✍️',id:'Tulis <b>dua lengkungannya</b> ✍️',ur:'<b>دو الٹے واؤ</b> لکھو ✍️',hi:'<b>दो लूप</b> लिखो ✍️'},
+'Trace les deux boucles.':{en:'Write the two loops.',es:'Traza los dos bucles.',de:'Schreibe die zwei Schleifen.',nl:'Schrijf de twee lusjes.',it:'Traccia i due riccioli.',pt:'Traça os dois laços.',ru:'Напиши два завитка.',tr:'İki kıvrımı yaz.',zh:'写出两个小圈。',id:'Tulis dua lengkungannya.',ur:'دو الٹے واؤ لکھو۔',hi:'दो लूप लिखो।'},
+'ÉTAPE 14 · TANWĪN':{en:'STEP 14 · TANWĪN',es:'PASO 14 · TANWĪN',de:'SCHRITT 14 · TANWĪN',nl:'STAP 14 · TANWĪN',it:'TAPPA 14 · TANWĪN',pt:'ETAPA 14 · TANWĪN',ru:'ШАГ 14 · ТАНВИН',tr:'ADIM 14 · TENVİN',zh:'第 14 步 · 双元音',id:'LANGKAH 14 · TANWIN',ur:'مرحلہ ۱۴ · تنوین',hi:'चरण 14 · तनवीन'},
+'Deux traits en-dessous :<br><b>« i »</b> devient <b>« in »</b>':{en:'Two dashes below:<br><b>“i”</b> becomes <b>“in”</b>',es:'Dos rayitas debajo:<br><b>«i»</b> pasa a <b>«in»</b>',de:'Zwei Striche darunter:<br>aus <b>„i“</b> wird <b>„in“</b>',nl:'Twee streepjes eronder:<br><b>“i”</b> wordt <b>“in”</b>',it:'Due trattini sotto:<br><b>«i»</b> diventa <b>«in»</b>',pt:'Dois traços abaixo:<br><b>«i»</b> passa a <b>«in»</b>',ru:'Две чёрточки снизу:<br><b>«и»</b> становится <b>«ин»</b>',tr:'Altta iki çizgi:<br><b>“i”</b> olur <b>“in”</b>',zh:'下面两横：<br><b>“i”</b> 变成 <b>“in”</b>',id:'Dua garis di bawah:<br><b>“i”</b> jadi <b>“in”</b>',ur:'نیچے دو لکیریں:<br><b>«اِ»</b> بنے <b>«اِن»</b>',hi:'नीचे दो रेखाएँ:<br><b>“इ”</b> बने <b>“इन”</b>'},
+'Deux traits en-dessous : « i » devient « in »':{en:'Two dashes below: “i” becomes “in”.',es:'Dos rayitas debajo: «i» pasa a «in».',de:'Zwei Striche darunter: aus „i“ wird „in“.',nl:'Twee streepjes eronder: “i” wordt “in”.',it:'Due trattini sotto: «i» diventa «in».',pt:'Dois traços abaixo: «i» passa a «in».',ru:'Две чёрточки снизу: «и» становится «ин».',tr:'Altta iki çizgi: “i” olur “in”.',zh:'下面两横：“i”变成“in”。',id:'Dua garis di bawah: “i” jadi “in”.',ur:'نیچے دو لکیریں: «اِ» بنے «اِن»۔',hi:'नीचे दो रेखाएँ: “इ” बने “इन”।'},
+'ÉTAPE 14 · TRACÉ':{en:'STEP 14 · WRITING',es:'PASO 14 · TRAZO',de:'SCHRITT 14 · SCHREIBEN',nl:'STAP 14 · SCHRIJVEN',it:'TAPPA 14 · TRACCIATO',pt:'ETAPA 14 · TRAÇADO',ru:'ШАГ 14 · ПИСЬМО',tr:'ADIM 14 · YAZMA',zh:'第 14 步 · 书写',id:'LANGKAH 14 · MENULIS',ur:'مرحلہ ۱۴ · لکھائی',hi:'चरण 14 · लेखन'},
+'ÉTAPE 15 · SOUKOUN':{en:'STEP 15 · SUKŪN',es:'PASO 15 · SUKŪN',de:'SCHRITT 15 · SUKŪN',nl:'STAP 15 · SUKŪN',it:'TAPPA 15 · SUKŪN',pt:'ETAPA 15 · SUKŪN',ru:'ШАГ 15 · СУКУН',tr:'ADIM 15 · SÜKÛN',zh:'第 15 步 · 静符',id:'LANGKAH 15 · SUKUN',ur:'مرحلہ ۱۵ · جزم',hi:'चरण 15 · सुकून'},
+'Un petit rond :<br>on ne prononce que<br>le <b>son de la lettre</b> ⭕':{en:'A little circle:<br>you say only<br>the <b>letter\'s sound</b> ⭕',es:'Un circulito:<br>solo se pronuncia<br>el <b>sonido de la letra</b> ⭕',de:'Ein kleiner Kreis:<br>man spricht nur<br>den <b>Buchstabenlaut</b> ⭕',nl:'Een rondje:<br>je zegt alleen<br>de <b>klank van de letter</b> ⭕',it:'Un cerchietto:<br>si pronuncia solo<br>il <b>suono della lettera</b> ⭕',pt:'Um circulozinho:<br>diz-se apenas<br>o <b>som da letra</b> ⭕',ru:'Кружок:<br>произносится только<br><b>звук буквы</b> ⭕',tr:'Küçük bir daire:<br>sadece <b>harfin sesi</b><br>okunur ⭕',zh:'一个小圆圈：<br>只读<b>字母本身的音</b> ⭕',id:'Bulatan kecil:<br>hanya <b>bunyi hurufnya</b><br>yang dibaca ⭕',ur:'ایک چھوٹا دائرہ:<br>صرف <b>حرف کی آواز</b><br>پڑھی جاتی ہے ⭕',hi:'एक छोटा गोला:<br>केवल <b>अक्षर की ध्वनि</b><br>बोली जाती है ⭕'},
+'Un petit rond : on ne prononce que le son de la lettre.':{en:'A little circle: you say only the letter\'s sound.',es:'Un circulito: solo se pronuncia el sonido de la letra.',de:'Ein kleiner Kreis: man spricht nur den Buchstabenlaut.',nl:'Een rondje: je zegt alleen de klank van de letter.',it:'Un cerchietto: si pronuncia solo il suono della lettera.',pt:'Um circulozinho: diz-se apenas o som da letra.',ru:'Кружок: произносится только звук буквы.',tr:'Küçük bir daire: sadece harfin sesi okunur.',zh:'一个小圆圈：只读字母本身的音。',id:'Bulatan kecil: hanya bunyi hurufnya yang dibaca.',ur:'ایک چھوٹا دائرہ: صرف حرف کی آواز پڑھی جاتی ہے۔',hi:'एक छोटा गोला: केवल अक्षर की ध्वनि बोली जाती है।'},
+'⭕ Pas de voyelle':{en:'⭕ No vowel',es:'⭕ Sin vocal',de:'⭕ Kein Vokal',nl:'⭕ Geen klinker',it:'⭕ Nessuna vocale',pt:'⭕ Sem vogal',ru:'⭕ Без огласовки',tr:'⭕ Sesli yok',zh:'⭕ 没有元音',id:'⭕ Tanpa vokal',ur:'⭕ کوئی حرکت نہیں',hi:'⭕ कोई स्वर नहीं'},
+'ÉTAPE 15 · TRACÉ':{en:'STEP 15 · WRITING',es:'PASO 15 · TRAZO',de:'SCHRITT 15 · SCHREIBEN',nl:'STAP 15 · SCHRIJVEN',it:'TAPPA 15 · TRACCIATO',pt:'ETAPA 15 · TRAÇADO',ru:'ШАГ 15 · ПИСЬМО',tr:'ADIM 15 · YAZMA',zh:'第 15 步 · 书写',id:'LANGKAH 15 · MENULIS',ur:'مرحلہ ۱۵ · لکھائی',hi:'चरण 15 · लेखन'},
+'Trace le <b>soukoun</b> ✍️':{en:'Write the <b>sukūn</b> ✍️',es:'Traza el <b>sukūn</b> ✍️',de:'Schreibe das <b>Sukūn</b> ✍️',nl:'Schrijf de <b>sukūn</b> ✍️',it:'Traccia il <b>sukūn</b> ✍️',pt:'Traça o <b>sukūn</b> ✍️',ru:'Напиши <b>сукун</b> ✍️',tr:'<b>Sükûnu</b> yaz ✍️',zh:'写出<b>静符</b> ✍️',id:'Tulis <b>sukun</b> ✍️',ur:'<b>جزم</b> لکھو ✍️',hi:'<b>सुकून</b> लिखो ✍️'},
+'Trace le soukoun.':{en:'Write the sukūn.',es:'Traza el sukūn.',de:'Schreibe das Sukūn.',nl:'Schrijf de sukūn.',it:'Traccia il sukūn.',pt:'Traça o sukūn.',ru:'Напиши сукун.',tr:'Sükûnu yaz.',zh:'写出静符。',id:'Tulis sukun.',ur:'جزم لکھو۔',hi:'सुकून लिखो।'},
+'Voyelles <b>maîtrisées</b> !<br>🎖️':{en:'Vowels <b>mastered</b>!<br>🎖️',es:'¡Vocales <b>dominadas</b>!<br>🎖️',de:'Vokale <b>gemeistert</b>!<br>🎖️',nl:'Klinkers <b>onder de knie</b>!<br>🎖️',it:'Vocali <b>imparate</b>!<br>🎖️',pt:'Vogais <b>dominadas</b>!<br>🎖️',ru:'Огласовки <b>освоены</b>!<br>🎖️',tr:'Sesliler <b>tamam</b>!<br>🎖️',zh:'元音<b>掌握了</b>！<br>🎖️',id:'Vokal <b>dikuasai</b>!<br>🎖️',ur:'حرکات <b>یاد ہو گئیں</b>!<br>🎖️',hi:'स्वर <b>सीख लिए</b>!<br>🎖️'},
+' accomplie ! Tu maîtrises les voyelles.':{en:' complete! You know the vowels.',es:' ¡completada! Ya dominas las vocales.',de:' geschafft! Du kennst die Vokale.',nl:' voltooid! Je kent de klinkers.',it:' completata! Conosci le vocali.',pt:' concluída! Já dominas as vogais.',ru:' выполнено! Ты знаешь огласовки.',tr:' tamamlandı! Sesli harfleri öğrendin.',zh:'完成！你掌握了元音。',id:' selesai! Kamu sudah menguasai vokal.',ur:' مکمل! تم نے حرکات سیکھ لیں۔',hi:' पूरा हुआ! तुमने स्वर सीख लिए।'}
+};
+/* FIN TRADUCTIONS ENFANT */
+
+function te(fr){
+  var e=_TE[fr];
+  if(!e)return fr;
+  return e[st.lang]||fr;
+}
+/* La phrase ÉCRITE : traduite, puis mise en couleur. */
+function TB(fr){
+  return String(te(fr))
+    .replace(/<b>/g,'<span style="color:var(--sk-vif)">')
+    .replace(/<\/b>/g,'</span>');
+}
+/* La VOIX suit la langue choisie. La narration des cours était forcée en
+   français : un enfant turc entendait les consignes en français. */
+var _VOIX={fr:'fr-FR',en:'en-US',es:'es-ES',de:'de-DE',nl:'nl-NL',it:'it-IT',
+           pt:'pt-PT',ru:'ru-RU',tr:'tr-TR',zh:'zh-CN',id:'id-ID',ur:'ur-PK',hi:'hi-IN'};
+function _voixEnfant(){return _VOIX[st.lang]||'fr-FR';}
 
 function _boyScene(ca,reprise){
   _HAB=_habDuProfil();
@@ -10435,67 +10540,67 @@ function _boyVowelCourse(ca){
   function q(s){return b('« '+s+' »');}
 
   B.run([
-    B.brief(_HAB.mission+' 1 · '+_HAB.depart,'Aujourd\'hui :<br>les '+b('voyelles')+' 🎯',
-      _HAB.missionMin+' du jour : les voyelles.',_HAB.partir),
-    B.obs('ÉTAPE 1 · REPÉRAGE',[[F,'a'],[D,'ou'],[K,'i']],null,
-      'Une voyelle,<br>c\'est un petit '+b('signe')+'.',
-      'Une voyelle, c\'est un petit signe.',null),
-    B.brief('ÉTAPE 2 · POSITION','Elle se place '+b('sur')+',<br>ou '+b('sous')+' la lettre.',
-      'Elle se place sur, ou sous la lettre.'),
-    B.brief('ÉTAPE 3 · ORDRE','On dit d\'abord la '+b('lettre')+',<br>'+b('PUIS')+' la voyelle.',
-      'Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.'),
-    B.brief('ÉTAPE 4 · INVENTAIRE','Il en existe<br>seulement '+b('3')+' ! 🖐️',
-      'Il existe seulement trois voyelles.'),
-    B.obs('ÉTAPE 6 · FATḤA',F,'a','Un trait au-'+b('dessus')+' :<br>ça fait '+q('a')+' ☀️',
-      'Un trait au-dessus, ça fait « a »',null,true),
-    B.tracer('ÉTAPE 6 · TRACÉ',F,'À toi de tracer<br>la '+b('fatḥa')+' ✍️','À toi de tracer la fatha.'),
-    B.obs('ÉTAPE 7 · ḌAMMA',D,'ou','Une boucle au-'+b('dessus')+' :<br>ça fait '+q('ou')+' 🌙',
-      'Une boucle au-dessus, ça fait « ou »',null,true),
-    B.tracer('ÉTAPE 7 · TRACÉ',D,'À toi de tracer<br>la '+b('ḍamma')+' ✍️','À toi de tracer la damma.'),
-    B.obs('ÉTAPE 8 · KASRA',K,'i','Un trait en-'+b('dessous')+' :<br>ça fait '+q('i')+' ⭐',
-      'Un trait en-dessous, ça fait « i »',null,true),
-    B.tracer('ÉTAPE 8 · TRACÉ',K,'À toi de tracer<br>la '+b('kasra')+' ✍️','À toi de tracer la kasra.'),
+    B.brief(_HAB.mission+' 1 · '+_HAB.depart,TB('Aujourd\'hui :<br>les <b>voyelles</b> 🎯'),
+      _HAB.missionMin+te(' du jour : les voyelles.'),_HAB.partir),
+    B.obs(te('ÉTAPE 1 · REPÉRAGE'),[[F,'a'],[D,'ou'],[K,'i']],null,
+      TB('Une voyelle,<br>c\'est un petit <b>signe</b>.'),
+      te('Une voyelle, c\'est un petit signe.'),null),
+    B.brief(te('ÉTAPE 2 · POSITION'),TB('Elle se place <b>sur</b>,<br>ou <b>sous</b> la lettre.'),
+      te('Elle se place sur, ou sous la lettre.')),
+    B.brief(te('ÉTAPE 3 · ORDRE'),TB('On dit d\'abord la <b>lettre</b>,<br><b>PUIS</b> la voyelle.'),
+      te('Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.')),
+    B.brief(te('ÉTAPE 4 · INVENTAIRE'),TB('Il en existe<br>seulement <b>3</b> ! 🖐️'),
+      te('Il existe seulement trois voyelles.')),
+    B.obs(te('ÉTAPE 6 · FATḤA'),F,'a',TB('Un trait au-<b>dessus</b> :<br>ça fait <b>\u00ab a \u00bb</b> ☀️'),
+      te('Un trait au-dessus, ça fait « a »'),null,true),
+    B.tracer(te('ÉTAPE 6 · TRACÉ'),F,TB('À toi de tracer<br>la <b>fatḥa</b> ✍️'),te('À toi de tracer la fatha.')),
+    B.obs(te('ÉTAPE 7 · ḌAMMA'),D,'ou',TB('Une boucle au-<b>dessus</b> :<br>ça fait <b>\u00ab ou \u00bb</b> 🌙'),
+      te('Une boucle au-dessus, ça fait « ou »'),null,true),
+    B.tracer(te('ÉTAPE 7 · TRACÉ'),D,TB('À toi de tracer<br>la <b>ḍamma</b> ✍️'),te('À toi de tracer la damma.')),
+    B.obs(te('ÉTAPE 8 · KASRA'),K,'i',TB('Un trait en-<b>dessous</b> :<br>ça fait <b>\u00ab i \u00bb</b> ⭐'),
+      te('Un trait en-dessous, ça fait « i »'),null,true),
+    B.tracer(te('ÉTAPE 8 · TRACÉ'),K,TB('À toi de tracer<br>la <b>kasra</b> ✍️'),te('À toi de tracer la kasra.')),
 
     /* Ordre tiré au sort : toujours a, puis i, puis ou, et l'enfant répond de
        mémoire sans plus écouter. */
     _melange([
-      B.controle('CONTRÔLE','Où est le son '+q('a')+' ?','Où est le son « a » ?',[F,K,D],F),
-      B.controle('CONTRÔLE','Où est le son '+q('i')+' ?','Où est le son « i » ?',[F,K,D],K),
-      B.controle('CONTRÔLE','Où est le son '+q('ou')+' ?','Où est le son « ou » ?',[F,K,D],D)
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab a \u00bb</b> ?'),te('Où est le son « a » ?'),[F,K,D],F),
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab i \u00bb</b> ?'),te('Où est le son « i » ?'),[F,K,D],K),
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab ou \u00bb</b> ?'),te('Où est le son « ou » ?'),[F,K,D],D)
     ]),
 
     /* Cet écran parle du NOM des voyelles : on joue donc le nom quand
-       l'enfant appuie dessus, pas le son — il vient de l'entendre trois
+       lte('enfant appuie dessus, pas le son — il vient de l')entendre trois
        écrans plus haut. */
-    B.surPiste('ÉTAPE 9 · NOMS','Elles ont un '+b('nom')+',<br>mais retiens le '+b('SON')+' !',
-      'Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.',
+    B.surPiste(te('ÉTAPE 9 · NOMS'),TB('Elles ont un <b>nom</b>,<br>mais retiens le <b>SON</b> !'),
+      te('Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.'),
       [[F,'fatḥa','fatha'],[D,'ḍamma','damma']],[[K,'kasra','kasra']]),
 
-    B.brief('ÉTAPE 10 · DOUBLEMENT','Si on '+b('double')+' une voyelle,<br>on ajoute le son '+q('n')+' 👃',
-      'Si on double une voyelle, on ajoute le son « n »'),
-    B.obs('ÉTAPE 12 · TANWĪN',TF,'anne','Deux traits au-dessus :<br>'+q('a')+' devient '+q('an'),
-      'Deux traits au-dessus : « a » devient « an »'),
-    B.tracer('ÉTAPE 12 · TRACÉ',TF,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
-    B.obs('ÉTAPE 13 · TANWĪN',TD,'oune','Deux boucles au-dessus :<br>'+q('ou')+' devient '+q('oun'),
-      'Deux boucles au-dessus : « ou » devient « oun »'),
-    B.tracer('ÉTAPE 13 · TRACÉ',TD,'Trace les '+b('deux boucles')+' ✍️','Trace les deux boucles.'),
-    B.obs('ÉTAPE 14 · TANWĪN',TK,'inne','Deux traits en-dessous :<br>'+q('i')+' devient '+q('in'),
-      'Deux traits en-dessous : « i » devient « in »'),
-    B.tracer('ÉTAPE 14 · TRACÉ',TK,'Trace les '+b('deux traits')+' ✍️','Trace les deux traits.'),
+    B.brief(te('ÉTAPE 10 · DOUBLEMENT'),TB('Si on <b>double</b> une voyelle,<br>on ajoute le son <b>\u00ab n \u00bb</b> 👃'),
+      te('Si on double une voyelle, on ajoute le son « n »')),
+    B.obs(te('ÉTAPE 12 · TANWĪN'),TF,'anne',TB('Deux traits au-dessus :<br><b>\u00ab a \u00bb</b> devient <b>\u00ab an \u00bb</b>'),
+      te('Deux traits au-dessus : « a » devient « an »')),
+    B.tracer(te('ÉTAPE 12 · TRACÉ'),TF,TB('Trace les <b>deux traits</b> ✍️'),te('Trace les deux traits.')),
+    B.obs(te('ÉTAPE 13 · TANWĪN'),TD,'oune',TB('Deux boucles au-dessus :<br><b>\u00ab ou \u00bb</b> devient <b>\u00ab oun \u00bb</b>'),
+      te('Deux boucles au-dessus : « ou » devient « oun »')),
+    B.tracer(te('ÉTAPE 13 · TRACÉ'),TD,TB('Trace les <b>deux boucles</b> ✍️'),te('Trace les deux boucles.')),
+    B.obs(te('ÉTAPE 14 · TANWĪN'),TK,'inne',TB('Deux traits en-dessous :<br><b>\u00ab i \u00bb</b> devient <b>\u00ab in \u00bb</b>'),
+      te('Deux traits en-dessous : « i » devient « in »')),
+    B.tracer(te('ÉTAPE 14 · TRACÉ'),TK,TB('Trace les <b>deux traits</b> ✍️'),te('Trace les deux traits.')),
 
     _melange([
-      B.controle('CONTRÔLE','Où est le son '+q('an')+' ?','Où est le son « an » ?',[TF,TK,TD],TF),
-      B.controle('CONTRÔLE','Où est le son '+q('oun')+' ?','Où est le son « oun » ?',[TF,TK,TD],TD),
-      B.controle('CONTRÔLE','Où est le son '+q('in')+' ?','Où est le son « in » ?',[TF,TK,TD],TK)
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab an \u00bb</b> ?'),te('Où est le son « an » ?'),[TF,TK,TD],TF),
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab oun \u00bb</b> ?'),te('Où est le son « oun » ?'),[TF,TK,TD],TD),
+      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab in \u00bb</b> ?'),te('Où est le son « in » ?'),[TF,TK,TD],TK)
     ]),
 
-    B.obs('ÉTAPE 15 · SOUKOUN',SK,null,'Un petit rond :<br>on ne prononce que<br>le '+b('son de la lettre')+' ⭕',
-      'Un petit rond : on ne prononce que le son de la lettre.','⭕ Pas de voyelle'),
-    B.tracer('ÉTAPE 15 · TRACÉ',SK,'Trace le '+b('soukoun')+' ✍️','Trace le soukoun.'),
+    B.obs(te('ÉTAPE 15 · SOUKOUN'),SK,null,TB('Un petit rond :<br>on ne prononce que<br>le <b>son de la lettre</b> ⭕'),
+      te('Un petit rond : on ne prononce que le son de la lettre.'),te('⭕ Pas de voyelle')),
+    B.tracer(te('ÉTAPE 15 · TRACÉ'),SK,TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission('Voyelles '+b('maîtrisées')+' !<br>🎖️',
-        _HAB.missionMin+' accomplie ! Tu maîtrises les voyelles.')(api);}
+      B.mission(TB('Voyelles <b>maîtrisées</b> !<br>🎖️'),
+        _HAB.missionMin+te(' accomplie ! Tu maîtrises les voyelles.'))(api);}
   ]);
 }
 
@@ -10519,75 +10624,75 @@ function _boyProlongCourse(ca){
   /* Un signe seul est minuscule au fil du texte : on le grossit. */
   function gros(s){return '<span style="font-size:1.9em;line-height:.7;vertical-align:-.15em">'+s+'</span>';}
   B.run([
-    B.brief(_HAB.mission+' · '+_HAB.depart,'Aujourd\'hui :<br>les '+b('prolongations')+' 📡',
-      _HAB.missionMin+' du jour : les prolongations.',_HAB.partir),
-    B.brief('ÉTAPE 1 · PRINCIPE','En arabe, la '+b('durée')+'<br>d\'une voyelle compte.',
-      'En arabe, le temps passé sur une voyelle est très important.'),
-    B.obs('ÉTAPE 2 · COURT','بَ','بَ','Ici c\'est '+b('court')+' :<br>'+q('ba')+' ⏱️','Ici c\'est court.'),
-    B.obs('ÉTAPE 3 · LONG','بَا','بَا','Avec un '+b('ا')+' c\'est '+b('long')+' :<br>'+q('baaa')+' 🎵',
-      'Avec un alif, le son devient long.'),
-    B.brief('ÉTAPE 4 · ENJEU','Allonger ou non<br>peut '+b('changer le sens')+' ! ⚠️',
-      'Allonger ou non peut complètement changer le sens.'),
-    B.obs('ÉTAPE 5 · EXEMPLE','لَأُحِبُّك','لَأُحِبُّك','Par exemple,<br>sans prolonger :<br>'+b('je t\'aime')+' ❤️',
-      'Par exemple, sans prolonger : je t\'aime.'),
-    B.obs('ÉTAPE 6 · EXEMPLE','لَا أُحِبُّك','لَا أُحِبُّك','Alors qu\'en prolongeant :<br>'+b('je ne t\'aime pas')+' 💔',
-      'Alors qu\'en prolongeant : je ne t\'aime pas.'),
+    B.brief(_HAB.mission+' · '+_HAB.depart,TB('Aujourd\'hui :<br>les <b>prolongations</b> 📡'),
+      _HAB.missionMin+te(' du jour : les prolongations.'),_HAB.partir),
+    B.brief(te('ÉTAPE 1 · PRINCIPE'),TB('En arabe, la <b>durée</b><br>d\'une voyelle compte.'),
+      te('En arabe, le temps passé sur une voyelle est très important.')),
+    B.obs(te('ÉTAPE 2 · COURT'),'بَ','بَ',TB('Ici c\'est <b>court</b> :<br><b>\u00ab ba \u00bb</b> ⏱️'),te('Ici c\'est court.')),
+    B.obs(te('ÉTAPE 3 · LONG'),'بَا','بَا',TB('Avec un <b>ا</b> c\'est <b>long</b> :<br><b>\u00ab baaa \u00bb</b> 🎵'),
+      te('Avec un alif, le son devient long.')),
+    B.brief(te('ÉTAPE 4 · ENJEU'),TB('Allonger ou non<br>peut <b>changer le sens</b> ! ⚠️'),
+      te('Allonger ou non peut complètement changer le sens.')),
+    B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',TB('Par exemple,<br>sans prolonger :<br><b>je t\'aime</b> ❤️'),
+      te('Par exemple, sans prolonger : je t\'aime.')),
+    B.obs(te('ÉTAPE 6 · EXEMPLE'),'لَا أُحِبُّك','لَا أُحِبُّك',TB('Alors qu\'en prolongeant :<br><b>je ne t\'aime pas</b> 💔'),
+      te('Alors qu\'en prolongeant : je ne t\'aime pas.')),
     /* De droite à gauche, comme on les lit : bā, bī, bū. Chaque syllabe
        porte la couleur de sa voyelle. */
     /* Seuls la voyelle et sa lettre de prolongation sont en couleur : le
        ب n'est là que pour les porter. Le 5e champ dit quelle partie garder
        en bleu. */
-    B.surPiste('ÉTAPE 7 · LES 3','Chaque voyelle est<br>prolongée par '+b('la même')+'<br>lettre, toujours.',
-      'Chaque voyelle est prolongée par la même lettre, toujours.',
+    B.surPiste(te('ÉTAPE 7 · LES 3'),TB('Chaque voyelle est<br>prolongée par <b>la même</b><br>lettre, toujours.'),
+      te('Chaque voyelle est prolongée par la même lettre, toujours.'),
       [['بَا','ā','بَا',CA,'ب'+Z],['بِي','ī','بِي',CI,'ب'+Z],['بُو','ū','بُو',COU,'ب'+Z]],[]),
 
-    B.obs('ÉTAPE 8 · ALIF','بَا','بَا',
-      'La voyelle '+gros(pa('َ'))+' s\'écrit<br>'+pa('au-dessus')+' de la lettre :<br>on la prolonge avec le '+pa('ا')+',<br>qui monte '+pa('au-dessus')+' de la ligne.',
-      'La voyelle fatha s\'écrit au-dessus de la lettre. On la prolonge avec le alif, qui monte au-dessus de la ligne.',null,true,'ب'+Z,CA),
-    B.tracer('ÉTAPE 8 · TRACÉ',['بَا','ـبَا'],'Trace '+b('بَا')+' ✍️','Trace ba prolongé.'),
+    B.obs(te('ÉTAPE 8 · ALIF'),'بَا','بَا',
+      'La voyelle '+gros(pa('َ'))+te(' s\'écrit<br>')+pa('au-dessus')+te(' de la lettre :<br>on la prolonge avec le ')+pa('ا')+te(',<br>qui monte ')+pa('au-dessus')+te(' de la ligne.'),
+      te('La voyelle fatha s\'écrit au-dessus de la lettre. On la prolonge avec le alif, qui monte au-dessus de la ligne.'),null,true,'ب'+Z,CA),
+    B.tracer(te('ÉTAPE 8 · TRACÉ'),['بَا','ـبَا'],TB('Trace <b>بَا</b> ✍️'),te('Trace ba prolongé.')),
 
-    B.obs('ÉTAPE 9 · YA','بِي','بِي',
-      'La voyelle '+gros(pi('ِ'))+' s\'écrit<br>'+pi('en-dessous')+' de la lettre :<br>on la prolonge avec le '+pi('ي')+',<br>qui descend '+pi('sous')+' la ligne.',
-      'La voyelle kasra s\'écrit en dessous de la lettre. On la prolonge avec le ya, qui descend sous la ligne.',null,true,'ب'+Z,CI),
-    B.tracer('ÉTAPE 9 · TRACÉ',['بِي','ـبِي'],'Trace '+b('بِي')+' ✍️','Trace bi prolongé.'),
+    B.obs(te('ÉTAPE 9 · YA'),'بِي','بِي',
+      'La voyelle '+gros(pi('ِ'))+te(' s\'écrit<br>')+pi('en-dessous')+te(' de la lettre :<br>on la prolonge avec le ')+pi('ي')+te(',<br>qui descend ')+pi('sous')+' la ligne.',
+      te('La voyelle kasra s\'écrit en dessous de la lettre. On la prolonge avec le ya, qui descend sous la ligne.'),null,true,'ب'+Z,CI),
+    B.tracer(te('ÉTAPE 9 · TRACÉ'),['بِي','ـبِي'],TB('Trace <b>بِي</b> ✍️'),te('Trace bi prolongé.')),
 
-    B.obs('ÉTAPE 10 · WAW','بُو','بُو',
-      'La voyelle '+gros(pou('ُ'))+' ressemble<br>à un petit '+pou('و')+' :<br>on la prolonge donc<br>avec le '+pou('و')+' 👀',
-      'La voyelle damma ressemble à un petit waw. On la prolonge donc avec le waw.',null,true,'ب'+Z,COU),
-    B.tracer('ÉTAPE 10 · TRACÉ',['بُو','ـبُو'],'Trace '+b('بُو')+' ✍️','Trace bou prolongé.'),
+    B.obs(te('ÉTAPE 10 · WAW'),'بُو','بُو',
+      'La voyelle '+gros(pou('ُ'))+te(' ressemble<br>à un petit ')+pou('و')+te(' :<br>on la prolonge donc<br>avec le ')+pou('و')+' 👀',
+      te('La voyelle damma ressemble à un petit waw. On la prolonge donc avec le waw.'),null,true,'ب'+Z,COU),
+    B.tracer(te('ÉTAPE 10 · TRACÉ'),['بُو','ـبُو'],TB('Trace <b>بُو</b> ✍️'),te('Trace bou prolongé.')),
 
-    B.brief('ÉTAPE 11 · RÈGLE','Ces lettres prolongent<br>leur voyelle '+b('UNIQUEMENT')+'<br>si elles n\'ont aucune<br>voyelle sur ou sous elles ! ⚠️',
-      'Ces trois lettres prolongent leur voyelle uniquement si elles n\'ont aucune voyelle sur ou sous elles.'),
+    B.brief(te('ÉTAPE 11 · RÈGLE'),TB('Ces lettres prolongent<br>leur voyelle <b>UNIQUEMENT</b><br>si elles n\'ont aucune<br>voyelle sur ou sous elles ! ⚠️'),
+      te('Ces trois lettres prolongent leur voyelle uniquement si elles n\'ont aucune voyelle sur ou sous elles.')),
     /* Un contre-exemple par lettre de prolongation, dans l'ordre du cours.
        Celui de l'alif s'écrirait avec une hamza dans un vrai mot : on s'en
-       passe ici, l'écran ne sert qu'à montrer la voyelle qui empêche la
+       passe ici, lte('écran ne sert qu')à montrer la voyelle qui empêche la
        prolongation. */
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بَاِ','بَاِ',
-      'Ici le '+pa('ا')+' porte une '+gros(pa('ِ'))+' :<br>on ne dit pas '+q('baa')+'<br>mais '+q('ba-ï')+' !',
-      'Ici le alif porte une kasra. On ne dit pas ba prolongé, mais ba i.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بِيَ','بِيَ',
-      'Ici le '+pi('ي')+' porte une '+gros(pi('َ'))+' :<br>on ne dit pas '+q('bii')+'<br>mais '+q('biya')+' !',
-      'Ici le ya porte une fatha. On ne dit pas bi prolongé, mais biya.'),
-    B.obs('ÉTAPE 11 · CONTRE-EXEMPLE','بُوَ','بُوَ',
-      'Ici le '+pou('و')+' porte une '+gros(pou('َ'))+' :<br>on ne dit pas '+q('bouu')+'<br>mais '+q('bouwa')+' !',
-      'Ici le waw porte une fatha. On ne dit pas bou prolongé, mais bouwa.'),
+    B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بَاِ','بَاِ',
+      'Ici le '+pa('ا')+' porte une '+gros(pa('ِ'))+TB(' :<br>on ne dit pas <b>\u00ab baa \u00bb</b><br>mais <b>\u00ab ba-ï \u00bb</b> !'),
+      te('Ici le alif porte une kasra. On ne dit pas ba prolongé, mais ba i.')),
+    B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بِيَ','بِيَ',
+      'Ici le '+pi('ي')+' porte une '+gros(pi('َ'))+TB(' :<br>on ne dit pas <b>\u00ab bii \u00bb</b><br>mais <b>\u00ab biya \u00bb</b> !'),
+      te('Ici le ya porte une fatha. On ne dit pas bi prolongé, mais biya.')),
+    B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بُوَ','بُوَ',
+      'Ici le '+pou('و')+' porte une '+gros(pou('َ'))+TB(' :<br>on ne dit pas <b>\u00ab bouu \u00bb</b><br>mais <b>\u00ab bouwa \u00bb</b> !'),
+      te('Ici le waw porte une fatha. On ne dit pas bou prolongé, mais bouwa.')),
 
-    B.controleMulti('CONTRÔLE 1','Trouve '+b('la ou les')+'<br>prolongations !',
-      'Trouve la ou les prolongations.',['بَ','بَا','بُو'],['بَا','بُو']),
-    B.controle('CONTRÔLE 2','Où est le son '+q('bououou')+' ?','Où est le son prolongé avec le waw ?',['بُ','بُو','بِي'],'بُو'),
+    B.controleMulti(te('CONTRÔLE 1'),TB('Trouve <b>la ou les</b><br>prolongations !'),
+      te('Trouve la ou les prolongations.'),['بَ','بَا','بُو'],['بَا','بُو']),
+    B.controle(te('CONTRÔLE 2'),TB('Où est le son <b>\u00ab bououou \u00bb</b> ?'),te('Où est le son prolongé avec le waw ?'),['بُ','بُو','بِي'],'بُو'),
 
-    B.obs('ÉTAPE 12 · UN DERNIER SIGNE','بّ','بّ',
-      'Voyons un dernier signe.<br>Il se place '+b('toujours')+'<br>au-dessus d\'une lettre<br>et ressemble à un '+b('w')+' :<br>la '+b('chaddah')+'.',
-      'Voyons maintenant un dernier petit signe. Il se place toujours au-dessus d\'une lettre et ressemble à un w : la chaddah.'),
-    B.brief('ÉTAPE 12 · CHADDAH','Avec ce petit '+b('chapeau')+',<br>on insiste sur la '+b('lettre')+' 💪',
-      'Avec ce petit chapeau, on insiste sur la lettre.'),
-    B.obs('ÉTAPE 13 · EXEMPLE','جَدّ','جَدّ',b('جَدّ')+' :<br>ça veut dire<br>'+b('grand-père')+' 👴','Jad-d, ça veut dire grand-père.'),
-    B.tracer('ÉTAPE 13 · TRACÉ','جَدّ','Trace '+b('جَدّ')+' ✍️','Trace jadd.',2),
-    B.brief('ÉTAPE 14 · NE PAS CONFONDRE','Chapeau = on insiste<br>sur la '+b('lettre')+'.<br>Prolongation = on insiste<br>sur la '+b('voyelle')+'.',
-      'Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.'),
+    B.obs(te('ÉTAPE 12 · UN DERNIER SIGNE'),'بّ','بّ',
+      TB('Voyons un dernier signe.<br>Il se place <b>toujours</b><br>au-dessus d\'une lettre<br>et ressemble à un <b>w</b> :<br>la <b>chaddah</b>.'),
+      te('Voyons maintenant un dernier petit signe. Il se place toujours au-dessus d\'une lettre et ressemble à un w : la chaddah.')),
+    B.brief(te('ÉTAPE 12 · CHADDAH'),TB('Avec ce petit <b>chapeau</b>,<br>on insiste sur la <b>lettre</b> 💪'),
+      te('Avec ce petit chapeau, on insiste sur la lettre.')),
+    B.obs(te('ÉTAPE 13 · EXEMPLE'),'جَدّ','جَدّ',TB('<b>جَدّ</b> :<br>ça veut dire<br><b>grand-père</b> 👴'),te('Jad-d, ça veut dire grand-père.')),
+    B.tracer(te('ÉTAPE 13 · TRACÉ'),'جَدّ',TB('Trace <b>جَدّ</b> ✍️'),'Trace jadd.',2),
+    B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br>Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
+      te('Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.')),
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission('Prolongations '+b('maîtrisées')+' !<br>🎖️',
-        _HAB.missionMin+' accomplie ! Tu maîtrises les prolongations.')(api);}
+      B.mission(TB('Prolongations <b>maîtrisées</b> !<br>🎖️'),
+        _HAB.missionMin+te(' accomplie ! Tu maîtrises les prolongations.'))(api);}
   ]);
 }
 
@@ -10602,9 +10707,9 @@ function _boyLetterCourse(ca,idx,premiere){
   var lourde=_CL_HEAVY.indexOf(L.ar)>=0;
   var lat=_CL_LAT[L.ar]!==undefined?_CL_LAT[L.ar]:'';
   var avecProlong=idx>=3;
-  /* Le tā marbūṭa ne vit qu'à la FIN d'un mot : ni début, ni milieu, ni
+  /* Le tā marbūṭa ne vit qute('à la FIN d')un mot : ni début, ni milieu, ni
      déduction, ni prolongation, et le soukoun ne se pose jamais dessus.
-     La hamza, elle, s'écrit toujours pareil — elle ne s'accroche ni avant ni
+     La hamza, elle, ste('écrit toujours pareil — elle ne s')accroche ni avant ni
      après : une seule forme, l'isolée. Ses voyelles et ses prolongations
      restent, elles. */
   var finDeMot=(L.ar==='ة');
@@ -10617,8 +10722,8 @@ function _boyLetterCourse(ca,idx,premiere){
   var A=L.ar,S=A+'ْ';
   var sc=[];
 
-  sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,'Nouvelle lettre :<br>'+b(L.name)+' 🎯',
-    _HAB.missionMin+' du moment : la lettre '+L.name,premiere?_HAB.partir:'SUIVANT ▸'));
+  sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,te('Nouvelle lettre :<br>')+b(L.name)+' 🎯',
+    _HAB.missionMin+te(' du moment : la lettre ')+L.name,premiere?_HAB.partir:'SUIVANT ▸'));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
@@ -10626,47 +10731,47 @@ function _boyLetterCourse(ca,idx,premiere){
   if(jumelle){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
     if(ref){
-      sc.push(B.brief(_HAB.mission+' · UN AIR CONNU',
-        b(L.name)+' s\'écrit exactement<br>comme '+b(ref.name)+',<br>'+b(jumelle.point)+' 👀',
-        'La lettre '+L.name+' s\'écrit exactement comme la lettre '+ref.name+', '+jumelle.point+'.'));
+      sc.push(B.brief(_HAB.mission+te(' · UN AIR CONNU'),
+        b(L.name)+te(' s\'écrit exactement<br>comme ')+b(ref.name)+',<br>'+b(jumelle.point)+' 👀',
+        'La lettre '+L.name+te(' s\'écrit exactement comme la lettre ')+ref.name+', '+jumelle.point+'.'));
     }
   }
-  /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
+  /* Lte('écran « toute seule, elle s')écrit ainsi » disait ce que celui-ci montre
      déjà : les deux sont réunis. Et la hamza n'a pas de son propre. */
   sc.push(formeUnique
-    ? B.obs('ÉTAPE 1 · IDENTIFICATION',A,null,
-        'Voici '+b(L.name)+'.<br>Elle s\'écrit '+b('toujours')+' ainsi.',
-        'Cette lettre n\'a aucun son. On prononce juste sa voyelle.')
-    : B.obs('ÉTAPE 1 · IDENTIFICATION',A,S,
-        'Voici '+b(L.name)+'.<br>'+b('Isolée')+', elle s\'écrit ainsi.',
-        'Voici la lettre '+L.name+'. Isolée, elle s\'écrit ainsi.'));
+    ? B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,null,
+        'Voici '+b(L.name)+TB('.<br>Elle s\'écrit <b>toujours</b> ainsi.'),
+        te('Cette lettre n\'a aucun son. On prononce juste sa voyelle.'))
+    : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
+        'Voici '+b(L.name)+TB('.<br><b>Isolée</b>, elle s\'écrit ainsi.'),
+        te('Voici la lettre ')+L.name+te('. Isolée, elle s\'écrit ainsi.')));
   /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
-     là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
+     là où il sert, sur les trois écrans de la fatḥa — cte('est là que l')oreille
      française se trompe. « khè » au lieu de « kha ». */
   function grave(son,juste){
-    return B.brief('ÉTAPE · ATTENTION','On ne dit pas '+b('« '+son+' »')+'<br>mais '+b('« '+juste+' »')+',<br>car c\'est une lettre '+b('grave')+' 👂',
-      'On ne dit pas '+son+', mais '+juste+', car c\'est une lettre grave.');
+    return B.brief(te('ÉTAPE · ATTENTION'),te('On ne dit pas ')+b('« '+son+' »')+'<br>mais '+b('« '+juste+' »')+TB(',<br>car c\'est une lettre <b>grave</b> 👂'),
+      te('On ne dit pas ')+son+', mais '+juste+te(', car c\'est une lettre grave.'));
   }
   var latMin=(lat||'').toLowerCase();
   if(finDeMot){
     /* Le tā marbūṭa n'a pas d'histoire d'accrochage à raconter : ce qui
        compte pour lui, c'est sa place. */
-    sc.push(B.brief('ÉTAPE · PLACE','Elle se trouvera '+b('toujours')+'<br>à la fin du mot 🔚',
-      'Elle se trouvera toujours à la fin du mot.'));
+    sc.push(B.brief(te('ÉTAPE · PLACE'),TB('Elle se trouvera <b>toujours</b><br>à la fin du mot 🔚'),
+      te('Elle se trouvera toujours à la fin du mot.')));
   }else if(formeUnique){
-    sc.push(B.brief('ÉTAPE · ACCROCHAGE','Sans support, elle ne s\'attache<br>'+b('JAMAIS')+',<br>ni avant, ni après 🚫',
-      'Sans support, elle ne s\'attache jamais, ni avant, ni après.'));
+    sc.push(B.brief(te('ÉTAPE · ACCROCHAGE'),TB('Sans support, elle ne s\'attache<br><b>JAMAIS</b>,<br>ni avant, ni après 🚫'),
+      te('Sans support, elle ne s\'attache jamais, ni avant, ni après.')));
   }else if(!attache){
-    sc.push(B.brief('ÉTAPE · ACCROCHAGE','Elle ne s\'accroche '+b('JAMAIS')+'<br>à la lettre suivante 🚫',
-      'Cette lettre ne s\'accroche jamais à la lettre suivante.'));
+    sc.push(B.brief(te('ÉTAPE · ACCROCHAGE'),TB('Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫'),
+      te('Cette lettre ne s\'accroche jamais à la lettre suivante.')));
   }
   /* Les 4 formes : observation PUIS tracé, sans exception */
   var NOMS=['ISOLÉE','DÉBUT','MILIEU','FIN'];
   /* Le tā marbūṭa n'a que deux formes, et sa forme attachée est forcément
      celle de la fin : on dit « attachée », c'est ce que l'enfant voit. */
-  var OU=['toute seule','au début du mot','au milieu du mot',
-          finDeMot?'attachée':'à la fin du mot'];
-  /* Le tā marbūṭa ne s'écrit qu'en fin de mot, la hamza ne s'écrit que d'une
+  var OU=['toute seule',te('au début du mot'),te('au milieu du mot'),
+          finDeMot?'attachée':te('à la fin du mot')];
+  /* Le tā marbūṭa ne ste('écrit qu')en fin de mot, la hamza ne ste('écrit que d')une
      seule façon : on ne montre que les formes qui existent vraiment. */
   var aMontrer=formeUnique?[0]:(finDeMot?[0,3]:[0,1,2,3]);
   var total=aMontrer.length;
@@ -10676,7 +10781,7 @@ function _boyLetterCourse(ca,idx,premiere){
   function formesMontrees(signe){
     return aMontrer.map(function(n){return _avecSigne(formes[n].form,signe);});
   }
-  /* Le tā marbūṭa n'a pas de « forme fin » : elle n'existe qu'attachée, et
+  /* Le tā marbūṭa nte('a pas de « forme fin » : elle n')existe qu'attachée, et
      c'est ainsi qu'on la nomme, au tracé comme à l'observation. */
   function nomForme(n){return (finDeMot&&n===3)?'attachée':NOMS[n].toLowerCase();}
   var nomsMontres=aMontrer.map(nomForme);
@@ -10684,24 +10789,24 @@ function _boyLetterCourse(ca,idx,premiere){
   aMontrer.forEach(function(n,rang){
     var f=formes[n];
     var rep=total>1?(' '+(rang+1)+'/'+total):'';
-    /* L'isolée vient d'être montrée à l'identification : on ne la remontre
+    /* Lte('isolée vient d')être montrée à l'identification : on ne la remontre
        pas, on la fait tracer directement. */
     if(n!==0){
       sc.push(B.obs('FORME'+rep+' · '+NOMS[n],f.form,S,
-        OU[n].charAt(0).toUpperCase()+OU[n].slice(1)+',<br>elle s\'écrit '+b('ainsi')+'.',
-        OU[n]+', elle s\'écrit ainsi.'));
+        OU[n].charAt(0).toUpperCase()+OU[n].slice(1)+TB(',<br>elle s\'écrit <b>ainsi</b>.'),
+        OU[n]+te(', elle s\'écrit ainsi.')));
     }
     sc.push(formeUnique
-      ? B.tracer('FORME · TRACÉ',f.form,'Trace la '+b('lettre')+' ✍️','Trace la lettre.')
-      : B.tracer('FORME'+rep+' · TRACÉ',f.form,
-          'Trace la forme<br>'+b(nomForme(n))+' ✍️','Trace la forme '+nomForme(n)+'.'));
+      ? B.tracer(te('FORME · TRACÉ'),f.form,TB('Trace la <b>lettre</b> ✍️'),te('Trace la lettre.'))
+      : B.tracer('FORME'+rep+te(' · TRACÉ'),f.form,
+          te('Trace la forme<br>')+b(nomForme(n))+' ✍️',te('Trace la forme ')+nomForme(n)+'.'));
   });
   /* « Deux formes à retenir » disait ce que le tableau montre juste après :
-     l'écran est retiré. Et la règle générale ne se rappelle qu'une fois, à
+     lte('écran est retiré. Et la règle générale ne se rappelle qu')une fois, à
      la toute première lettre — la répéter à chaque lettre lasse. */
   var premiereLettre=(idx===0);
   /* Le tiret n'est pas écrit tel quel dans le titre : posé seul il ressemble
-     à un trait droit, alors que c'est le trait de liaison arabe. C'est
+     à un trait droit, alors que cte('est le trait de liaison arabe. C')est
      l'animation du tableau qui le montre, collé à la lettre. */
   if(!sansDeduction){
     /* Les deux lignes suivent l'ordre des RANGÉES du tableau : isolée et fin
@@ -10709,30 +10814,30 @@ function _boyLetterCourse(ca,idx,premiere){
        premier, en face de sa rangée, et « Milieu = début + — » en dessous,
        en face de la sienne. La phrase dite suit le même ordre, sans quoi la
        voix nommerait une ligne pendant que l'autre s'anime. */
-    sc.push(B.tableau('ÉTAPE · DÉDUCTION',
-      B.iso('Fin')+' = '+B.iso('isolée')+' + '+b('—')+'<br>'
-        +B.deb('Milieu')+' = '+B.deb('début')+' + '+b('—'),
-      'La forme de la fin, c\'est l\'isolée avec un trait devant. La forme du milieu, c\'est celle du début avec un trait devant.',
+    sc.push(B.tableau(te('ÉTAPE · DÉDUCTION'),
+      B.iso('Fin')+' = '+B.iso('isolée')+TB(' + <b>—</b><br>')
+        +B.deb('Milieu')+' = '+B.deb('début')+TB(' + <b>—</b>'),
+      te('La forme de la fin, c\'est l\'isolée avec un trait devant. La forme du milieu, c\'est celle du début avec un trait devant.'),
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
   }
   if(premiereLettre&&!sansDeduction){
-    sc.push(B.brief('ÉTAPE · LA CLÉ',
-      'C\'est pourquoi il faut<br>connaître par cœur<br>'+B.iso('isolée')+' et '+B.deb('début')+' :<br>les deux autres se '+b('déduisent')+' ! 🔑',
-      'C\'est pourquoi il est très important de connaître parfaitement l\'écriture de chaque lettre isolée et en début de mot. Tu pourras alors déduire les deux autres formes.'));
-    sc.push(B.brief('ÉTAPE · PORTÉE','Cette règle vaut pour<br>'+b('toutes les lettres')+',<br>sauf '+b('3')+' que l\'on verra<br>plus tard ! ⚠️',
-      'Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.'));
+    sc.push(B.brief(te('ÉTAPE · LA CLÉ'),
+      te('C\'est pourquoi il faut<br>connaître par cœur<br>')+B.iso('isolée')+' et '+B.deb('début')+TB(' :<br>les deux autres se <b>déduisent</b> ! 🔑'),
+      te('C\'est pourquoi il est très important de connaître parfaitement l\'écriture de chaque lettre isolée et en début de mot. Tu pourras alors déduire les deux autres formes.')));
+    sc.push(B.brief(te('ÉTAPE · PORTÉE'),TB('Cette règle vaut pour<br><b>toutes les lettres</b>,<br>sauf <b>3</b> que l\'on verra<br>plus tard ! ⚠️'),
+      te('Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.')));
   }
   /* On ne nomme pas les trois exceptions ici : les citer à un enfant qui ne
-     les a pas encore vues n'apprend rien et charge l'écran. Chacune se
+     les a pas encore vues nte('apprend rien et charge l')écran. Chacune se
      présente d'elle-même le jour où elle arrive (voir juste en dessous). */
   if(A==='ع'||A==='غ'){
-    sc.push(B.brief('ÉTAPE · EXCEPTION','Pour cette lettre,<br>il faut apprendre<br>les '+b('4 formes')+' ! ⚠️',
-      'Pour cette lettre, il faut apprendre les quatre formes.'));
+    sc.push(B.brief(te('ÉTAPE · EXCEPTION'),TB('Pour cette lettre,<br>il faut apprendre<br>les <b>4 formes</b> ! ⚠️'),
+      te('Pour cette lettre, il faut apprendre les quatre formes.')));
   }
   if(A==='ء'){
     ['أ','ؤ','ئ'].forEach(function(g,n){
-      sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ','Parfois, tu verras<br>la hamzah sur le '+b(['ا','و','ي'][n])+' 🪑',
-        'Parfois, tu verras la hamzah sur le '+['alif','waw','ya'][n]+'.'));
+      sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ',te('Parfois, tu verras<br>la hamzah sur le ')+b(['ا','و','ي'][n])+' 🪑',
+        te('Parfois, tu verras la hamzah sur le ')+['alif','waw','ya'][n]+'.'));
       /* Le siège, lui, s'attache : on trace ses formes, la hamzah dessus. */
       var afSiege=_AF[g]||_AF[['ا','و','ي'][n]]||{i:g,m:g,f:g};
       var fSiege=_childForms({ar:g},afSiege);
@@ -10741,21 +10846,21 @@ function _boyLetterCourse(ca,idx,premiere){
         if(vues[f.form])return;vues[f.form]=1;
         listeSiege.push(f.form);nomsSiege.push(NOMS[k].toLowerCase());
       });
-      sc.push(B.tracer('SUPPORT '+(n+1)+'/3 · TRACÉ',listeSiege,
+      sc.push(B.tracer('SUPPORT '+(n+1)+te('/3 · TRACÉ'),listeSiege,
         'Trace '+b(g)+'<br>dans ses '+b(listeSiege.length+' formes')+' ✍️',
-        'Trace ce support dans ses formes.',null,nomsSiege));
+        te('Trace ce support dans ses formes.'),null,nomsSiege));
     });
   }
   /* La lettre sur la piste, avec ses voyelles */
-  sc.push(B.brief('ÉTAPE · SUR LA PISTE','Maintenant,<br>ses '+b('voyelles')+'.',
-    'Voyons maintenant la lettre avec ses voyelles.'));
+  sc.push(B.brief(te('ÉTAPE · SUR LA PISTE'),TB('Maintenant,<br>ses <b>voyelles</b>.'),
+    te('Voyons maintenant la lettre avec ses voyelles.')));
   [['َ','a','au-dessus'],['ِ','i','en-dessous'],['ُ','ou','au-dessus']].forEach(function(v,n){
     sc.push(B.obs('VOYELLE '+(n+1)+'/3',A+v[0],A+v[0],
-      'Signe '+b(v[2])+' :<br>ça fait '+q(v[1]),'Signe '+v[2]+', ça fait '+(lat+v[1]).toLowerCase(),null,true));
+      'Signe '+b(v[2])+te(' :<br>ça fait ')+q(v[1]),'Signe '+v[2]+te(', ça fait ')+(lat+v[1]).toLowerCase(),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
-    sc.push(B.tracer('VOYELLE '+(n+1)+'/3 · TRACÉ',formesMontrees(v[0]),
+    sc.push(B.tracer('VOYELLE '+(n+1)+te('/3 · TRACÉ'),formesMontrees(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(combien)+' ✍️',
-      'Trace cette syllabe dans '+combien+'.',null,nomsMontres));
+      te('Trace cette syllabe dans ')+combien+'.',null,nomsMontres));
   });
   /* Les propositions melangent les FORMES : l'enfant doit reconnaitre le
      son quelle que soit la place de la lettre dans le mot. */
@@ -10769,7 +10874,7 @@ function _boyLetterCourse(ca,idx,premiere){
     .forEach(function(o,n){
       var f=fx(o[0]);
       function cible(sg){return _avecSigne(f,sg);}
-      sc.push(B.controle('CONTRÔLE '+(n+1),'Où est '+q(o[2])+' ?','Où est ce son ?',
+      sc.push(B.controle(te('CONTRÔLE ')+(n+1),te('Où est ')+q(o[2])+' ?',te('Où est ce son ?'),
         [[cible('َ'),A+'َ'],[cible('ِ'),A+'ِ'],[cible('ُ'),A+'ُ']],cible(o[1])));
     });
   /* Tanwīn */
@@ -10778,42 +10883,42 @@ function _boyLetterCourse(ca,idx,premiere){
   var tanwFormes=aMontrer.filter(function(n){return n===0||n===3;});
   var tanwListe=function(signe){return tanwFormes.map(function(n){return _avecSigne(formes[n].form,signe);});};
   var tanwNoms=tanwFormes.map(function(n){return NOMS[n].toLowerCase();});
-  var tanwCombien=tanwFormes.length>1?('ses '+tanwFormes.length+' formes de fin de mot'):'cette forme';
+  var tanwCombien=tanwFormes.length>1?('ses '+tanwFormes.length+te(' formes de fin de mot')):'cette forme';
   [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
-    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],'Doublé :<br>ça fait '+q(v[1])+' 👃',
-      'Doublé, ça fait '+(lat+v[1]).toLowerCase(),null,true));
+    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],te('Doublé :<br>ça fait ')+q(v[1])+' 👃',
+      te('Doublé, ça fait ')+(lat+v[1]).toLowerCase(),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
-    sc.push(B.tracer('TANWĪN '+(n+1)+'/3 · TRACÉ',tanwListe(v[0]),
+    sc.push(B.tracer('TANWĪN '+(n+1)+te('/3 · TRACÉ'),tanwListe(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
-      'Trace ce tanwîn dans '+tanwCombien+'.',null,tanwNoms));
+      te('Trace ce tanwîn dans ')+tanwCombien+'.',null,tanwNoms));
   });
   /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas. */
   if(!finDeMot){
-    /* L'alif et la hamzah n'ont pas de son propre : avec un soukoun, on ne
+    /* Lte('alif et la hamzah n')ont pas de son propre : avec un soukoun, on ne
        prononce rien du tout. */
     var muette=(A==='ا'||A==='ء');
-    sc.push(B.obs('ÉTAPE · SOUKOUN',A+'ْ',A+'ْ',
-      muette?('Petit rond :<br>on ne '+b('prononce rien')+' ⭕')
-            :('Petit rond :<br>on ne dit que<br>le '+b('son de la lettre')+' ⭕'),
-      muette?'Petit rond : on ne prononce rien.'
-            :'Petit rond : on ne prononce que le son de la lettre.'));
+    sc.push(B.obs(te('ÉTAPE · SOUKOUN'),A+'ْ',A+'ْ',
+      muette?(TB('Petit rond :<br>on ne <b>prononce rien</b> ⭕'))
+            :(TB('Petit rond :<br>on ne dit que<br>le <b>son de la lettre</b> ⭕')),
+      muette?te('Petit rond : on ne prononce rien.')
+            :te('Petit rond : on ne prononce que le son de la lettre.')));
     /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
        fait donc tracer sur les formes début et milieu, les seules où il
        apparaît. */
     if(attache){
-      sc.push(B.tracer('ÉTAPE · SOUKOUN · TRACÉ',
+      sc.push(B.tracer(te('ÉTAPE · SOUKOUN · TRACÉ'),
         [_avecSigne(formes[1].form,'ْ'),_avecSigne(formes[2].form,'ْ')],
-        'Trace le '+b('soukoun')+'<br>sur le '+b('début')+' et le '+b('milieu')+' ✍️',
-        'Trace le soukoun sur la forme du début et sur celle du milieu.',
+        TB('Trace le <b>soukoun</b><br>sur le <b>début</b> et le <b>milieu</b> ✍️'),
+        te('Trace le soukoun sur la forme du début et sur celle du milieu.'),
         null,['début','milieu']));
     }
   }
   if(avecProlong&&!finDeMot){
     [['َا','aaa','ا'],['ُو','ouou','و'],['ِي','iii','ي']].forEach(function(v,n){
-      sc.push(B.obs('ALLONGEMENT '+(n+1)+'/3',A+v[0],A+v[0],'Avec '+b(v[2])+' :<br>ça fait '+q(v[1])+' 🎵',
-        'Avec cette lettre, le son s\'étire.'));
+      sc.push(B.obs('ALLONGEMENT '+(n+1)+'/3',A+v[0],A+v[0],'Avec '+b(v[2])+te(' :<br>ça fait ')+q(v[1])+' 🎵',
+        te('Avec cette lettre, le son s\'étire.')));
       if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
-      /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
+      /* Une syllabe prolongée vit à lte('intérieur d')un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au
          milieu, et la prolongation qui appelle la suite ou termine le mot.
          Une lettre de prolongation qui ne s'accroche pas (ا et و) coupe le
@@ -10831,53 +10936,50 @@ function _boyLetterCourse(ca,idx,premiere){
         casesP.push(_TATWEEL+A+v[0]);nomsP.push('fin');
       }
       var plusieursP=casesP.length>1;
-      sc.push(B.tracer('ALLONGEMENT '+(n+1)+'/3 · TRACÉ',casesP,
+      sc.push(B.tracer('ALLONGEMENT '+(n+1)+te('/3 · TRACÉ'),casesP,
         'Trace '+b((lat+v[1]).toLowerCase())
           +(plusieursP?('<br>dans '+b(casesP.length+' places')):'')+' ✍️',
-        plusieursP?'Trace cet allongement dans ses différentes places.'
-                  :'Trace cet allongement.',null,nomsP));
+        plusieursP?te('Trace cet allongement dans ses différentes places.')
+                  :te('Trace cet allongement.'),null,nomsP));
     });
   }
   /* Le mot */
   sc.push(function(api){
-    var p=api.panneau('ÉTAPE FINALE · LE MOT');
-    api.titre(p,'Un mot avec '+b(L.name)+' '+L.emoji,'Voici un mot avec cette lettre.');
+    var p=api.panneau(te('ÉTAPE FINALE · LE MOT'));
+    api.titre(p,'Un mot avec '+b(L.name)+' '+L.emoji,te('Voici un mot avec cette lettre.'));
     var e=document.createElement('div');e.style.cssText='font-size:4rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
     api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     api.bouton(p,'SUIVANT ▸',api.suivant);
   });
   /* Le dernier tracé reprend les quatre formes, dans le sens de lecture :
-     c'est le moment où l'enfant montre qu'il sait écrire la lettre partout,
+     cte('est le moment où l')enfant montre qu'il sait écrire la lettre partout,
      pas seulement seule. */
-  sc.push(B.tracer('ÉTAPE FINALE · TRACÉ',formesMontrees(),
-    'Trace une dernière fois<br>'+b(L.name)+'<br>dans '+b(combien)+' ✍️',
-    'Trace une dernière fois cette lettre, dans '+combien+'.',null,nomsMontres));
+  sc.push(B.tracer(te('ÉTAPE FINALE · TRACÉ'),formesMontrees(),
+    te('Trace une dernière fois<br>')+b(L.name)+'<br>dans '+b(combien)+' ✍️',
+    te('Trace une dernière fois cette lettre, dans ')+combien+'.',null,nomsMontres));
   sc.push(function(api){
     var ile=_boyLettreFinie(_boySession,idx);
     /* Dernière île du parcours : plus rien après elle. */
     var derniereIle=!!(_boySession&&ALL_S.indexOf(_boySession)===ALL_S.length-1);
-    /* Une île qu'on vient de terminer appelle la suite de l'aventure. Une
-       île déjà bouclée qu'on révise, non : on rend l'enfant à la liste des
+    /* Une île qute('on vient de terminer appelle la suite de l')aventure. Une
+       île déjà bouclée qute('on révise, non : on rend l')enfant à la liste des
        lettres de SON île, là d'où il est parti. */
     if(ile.finie&&ile.deja&&_boySession){
-      B.mission('Bravo ! 🎉<br>Tu as revu '+b(L.name)+' 🎖️<br>Tu la connais bien !',
-        'Bravo ! Tu as revu cette lettre. Tu la connais bien !',
+      B.mission(te('Bravo ! 🎉<br>Tu as revu ')+b(L.name)+te(' 🎖️<br>Tu la connais bien !'),
+        te('Bravo ! Tu as revu cette lettre. Tu la connais bien !'),
         function(){_boyLetterPicker(ca,_boySession);},_HAB.monLieu)(api);
     }else if(ile.finie&&derniereIle){
       /* La toute dernière île : il n'y a plus d'aventure à annoncer, on
          envoie l'enfant s'entraîner. */
-      B.mission('Bravo ! 🎉<br>Tu as validé<br>'+b('toutes les '+_HAB.missionMin.toLowerCase()+'s')+' !<br>'
-        +'Teste tes connaissances<br>dans la rubrique '
-        +'<span class="boy-lien" onclick="navToPage(\'exercises\')">Exercices</span> 🏅',
-        'Bravo ! Tu as validé toutes les '+_HAB.missionMin.toLowerCase()+'s ! Teste tes connaissances dans la rubrique Exercices.',
-        function(){showS('s-menu',true,true);},'▸ MENU PRINCIPAL')(api);
+      B.mission(te('Bravo ! 🎉<br>Tu as validé<br>')+b('toutes les '+_HAB.missionMin.toLowerCase()+'s')+TB(' !<br>Teste tes connaissances<br>dans la rubrique <span class="boy-lien" onclick="navToPage(\'exercises\')">Exercices</span> 🏅'),
+        te('Bravo ! Tu as validé toutes les ')+_HAB.missionMin.toLowerCase()+te('s ! Teste tes connaissances dans la rubrique Exercices.'),
+        function(){showS('s-menu',true,true);},te('▸ MENU PRINCIPAL'))(api);
     }else if(ile.finie){
       /* Île terminée : on annonce la mission finie et on ramène l'enfant à la
          carte sans qu'il ait à appuyer — le temps de lire, pas plus. */
-      B.mission('Bravo ! 🎉<br>Tu as fini ta '+b(_HAB.missionMin.toLowerCase())+' !<br>'
-        +'À très vite pour une<br>'+b('prochaine aventure')+' ! '+_HAB.veh,
-        'Bravo ! Tu as fini ta '+_HAB.missionMin.toLowerCase()+' ! À très vite pour une prochaine aventure !',
+      B.mission(te('Bravo ! 🎉<br>Tu as fini ta ')+b(_HAB.missionMin.toLowerCase())+TB(' !<br>À très vite pour une<br><b>prochaine aventure</b> ! ')+_HAB.veh,
+        te('Bravo ! Tu as fini ta ')+_HAB.missionMin.toLowerCase()+te(' ! À très vite pour une prochaine aventure !'),
         function(){renderSessionsMap(ca);},_HAB.carte)(api);
       /* Le retour automatique ne doit valoir QUE pour cet écran-là : si
          l'enfant a déjà ouvert une autre île entre-temps, son cours se
@@ -10888,10 +10990,10 @@ function _boyLetterCourse(ca,idx,premiere){
         if(ecranFin&&ecranFin.isConnected)renderSessionsMap(ca);
       },5200);
     }else{
-      B.mission('Bravo ! 🎉<br>Tu maîtrises '+b(L.name)+' 🎖️<br>Continue comme ça !',
-        'Bravo ! Tu maîtrises cette lettre. Continue comme ça !',
+      B.mission(te('Bravo ! 🎉<br>Tu maîtrises ')+b(L.name)+te(' 🎖️<br>Continue comme ça !'),
+        te('Bravo ! Tu maîtrises cette lettre. Continue comme ça !'),
         function(){if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);},
-        '▸ LETTRE SUIVANTE')(api);
+        te('▸ LETTRE SUIVANTE'))(api);
     }
   });
 
