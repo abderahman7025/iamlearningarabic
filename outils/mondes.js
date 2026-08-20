@@ -808,7 +808,36 @@ function ciel(o) {
    dans un monde, on veut le monde, pas un filigrane. */
 
 
+/* LES SUCRERIES EN PIÈCES DÉTACHÉES.
+ *
+ * Dans le cours du monde des sucreries, il en faut au premier plan, posées
+ * en bas de l'écran — le paysage seul est recadré par `cover` et n'en
+ * laisse presque rien voir. Chaque friandise est donc écrite dans son
+ * propre fichier, comme les bêtes du client, et la page les sème.
+ * Le motif est dessiné autour de (100, 120) : la boîte est la même pour
+ * toutes, elles se posent donc à la même hauteur. */
+const PIECES = [
+  ['sucette-rose', sucette(100, 96, 92, '#ffffff', '#ff6fae', 0)],
+  ['sucette-bleue', sucette(100, 96, 92, '#fff3b8', '#7fd0f0', 0.4)],
+  ['sucette-mauve', sucette(100, 96, 92, '#ffd6e8', '#a86ad8', 0.8)],
+  ['donut', donut(100, 110, 104, '#e8a86a', '#ff9ec4', 0.2)],
+  ['cupcake', cupcake(100, 108, 104, '#ffb3d1', '#fff0f8', 0.6)],
+  ['glace', glace(100, 104, 100, '#a8e8d4', '#ffd34e', 1.0)],
+  ['canne', canne(100, 110, 96, 1.4)],
+  ['bonbon-vert', bonbon(100, 130, 92, '#a8e8d4', '#e8fff8', 1.8)],
+  ['bonbon-jaune', bonbon(100, 130, 88, '#ffe36a', '#fff8d8', 2.2)],
+  ['nounours', nounours(100, 112, 92, 0.9)]
+];
+
 if (!fs.existsSync(SORTIE)) fs.mkdirSync(SORTIE, { recursive: true });
+PIECES.forEach(function (pc) {
+  const f = path.join(SORTIE, 'sucrerie-' + pc[0] + '.svg');
+  fs.writeFileSync(f,
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">\n'
+    + MOUVEMENT + '\n  ' + pc[1] + '\n</svg>\n', 'utf8');
+});
+console.log(PIECES.length + ' sucreries en pieces detachees.');
+
 MONDES.forEach(function (m) {
   const f = path.join(SORTIE, 'monde-' + m.nom + '.svg');
   fs.writeFileSync(f, monde(m), 'utf8');

@@ -6540,14 +6540,25 @@ function _volCarte(o){
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
      conteneur de la carte, sous le personnage, et se retirent tout seuls. */
+  /* La traînée. Le garçon laisse un feu clair ; la fille, une FUMÉE
+     D'ARC-EN-CIEL — chaque grain prend la couleur suivante de l'arc, et le
+     nuage blanc d'avant devient un ruban coloré qui s'efface. */
+  var rangArc=0;
+  function couleurGrain(){
+    var arc=_HAB&&_HAB.traineeArc;
+    if(!arc||!arc.length)return o.trainee||'rgba(255,255,255,.85)';
+    return arc[(rangArc++)%arc.length];
+  }
   function grain(x,y){
     var T=Date.now();
     if(T-dernierGrain<70)return;
     dernierGrain=T;
     var g=document.createElement('div');
-    g.style.cssText='position:absolute;left:'+(x-5)+'px;top:'+(y-5)+'px;width:10px;height:10px;'
-      +'border-radius:50%;pointer-events:none;z-index:19;background:'+(o.trainee||'rgba(255,255,255,.85)')
-      +';transition:opacity .7s ease,transform .7s ease';
+    var taille=(_HAB&&_HAB.traineeArc)?16:10;
+    g.style.cssText='position:absolute;left:'+(x-taille/2)+'px;top:'+(y-taille/2)+'px;'
+      +'width:'+taille+'px;height:'+taille+'px;'
+      +'border-radius:50%;pointer-events:none;z-index:19;background:'+couleurGrain()
+      +';filter:blur(1px);transition:opacity .7s ease,transform .7s ease';
     globe.appendChild(g);grains.push(g);
     requestAnimationFrame(function(){
       g.style.opacity='0';g.style.transform='scale(.3)';
@@ -7878,7 +7889,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v117';
+var _VERSION_REPLI='v118';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9356,6 +9367,9 @@ var _HABILLAGES={
     slugs:['licornes','couronne','nuages','fleurs','coeurs','pingouins',
            'papillons','tortue','chats-chiens','ours','sucreries','chateau'],
     trainee:'rgba(255,255,255,.95)',
+    /* Sa traînée n'est pas une fumée blanche mais un ARC-EN-CIEL : chaque
+       grain prend la couleur suivante. */
+    traineeArc:['#ff8ec4','#ffb3a8','#ffe36a','#a8e8b0','#8fd0ff','#c9b6ff'],
     /* Un monde est dessiné dans un carré, comme une planète : il occupe donc
        bien moins de place qu'une île peinte en paysage, et prend le même
        facteur d'agrandissement que le garçon. */
@@ -9457,12 +9471,36 @@ var _HABILLAGES={
         {img:'/images/bete-ours2.png',x:84,b:2,l:14,anim2:'beteBalance',dur2:3.8},
         {img:'/images/bete-ours2.png',x:71,b:1,l:11,anim2:'beteBalance',dur2:2.9},
         {img:'/images/bete-ours2.png',x:16,b:1,l:11,anim2:'beteBalance',dur2:4.4},
-        {img:'/images/bete-ours2.png',x:57,b:0,l:9,anim2:'beteBalance',dur2:3.5}
+        /* Celui-ci se retrouvait sous le grand ours : il rejoint les deux de
+           droite, un peu en retrait derrière eux. */
+        {img:'/images/bete-ours2.png',x:78,b:7,l:8,anim2:'beteBalance',dur2:3.5}
       ],
       /* Une seule fois chaque image, TRÈS GROS, et assis par terre. */
       'chats-chiens':[
         {img:'/images/bete-chienchat1.png',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
         {img:'/images/bete-chienchat2.png',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
+      ],
+      /* Le paysage des sucreries est recadré par `cover` : on n'en voyait
+         presque rien. Il en faut donc AU PREMIER PLAN, posées en bas. */
+      'sucreries':[
+        {img:'/images/sucrerie-sucette-rose.svg',x:1,b:1,l:11,anim2:'beteBalance',dur2:3.4},
+        {img:'/images/sucrerie-donut.svg',x:13,b:0,l:12,anim2:'beteBalance',dur2:4.0},
+        {img:'/images/sucrerie-cupcake.svg',x:26,b:1,l:11,anim2:'beteBalance',dur2:3.1},
+        {img:'/images/sucrerie-glace.svg',x:38,b:0,l:11,anim2:'beteBalance',dur2:4.4},
+        {img:'/images/sucrerie-canne.svg',x:50,b:1,l:10,anim2:'beteBalance',dur2:3.7},
+        {img:'/images/sucrerie-nounours.svg',x:61,b:0,l:11,anim2:'beteBalance',dur2:4.8},
+        {img:'/images/sucrerie-bonbon-vert.svg',x:73,b:1,l:11,anim2:'beteBalance',dur2:3.3},
+        {img:'/images/sucrerie-sucette-bleue.svg',x:85,b:0,l:11,anim2:'beteBalance',dur2:4.2},
+        {img:'/images/sucrerie-bonbon-jaune.svg',x:7,b:14,l:8,anim2:'beteBalance',dur2:5.0},
+        {img:'/images/sucrerie-sucette-mauve.svg',x:90,b:15,l:8,anim2:'beteBalance',dur2:3.9}
+      ],
+      /* LA COURONNE EST TOUJOURS DANS SON MONDE — même une fois gagnée :
+         c'est le monde de la couronne. Sur la carte, elle disparaît quand
+         la fille la prend ; ici, elle reste. */
+      'couronne':[
+        {img:'/images/couronne.png',x:32,b:6,l:36,anim2:'beteBalance',dur2:5.2},
+        {img:'/images/couronne.png',x:4,b:2,l:14,anim2:'beteBalance',dur2:3.6,o:0.8},
+        {img:'/images/couronne.png',x:82,b:2,l:15,anim2:'beteBalance',dur2:4.4,o:0.8}
       ],
       /* Les licornes du client vont DANS TOUS LES SENS. */
       'licornes':[

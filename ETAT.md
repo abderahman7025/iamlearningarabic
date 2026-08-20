@@ -943,6 +943,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Quatre retouches demandées le 20 août au soir.**
+  - **Les sucreries en pièces détachées** (`sucrerie-*.svg`, dix fichiers
+    écrits par `outils/mondes.js`). Le paysage seul est recadré par
+    `cover` : on n'en voyait presque rien dans le cours. Elles sont
+    maintenant posées AU PREMIER PLAN, une rangée en bas de l'écran.
+  - **La couronne est toujours dans son monde**, à l'intérieur du cours —
+    une grande sur son coussin, deux petites sur les côtés. Sur la carte
+    elle disparaît quand la fille la gagne ; dans le monde, elle reste.
+  - **L'ourson que le grand écrasait** a rejoint les deux de droite, un peu
+    en retrait derrière eux.
+  - **La traînée de la licorne est un ARC-EN-CIEL** (`traineeArc`) : chaque
+    grain prend la couleur suivante de l'arc, plus gros et légèrement
+    flouté — une fumée colorée au lieu du nuage blanc. Le garçon garde la
+    sienne, l'habillage seul décide.
+
 - **Dans un monde, le ciel de la carte s'éteint.** Le calque d'ambiance de
   la fille (`#girl-bg-anim` : étoiles, cœurs, nuages, licornes qui dérivent)
   est allumé sur TOUT le profil : on le retrouvait donc par-dessus la
