@@ -2461,6 +2461,14 @@ body.fond-espace #root.profile-boy .nav-card .nav-desc{opacity:.85}
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* DANS UN MONDE, LE CIEL DE LA CARTE S'ETEINT. Le calque d'ambiance de la
+   fille — ses etoiles, ses coeurs, ses nuages et ses licornes qui derivent
+   — est allume sur tout le profil : on le retrouvait donc par-dessus la
+   banquise et la clairiere. C'est le paysage du monde qui tient ce role
+   une fois qu'on y est entre. Trois classes, pour passer devant la regle
+   qui l'allume (voir le piege de specificite plus bas). */
+body.profile-girl.dans-un-monde #girl-bg-anim{display:none !important}
+
 /* LE DECOR EST UN FOND, PAS UN PREMIER PLAN.
    Il vit sur le `body` (un `position:fixed` posé dans `#ca` cesse d'être
    fixe, voir plus bas), mais `#root` est lui aussi positionné : deux
@@ -7870,7 +7878,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v115';
+var _VERSION_REPLI='v116';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

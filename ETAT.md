@@ -934,6 +934,14 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Dans un monde, le ciel de la carte s'éteint.** Le calque d'ambiance de
+  la fille (`#girl-bg-anim` : étoiles, cœurs, nuages, licornes qui dérivent)
+  est allumé sur TOUT le profil : on le retrouvait donc par-dessus la
+  banquise et la clairière. Une règle à trois classes l'éteint pendant
+  qu'on est dans un monde — c'est le paysage qui tient ce rôle une fois
+  qu'on y est entré. Vérifié sur le cycle : menu (allumé) → monde (éteint)
+  → retour carte (rallumé).
+
 - **LE PAYSAGE D'UN MONDE, ET LE PIÈGE DE LA SPÉCIFICITÉ.** Après l'avoir
   fait repasser DERRIÈRE le cours (`z-index:-2`, inséré avant `#root`), il
   ne se voyait plus du tout : `body`/`#root` peignaient toujours le dégradé
