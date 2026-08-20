@@ -985,6 +985,24 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le modèle s'écrit tout seul dans les canvas adulte — v128.** Il a fallu
+  d'abord lui donner SON CALQUE : le modèle partageait le canvas de l'élève,
+  donc le redessiner effaçait son écriture, et une animation était
+  impossible. C'est l'architecture de l'interface enfant. Effet de bord
+  gagné au passage : masquer puis rafficher le modèle ne détruit plus le
+  travail en cours (mesuré : 1252 pixels d'encre avant, 1252 après).
+  Le tracé réutilise `_revelateur` / `_reveleJusqua`, déjà réglés pour
+  l'enfant — le corps, puis les points, puis la voyelle. `_revelateur` prend
+  une couleur en 9ᵉ argument ; sans elle il garde son gris-bleu.
+  Deux pièges refermés : `doReset` comptait sur `redraw()` pour vider
+  l'encre, il doit maintenant le faire lui-même ; et la mesure des voyelles
+  seules doit se prendre sur le contexte du MODÈLE, seul endroit où la
+  police arabe est posée.
+- **Le blanc s'arrête au pied de la dent.** Le nūn, que le client donne pour
+  parfait, s'arrête exactement là : 24 px au milieu. La petite verticale qui
+  remonte appartient à la lettre. Le bāʾ et le yāʾ ont le même pied
+  (0,171 em au milieu, 0,214 pour le bāʾ final).
+
 - **La coupe du trait de liaison est en L, plus verticale — v127.** Une coupe
   droite ne sait pas séparer un POINT d'un trait : le point du bāʾ et les deux
   du yāʾ, au milieu, se trouvent sous le trait de liaison et partaient en

@@ -1234,6 +1234,14 @@ body {
   aspect-ratio:1;
   cursor:crosshair;
   touch-action:none;
+  /* au-dessus du modèle, et transparent pour le laisser voir */
+  position:relative;z-index:1;background:transparent;
+}
+/* Le modèle vit sur son propre calque, dessous : on peut donc l'animer sans
+   effacer ce que l'élève a écrit. */
+.writing-model{
+  position:absolute;left:0;top:0;width:100%;height:100%;
+  pointer-events:none;
 }
 @media(orientation:landscape){
   
@@ -8016,7 +8024,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v127';
+var _VERSION_REPLI='v128';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8811,8 +8819,11 @@ function _bandeLiaison(){
    · kāf et ṭāʾ : leurs deux formes ne s'accordaient pas (28 px contre 23,
      23 contre 26). Le milieu reprend la valeur de la finale, comme demandé.
    · jīm, bāʾ, yāʾ : la mesure se trompe des deux côtés — leur forme garde un
-     segment PLAT sur la ligne après le trait, sans creux où s'arrêter. Elles
-     reçoivent leur propre valeur, lue à l'œil.
+     segment PLAT sur la ligne après le trait, sans creux où s'arrêter.
+     La règle est donnée par le nūn : le blanc s'arrête au PIED DE LA DENT,
+     la petite verticale qui remonte, laquelle appartient à la lettre. Son
+     pied est à 0,171 em au milieu pour le nūn comme pour le bāʾ et le yāʾ,
+     et à 0,214 pour le bāʾ final.
 
    Tout le reste de l'alphabet garde la mesure automatique. */
 var _LIAISON_EM={
@@ -8820,9 +8831,9 @@ var _LIAISON_EM={
   'ط|milieu':0.164,'ظ|milieu':0.164,
   'ج|fin':0.18,'ح|fin':0.18,'خ|fin':0.18,
   'ج|milieu':0.26,'ح|milieu':0.26,'خ|milieu':0.26,
-  'ب|fin':0.34,'ت|fin':0.34,'ث|fin':0.34,
-  'ب|milieu':0.26,'ت|milieu':0.26,'ث|milieu':0.26,
-  'ي|milieu':0.26
+  'ب|fin':0.214,'ت|fin':0.214,'ث|fin':0.214,
+  'ب|milieu':0.171,'ت|milieu':0.171,'ث|milieu':0.171,
+  'ي|milieu':0.171
 };
 /* La clé d'une forme : la lettre nue, et sa place lue sur ses tatweels. */
 function _cleForme(f){
@@ -9027,13 +9038,17 @@ function _cheminSurEncre(gestes,encre,w,h,ancreX,ancreY,px){
    on sépare le corps de ses points, et on range les pixels du corps dans
    l'ordre où le crayon passe dessus. Renvoie null si la forme n'a pas de
    geste connu — l'appelant la dessinera alors d'un bloc. */
-function _revelateur(texte,ax,ay,px,x0,y0,w,h){
+function _revelateur(texte,ax,ay,px,x0,y0,w,h,couleur){
   var gestes=_trajectoire(texte);
   if(!gestes||w<=0||h<=0)return null;
   var cv=document.createElement('canvas');cv.width=w;cv.height=h;
   var c=cv.getContext('2d');
   c.font=px+"px 'Scheherazade New',serif";
-  c.textBaseline='alphabetic';c.textAlign='center';c.fillStyle=_TRACE_GRIS;
+  /* L'appelant peut donner sa couleur — l'adulte veut son or, l'enfant garde
+     le gris-bleu. On peint en PLEIN : la transparence se met au moment de
+     poser le calque, sinon les bords adoucis passeraient sous le seuil qui
+     repère l'encre, et la lettre maigrirait. */
+  c.textBaseline='alphabetic';c.textAlign='center';c.fillStyle=couleur||_TRACE_GRIS;
   _dessineSurLigne(c,texte,ax-x0,ay-y0,px);
   var img=c.getImageData(0,0,w,h),d=img.data;
   var encre=new Uint8Array(w*h),nEncre=0;
@@ -12698,7 +12713,10 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         +'<div class="wm-portrait-only">'
           +'<div class="letter-forms" id="wm-forms-portrait" style="margin-bottom:8px;gap:10px"></div>'
         +'</div>'
-        +'<div class="canvas-wrap"><canvas class="writing-canvas" id="wm-canvas"></canvas></div>'
+        +'<div class="canvas-wrap">'
+          +'<canvas class="writing-model" id="wm-model"></canvas>'
+          +'<canvas class="writing-canvas" id="wm-canvas"></canvas>'
+        +'</div>'
         // Contrôles portrait - sous les formes
         +'<div class="wm-portrait-only" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px">'
           +'<div class="writing-btn active" id="wm-guide-portrait">👁 '+wGuideOn+'</div>'
@@ -12737,6 +12755,9 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
     const canvas = mod.querySelector('#wm-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    /* Le calque du modèle, sous l'encre. */
+    const cvModele = mod.querySelector('#wm-model');
+    const mctx = cvModele ? cvModele.getContext('2d') : ctx;
 
     function setupCanvas() {
       const dpr = window.devicePixelRatio || 1;
@@ -12746,33 +12767,85 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      redraw();
+      if (cvModele) {
+        cvModele.width = rect.width * dpr;
+        cvModele.height = rect.height * dpr;
+        mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      relanceModele();
     }
 
-    function drawGuide() {
+    /* ── Le modèle s'écrit tout seul ──────────────────────────────────────
+       Même machinerie que l'interface enfant : le corps de la lettre au fil
+       du geste, puis ses points, puis sa voyelle. Une seule passe, à
+       l'apparition — ensuite le modèle reste entier sous la main.
+       Minuterie et non requestAnimationFrame : rAF ne tourne pas dans un
+       onglet qui n'est pas au premier plan. */
+    var rev = null, revProg = 3, revDebut = 0, revTic = null;
+    var REV_DUREE = 2200;
+
+    function prepareRevelateur() {
+      rev = null;
       const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !showGuide) return;
+      var fs = rect.width * (window.matchMedia('(orientation:landscape)').matches ? 0.22 : 0.35);
+      var baseY = rect.height * 0.65;
+      try {
+        rev = _revelateur(currentLetterForm, rect.width / 2, baseY, fs,
+                          0, 0, Math.ceil(rect.width), Math.ceil(rect.height), '#f5c842');
+      } catch (e) { rev = null; }
+    }
+
+    function relanceModele() {
+      if (revTic) { clearInterval(revTic); revTic = null; }
+      prepareRevelateur();
+      /* Pas de geste connu pour cette forme : on la pose entière. */
+      if (!rev) { revProg = 3; dessineModele(); return; }
+      revProg = 0; revDebut = Date.now();
+      dessineModele();
+      revTic = setInterval(function () {
+        var p = 3 * (Date.now() - revDebut) / REV_DUREE;
+        revProg = Math.min(3, p);
+        dessineModele();
+        if (revProg >= 3) { clearInterval(revTic); revTic = null; }
+      }, 33);
+    }
+
+    function dessineModele() {
+      const rect = canvas.getBoundingClientRect();
+      mctx.clearRect(0, 0, rect.width, rect.height);
       // Ligne de base en pointillés
       const baseY = rect.height * 0.65;
-      ctx.save();
-      ctx.setLineDash([8, 6]);
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = (st.profile==='girl') ? 'rgba(194,24,91,0.35)' : (st.profile==='boy') ? 'rgba(2,136,209,0.35)' : (st.profile==='adult') ? 'rgba(184,134,11,0.35)' : 'rgba(245,200,66,0.45)';
-      ctx.beginPath();
-      ctx.moveTo(rect.width * 0.05, baseY);
-      ctx.lineTo(rect.width * 0.95, baseY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
+      mctx.save();
+      mctx.setLineDash([8, 6]);
+      mctx.lineWidth = 1.5;
+      mctx.strokeStyle = (st.profile==='girl') ? 'rgba(194,24,91,0.35)' : (st.profile==='boy') ? 'rgba(2,136,209,0.35)' : (st.profile==='adult') ? 'rgba(184,134,11,0.35)' : 'rgba(245,200,66,0.45)';
+      mctx.beginPath();
+      mctx.moveTo(rect.width * 0.05, baseY);
+      mctx.lineTo(rect.width * 0.95, baseY);
+      mctx.stroke();
+      mctx.setLineDash([]);
+      mctx.restore();
       // Modèle lettre
       if (!showGuide) return;
-      ctx.save();
-      ctx.globalAlpha = 0.14;
+      /* Un geste est connu pour cette forme : on la fait s'écrire. Le calque
+         rendu par _reveleJusqua est déjà à la bonne place, on ne fait que le
+         poser — et c'est ici que le modèle prend sa transparence. */
+      if (rev) {
+        mctx.save();
+        mctx.globalAlpha = 0.14;
+        mctx.drawImage(_reveleJusqua(rev, revProg), rev.x0, rev.y0);
+        mctx.restore();
+        return;
+      }
+      mctx.save();
+      mctx.globalAlpha = 0.14;
       var fontScale = window.matchMedia('(orientation:landscape)').matches ? 0.22 : 0.35;
-      ctx.font = (rect.width * fontScale) + 'px \'Scheherazade New\', serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = '#f5c842';
-      var fontSize2 = parseFloat(ctx.font);
+      mctx.font = (rect.width * fontScale) + 'px \'Scheherazade New\', serif';
+      mctx.textAlign = 'center';
+      mctx.textBaseline = 'alphabetic';
+      mctx.fillStyle = '#f5c842';
+      var fontSize2 = parseFloat(mctx.font);
       /* ── Une voyelle seule se pose CONTRE la ligne d'écriture ──────────
          Un signe sans lettre n'a pas de largeur ni de hauteur d'avance :
          posé à la même place qu'une lettre, il flotte n'importe où. Les
@@ -12805,7 +12878,7 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
            passaient donc en haut, et rien ne les redescendait ensuite. */
         var SOUS_LA_LIGNE = [0x0650, 0x064D, 0x0655, 0x0656];
         var dessous = SOUS_LA_LIGNE.indexOf(_dcp) >= 0;
-        var mes = ctx.measureText(currentLetterForm);
+        var mes = mctx.measureText(currentLetterForm);
         var monte = mes.actualBoundingBoxAscent, descend = mes.actualBoundingBoxDescent;
         /* 0,08 collait trop la voyelle à la ligne pointillée : elle doit
            respirer comme si une lettre la portait. */
@@ -12820,16 +12893,13 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         var g = mes.actualBoundingBoxLeft, d = mes.actualBoundingBoxRight;
         if (isFinite(g) && isFinite(d)) drawX += (g - d) / 2;
       }
-      ctx.fillText(currentLetterForm, drawX, drawY);
-      ctx.restore();
+      mctx.fillText(currentLetterForm, drawX, drawY);
+      mctx.restore();
     }
 
-    function redraw() {
-      const rect = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
-      ctx.beginPath();
-      drawGuide();
-    }
+    /* Refaire le modèle n'efface plus ce que l'élève a écrit : les deux
+       vivent sur des calques séparés. */
+    function redraw() { relanceModele(); }
 
     /* Le modèle est dessiné, et mesuré, avec la police arabe. Si elle
        arrive après le premier tracé du modèle, celui-ci reste dessiné avec
@@ -12841,7 +12911,7 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       canvas.addEventListener(ev, function () { _aEcrit = true; }, { passive: true });
     });
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () { if (!_aEcrit) redraw(); });
+      document.fonts.ready.then(function () { if (!_aEcrit) relanceModele(); });
     }
 
     function getPos(e) {
@@ -13000,8 +13070,14 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       const guideBtn = mod.querySelector('#wm-guide');
       guideBtn.textContent = t('model_shown');
       guideBtn.classList.add('active');
-      redraw();
+      /* L'encre a son propre calque depuis que le modèle s'anime : elle ne
+         part plus toute seule quand on redessine, il faut la vider ici. */
+      var _r = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, _r.width, _r.height);
+      ctx.beginPath();
+      relanceModele();
       hasDrawn = false;
+      _aEcrit = false;
     }
     var resetEl = mod.querySelector('#wm-reset');
     var resetPEl = mod.querySelector('#wm-reset-portrait');
