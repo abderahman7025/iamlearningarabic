@@ -985,6 +985,22 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Une rangée de voyelles sous les formes, dans le module d'écriture — v129.**
+  Trois simples, leurs trois doublées, le soukoun, et « sans voyelle » pour
+  revenir à la lettre nue. Le modèle à tracer prend la voyelle choisie, et
+  comme le révélateur écrit le corps, puis les points, puis la voyelle, elle
+  arrive en dernier — dans l'ordre où la main écrit.
+  La marque se glisse APRÈS la lettre, pas au bout de la forme : dans
+  « ـبـ » la lettre est au milieu, et posée au bout la voyelle tomberait sur
+  le trait de liaison.
+  Deux règles, demandées par le client :
+  · une voyelle **doublée** ne tombe qu'en fin de mot — elle éteint les
+    formes début et milieu, et ces formes éteignent les doublées ;
+  · le **tā marbūṭa** n'a pas de soukoun (`_SANS_SOUKOUN`, une table : la
+    prochaine exception ne coûtera qu'une ligne).
+  Une voyelle impossible est ÉTEINTE, pas cachée : l'élève voit qu'elle
+  existe et qu'elle ne va pas là.
+
 - **Le modèle s'écrit tout seul dans les canvas adulte — v128.** Il a fallu
   d'abord lui donner SON CALQUE : le modèle partageait le canvas de l'élève,
   donc le redessiner effaçait son écriture, et une animation était

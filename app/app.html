@@ -1289,6 +1289,24 @@ body {
   flex:1;min-width:0;
 }
 .lform-btn:hover{background:rgba(255,255,255,.14);}
+/* La rangée de voyelles, sous les formes. Une voyelle qui ne peut pas se
+   poser sur la forme choisie n'est pas cachée : elle est éteinte, pour que
+   l'élève voie qu'elle existe et qu'elle ne va pas là. */
+.wm-voy{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px 0 2px}
+.wm-voy-btn{
+  min-width:34px;padding:4px 6px 5px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);
+  cursor:pointer;transition:all .2s;text-align:center;
+  font-family:var(--fa);font-size:1.15rem;line-height:1.25;color:var(--vowel);
+}
+.wm-voy-btn .wm-voy-lat{
+  display:block;font-family:Outfit,sans-serif;font-size:.44rem;
+  color:var(--txt2);letter-spacing:.04em}
+.wm-voy-btn:hover{background:rgba(255,255,255,.14);}
+.wm-voy-btn.active{background:rgba(245,200,66,.2);border-color:rgba(245,200,66,.5);}
+.wm-voy-btn.eteint,.lform-btn.eteint{
+  opacity:.28;cursor:not-allowed;pointer-events:none;}
 .lform-btn.active{
   background:rgba(245,200,66,.2);
   border-color:rgba(245,200,66,.5);
@@ -8024,7 +8042,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v128';
+var _VERSION_REPLI='v129';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8184,6 +8202,9 @@ var _SOUS_LA_LIGNE=/[ٍِ]/;   /* kasra · tanwīn kasr */
       dessin ET pour le chemin de l'animation — sinon le crayon passerait à
       côté de la lettre. */
 var _JAMBAGE_ISOLE=/^[جحخ]$/;
+/* Les lettres qui ne prennent pas de soukoun. Le tā marbūṭa ne ferme jamais
+   une syllabe : il porte toujours une voyelle ou un tanwīn. */
+var _SANS_SOUKOUN='ة';
 function _descenteGlyphe(texte,px){
   var t=String(texte),corps=t.replace(_MARQUES,'');
   if(!corps&&_SOUS_LA_LIGNE.test(t))return Math.round(px*0.24);
@@ -12686,6 +12707,10 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
   let profileInkColor = st.profile==='girl' ? '#c2185b' : st.profile==='boy' ? '#0288d1' : st.profile==='adult' ? '#b8860b' : 'white';
   let color = profileInkColor;
   let currentLetterForm = letterAr;
+  /* La forme choisie et la voyelle choisie, séparément : le modèle est
+     fabriqué à partir des deux. */
+  let currentFormKey = 'isolée';
+  let currentVowel = '';
 
   var wHint = t('writing_hint')||'';
   var wGuideOn = t('writing_guide_on')||'';
@@ -12705,13 +12730,15 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       // Colonne gauche paysage : formes
       +'<div class="wm-forms-col">'
         +'<div class="letter-forms" id="wm-forms-landscape" style="flex-direction:column;gap:6px"></div>'
+        +'<div class="wm-voy" id="wm-voy-landscape"></div>'
       +'</div>'
 
       // Colonne centrale : canvas + (formes portrait en dessous)
       +'<div class="wm-canvas-col">'
         // Formes portrait - AU-DESSUS du canvas
         +'<div class="wm-portrait-only">'
-          +'<div class="letter-forms" id="wm-forms-portrait" style="margin-bottom:8px;gap:10px"></div>'
+          +'<div class="letter-forms" id="wm-forms-portrait" style="margin-bottom:2px;gap:10px"></div>'
+          +'<div class="wm-voy" id="wm-voy-portrait"></div>'
         +'</div>'
         +'<div class="canvas-wrap">'
           +'<canvas class="writing-model" id="wm-model"></canvas>'
@@ -12991,24 +13018,102 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       letterPos.forEach(function(p){ posMap[p.l] = p.ar || p.g; });
       posMap['isolée'] = letterAr;
 
+      /* ── La voyelle se pose sur la LETTRE, pas au bout de la forme ────
+         Dans « ـبـ », la lettre est au milieu : la marque se glisse juste
+         après elle, sinon elle irait se poser sur le trait de liaison. */
+      function avecVoyelle(forme, marque) {
+        if (!marque) return forme;
+        var f = String(forme);
+        for (var i = 0; i < f.length; i++) {
+          if (f.charAt(i) !== _TATWEEL) return f.slice(0, i + 1) + marque + f.slice(i + 1);
+        }
+        return f + marque;
+      }
+      function majModele() {
+        currentLetterForm = avecVoyelle(posMap[currentFormKey] || letterAr, currentVowel);
+        redraw();
+      }
+
+      var VOYELLES = [
+        {ar:'',  lat:'—',   cls:'nue'},
+        {ar:'َ', lat:'a',   cls:'simple'},
+        {ar:'ُ', lat:'u',   cls:'simple'},
+        {ar:'ِ', lat:'i',   cls:'simple'},
+        {ar:'ً', lat:'an',  cls:'double'},
+        {ar:'ٌ', lat:'un',  cls:'double'},
+        {ar:'ٍ', lat:'in',  cls:'double'},
+        {ar:'ْ', lat:'∅',   cls:'soukoun'}
+      ];
+      /* Une lettre nue — c'est le cas du tā marbūṭa — n'a pas de soukoun. */
+      var refuseSoukoun = (_SANS_SOUKOUN.indexOf(letterAr) >= 0);
+      /* Une voyelle DOUBLÉE ne tombe qu'en fin de mot : elle ne va donc ni
+         au début ni au milieu. La règle joue dans les deux sens — c'est le
+         même fait, vu de chaque bout. */
+      function formeAccepteDouble(key) { return key === 'isolée' || key === 'fin'; }
+
+      function majContraintes() {
+        var doubleChoisie = VOYELLES.some(function (v) {
+          return v.ar === currentVowel && v.cls === 'double';
+        });
+        mod.querySelectorAll('.lform-btn').forEach(function (b) {
+          var k = b.getAttribute('data-forme');
+          b.classList.toggle('eteint', doubleChoisie && !formeAccepteDouble(k));
+        });
+        mod.querySelectorAll('.wm-voy-btn').forEach(function (b) {
+          var cls = b.getAttribute('data-cls');
+          var off = (cls === 'double' && !formeAccepteDouble(currentFormKey))
+                 || (cls === 'soukoun' && refuseSoukoun);
+          b.classList.toggle('eteint', off);
+        });
+      }
+
       function makeFormBtn(key, isLandscape) {
         if (!posMap[key]) return null;
         var btn = document.createElement('div');
         btn.className = 'lform-btn' + (key === 'isolée' ? ' active' : '');
+        btn.setAttribute('data-forme', key);
         if(isLandscape) btn.style.cssText = 'width:100%;flex-direction:row;gap:8px;justify-content:flex-start';
         btn.innerHTML = '<span class="lform-ar">'+posMap[key]+'</span><span class="lform-label">'+formLabels2[key]+'</span>';
         btn.addEventListener('click', function() {
-          mod.querySelectorAll('.lform-btn').forEach(function(b){ b.classList.remove('active'); });
-          this.classList.add('active');
-          currentLetterForm = posMap[key];
-          redraw();
+          mod.querySelectorAll('.lform-btn').forEach(function(b){
+            b.classList.toggle('active', b.getAttribute('data-forme')===key);
+          });
+          currentFormKey = key;
+          majContraintes();
+          majModele();
         });
         return btn;
       }
+      function makeVoyBtn(v) {
+        var btn = document.createElement('div');
+        btn.className = 'wm-voy-btn' + (v.ar === currentVowel ? ' active' : '');
+        btn.setAttribute('data-cls', v.cls);
+        btn.setAttribute('data-ar', v.ar);
+        /* Une marque seule ne s'affiche pas : on la pose sur un cercle
+           pointillé, le porteur que la typographie arabe utilise pour ça. */
+        btn.innerHTML = (v.ar ? ('◌' + v.ar) : '—')
+          + '<span class="wm-voy-lat">' + v.lat + '</span>';
+        btn.addEventListener('click', function() {
+          mod.querySelectorAll('.wm-voy-btn').forEach(function(b){
+            b.classList.toggle('active', b.getAttribute('data-ar')===v.ar);
+          });
+          currentVowel = v.ar;
+          majContraintes();
+          majModele();
+        });
+        return btn;
+      }
+
       var formsPortrait = mod.querySelector('#wm-forms-portrait');
       if(formsPortrait){ formOrderPortrait.forEach(function(k){ var b=makeFormBtn(k,false); if(b)formsPortrait.appendChild(b); }); }
       var formsLandscape = mod.querySelector('#wm-forms-landscape');
       if(formsLandscape){ formOrderLandscape.forEach(function(k){ var b=makeFormBtn(k,true); if(b)formsLandscape.appendChild(b); }); }
+      ['#wm-voy-portrait','#wm-voy-landscape'].forEach(function(sel){
+        var box = mod.querySelector(sel);
+        if(!box) return;
+        VOYELLES.forEach(function(v){ box.appendChild(makeVoyBtn(v)); });
+      });
+      majContraintes();
     }
 
     
