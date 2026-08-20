@@ -468,7 +468,13 @@ const MONDES = [
   /* 1 — les licornes. Le décor est un ciel d'arc-en-ciel et de nuages : LA
      LICORNE, c'est celle du client, posée sur le monde par la carte tant
      que la fille ne l'a pas rejointe. Aucune licorne dessinée ici. */
-  { nom: 'licornes', r: 128, clair: '#fdeaff', moyen: '#e8c0fa', fonce: '#b478d8', halo: '#e0a8ff', trait: '#9a5cbc',
+  { nom: 'licornes', r: 128,
+    /* Un ciel d'arc-en-ciel au-dessus d'une prairie mauve. */
+    ciel: ['#d8ecff', '#f4dcff', '#e8c4fa'], terre: '#c9a2ec',
+    paysage: arcEnCiel(700, 640, 470, 40)
+      + nuage(300, 190, 70, '#ffffff', .9, 0, true, 46)
+      + nuage(1050, 250, 56, '#ffffff', .8, -18, true, 38)
+      + '<ellipse cx="700" cy="900" rx="900" ry="200" fill="#dcb8f8" opacity=".55"/>', clair: '#fdeaff', moyen: '#e8c0fa', fonce: '#b478d8', halo: '#e0a8ff', trait: '#9a5cbc',
     sol: sol('#dcaef2', 62, '#ecc8ff'),
     dedans: arcEnCiel(200, 214, 116, 11)
       + nuage(126, 148, 40, '#ffffff', .92, 0)
@@ -481,7 +487,14 @@ const MONDES = [
   /* 2 — la couronne. Le décor porte le COUSSIN ; la couronne elle-même est
      l'image du client, posée par la carte, et elle disparaît quand la
      fille la gagne. */
-  { nom: 'couronne', r: 126, clair: '#fff7e6', moyen: '#ffe1b0', fonce: '#e8a86a', halo: '#ffd08a', trait: '#c98a4a',
+  { nom: 'couronne', r: 126,
+    /* Une salle du trône : ciel doré, tapis rouge, coussin au milieu. */
+    ciel: ['#fff8e8', '#ffeccc', '#f7d5a0'], terre: '#e8b06a',
+    paysage: '<path d="M 470 900 L 620 620 L 780 620 L 930 900 Z" fill="#e8628f" opacity=".55"/>'
+      + '<g class="anim flotte"><path d="M 560 610 q 140 -52 280 0 q 12 46 -28 62 q -112 30 -224 0 q -40 -16 -28 -62 Z" fill="#e86a9c"/>'
+      + '<path d="M 560 610 q 140 -52 280 0 q -140 52 -280 0 Z" fill="#ff9ec4"/></g>'
+      + coeur(240, 300, 34, '#ff9ec4', '.8', 'vitcoeur', 0)
+      + coeur(1160, 260, 30, '#ff9ec4', '.8', 'vitcoeur', 2.4), clair: '#fff7e6', moyen: '#ffe1b0', fonce: '#e8a86a', halo: '#ffd08a', trait: '#c98a4a',
     sol: sol('#f7cf9a', 58, '#ffe2b8'),
     dedans: '<ellipse cx="200" cy="214" rx="96" ry="90" fill="#ffffff" opacity=".34"/>'
       + '<g class="anim flotte">'
@@ -494,7 +507,13 @@ const MONDES = [
     etincelles: [[96, 112, 14], [312, 128, 12], [300, 300, 11], [200, 150, 13]] },
 
   /* 3 — les nuages, qui dérivent lentement. */
-  { nom: 'nuages', r: 128, clair: '#f2fbff', moyen: '#c5e9ff', fonce: '#79b8e8', halo: '#a8dcff', trait: '#5f9fd0',
+  { nom: 'nuages', r: 128,
+    /* Rien que du ciel : les nuages le traversent de part en part. */
+    ciel: ['#bfe6ff', '#dcf2ff', '#a8d8f4'], terre: '#c8e8ff',
+    paysage: nuage(700, 170, 90, '#ffffff', .95, 0, true, 52)
+      + nuage(700, 330, 66, '#ffffff', .9, -16, true, 40)
+      + nuage(700, 520, 104, '#ffffff', .85, -30, true, 62)
+      + nuage(700, 700, 74, '#ffffff', .8, -46, true, 46), clair: '#f2fbff', moyen: '#c5e9ff', fonce: '#79b8e8', halo: '#a8dcff', trait: '#5f9fd0',
     dedans: nuage(200, 150, 54, '#ffffff', .95, 0, true, 24)
       + nuage(200, 208, 44, '#ffffff', .9, -7, true, 19)
       + nuage(200, 262, 62, '#ffffff', .85, -14, true, 28)
@@ -503,7 +522,14 @@ const MONDES = [
     etincelles: [[92, 120, 12], [318, 296, 12], [110, 316, 10]] },
 
   /* 4 — les fleurs, en volume, qui dodelinent sur leurs tiges. */
-  { nom: 'fleurs', r: 128, clair: '#f6ffef', moyen: '#d6f2c0', fonce: '#8fc879', halo: '#bfe8a8', trait: '#6aa858',
+  { nom: 'fleurs', r: 128,
+    /* Un pré fleuri sous un ciel tendre. */
+    ciel: ['#e8f8ff', '#f4ffe8', '#cfeeb0'], terre: '#8fce78',
+    paysage: '<ellipse cx="700" cy="920" rx="900" ry="220" fill="#a8dc8c" opacity=".7"/>'
+      + tige(180, 560, 900, '#5f9e4c') + tige(1220, 580, 900, '#5f9e4c')
+      + fleur('gg1', 180, 548, 78, '#ffc9e0', '#ff6fae', '#ffcf4e', 0)
+      + fleur('gg2', 1220, 568, 72, '#d8c8ff', '#9a6fd8', '#ffcf4e', 1.4)
+      + nuage(560, 190, 60, '#ffffff', .85, 0, true, 44), clair: '#f6ffef', moyen: '#d6f2c0', fonce: '#8fc879', halo: '#bfe8a8', trait: '#6aa858',
     sol: sol('#8fce78', 74, '#a8dc8c'),
     dedans: tige(106, 226, 322, '#5f9e4c') + tige(200, 206, 330, '#5f9e4c') + tige(294, 226, 322, '#5f9e4c')
       + tige(152, 276, 336, '#68a854') + tige(250, 272, 336, '#68a854')
@@ -516,7 +542,15 @@ const MONDES = [
     etincelles: [[96, 122, 12], [312, 128, 11], [300, 306, 10]] },
 
   /* 5 — les cœurs, qui BATTENT. */
-  { nom: 'coeurs', r: 128, clair: '#fff2f7', moyen: '#ffd0e4', fonce: '#f07aae', halo: '#ff9ecf', trait: '#d4568f',
+  { nom: 'coeurs', r: 128,
+    /* Une pluie de cœurs, du haut en bas. */
+    ciel: ['#fff0f6', '#ffd8e8', '#ffb3d1'], terre: '#ff9ec4',
+    paysage: coeur(260, 240, 90, '#ff5f8f', null, 'vitcoeur', 0)
+      + coeur(1140, 300, 74, '#ff85b5', null, 'vitcoeur', 1.2)
+      + coeur(700, 200, 56, '#ffffff', '.9', 'vitcoeur', 2.4)
+      + coeur(420, 640, 64, '#ff2e6b', '.9', 'vitcoeur', 3.6)
+      + coeur(1000, 700, 80, '#ffb3d1', null, 'vitcoeur', 4.8)
+      + coeur(120, 620, 48, '#ffc9df', null, 'vitcoeur', 1.8), clair: '#fff2f7', moyen: '#ffd0e4', fonce: '#f07aae', halo: '#ff9ecf', trait: '#d4568f',
     dedans: coeur(196, 204, 62, '#ff5f8f', null, 'bat', 0)
       + coeur(126, 172, 34, '#ff9ec4', null, 'vitcoeur', 0)
       + coeur(272, 174, 30, '#ffb3d1', null, 'vitcoeur', 0.9)
@@ -530,7 +564,17 @@ const MONDES = [
     etincelles: [[92, 232, 12], [306, 234, 11], [150, 120, 12]] },
 
   /* 6 — les pingouins sur la banquise. */
-  { nom: 'pingouins', r: 128, clair: '#fbfeff', moyen: '#dbf1ff', fonce: '#94c8e8', halo: '#bfe4ff', trait: '#6ea8cc',
+  { nom: 'pingouins', r: 128, bouquetsCiel: false,
+    /* LA BANQUISE : un ciel polaire, la glace, ses blocs et son eau. */
+    ciel: ['#cfeeff', '#eaf8ff', '#ffffff'], terre: '#ffffff',
+    paysage: '<path d="M 0 780 L 220 600 L 430 780 Z" fill="#ffffff"/>'
+      + '<path d="M 320 800 L 560 560 L 800 800 Z" fill="#f4fbff"/>'
+      + '<path d="M 900 790 L 1120 590 L 1340 790 Z" fill="#ffffff"/>'
+      + '<path d="M 0 700 L 220 600 L 300 660 Z" fill="#dceeff" opacity=".8"/>'
+      + '<path d="M 560 560 L 700 690 L 460 690 Z" fill="#dceeff" opacity=".8"/>'
+      + '<ellipse cx="700" cy="900" rx="900" ry="150" fill="#bfe4ff" opacity=".6"/>'
+      + nuage(400, 180, 62, '#ffffff', .9, 0, true, 50)
+      + nuage(1060, 240, 48, '#ffffff', .8, -22, true, 40), clair: '#fbfeff', moyen: '#dbf1ff', fonce: '#94c8e8', halo: '#bfe4ff', trait: '#6ea8cc',
     sol: sol('#eaf8ff', 84, '#ffffff'),
     /* Les pingouins sont ceux du client, poses par la carte : ici, la
        banquise seule. */
@@ -542,7 +586,16 @@ const MONDES = [
     etincelles: [[98, 128, 12], [306, 132, 11], [200, 104, 10]] },
 
   /* 7 — les papillons, qui battent des ailes en flottant. */
-  { nom: 'papillons', r: 128, clair: '#fdf4ff', moyen: '#e8d8ff', fonce: '#a98fd8', halo: '#c9b6ff', trait: '#8a6ec0',
+  { nom: 'papillons', r: 128, bouquetsCiel: false,
+    /* Une prairie de lavande, pour que les papillons s'y détachent. */
+    ciel: ['#f4ecff', '#e8dcff', '#cbb4f2'], terre: '#b79ae8',
+    paysage: '<ellipse cx="700" cy="920" rx="900" ry="210" fill="#c9b0f0" opacity=".7"/>'
+      + '<path d="M 120 900 v -120 M 260 900 v -150 M 420 900 v -110 M 980 900 v -140 M 1150 900 v -120 M 1300 900 v -100"'
+      + ' stroke="#9a7fd0" stroke-width="9" stroke-linecap="round" opacity=".55"/>'
+      + tige(560, 660, 900, '#7f66b8') + tige(880, 690, 900, '#7f66b8')
+      + fleur('pp1', 560, 648, 62, '#ffd8ee', '#e86ab0', '#ffcf4e', 0.4)
+      + fleur('pp2', 880, 678, 54, '#d8e8ff', '#6a8ad8', '#ffcf4e', 1.6)
+      + nuage(340, 200, 54, '#ffffff', .75, 0, true, 46), clair: '#fdf4ff', moyen: '#e8d8ff', fonce: '#a98fd8', halo: '#c9b6ff', trait: '#8a6ec0',
     sol: sol('#c2a8ec', 56, '#d8c4ff'),
     /* Les papillons sont ceux du client, et ils volent : ici, le pre et le
        ciel qui les portent. */
@@ -554,7 +607,16 @@ const MONDES = [
     etincelles: [[94, 122, 12], [312, 300, 11], [104, 306, 10]] },
 
   /* 8 — l'île de la tortue : plusieurs tortues, qui respirent. */
-  { nom: 'tortue', r: 128, clair: '#f2fffb', moyen: '#c4f0e2', fonce: '#6fc0a8', halo: '#a8e8d4', trait: '#4f9c88',
+  { nom: 'tortue', r: 128, bouquetsCiel: false,
+    /* Une plage : la mer en haut, le sable en bas, et le ressac entre les
+       deux. */
+    ciel: ['#d8f6ff', '#a8e8e0', '#6fc8c0'], terre: '#ffe9b8',
+    paysage: '<path class="anim derive" d="M 0 640 q 140 -30 280 0 t 280 0 t 280 0 t 280 0 t 280 0" stroke="#ffffff" stroke-width="10" fill="none" opacity=".75"/>'
+      + '<path class="anim derive" style="--d:-8s" d="M 0 690 q 160 -26 320 0 t 320 0 t 320 0 t 320 0" stroke="#ffffff" stroke-width="8" fill="none" opacity=".6"/>'
+      + '<ellipse cx="700" cy="930" rx="900" ry="190" fill="#fff3d4" opacity=".8"/>'
+      + '<ellipse cx="300" cy="840" rx="70" ry="20" fill="#ffdca8"/>'
+      + '<ellipse cx="1120" cy="800" rx="56" ry="16" fill="#ffdca8"/>'
+      + nuage(420, 180, 58, '#ffffff', .85, 0, true, 48), clair: '#f2fffb', moyen: '#c4f0e2', fonce: '#6fc0a8', halo: '#a8e8d4', trait: '#4f9c88',
     sol: sol('#ffe9b8', 66, '#fff3d4'),
     /* Les tortues sont celles du client : ici, la plage et le ressac. */
     dedans: '<path class="anim derive" d="M 60 296 q 34 -14 62 0 t 62 0 t 62 0 t 62 0" stroke="#8fdcc4" stroke-width="7" fill="none" opacity=".7"/>'
@@ -566,7 +628,16 @@ const MONDES = [
 
   /* 9 — les chats et les chiens, entiers, avec leurs queues qui remuent.
      Plus d'empreintes : le client n'en voulait pas. */
-  { nom: 'chats-chiens', r: 128, clair: '#fff8f0', moyen: '#ffe2c4', fonce: '#e0a878', halo: '#ffcf9e', trait: '#c08a58',
+  { nom: 'chats-chiens', r: 128, bouquetsCiel: false,
+    /* Un jardin, sa balle et sa niche. */
+    ciel: ['#eaf6ff', '#fff4e0', '#ffe0bc'], terre: '#a8dc8c',
+    paysage: '<ellipse cx="700" cy="920" rx="900" ry="210" fill="#8fce78" opacity=".75"/>'
+      + '<circle cx="1120" cy="760" r="42" fill="#ff9ec4"/>'
+      + '<path d="M 1082 742 q 38 -22 76 6 M 1084 780 q 38 18 74 -10" stroke="#ffffff" stroke-width="9" fill="none"/>'
+      + '<path d="M 170 800 h 180 v -90 l -90 -70 l -90 70 Z" fill="#c98a52"/>'
+      + '<ellipse cx="260" cy="790" rx="46" ry="56" fill="#7a4f2c"/>'
+      + coeur(700, 230, 44, '#ff9ec4', '.85', 'vitcoeur', 0)
+      + coeur(1240, 300, 32, '#ffb3d1', '.8', 'vitcoeur', 2.6), clair: '#fff8f0', moyen: '#ffe2c4', fonce: '#e0a878', halo: '#ffcf9e', trait: '#c08a58',
     sol: sol('#a8dc8c', 66, '#bfe8a0'),
     /* Le chien et les chats sont ceux du client : ici, le pre, sa balle et
        ses coeurs. */
@@ -578,7 +649,19 @@ const MONDES = [
     etincelles: [[92, 122, 12], [314, 296, 11], [300, 130, 10]] },
 
   /* 10 — les ours bruns, ENTIERS. */
-  { nom: 'ours', r: 128, clair: '#fff6ea', moyen: '#f0d6b0', fonce: '#c99a68', halo: '#e8c096', trait: '#a87c4e',
+  { nom: 'ours', r: 128, bouquetsCiel: false,
+    /* Une clairière : des sapins, l'herbe et le pot de miel. */
+    ciel: ['#fff2dc', '#ffe4c0', '#f0d2a0'], terre: '#8fc878',
+    paysage: '<ellipse cx="700" cy="920" rx="900" ry="220" fill="#a8dc8c" opacity=".75"/>'
+      + '<g opacity=".9">'
+      + '<path d="M 150 640 l 70 -170 l 70 170 Z" fill="#4f8c46"/><path d="M 150 720 l 70 -160 l 70 160 Z" fill="#5f9e4c"/>'
+      + '<rect x="208" y="716" width="24" height="54" fill="#8f6a44"/>'
+      + '<path d="M 1120 610 l 60 -150 l 60 150 Z" fill="#4f8c46"/><path d="M 1120 690 l 60 -140 l 60 140 Z" fill="#5f9e4c"/>'
+      + '<rect x="1170" y="686" width="20" height="48" fill="#8f6a44"/>'
+      + '</g>'
+      + '<path d="M 620 830 q 70 -18 70 34 q 0 34 -70 34 q -70 0 -70 -34 q 0 -52 70 -34 Z" fill="#ffcf6a"/>'
+      + '<rect x="548" y="818" width="144" height="30" rx="15" fill="#e8a83c"/>'
+      + nuage(880, 200, 56, '#ffffff', .8, 0, true, 46), clair: '#fff6ea', moyen: '#f0d6b0', fonce: '#c99a68', halo: '#e8c096', trait: '#a87c4e',
     sol: sol('#8fc878', 70, '#a8dc8c'),
     /* Les ours sont ceux du client : ici, la clairiere, ses sapins et son
        petit pot de miel. */
@@ -593,7 +676,16 @@ const MONDES = [
     etincelles: [[94, 124, 12], [310, 130, 11], [304, 302, 10]] },
 
   /* 11 — les sucreries : il en faut BEAUCOUP, et de toutes sortes. */
-  { nom: 'sucreries', r: 128, clair: '#fff4fb', moyen: '#ffd8ee', fonce: '#f08acc', halo: '#ffabe0', trait: '#d466ac',
+  { nom: 'sucreries', r: 128,
+    /* Un pays de sucre : ciel framboise et sol de glaçage. */
+    ciel: ['#fff0fa', '#ffd8ee', '#ffb3dc'], terre: '#ff9ed8',
+    paysage: '<ellipse cx="700" cy="920" rx="900" ry="200" fill="#ffc4e8" opacity=".8"/>'
+      + '<path d="M 0 760 q 100 -60 200 0 t 200 0 t 200 0 t 200 0 t 200 0 t 200 0 t 200 0 L 1400 900 L 0 900 Z" fill="#ffffff" opacity=".7"/>'
+      + sucette(200, 560, 130, '#ffffff', '#ff6fae', 0)
+      + sucette(1180, 600, 110, '#fff3b8', '#7fd0f0', 1.2)
+      + donut(560, 300, 120, '#e8a86a', '#ff9ec4', 0.6)
+      + glace(980, 320, 118, '#a8e8d4', '#ffd34e', 1.8)
+      + canne(760, 660, 110, 2.4), clair: '#fff4fb', moyen: '#ffd8ee', fonce: '#f08acc', halo: '#ffabe0', trait: '#d466ac',
     /* DEUX FOIS PLUS de sucreries, demandees le 20 aout — et toutes DANS le
        disque : a y=320 il ne reste que 120 px de large, tout ce qui
        descendait plus bas etait rogne. */
@@ -618,7 +710,15 @@ const MONDES = [
     etincelles: [[96, 250, 12], [310, 130, 11], [110, 130, 10]] },
 
   /* 12 — le château de la princesse : elle rentre chez elle. */
-  { nom: 'chateau', r: 128, clair: '#fff2f9', moyen: '#ffd6ea', fonce: '#e08ab8', halo: '#ffabd4', trait: '#c26a9c',
+  { nom: 'chateau', r: 128,
+    /* Le château au bout du chemin : elle rentre chez elle. */
+    ciel: ['#fff0f8', '#ffd8ec', '#e8c0f4'], terre: '#c2a0dc',
+    paysage: '<ellipse cx="700" cy="930" rx="900" ry="200" fill="#d8bcf0" opacity=".75"/>'
+      + chateau(700, 620, 420, '#fff0f8', '#e8b8d4', '#ff7fb8')
+      + '<path d="M 700 900 L 620 900 Q 660 800 700 780 Q 740 800 780 900 Z" fill="#f0dcff" opacity=".8"/>'
+      + coeur(230, 280, 40, '#ffffff', '.85', 'vitcoeur', 0)
+      + coeur(1180, 320, 34, '#ffffff', '.85', 'vitcoeur', 2.8)
+      + nuage(380, 190, 58, '#ffffff', .8, 0, true, 48), clair: '#fff2f9', moyen: '#ffd6ea', fonce: '#e08ab8', halo: '#ffabd4', trait: '#c26a9c',
     sol: sol('#c2a0dc', 66, '#d8bcf0'),
     dedans: chateau(200, 220, 128, '#fff0f8', '#e8b8d4', '#ff7fb8')
       + coeur(110, 210, 18, '#ffffff', '.85', 'bat', 0.2)
@@ -634,31 +734,65 @@ const MONDES = [
  * trois fois sur un cadre large et sans disque, en fond de page.
  * Les motifs sont dessines pour un carre de 400 : on les repose donc a
  * trois endroits, a trois tailles, plutot que de tout redessiner. */
-function scene(o) {
-  /* Un bouquet de motifs, CENTRÉ sur (cx, cy). Les motifs d'un monde sont
-     dessinés dans la moitié basse de leur carré de 400 : c'est ce point-là
-     qu'il faut recentrer, sinon tout se tasse en haut de la scène et le
-     bas de la page reste vide. */
+/* LE PAYSAGE DU MONDE, en fond d'écran plein cadre.
+ *
+ * Quand la fille entre dans un monde, ce n'est plus le dégradé pastel de la
+ * carte qu'elle voit derrière son cours, mais LE MONDE lui-même : la
+ * banquise chez les pingouins, la plage chez les tortues, le pré chez les
+ * ours. Le client l'a demandé le 20 août, et c'est ce qui fait la
+ * différence entre « un décor » et « y être ».
+ *
+ * Le fichier est large (1400 × 900) et servi en `background-size:cover` :
+ * il se recadre tout seul, du téléphone en portrait à l'écran de bureau.
+ * Ce qui compte doit donc rester dans la bande du milieu — les bords sont
+ * les premiers rognés.
+ *
+ * `ciel` donne les trois couleurs du fond, `terre` la couleur du sol, et
+ * `paysage` ce qu'on y sème de propre à ce monde. Le reste — les bouquets
+ * de motifs — vient du décor de la carte, repris tel quel : les deux
+ * doivent se ressembler, sinon on ne comprend pas où l'on est. */
+function ciel(o) {
+  const c = o.ciel || [o.clair, o.moyen, o.fonce];
+  const terre = o.terre || o.moyen;
+  const W = 1400, H = 900, SOL = H * 0.72;
   function bouquet(cx, cy, k, op) {
     return '  <g transform="translate(' + (cx - 200 * k).toFixed(0) + ' ' + (cy - 230 * k).toFixed(0)
       + ') scale(' + k + ')" opacity="' + op + '">' + (o.dedans || '') + '</g>\n';
   }
-  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600">\n'
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '"'
+    + ' width="' + W + '" height="' + H + '" preserveAspectRatio="xMidYMid slice">\n'
     + MOUVEMENT + '\n'
-    + bouquet(160, 170, 0.72, '.85')
-    + bouquet(640, 130, 0.58, '.7')
-    + bouquet(380, 420, 0.88, '.75')
-    + bouquet(790, 440, 0.52, '.6')
+    + '  <defs><linearGradient id="ciel-' + o.nom + '" x1="0" y1="0" x2="0" y2="1">'
+    + '<stop offset="0%" stop-color="' + c[0] + '"/>'
+    + '<stop offset="52%" stop-color="' + c[1] + '"/>'
+    + '<stop offset="100%" stop-color="' + c[2] + '"/></linearGradient></defs>\n'
+    + '  <rect width="' + W + '" height="' + H + '" fill="url(#ciel-' + o.nom + ')"/>\n'
+    /* le sol : une courbe douce, pas une ligne droite */
+    + '  <path d="M 0 ' + (SOL + 40) + ' Q ' + (W * 0.25) + ' ' + (SOL - 40) + ' ' + (W * 0.5) + ' ' + SOL
+    + ' T ' + W + ' ' + (SOL + 20) + ' L ' + W + ' ' + H + ' L 0 ' + H + ' Z" fill="' + terre + '"/>\n'
+    + (o.paysage || '')
+    /* Les bouquets de motifs restent AU SOL. Semés en plein ciel, un pot de
+       miel ou une touffe d'herbe flottent — cela se voit tout de suite. Et
+       les mondes qui ont les illustrations du client n'en portent pas : ses
+       bêtes et le paysage suffisent, le reste ferait doublon. */
+    + (o.bouquetsCiel === false ? ''
+        : bouquet(250, 700, 1.0, '.9')
+        + bouquet(1170, 690, 0.8, '.8')
+        + bouquet(700, 780, 1.1, '.85'))
     + '</svg>\n';
 }
+
+/* La scene transparente a ete remplacee par le PAYSAGE plein cadre :
+   dans un monde, on veut le monde, pas un filigrane. */
+
 
 if (!fs.existsSync(SORTIE)) fs.mkdirSync(SORTIE, { recursive: true });
 MONDES.forEach(function (m) {
   const f = path.join(SORTIE, 'monde-' + m.nom + '.svg');
   fs.writeFileSync(f, monde(m), 'utf8');
-  const f2 = path.join(SORTIE, 'scene-' + m.nom + '.svg');
-  fs.writeFileSync(f2, scene(m), 'utf8');
-  console.log('ecrit : ' + path.relative(path.join(__dirname, '..'), f) + ' + sa scene');
+  const f3 = path.join(SORTIE, 'ciel-' + m.nom + '.svg');
+  fs.writeFileSync(f3, ciel(m), 'utf8');
+  console.log('ecrit : ' + path.relative(path.join(__dirname, '..'), f) + ' + son paysage');
 });
 console.log(MONDES.length + ' decors ecrits.');
 

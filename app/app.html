@@ -2435,6 +2435,20 @@ body.profile-boy.fond-espace,#root.profile-boy.fond-espace{
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* Dans un monde, le fond pastel de la carte disparaît sous le paysage :
+   c'est le paysage qui EST le fond d'écran. Et l'écran du choix de la
+   lettre reçoit un voile clair : sans lui, ses titres se poseraient
+   directement sur la banquise ou sur le pré. */
+body.dans-un-monde #ca .child-wrap{
+  background:rgba(255,255,255,.66);
+  border-radius:28px;
+  padding:18px 14px 22px;
+  box-shadow:0 10px 30px rgba(120,70,150,.14);
+}
+body.dans-un-monde.fond-licorne,#root.dans-un-monde.fond-licorne{
+  background:#f4e8ff !important;
+}
+
 /* LES BETES DU CLIENT. Ses illustrations sont posees par-dessus le decor
    d'un monde, et semees dans le cours de ce monde. Elles bougent : un
    animal se balance sur place, un papillon vole d'un point a l'autre.
@@ -2476,12 +2490,13 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
    tout le reste : `z-index:0` et la scene entiere passe par-dessus. */
 .decor-monde{
   position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-repeat:no-repeat;background-position:center 22%;
-  background-size:min(1100px,140%) auto;
-  opacity:.55;
-}
-@media (max-width:700px){
-  .decor-monde{background-size:170% auto;background-position:center 18%;opacity:.5}
+  background-repeat:no-repeat;background-position:center center;
+  /* PLEIN CADRE : dans un monde, c'est le monde qu'on voit derrière le
+     cours, pas le dégradé pastel de la carte. Le paysage est dessiné large
+     et recadré par `cover` — ce qui compte y est au milieu, les bords sont
+     les premiers rognés. */
+  background-size:cover;
+  opacity:1;
 }
 
 /* ══ LE CIEL PASTEL DE LA FILLE ════════════════════════════════════════
@@ -7728,7 +7743,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v111';
+var _VERSION_REPLI='v112';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9245,8 +9260,8 @@ var _HABILLAGES={
     /* Le seul chemin dessiné de la carte : le toboggan qui descend vers le
        premier monde. */
     arcEnCiel:true,
-    /* Le cours porte le décor du monde où l'on se trouve : une image par
-       monde, `scene-<slug>.svg`, écrite par `outils/mondes.js`. */
+    /* Dans un monde, le fond d'écran EST ce monde : un paysage plein cadre
+       par monde, `ciel-<slug>.svg`, écrit par `outils/mondes.js`. */
     scenesMonde:true,
     /* Le monde des licornes montre LA licorne du client, pas un dessin. */
     scenesImage:{'licornes':'/images/licorne-seule-gd.png'},
@@ -9334,10 +9349,14 @@ function _decorMonde(ca,actif){
   if(ca)Array.prototype.forEach.call(ca.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours'),function(v){
     if(v.parentNode)v.parentNode.removeChild(v);
   });
+  document.body.classList.remove('dans-un-monde');
+  var r1=document.getElementById('root');if(r1)r1.classList.remove('dans-un-monde');
   if(!actif||!ca||!_HAB||!_HAB.scenesMonde||!_currentIsleSlug)return;
+  document.body.classList.add('dans-un-monde');
+  var r0=document.getElementById('root');if(r0)r0.classList.add('dans-un-monde');
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/scene-"+_currentIsleSlug+".svg?v=111')";
+  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=112')";
   ca.appendChild(d);
   /* Certains mondes tiennent a une image du client plutot qu'a un dessin :
      le monde des licornes doit montrer SA licorne. Elle ne peut pas entrer
@@ -9352,17 +9371,27 @@ function _decorMonde(ca,actif){
     /* Les places sont FIXES : un tirage au sort redistribuerait le decor a
        chaque ecran, et cela se voit tout de suite. Elles longent les bords,
        pour laisser le milieu au cours. */
-    var PLACES=[[2,10,13],[80,8,11],[40,3,9],[10,34,14],[86,30,12],[3,58,13],
-                [84,54,12],[16,76,11],[74,78,12],[44,86,10],[28,64,9],[62,66,10],
-                [8,88,10],[92,86,9]];
+    /* Elles longent les bords — le milieu reste au cours — mais elles sont
+       GRANDES : le client veut voir ses pingouins, pas les deviner.
+       CE QUI MARCHE RESTE AU SOL : un ours accroché en plein ciel se voit
+       tout de suite. Seul ce qui vole occupe toute la hauteur. */
+    var AU_SOL=[[1,46,21],[75,42,22],[12,66,19],[68,68,20],[30,80,15],
+                [52,84,14],[86,62,13],[22,56,12],[62,56,12],[40,74,11],
+                [6,86,12],[78,86,11],[34,62,10],[46,50,10]];
+    var EN_VOL=[[2,10,17],[76,6,16],[38,2,13],[8,34,15],[82,30,14],[26,60,13],
+                [66,54,14],[14,78,12],[72,80,13],[44,86,11],[54,24,11],[30,30,10],
+                [90,60,10],[4,58,11]];
+    var VOLE=!!(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]);
+    var PLACES=VOLE?EN_VOL:AU_SOL;
     var COMBIEN=Math.min(PLACES.length,betes.longueur||betes.length*3);
     for(var i=0;i<COMBIEN;i++){
       var pl=PLACES[i],b=betes[i%betes.length];
       var im=document.createElement('img');
       im.src=b;im.alt='';im.className='bete-cours';
-      im.style.cssText='z-index:0;opacity:.7;left:'+pl[0]+'%;top:'+pl[1]+'%;width:'+pl[2]+'%;'
-        +'animation:'+(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]?'beteVole':'beteBalance')+' '
-        +(9+(i%5)*2.4)+'s '+(_HAB.scenesVol&&_HAB.scenesVol[_currentIsleSlug]?'linear':'ease-in-out')
+      im.style.cssText='z-index:0;opacity:.92;left:'+pl[0]+'%;top:'+pl[1]+'%;width:'+pl[2]+'%;'
+        +'filter:drop-shadow(0 10px 14px rgba(80,50,110,.22));'
+        +'animation:'+(VOLE?'beteVole':'beteBalance')+' '
+        +(VOLE?9+(i%5)*2.4:3.4+(i%4)*0.8)+'s '+(VOLE?'linear':'ease-in-out')
         +' infinite;animation-delay:-'+(i*1.7)+'s';
       ca.appendChild(im);
     }

@@ -934,6 +934,31 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le monde devient le FOND D'ÉCRAN — 20 août 2026.** Entrer dans un monde
+  ne change plus seulement un filigrane : le dégradé pastel de la carte
+  laisse la place au **paysage du monde**, plein cadre. La banquise et ses
+  blocs de glace chez les pingouins, la plage et son ressac chez les
+  tortues, la clairière et ses sapins chez les ours, le champ de lavande
+  chez les papillons, le pays de sucre, la salle du trône, le château.
+  - `outils/mondes.js` écrit un `ciel-<nom>.svg` par monde, large
+    (1400 × 900) et servi en `background-size:cover` : il se recadre seul du
+    téléphone au bureau, donc **ce qui compte doit rester au milieu** — les
+    bords sont les premiers rognés. Chaque monde donne son `ciel` (trois
+    couleurs), sa `terre` et son `paysage`.
+  - La scène transparente d'avant (`scene-*.svg`) est **supprimée** : dans
+    un monde, on veut le monde, pas un filigrane.
+  - **Ce qui marche reste au sol.** Les bêtes du client sont semées à des
+    places fixes, mais deux tables : `AU_SOL` pour ce qui a des pattes,
+    `EN_VOL` pour les papillons. Un ours accroché en plein ciel se voit tout
+    de suite — c'était le cas du premier jet.
+  - L'écran du choix de la lettre reçoit un **voile clair** : ses titres se
+    posaient sinon directement sur la banquise.
+  - **Piège de l'outil de capture, pas du site** : en peignant un écran dans
+    un canevas, il faut CHARGER toutes les images puis peindre dans l'ordre.
+    À dessiner au fil des `onload`, le fond — plus lourd — arrive en dernier
+    et recouvre tout le reste ; j'ai cru deux fois que les bêtes avaient
+    disparu.
+
 - **Les mondes de la fille, troisième passe — 20 août 2026, ses images.**
   Le client a fourni douze illustrations (`bete-*.png` détourées, et
   **quatre GIF animés** de papillons) et demandé que les mondes s'en

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900" preserveAspectRatio="xMidYMid slice">
+
+  <style>
+    .anim{transform-box:fill-box;transform-origin:center}
+    .bat    {animation:bat 1.6s ease-in-out infinite;animation-delay:var(--d,0s)}
+    .respire{animation:respire 3.4s ease-in-out infinite;animation-delay:var(--d,0s)}
+    .flotte {animation:flotte 4.2s ease-in-out infinite;animation-delay:var(--d,0s)}
+    .derive {animation:derive 16s linear infinite;animation-delay:var(--d,0s)}
+    .aileG  {animation:aileG 0.5s ease-in-out infinite;animation-delay:var(--d,0s);
+             transform-box:fill-box;transform-origin:right center}
+    .aileD  {animation:aileD 0.5s ease-in-out infinite;animation-delay:var(--d,0s);
+             transform-box:fill-box;transform-origin:left center}
+    .queue  {animation:queue 1.3s ease-in-out infinite;animation-delay:var(--d,0s);
+             transform-box:fill-box;transform-origin:left bottom}
+    .dodeline{animation:dodeline 2.8s ease-in-out infinite;animation-delay:var(--d,0s);
+             transform-box:fill-box;transform-origin:center bottom}
+    .brille {animation:brille 2.6s ease-in-out infinite;animation-delay:var(--d,0s)}
+    /* Un cœur ne fait pas que battre : il paraît, il grossit, il s'efface,
+       et un autre prend sa place. */
+    .vitcoeur{animation:vitcoeur 6s ease-in-out infinite;animation-delay:var(--d,0s)}
+    /* Un nuage TRAVERSE son monde et revient par l'autre bord. Le disque
+       découpe l'image : il disparaît donc tout seul en sortant. */
+    .traverse{animation:traverse var(--t,22s) linear infinite;animation-delay:var(--d,0s)}
+    @keyframes vitcoeur{
+      0%   {opacity:0;transform:scale(.35)}
+      12%  {opacity:1;transform:scale(1.12)}
+      20%  {transform:scale(.96)}
+      30%  {transform:scale(1.08)}
+      40%  {transform:scale(.98)}
+      52%  {opacity:1;transform:scale(1.14)}
+      70%  {opacity:.85;transform:scale(1)}
+      88%  {opacity:0;transform:scale(.45)}
+      100% {opacity:0;transform:scale(.35)}
+    }
+    @keyframes traverse{
+      0%  {transform:translateX(-330px)}
+      100%{transform:translateX(330px)}
+    }
+    @keyframes bat     {0%,100%{transform:scale(1)}18%{transform:scale(1.16)}30%{transform:scale(1.02)}45%{transform:scale(1.10)}}
+    @keyframes respire {0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+    @keyframes flotte  {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes derive  {0%{transform:translateX(-26px)}50%{transform:translateX(26px)}100%{transform:translateX(-26px)}}
+    @keyframes aileG   {0%,100%{transform:scaleX(1)}50%{transform:scaleX(.42) }}
+    @keyframes aileD   {0%,100%{transform:scaleX(1)}50%{transform:scaleX(.42) }}
+    @keyframes queue   {0%,100%{transform:rotate(-13deg)}50%{transform:rotate(15deg)}}
+    @keyframes dodeline{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
+    @keyframes brille  {0%,100%{opacity:.35;transform:scale(.85)}50%{opacity:1;transform:scale(1.12)}}
+  </style>
+  <defs><linearGradient id="ciel-pingouins" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#cfeeff"/><stop offset="52%" stop-color="#eaf8ff"/><stop offset="100%" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="1400" height="900" fill="url(#ciel-pingouins)"/>
+  <path d="M 0 688 Q 350 608 700 648 T 1400 668 L 1400 900 L 0 900 Z" fill="#ffffff"/>
+<path d="M 0 780 L 220 600 L 430 780 Z" fill="#ffffff"/><path d="M 320 800 L 560 560 L 800 800 Z" fill="#f4fbff"/><path d="M 900 790 L 1120 590 L 1340 790 Z" fill="#ffffff"/><path d="M 0 700 L 220 600 L 300 660 Z" fill="#dceeff" opacity=".8"/><path d="M 560 560 L 700 690 L 460 690 Z" fill="#dceeff" opacity=".8"/><ellipse cx="700" cy="900" rx="900" ry="150" fill="#bfe4ff" opacity=".6"/><g class="anim traverse" opacity="0.9" style="--d:0s;--t:50s"><rect x="338" y="161.4" width="124" height="37.199999999999996" rx="18.599999999999998" fill="#ffffff"/><circle cx="378.92" cy="160.16" r="31" fill="#ffffff"/><circle cx="419.84" cy="168.84" r="22.32" fill="#ffffff"/></g><g class="anim traverse" opacity="0.8" style="--d:-22s;--t:40s"><rect x="1012" y="225.6" width="96" height="28.799999999999997" rx="14.399999999999999" fill="#ffffff"/><circle cx="1043.68" cy="224.64" r="24" fill="#ffffff"/><circle cx="1075.36" cy="231.36" r="17.28" fill="#ffffff"/></g></svg>
