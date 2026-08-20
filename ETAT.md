@@ -934,6 +934,70 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le parcours de la fille, deuxième passe — 20 août 2026.** Le client a
+  regardé le premier jet et a tout repris point par point. Ce qui a changé,
+  et pourquoi :
+
+  - **La monture posée avait changé de taille.** En vol, l'image porte la
+    licorne ET la fille : elle est haute, et `object-fit:contain` la réduit
+    d'autant. Posée, la licorne seule est presque carrée et remplissait
+    toute la boîte — elle paraissait deux fois plus grosse, et la fille,
+    dessinée à part, deux fois plus petite. `montureEchelle` (0,78) réduit
+    la monture posée, ancrée en BAS et au CENTRE ; la boîte de la fille est
+    passée à 55 × 88 %. Réglé en comparant les deux côte à côte sur une
+    capture, pas au jugé.
+  - **On arrive DIRECTEMENT au sommet.** Les segments joignent les milieux
+    des étapes : la courbe déposait donc la monture au milieu du décor, et
+    une « approche » la faisait remonter au sommet — « ils arrivent en bas
+    du monde, ralentissent, puis remontent ». Le dernier segment est
+    maintenant écarté vers le sommet (`versSommet`, l'écart croît en t²),
+    le vol droit vise le sommet, et l'approche est sautée quand il ne
+    reste rien à parcourir.
+  - **En revenant d'un cours, on est SUR l'étape qu'on vient de quitter**,
+    des deux côtés. `arab_ile` était mis en concurrence avec l'étape la
+    plus avancée jamais entamée : un enfant qui revenait sur son troisième
+    monde retrouvait sa monture posée sur le huitième. L'étape quittée
+    gagne désormais sur tout le reste. Le client le demandait depuis
+    longtemps.
+  - **Le ciel de la fille** : plus de papillons, de fleurs ni de licornes
+    en emoji. À la place, cinq de SES licornes, qui dérivent chacune dans
+    sa direction comme les comètes du garçon. Il faut **trois étages** :
+    le déplacement tourne l'élément de son cap puis le fait avancer, un
+    étage intermédiaire **remet le dessin d'aplomb** (sinon la licorne
+    voyage couchée), et l'image garde son flottement — une seule balise ne
+    peut pas porter les trois animations. Le bas du dégradé est passé du
+    rose au **violet pastel**.
+  - **Le toboggan.** Un seul chemin est dessiné sur la carte : un ruban
+    d'arc-en-ciel du coin haut-gauche au premier monde (`_arcEnCiel`, le
+    même tracé repeint six fois de moins en moins large). La fille y glisse
+    **seule** : tant que le monde 1 n'est pas fini, `_equipage` est
+    construit sans monture.
+  - **Ce qui attend sur un monde** (`objetsEtape`, `_poserObjets`) : sa
+    licorne sur le monde 1, la couronne du client sur le monde 2. L'objet
+    est posé sur le SOMMET du décor et **disparaît dès l'étape terminée** —
+    il part avec elle. La couronne ne se porte donc qu'une fois le monde 2
+    fini (`couronneEtape`), en vol comme à pied.
+  - **Le cours porte le décor de son monde** (`scene-<slug>.svg`,
+    `_decorMonde`) : les mêmes motifs animés, semés en quatre bouquets sur
+    un cadre large et transparent. Le monde des licornes montre en plus
+    l'image du client — un SVG servi par une balise `img` ne charge aucune
+    image extérieure, elle est donc posée en DOM par-dessus.
+  - **Les douze décors ont été refaits** : ours et chiens et chats
+    entiers (plus de têtes ni d'empreintes), plusieurs tortues avec la tête
+    DEVANT la carapace, papillons qui battent des ailes, fleurs en volume
+    sur leurs tiges, cœurs qui battent, nuages qui dérivent, et neuf
+    sortes de sucreries. Tout est animé en CSS **dans** le fichier SVG :
+    une animation déclarative tourne dans une balise `img`, un script non.
+  - **Deux pièges de ce travail, à ne pas refaire** :
+    1. un `transform` CSS **écrase** l'attribut `transform` d'un élément
+       SVG. Un motif placé par attribut et animé par classe repartait au
+       coin de l'image, à la mauvaise taille. Chaque motif est donc un
+       groupe de PLACEMENT qui contient un groupe d'ANIMATION. Et il faut
+       `transform-box:fill-box`, sinon l'origine est celle du canevas.
+    2. tout ce qui est dessiné sous **y = 328** sort du disque du monde
+       (rayon 128 dans un carré de 400) et se fait rogner. À y = 300, il ne
+       reste que 160 px de large.
+
 - **Le ciel de la fille : nuages et cœurs** (). Cinq nuages
   qui dérivent et neuf cœurs qui montent en se balançant, en plus des
   étoiles, papillons et licornes déjà posés. Ils sont **dessinés en CSS**,

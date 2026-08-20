@@ -2297,16 +2297,9 @@ body.profile-boy #boy-bg-anim {
   animation:starTwinkle 4s ease-in-out infinite;
   animation-delay:var(--del,0s);
 }
-#girl-bg-anim .bg-butterfly {
-  position:fixed;font-size:2.5rem;opacity:.5;
-  animation:butterflyFly 12s linear infinite backwards;
-  animation-delay:var(--del,0s);
-}
-#girl-bg-anim .bg-unicorn {
-  position:fixed;font-size:3.5rem;opacity:.5;
-  animation:unicornFly 14s linear infinite backwards;
-  animation-delay:var(--del,0s);
-}
+/* Les papillons et les licornes en emoji ont ete retires du ciel le
+   20 aout : le client les remplace par SES licornes, qui derivent chacune
+   dans sa direction (voir .bg-licorne plus bas). */
 #boy-bg-anim .bg-rocket {
   position:fixed;font-size:2.6rem;opacity:.5;
   animation:rocketLaunch 7s linear infinite backwards;
@@ -2354,6 +2347,42 @@ body.profile-boy #boy-bg-anim {
 @keyframes nuageDerive{
   0%  {transform:translateX(0)}
   100%{transform:translateX(var(--course,128vw))}
+}
+
+/* ── LES LICORNES QUI TRAVERSENT LE CIEL ───────────────────────────────
+   Les dessins du client, qui derivent chacun dans SA direction, comme les
+   cometes de l'espace du garcon. Elles remplacent les licornes, papillons
+   et fleurs en emoji, qui defilaient tous a l'horizontale.
+
+   TROIS ETAGES, et il en faut trois : le deplacement tourne l'element de
+   son cap PUIS le fait avancer sur son propre axe (c'est ce qui donne des
+   directions variees sans un calcul dans le keyframe) ; l'etage du milieu
+   REMET LE DESSIN D'APLOMB, sinon la licorne voyage couchee ; et l'image
+   garde son flottement. Un seul element ne peut pas porter les trois : la
+   derniere animation ecraserait les autres. */
+#girl-bg-anim .bg-licorne{
+  position:fixed;width:var(--t,110px);height:var(--t,110px);
+  opacity:var(--o,.5);
+  animation:licorneDerive var(--dur,30s) linear infinite backwards;
+  animation-delay:var(--del,0s);
+}
+#girl-bg-anim .bg-licorne .droit{
+  display:block;width:100%;height:100%;
+  transform:rotate(calc(-1 * var(--cap,0deg)));
+}
+#girl-bg-anim .bg-licorne img{
+  width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 6px 10px rgba(150,90,190,.25));
+  animation:licorneFlotte 3.4s ease-in-out infinite;
+  animation-delay:var(--del,0s);
+}
+@keyframes licorneDerive{
+  0%  {transform:rotate(var(--cap,20deg)) translateX(0)}
+  100%{transform:rotate(var(--cap,20deg)) translateX(var(--course,130vmax))}
+}
+@keyframes licorneFlotte{
+  0%,100%{transform:translateY(0)}
+  50%    {transform:translateY(-9%)}
 }
 
 /* Un coeur : deux lobes arrondis, chacun tourne d'un quart de tour autour
@@ -2406,6 +2435,22 @@ body.profile-boy.fond-espace,#root.profile-boy.fond-espace{
    l'espace : on les retire sur ces ecrans-la. */
 body.fond-espace #root.profile-boy::before,
 body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* LE DECOR DU COURS. Quand la fille entre dans un monde, le cours porte le
+   MEME decor : des licornes chez les licornes, des papillons chez les
+   papillons. C'est une image posee derriere la page, transparente et sans
+   disque, avec les memes motifs animes que le monde.
+   Elle est posee sur le conteneur du cours (pas sur le body) et derriere
+   tout le reste : `z-index:0` et la scene entiere passe par-dessus. */
+.decor-monde{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-repeat:no-repeat;background-position:center 22%;
+  background-size:min(1100px,140%) auto;
+  opacity:.55;
+}
+@media (max-width:700px){
+  .decor-monde{background-size:170% auto;background-position:center 18%;opacity:.5}
+}
+
 /* ══ LE CIEL PASTEL DE LA FILLE ════════════════════════════════════════
    Dicte par le client : du BLEU en haut, du JAUNE au milieu, du ROSE en
    bas, en couleurs bien pastel, avec des degrades francs entre les trois.
@@ -2416,6 +2461,8 @@ body.fond-espace #root.profile-boy::after{background:none !important;opacity:0 !
    un vert d'eau qu'on voyait tout de suite en travers du ciel. Ils se
    croisent donc par un blanc tres pale, et le jaune par une peche pale
    avant le rose.
+   Le BAS est un violet pastel, demande le 20 aout a la place du rose : le
+   rose reste en passage, entre le jaune et lui.
    Il se pose comme celui du garcon : sur le BODY, et seulement sur la
    carte et le cours (voir `_fondEnfant`). */
 body.profile-girl.fond-licorne,#root.profile-girl.fond-licorne{
@@ -2423,7 +2470,8 @@ body.profile-girl.fond-licorne,#root.profile-girl.fond-licorne{
     #b8e2ff 0%,  #cfeeff 17%,
     #eef9ff 27%, #fffbe6 38%,
     #fff6c2 47%, #fff3cc 60%,
-    #ffe7e3 71%, #ffd2e8 84%, #ffbeda 100%) !important;
+    #ffe7e3 70%, #f6d8f2 80%,
+    #ddc4f7 91%, #c9addd 100%) !important;
 }
 /* Les voiles roses poses par-dessus le fond de la fille eteindraient le
    pastel : on les retire sur ces ecrans-la, comme pour le garcon. */
@@ -2507,8 +2555,10 @@ body.fond-licorne .sess-gp-bar{background:rgba(74,16,64,.14) !important}
 }
 @media (prefers-reduced-motion:reduce){
   #boy-bg-anim .bg-etoile,#boy-bg-anim .bg-filante,#boy-bg-anim .bg-asteroide,
-  #girl-bg-anim .bg-nuage,#girl-bg-anim .bg-coeur{
+  #girl-bg-anim .bg-nuage,#girl-bg-anim .bg-coeur,
+  #girl-bg-anim .bg-licorne,#girl-bg-anim .bg-licorne img{
     animation:none !important}
+  #girl-bg-anim .bg-licorne{opacity:0}
   #boy-bg-anim .bg-filante{opacity:0}
   /* Un coeur nait invisible (opacity:0) et ne se montre que par son
      animation : sans elle, il faut le rallumer, sinon le ciel de la fille
@@ -5728,9 +5778,17 @@ function _migreProgressionFille(){
 }
 function _ileDepart(islandDefs){
   var derniere=-1;
+  /* L'ETAPE QU'ON VIENT DE QUITTER gagne sur tout le reste. Elle etait
+     jusqu'ici mise en concurrence avec l'etape la plus avancee jamais
+     entamee : un enfant qui revenait sur son troisieme monde retrouvait sa
+     licorne posee sur le huitieme. C'est ce que le client demandait depuis
+     longtemps — en revenant du cours, on doit se retrouver LA. */
   try{
     var v=localStorage.getItem('arab_ile');
-    if(v!==null&&v!=='')derniere=Math.max(derniere,parseInt(v,10));
+    if(v!==null&&v!==''){
+      var i0=parseInt(v,10);
+      if(i0>=0&&i0<islandDefs.length)return i0+1;
+    }
   }catch(e){}
   islandDefs.forEach(function(isle,i){
     var entamee=isle.sids.some(function(sid){
@@ -5796,6 +5854,28 @@ function _quandCartePrete(el,max,fn){
    La fonction est gardee, vide : c'est le seul endroit ou remettre un trait
    si l'envie revenait. */
 function _traceVol(){}
+
+/* LE TOBOGGAN DE LA FILLE. Un seul chemin est dessine sur la carte : celui
+   qui descend du coin haut-gauche jusqu'au premier monde. La fille s'y
+   laisse glisser, seule, pour rejoindre sa licorne. C'est un ruban
+   d'arc-en-ciel : le meme trace, repeint six fois de moins en moins large,
+   chaque couleur par-dessus la precedente — six chemins paralleles se
+   calculeraient un a un, celui-ci ne coute rien. */
+function _arcEnCiel(svg,d){
+  if(!svg||!d||!_HAB||!_HAB.arcEnCiel)return;
+  var cs=['#ff9ec4','#ffc48a','#fff2a8','#bfe8b0','#a8d8ff','#c9b6ff'];
+  var LARGE=38;
+  for(var i=0;i<cs.length;i++){
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',d);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke',cs[i]);
+    p.setAttribute('stroke-width',String(LARGE-i*(LARGE/cs.length)));
+    p.setAttribute('stroke-linecap','round');
+    p.setAttribute('opacity','.92');
+    svg.appendChild(p);
+  }
+}
 function _bezier(t,s){
   var m=1-t;
   return{x:m*m*m*s.x0+3*m*m*t*s.cpx1+3*m*t*t*s.cpx2+t*t*t*s.x3,
@@ -5850,13 +5930,16 @@ function _inclinaison(deg){
    qui vole et qui se pose, exactement comme avant.
    La flamme est posee AVANT l'image dans le meme calque : elle passe donc
    derriere la fusee, et n'en sort que par le bas. */
-function _equipage(taille){
+function _equipage(taille,sansMonture){
   var el=document.createElement('div');
   el.style.cssText='position:absolute;z-index:20;pointer-events:none;'
     +'width:'+taille+'px;height:'+taille+'px;will-change:transform,left,top;'
     +'filter:drop-shadow(0 10px 16px rgba(0,0,0,0.45))';
   var eq={el:el,vaisseau:null,pilote:null,flamme:null,aVaisseau:false};
-  if(_HAB.vaisseau&&_HAB.pilote){
+  /* SANS MONTURE : la fille n'a pas encore sa licorne — elle l'attend sur
+     le monde 1. Elle glisse donc seule sur l'arc-en-ciel, et tout le
+     mecanisme de vaisseau reste au repos. */
+  if(_HAB.vaisseau&&_HAB.pilote&&!sansMonture){
     var v=document.createElement('div');
     v.style.cssText='position:absolute;left:0;top:0;right:0;bottom:0;'
       +'transition:opacity .6s ease,transform .75s ease-out';
@@ -5890,7 +5973,11 @@ function _equipage(taille){
   }else{
     var src=document.querySelector('#'+(st.profile==='girl'?'girl':'boy')+'-mascot img');
     var m=document.createElement('img');m.alt='';
-    if(src)m.src=src.src;
+    /* Le personnage seul, quand l'habillage en donne un : c'est la fille
+       qui glisse vers son premier monde. Sinon, l'ancienne mascotte. */
+    var seul=_HAB.piloteSansCouronne||_HAB.pilote;
+    if(seul)m.src=seul;
+    else if(src)m.src=src.src;
     m.style.cssText='width:100%;height:100%;object-fit:contain;'
       +'animation:volFlotte 2.8s ease-in-out infinite';
     el.appendChild(m);
@@ -5907,6 +5994,9 @@ function _equipage(taille){
 function _fondEnfant(actif){
   var b=document.body,r=document.getElementById('root');
   if(!b)return;
+  /* Le decor du monde suit le fond : il ne doit pas rester derriere le
+     menu ou les reglages. */
+  if(!actif){var ca0=document.getElementById('ca');if(ca0)_decorMonde(ca0,false);}
   /* On retire le fond de TOUS les univers, pas seulement celui du garcon :
      avec un seul nom ecrit en dur, un enfant qui change de profil garde le
      fond de l'autre, et le pastel se retrouve sous l'espace. */
@@ -5995,6 +6085,39 @@ function _hautDuDessin(img){
   _HAUTS_DECOR[cle]=r;
   return r;
 }
+/* Ce qui ATTEND la fille sur un monde : sa licorne au monde 1, la couronne
+   au monde 2. L'image est posee sur le SOMMET du decor, comme le
+   personnage, et retiree des que l'etape est finie — l'objet part alors
+   avec elle. Elle vit dans le meme conteneur que le personnage, pas dans
+   la carte : c'est la que les coordonnees du sommet ont un sens. */
+function _poserObjets(globe,cartes,faites){
+  if(!globe||!_HAB||!_HAB.objetsEtape)return;
+  Array.prototype.forEach.call(globe.querySelectorAll('.objet-monde'),function(o){
+    if(o.parentNode)o.parentNode.removeChild(o);
+  });
+  Object.keys(_HAB.objetsEtape).forEach(function(cle){
+    var rang=parseInt(cle,10);
+    if(faites&&faites[rang])return;                 /* deja gagne : il n'y est plus */
+    var o=_HAB.objetsEtape[cle],carte=cartes[rang];
+    if(!o||!carte)return;
+    var som=_sommetEtape(carte);
+    if(!som)return;
+    var img=carte.querySelector('.isle-img');
+    var large=(img?img.offsetWidth:160)*(o.taille||0.32);
+    var el=document.createElement('img');
+    el.className='objet-monde';
+    el.src=o.img;el.alt='';
+    el.style.cssText='position:absolute;z-index:12;pointer-events:none;'
+      +'width:'+Math.round(large)+'px;'
+      +'left:'+Math.round(som.x-large/2+(o.dx||0)*large)+'px;'
+      +'top:'+Math.round(som.y+(o.dy||0)*large)+'px;'
+      +'transform:translateY(-100%);'
+      +'filter:drop-shadow(0 8px 12px rgba(120,60,140,.35));'
+      +'animation:volFlotte 3.6s ease-in-out infinite';
+    globe.appendChild(el);
+  });
+}
+
 function _sommetEtape(carte){
   if(!carte)return null;
   var img=carte.querySelector('.isle-img');
@@ -6050,14 +6173,32 @@ function _volCarte(o){
   /* L'enfant ne peut pas etre a la fois DANS la fusee et DEVANT elle. En
      vol, c'est la fusee avec lui au hublot ; posee et l'enfant sorti, c'est
      la fusee VIDE. Deux dessins du client, un pour chaque situation. */
+  /* La MEME taille en vol et pose. En vol, l'image porte la monture ET
+     l'enfant : elle est haute, et `object-fit:contain` la reduit d'autant.
+     Posee, la monture seule est presque carree : contenue dans la meme
+     boite, elle paraissait d'un coup beaucoup plus grosse — et l'enfant,
+     dessine a part, beaucoup plus petit. On reduit donc la monture posee
+     du facteur `montureEchelle`, ancree en BAS et au CENTRE : ses pieds ne
+     bougent pas, seule sa taille change. Pas de `transform` ici — le
+     flottement en occupe deja un sur cette image. */
+  function tailleMonture(posee){
+    if(!eq.image)return;
+    var k=posee?(_HAB.montureEchelle||1):1;
+    eq.image.style.width=(k*100)+'%';
+    eq.image.style.height=(k*100)+'%';
+    eq.image.style.left=((1-k)*50)+'%';
+    eq.image.style.top=((1-k)*100)+'%';
+  }
   function vaisseauHabite(oui){
     if(!eq.aVaisseau||!eq.image)return;
+    tailleMonture(!oui);
     var src;
     if(oui){
-      /* En vol. Sans couronne au depart du monde 1, avec elle ensuite —
-         et dans le sens de la marche. */
-      src=(_HAB.vaisseauSansCouronne&&partiDe<(_HAB.couronneDes||99))
-        ? _HAB.vaisseauSansCouronne
+      /* En vol. La couronne ne se porte qu'une fois GAGNEE — c'est-a-dire
+         le monde qui la donne termine — et le dessin suit le sens de la
+         marche. */
+      src=(_HAB.vaisseauSansCouronne&&o.couronneGagnee===false)
+        ? (parSens(_HAB.vaisseauSansCouronneSens)||_HAB.vaisseauSansCouronne)
         : (parSens(_HAB.vaisseauSens)||_HAB.vaisseau);
     }else{
       src=parSens(_HAB.vaisseauVideSens)||_HAB.vaisseauVide||_HAB.vaisseau;
@@ -6255,6 +6396,12 @@ function _volCarte(o){
   function arriver(fini,depuis){
     var but=ouSePoser(idx);
     var de=depuis||{x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
+    /* Le vol se termine DEJA sur le sommet : plus rien a rejoindre, on se
+       pose. L'approche ne servait qu'a rattraper un vol qui s'arretait au
+       milieu de l'etape — le client voyait la licorne arriver EN BAS du
+       monde, ralentir, puis remonter pour se poser. */
+    var d2=(but.x-de.x)*(but.x-de.x)+(but.y-de.y)*(but.y-de.y);
+    if(d2<=144){poser(but.x,but.y,null);poserPilote(fini);return;}
     approche(de,but,function(){poserPilote(fini);});
   }
   function allerA(cible,fini){
@@ -6287,14 +6434,30 @@ function _volCarte(o){
        eux, ne changent pas : ce sont des phases a part. */
     if(file.length>1){
       var der=file[file.length-1];
-      var but={x:der.sens>0?der.seg.x3:der.seg.x0,
-               y:der.sens>0?der.seg.y3:der.seg.y0};
+      /* On vise le SOMMET de l'etape, pas son milieu : c'est la qu'on se
+         pose, et le trajet doit y mener directement. */
+      var but=ouSePoser(cible)||{x:der.sens>0?der.seg.x3:der.seg.x0,
+                                 y:der.sens>0?der.seg.y3:der.seg.y0};
       var ici={x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
       idx=cible;
       volDroit(ici,but,function(){arriver(fini,but);});
       return;
     }
     var n=0,u=0;
+    /* LA COURBE SE TERMINE SUR LE SOMMET. Les segments joignent les MILIEUX
+       des etapes : suivie jusqu'au bout, la courbe deposait la monture au
+       milieu du decor, et il fallait ensuite remonter au sommet — d'ou le
+       « ils arrivent en bas du monde, puis remontent » du client. On ecarte
+       donc le dernier segment vers le sommet, progressivement, pour que le
+       vol y arrive de lui-meme. */
+    var butFinal=ouSePoser(cible);
+    var finSeg=file.length?file[file.length-1]:null;
+    var centreFin=finSeg?(finSeg.sens>0?{x:finSeg.seg.x3,y:finSeg.seg.y3}:{x:finSeg.seg.x0,y:finSeg.seg.y0}):null;
+    function versSommet(p,dernier,t){
+      if(!dernier||!butFinal||!centreFin)return p;
+      var e=t*t;                      /* l'ecart ne se voit qu'a la fin */
+      return {x:p.x+(butFinal.x-centreFin.x)*e, y:p.y+(butFinal.y-centreFin.y)*e};
+    }
     /* Un saut dure le même temps quelle que soit sa longueur : c'est
        l'allure d'un déplacement en l'air, pas d'un pas qui s'allonge. */
     var DUREE=o.duree||900;
@@ -6305,7 +6468,7 @@ function _volCarte(o){
       if(!item){idx=cible;arriver(fini);return;}
       u=Math.min(1,(Date.now()-debut)/DUREE);
       var t=item.sens>0?adouci(u):1-adouci(u);
-      var p=_bezier(t,item.seg);
+      var p=versSommet(_bezier(t,item.seg),n===file.length-1,adouci(u));
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
       /* On se penche en décollant, on se redresse en se posant. Sans ce
          redressement, le personnage arrivait sur l'étape encore couché à
@@ -6485,6 +6648,17 @@ var islandDefs=[
     if(_HAB.etapes[i])isle.label=_HAB.etapes[i];
   });
 
+  /* CE QUI EST GAGNE, etape par etape. La fille arrive au monde 1 SEULE :
+     sa licorne l'y attend, et elle ne repart avec elle qu'une fois le monde
+     fini. Meme chose pour la couronne, posee sur le monde 2. Un objet
+     gagne disparait de son monde — c'est la regle dictee par le client. */
+  var _etapeFaite=islandDefs.map(function(isle){
+    return isle.sids.every(function(sid){
+      var a=(st.accuracy||{})[sid];return a&&a.t>0&&a.c/a.t>=0.8;});
+  });
+  var _montureGagnee=(!_HAB.montureEtape)||!!_etapeFaite[_HAB.montureEtape-1];
+  var _couronneGagnee=(!_HAB.couronneEtape)||!!_etapeFaite[_HAB.couronneEtape-1];
+
   islandDefs.forEach(function(isle,isleIdx){
     // Statut des sessions de cette île
     var isleSessions=isle.sids.map(function(sid){
@@ -6644,7 +6818,7 @@ var islandDefs=[
          la main a chaque image. */
       /* Plus grande qu'avant : la fusee reste garee sur l'etape et
          l'enfant se tient devant elle — il faut la place pour les deux. */
-      var eqMob=_equipage(112);
+      var eqMob=_equipage(112,!_montureGagnee);
       var charElMob=eqMob.el;
       globeDiv.appendChild(charElMob);
       _quandCartePrete(ca,1500,function(){
@@ -6663,12 +6837,14 @@ var islandDefs=[
         var cpMRight=Math.min(gW*0.95,maxMX+80);
         var cpMLeft=Math.max(gW*0.05,minMX-80);
         if(isleCardsMob.length>0){
-          var avX=gW*0.08,avY=40;
+          var avX=gW*0.08,avY=_HAB.arcEnCiel?150:40;
           var t0x=centersM[0].x,t0y=centersM[0].y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           var mid0mx=(avX+t0x)*0.5;
           segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-          drawMobPath('M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y, lk0);
+          var _d0m='M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y;
+          drawMobPath(_d0m, lk0);
+          _arcEnCiel(svg,_d0m);
         }
         // Segments île->île : serpentin tangentes horizontales (île 0=droite, île 1=gauche…)
         for(var i=0;i<isleCardsMob.length-1;i++){
@@ -6687,12 +6863,16 @@ var islandDefs=[
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey, segLkM);
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
-        var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,
+        _poserObjets(globeDiv,isleCardsMob,_etapeFaite);
+        var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
           equipage:eqMob,decalageX:56,decalageY:112,demiAssise:31,depart:charIdxM,
           trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
           dureeTotale:9000,camera:true,
           pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null,
           pilotePour:function(i){
+            /* Sans la couronne tant qu'elle n'est pas gagnee, quel que soit
+               le monde ; le tableau par etape sert au garcon (la Terre). */
+            if(_HAB.piloteSansCouronne&&!_couronneGagnee)return _HAB.piloteSansCouronne;
             return (_HAB.pilotesEtape&&_HAB.pilotesEtape[i-1])||null;}});
         /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
            cours est là dès la première image affichée. */
@@ -6771,12 +6951,18 @@ var islandDefs=[
 
       // Segment 0 : coin haut-gauche → île 0 — arc doux (pas de ligne horizontale)
       if(centers.length>0){
-        var avX=gW*0.05,avY=60;
+        /* Le depart du toboggan descend : accrochee tout en haut, la fille
+           etait coupee par le bord de la carte. */
+        var avX=gW*0.05,avY=_HAB.arcEnCiel?170:60;
         var t0x=centers[0].x,t0y=centers[0].y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
         var mid0x=(avX+t0x)*0.5,mid0y=(avY+t0y)*0.5;
         segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-        drawPath('M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y, lk0);
+        var _d0='M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y;
+        drawPath(_d0, lk0);
+        /* LE TOBOGGAN : le seul chemin dessine de la carte, du coin haut a
+           gauche jusqu'au premier monde. */
+        _arcEnCiel(svg,_d0);
       }
 
       // Segments île→île : serpentin strict alternant droite/gauche (i%2)
@@ -6792,18 +6978,20 @@ var islandDefs=[
       }
 
       // Avatar
-      var eq=_equipage(140);
+      var eq=_equipage(140,!_montureGagnee);
       var charEl=eq.el;
       globeDiv.appendChild(charEl);
 
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
-      var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,
+      _poserObjets(globeDiv,isleCards,_etapeFaite);
+      var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
         equipage:eq,decalageX:70,decalageY:140,demiAssise:39,depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
         dureeTotale:9000,camera:true,
         pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null,
         pilotePour:function(i){
+          if(_HAB.piloteSansCouronne&&!_couronneGagnee)return _HAB.piloteSansCouronne;
           return (_HAB.pilotesEtape&&_HAB.pilotesEtape[i-1])||null;}});
 
       /* Défilement AVANT de montrer la carte : l'étape en cours doit être à
@@ -7468,7 +7656,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v109';
+var _VERSION_REPLI='v110';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8954,22 +9142,50 @@ var _HABILLAGES={
        retournement horizontal, déjà refusé. */
     vaisseau:'/images/licorne-couronne-gd.png',
     vaisseauSens:{gd:'/images/licorne-couronne-gd.png',dg:'/images/licorne-couronne-dg.png'},
-    /* Avant la couronne, une seule image, sans variante de sens : elle ne
-       sert qu'au tout premier vol, celui qui part du monde 1. */
+    /* Avant la couronne, ses deux dessins sans couronne — le client a
+       fourni le sens droite→gauche le 20 août. Ils servent tant que la
+       couronne n'est pas gagnée, c'est-à-dire jusqu'à la fin du monde 2. */
     vaisseauSansCouronne:'/images/licorne-fille.png',
-    couronneDes:2,
+    vaisseauSansCouronneSens:{gd:'/images/licorne-fille.png',dg:'/images/licorne-fille-dg.png'},
+    /* La couronne se gagne EN TERMINANT le monde 2 : elle ne la porte donc
+       pas en partant du monde 2, seulement à partir du monde 3. */
+    couronneDes:3,
     vaisseauVide:'/images/licorne-seule-gd.png',
     vaisseauVideSens:{gd:'/images/licorne-seule-gd.png',dg:'/images/licorne-seule-dg.png'},
-    /* La fille descendue. Elle porte la couronne à partir du monde 2 : au
-       monde 1 seulement, c'est la fille sans couronne. */
+    /* La fille descendue. Elle ne porte la couronne qu'une fois le monde 2
+       TERMINÉ — avant, c'est la fille sans couronne, sur tous les mondes. */
     pilote:'/images/fille-couronne.png',
-    pilotesEtape:{0:'/images/fille-seule.png'},
+    piloteSansCouronne:'/images/fille-seule.png',
+    pilotesEtape:null,
+    /* CE QUI L'ATTEND SUR UN MONDE. Sa licorne au monde 1 : elle y arrive
+       seule, en glissant sur l'arc-en-ciel, et repart avec. La couronne au
+       monde 2 : elle la gagne en le terminant. Un objet gagné disparaît de
+       son monde — le client y tient. */
+    montureEtape:1,
+    couronneEtape:2,
+    objetsEtape:{
+      0:{img:'/images/licorne-seule-gd.png',taille:0.34,dy:0.06},
+      1:{img:'/images/couronne.png',taille:0.34,dy:0.04}
+    },
+    /* Le seul chemin dessiné de la carte : le toboggan qui descend vers le
+       premier monde. */
+    arcEnCiel:true,
+    /* Le cours porte le décor du monde où l'on se trouve : une image par
+       monde, `scene-<slug>.svg`, écrite par `outils/mondes.js`. */
+    scenesMonde:true,
+    /* Le monde des licornes montre LA licorne du client, pas un dessin. */
+    scenesImage:{'licornes':'/images/licorne-seule-gd.png'},
     /* Elle est plus étroite et plus haute qu'un astronaute, et se tient à
        l'ARRIÈRE de sa licorne pour qu'on voie la tête de celle-ci — c'est
        la contrainte du client. `piloteDecale` est en points de pourcentage,
        et change de côté avec le sens de la marche. */
-    piloteBoite:{gauche:30,largeur:40,hauteur:66},
-    piloteDecale:24,
+    piloteBoite:{gauche:23,largeur:55,hauteur:88},
+    piloteDecale:23,
+    /* La monture posée est réduite pour retrouver la taille qu'elle a en
+       vol : l'image de vol porte la licorne ET la fille, donc elle est
+       haute et `contain` la réduit ; la licorne seule est presque carrée et
+       remplissait toute la boîte. Réglé en comparant les deux côte à côte. */
+    montureEchelle:0.78,
     /* Une licorne n'a pas de réacteur. */
     flamme:false,
     /* Elle se pose sur le SOMMET du monde, comme l'astronaute sur sa
@@ -9005,12 +9221,42 @@ function _habDuProfil(){
   return (st&&st.profile==='girl')?_HABILLAGES.licorne:_HABILLAGES.garcon;
 }
 
+/* Le decor du monde ou l'on se trouve, derriere le cours. `_currentIsleSlug`
+   est pose au clic sur la carte : c'est lui qui dit dans quel monde on est.
+   Sans habillage qui les fournisse (le garcon), il n'y a rien a poser. */
+function _decorMonde(ca,actif){
+  if(ca)Array.prototype.forEach.call(ca.querySelectorAll('.decor-monde,.decor-monde-img'),function(v){
+    if(v.parentNode)v.parentNode.removeChild(v);
+  });
+  if(!actif||!ca||!_HAB||!_HAB.scenesMonde||!_currentIsleSlug)return;
+  var d=document.createElement('div');
+  d.className='decor-monde';
+  d.style.backgroundImage="url('/images/scene-"+_currentIsleSlug+".svg')";
+  ca.appendChild(d);
+  /* Certains mondes tiennent a une image du client plutot qu'a un dessin :
+     le monde des licornes doit montrer SA licorne. Elle ne peut pas entrer
+     dans le fichier SVG — une image servie par une balise img ne charge
+     aucune image exterieure — elle est donc posee ici, en deux exemplaires. */
+  var extra=_HAB.scenesImage&&_HAB.scenesImage[_currentIsleSlug];
+  if(extra){
+    [[4,16,24],[70,58,18]].forEach(function(pos,i){
+      var im=document.createElement('img');
+      im.src=extra;im.alt='';im.className='decor-monde-img';
+      im.style.cssText='position:fixed;z-index:0;pointer-events:none;opacity:.5;'
+        +'left:'+pos[0]+'%;top:'+pos[1]+'%;width:'+pos[2]+'%;'
+        +'animation:volFlotte '+(3.6+i)+'s ease-in-out infinite';
+      ca.appendChild(im);
+    });
+  }
+}
+
 function _boyScene(ca,reprise){
   _HAB=_habDuProfil();
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
   var _repriseSuivie=!!reprise;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
   _fondEnfant(true);
+  _decorMonde(ca,true);
   var wrap=document.createElement('div');
   wrap.className='boy-wrap'+(_HAB.classe?' '+_HAB.classe:'');ca.appendChild(wrap);
   /* Le cours entier se joue en plein écran paysage, dès l'arrivée sur la
@@ -11900,7 +12146,8 @@ function initChildBgAnim() {
   var girlBg = document.getElementById('girl-bg-anim');
   if (girlBg && girlBg.children.length === 0) {
     // 6 étoiles : position fixe, animation sur place
-    var stars = ['⭐','🌸','✨','💫','🌟','⭐'];
+    // (plus de fleur parmi elles : le client n'en veut plus dans le ciel)
+    var stars = ['⭐','✨','💫','🌟','✨','⭐'];
     var starPosX = [5, 22, 45, 62, 80, 92];
     var starDelays = [0, 0.5, 1.0, 1.5, 2.0, 2.5];
     for (var i = 0; i < 6; i++) {
@@ -11913,31 +12160,43 @@ function initChildBgAnim() {
       girlBg.appendChild(s);
     }
 
-    // 3 papillons : traversée gauche→droite, top distribué, delay échelonné (12s/3 = 4s)
-    var butterflies = ['🦋','🌺','🌷'];
-    var bfTops = [15, 45, 72];
-    var bfDelays = [0, 4, 8];
-    for (var j = 0; j < 3; j++) {
-      var b = document.createElement('span');
-      b.className = 'bg-butterfly';
-      b.textContent = butterflies[j % butterflies.length];
-      b.style.left = '0';
-      b.style.top = bfTops[j] + '%';
-      b.style.setProperty('--del', bfDelays[j] + 's');
-      girlBg.appendChild(b);
-    }
-
-    // 2 licornes : traversée gauche→droite, top distribué, delay échelonné (14s/2 = 7s)
-    var unicornTops = [25, 62];
-    var unicornDelays = [0, 7];
-    for (var u = 0; u < 2; u++) {
-      var un = document.createElement('span');
-      un.className = 'bg-unicorn';
-      un.textContent = '🦄';
-      un.style.left = '0';
-      un.style.top = unicornTops[u] + '%';
-      un.style.setProperty('--del', unicornDelays[u] + 's');
-      girlBg.appendChild(un);
+    /* Les licornes du client traversent le ciel, chacune dans SA direction,
+       comme les cometes du garcon. Elles ont remplace les papillons, les
+       fleurs et les licornes en emoji, qui defilaient tous de gauche a
+       droite sur la meme ligne.
+       Le point de depart est pris du cote d'ou l'on vient, pour que le
+       trajet traverse vraiment l'ecran ; le dessin suit le sens de la
+       marche — vers la droite ou vers la gauche — car il n'y a pas de
+       retournement horizontal dans ce projet. */
+    var licornes = [
+      { cap:  26, x: -14, y:  8,  t:132, dur: 34, del:  0,  o:.55 },
+      { cap: 154, x: 104, y: 22,  t: 96, dur: 27, del:  9,  o:.48 },
+      { cap:  -8, x: -14, y: 58,  t:116, dur: 31, del: 17,  o:.52 },
+      { cap: 200, x: 104, y: 74,  t: 84, dur: 24, del: 25,  o:.45 },
+      { cap:  38, x: -14, y: 86,  t:104, dur: 29, del: 33,  o:.50 }
+    ];
+    for (var u = 0; u < licornes.length; u++) {
+      var L = licornes[u];
+      var lc = document.createElement('span');
+      lc.className = 'bg-licorne';
+      lc.style.left = L.x + '%';
+      lc.style.top = L.y + '%';
+      lc.style.setProperty('--cap', L.cap + 'deg');
+      lc.style.setProperty('--t', L.t + 'px');
+      lc.style.setProperty('--dur', L.dur + 's');
+      lc.style.setProperty('--del', '-' + L.del + 's');
+      lc.style.setProperty('--o', L.o);
+      lc.style.setProperty('--course', 'calc(130vmax)');
+      var droit = document.createElement('span');
+      droit.className = 'droit';
+      var li = document.createElement('img');
+      /* Elle regarde la ou elle va : le cap decide du dessin. */
+      var versLaDroite = Math.cos(L.cap * Math.PI / 180) >= 0;
+      li.src = versLaDroite ? '/images/licorne-seule-gd.png' : '/images/licorne-seule-dg.png';
+      li.alt = '';
+      droit.appendChild(li);
+      lc.appendChild(droit);
+      girlBg.appendChild(lc);
     }
 
     /* Les nuages. Cinq, de tailles et de hauteurs differentes, qui
