@@ -17,6 +17,12 @@ dans `_VERSION_REPLI` de `app/app.html`, committer, pousser. Vercel
 déploie tout seul. Puis vérifier en ligne que `iamlearningarabic.com/sw.js`
 affiche bien le nouveau numéro.
 
+**Cette vérification passe par le NAVIGATEUR**, pas par `curl` : le bac à
+sable qui exécute les commandes n'a pas toujours accès au réseau, et `curl`
+répond alors « code http 000 » sans rien dire de plus — ce qui ressemble à
+un déploiement raté alors que tout va bien. Ouvrir l'adresse dans le
+navigateur intégré et lire les deux premières lignes.
+
 Pour regarder soi-même ce qu'on vient de changer, sans passer par la
 production ni par le client : `node outils/serveur-local.js`
 (voir « Le banc EN LOCAL » plus bas).
