@@ -1017,6 +1017,28 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Toutes les isolées étaient BLANCHES au lieu de bleues — v130.** Le client
+  l'a signalé trois fois avant que je trouve : la couleur était posée sur
+  `.pos-ar`, qu'une règle `!important` de l'habillage adulte (ligne ~1703)
+  force en blanc. Les autres formes y échappaient parce que `_formeCoupee`
+  pose leur couleur sur une balise INTÉRIEURE. L'isolée fait pareil désormais.
+  **Leçon : ne jamais poser une couleur sur `.pos-ar` ni sur `.pos-lbl`.**
+- **La rangée de voyelles se lisait à l'envers.** `direction:rtl` : en arabe
+  on écrit de droite à gauche, la première voyelle va à droite.
+- **Les voyelles offertes viennent des `harakat` de la lettre.** Le client :
+  « sers-toi des lettres en forme de fleur ». La fleur est bâtie sur cette
+  table, et elle porte déjà toutes les spécificités : l'alif n'y a pas de
+  tanwīn, le tā marbūṭa pas de soukoun. La liste fixe et la table
+  `_SANS_SOUKOUN` ont disparu — rien à tenir à jour à la main.
+- **La hamza a enfin ses voyelles.** Elle reçoit volontairement une liste de
+  formes VIDE (elle a son propre affichage à quatre supports), et le bloc
+  entier était sauté. Les formes restent conditionnelles, les voyelles non.
+- **Page de vente** : « 12 leçons détaillées » → « Leçons détaillées »,
+  « Aide 24/7 » → « Accompagnement 24/7 », et la promesse devient « La
+  meilleure formation pour lire l'arabe » — dans les treize langues, sinon
+  le compte « 12 » resterait affiché ailleurs. Trois langues annonçaient
+  « 9 langues » : corrigé.
+
 - **Une rangée de voyelles sous les formes, dans le module d'écriture — v129.**
   Trois simples, leurs trois doublées, le soukoun, et « sans voyelle » pour
   revenir à la lettre nue. Le modèle à tracer prend la voyelle choisie, et

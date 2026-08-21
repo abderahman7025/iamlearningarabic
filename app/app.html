@@ -1292,7 +1292,10 @@ body {
 /* La rangée de voyelles, sous les formes. Une voyelle qui ne peut pas se
    poser sur la forme choisie n'est pas cachée : elle est éteinte, pour que
    l'élève voie qu'elle existe et qu'elle ne va pas là. */
-.wm-voy{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px 0 2px}
+/* direction:rtl — on écrit de DROITE à GAUCHE en arabe : la première
+   voyelle doit être à droite, comme les formes juste au-dessus. */
+.wm-voy{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;
+  margin:8px 0 2px;direction:rtl}
 .wm-voy-btn{
   min-width:34px;padding:4px 6px 5px;border-radius:10px;
   border:1px solid rgba(255,255,255,.15);
@@ -8042,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v129';
+var _VERSION_REPLI='v130';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8202,9 +8205,26 @@ var _SOUS_LA_LIGNE=/[ٍِ]/;   /* kasra · tanwīn kasr */
       dessin ET pour le chemin de l'animation — sinon le crayon passerait à
       côté de la lettre. */
 var _JAMBAGE_ISOLE=/^[جحخ]$/;
-/* Les lettres qui ne prennent pas de soukoun. Le tā marbūṭa ne ferme jamais
-   une syllabe : il porte toujours une voyelle ou un tanwīn. */
-var _SANS_SOUKOUN='ة';
+/* Quelles marques une lettre accepte-t-elle ? La réponse est déjà dans ses
+   `harakat` — la table qui nourrit la fleur de voyelles du cours. L'alif n'y
+   a pas de tanwīn, le tā marbūṭa pas de soukoun : les spécificités de chaque
+   lettre sont donc lues, jamais retenues à part. */
+function _marquesDeLaLettre(lettreAr){
+  var L=null;
+  if(typeof ALL_S==='undefined')return null;
+  ALL_S.forEach(function(s){
+    (s.letters||[]).forEach(function(q){ if(q.ar===lettreAr)L=q; });
+  });
+  if(!L||!L.harakat||!L.harakat.length)return null;
+  var dispo={};
+  L.harakat.forEach(function(h){
+    var t=String(h.ar||'');
+    /* la lettre suivie d'UNE marque : les formes longues (بَا) et les
+       lettres composées (آ) ne disent rien d'une marque simple */
+    if(t.length===2 && t.charAt(0)===lettreAr) dispo[t.charAt(1)]=true;
+  });
+  return dispo;
+}
 function _descenteGlyphe(texte,px){
   var t=String(texte),corps=t.replace(_MARQUES,'');
   if(!corps&&_SOUS_LA_LIGNE.test(t))return Math.round(px*0.24);
@@ -12108,7 +12128,11 @@ function renderLLesson(ca,s,idx){
     const sansCode=(letter.ar==='ع'||letter.ar==='غ');
     const isoBox=document.createElement('div');isoBox.className='pos-c';
     const coulIso=sansCode?'var(--txt)':'var(--blue)';
-    isoBox.innerHTML=`<div class="pos-lbl" style="color:${coulIso}">${t('isolated')}</div><div class="pos-ar" style="color:${coulIso};font-weight:400">${letter.iso||letter.ar}</div>`;
+    /* La couleur va sur une balise INTÉRIEURE, jamais sur .pos-ar : une règle
+       !important de l'habillage adulte force .pos-ar en blanc, et l'isolée
+       ressortait blanche alors que les autres formes, colorées par
+       _formeCoupee sur une balise interne, y échappaient. */
+    isoBox.innerHTML=`<div class="pos-lbl" style="color:${coulIso}">${t('isolated')}</div><div class="pos-ar" style="font-weight:400"><span style="color:${coulIso}">${letter.iso||letter.ar}</span></div>`;
     posRowWrap.appendChild(isoBox);
     sortedPos.forEach(p=>{
       const pc=document.createElement('div');pc.className='pos-c';
@@ -13013,9 +13037,11 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       'milieu': t('form_medial')||'milieu',
       'fin':    t('form_final')||'fin'
     };
-    if (letterPos && letterPos.length > 0) {
+    /* Les formes ne sont pas toujours là — la hamza a son propre affichage —
+       mais les voyelles, si : elles vivent donc hors du bloc des formes. */
+    {
       var posMap = {};
-      letterPos.forEach(function(p){ posMap[p.l] = p.ar || p.g; });
+      (letterPos || []).forEach(function(p){ posMap[p.l] = p.ar || p.g; });
       posMap['isolée'] = letterAr;
 
       /* ── La voyelle se pose sur la LETTRE, pas au bout de la forme ────
@@ -13034,7 +13060,7 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         redraw();
       }
 
-      var VOYELLES = [
+      var TOUTES_VOYELLES = [
         {ar:'',  lat:'—',   cls:'nue'},
         {ar:'َ', lat:'a',   cls:'simple'},
         {ar:'ُ', lat:'u',   cls:'simple'},
@@ -13044,8 +13070,11 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         {ar:'ٍ', lat:'in',  cls:'double'},
         {ar:'ْ', lat:'∅',   cls:'soukoun'}
       ];
-      /* Une lettre nue — c'est le cas du tā marbūṭa — n'a pas de soukoun. */
-      var refuseSoukoun = (_SANS_SOUKOUN.indexOf(letterAr) >= 0);
+      /* On n'offre que les marques que cette lettre porte vraiment. */
+      var _dispo = _marquesDeLaLettre(letterAr);
+      var VOYELLES = _dispo
+        ? TOUTES_VOYELLES.filter(function(v){ return !v.ar || _dispo[v.ar]; })
+        : TOUTES_VOYELLES;
       /* Une voyelle DOUBLÉE ne tombe qu'en fin de mot : elle ne va donc ni
          au début ni au milieu. La règle joue dans les deux sens — c'est le
          même fait, vu de chaque bout. */
@@ -13061,9 +13090,8 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         });
         mod.querySelectorAll('.wm-voy-btn').forEach(function (b) {
           var cls = b.getAttribute('data-cls');
-          var off = (cls === 'double' && !formeAccepteDouble(currentFormKey))
-                 || (cls === 'soukoun' && refuseSoukoun);
-          b.classList.toggle('eteint', off);
+          b.classList.toggle('eteint',
+            cls === 'double' && !formeAccepteDouble(currentFormKey));
         });
       }
 
@@ -13104,10 +13132,12 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         return btn;
       }
 
-      var formsPortrait = mod.querySelector('#wm-forms-portrait');
-      if(formsPortrait){ formOrderPortrait.forEach(function(k){ var b=makeFormBtn(k,false); if(b)formsPortrait.appendChild(b); }); }
-      var formsLandscape = mod.querySelector('#wm-forms-landscape');
-      if(formsLandscape){ formOrderLandscape.forEach(function(k){ var b=makeFormBtn(k,true); if(b)formsLandscape.appendChild(b); }); }
+      if (letterPos && letterPos.length > 0) {
+        var formsPortrait = mod.querySelector('#wm-forms-portrait');
+        if(formsPortrait){ formOrderPortrait.forEach(function(k){ var b=makeFormBtn(k,false); if(b)formsPortrait.appendChild(b); }); }
+        var formsLandscape = mod.querySelector('#wm-forms-landscape');
+        if(formsLandscape){ formOrderLandscape.forEach(function(k){ var b=makeFormBtn(k,true); if(b)formsLandscape.appendChild(b); }); }
+      }
       ['#wm-voy-portrait','#wm-voy-landscape'].forEach(function(sel){
         var box = mod.querySelector(sel);
         if(!box) return;
