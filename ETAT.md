@@ -1017,6 +1017,22 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Recopier les points d'une forme sur une autre ne suffit PAS — v138.**
+  Les coordonnées d'un geste partent du CENTRE DE LA CHAÎNE. Deux formes de
+  la même lettre n'ont pas la même largeur, donc le corps de la lettre n'y
+  est pas au même endroit : les points recopiés tombent à côté de l'encre, et
+  `_cheminSurEncre` les rabat sur le trait le plus proche — le tracé ne
+  ressemble alors plus au modèle, alors que la table dit le contraire.
+  C'est ce qui faisait que le ʿayn fin ne ressemblait pas au ʿayn milieu bien
+  qu'ayant « les mêmes points ». Mesuré : sa tête est 0,028 em plus à GAUCHE
+  que dans la forme milieu (l'ancien code la mettait 0,03 à droite), et sa
+  grande boucle 0,007 plus à droite que celle de l'isolée.
+  **Le contrôle à faire après toute retouche de geste : la distance de chaque
+  point à l'encre la plus proche.** Elle doit rester du même ordre que celle
+  de la forme modèle — au-delà, le moteur reprend la main. Relevé après
+  correction : ʿayn fin 0,040 contre 0,030 pour le milieu ; wāw fin 0,028
+  contre 0,005 pour l'isolé ; ṭāʾ début 0,033, fin 0,018, isolé 0,040.
+
 - **Le ṭāʾ isolé commençait par son petit trait de gauche — v137.** Le geste
   partait de −0,34, le bout gauche : ce trait se remplissait avant la boucle.
   Même correction que sur la forme début, déjà validée — on part du pied de
