@@ -6684,16 +6684,31 @@ function _volCarte(o){
        donc ils se chevauchent largement — le trait reste continu, et il y a
        deux fois moins d'elements a animer sur un telephone. */
     if(d<9)return;
-    var ep=(o.epaisseurTrainee||15);
+    var feu=_HAB&&_HAB.traineeFeu;
+    var ep=(o.epaisseurTrainee||15)*(feu?1.25:1);
     var seg=document.createElement('div');
+    /* Un feu n'a pas de bord net : plus flou, et un halo autour. */
+    var teinte=feu?(feu.flamme):couleurGrain();
+    if(feu&&(rangArc++%2))teinte=feu.coeur;
     seg.style.cssText='position:absolute;left:'+dernierPoint.x+'px;top:'+(dernierPoint.y-ep/2)+'px;'
       +'width:'+(d+ep*0.55)+'px;height:'+ep+'px;border-radius:'+ep+'px;'
       +'transform-origin:'+(ep/2)+'px 50%;'
       +'transform:translateX(-'+(ep/2)+'px) rotate('+(Math.atan2(ay,ax)*180/Math.PI).toFixed(1)+'deg);'
-      +'background:'+couleurGrain()+';filter:blur(2px);opacity:.85;'
-      +'pointer-events:none;z-index:19;transition:opacity 1s ease';
+      +'background:'+teinte+';filter:blur('+(feu?4:2)+'px);opacity:'+(feu?'.95':'.85')+';'
+      +(feu?'box-shadow:0 0 '+Math.round(ep*0.9)+'px '+feu.halo+';':'')
+      +'pointer-events:none;z-index:19;'
+      +'transition:opacity '+(feu?'0.85':'1')+'s ease'
+      +(feu?',background-color .7s ease,transform .85s ease':'');
     globe.appendChild(seg);grains.push(seg);
-    requestAnimationFrame(function(){seg.style.opacity='0';});
+    requestAnimationFrame(function(){
+      seg.style.opacity='0';
+      /* Le feu REFROIDIT : il vire à la braise en s'effaçant, et se resserre
+         un peu — la flamme s'amenuise au lieu de disparaître à plat. */
+      if(feu){
+        seg.style.backgroundColor=feu.braise;
+        seg.style.transform=seg.style.transform+' scaleY(.45)';
+      }
+    });
     setTimeout(function(){
       if(seg.parentNode)seg.parentNode.removeChild(seg);
       grains=grains.filter(function(k){return k!==seg;});
@@ -6703,7 +6718,7 @@ function _volCarte(o){
   function grain(x,y){
     /* Un ruban continu quand l'habillage donne un arc-en-ciel ; les grains
        d'avant sinon — le feu de la fusee est valide, on n'y touche pas. */
-    if(_HAB&&_HAB.traineeArc){ruban(x,y);return;}
+    if(_HAB&&(_HAB.traineeArc||_HAB.traineeFeu)){ruban(x,y);return;}
     var T=Date.now();
     if(T-dernierGrain<70)return;
     dernierGrain=T;
@@ -8045,7 +8060,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v143';
+var _VERSION_REPLI='v144';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9801,6 +9816,13 @@ var _HABILLAGES={
     slugs:['soleil','mercure','venus','terre','lune','mars',
            'jupiter','saturne','uranus','neptune','pluton','comete'],
     trainee:'rgba(255,183,77,.92)',
+    /* LA TRAÎNÉE DE FEU. Même ruban continu que l'arc-en-ciel de la licorne,
+       mais la couleur ne défile pas : chaque segment naît clair — cœur ou
+       flamme en alternance, ce qui donne le scintillement — puis vire à la
+       braise en s'effaçant. Un feu refroidit avec le temps, il ne change pas
+       de teinte le long du trait. */
+    traineeFeu:{coeur:'#fff6d5',flamme:'#ffa62b',braise:'#c9331b',
+                halo:'rgba(255,140,40,.55)'},
     /* Le decor du garcon est dessine dans un carre : une planete occupe
        bien moins de place qu'une ile peinte en paysage. Le client la veut
        une fois et demie plus grande. */
