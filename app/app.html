@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v130';
+var _VERSION_REPLI='v131';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8924,6 +8924,133 @@ if(document.fonts&&document.fonts.ready){
    et la ligne de base se trouve donc à `lh/2 − 0,32` em du BAS de la boîte.
    Sert à ne blanchir le trait de liaison qu'au-dessus de cette ligne. */
 function _basLigne(lh){return Math.max(0.02,(lh||1.2)/2-0.32);}
+/* ── Les formes qu'une coupe droite ne peut pas séparer ──────────────────
+   Le jīm remonte à 45° après son trait, le kāf croise sa propre diagonale :
+   à une même abscisse, le trait est en haut et la lettre en bas. On les
+   découpe donc par la FORME, pas par une ligne.
+
+   Le principe est celui du cours : « milieu = début + trait », « fin =
+   isolée + trait ». On dessine la forme attachée et sa forme de base,
+   alignées par leur bord gauche et sur la ligne d'écriture ; ce que
+   l'attachée a EN PLUS est le trait de liaison. La base est dilatée de deux
+   pixels avant la comparaison, sinon les écarts de rendu laisseraient un
+   liseré le long de la lettre.
+
+   Les autres lettres gardent la coupe droite : le client les donne pour
+   justes, et on n'y touche pas. */
+var _MASQUE_FORME={
+  'ج|fin':1,'ح|fin':1,'خ|fin':1,
+  'ج|milieu':1,'ح|milieu':1,'خ|milieu':1,
+  'ك|milieu':1,
+  'ط|milieu':1,'ظ|milieu':1
+};
+var _MQ_TAILLE=150, _MQ_CACHE={};
+function _formeRasterisee(f,taille){
+  var cx=document.createElement('canvas').getContext('2d');
+  cx.font=taille+"px 'Scheherazade New',serif";
+  var W=cx.measureText(f).width;
+  if(!W)return null;
+  var M=Math.round(taille*0.4);
+  var cw=Math.ceil(W)+M*2, ch=Math.round(taille*2.8), base=Math.round(ch*0.62);
+  var c=document.createElement('canvas');c.width=cw;c.height=ch;
+  var x=c.getContext('2d');
+  x.font=taille+"px 'Scheherazade New',serif";
+  x.direction='rtl';x.textAlign='right';x.textBaseline='alphabetic';
+  x.fillStyle='#000';x.fillText(f,M+W,base);
+  var d=x.getImageData(0,0,cw,ch).data;
+  var m=new Uint8Array(cw*ch), g=-1;
+  for(var py=0;py<ch;py++)for(var px=0;px<cw;px++){
+    if(d[(py*cw+px)*4+3]>60){ m[py*cw+px]=1; if(g<0||px<g)g=px; }
+  }
+  return {W:W,M:M,cw:cw,ch:ch,base:base,m:m,gauche:g,alpha:d};
+}
+/* Le masque du trait, et les deux calques prêts à peindre. */
+function _masqueLiaison(forme){
+  var f=String(forme);
+  if(_MQ_CACHE[f]!==undefined)return _MQ_CACHE[f];
+  var nue=f.split(_TATWEEL).join('');
+  if(nue.length!==1||f.charAt(0)!==_TATWEEL)return null;
+  var socle=f.slice(1);                       /* la forme de base */
+  var A=_formeRasterisee(f,_MQ_TAILLE), B=_formeRasterisee(socle,_MQ_TAILLE);
+  if(!A||!B||A.gauche<0||B.gauche<0)return null;
+  var dx=A.gauche-B.gauche, dy=A.base-B.base;
+  var trait=new Uint8Array(A.cw*A.ch), n=0;
+  for(var y=0;y<A.ch;y++)for(var x=0;x<A.cw;x++){
+    if(!A.m[y*A.cw+x])continue;
+    var couvert=false;
+    for(var oy=-2;oy<=2&&!couvert;oy++)for(var ox=-2;ox<=2;ox++){
+      var bx=x-dx+ox, by=y-dy+oy;
+      if(bx>=0&&bx<B.cw&&by>=0&&by<B.ch&&B.m[by*B.cw+bx]){couvert=true;break;}
+    }
+    if(!couvert){trait[y*A.cw+x]=1;n++;}
+  }
+  if(!n)return null;
+  var r={A:A,trait:trait};
+  var prete=!document.fonts||document.fonts.check(_MQ_TAILLE+"px 'Scheherazade New'");
+  if(prete)_MQ_CACHE[f]=r;
+  return r;
+}
+/* Un canvas ne sait pas lire `var(--green)` : il refuse la valeur et retombe
+   sur le noir. On résout donc la variable sur la racine du document avant de
+   peindre — et on accepte aussi bien #rrggbb que rgb() et rgba(). */
+function _enRVB(couleur){
+  var c=String(couleur||'').trim();
+  var v=/^var\(\s*(--[\w-]+)\s*\)$/.exec(c);
+  if(v)c=getComputedStyle(document.documentElement).getPropertyValue(v[1]).trim()||'#000';
+  var x=document.createElement('canvas').getContext('2d');
+  x.fillStyle='#000'; x.fillStyle=c;
+  var s=x.fillStyle;
+  var h=/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(s);
+  if(h)return [parseInt(h[1],16),parseInt(h[2],16),parseInt(h[3],16)];
+  var r=/^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(s);
+  if(r)return [+r[1],+r[2],+r[3]];
+  return [0,0,0];
+}
+/* Un calque : la forme peinte d'une couleur, limitée au masque voulu. */
+function _calqueForme(r,couleur,masque,veutTrait){
+  var A=r.A, c=document.createElement('canvas');
+  c.width=A.cw;c.height=A.ch;
+  var x=c.getContext('2d');
+  var img=x.createImageData(A.cw,A.ch), D=img.data;
+  var rgb=_enRVB(couleur), R=rgb[0], G=rgb[1], B2=rgb[2];
+  for(var p=0;p<A.cw*A.ch;p++){
+    if(!A.m[p])continue;
+    if((masque[p]?1:0)!==(veutTrait?1:0))continue;
+    D[p*4]=R;D[p*4+1]=G;D[p*4+2]=B2;
+    D[p*4+3]=A.alpha[p*4+3];      /* on garde l'adoucissement des bords */
+  }
+  x.putImageData(img,0,0);
+  return c;
+}
+/* La forme découpée par sa forme, en éléments prêts à poser.
+   Renvoie {hote, trait} : l'hôte à insérer, et le calque du trait, que
+   l'interface enfant fait apparaître en dernier. */
+function _formeCoupeeMasque(forme,couleurCorps,couleurTrait,ligne){
+  var r=_masqueLiaison(forme);
+  if(!r)return null;
+  var A=r.A, S=_MQ_TAILLE, L=ligne||1.2;
+  var hote=document.createElement('span');
+  hote.style.cssText='position:relative;display:inline-block';
+  /* Le texte invisible réserve EXACTEMENT la boîte du glyphe : les calques
+     se posent dessus, sans jamais recalculer une largeur à la main. */
+  var creux=document.createElement('span');
+  creux.style.visibility='hidden';
+  creux.textContent=forme;
+  hote.appendChild(creux);
+  /* La ligne de base tombe à L/2 + 0,32 em du haut de la boîte (police
+     mesurée : 1,34 em au-dessus, 0,70 en dessous). */
+  var hautEm=(L/2+0.32)-(A.base/S), gaucheEm=-(A.M/S);
+  function pose(cv){
+    cv.style.cssText='position:absolute;pointer-events:none;'
+      +'left:'+gaucheEm.toFixed(4)+'em;top:'+hautEm.toFixed(4)+'em;'
+      +'width:'+(A.cw/S).toFixed(4)+'em;height:'+(A.ch/S).toFixed(4)+'em';
+    hote.appendChild(cv);
+    return cv;
+  }
+  pose(_calqueForme(r,couleurCorps,r.trait,false));
+  var trait=pose(_calqueForme(r,couleurTrait,r.trait,true));
+  return {hote:hote,trait:trait};
+}
 /* La forme attachée, corps coloré et trait de liaison à part, en HTML.
    Deux exemplaires superposés et découpés : couper la chaîne en deux
    morceaux casserait la liaison arabe et le trait redeviendrait un tiret
@@ -10976,6 +11103,26 @@ function _boyScene(ca,reprise){
              balises casse la liaison arabe, et le trait redevient un tiret
              tout droit, ce qui n'est pas la même chose. */
           var part=_partLiaison(g);
+          /* Les formes qu'une ligne verticale ne sait pas couper passent par
+             la découpe en forme — mêmes deux calques, même animation. */
+          var _cf=_cleForme(g);
+          if(_cf&&_MASQUE_FORME[_cf]){
+            var mq=_formeCoupeeMasque(g,coul[k],LIEN,1.5);
+            if(mq){
+              mq.hote.style.cssText+=';vertical-align:baseline';
+              var sC=mq.hote.children[1], sL=mq.trait;
+              sC.style.transition='opacity .4s,transform .4s cubic-bezier(.34,1.56,.64,1)';
+              sL.style.transition='opacity .35s,transform .35s';
+              gl.appendChild(mq.hote);
+              corps[k]=sC;liens[k]=sL;
+              sC.style.opacity='0';sC.style.transform='scale(.55)';
+              sL.style.opacity='0';sL.style.transform='translateX(16px)';
+              c.appendChild(gl);
+              c.onclick=function(){N.stop();N.dire(f);};
+              t.appendChild(c);
+              return;
+            }
+          }
           /* Coupe en L, comme dans l'interface adulte : le trait n'est pris
              qu'au-dessus de la ligne d'écriture, sinon le point du bāʾ et
              ceux du yāʾ partiraient avec lui. L'interligne de cette case
@@ -12142,8 +12289,13 @@ function renderLLesson(ca,s,idx){
          la couleur, pour que « fin = isolée + — » se voie. Colorer p.g dans
          la chaine ne suffisait pas — la forme attachee porte son trait
          d'entree dans son propre dessin, et un bout partait en couleur. */
-      const arDisplay=_formeCoupee(p.ar,gpColor,'#f0ece4');
-      pc.innerHTML=`<div class="pos-lbl">${posMap[p.l]||p.l}</div><div class="pos-ar" style="font-weight:400">${arDisplay}</div>`;
+      /* Neuf formes ne se laissent pas couper par une ligne verticale (jīm,
+         kāf milieu, ṭāʾ milieu) : elles passent par la découpe en forme. */
+      const cleF=_cleForme(p.ar);
+      const parForme=(cleF&&_MASQUE_FORME[cleF])
+        ? _formeCoupeeMasque(p.ar,gpColor,'#f0ece4',1.2) : null;
+      pc.innerHTML=`<div class="pos-lbl">${posMap[p.l]||p.l}</div><div class="pos-ar" style="font-weight:400">${parForme?'':_formeCoupee(p.ar,gpColor,'#f0ece4')}</div>`;
+      if(parForme)pc.querySelector('.pos-ar').appendChild(parForme.hote);
       posRowWrap.appendChild(pc);
     });
     layout.appendChild(posRowWrap);

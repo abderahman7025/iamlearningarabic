@@ -1017,6 +1017,27 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Une coupe VERTICALE ne peut pas séparer certaines formes — v131.** C'est
+  le client qui a fini par nommer le défaut : « certaines parties de la lettre
+  sont à la même position sur une ligne d'abscisse, mais ordonnée
+  différente ». Le jīm remonte à 45° après son trait ; le kāf croise sa propre
+  diagonale. Aucune ligne verticale ne peut y passer, et j'ai perdu quatre
+  tentatives à chercher le bon POURCENTAGE alors que le problème n'était pas
+  là.
+  Ces neuf formes (`_MASQUE_FORME` : jīm/ḥāʾ/khāʾ fin et milieu, kāf milieu,
+  ṭāʾ/ẓāʾ milieu) sont découpées par leur FORME : on rastérise la forme
+  attachée et sa forme de base — fin → isolée, milieu → début —, alignées par
+  leur bord gauche et sur la ligne d'écriture, et ce que l'attachée a EN PLUS
+  est le trait de liaison. La base est dilatée de 2 px avant comparaison,
+  sinon les écarts de rendu laissent un liseré le long de la lettre.
+  Le résultat est peint sur deux calques `<canvas>` posés sur un texte
+  invisible qui réserve la boîte exacte du glyphe : aucune largeur calculée
+  à la main. L'animation de l'enfant s'y branche pareil.
+  **Toutes les autres lettres gardent la coupe droite** — nūn, bāʾ, yāʾ,
+  kāf fin, ṭāʾ fin sont déclarées justes par le client : ne pas y toucher.
+  Piège rencontré : un canvas ne sait pas lire `var(--green)`, il retombe sur
+  le noir. `_enRVB` résout la variable sur la racine avant de peindre.
+
 - **Toutes les isolées étaient BLANCHES au lieu de bleues — v130.** Le client
   l'a signalé trois fois avant que je trouve : la couleur était posée sur
   `.pos-ar`, qu'une règle `!important` de l'habillage adulte (ligne ~1703)
