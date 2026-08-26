@@ -1017,6 +1017,16 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Le ṭāʾ isolé commençait par son petit trait de gauche — v137.** Le geste
+  partait de −0,34, le bout gauche : ce trait se remplissait avant la boucle.
+  Même correction que sur la forme début, déjà validée — on part du pied de
+  la boucle, on la fait, PUIS on file vers la gauche, et la barre verticale
+  vient en dernier. Mesuré : à 15 % du tracé, le bord gauche de l'encre passe
+  de −0,34 à −0,12 em, la valeur de la forme début.
+  **Méthode qui a marché : mettre chaque forme corrigée en regard de sa forme
+  RÉFÉRENCE, aux mêmes pourcentages d'avancement.** Le défaut saute aux yeux
+  en une image, là où quatre échanges n'y étaient pas parvenus.
+
 - **L'animation du modèle passait en un éclair — v136.** Le client ne voyait
   pas les corrections d'ordre de tracé, et pour cause : le révélateur découpe
   le tracé en TROIS temps — le corps, les points, la voyelle — et le temps

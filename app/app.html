@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v136';
+var _VERSION_REPLI='v137';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8432,7 +8432,11 @@ var _TRACE_MODELE={
   },
   /* ط ظ — l'œil, puis le crayon se lève et la barre verticale descend du haut */
   'ط':{
-    seule:[[[-0.34,-0.04],[-0.10,-0.22],[0.10,-0.32],[0.28,-0.26],[0.30,-0.10],[0.10,-0.03],[-0.20,-0.03]],
+    /* La boucle d'abord, le petit trait horizontal de gauche ENSUITE, la
+       barre verticale en dernier — comme sur la forme début. Le geste
+       partait du bout gauche, et ce trait apparaissait avant la boucle. */
+    seule:[[[-0.10,-0.04],[-0.10,-0.22],[0.10,-0.32],[0.28,-0.26],[0.30,-0.10],[0.10,-0.03],
+            [-0.20,-0.03],[-0.34,-0.04]],
            [[-0.14,-0.70],[-0.14,-0.06]]],
     /* La boucle EXACTEMENT comme sur l'isolée, puis seulement après le trait
        de liaison vers la gauche, puis la barre verticale. Le geste partait
