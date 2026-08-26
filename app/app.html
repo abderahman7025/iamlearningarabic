@@ -6595,7 +6595,7 @@ function _volCarte(o){
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
-      poser(x,y,cap,descente?Math.min(1,u/0.14):Math.min(1,u/0.14,(1-u)/0.14));
+      poser(x,y,cap,descente?Math.min(1,u/0.14):Math.min(1,u/0.14,redresse(u)));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
@@ -6611,14 +6611,14 @@ function _volCarte(o){
        stationnaire, sinon on la voit remonter avant d'atterrir. */
     if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
     enApproche=!!o.aligne;dernierPoint=null;
-    var t0=Date.now(),D=o.dureeApproche||750;
+    var t0=Date.now(),D=o.dureeApproche||900;
     /* Elle vole encore : son nez reste dans le sens de la marche, et elle
        se redresse seulement en arrivant — on ne se pose pas couche. */
     var capA=Math.atan2(vers.y-de.y,vers.x-de.x)*180/Math.PI;
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
-      poser(x,y,capA,Math.min(1,(1-u)/0.45));
+      poser(x,y,capA,redresse(u));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(y);
       if(u>=1){enApproche=false;poser(vers.x,vers.y,null);fini();return;}
@@ -7017,7 +7017,17 @@ function _volCarte(o){
      traverser pour y arriver — mesure faite, elle passait a 43 px du centre
      d'un astre de 70. On entre donc en bas DU COTE D'OU L'ON VIENT, a
      quarante degres du bas, et le tour dure d'autant plus. */
-  var BOUCLE_JEU=0.40, BOUCLE_ENTREE=125, BOUCLE_DUREE=1000;
+  var BOUCLE_JEU=0.40, BOUCLE_ENTREE=125, BOUCLE_DUREE=1450;
+  /* ON NE SE POSE PAS A PLEINE VITESSE. Le redressement occupait le dernier
+     quart du tour, et LINEAIREMENT : mesure, la fusee tournait encore a 6,5
+     degres par image — 260 degres par seconde — a l'instant de toucher. Il
+     prend maintenant les quatre dixiemes du tour, et sa courbe s'aplatit en
+     fin de course : la rotation s'eteint au lieu de s'arreter net. */
+  var REDRESSE_PART=0.42;
+  function redresse(u){
+    var x=Math.min(1,(1-u)/REDRESSE_PART);
+    return Math.pow(x,1.7);
+  }
   var BOUCLE_TOUR=360-BOUCLE_ENTREE;   /* de l'entree jusqu'au sommet */
   function pointBoucle(b,phi){
     var t=phi*Math.PI/180;
@@ -7059,7 +7069,7 @@ function _volCarte(o){
         cap=capEntree+ec*k;
       }
       /* Elle se redresse sur le dernier quart, comme partout ailleurs. */
-      poser(p.x,p.y,cap,Math.min(1,(1-u)/0.25));
+      poser(p.x,p.y,cap,redresse(u));
       var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(p.y);
       if(u>=1){poser(b.sommet.x,b.sommet.y,null);fini();return;}
@@ -7162,7 +7172,7 @@ function _volCarte(o){
          24° et y restait planté de travers le temps d'un battement. */
       /* En descendant, la BOUCLE prend le relais et repart a l'horizontale :
          se redresser ici ferait un a-coup de 90 degres a l'entree. */
-      poser(p.x,p.y,deg,descente?Math.min(1,u/0.26):Math.min(1,u/0.26,(1-u)/0.26));
+      poser(p.x,p.y,deg,descente?Math.min(1,u/0.26):Math.min(1,u/0.26,redresse(u)));
       var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(p.y);
       if(u>=1){
@@ -8368,7 +8378,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v150';
+var _VERSION_REPLI='v151';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
