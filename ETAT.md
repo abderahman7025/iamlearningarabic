@@ -1017,6 +1017,24 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Les dix dessins du 22 août — v134.** La fille est maintenant voilée, sur
+  sa licorne, avec et sans couronne, dans les deux sens. Ils arrivaient en
+  **JPG sur fond blanc** : posés tels quels sur le dégradé pastel on aurait vu
+  un rectangle. `outils/detoure.py` enlève le fond — mais pas tout ce qui est
+  blanc, le corps de la licorne l'est aussi : le fond se reconnaît à ce qu'il
+  TOUCHE LE BORD, on part des quatre côtés et on n'avance que dans le blanc.
+  Les bords sont adoucis, l'image recadrée sur le dessin. Rejouable :
+  `python3 outils/detoure.py`.
+- **Le `?v=` est indispensable** quand une image change SANS changer de nom :
+  sinon le navigateur et le service worker gardent l'ancienne. Les huit
+  dessins du personnage sont en `?v=133`.
+- **Le cadrage de la fille debout a dû suivre.** Les nouveaux dessins sont
+  plus hauts — elle y fait toute la hauteur de la composition — et à l'ancien
+  cadrage elle masquait la tête de la licorne, que le client veut voir.
+  `piloteBoite` passe de {23,55,88} à {28,44,74}. Attention : `gauche` est la
+  position CENTRÉE, `piloteDecale` la déplace ensuite de ±23 points selon le
+  sens de marche. Une valeur de 2 envoyait la fille hors cadre.
+
 - **Quatre ordres de tracé, dictés par le client — v133.** wāw fin et milieu :
   le trait de liaison, puis EXACTEMENT le geste de l'isolée. Attention, les
   points d'un geste sont posés par rapport au centre de la CHAÎNE : la forme

@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v133';
+var _VERSION_REPLI='v134';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9871,22 +9871,22 @@ var _HABILLAGES={
        Deux dessins par situation, un par SENS de marche : c'est le client
        qui les a faits, et il ne faut surtout pas retomber sur le
        retournement horizontal, déjà refusé. */
-    vaisseau:'/images/licorne-couronne-gd.png',
-    vaisseauSens:{gd:'/images/licorne-couronne-gd.png',dg:'/images/licorne-couronne-dg.png'},
+    vaisseau:'/images/licorne-couronne-gd.png?v=133',
+    vaisseauSens:{gd:'/images/licorne-couronne-gd.png?v=133',dg:'/images/licorne-couronne-dg.png?v=133'},
     /* Avant la couronne, ses deux dessins sans couronne — le client a
        fourni le sens droite→gauche le 20 août. Ils servent tant que la
        couronne n'est pas gagnée, c'est-à-dire jusqu'à la fin du monde 2. */
-    vaisseauSansCouronne:'/images/licorne-fille.png',
-    vaisseauSansCouronneSens:{gd:'/images/licorne-fille.png',dg:'/images/licorne-fille-dg.png'},
+    vaisseauSansCouronne:'/images/licorne-fille.png?v=133',
+    vaisseauSansCouronneSens:{gd:'/images/licorne-fille.png?v=133',dg:'/images/licorne-fille-dg.png?v=133'},
     /* La couronne se gagne EN TERMINANT le monde 2 : elle ne la porte donc
        pas en partant du monde 2, seulement à partir du monde 3. */
     couronneDes:3,
-    vaisseauVide:'/images/licorne-seule-gd.png',
-    vaisseauVideSens:{gd:'/images/licorne-seule-gd.png',dg:'/images/licorne-seule-dg.png'},
+    vaisseauVide:'/images/licorne-seule-gd.png?v=133',
+    vaisseauVideSens:{gd:'/images/licorne-seule-gd.png?v=133',dg:'/images/licorne-seule-dg.png?v=133'},
     /* La fille descendue. Elle ne porte la couronne qu'une fois le monde 2
        TERMINÉ — avant, c'est la fille sans couronne, sur tous les mondes. */
-    pilote:'/images/fille-couronne.png',
-    piloteSansCouronne:'/images/fille-seule.png',
+    pilote:'/images/fille-couronne.png?v=133',
+    piloteSansCouronne:'/images/fille-seule.png?v=133',
     pilotesEtape:null,
     /* CE QUI L'ATTEND SUR UN MONDE. Sa licorne au monde 1 : elle y arrive
        seule, en glissant sur l'arc-en-ciel, et repart avec. La couronne au
@@ -9895,7 +9895,7 @@ var _HABILLAGES={
     montureEtape:1,
     couronneEtape:2,
     objetsEtape:{
-      0:{img:'/images/licorne-seule-gd.png',taille:0.34,dy:0.06},
+      0:{img:'/images/licorne-seule-gd.png?v=133',taille:0.34,dy:0.06},
       1:{img:'/images/couronne.png',taille:0.34,dy:0.04}
     },
     /* Le seul chemin dessiné de la carte : le toboggan qui descend vers le
@@ -9996,17 +9996,24 @@ var _HABILLAGES={
       ],
       /* Les licornes du client vont DANS TOUS LES SENS. */
       'licornes':[
-        {img:'/images/licorne-seule-gd.png',x:2,y:20,l:26,anim:'beteVole',dur:30,del:0},
-        {img:'/images/licorne-seule-dg.png',x:62,y:56,l:24,anim:'beteVole',dur:26,del:8},
-        {img:'/images/licorne-seule-gd.png',x:22,y:70,l:20,anim:'beteVole',dur:34,del:17},
-        {img:'/images/licorne-seule-dg.png',x:70,y:14,l:18,anim:'beteVole',dur:23,del:25}
+        {img:'/images/licorne-seule-gd.png?v=133',x:2,y:20,l:26,anim:'beteVole',dur:30,del:0},
+        {img:'/images/licorne-seule-dg.png?v=133',x:62,y:56,l:24,anim:'beteVole',dur:26,del:8},
+        {img:'/images/licorne-seule-gd.png?v=133',x:22,y:70,l:20,anim:'beteVole',dur:34,del:17},
+        {img:'/images/licorne-seule-dg.png?v=133',x:70,y:14,l:18,anim:'beteVole',dur:23,del:25}
       ]
     },
     /* Elle est plus étroite et plus haute qu'un astronaute, et se tient à
        l'ARRIÈRE de sa licorne pour qu'on voie la tête de celle-ci — c'est
        la contrainte du client. `piloteDecale` est en points de pourcentage,
        et change de côté avec le sens de la marche. */
-    piloteBoite:{gauche:23,largeur:55,hauteur:88},
+    /* Les dessins du 22 août sont plus hauts que les précédents : la fille
+       debout y fait toute la hauteur de la composition. Au cadrage d'avant
+       elle masquait la tête de la licorne, que le client veut voir. */
+    /* `gauche` est la position CENTRÉE : `piloteDecale` la déplace ensuite
+       de 23 points d'un côté ou de l'autre selon le sens de marche. Avec
+       une largeur de 44, le centre tombe à 28 — d'où 5 % quand la licorne
+       regarde à droite, 51 % quand elle regarde à gauche. */
+    piloteBoite:{gauche:28,largeur:44,hauteur:74},
     piloteDecale:23,
     /* La monture posée est réduite pour retrouver la taille qu'elle a en
        vol : l'image de vol porte la licorne ET la fille, donc elle est
@@ -13672,7 +13679,7 @@ function initChildBgAnim() {
       var li = document.createElement('img');
       /* Elle regarde la ou elle va : le cap decide du dessin. */
       var versLaDroite = Math.cos(L.cap * Math.PI / 180) >= 0;
-      li.src = versLaDroite ? '/images/licorne-seule-gd.png' : '/images/licorne-seule-dg.png';
+      li.src = versLaDroite ? '/images/licorne-seule-gd.png?v=133' : '/images/licorne-seule-dg.png?v=133';
       li.alt = '';
       droit.appendChild(li);
       lc.appendChild(droit);
