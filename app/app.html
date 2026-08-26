@@ -6637,12 +6637,33 @@ function _volCarte(o){
      hérité — elle aurait suivi le personnage au lieu de rester sur le
      monde. */
   var PORTE_OUVRE=520, PORTE_DESCEND=620, PORTE_FERME=420, PORTE_BLANC=380;
+  /* Le pas que l'enfant fait seul, en avant de sa monture. Il dure le temps
+     que la porte met a s'ouvrir, et se joue EN MEME TEMPS : le compte total
+     ne change pas. */
+  var PORTE_PAS=520;
   function porteLumiere(sens,apres){
     if(!el||!globe||!el.getBoundingClientRect){if(apres)apres();return;}
     var rg=globe.getBoundingClientRect(), re=el.getBoundingClientRect();
     if(!re.width){if(apres)apres();return;}
-    var cx=re.left-rg.left+re.width/2, cy=re.top-rg.top+re.height*0.92;
-    var L=Math.max(60,re.width*0.62), Ht=Math.max(16,re.width*0.20);
+    /* DE COMBIEN IL DESCEND. La monture occupe toute la boite de l'equipage :
+       la porte, ouverte a ses pieds, s'ouvrait donc sous elle et on ne voyait
+       plus l'enfant. Il fait quelques pas vers le bas, sur la face avant du
+       monde, et la porte le suit.
+       Le pas suit le RAYON de l'astre quand la carte le donne : mesure sur la
+       seule taille de la fusee, il jetterait l'enfant hors d'une comete. */
+    var astre=null;try{astre=ouSePoser(idx);}catch(e){}
+    var R=(astre&&astre.r)||0;
+    var PAS=Math.round(R?Math.max(re.height*0.22,Math.min(re.height*0.46,R*0.55))
+                        :re.height*0.34);
+    /* Ses pieds a lui, pas ceux de l'equipage : l'image du pilote est posee au
+       bas de la boite, centree, et c'est son milieu qui doit recevoir la porte. */
+    var rp=(eq.pilote&&eq.pilote.getBoundingClientRect)?eq.pilote.getBoundingClientRect():null;
+    if(!rp||!rp.width)rp=re;
+    var cx=rp.left-rg.left+rp.width/2, cy=re.bottom-rg.top+PAS;
+    var L=Math.max(52,rp.width*0.90), Ht=Math.max(15,rp.width*0.28);
+    /* La pose de l'enfant descendu : un peu plus grand, il est plus pres. */
+    var POSE_BAS='translateY('+PAS+'px) scale(1.06)';
+    var POSE_TROU='translateY('+(PAS+re.height*0.10)+'px) scale(.10)';
     var porte=document.createElement('div');
     porte.style.cssText='position:absolute;left:'+(cx-L/2)+'px;top:'+(cy-Ht/2)+'px;'
       +'width:'+L+'px;height:'+Ht+'px;border-radius:50%;pointer-events:none;z-index:18;'
@@ -6664,18 +6685,26 @@ function _volCarte(o){
       if(porte.parentNode)porte.parentNode.removeChild(porte);
     }
     if(sens>0){
-      setTimeout(function(){porte.style.transform='scale(1)';porte.style.opacity='1';},20);
+      /* Le pas et l'ouverture, en meme temps : il quitte sa monture et marche
+         vers la porte pendant qu'elle s'ouvre. */
+      setTimeout(function(){
+        porte.style.transform='scale(1)';porte.style.opacity='1';
+        if(pil){
+          pil.style.transition='transform '+PORTE_PAS+'ms cubic-bezier(.34,1.06,.5,1)';
+          pil.style.transform=POSE_BAS;
+        }
+      },20);
       /* Il descend DANS la porte : il rapetisse et s'enfonce. */
       setTimeout(function(){
         if(pil){
           pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.5,0,.75,0),opacity '+PORTE_DESCEND+'ms ease';
-          pil.style.transform='translateY(14%) scale(.10)';
+          pil.style.transform=POSE_TROU;
           pil.style.opacity='0';
         }
-      },PORTE_OUVRE*0.45);
+      },Math.max(PORTE_OUVRE,PORTE_PAS)*0.62);
       setTimeout(function(){
         porte.style.transform='scale(0.04)';porte.style.opacity='0';
-      },PORTE_OUVRE*0.45+PORTE_DESCEND);
+      },Math.max(PORTE_OUVRE,PORTE_PAS)*0.62+PORTE_DESCEND);
       setTimeout(function(){
         var v=voile();
         setTimeout(function(){v.style.opacity='1';},20);
@@ -6688,27 +6717,35 @@ function _volCarte(o){
             setTimeout(function(){if(v.parentNode)v.parentNode.removeChild(v);},PORTE_BLANC+60);
           },80);
         },PORTE_BLANC);
-      },PORTE_OUVRE*0.45+PORTE_DESCEND+PORTE_FERME*0.55);
+      },Math.max(PORTE_OUVRE,PORTE_PAS)*0.62+PORTE_DESCEND+PORTE_FERME*0.55);
     }else{
-      /* AU RETOUR : il sort de la porte et reprend sa taille. */
+      /* AU RETOUR : il sort de la porte, en bas, puis REMONTE rejoindre sa
+         monture. La carte vient d'etre redessinee, le pilote y est debout et
+         entier : on le remet d'abord au fond du trou, sans transition. */
       if(pil){
         pil.style.transition='none';
-        pil.style.transform='translateY(14%) scale(.10)';
+        pil.style.transform=POSE_TROU;
         pil.style.opacity='0';
+        pil.offsetHeight;  /* la remise a zero doit prendre avant l'animation */
       }
       setTimeout(function(){porte.style.transform='scale(1)';porte.style.opacity='1';},20);
       setTimeout(function(){
         if(pil){
           pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.22,1,.36,1),opacity '+Math.round(PORTE_DESCEND*0.6)+'ms ease';
-          pil.style.transform='';
+          pil.style.transform=POSE_BAS;
           pil.style.opacity='1';
         }
       },PORTE_OUVRE*0.55);
+      /* La porte se referme PENDANT qu'il remonte : le compte ne change pas. */
       setTimeout(function(){
         porte.style.transform='scale(0.04)';porte.style.opacity='0';
+        if(pil){
+          pil.style.transition='transform '+PORTE_PAS+'ms cubic-bezier(.32,1.04,.5,1)';
+          pil.style.transform='';
+        }
       },PORTE_OUVRE*0.55+PORTE_DESCEND*0.7);
       setTimeout(function(){nettoie();if(apres)apres();},
-        PORTE_OUVRE*0.55+PORTE_DESCEND*0.7+PORTE_FERME);
+        PORTE_OUVRE*0.55+PORTE_DESCEND*0.7+Math.max(PORTE_FERME,PORTE_PAS));
     }
   }
   function poserPilote(fini){
@@ -8187,7 +8224,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v146';
+var _VERSION_REPLI='v147';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
