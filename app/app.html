@@ -6468,6 +6468,9 @@ function _sommetEtape(carte){
           r:Math.max(1,(0.5-haut)*vh)};
 }
 
+/* Vrai quand on vient de descendre dans un monde par la porte de lumière :
+   au retour sur la carte, l'enfant en ressort au lieu d'apparaître. */
+var _porteRetour=false;
 function _volCarte(o){
   var segs=o.segments,el=o.charEl,globe=o.globe;
   var eq=o.equipage||{};
@@ -6624,6 +6627,90 @@ function _volCarte(o){
      2. une fois posee, l'enfant parait DEVANT elle.
      Elle ne repart pas et ne s'efface pas : elle reste garee la, et c'est
      de la qu'elle redecollera. */
+  /* ── LA PORTE DE LUMIÈRE ──────────────────────────────────────────────
+     Elle s'ouvre au pied du personnage, sur le monde ou la planète, il y
+     descend, elle se referme, puis l'écran passe au blanc et le cours
+     paraît. `sens` vaut +1 pour descendre, −1 pour remonter au retour.
+
+     Elle est posée dans le GLOBE, pas dans le conteneur du personnage :
+     celui-ci porte des transitions de transform, dont la porte aurait
+     hérité — elle aurait suivi le personnage au lieu de rester sur le
+     monde. */
+  var PORTE_OUVRE=520, PORTE_DESCEND=620, PORTE_FERME=420, PORTE_BLANC=380;
+  function porteLumiere(sens,apres){
+    if(!el||!globe||!el.getBoundingClientRect){if(apres)apres();return;}
+    var rg=globe.getBoundingClientRect(), re=el.getBoundingClientRect();
+    if(!re.width){if(apres)apres();return;}
+    var cx=re.left-rg.left+re.width/2, cy=re.top-rg.top+re.height*0.92;
+    var L=Math.max(60,re.width*0.62), Ht=Math.max(16,re.width*0.20);
+    var porte=document.createElement('div');
+    porte.style.cssText='position:absolute;left:'+(cx-L/2)+'px;top:'+(cy-Ht/2)+'px;'
+      +'width:'+L+'px;height:'+Ht+'px;border-radius:50%;pointer-events:none;z-index:18;'
+      +'background:radial-gradient(ellipse at 50% 50%,#fffdf2 0%,#ffe9a8 42%,rgba(255,206,80,0) 78%);'
+      +'box-shadow:0 0 '+Math.round(L*0.55)+'px rgba(255,214,120,.85);'
+      +'transform:scale(0.04);opacity:0;'
+      +'transition:transform '+PORTE_OUVRE+'ms cubic-bezier(.22,1,.36,1),opacity '+Math.round(PORTE_OUVRE*0.6)+'ms ease';
+    globe.appendChild(porte);
+    /* Le voile blanc couvre l'écran entier : c'est lui qui emmène au cours. */
+    function voile(){
+      var v=document.createElement('div');
+      v.style.cssText='position:fixed;inset:0;background:#fffaf0;opacity:0;z-index:9998;'
+        +'pointer-events:none;transition:opacity '+PORTE_BLANC+'ms ease';
+      document.body.appendChild(v);
+      return v;
+    }
+    var pil=eq.pilote;
+    function nettoie(){
+      if(porte.parentNode)porte.parentNode.removeChild(porte);
+    }
+    if(sens>0){
+      setTimeout(function(){porte.style.transform='scale(1)';porte.style.opacity='1';},20);
+      /* Il descend DANS la porte : il rapetisse et s'enfonce. */
+      setTimeout(function(){
+        if(pil){
+          pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.5,0,.75,0),opacity '+PORTE_DESCEND+'ms ease';
+          pil.style.transform='translateY(14%) scale(.10)';
+          pil.style.opacity='0';
+        }
+      },PORTE_OUVRE*0.45);
+      setTimeout(function(){
+        porte.style.transform='scale(0.04)';porte.style.opacity='0';
+      },PORTE_OUVRE*0.45+PORTE_DESCEND);
+      setTimeout(function(){
+        var v=voile();
+        setTimeout(function(){v.style.opacity='1';},20);
+        setTimeout(function(){
+          nettoie();
+          if(apres)apres();
+          /* Le cours est en place : le voile s'efface et le découvre. */
+          setTimeout(function(){
+            v.style.opacity='0';
+            setTimeout(function(){if(v.parentNode)v.parentNode.removeChild(v);},PORTE_BLANC+60);
+          },80);
+        },PORTE_BLANC);
+      },PORTE_OUVRE*0.45+PORTE_DESCEND+PORTE_FERME*0.55);
+    }else{
+      /* AU RETOUR : il sort de la porte et reprend sa taille. */
+      if(pil){
+        pil.style.transition='none';
+        pil.style.transform='translateY(14%) scale(.10)';
+        pil.style.opacity='0';
+      }
+      setTimeout(function(){porte.style.transform='scale(1)';porte.style.opacity='1';},20);
+      setTimeout(function(){
+        if(pil){
+          pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.22,1,.36,1),opacity '+Math.round(PORTE_DESCEND*0.6)+'ms ease';
+          pil.style.transform='';
+          pil.style.opacity='1';
+        }
+      },PORTE_OUVRE*0.55);
+      setTimeout(function(){
+        porte.style.transform='scale(0.04)';porte.style.opacity='0';
+      },PORTE_OUVRE*0.55+PORTE_DESCEND*0.7);
+      setTimeout(function(){nettoie();if(apres)apres();},
+        PORTE_OUVRE*0.55+PORTE_DESCEND*0.7+PORTE_FERME);
+    }
+  }
   function poserPilote(fini){
     if(!eq.aVaisseau){if(fini)fini();return;}
     if(eq.flamme)eq.flamme.style.display='none';
@@ -6636,7 +6723,13 @@ function _volCarte(o){
         vaisseauHabite(false);                 /* il quitte le hublot */
         eq.pilote.style.opacity='1';           /* et parait devant elle */
         eq.pilote.style.transform='translateY(0) scale(1)';
-        setTimeout(function(){if(fini)fini();},900);
+        /* Il est debout sur le monde : la porte s'ouvre et l'emmène au
+           cours, au lieu d'y basculer sèchement. */
+        setTimeout(function(){
+          if(!fini){return;}
+          _porteRetour=true;
+          porteLumiere(1,fini);
+        },620);
       },780);
     },700);
   }
@@ -6900,7 +6993,13 @@ function _volCarte(o){
     }
     tic();
   }
-  return{allerA:allerA,placerA:placerA,ou:function(){return idx;}};
+  return{allerA:allerA,placerA:placerA,ou:function(){return idx;},
+         porteRetour:function(){
+           /* On ne remonte de la porte QUE si l'on vient d'un cours. */
+           if(!_porteRetour)return;
+           _porteRetour=false;
+           porteLumiere(-1,null);
+         }};
 }
 
 /* La carte du parcours — UNE seule, pour la fille comme pour le garçon.
@@ -7300,6 +7399,8 @@ var islandDefs=[
         if(segsMob.length>0){
           var _ca=document.getElementById('ca');
           if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxM,charElMob);
+          /* Retour d'un cours : il remonte par la porte de lumière. */
+          setTimeout(function(){volM.porteRetour();},220);
         }
         wrap.style.visibility='';
         // Clic : voler jusqu'à l'étape, puis ouvrir le cours
@@ -7421,6 +7522,8 @@ var islandDefs=[
          l'écran dès la première image affichée, sans saut. */
       var _cad=document.getElementById('ca');
       if(_cad)_centreDeuxIles(_cad,isleCards,charIdx,charEl);
+      /* Retour d'un cours : il remonte par la porte de lumière. */
+      setTimeout(function(){vol.porteRetour();},220);
       wrap.style.visibility='';
 
       // Clic : voler jusqu'à l'étape PUIS ouvrir le cours
@@ -8084,7 +8187,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v145';
+var _VERSION_REPLI='v146';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
