@@ -1017,6 +1017,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Deux pièges de geste, vus seulement en regardant les images du banc — v141.**
+  *Un* : couper un geste en DEUX traits fait pousser deux morceaux à la fois.
+  Le révélateur classe les pixels par leur point de passage le plus proche ;
+  avec un lever de crayon entre le trait de liaison et la boucle, le départ de
+  la boucle se remplissait en même temps que le trait. Le wāw fin est
+  maintenant d'un seul tenant, comme l'isolé qui lui sert de modèle.
+  *Deux* : un geste doit couvrir TOUTE l'encre de la forme. Le ṭāʾ fin
+  s'arrêtait à −0,188 alors que sa base descend à −0,411 : dans la forme
+  finale cette partie n'est pas un trait de liaison, c'est la lettre, et sans
+  point de passage elle se remplissait n'importe quand.
+  **Le banc `/banc` sert à ça** : il charge l'application réellement servie par
+  le site et anime les formes en cause à côté de leur modèle. La liste par
+  défaut (`AREVOIR`, dans `app/banc.html`) se change à chaque série de
+  corrections ; `?tout=1` remet l'alphabet entier.
+
 - **Porter un geste d'une forme à l'autre : il faut le METTRE À L'ÉCHELLE,
   pas seulement le décaler — v139.** Le wāw : la boucle de la forme finale
   est bien plus PLATE que celle de l'isolée (0,225 de haut contre 0,296),
