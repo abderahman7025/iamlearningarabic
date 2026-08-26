@@ -6661,9 +6661,18 @@ function _volCarte(o){
     if(!rp||!rp.width)rp=re;
     var cx=rp.left-rg.left+rp.width/2, cy=re.bottom-rg.top+PAS;
     var L=Math.max(52,rp.width*0.90), Ht=Math.max(15,rp.width*0.28);
+    var pilAncre=eq.pilote;
     /* La pose de l'enfant descendu : un peu plus grand, il est plus pres. */
     var POSE_BAS='translateY('+PAS+'px) scale(1.06)';
-    var POSE_TROU='translateY('+(PAS+re.height*0.10)+'px) scale(.10)';
+    /* Il descend SOUS la bouche du trou, et s'y resserre presque a rien.
+       Avec l'ancre posee a ses pieds (voir `ancre()`), le resserrement le
+       tire VERS la porte au lieu de l'en eloigner. */
+    var POSE_TROU='translateY('+(PAS+Math.round(Ht*0.55))+'px) scale(.07)';
+    /* L'ancre du retrecissement : le bas de son image, donc ses pieds, donc
+       la bouche du trou. Sans elle il remonte vers le milieu de sa boite.
+       Elle est RENDUE a la fin : le moteur de vol compte sur l'ancre par
+       defaut pour l'asseoir au hublot. */
+    function ancre(v){if(pilAncre)pilAncre.style.transformOrigin=v;}
     var porte=document.createElement('div');
     porte.style.cssText='position:absolute;left:'+(cx-L/2)+'px;top:'+(cy-Ht/2)+'px;'
       +'width:'+L+'px;height:'+Ht+'px;border-radius:50%;pointer-events:none;z-index:18;'
@@ -6683,6 +6692,7 @@ function _volCarte(o){
     var pil=eq.pilote;
     function nettoie(){
       if(porte.parentNode)porte.parentNode.removeChild(porte);
+      ancre('');
     }
     if(sens>0){
       /* Le pas et l'ouverture, en meme temps : il quitte sa monture et marche
@@ -6690,6 +6700,7 @@ function _volCarte(o){
       setTimeout(function(){
         porte.style.transform='scale(1)';porte.style.opacity='1';
         if(pil){
+          ancre('50% 100%');
           pil.style.transition='transform '+PORTE_PAS+'ms cubic-bezier(.34,1.06,.5,1)';
           pil.style.transform=POSE_BAS;
         }
@@ -6697,7 +6708,8 @@ function _volCarte(o){
       /* Il descend DANS la porte : il rapetisse et s'enfonce. */
       setTimeout(function(){
         if(pil){
-          pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.5,0,.75,0),opacity '+PORTE_DESCEND+'ms ease';
+          pil.style.transition='transform '+PORTE_DESCEND+'ms cubic-bezier(.62,0,.9,.32),'
+            +'opacity '+Math.round(PORTE_DESCEND*0.85)+'ms ease-in '+Math.round(PORTE_DESCEND*0.3)+'ms';
           pil.style.transform=POSE_TROU;
           pil.style.opacity='0';
         }
@@ -6723,6 +6735,7 @@ function _volCarte(o){
          monture. La carte vient d'etre redessinee, le pilote y est debout et
          entier : on le remet d'abord au fond du trou, sans transition. */
       if(pil){
+        ancre('50% 100%');
         pil.style.transition='none';
         pil.style.transform=POSE_TROU;
         pil.style.opacity='0';
@@ -8224,7 +8237,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v147';
+var _VERSION_REPLI='v148';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
