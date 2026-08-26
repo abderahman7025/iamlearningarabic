@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v132';
+var _VERSION_REPLI='v133';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8434,7 +8434,12 @@ var _TRACE_MODELE={
   'ط':{
     seule:[[[-0.34,-0.04],[-0.10,-0.22],[0.10,-0.32],[0.28,-0.26],[0.30,-0.10],[0.10,-0.03],[-0.20,-0.03]],
            [[-0.14,-0.70],[-0.14,-0.06]]],
-    debut:[[[-0.36,-0.04],[-0.12,-0.22],[0.06,-0.32],[0.24,-0.26],[0.26,-0.10],[0.06,-0.03],[-0.36,-0.05]],
+    /* La boucle EXACTEMENT comme sur l'isolée, puis seulement après le trait
+       de liaison vers la gauche, puis la barre verticale. Le geste partait
+       jusqu'ici du bout gauche : le trait de liaison se remplissait avant
+       que la boucle commence. */
+    debut:[[[-0.10,-0.04],[-0.12,-0.22],[0.06,-0.32],[0.24,-0.26],[0.26,-0.10],[0.06,-0.03],
+            [-0.16,-0.04],[-0.36,-0.05]],
            [[-0.15,-0.72],[-0.15,-0.06]]],
     /* Milieu et fin : le trait de liaison va de la droite vers la gauche
        jusqu'au départ de l'œil, puis c'est le geste du début — l'œil monte à
@@ -8443,7 +8448,11 @@ var _TRACE_MODELE={
              [0.02,-0.22],[0.18,-0.30],[0.28,-0.22],[0.24,-0.08],[0.04,-0.05],
              [-0.20,-0.05],[-0.42,-0.05]],
             [[-0.14,-0.72],[-0.14,-0.40],[-0.14,-0.06]]],
-    fin:[[[0.45,-0.05],[0.28,-0.05],[0.08,-0.05],[-0.08,-0.06],
+    /* Comme le début du ṣād fin : le trait de liaison, on continue sur le BAS
+       de la boucle, on remonte pour son haut, on repasse par le bas, et le
+       petit trait horizontal de gauche vient seulement là. Il partait avant,
+       parce que le geste filait jusqu'à −0,08 avant de monter. */
+    fin:[[[0.45,-0.05],[0.28,-0.05],[0.08,-0.05],
           [0.04,-0.22],[0.20,-0.30],[0.30,-0.22],[0.26,-0.08],[0.06,-0.05],
           [-0.20,-0.05],[-0.40,-0.05]],
          [[-0.12,-0.71],[-0.12,-0.40],[-0.12,-0.06]]]
@@ -8492,10 +8501,14 @@ var _TRACE_MODELE={
              [0.00,-0.07],[-0.10,-0.13],[-0.10,-0.23],[0.01,-0.28],[0.11,-0.22],
              [0.12,-0.12],[0.05,-0.06],
              [-0.12,-0.05],[-0.22,-0.05],[-0.32,-0.05]]],
-    fin:[[[0.35,-0.05],[0.22,-0.05],[0.16,-0.07],
-          [0.03,-0.07],[-0.07,-0.13],[-0.07,-0.24],[0.05,-0.29],[0.15,-0.23],
-          [0.16,-0.12],[0.08,-0.06],
-          [-0.05,0.10],[-0.14,0.30],[-0.06,0.46],[0.14,0.50],[0.30,0.42]]]
+    /* EXACTEMENT le geste du milieu — que le client valide — jusqu'au bas de
+       la tête ; à la place de sa sortie vers la gauche, la grande boucle de
+       l'isolée, reprise telle quelle. La boucle tournait auparavant dans le
+       mauvais sens. */
+    fin:[[[0.31,-0.05],[0.18,-0.05],[0.12,-0.07],
+          [0.00,-0.07],[-0.10,-0.13],[-0.10,-0.23],[0.01,-0.28],[0.11,-0.22],
+          [0.12,-0.12],[0.05,-0.06],
+          [-0.18,0.02],[-0.26,0.22],[-0.18,0.40],[0.02,0.48],[0.22,0.46],[0.34,0.40]]]
   },
   /* ف — le petit cercle dans le sens des aiguilles d'une montre, puis le
      trait horizontal, puis on remonte un peu */
@@ -8703,9 +8716,9 @@ var _TRACE_MODELE={
        frôlant le flanc de la boucle et l'allumait avant l'heure ; c'est le
        même défaut que sur le fā fin, et la même correction. */
     fin:[[[0.30,-0.05],[0.20,-0.05]],
-         [[0.13,-0.08],[0.06,-0.04],[-0.01,-0.09],[-0.03,-0.17],[0.01,-0.24],
-          [0.08,-0.27],[0.14,-0.22],[0.15,-0.14],[0.13,-0.07],
-          [0.14,0.03],[0.10,0.13],[0.02,0.22],[-0.10,0.28],[-0.24,0.27]]]
+         [[0.086,-0.08],[0.016,-0.04],[-0.054,-0.09],[-0.074,-0.17],[-0.034,-0.24],
+          [0.036,-0.27],[0.096,-0.22],[0.106,-0.14],[0.086,-0.07],
+          [0.096,0.03],[0.056,0.13],[-0.024,0.22],[-0.144,0.28],[-0.284,0.27]]]
   },
   /* ي — le serpentin d'un seul trait, en partant du haut à droite ; au
      milieu, elle s'écrit comme le bā */

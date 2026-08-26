@@ -1017,6 +1017,22 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Quatre ordres de tracé, dictés par le client — v133.** wāw fin et milieu :
+  le trait de liaison, puis EXACTEMENT le geste de l'isolée. Attention, les
+  points d'un geste sont posés par rapport au centre de la CHAÎNE : la forme
+  fin étant plus large de 0,088 em, le corps du wāw s'y trouve 0,044 em plus
+  à gauche, et les points recopiés doivent être décalés d'autant, sinon ils
+  tombent à côté de l'encre.
+  ṭāʾ début : la boucle d'abord, le trait de liaison ensuite, la barre
+  verticale en dernier — le geste partait du bout gauche, donc le trait se
+  remplissait avant la boucle.
+  ṭāʾ fin : comme le début du ṣād fin. Le geste filait jusqu'à −0,08 avant de
+  monter, ce qui remplissait le petit trait de gauche trop tôt.
+  ʿayn fin : le geste du milieu à l'identique, puis la grande boucle de
+  l'isolée à la place de la sortie à gauche — elle tournait à l'envers.
+  **Règle du client, à suivre sans l'interpréter : une forme juste sert de
+  modèle à ses sœurs, on recopie ses points, on ne réinvente pas un tracé.**
+
 - **Une coupe VERTICALE ne peut pas séparer certaines formes — v131.** C'est
   le client qui a fini par nommer le défaut : « certaines parties de la lettre
   sont à la même position sur une ligne d'abscisse, mais ordonnée
