@@ -6592,7 +6592,7 @@ function _volCarte(o){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
       poser(x,y,cap,Math.min(1,u/0.14,(1-u)/0.14));
-      grain(x,y);camera(y);
+      var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
     }
@@ -6606,6 +6606,7 @@ function _volCarte(o){
        la qu'elle descendra se poser. Meme hauteur que la tenue en vol
        stationnaire, sinon on la voit remonter avant d'atterrir. */
     if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
+    enApproche=!!o.aligne;dernierPoint=null;
     var t0=Date.now(),D=o.dureeApproche||750;
     /* Elle vole encore : son nez reste dans le sens de la marche, et elle
        se redresse seulement en arrivant — on ne se pose pas couche. */
@@ -6614,9 +6615,9 @@ function _volCarte(o){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
       poser(x,y,capA,Math.min(1,(1-u)/0.45));
-      grain(x,y);
+      var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(y);
-      if(u>=1){poser(vers.x,vers.y,null);fini();return;}
+      if(u>=1){enApproche=false;poser(vers.x,vers.y,null);fini();return;}
       raf=requestAnimationFrame(tic);
     }
     tic();
@@ -6791,10 +6792,16 @@ function _volCarte(o){
      quand la tangente passe de +179 a -179 : on prend toujours le chemin
      le plus court. Sans ce recalage, la fusee fait un tour complet sur
      elle-meme au milieu d'un virage. */
+  var enApproche=false;
   var angleVu=0;
+  /* L'angle REELLEMENT pose sur l'element — apres le redressement, donc pas
+     forcement celui de la trajectoire. C'est lui qui dit ou est la tuyere. */
+  var anglePose=0;
+  /* La verticale que vise le redressement en cours, et le fait qu'il ait
+     lieu : tant qu'il dure, la fusee pivote sur place et ne seme pas. */
+  var droitFige=null, manoeuvre=false;
   /* Le SENS dans lequel la fusee tourne en ce moment, et le dernier angle
      brut. Ils servent a la redresser en CONTINUANT son mouvement. */
-  var brutVu=null,sensRot=1;
   function _court(a){
     while(a-angleVu>180)a-=360;
     while(a-angleVu<-180)a+=360;
@@ -6802,28 +6809,57 @@ function _volCarte(o){
   }
   function poser(x,y,deg,part){
     el.style.left=(x-dx)+'px';el.style.top=(y-dy)+'px';
-    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;brutVu=null;dernierPoint=null;return;}
+    if(deg===undefined||deg===null){el.style.transform='';angleVu=0;anglePose=0;
+      droitFige=null;manoeuvre=false;dernierPoint=null;return;}
     var p=(part===undefined?1:Math.max(0,Math.min(1,part)));
     var a;
     if(o.aligne){
       a=_court(deg+90);
-      /* Dans quel sens tourne-t-elle ? */
-      if(brutVu!==null&&Math.abs(a-brutVu)>0.05)sensRot=(a>brutVu)?1:-1;
-      brutVu=a;
-      /* LE REDRESSEMENT CONTINUE LE TOUR COMMENCE. En ramenant simplement
-         l'angle vers zero, la fusee amorçait sa rotation puis repartait en
-         sens inverse pour se remettre droite — c'est ce que le client
-         voyait en arrivant sur une planete plus basse. On vise donc le
-         quart de tour SUIVANT dans le sens ou elle tourne deja. */
+      /* PAS DE TOUR INUTILE. On visait le quart de tour SUIVANT dans le sens
+         ou la fusee tournait deja : au decollage comme a l'atterrissage elle
+         faisait donc un cercle complet avant de se remettre droite, et le
+         client n'en veut plus. On rejoint la verticale LA PLUS PROCHE —
+         celle qui est a moins d'un demi-tour de l'angle de vol. `_court` a
+         deja ramene l'angle au plus pres de celui qu'on vient de poser, la
+         rotation reste donc continue. */
       if(p<1){
-        var tours=a/360;
-        var cible=(sensRot>0?Math.ceil(tours):Math.floor(tours))*360;
-        a=a+(cible-a)*(1-p);
-      }
+        /* La verticale visee est FIGEE au premier tour du redressement.
+           Recalculee a chaque image, elle basculait de 0 a 360 des que
+           l'angle de vol traversait 180 deg — ce qui arrive des que la fusee
+           pique vers le bas — et l'angle pose sautait alors de 200 deg d'une
+           image a l'autre. C'est ce demi-tour brutal que le client voyait
+           comme un cercle. */
+        if(droitFige===null)droitFige=Math.round(a/360)*360;
+        a=droitFige+(a-droitFige)*p;
+      }else{droitFige=null;}
+      /* Elle se redresse : la tuyere pivote presque sur place, et la trainee
+         y dessinerait un arc autour de la planete. */
+      manoeuvre=(p<1);
     }else{
       a=_inclinaison(deg)*p;
+      manoeuvre=false;
     }
     el.style.transform='rotate('+a.toFixed(1)+'deg)';
+    anglePose=a;
+  }
+  /* ── D'OU SORT LA TRAINEE ──
+     La trajectoire donne le BAS DE LA BOITE, sans tenir compte de ce que la
+     fusee est tournee. Penchee a quarante degres, sa tuyere est ailleurs : le
+     feu partait alors de son flanc, et parfois devant elle.
+     Le point de sortie est sur l'AXE de la fusee, a la pointe de la flamme —
+     celle-ci descend de 36 % sous la boite (voir `.vol-flamme`) — et il
+     TOURNE avec elle. Le feu tombe donc toujours derriere, a l'oppose de la
+     marche. Sous la licorne, qui n'a pas de flamme, on reste au bas de la
+     boite : l'arc-en-ciel court sur ses sabots. */
+  function queue(x,y){
+    /* Rien pendant la manoeuvre : la fusee pivote, la tuyere balaie un arc,
+       et le feu ferait un cercle autour de l'astre. */
+    if(manoeuvre||enApproche)return null;
+    var r=(_HAB&&_HAB.traineeFeu)?dy*0.80:dy*0.5;
+    var t=anglePose*Math.PI/180;
+    var cy=y-dy/2;                    /* le centre de la boite, autour duquel
+                                         la rotation se fait */
+    return {x:x-r*Math.sin(t), y:cy+r*Math.cos(t)};
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
      conteneur de la carte, sous le personnage, et se retirent tout seuls. */
@@ -6968,7 +7004,7 @@ function _volCarte(o){
        bouge. Le sens vient des abscisses des deux etapes ; un trajet
        rigoureusement vertical garde le sens precedent. */
     partiDe=idx;
-    brutVu=null;sensRot=1;dernierPoint=null;
+    dernierPoint=null;
     var _de=ouSePoser(idx),_vers=ouSePoser(cible);
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
@@ -7032,7 +7068,7 @@ function _volCarte(o){
          redressement, le personnage arrivait sur l'étape encore couché à
          24° et y restait planté de travers le temps d'un battement. */
       poser(p.x,p.y,deg,Math.min(1,u/0.26,(1-u)/0.26));
-      grain(p.x,p.y);
+      var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(p.y);
       if(u>=1){
         n++;u=0;debut=Date.now();
@@ -8237,7 +8273,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v148';
+var _VERSION_REPLI='v149';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
