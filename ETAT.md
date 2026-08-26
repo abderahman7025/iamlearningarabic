@@ -1017,6 +1017,23 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Porter un geste d'une forme à l'autre : il faut le METTRE À L'ÉCHELLE,
+  pas seulement le décaler — v139.** Le wāw : la boucle de la forme finale
+  est bien plus PLATE que celle de l'isolée (0,225 de haut contre 0,296),
+  pour une largeur presque identique. Les points de l'isolée, même décalés,
+  sortaient par le haut de l'encre ; `_cheminSurEncre` les rabattait, et la
+  boucle ne se traçait plus dans le sens des aiguilles d'une montre. On porte
+  maintenant les neuf points de la boucle sur la boîte de la boucle FINALE
+  (0,98 en x, 0,76 en y), et la queue garde sa propre échelle verticale —
+  mesurer la boîte du corps entier fausse le calcul, la queue et la boucle
+  n'ont pas le même rapport.
+  Le ṭāʾ fin est le geste du MILIEU privé de son dernier point — le trait de
+  liaison qui suit la lettre, absent de la forme finale — porté sur la boucle
+  de celle-ci (1,037 en x).
+  **Le bon contrôle est l'écart MOYEN de chaque point à l'encre, pas le pire.**
+  Relevé : wāw fin 0,004 (modèle 0,002), ṭāʾ fin 0,004 (modèle 0,006), ʿayn
+  fin 0,007 (modèle 0,005).
+
 - **Recopier les points d'une forme sur une autre ne suffit PAS — v138.**
   Les coordonnées d'un geste partent du CENTRE DE LA CHAÎNE. Deux formes de
   la même lettre n'ont pas la même largeur, donc le corps de la lettre n'y
