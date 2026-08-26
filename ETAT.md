@@ -1017,6 +1017,17 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **« fin = isolée + trait » n'est pas vrai au pixel près — v142.** Le client
+  l'a vu à l'œil : entre le trait de liaison et la boucle, le wāw final a un
+  PETIT HORIZONTAL de plus, que l'isolé n'a pas. Relevé de l'encre colonne par
+  colonne : de x = 0,26 à x = 0,12 la forme finale montre un trait plat
+  d'épaisseur constante (0,087), et la boucle ne commence qu'à 0,10. Le geste
+  sautait par-dessus, et ces pixels — sans point de passage — se remplissaient
+  n'importe quand.
+  **Avant de porter un geste d'une forme à l'autre, relever le profil de
+  l'encre de la forme cible** (épaisseur colonne par colonne) : il montre les
+  morceaux que le modèle n'a pas.
+
 - **Deux pièges de geste, vus seulement en regardant les images du banc — v141.**
   *Un* : couper un geste en DEUX traits fait pousser deux morceaux à la fois.
   Le révélateur classe les pixels par leur point de passage le plus proche ;
