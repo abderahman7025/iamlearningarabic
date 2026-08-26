@@ -6587,15 +6587,25 @@ function _volCarte(o){
      suit la distance — on ne met pas le meme temps pour traverser deux
      etapes que dix — mais elle reste bornee : il faut que ce soit
      regardable sans etre interminable. */
-  function volDroit(de,vers,fini){
+  function volDroit(de,vers,fini,duree){
     var dist=Math.sqrt((vers.x-de.x)*(vers.x-de.x)+(vers.y-de.y)*(vers.y-de.y));
-    var D=Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
+    var D=duree||Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
     var cap=Math.atan2(vers.y-de.y,vers.x-de.x)*180/Math.PI;
+    /* En descendant, la ligne droite CONTINUE l'arc de sortie : elle reprend
+       le cap ou il l'a laissee, sinon la fusee se remettrait droite entre les
+       deux. Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
+    var capEntree=(o.aligne&&descente)?(anglePose-90):null;
     var t0=Date.now();
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
-      poser(x,y,cap,descente?Math.min(1,u/0.14):Math.min(1,u/0.14,redresse(u)));
+      var c=cap;
+      if(capEntree!==null&&u<0.22){
+        var k=u/0.22, ec=cap-capEntree;
+        while(ec>180)ec-=360; while(ec<-180)ec+=360;
+        c=capEntree+ec*k;
+      }
+      poser(x,y,c,descente?1:Math.min(1,u/0.14,redresse(u)));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
@@ -6803,10 +6813,13 @@ function _volCarte(o){
   var anglePose=0;
   /* La verticale que vise le redressement en cours, et le fait qu'il ait
      lieu : tant qu'il dure, la fusee pivote sur place et ne seme pas. */
-  var droitFige=null, manoeuvre=false;
+  var droitFige=null, angleFige=null, manoeuvre=false;
   /* Le trajet en cours monte-t-il ? descend-il ? Les deux ne se volent pas
      de la meme facon : voir `poser` et `contourne`. */
-  var montee=false, descente=false;
+  var montee=false, descente=false, volVertical=false, astreArrivee=null;
+  /* Le penche en montant. « Legerement » : de quoi montrer la direction,
+     pas de quoi coucher la fusee. */
+  var MONTEE_PENCHE=14;
   /* Le SENS dans lequel la fusee tourne en ce moment, et le dernier angle
      brut. Ils servent a la redresser en CONTINUANT son mouvement. */
   function _court(a){
@@ -6820,10 +6833,24 @@ function _volCarte(o){
       droitFige=null;manoeuvre=false;dernierPoint=null;return;}
     var p=(part===undefined?1:Math.max(0,Math.min(1,part)));
     var a;
-    /* EN MONTANT, PRESQUE PAS DE ROTATION. Alignee pleinement, la fusee
-       parcourait plus de cent degres pour une simple remontee. Elle se
-       contente du penche de la licorne : on la voit filer, sans tourner. */
-    if(o.aligne&&!montee){
+    /* EN MONTANT — le nez penche LEGEREMENT du cote ou l'on va, tout de
+       suite et non progressivement, et il tient ce penche tout le trajet.
+       Il se redresse en atteignant le CENTRE de l'astre d'arrivee : de la au
+       sommet, le penche s'efface. Un trajet vertical n'en prend aucun. */
+    if(o.aligne&&montee){
+      var pen=volVertical?0:(MONTEE_PENCHE*sensVol);
+      var f=1;
+      if(astreArrivee&&astreArrivee.r){
+        /* Zero au sommet, un au centre : le rayon separe les deux. */
+        f=Math.max(0,Math.min(1,(y-astreArrivee.y)/astreArrivee.r));
+      }
+      a=pen*f;
+      manoeuvre=false;      /* elle ne pivote pas : la trainee continue */
+      el.style.transform='rotate('+a.toFixed(1)+'deg)';
+      anglePose=a;
+      return;
+    }
+    if(o.aligne){
       a=_court(deg+90);
       /* PAS DE TOUR INUTILE. On visait le quart de tour SUIVANT dans le sens
          ou la fusee tournait deja : au decollage comme a l'atterrissage elle
@@ -6839,9 +6866,14 @@ function _volCarte(o){
            pique vers le bas — et l'angle pose sautait alors de 200 deg d'une
            image a l'autre. C'est ce demi-tour brutal que le client voyait
            comme un cercle. */
-        if(droitFige===null)droitFige=Math.round(a/360)*360;
-        a=droitFige+(a-droitFige)*p;
-      }else{droitFige=null;}
+        /* On fige la verticale visee ET l'angle d'ou l'on part. En gardant
+           l'angle courant, celui-ci continuait de tourner avec la tangente
+           pendant que la part diminuait : le produit des deux n'etait plus
+           monotone et la fusee OSCILLAIT de 27 degres juste avant de se
+           poser. Fige, le redressement va tout droit vers la verticale. */
+        if(droitFige===null){droitFige=Math.round(a/360)*360;angleFige=a;}
+        a=droitFige+(angleFige-droitFige)*p;
+      }else{droitFige=null;angleFige=null;}
       /* Elle se redresse : la tuyere pivote presque sur place, et la trainee
          y dessinerait un arc autour de la planete. */
       manoeuvre=(p<1);
@@ -7017,7 +7049,14 @@ function _volCarte(o){
      traverser pour y arriver — mesure faite, elle passait a 43 px du centre
      d'un astre de 70. On entre donc en bas DU COTE D'OU L'ON VIENT, a
      quarante degres du bas, et le tour dure d'autant plus. */
-  var BOUCLE_JEU=0.40, BOUCLE_ENTREE=125, BOUCLE_DUREE=1450;
+  /* « Elle contourne par la gauche de la planete, LENTEMENT. »
+     L'entree se prend HAUT, a cinquante-cinq degres du sommet, du cote ou
+     l'on contourne. Prise en bas, la ligne droite qui l'amenait devait
+     traverser l'astre pour y descendre — mesure, elle passait a 51 px du
+     centre d'un astre de 70 sur un trajet court ou vertical. Prise haut,
+     elle arrive par au-dessus et ne coupe rien ; le tour est plus long, ce
+     qui va dans le sens voulu. */
+  var BOUCLE_JEU=0.44, BOUCLE_ENTREE=55, BOUCLE_DUREE=2100;
   /* ON NE SE POSE PAS A PLEINE VITESSE. Le redressement occupait le dernier
      quart du tour, et LINEAIREMENT : mesure, la fusee tournait encore a 6,5
      degres par image — 260 degres par seconde — a l'instant de toucher. Il
@@ -7044,6 +7083,48 @@ function _volCarte(o){
     var e=pointBoucle(b,b.phi);
     b.x=e.x;b.y=e.y;
     return b;
+  }
+  /* ── L'ARC DE SORTIE ───────────────────────────────────────────────
+     En descendant, la fusee ne pique pas droit sur sa cible : elle quitte
+     son astre par un ARC DE CERCLE du cote ou elle va, comme une bille qui
+     suit le bord d'une cuvette. Le rayon s'ouvre pendant le tour — elle part
+     de la surface, ou elle etait posee, et s'en ecarte — sinon elle sauterait
+     d'un coup a la hauteur de vol. */
+  var SORTIE_TOUR=90, SORTIE_DUREE=620;
+  function sortieAstre(i){
+    var p=ouSePoser(i);
+    if(!p||!p.r)return null;
+    var b={cx:p.x, cy:p.y+p.r, rho:p.r+dy*BOUCLE_JEU,
+           sens:(sensVol>0?1:-1), phi:0};
+    /* La ou elle est POSEE : un peu moins d'un rayon, l'assise l'enfonce. */
+    b.rho0=Math.max(1,b.cy-p.y);
+    b.fin=pointBoucle(b,b.phi+b.sens*SORTIE_TOUR);
+    return b;
+  }
+  function arcSortie(b,fini){
+    var t0=Date.now();
+    function tic(){
+      var u=Math.min(1,(Date.now()-t0)/SORTIE_DUREE),e=adouci(u);
+      var phi=b.phi+b.sens*SORTIE_TOUR*e;
+      var t=phi*Math.PI/180, ray=b.rho0+(b.rho-b.rho0)*e;
+      var x=b.cx+ray*Math.sin(t), y=b.cy-ray*Math.cos(t);
+      /* ── COMMENT ELLE SE TIENT DANS L'ARC ──
+         PAS le long de la tangente : au sommet celle-ci est HORIZONTALE, et
+         s'y aligner couchait la fusee d'un quart de tour a l'instant meme du
+         decollage — mesure, 56 degres en une image.
+         Elle part donc NEZ EN L'AIR, dans l'axe qui s'ecarte de l'astre —
+         debout sur son sol, comme une vraie fusee — et bascule vers la
+         tangente au fil de l'arc. Au bout, sortie a l'equateur, elle file
+         vers le bas. C'est le virage d'un decollage. */
+      var radial=phi-90;                     /* l'axe qui s'ecarte du sol */
+      var cap=radial+b.sens*90*e;            /* ... jusqu'a la tangente */
+      poser(x,y,cap,1);
+      var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;
+      camera(y);
+      if(u>=1){fini();return;}
+      raf=requestAnimationFrame(tic);
+    }
+    tic();
   }
   function contourne(b,fini){
     /* Meme tenue que pendant l'approche : elle vole encore. */
@@ -7106,8 +7187,29 @@ function _volCarte(o){
     /* Huit pixels de marge : deux etapes a la meme hauteur ne montent ni ne
        descendent, et gardent le vol droit. */
     montee=(_vers.y<_de.y-8); descente=(_vers.y>_de.y+8);
+    /* « Si la trajectoire est verticale, la question ne se pose pas. » */
+    volVertical=(Math.abs(_vers.x-_de.x)<14);
+    astreArrivee=_vers;
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
+    /* ── LE TRAJET EN DESCENDANT ──
+       Un arc de cercle du cote ou l'on va, puis tout droit sur l'astre
+       d'arrivee, puis on le contourne par l'autre cote. Rien n'est dessine
+       sur la carte du garcon : la fusee est libre de sa route. */
+    if(descente&&o.aligne){
+      var _sortie=sortieAstre(idx), _entree=entreeBoucle(cible);
+      if(_sortie&&_entree){
+        idx=cible;
+        arcSortie(_sortie,function(){
+          /* Le trajet entre deux astres voisins n'est pas un grand saut : il
+             ne prend pas la duree plancher des traversees de carte. */
+          var _d=Math.sqrt(Math.pow(_entree.x-_sortie.fin.x,2)+Math.pow(_entree.y-_sortie.fin.y,2));
+          volDroit(_sortie.fin,_entree,function(){arriver(fini,_entree);},
+                   Math.max(650,Math.min(1300,_d*0.9)));
+        });
+        return;
+      }
+    }
     /* La fusee part TOUJOURS de la ou elle se trouve vraiment, et fait tout
        le trajet — c'est la demande du client. Elle se posait avant sur
        l'etape juste avant la visee, ce qui la faisait apparaitre d'un coup
@@ -8378,7 +8480,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v151';
+var _VERSION_REPLI='v152';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
