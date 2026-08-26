@@ -1017,6 +1017,18 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **L'animation du modèle passait en un éclair — v136.** Le client ne voyait
+  pas les corrections d'ordre de tracé, et pour cause : le révélateur découpe
+  le tracé en TROIS temps — le corps, les points, la voyelle — et le temps
+  était réparti sur les trois quoi qu'il arrive. Un wāw seul n'a ni point ni
+  voyelle : son tracé se jouait dans le premier tiers, **0,7 seconde**, et
+  les 1,5 restantes ne montraient rien. Le temps se répartit maintenant sur
+  les seuls temps qui ont du contenu, le tracé dure 2,6 s, et il **se rejoue**
+  après une pause tant que l'élève n'a pas posé le doigt.
+  **Leçon : vérifier une animation, c'est mesurer sa COURBE dans le temps,
+  pas seulement son image finale.** Le contrôle « le modèle est bien peint »
+  passait, et l'animation était pourtant invisible.
+
 - **Les dix dessins du 22 août — v134.** La fille est maintenant voilée, sur
   sa licorne, avec et sans couronne, dans les deux sens. Ils arrivaient en
   **JPG sur fond blanc** : posés tels quels sur le dégradé pastel on aurait vu

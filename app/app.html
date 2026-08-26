@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v135';
+var _VERSION_REPLI='v136';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13031,8 +13031,12 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
        l'apparition — ensuite le modèle reste entier sous la main.
        Minuterie et non requestAnimationFrame : rAF ne tourne pas dans un
        onglet qui n'est pas au premier plan. */
-    var rev = null, revProg = 3, revDebut = 0, revTic = null;
-    var REV_DUREE = 2200;
+    /* Déclaré ici et pas plus bas : l'horloge du modèle le lit à chaque
+       image, et il doit exister dès le premier tour. */
+    var _aEcrit = false;
+    var rev = null, revProg = 3, revDebut = 0, revTic = null, revTemps = [1];
+    /* Le temps d'un tracé, et le repos avant qu'il se rejoue. */
+    var REV_DUREE = 2600, REV_REPOS = 1100;
 
     function prepareRevelateur() {
       rev = null;
@@ -13044,6 +13048,12 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
         rev = _revelateur(currentLetterForm, rect.width / 2, baseY, fs,
                           0, 0, Math.ceil(rect.width), Math.ceil(rect.height), '#f5c842');
       } catch (e) { rev = null; }
+      /* Les temps qui ont vraiment quelque chose à montrer. Le corps est
+         toujours là ; les points et la voyelle, non. Sans ce tri, une lettre
+         nue voyait son tracé compressé dans le premier tiers du temps. */
+      revTemps = [1];
+      if (rev && rev.points && rev.points.length) revTemps.push(2);
+      if (rev && rev.voyelle && rev.voyelle.length) revTemps.push(3);
     }
 
     function relanceModele() {
@@ -13054,10 +13064,18 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       revProg = 0; revDebut = Date.now();
       dessineModele();
       revTic = setInterval(function () {
-        var p = 3 * (Date.now() - revDebut) / REV_DUREE;
-        revProg = Math.min(3, p);
+        /* Tant que l'élève n'a rien écrit, le tracé se rejoue : une seule
+           passe d'une seconde ne se voit pas. Dès qu'il pose son doigt, le
+           modèle reste entier sous sa main. */
+        if (_aEcrit) { revProg = 3; dessineModele(); clearInterval(revTic); revTic = null; return; }
+        var t = (Date.now() - revDebut) % (REV_DUREE + REV_REPOS);
+        var f = Math.min(1, t / REV_DUREE);
+        var n = revTemps.length;
+        var i = Math.min(n - 1, Math.floor(f * n));
+        var dans = f * n - i;
+        revProg = (revTemps[i] - 1) + Math.min(1, dans);
+        if (f >= 1) revProg = 3;
         dessineModele();
-        if (revProg >= 3) { clearInterval(revTic); revTic = null; }
       }, 33);
     }
 
@@ -13156,7 +13174,6 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
        la police de repli — mauvais glyphe et mauvaises mesures. On le
        refait dès qu'elle est là, mais JAMAIS par-dessus ce que l'enfant a
        déjà écrit : l'encre vit sur ce même canvas. */
-    var _aEcrit = false;
     ['mousedown', 'touchstart'].forEach(function (ev) {
       canvas.addEventListener(ev, function () { _aEcrit = true; }, { passive: true });
     });
