@@ -3107,6 +3107,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media(orientation:landscape) and (min-width:640px){
   .boy-titre{font-size:1.75rem;line-height:1.6;max-width:34em}
 }
+/* Une phrase de quatre lignes tient sur deux en paysage : on cache une
+   coupure sur deux. Les coupures restantes gardent le découpage voulu —
+   ce n'est pas un retour à la ligne automatique. */
+@media(orientation:landscape){
+  .boy-titre.titre-long br:nth-of-type(odd){display:none}
+}
+}
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
 .ar-air{display:inline-block;margin:0 .34em;line-height:1}
@@ -3175,6 +3182,23 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    ============================================================ */
 *{box-sizing:border-box}
 .ca{overflow-x:hidden}
+/* PAYSAGE COURT — un téléphone couché fait 360 à 420 px de haut. Les 100 px
+   de marge basse de `.ca`, pensés pour le portrait, y mangeaient un quart de
+   l'écran : le cadre d'un contrôle passait sous le bord et se trouvait
+   tronqué. Tout se resserre, et les cibles suivent la hauteur disponible. */
+@media(orientation:landscape) and (max-height:520px){
+  /* La barre du haut est fixe : elle passe de 60 à 44 px, et la marge du
+     `.ca` suit. `!important` parce que cette marge est posée en ligne par le
+     code, à chaque changement d'écran. */
+  .topbar{height:44px;min-height:44px}
+  .ca{padding:48px 14px 6px !important}
+  .boy-wrap{padding-top:6px;padding-bottom:4px}
+  .boy-panel{padding-top:8px;padding-bottom:8px;margin-bottom:2px}
+  .boy-jauge{margin-bottom:6px}
+  .boy-cible{width:clamp(64px,22vh,104px);height:clamp(64px,22vh,104px);
+    font-size:clamp(1.5rem,9vh,2.6rem)}
+  .boy-titre{line-height:1.5}
+
 /* Conteneurs principaux fluides */
 .sess-map-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
 .mg-list-wrap{padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
@@ -8060,7 +8084,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v144';
+var _VERSION_REPLI='v145';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10607,7 +10631,12 @@ function _boyScene(ca,reprise){
   }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';
-    t.innerHTML=_airAutourArabe(_sansCercle(html));p.appendChild(t);
+    t.innerHTML=_airAutourArabe(_sansCercle(html));
+    /* Les coupures de ligne sont écrites dans le texte, pour le portrait où
+       la largeur manque. Une phrase de quatre lignes en gagne deux en
+       paysage : la CSS y cache une coupure sur deux. */
+    if((t.innerHTML.match(/<br\s*\/?>/gi)||[]).length>=3)t.classList.add('titre-long');
+    p.appendChild(t);
     /* fr === false : la scène dit elle-même sa phrase, morceau par morceau,
        pour caler une animation dessus (voir le tableau des formes). */
     if(fr!==false)N.plusTard(function(){N.dire(fr||html);},420);
