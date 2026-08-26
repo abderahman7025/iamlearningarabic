@@ -1828,3 +1828,7 @@ page et URL propres, indexables. Elles se rangent à côté de
   cible.** Recalculee a chaque image, `Math.round(a/360)*360` bascule de 0 a
   360 des que l'angle traverse 180 degres, et l'element fait un demi-tour
   brutal. On fige la cible au debut du mouvement.
+- **Une image-cle l'emporte toujours sur la regle.** `.bg-rocket` portait
+  `opacity:.5`, mais `@keyframes rocketLaunch` remettait `opacity:1` a
+  chaque etape : les fusees du decor etaient opaques. Un plafond
+  d'opacite se pose DANS les images-cles, jamais a cote.
