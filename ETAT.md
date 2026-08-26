@@ -1812,3 +1812,8 @@ page et URL propres, indexables. Elles se rangent à côté de
   l'ancien index.html à zéro octet.
 - Le service worker ne met plus en cache une réponse redirigée : sans cela, la
   page de connexion se retrouvait rangée sous l'adresse d'un cours.
+- **Un décor posé dans le conteneur du personnage hérite de ses
+  transitions.** Le conteneur du pilote porte des `transition:transform` :
+  la porte de lumière (v146), posée dedans, aurait glissé avec lui au lieu
+  de rester sur le monde. Elle est posée dans le GLOBE de la carte, aux
+  coordonnées du personnage calculées par `getBoundingClientRect`.
