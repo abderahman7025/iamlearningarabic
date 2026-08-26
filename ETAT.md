@@ -1031,9 +1031,17 @@ page et URL propres, indexables. Elles se rangent à côté de
 - **Le cadrage de la fille debout a dû suivre.** Les nouveaux dessins sont
   plus hauts — elle y fait toute la hauteur de la composition — et à l'ancien
   cadrage elle masquait la tête de la licorne, que le client veut voir.
-  `piloteBoite` passe de {23,55,88} à {28,44,74}. Attention : `gauche` est la
-  position CENTRÉE, `piloteDecale` la déplace ensuite de ±23 points selon le
-  sens de marche. Une valeur de 2 envoyait la fille hors cadre.
+  Attention : `gauche` est la position CENTRÉE, `piloteDecale` la déplace
+  ensuite de ±23 points selon le sens de marche. Une valeur de 2 envoyait la
+  fille hors cadre.
+- **La taille de la licorne posée et de la fille debout SE MESURE, elle ne se
+  règle pas à l'œil.** Les dessins du client sont tous à la même échelle :
+  dans la composition « licorne avec fille » (812 × 1327), la licorne seule
+  fait 840 de haut et la fille 1327 — soit 63 % et 100 % de la boîte. Il
+  suffit de reporter ces deux nombres (`montureEchelle` et `piloteBoite`)
+  pour qu'elles gardent, posées, la taille qu'elles ont ensemble. Elles
+  étaient à 78 % et 74 %, d'où « la licorne trop grosse et la fille trop
+  petite ».
 
 - **Quatre ordres de tracé, dictés par le client — v133.** wāw fin et milieu :
   le trait de liaison, puis EXACTEMENT le geste de l'isolée. Attention, les

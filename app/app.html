@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v134';
+var _VERSION_REPLI='v135';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10009,17 +10009,21 @@ var _HABILLAGES={
     /* Les dessins du 22 août sont plus hauts que les précédents : la fille
        debout y fait toute la hauteur de la composition. Au cadrage d'avant
        elle masquait la tête de la licorne, que le client veut voir. */
-    /* `gauche` est la position CENTRÉE : `piloteDecale` la déplace ensuite
-       de 23 points d'un côté ou de l'autre selon le sens de marche. Avec
-       une largeur de 44, le centre tombe à 28 — d'où 5 % quand la licorne
-       regarde à droite, 51 % quand elle regarde à gauche. */
-    piloteBoite:{gauche:28,largeur:44,hauteur:74},
+    /* La fille fait 1327 de haut sur 694 de large, soit 100 % et 52 % de la
+       boite : la meme taille que dans la composition ou elle monte sa
+       licorne. `gauche` est la position CENTREE — (100-52)/2 = 24 — et
+       `piloteDecale` la deplace ensuite de 23 points selon le sens. */
+    piloteBoite:{gauche:24,largeur:52,hauteur:100},
     piloteDecale:23,
     /* La monture posée est réduite pour retrouver la taille qu'elle a en
        vol : l'image de vol porte la licorne ET la fille, donc elle est
        haute et `contain` la réduit ; la licorne seule est presque carrée et
        remplissait toute la boîte. Réglé en comparant les deux côte à côte. */
-    montureEchelle:0.78,
+    /* 63 %, pas un chiffre au juge : c'est la hauteur de la licorne seule
+       (840 px) rapportee a celle de la composition ou elle porte la fille
+       (1327 px). Les dessins du client etant tous a la meme echelle, ce
+       rapport garde entre elles la taille qu'elles ont ensemble. */
+    montureEchelle:0.633,
     /* Une licorne n'a pas de réacteur. */
     flamme:false,
     /* Elle se pose sur le SOMMET du monde, comme l'astronaute sur sa
