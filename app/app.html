@@ -2344,13 +2344,17 @@ body.profile-adult, #root.profile-adult {
 }
 
 /* 🚀 Fusée : bas → haut en ligne droite, rétrécit à mi-écran */
+/* Les fusees du DECOR restent en retrait : ce sont des passantes, pas la
+   fusee de l'enfant. La regle `.bg-rocket` leur donnait bien `opacity:.5`,
+   mais ces images-cles la reecrivaient a 1 — une image-cle l'emporte
+   toujours sur la regle. Le plafond est donc pose ici. */
 @keyframes rocketLaunch {
   0%   { transform: translateY(110vh) rotate(-45deg) scale(1.4); opacity:0; }
-  6%   { transform: translateY(85vh)  rotate(-45deg) scale(1.4); opacity:1; }
-  48%  { transform: translateY(5vh)   rotate(-45deg) scale(1.3); opacity:1; }
-  52%  { transform: translateY(-5vh)  rotate(-45deg) scale(1.1); opacity:1; }
-  75%  { transform: translateY(-55vh) rotate(-45deg) scale(0.5); opacity:1; }
-  92%  { transform: translateY(-95vh) rotate(-45deg) scale(0.1); opacity:0.4; }
+  6%   { transform: translateY(85vh)  rotate(-45deg) scale(1.4); opacity:.42; }
+  48%  { transform: translateY(5vh)   rotate(-45deg) scale(1.3); opacity:.42; }
+  52%  { transform: translateY(-5vh)  rotate(-45deg) scale(1.1); opacity:.42; }
+  75%  { transform: translateY(-55vh) rotate(-45deg) scale(0.5); opacity:.38; }
+  92%  { transform: translateY(-95vh) rotate(-45deg) scale(0.1); opacity:.2; }
   100% { transform: translateY(-115vh) rotate(-45deg) scale(0.05); opacity:0; }
 }
 
@@ -6591,7 +6595,7 @@ function _volCarte(o){
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
       var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
-      poser(x,y,cap,Math.min(1,u/0.14,(1-u)/0.14));
+      poser(x,y,cap,descente?Math.min(1,u/0.14):Math.min(1,u/0.14,(1-u)/0.14));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
@@ -6800,6 +6804,9 @@ function _volCarte(o){
   /* La verticale que vise le redressement en cours, et le fait qu'il ait
      lieu : tant qu'il dure, la fusee pivote sur place et ne seme pas. */
   var droitFige=null, manoeuvre=false;
+  /* Le trajet en cours monte-t-il ? descend-il ? Les deux ne se volent pas
+     de la meme facon : voir `poser` et `contourne`. */
+  var montee=false, descente=false;
   /* Le SENS dans lequel la fusee tourne en ce moment, et le dernier angle
      brut. Ils servent a la redresser en CONTINUANT son mouvement. */
   function _court(a){
@@ -6813,7 +6820,10 @@ function _volCarte(o){
       droitFige=null;manoeuvre=false;dernierPoint=null;return;}
     var p=(part===undefined?1:Math.max(0,Math.min(1,part)));
     var a;
-    if(o.aligne){
+    /* EN MONTANT, PRESQUE PAS DE ROTATION. Alignee pleinement, la fusee
+       parcourait plus de cent degres pour une simple remontee. Elle se
+       contente du penche de la licorne : on la voit filer, sans tourner. */
+    if(o.aligne&&!montee){
       a=_court(deg+90);
       /* PAS DE TOUR INUTILE. On visait le quart de tour SUIVANT dans le sens
          ou la fusee tournait deja : au decollage comme a l'atterrissage elle
@@ -6986,7 +6996,84 @@ function _volCarte(o){
   }
   placerA(idx);
   /* Arriver : rejoindre le sommet de l'etape, puis y poser le pilote. */
+  /* ── LE CONTOURNEMENT ──────────────────────────────────────────────
+     En descendant, la fusee ne pique plus sur le sommet pour s'y redresser
+     sur place : elle passe A COTE de l'astre, en fait le tour PAR DESSOUS,
+     et remonte se poser dessus. Sa rotation se joue alors le long d'un arc
+     large, et non plus autour de son propre centre.
+
+     L'arc porte sur un cercle concentrique a l'astre, plus large de la
+     hauteur d'un tiers de vaisseau pour qu'elle ne le rase pas. On y entre
+     SOUS l'astre : c'est la seule entree qui se raccorde sans a-coup, car la
+     courbe de la carte arrive horizontalement — ses points de controle sont a
+     la hauteur des deux etapes. Entrer a l'equateur en piquant aurait exige
+     que la fusee soit nez en bas, c'est-a-dire le renversement meme qu'on
+     supprime. De la elle remonte le long du flanc et repasse par le sommet :
+     un DEMI-tour, et l'angle pose va de 90 a 0 degre.
+
+     Repere : l'angle part du sommet et tourne dans le sens des aiguilles.
+     Le point vaut donc C + rayon*(sin, -cos). */
+  /* On n'entre pas PILE sous l'astre : la courbe de descente devrait alors le
+     traverser pour y arriver — mesure faite, elle passait a 43 px du centre
+     d'un astre de 70. On entre donc en bas DU COTE D'OU L'ON VIENT, a
+     quarante degres du bas, et le tour dure d'autant plus. */
+  var BOUCLE_JEU=0.40, BOUCLE_ENTREE=125, BOUCLE_DUREE=1000;
+  var BOUCLE_TOUR=360-BOUCLE_ENTREE;   /* de l'entree jusqu'au sommet */
+  function pointBoucle(b,phi){
+    var t=phi*Math.PI/180;
+    return {x:b.cx+b.rho*Math.sin(t), y:b.cy-b.rho*Math.cos(t)};
+  }
+  function entreeBoucle(i){
+    var p=ouSePoser(i);
+    if(!p||!p.r)return null;
+    /* On parcourt le cercle a REBOURS du sens de marche : partie du bas en
+       filant vers la droite, la fusee remonte par le flanc droit. */
+    var b={cx:p.x, cy:p.y+p.r, rho:p.r+dy*BOUCLE_JEU,
+           sens:(sensVol>0?-1:1), sommet:p};
+    b.phi=(b.sens>0)?BOUCLE_ENTREE:(360-BOUCLE_ENTREE);
+    var e=pointBoucle(b,b.phi);
+    b.x=e.x;b.y=e.y;
+    return b;
+  }
+  function contourne(b,fini){
+    /* Meme tenue que pendant l'approche : elle vole encore. */
+    if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
+    /* Le cap avec lequel le vol vient de se presenter : `anglePose` est la
+       rotation appliquee, et le cap vaut quatre-vingt-dix degres de moins. */
+    var capEntree=o.aligne?(anglePose-90):null;
+    var t0=Date.now();
+    function tic(){
+      var u=Math.min(1,(Date.now()-t0)/BOUCLE_DUREE),e=adouci(u);
+      var phi=b.phi+b.sens*BOUCLE_TOUR*e;
+      var p=pointBoucle(b,phi);
+      /* La tangente au cercle, dans le sens du parcours. */
+      var t=phi*Math.PI/180;
+      var cap=Math.atan2(b.sens*Math.sin(t),b.sens*Math.cos(t))*180/Math.PI;
+      /* LE RACCORD. La courbe n'arrive pas exactement dans l'axe du cercle :
+         mesure faite, le cap sautait de 39 degres a l'entree. On part donc du
+         cap que le vol avait, et on rejoint la tangente sur le premier
+         cinquieme du tour. */
+      if(u<0.2&&capEntree!==null){
+        var k=u/0.2, ec=cap-capEntree;
+        while(ec>180)ec-=360; while(ec<-180)ec+=360;
+        cap=capEntree+ec*k;
+      }
+      /* Elle se redresse sur le dernier quart, comme partout ailleurs. */
+      poser(p.x,p.y,cap,Math.min(1,(1-u)/0.25));
+      var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
+      camera(p.y);
+      if(u>=1){poser(b.sommet.x,b.sommet.y,null);fini();return;}
+      raf=requestAnimationFrame(tic);
+    }
+    tic();
+  }
   function arriver(fini,depuis){
+    /* En descendant, l'arrivee EST le contournement : le vol s'est arrete a
+       l'entree de la boucle, elle le prend de la jusqu'au sommet. */
+    if(descente){
+      var b=entreeBoucle(idx);
+      if(b){contourne(b,function(){poserPilote(fini);});return;}
+    }
     var but=ouSePoser(idx);
     var de=depuis||{x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
     /* Le vol se termine DEJA sur le sommet : plus rien a rejoindre, on se
@@ -7006,6 +7093,9 @@ function _volCarte(o){
     partiDe=idx;
     dernierPoint=null;
     var _de=ouSePoser(idx),_vers=ouSePoser(cible);
+    /* Huit pixels de marge : deux etapes a la meme hauteur ne montent ni ne
+       descendent, et gardent le vol droit. */
+    montee=(_vers.y<_de.y-8); descente=(_vers.y>_de.y+8);
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
     /* La fusee part TOUJOURS de la ou elle se trouve vraiment, et fait tout
@@ -7030,8 +7120,9 @@ function _volCarte(o){
       var der=file[file.length-1];
       /* On vise le SOMMET de l'etape, pas son milieu : c'est la qu'on se
          pose, et le trajet doit y mener directement. */
-      var but=ouSePoser(cible)||{x:der.sens>0?der.seg.x3:der.seg.x0,
-                                 y:der.sens>0?der.seg.y3:der.seg.y0};
+      var but=(descente&&entreeBoucle(cible))||ouSePoser(cible)
+              ||{x:der.sens>0?der.seg.x3:der.seg.x0,
+                 y:der.sens>0?der.seg.y3:der.seg.y0};
       var ici={x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
       idx=cible;
       volDroit(ici,but,function(){arriver(fini,but);});
@@ -7044,7 +7135,9 @@ function _volCarte(o){
        « ils arrivent en bas du monde, puis remontent » du client. On ecarte
        donc le dernier segment vers le sommet, progressivement, pour que le
        vol y arrive de lui-meme. */
-    var butFinal=ouSePoser(cible);
+    /* En descendant, la courbe ne mene plus au sommet mais a l'entree de la
+       boucle : c'est elle qui finira le travail. */
+    var butFinal=(descente&&entreeBoucle(cible))||ouSePoser(cible);
     var finSeg=file.length?file[file.length-1]:null;
     var centreFin=finSeg?(finSeg.sens>0?{x:finSeg.seg.x3,y:finSeg.seg.y3}:{x:finSeg.seg.x0,y:finSeg.seg.y0}):null;
     function versSommet(p,dernier,t){
@@ -7067,7 +7160,9 @@ function _volCarte(o){
       /* On se penche en décollant, on se redresse en se posant. Sans ce
          redressement, le personnage arrivait sur l'étape encore couché à
          24° et y restait planté de travers le temps d'un battement. */
-      poser(p.x,p.y,deg,Math.min(1,u/0.26,(1-u)/0.26));
+      /* En descendant, la BOUCLE prend le relais et repart a l'horizontale :
+         se redresser ici ferait un a-coup de 90 degres a l'entree. */
+      poser(p.x,p.y,deg,descente?Math.min(1,u/0.26):Math.min(1,u/0.26,(1-u)/0.26));
       var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(p.y);
       if(u>=1){
@@ -8273,7 +8368,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v149';
+var _VERSION_REPLI='v150';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10047,7 +10142,9 @@ var _HABILLAGES={
     /* La meme fusee, hublot vide : celle qu'on voit une fois l'enfant sorti. */
     vaisseauVide:'/images/fusee-vide.png',
     pilote:'/images/astronaute-garcon.png',
-    flamme:true,
+    /* PLUS DE FLAMME SOUS LA FUSEE : la trainee de feu la remplace, et deux
+       feux au meme endroit se font de l'ombre. */
+    flamme:false,
     /* L'astronaute se tient DEBOUT sur le sommet de sa planete. La fille,
        elle, marche dans le decor de son ile : sa mascotte reste sur la
        trajectoire. */
