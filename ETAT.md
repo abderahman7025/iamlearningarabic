@@ -1017,6 +1017,21 @@ page et URL propres, indexables. Elles se rangent à côté de
 
 ## Fait récemment (ne pas refaire)
 
+- **Les points d'une boucle se posent SUR L'ANNEAU, par leur angle — v143.**
+  C'est la clé de toute cette série. Porter un geste d'une forme à l'autre en
+  étirant sa boîte sort les points de l'anneau : ils tombent dans le trou ou
+  en dehors, `_cheminSurEncre` les rattache à la branche la plus proche —
+  souvent la MAUVAISE — et la boucle se trace du mauvais côté. Le client
+  voyait « la partie droite de la boucle avant la partie gauche », et la
+  distance moyenne à l'encre restait pourtant bonne : elle ne dit pas SUR
+  QUELLE branche on est tombé.
+  La méthode qui marche : trouver le TROU de la boucle (les points vides
+  entourés d'encre dans les quatre directions), prendre l'ANGLE de chaque
+  point du modèle autour de son trou, puis reposer le point au même angle sur
+  l'anneau de la forme visée, au milieu de son épaisseur. L'ordre de rotation
+  est alors le même par construction.
+  Appliqué au wāw fin (9 points) et au ṭāʾ fin (4 points de boucle).
+
 - **« fin = isolée + trait » n'est pas vrai au pixel près — v142.** Le client
   l'a vu à l'œil : entre le trait de liaison et la boucle, le wāw final a un
   PETIT HORIZONTAL de plus, que l'isolé n'a pas. Relevé de l'encre colonne par
