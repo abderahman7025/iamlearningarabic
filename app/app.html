@@ -8045,7 +8045,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v131';
+var _VERSION_REPLI='v132';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -8985,6 +8985,29 @@ function _masqueLiaison(forme){
     if(!couvert){trait[y*A.cw+x]=1;n++;}
   }
   if(!n)return null;
+  /* Le trait de liaison touche le bord droit et ne se coupe pas : on ne
+     garde que la tache qui part de la droite. Un point de la lettre, qui ne
+     tombe pas au meme endroit d'une forme a l'autre, se retrouvait sinon
+     compte comme « en plus » et passait en blanc. */
+  var depart=-1;
+  for(var x2=A.cw-1;x2>=0&&depart<0;x2--)
+    for(var y2=0;y2<A.ch;y2++)
+      if(trait[y2*A.cw+x2]){depart=y2*A.cw+x2;break;}
+  if(depart<0)return null;
+  var garde=new Uint8Array(A.cw*A.ch), pile=[depart], reste=0;
+  garde[depart]=1;
+  while(pile.length){
+    var i=pile.pop(), ix=i%A.cw, iy=(i-ix)/A.cw;
+    reste++;
+    for(var oy2=-1;oy2<=1;oy2++)for(var ox2=-1;ox2<=1;ox2++){
+      var jx=ix+ox2, jy=iy+oy2;
+      if(jx<0||jx>=A.cw||jy<0||jy>=A.ch)continue;
+      var j=jy*A.cw+jx;
+      if(trait[j]&&!garde[j]){garde[j]=1;pile.push(j);}
+    }
+  }
+  trait=garde;
+  if(!reste)return null;
   var r={A:A,trait:trait};
   var prete=!document.fonts||document.fonts.check(_MQ_TAILLE+"px 'Scheherazade New'");
   if(prete)_MQ_CACHE[f]=r;

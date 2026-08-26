@@ -1035,8 +1035,14 @@ page et URL propres, indexables. Elles se rangent à côté de
   à la main. L'animation de l'enfant s'y branche pareil.
   **Toutes les autres lettres gardent la coupe droite** — nūn, bāʾ, yāʾ,
   kāf fin, ṭāʾ fin sont déclarées justes par le client : ne pas y toucher.
-  Piège rencontré : un canvas ne sait pas lire `var(--green)`, il retombe sur
-  le noir. `_enRVB` résout la variable sur la racine avant de peindre.
+  Deux pièges rencontrés. Un canvas ne sait pas lire `var(--green)`, il
+  retombe sur le noir : `_enRVB` résout la variable sur la racine avant de
+  peindre. Et le POINT d'une lettre ne tombe pas au même endroit d'une forme
+  à l'autre — il ressortait donc « en plus » et passait en blanc. Un trait de
+  liaison tient au bord droit et est d'un seul tenant : on ne garde du masque
+  que la tache qui part de la droite, et les points restent à la lettre quelle
+  que soit leur hauteur.
+  Coût mesuré : 25 à 50 ms par forme la première fois, puis rien.
 
 - **Toutes les isolées étaient BLANCHES au lieu de bleues — v130.** Le client
   l'a signalé trois fois avant que je trouve : la couleur était posée sur
