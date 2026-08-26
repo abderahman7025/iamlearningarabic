@@ -1817,3 +1817,14 @@ page et URL propres, indexables. Elles se rangent à côté de
   la porte de lumière (v146), posée dedans, aurait glissé avec lui au lieu
   de rester sur le monde. Elle est posée dans le GLOBE de la carte, aux
   coordonnées du personnage calculées par `getBoundingClientRect`.
+- **Le vol de la carte se mesure avec une horloge pilotee.** Ni
+  `requestAnimationFrame` ni les transitions CSS ne battent dans le panneau
+  d'essai. Pour observer un vol, on remplace `Date.now` par une horloge
+  fausse et `requestAnimationFrame` par une file que l'on pompe image par
+  image : le vol entier se joue alors en une seule expression, et l'angle
+  pose comme le point de semis se lisent a chaque image. C'est ainsi qu'a
+  ete trouve le saut de 200 degres du redressement (v149).
+- **Un angle interpole vers « la verticale la plus proche » doit FIGER sa
+  cible.** Recalculee a chaque image, `Math.round(a/360)*360` bascule de 0 a
+  360 des que l'angle traverse 180 degres, et l'element fait un demi-tour
+  brutal. On fige la cible au debut du mouvement.
