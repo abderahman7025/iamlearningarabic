@@ -1,6 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- Mesure et consentement : tout est dans /tag.js, y compris
+       l identifiant du conteneur. Charge AVANT le reste pour que le
+       Consent Mode soit pose avant la premiere balise. -->
+  <script src="/tag.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>لنتعلم العربية</title>
@@ -4926,6 +4930,10 @@ async function doPay(){
           body:JSON.stringify({email,paymentIntentId:result.paymentIntent.id})
         });
       }catch(e){/* webhook prendra le relais */}
+      /* LA CONVERSION, avec son montant et son identifiant. Poussee AVANT la
+         redirection : la balise part par `sendBeacon`, qui survit au
+         changement de page. */
+      try{if(window.tagAchat)window.tagAchat(result.paymentIntent.id,74.99,'EUR');}catch(_e){}
       window.location.href=`/inscription?email=${encodeURIComponent(email)}&payment=success`;
     }
   }catch(e){errEl.textContent=t('err_connection');btn.disabled=false;btn.textContent='Payer 74,99 €';}
@@ -8660,7 +8668,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v166';
+var _VERSION_REPLI='v167';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
