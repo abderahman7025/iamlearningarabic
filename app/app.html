@@ -8660,7 +8660,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v165';
+var _VERSION_REPLI='v166';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13141,9 +13141,11 @@ function renderPLesson(ca,s){
    pas besoin d'un decor, mais il a la meme memoire qu'un enfant : c'est le
    rappel espace et l'effort de retrouver qui fixent, pas la relecture.
 
-   ESSAI SUR LA SEULE LECON 2 — le client veut juger avant qu'on l'ouvre
-   partout. Pour l'ouvrir, il suffit de changer `_ENTRAINEMENT_LECONS`. */
-var _ENTRAINEMENT_LECONS=[4];
+   Valide sur la lecon 2, puis ouvert a TOUTES les lecons de lettres. Les
+   voyelles et les prolongations ont leur propre ecran et ne passent pas par
+   ici. `null` veut dire « toutes » ; une liste d'identifiants restreindrait a
+   celles-la, si le besoin revenait. */
+var _ENTRAINEMENT_LECONS=null;
 /* Toutes les lettres rencontrees avant celle-ci, dans l'ordre du parcours. */
 function _lettresVues(s,idx){
   var vues=[];
@@ -13159,7 +13161,7 @@ function _lettresVues(s,idx){
   return vues.filter(function(l){return l&&l.ar;});
 }
 function _entrainementAdulte(ca,s,idx){
-  if(_ENTRAINEMENT_LECONS.indexOf(s.id)<0)return;
+  if(_ENTRAINEMENT_LECONS&&_ENTRAINEMENT_LECONS.indexOf(s.id)<0)return;
   var letter=s.letters[idx];
   if(!letter||!letter.ar)return;
   var OR='#f5c842';
@@ -13264,10 +13266,15 @@ function _entrainementAdulte(ca,s,idx){
   /* 3 — LE MOT A TROU. Une question par place possible dans le mot. */
   var formes=[letter.iso||letter.ar].concat((letter.pos||[]).map(function(p2){return p2.ar;}));
   var uniques=[];formes.forEach(function(f){if(uniques.indexOf(f)<0)uniques.push(f);});
-  if((letter.pos||[]).length&&uniques.length>1){
+  /* LA HAMZA n'a pas de forme selon la place : elle se pose sur un siege, et
+     la question n'a pas de sens pour elle. LE TĀʾ MARBŪṬA, lui, est TOUJOURS
+     en fin de mot — le cours le dit deux ecrans plus haut : on ne va pas le
+     mettre au debut d'un mot invente pour la beaute de l'exercice. */
+  var places=(letter.ar==='ة')?[2]:[0,1,2];
+  if((letter.pos||[]).length&&uniques.length>1&&letter.ar!=='ء'){
     var cmp=(letter.ar==='ب')?'ت':'ب';
     var att=!!letter.attaches;
-    melange([0,1,2]).forEach(function(g){
+    melange(places).forEach(function(g){
       var cases=[cmp,cmp,cmp];cases[g]=letter.ar;
       var dr=cases.slice(0,g).join('')+(g>0?_TATWEEL:'');
       var ga=((g<2&&att)?_TATWEEL:'')+cases.slice(g+1).join('');
