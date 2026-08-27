@@ -6748,9 +6748,25 @@ function _volCarte(o){
      s'applique : sa mascotte vole et se pose d'un bloc. */
   /* Quel enfant descend ici : sur la Terre il n'a pas besoin de sa
      combinaison. L'habillage le dit etape par etape. */
+  /* Le pendant d'un dessin, tourne de l'autre cote. Les paires sont declarees
+     dans l'habillage ; si le dessin donne appartient a l'une d'elles, on rend
+     celui de la paire qui regarde dans le sens de la marche. Sinon on le
+     laisse tel quel — un dessin sans pendant ne se retourne pas. */
+  function memeSens(src){
+    var paires=[_HAB.piloteSens,_HAB.piloteSansCouronneSens],i,t;
+    for(i=0;i<paires.length;i++){
+      t=paires[i];
+      if(t&&(t.gd===src||t.dg===src))return parSens(t)||src;
+    }
+    return src;
+  }
   function habillePilote(){
     if(!eq.aVaisseau)return;
-    var src=(o.pilotePour&&o.pilotePour(idx))||_HAB.pilote;
+    /* Le dessin voulu par l'etape, sinon celui de l'habillage — puis le SENS
+       DE MARCHE, qui decide vers ou l'enfant regarde. La licorne se retournait
+       deja ; la fille restait tournee vers la droite meme en partant a
+       gauche. */
+    var src=memeSens((o.pilotePour&&o.pilotePour(idx))||_HAB.pilote);
     if(eq.pilote.getAttribute('src')!==src)eq.pilote.setAttribute('src',src);
     placerPilote();
   }
@@ -8060,7 +8076,8 @@ var islandDefs=[
           pilotePour:function(i){
             /* Sans la couronne tant qu'elle n'est pas gagnee, quel que soit
                le monde ; le tableau par etape sert au garcon (la Terre). */
-            if(_HAB.piloteSansCouronne&&!_couronneGagnee)return _HAB.piloteSansCouronne;
+            if(_HAB.piloteSansCouronne&&!_couronneGagnee)
+              return _HAB.piloteSansCouronne;
             return (_HAB.pilotesEtape&&_HAB.pilotesEtape[i-1])||null;}});
         /* Défilement AVANT de montrer la carte, et sans animation : l'étape en
            cours est là dès la première image affichée. */
@@ -8242,15 +8259,17 @@ var islandDefs=[
         var _f0=_finToboggan(isleCards[0],centers[0]);
         var t0x=_f0.x,t0y=_f0.y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
-        var mid0x=(avX+t0x)*0.5,mid0y=(avY+t0y)*0.5;
-        /* PAR-DESSUS, PAS PAR-DESSOUS. Le dernier point de controle etait
-           sous l'arrivee : le ruban remontait vers le sommet en rasant le
-           flanc de l'astre, donc en le mordant. On le place en HAUT et en
-           retrait, si bien que la courbe passe au-dessus puis redescend se
-           poser — le geste meme de la licorne, qui arrive par le ciel. */
-        var _c2xL=t0x-(t0x-avX)*0.25, _c2yL=t0y-45;
-        segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:_c2xL,cpy2:_c2yL,x3:t0x,y3:t0y});
-        var _d0='M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+_c2xL+','+_c2yL+' '+t0x+','+t0y;
+        /* ── UN CHEMIN DROIT ──
+           La courbe partait du milieu du haut, plongeait vers la droite puis
+           se reprenait vers le premier monde : on croyait lire un trait allant
+           du premier monde au deuxieme. Le client veut la ligne, rien de plus.
+           On garde la forme cubique — le vol lit ces segments — mais on pose
+           les deux points de controle SUR le segment, aux tiers : une courbe
+           de Bezier dont les quatre points sont alignes est une droite. */
+        var _c1xL=avX+(t0x-avX)/3,  _c1yL=avY+(t0y-avY)/3;
+        var _c2xL=avX+(t0x-avX)*2/3,_c2yL=avY+(t0y-avY)*2/3;
+        segments.push({x0:avX,y0:avY,cpx1:_c1xL,cpy1:_c1yL,cpx2:_c2xL,cpy2:_c2yL,x3:t0x,y3:t0y});
+        var _d0='M '+avX+','+avY+' C '+_c1xL+','+_c1yL+' '+_c2xL+','+_c2yL+' '+t0x+','+t0y;
         drawPath(_d0, lk0);
         /* LE TOBOGGAN : le seul chemin dessine de la carte, du coin haut a
            gauche jusqu'au premier monde. */
@@ -9073,7 +9092,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v183';
+var _VERSION_REPLI='v184';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11070,8 +11089,17 @@ var _HABILLAGES={
     vaisseauVideSens:{gd:'/images/licorne-seule-gd.png?v=133',dg:'/images/licorne-seule-dg.png?v=133'},
     /* La fille descendue. Elle ne porte la couronne qu'une fois le monde 2
        TERMINÉ — avant, c'est la fille sans couronne, sur tous les mondes. */
+    /* LA FILLE REGARDE DU COTE OU ELLE VA. Sa licorne se retournait deja —
+       elle a ses deux dessins — mais la fille, une fois descendue, restait
+       tournee vers la droite meme en partant vers la gauche. Ses deux
+       dessins existaient pourtant : on les declare, comme pour la monture.
+       `gd` = de gauche a droite, donc tournee vers la droite. */
     pilote:'/images/fille-couronne.png?v=133',
+    piloteSens:{gd:'/images/fille-couronne.png?v=133',
+                dg:'/images/fille-couronne-dg.png?v=133'},
     piloteSansCouronne:'/images/fille-seule.png?v=133',
+    piloteSansCouronneSens:{gd:'/images/fille-seule.png?v=133',
+                            dg:'/images/fille-seule-dg.png?v=133'},
     pilotesEtape:null,
     /* CE QUI L'ATTEND SUR UN MONDE. Sa licorne au monde 1 : elle y arrive
        seule, en glissant sur l'arc-en-ciel, et repart avec. La couronne au
