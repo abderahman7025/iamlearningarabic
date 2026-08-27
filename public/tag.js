@@ -33,8 +33,17 @@
      ce qui permet le retour sur dépense et l'écart des doublons. */
   var CONVERSION = 'AW-18410302853/QMUDCOKz5OccEIXb28pE';
 
-  /* Facultatif : un conteneur Tag Manager, le jour où il y aura plusieurs
-     balises à gérer (GA4, Meta, Clarity). Les deux peuvent coexister. */
+  /* LE CONTENEUR TAG MANAGER, pour toutes les AUTRES balises — GA4, Meta,
+     Clarity — que vous piloterez depuis l'interface de GTM sans repasser par
+     moi. Il cohabite avec la balise Ads ci-dessus.
+
+     ⚠ N'AJOUTEZ PAS la conversion d'achat Google Ads dans GTM : elle est
+     déjà envoyée par ce fichier, avec le montant réel et l'identifiant
+     Stripe. La mettre aussi dans GTM ferait compter chaque vente DEUX FOIS,
+     et vos enchères automatiques se régleraient sur un chiffre faux.
+
+     Toutes vos balises GTM peuvent se déclencher sur l'événement `purchase`
+     du dataLayer : il porte déjà `transaction_id`, `value` et `currency`. */
   var CONTENEUR = '';          /* ex. 'GTM-XXXXXXX' */
 
   if (!BALISE && !CONTENEUR) return;
