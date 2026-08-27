@@ -44,7 +44,7 @@
 
      Toutes vos balises GTM peuvent se déclencher sur l'événement `purchase`
      du dataLayer : il porte déjà `transaction_id`, `value` et `currency`. */
-  var CONTENEUR = '';          /* ex. 'GTM-XXXXXXX' */
+  var CONTENEUR = 'GTM-5DHGNVLW';
 
   if (!BALISE && !CONTENEUR) return;
 
