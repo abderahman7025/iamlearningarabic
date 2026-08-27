@@ -3121,10 +3121,25 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    donc pas ou cliquer. Deux colonnes, et les quatre lettres tiennent d'un
    coup, bouton compris. En portrait la colonne unique reste la bonne mise en
    page : c'est la hauteur qui abonde, pas la largeur. */
-.child-letters{display:grid;grid-template-columns:1fr;gap:12px;align-items:stretch}
+/* En colonne dans le portrait : la hauteur ne manque pas. */
+.child-letters{display:flex;flex-direction:column;gap:12px}
 .child-letters>.child-card{margin-bottom:0}
+/* DEUX PAR LIGNE, COUCHE. Une grille de deux pistes debordait : ses colonnes
+   se calaient sur la largeur du contenu et depassaient le cadre, si bien que
+   la troisieme carte, centree sur des pistes trop larges, tombait a cote.
+   Une piste flex bornee a 50 % ne peut pas deborder, et `justify-content`
+   centre d'elle-meme la carte esseulee — deux en haut, une centree dessous,
+   sans regle particuliere pour le nombre impair. */
 @media(orientation:landscape) and (min-width:560px){
-  .child-letters{grid-template-columns:1fr 1fr}
+  .child-letters{flex-direction:row;flex-wrap:wrap;justify-content:center;
+    align-content:flex-start}
+  /* Base a 45 % et non a « 50 % moins la gouttiere » : deux cartes font 90 %
+     et tiennent a coup sur sur la ligne, trois feraient 135 % et passent donc
+     a la suivante. `flex-grow:1` leur fait ensuite remplir la ligne, et le
+     plafond a 50 % empeche une carte esseulee de s'etaler sur toute la
+     largeur. Une base exprimee au pixel pres se revelait fragile : selon
+     l'ile, la meme regle donnait deux cartes par ligne ou une seule. */
+  .child-letters>.child-card{flex:1 1 45%;max-width:calc(50% - 5px);min-width:0}
 }
 /* Un telephone couche n'a que ~390 px de haut, et cette page NE DEFILE PAS :
    ce qui depasse est perdu, y compris le bouton « Retour a la carte », qui
@@ -3138,7 +3153,20 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .child-choix .child-titre{font-size:1.1rem!important;margin-bottom:2px!important}
   .child-choix .child-sous{font-size:.8rem!important;margin-bottom:8px!important}
   .child-letters{gap:8px}
-  .child-letters>.child-card{padding:8px 12px!important}
+  /* LA CARTE RESTE UN RECTANGLE FIN. En deux colonnes elle n'a plus que
+     240 px de large : le libelle d'etat — « ✅ Déjà vue — revoir » — passait
+     a la ligne et la carte montait a 110 px de haut, presque un carre. On
+     resserre l'emoji et le glyphe, et on interdit le retour a la ligne : la
+     carte retombe a ~55 px, soit un rapport de 4 pour 1, comme a l'origine. */
+  .child-letters>.child-card{padding:8px 12px!important;gap:9px!important}
+  .child-letters>.child-card .child-emoji{font-size:1.7rem!important}
+  .child-letters>.child-card .child-glyphe{font-size:2.1rem!important;
+    min-width:42px!important}
+  .child-letters>.child-card .child-infos{min-width:0}
+  .child-letters>.child-card .child-infos>div{white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis}
+  .child-letters>.child-card .child-infos>div:first-child{font-size:.95rem!important}
+  .child-letters>.child-card .child-infos>div:last-child{font-size:.72rem!important}
   .child-choix .rbtn{padding:9px!important;font-size:.92rem!important}
   /* ── ET SURTOUT : ON PARTAGE LA HAUTEUR, ON NE LA COMPTE PAS ──
      Rogner les marges au pixel pres marchait pour le garcon et ratait de
@@ -3151,7 +3179,12 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   /* `.child-wrap` porte 72 px de marge en haut et 60 en bas : sur un ecran de
      390 px, ces 132 px sont la moitie de la place utile. On les rend au
      contenu — la barre du haut est deja compensee par le padding de `.ca`. */
-  .child-choix{padding-top:4px!important;padding-bottom:6px!important}
+  /* `.child-wrap` est bride a 400 px — la bonne largeur pour une colonne de
+     telephone tenu debout. Couche, l'ecran en fait 844 : les deux colonnes
+     tombaient a 136 px et la carte redevenait un timbre. On lui rend la
+     largeur, sans aller au bord. */
+  .child-choix{padding-top:4px!important;padding-bottom:6px!important;
+    max-width:min(760px,94vw)!important}
   /* ET LE FILET DE SECURITE : la page DEFILE. Deux colonnes et un entete
      resserre suffisent pour quatre lettres, mais l'habillage de la fille
      descend le contenu de 104 px et une ile plus fournie deborderait encore.
@@ -3270,9 +3303,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
      etait donc hors d'atteinte. C'est ce que le client a vu sur le sin et
      sur le ra, les deux lettres dont la grille est la plus remplie.
      Plus petites, elles passent a cinq par rangee et tiennent en trois. */
-  .cibles-nombreuses{gap:10px!important}
-  .cibles-nombreuses .boy-cible{width:clamp(46px,15vh,72px);height:clamp(46px,15vh,72px);
-    font-size:clamp(1.05rem,6.4vh,1.9rem)}
+  /* QUATRE PAR RANGEE, TROIS RANGEES. En laissant le flux decider on
+     obtenait 5, 5 puis 2 — une derniere ligne bancale. La grille impose la
+     coupe, et la case retrecit assez pour que les trois rangees tiennent. */
+  .cibles-nombreuses{display:grid!important;grid-template-columns:repeat(4,auto)!important;
+    gap:8px 10px!important;justify-content:center;justify-items:center}
+  .cibles-nombreuses .boy-cible{width:clamp(46px,14.5vh,72px);height:clamp(46px,14.5vh,72px);
+    font-size:clamp(1.05rem,6.2vh,1.9rem)}
   .boy-titre{line-height:1.5}
   /* LE MOT A TROU. Un mot en gros, une note et quatre cibles a la suite : sur
      un telephone couche de 380 px de haut, la derniere rangee passait sous le
@@ -7988,8 +8025,7 @@ var islandDefs=[
     globeDiv.style.display='grid';
     globeDiv.style.gridTemplateColumns='repeat(3,1fr)';
     globeDiv.style.justifyItems='center';
-    globeDiv.style.alignItems='center';
-    globeDiv.style.gap='18px 10px';
+    globeDiv.style.gap='0 10px';
     /* Un tiers de la largeur, moins la gouttiere — et jamais plus haut que
        40 % de l'ecran, pour que deux rangees restent visibles ensemble. */
     var IW=Math.min(Math.round(DW/3)-24,240);
@@ -8012,33 +8048,68 @@ var islandDefs=[
       el.style.position='relative';
       el.style.zIndex='5';
     });
-    /* ── LES CARTES « JEU » ──
-       Elles prenaient une case comme un monde, et les rangees tombaient a 3,
-       puis 2. Leur donner la rangee entiere ne suffit pas : un bloc pleine
-       largeur ne peut demarrer qu'en premiere colonne, si bien que le monde
-       juste avant restait SEUL sur sa ligne — 3, 1, 3, 1.
+    /* ── TROIS MONDES PAR ECRAN, EN ZIGZAG ──
+       Alignes sur une grille bien rangee, on en voyait six d'un coup et la
+       carte ressemblait a un tableau. Le client veut un CHEMIN : le premier
+       monde en haut a gauche, le deuxieme au milieu — en largeur comme en
+       hauteur — le troisieme en bas a droite. Les trois suivants repartent
+       dans l'autre sens, et ainsi de suite.
 
-       On les glisse donc a la fin de la rangee commencee. L'ordre du parcours
-       tient toujours : le jeu vient toujours apres les memes mondes, un ou
-       deux plus tard seulement, et les mondes restent trois par trois. */
-    Array.from(globeDiv.querySelectorAll('.isle-mg')).forEach(function(el){
-      el.style.gridColumn='1 / -1';el.style.margin='0';el.style.width='100%';
-      var avant=0,n;
-      for(n=0;n<isleCards.length;n++){
-        if(isleCards[n].compareDocumentPosition(el)&Node.DOCUMENT_POSITION_FOLLOWING)avant++;
-      }
-      /* le dernier monde de la rangee entamee */
-      var fin=Math.min(isleCards.length,Math.ceil(avant/3)*3)-1;
-      if(fin>=0&&isleCards[fin]&&isleCards[fin]!==el.previousElementSibling){
-        isleCards[fin].parentNode.insertBefore(el,isleCards[fin].nextSibling);
-      }
+       Chaque groupe de trois occupe donc une rangee haute comme l'ecran, et
+       les trois mondes s'y accrochent en haut, au milieu, en bas. Une rangee
+       par ecran : on en voit trois a la fois, pas six.
+
+       Les cartes « jeu » et le monde final prennent leur propre rangee, a la
+       hauteur de leur contenu — pas un ecran entier pour un bouton. Les
+       rangees sont donc dimensionnees UNE PAR UNE, dans l'ordre du parcours,
+       et non par `grid-auto-rows` qui les traiterait toutes pareil. */
+    var bande=Math.max(300,Math.round(DH*0.92));
+    /* On numerote d'abord les mondes : trois par groupe, un groupe par ecran.
+       Les blocs pleine largeur — jeux et monde final — viennent ENSUITE se
+       loger apres le groupe qu'ils suivent. Les placer au fil du DOM cassait
+       le groupe en cours et laissait un monde seul sur sa rangee. */
+    var groupeDe={},nbGroupes=0;
+    isleCards.forEach(function(el,i){groupeDe[i]=Math.floor(i/3);});
+    nbGroupes=Math.ceil(isleCards.length/3);
+    var blocs=Array.from(globeDiv.children).filter(function(el){
+      return el.classList&&(el.classList.contains('isle-mg')
+             ||el.classList.contains('boss-isle'));});
+    /* apres combien de mondes chaque bloc arrive-t-il ? */
+    var apres=blocs.map(function(el){
+      var n=0;
+      isleCards.forEach(function(m){
+        if(m.compareDocumentPosition(el)&Node.DOCUMENT_POSITION_FOLLOWING)n++;});
+      return Math.min(nbGroupes-1,Math.max(0,Math.ceil(n/3)-1));
     });
-    var bossEl=globeDiv.querySelector('.boss-isle');
-    if(bossEl){bossEl.style.gridColumn='1 / -1';bossEl.style.margin='0 auto';
-      bossEl.style.zIndex='5';
-      bossEl.style.width=IW+'px';
-      var bImg=bossEl.querySelector('.isle-img');
-      if(bImg)bImg.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';}
+    /* la liste des rangees, dans l'ordre : groupe 0, ses blocs, groupe 1... */
+    var tailles=[],rangDuGroupe={},rangDuBloc={},r=0;
+    for(var g=0;g<nbGroupes;g++){
+      tailles.push(bande+'px'); rangDuGroupe[g]=++r;
+      blocs.forEach(function(el,bi){
+        if(apres[bi]===g){tailles.push('auto');rangDuBloc[bi]=++r;}
+      });
+    }
+    isleCards.forEach(function(el,i){
+      var g=groupeDe[i],pos=i%3;
+      /* un groupe sur deux repart de la droite : le chemin serpente */
+      el.style.gridColumn=String((g%2===0)?(pos+1):(3-pos));
+      el.style.gridRow=String(rangDuGroupe[g]);
+      el.style.alignSelf=['start','center','end'][pos];
+      el.style.margin='0';
+    });
+    blocs.forEach(function(el,bi){
+      el.style.gridRow=String(rangDuBloc[bi]);
+      el.style.gridColumn='1 / -1';
+      el.style.alignSelf='center';
+      el.style.margin='0 auto';
+      el.style.zIndex='5';
+      if(el.classList.contains('boss-isle')){
+        el.style.width=IW+'px';
+        var bImg=el.querySelector('.isle-img');
+        if(bImg)bImg.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';
+      }else{ el.style.width='100%'; }
+    });
+    globeDiv.style.gridTemplateRows=tailles.join(' ');
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     _quandCartePrete(ca,1500,function(){
@@ -8803,7 +8874,8 @@ function _boyLetterPicker(ca,session){
     var lettre=document.createElement('div');lettre.className='child-glyphe';
     lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
     lettre.textContent=L.ar;carte.appendChild(lettre);
-    var infos=document.createElement('div');infos.style.cssText='flex:1';
+    var infos=document.createElement('div');infos.className='child-infos';
+    infos.style.cssText='flex:1';
     var etat=fait?'✅ Déjà vue — revoir':(ouverte?'▶ À découvrir':'🔒 Termine la précédente');
     infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>'
       +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">'+etat+'</div>';
@@ -8834,7 +8906,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v178';
+var _VERSION_REPLI='v179';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9779,7 +9851,19 @@ if(document.fonts&&document.fonts.ready){
    dessous. Avec un interligne `lh`, le demi-plomb vaut (lh − 1,34 − 0,70)/2,
    et la ligne de base se trouve donc à `lh/2 − 0,32` em du BAS de la boîte.
    Sert à ne blanchir le trait de liaison qu'au-dessus de cette ligne. */
-function _basLigne(lh){return Math.max(0.02,(lh||1.2)/2-0.32);}
+/* OU TOMBE LA COUPE BASSE DU « L », comptee depuis le bas de la boite.
+   Le trait de liaison vit entre -0,09 et 0 em : il touche la ligne de base
+   par en dessous. La coupe tombait a 0,0075 em SOUS cette ligne — quatre
+   dixiemes de pixel : le bas du trait restait donc dans le calque de la
+   lettre, et laissait le petit bout horizontal que le client voit a droite
+   du ba, fin comme milieu.
+
+   On la descend a 0,05 em sous la ligne. Marge en dessous : le point du ba
+   milieu pend a 0,127 em et les deux points du ya milieu a 0,187 — ils
+   restent a la lettre, ce qui est tout l'objet de cette coupe en L.
+   Calcul : la ligne de base est a lh/2 + 0,3125 em du haut de la boite ; on
+   veut couper 0,05 plus bas, d'ou lh - (lh/2 + 0,3625). */
+function _basLigne(lh){return Math.max(0.02,(lh||1.2)/2-0.3625);}
 /* ── Les formes qu'une coupe droite ne peut pas séparer ──────────────────
    Le jīm remonte à 45° après son trait, le kāf croise sa propre diagonale :
    à une même abscisse, le trait est en haut et la lettre en bas. On les
@@ -10423,6 +10507,15 @@ function _armePleinEcran(el){
 function _blocEcriture(hote,o){
   var liste=o.liste,nb=liste.length;
   var CW0=520,CH0=o.signeSeul?250:220;
+  /* ── LA BANDE DU RAPPEL, DANS LE CADRE ──
+     De tete, l'enfant peut demander a revoir une forme. Elle s'affichait SOUS
+     son propre trace, au meme endroit : les deux encres se superposaient et
+     il n'y avait rien a comparer. Je l'avais ensuite sortie dans un cadre a
+     part, au-dessus — ce n'est pas ce que le client demande non plus. Elle
+     occupe donc une bande en HAUT DU MEME CADRE, au-dessus de la ligne ou
+     l'enfant ecrit : le modele en haut, son trace juste en dessous. */
+  var BANDE0=o.deTete?Math.round(CH0*0.36):0;
+  CH0+=BANDE0;
   /* Moins il y a de cases, plus le modèle peut être grand : un doigt
      d'enfant a besoin de place pour repasser dessus. */
   var PX0=o.signeSeul?124:({1:150,2:126,3:104}[nb]||80);
@@ -10433,35 +10526,30 @@ function _blocEcriture(hote,o){
 
   var el=document.createElement('div');el.style.cssText='width:100%';
   var boite=document.createElement('div');
-  boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
+  /* LE CADRE NE DOIT JAMAIS DEPASSER L'ECRAN. Il est dessine a une taille
+     fixe puis reduit a la largeur disponible — mais rien ne bornait sa
+     HAUTEUR : couche, avec un titre au-dessus et des boutons en dessous, il
+     sortait par le bas. Comme son rapport largeur/hauteur est connu, plafonner
+     la largeur revient a plafonner la hauteur. Les 150 px reserves sont ceux
+     de la barre, du titre et des boutons ; en portrait la hauteur ne manque
+     pas et c'est `100%` qui l'emporte. */
+  boite.style.cssText='position:relative;width:'+CW+'px;'
+    +'max-width:min(100%,calc((100vh - 150px) * '+(CW/CH).toFixed(3)+'));'
+    +'margin:6px auto;'
     +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba('+_HAB.rgb+',.30)';
   var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
   cvM.style.cssText='display:block;width:100%;height:auto';
   var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
   cvE.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none';
-  boite.appendChild(cvM);boite.appendChild(cvE);
-  /* ── LE MODELE, AU-DESSUS ──
-     Quand l'enfant demandait a revoir une forme, elle s'affichait SOUS son
-     propre trace, exactement au meme endroit : les deux encres se
-     superposaient et il n'y avait plus rien a comparer. Le rappel a donc sa
-     bande a lui, au-dessus de la zone d'ecriture — le modele d'un cote, ce
-     que l'enfant a ecrit de l'autre, l'un sous l'autre. */
-  var cvR=null,cxR=null,RH=0;
-  if(o.deTete){
-    RH=Math.round(CH*0.58);
-    cvR=document.createElement('canvas');cvR.width=CW;cvR.height=RH;
-    cvR.style.cssText='display:none;width:'+CW+'px;max-width:100%;height:auto;'
-      +'margin:0 auto 4px;border-radius:12px;background:rgba('+_HAB.rgb+',.05);'
-      +'border:2px dashed rgba('+_HAB.rgb+',.28)';
-    el.appendChild(cvR);
-    cxR=cvR.getContext('2d');
-  }
-  el.appendChild(boite);
+  boite.appendChild(cvM);boite.appendChild(cvE);el.appendChild(boite);
   hote.appendChild(el);
   var cx=cvM.getContext('2d'),cxE=cvE.getContext('2d');
   /* Un signe seul descend bien plus bas que le corps d'une lettre :
      on remonte sa ligne d'écriture pour lui laisser la place. */
-  var baseY=Math.round(CH*(o.signeSeul?0.50:0.62));
+  var BANDE=Math.round(BANDE0*k);
+  /* La ligne d'ecriture se place dans ce qui RESTE sous la bande, aux memes
+     proportions qu'avant : la zone de trace ne retrecit pas. */
+  var baseY=BANDE+Math.round((CH-BANDE)*(o.signeSeul?0.50:0.62));
   var pas=CW/nb;
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
      garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
@@ -10487,18 +10575,24 @@ function _blocEcriture(hote,o){
      leur colonne : la case tout a droite reste l'isolee, comme en bas, pour
      que l'oeil aille droit du modele a ce qu'il a ecrit. */
   function dessineRappel(){
-    if(!cxR)return;
-    cxR.clearRect(0,0,CW,RH);
-    var PR=Math.round(PX*0.80),baseR=Math.round(RH*0.70),vus=0;
+    if(!BANDE)return;
+    var PR=Math.round(PX*0.62),baseR=Math.round(BANDE*0.80),vus=0;
     for(var n=0;n<nb;n++)if(montres[n]){
       vus++;
-      cxR.save();
-      cxR.font=PR+"px 'Scheherazade New',serif";
-      cxR.textBaseline='alphabetic';cxR.textAlign='center';cxR.fillStyle=_TRACE_GRIS;
-      _dessineSurLigne(cxR,liste[n],caseX(n),baseR,PR);
-      cxR.restore();
+      cx.save();
+      cx.font=PR+"px 'Scheherazade New',serif";
+      cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
+      _dessineSurLigne(cx,liste[n],caseX(n),baseR,PR);
+      cx.restore();
     }
-    cvR.style.display=vus?'block':'none';
+    /* Un trait leger separe le rappel de la zone d'ecriture : sans lui les
+       deux encres se lisent comme une seule. */
+    if(vus){
+      cx.save();
+      cx.strokeStyle='rgba('+_HAB.rgb+',.22)';cx.lineWidth=1.5*k;
+      cx.beginPath();cx.moveTo(14*k,BANDE-2);cx.lineTo(CW-14*k,BANDE-2);cx.stroke();
+      cx.restore();
+    }
   }
   function guide(prog){
     cx.clearRect(0,0,CW,CH);
@@ -11576,7 +11670,7 @@ function _boyScene(ca,reprise){
        les lettres », « on insistesur la lettre ». L'espace pose ici survit
        au masquage. En portrait il ne se voit pas : une espace en debut de
        ligne est supprimee par le rendu. */
-    t.innerHTML=_airAutourArabe(_sansCercle(html)).replace(/(<br[^>]*>)/gi,'$1 ');
+    t.innerHTML=_airAutourArabe(_sansCercle(html)).replace(/(<br\b[^>]*>)/gi,'$1 ');
     /* Les coupures de ligne sont écrites dans le texte, pour le portrait où
        la largeur manque. En paysage elles disparaissent et le texte se
        repartit sur la largeur — sauf celles marquees `dur`. */
