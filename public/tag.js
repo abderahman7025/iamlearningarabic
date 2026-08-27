@@ -5,29 +5,40 @@
 
    Trois choses, dans cet ordre, et l'ordre compte :
 
-     1. LES REFUS PAR DÉFAUT. Le Consent Mode v2 doit être posé AVANT que
-        Google Tag Manager ne s'exécute, sinon la première mesure part sans
-        consentement et la loi comme Google le reprochent.
-     2. GTM, qui chargera ensuite ce que vous y aurez mis (GA4, Ads, ce que
-        vous voudrez) — sans jamais écrire de cookie publicitaire tant que le
-        visiteur n'a pas dit oui.
+     1. LES REFUS PAR DÉFAUT. Le Consent Mode v2 doit être posé AVANT que la
+        balise ne s'exécute, sinon la première mesure part sans consentement,
+        et la loi comme Google le reprochent.
+     2. LA BALISE Google du compte Ads — et, le jour où il y en aura
+        plusieurs, un conteneur Tag Manager. Ni l'une ni l'autre n'écrit de
+        cookie publicitaire tant que le visiteur n'a pas dit oui.
      3. LE BANDEAU, qui transforme les refus en accords si le visiteur le
         souhaite. Deux boutons de même poids : accepter et refuser. Un choix
         où seul « accepter » est visible ne vaut pas consentement.
 
-   Rien ne se charge tant que `CONTENEUR` est vide : pas de balise, pas de
-   bandeau, pas de cookie. On peut donc déployer avant d'avoir l'identifiant.
+   Rien ne se charge tant qu'aucun identifiant n'est renseigné : pas de
+   balise, pas de bandeau, pas de cookie.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* ⇩⇩ L'IDENTIFIANT DU CONTENEUR — la seule ligne à remplir ⇩⇩
-     Un conteneur PROPRE à ce site, pas celui d'alyanco : deux sites dans le
-     même conteneur obligent à filtrer chaque déclencheur par nom de domaine,
-     et un réglage fait pour l'un casse le suivi de l'autre. */
+  /* ⇩⇩ LES DEUX SEULES LIGNES À REMPLIR ⇩⇩ */
+
+  /* La balise Google du compte Ads. Elle suffit à elle seule : pas besoin de
+     Tag Manager tant qu'on n'a qu'une balise à poser. */
+  var BALISE = 'AW-18410302853';
+
+  /* L'ÉTIQUETTE de l'action de conversion « Achat », à créer dans Google Ads
+     (Objectifs → Conversions → Nouvelle action → Site web → manuel). Elle
+     ressemble à `AW-18410302853/AbC-D_efGhIj`. Tant qu'elle est vide, la
+     vente est bien poussée dans le dataLayer mais rien n'est envoyé à Ads :
+     on ne devine pas une étiquette, et une mauvaise ne remonterait rien. */
+  var CONVERSION = '';
+
+  /* Facultatif : un conteneur Tag Manager, le jour où il y aura plusieurs
+     balises à gérer (GA4, Meta, Clarity). Les deux peuvent coexister. */
   var CONTENEUR = '';          /* ex. 'GTM-XXXXXXX' */
 
-  if (!CONTENEUR) return;
+  if (!BALISE && !CONTENEUR) return;
 
   var CLE = 'consentement_v2';
   var dl = (window.dataLayer = window.dataLayer || []);
@@ -55,13 +66,22 @@
   if (!deja) defauts.wait_for_update = 500;
   gtag('consent', 'default', defauts);
 
-  /* ── 2. Google Tag Manager ─────────────────────────────────────────── */
-  dl.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  /* ── 2. Les balises ────────────────────────────────────────────────── */
   var s0 = document.getElementsByTagName('script')[0];
-  var js = document.createElement('script');
-  js.async = true;
-  js.src = 'https://www.googletagmanager.com/gtm.js?id=' + CONTENEUR;
-  s0.parentNode.insertBefore(js, s0);
+  function charge(src) {
+    var js = document.createElement('script');
+    js.async = true; js.src = src;
+    s0.parentNode.insertBefore(js, s0);
+  }
+  if (BALISE) {
+    charge('https://www.googletagmanager.com/gtag/js?id=' + BALISE);
+    gtag('js', new Date());
+    gtag('config', BALISE);
+  }
+  if (CONTENEUR) {
+    dl.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+    charge('https://www.googletagmanager.com/gtm.js?id=' + CONTENEUR);
+  }
 
   /* ── 3. Le bandeau ─────────────────────────────────────────────────── */
   var TEXTES = {
@@ -159,16 +179,22 @@
      rechargement de la page compte une deuxième vente. L'identifiant permet à
      Google d'écarter les doublons. */
   window.tagAchat = function (id, valeur, devise) {
+    var tid = String(id || ''), v = Number(valeur || 0), cur = devise || 'EUR';
+    /* Pour Tag Manager, ou pour toute balise qu'on ajoutera plus tard. */
     dl.push({ ecommerce: null });
     dl.push({
       event: 'purchase',
       ecommerce: {
-        transaction_id: String(id || ''),
-        value: Number(valeur || 0),
-        currency: devise || 'EUR',
-        items: [{ item_id: 'acces-vie', item_name: 'Acces a vie', price: Number(valeur || 0), quantity: 1 }]
+        transaction_id: tid, value: v, currency: cur,
+        items: [{ item_id: 'acces-vie', item_name: 'Acces a vie', price: v, quantity: 1 }]
       }
     });
+    /* Et pour Google Ads directement, des que l'etiquette est connue. */
+    if (BALISE && CONVERSION) {
+      gtag('event', 'conversion', {
+        send_to: CONVERSION, value: v, currency: cur, transaction_id: tid
+      });
+    }
   };
 
   if (!deja) {
