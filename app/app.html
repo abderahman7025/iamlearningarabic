@@ -8660,7 +8660,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v163';
+var _VERSION_REPLI='v164';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12855,7 +12855,13 @@ function _showFinish(pct,ca){
     +'<div style="font-size:1.4rem;font-weight:900;color:'+(isOK?'#f5c842':'#fff')+';margin-bottom:8px">'+(isOK?(okMsg[L]||okMsg.fr):(koMsg[L]||koMsg.fr))+'</div>'
     +'<div style="font-size:1rem;color:rgba(255,255,255,.7)">'+Math.round(pct*100)+'%</div>';
   ov.appendChild(bx);document.body.appendChild(ov);
-  setTimeout(function(){ov.style.transition='opacity .5s';ov.style.opacity='0';setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);renderSessionsMap(ca);},500);},isOK?2200:1500);
+  setTimeout(function(){ov.style.transition='opacity .5s';ov.style.opacity='0';setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);
+      /* CHACUN CHEZ SOI. La carte des mondes appartient aux interfaces
+         enfant : un adulte qui finissait un cours se retrouvait devant les
+         planetes, la fusee et le garcon. On aiguille sur le profil, comme
+         `renderPage` le fait partout ailleurs. */
+      if(st.profile==='girl'||st.profile==='boy')renderSessionsMap(ca);
+      else renderSessions(ca);},500);},isOK?2200:1500);
 }
 // VOWEL LESSON
 function renderVLesson(ca,s){
@@ -13179,10 +13185,14 @@ function _entrainementAdulte(ca,s,idx){
     var reste=bonnes.slice(), fini=false;
     choix.slice().sort(function(){return Math.random()-.5;}).forEach(function(c){
       var b=document.createElement('div');
+      /* `color:inherit` — et surtout PAS de blanc en dur. Le module de
+         l'interface adulte est pose sur du CLAIR (`rgba(255,255,255,.82)`) :
+         un texte blanc y etait invisible. En heritant, la case suit la
+         couleur du module, sombre ici, claire ailleurs. */
       b.style.cssText='min-width:62px;height:62px;display:flex;align-items:center;'
         +'justify-content:center;padding:0 10px;border-radius:14px;cursor:pointer;'
-        +'font-family:"Scheherazade New",serif;font-size:2rem;color:#fff;'
-        +'background:rgba(255,255,255,.05);border:1px solid rgba(245,200,66,.25);'
+        +'font-family:"Scheherazade New",serif;font-size:2rem;color:inherit;'
+        +'background:rgba(184,134,11,.10);border:1px solid rgba(184,134,11,.35);'
         +'transition:all .18s ease';
       b.textContent=c;
       b.onclick=function(){
@@ -13233,8 +13243,14 @@ function _entrainementAdulte(ca,s,idx){
     var haut=document.createElement('div');
     haut.style.cssText='text-align:center;margin-bottom:8px';
     var hp=document.createElement('button');
-    hp.className='btn-sec';
-    hp.style.cssText+=';width:auto;padding:8px 16px';
+    /* Le bouton MAISON du module d'ecriture, pas un bouton de formulaire :
+       celui-ci a la pilule, la graisse et les couleurs de l'interface. */
+    hp.className='writing-btn';
+    /* `color:inherit` en plus : les boutons maison sont dans `.wm-body`, que
+       l'interface adulte force a heriter de la couleur du module. Le notre est
+       en dehors, il gardait donc le gris clair du theme sombre — illisible sur
+       le fond clair de l'adulte. */
+    hp.style.cssText+=';display:inline-flex;margin:0 auto;color:inherit';
     hp.textContent=t('training_listen_btn');
     hp.onclick=function(){try{speak(letter.iso||letter.ar,.78);}catch(ex){}};
     haut.appendChild(hp);
@@ -13261,7 +13277,7 @@ function _entrainementAdulte(ca,s,idx){
       var mot=document.createElement('div');
       mot.style.cssText='direction:rtl;display:flex;align-items:center;justify-content:center;'
         +'gap:2px;font-family:"Scheherazade New",serif;line-height:1.3;'
-        +'font-size:clamp(1.8rem,9vh,2.8rem);margin:2px 0 10px;color:#fff';
+        +'font-size:clamp(1.8rem,9vh,2.8rem);margin:2px 0 10px;color:inherit';
       function bout(x){if(!x)return;var d=document.createElement('span');
         d.textContent=x;mot.appendChild(d);}
       bout(dr);

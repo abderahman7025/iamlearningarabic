@@ -1868,3 +1868,12 @@ page et URL propres, indexables. Elles se rangent à côté de
   un eclat parasite. Ce qui prouve, c'est le DESSIN, image par image : rendre
   le trace en texte (une grille de # et de .) et comparer la forme corrigee a
   sa reference au meme pourcentage.
+- **`_showFinish` renvoyait TOUT LE MONDE sur la carte des enfants.** La fin
+  d'un cours appelait `renderSessionsMap` en dur : un adulte se retrouvait
+  devant les planetes, la fusee et le garcon. Toute fonction partagee par les
+  trois interfaces doit aiguiller sur `st.profile`, comme `renderPage` (v164).
+- **Le module d'ecriture de l'ADULTE est pose sur du CLAIR**
+  (`rgba(255,255,255,.82)`), a l'inverse des interfaces enfant. Un texte blanc
+  en dur y disparait. Dans ce module on ecrit `color:inherit`, jamais une
+  couleur fixe — et les boutons hors de `.wm-body` doivent le poser eux-memes,
+  la regle qui l'impose ne visant que l'interieur de ce bloc.
