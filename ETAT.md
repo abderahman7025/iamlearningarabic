@@ -1877,3 +1877,19 @@ page et URL propres, indexables. Elles se rangent à côté de
   en dur y disparait. Dans ce module on ecrit `color:inherit`, jamais une
   couleur fixe — et les boutons hors de `.wm-body` doivent le poser eux-memes,
   la regle qui l'impose ne visant que l'interieur de ce bloc.
+- **DOUZE FONCTIONS SERVERLESS, PAS UNE DE PLUS.** Le plan Vercel du projet
+  plafonne les routes de `api/` à douze (les fichiers en `_` n'en sont pas).
+  En ajouter une treizième n'échoue pas bruyamment : les commits partent, la
+  mise en ligne n'arrive JAMAIS, et l'edge continue de servir la version
+  précédente. On cherche longtemps ailleurs. Avant d'ajouter une route,
+  compter : `ls api/*.js | grep -v /_ | wc -l`. La parade est de replier la
+  nouvelle logique dans une route existante, derrière un drapeau (v172).
+- **Le site est derrière Cloudflare ET l'edge Vercel.** Un `x-vercel-cache:
+  HIT` avec un `Age:` élevé ne prouve pas que le déploiement a eu lieu : il
+  prouve le contraire. Pour savoir si une mise en ligne est passée, demander
+  une ROUTE NOUVELLE — un 404 sur `/api/...` tranche, là où le HTML ment.
+- **L'ESSAI GRATUIT est un fichier à part**, `app/app-essai.html`, fabriqué
+  par `outils/allege.js`. À REGÉNÉRER À LA MAIN après toute modification de
+  `app.html` : `node outils/allege.js`. Ce n'est PAS un script `build` de
+  `package.json` — en ajouter un bascule Vercel dans un autre mode de
+  construction.
