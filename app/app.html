@@ -8572,7 +8572,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v154';
+var _VERSION_REPLI='v155';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10261,7 +10261,11 @@ function _blocEcriture(hote,o){
     cxE.beginPath();cxE.moveTo(q.x,q.y);e.preventDefault();
   }
   function mv(e){if(!trace)return;var q=pos(e);cxE.lineWidth=Math.round(7*k);
-    cxE.strokeStyle='#e65100';cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
+    /* L'ENCRE DE L'ENFANT. Elle etait en dur ici — un orange-rouge — et
+       echappait donc au changement de couleur par interface. C'est le
+       canevas ou l'enfant ecrit vraiment : violet pastel cote fille, bleu
+       turquoise cote garcon, comme partout ailleurs. */
+    cxE.strokeStyle=_encreProfil();cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
   function fin(){trace=false;}
   cvE.addEventListener('mousedown',deb);cvE.addEventListener('mousemove',mv);cvE.addEventListener('mouseup',fin);
   cvE.addEventListener('touchstart',deb,{passive:false});cvE.addEventListener('touchmove',mv,{passive:false});cvE.addEventListener('touchend',fin);
