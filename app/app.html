@@ -6831,33 +6831,30 @@ function _volCarte(o){
      suit la distance — on ne met pas le meme temps pour traverser deux
      etapes que dix — mais elle reste bornee : il faut que ce soit
      regardable sans etre interminable. */
-  /* ── LA TRAJECTOIRE : UNE ONDULATION AUTOUR DE LA LIGNE DROITE ──
-     D'un monde a son voisin, le vaisseau suivait la courbe dessinee sur la
-     carte : elle part dans un sens, se reprend, se reprend encore, et le
-     mouvement se lit comme trois morceaux colles bout a bout. Le client veut
-     une seule onde : la ligne droite du depart a l'arrivee, et le vaisseau
-     qui ondule autour, en trois ventres.
+  /* ── LA TRAJECTOIRE : UNE ONDE COMPLETE AUTOUR DE LA LIGNE DROITE ──
+     On trace la ligne droite du depart a l'arrivee, et le vaisseau la longe
+     en ondulant : la PREMIERE moitie au-dessus, il touche la ligne a
+     mi-distance, la SECONDE moitie en dessous. Une periode entiere, pas
+     davantage — c'est le dessin que le client demande.
 
-     L'ecart lateral vaut `amp · sin(pi·e) · sin(3pi·e)`. Le second facteur
-     donne les trois ventres ; le premier est une ENVELOPPE qui les eteint aux
-     deux bouts. Sans elle, l'ecart aurait encore de la vitesse laterale a
-     l'arrivee et le vaisseau s'y presenterait de biais, avec la cassure que
-     le client decrit. Avec elle, la vitesse laterale est nulle au depart
-     comme a l'arrivee : on part et on arrive dans l'axe. */
-  function ecartOnde(e,amp){return amp*Math.sin(Math.PI*e)*Math.sin(3*Math.PI*e);}
-  function penteOnde(e,amp){
-    return amp*(Math.PI*Math.cos(Math.PI*e)*Math.sin(3*Math.PI*e)
-               +3*Math.PI*Math.sin(Math.PI*e)*Math.cos(3*Math.PI*e));
-  }
+     `sin(2pi·e)` fait exactement cela : nul au depart, positif jusqu'a la
+     moitie, nul a la moitie, negatif ensuite, nul a l'arrivee. */
+  function ecartOnde(e,amp){return amp*Math.sin(2*Math.PI*e);}
+  function penteOnde(e,amp){return amp*2*Math.PI*Math.cos(2*Math.PI*e);}
   function volDroit(de,vers,fini,duree){
     var vx=vers.x-de.x, vy=vers.y-de.y;
     var dist=Math.sqrt(vx*vx+vy*vy)||1;
     var D=duree||Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
-    /* La normale a la ligne, et une amplitude proportionnee au trajet : une
-       ondulation de meme largeur sur un saut court et sur la traversee de la
-       carte ne se lirait pas de la meme facon. */
-    var nx=-vy/dist, ny=vx/dist;
-    var amp=Math.min(70,dist*0.11);
+    /* La normale a la ligne, choisie pour pointer vers le HAUT de l'ecran :
+       la premiere moitie du vol doit passer AU-DESSUS de la ligne, quel que
+       soit le sens du deplacement. Sur un trajet vertical elle est
+       horizontale, et l'onde se fait alors sur le cote — il n'y a pas de
+       « dessus » dans ce cas. */
+    var nx=vy/dist, ny=-vx/dist;
+    if(ny>0){nx=-nx;ny=-ny;}
+    /* Une amplitude proportionnee au trajet : la meme largeur d'onde sur un
+       saut court et sur la traversee de la carte ne se lirait pas pareil. */
+    var amp=Math.min(60,dist*0.10);
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
        ou il l'a laissee, sinon la fusee se remettrait droite entre les deux.
        Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
@@ -6878,7 +6875,12 @@ function _volCarte(o){
         while(ec>180)ec-=360; while(ec<-180)ec+=360;
         c=capEntree+ec*k;
       }
-      poser(x,y,c,contournera?1:Math.min(1,u/0.14,redresse(u)));
+      /* LA POINTE DE LA FUSEE RESTE DANS L'AXE DU MOUVEMENT, tout le vol :
+         c'est la regle du client. La part `1` dit a `poser` de ne pas la
+         redresser vers la verticale en chemin ; le redressement appartient a
+         la pose, pas au voyage. La licorne, elle, n'est pas alignee sur sa
+         route et garde son traitement. */
+      poser(x,y,c,(o.aligne||contournera)?1:Math.min(1,u/0.14,redresse(u)));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
@@ -7125,7 +7127,10 @@ function _volCarte(o){
        suite et non progressivement, et il tient ce penche tout le trajet.
        Il se redresse en atteignant le CENTRE de l'astre d'arrivee : de la au
        sommet, le penche s'efface. Un trajet vertical n'en prend aucun. */
-    if(o.aligne&&montee){
+    /* Le penche fixe de la montee vaut pour la carte en portrait, ou le vol
+       suit un ruban dessine. Avec l'onde, la direction change a chaque
+       instant et le nez doit la suivre : on laisse alors faire la tangente. */
+    if(o.aligne&&montee&&!o.ondule){
       var pen=volVertical?0:(MONTEE_PENCHE*sensVol);
       var f=1;
       if(astreArrivee&&astreArrivee.r){
@@ -9038,7 +9043,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v181';
+var _VERSION_REPLI='v182';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
