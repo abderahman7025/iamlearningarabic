@@ -3202,6 +3202,14 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .boy-cible{width:clamp(64px,22vh,104px);height:clamp(64px,22vh,104px);
     font-size:clamp(1.5rem,9vh,2.6rem)}
   .boy-titre{line-height:1.5}
+  /* LE MOT A TROU. Un mot en gros, une note et quatre cibles a la suite : sur
+     un telephone couche de 380 px de haut, la derniere rangee passait sous le
+     bord. Ces trois pieces-la suivent donc la hauteur disponible. */
+  .ecran-trou .trou-mot{font-size:clamp(1.5rem,9vh,2.6rem) !important;
+    line-height:1.25 !important;margin:2px 0 0 !important}
+  .ecran-trou .boy-note{margin:2px 0 0;font-size:.78rem}
+  .ecran-trou .boy-cible{width:clamp(54px,18vh,88px);height:clamp(54px,18vh,88px);
+    font-size:clamp(1.25rem,7vh,2.1rem)}
 
 /* Conteneurs principaux fluides */
 .sess-map-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
@@ -8516,10 +8524,14 @@ var _boySession=null;
    Le rappel espace : on ne redemande pas la lettre du jour — elle vient
    d'etre vue et ne prouve rien — mais une lettre de deux a quatre lecons en
    arriere, celle qui est en train de s'effacer. */
-function _lettreARevoir(idx){
-  var haut=idx-2, bas=Math.max(0,idx-4);
-  if(haut<0)return null;
-  return CHILD_LETTERS[bas+Math.floor(Math.random()*(haut-bas+1))]||null;
+function _lettresARevoir(idx,combien){
+  /* Toutes celles deja rencontrees. Les plus recentes d'abord : ce sont
+     elles qui vacillent encore, les premieres sont acquises. */
+  var vues=CHILD_LETTERS.slice(0,Math.max(0,idx));
+  if(!vues.length)return [];
+  var recentes=vues.slice(-6).sort(function(){return Math.random()-.5;});
+  var vieilles=vues.slice(0,-6).sort(function(){return Math.random()-.5;});
+  return recentes.concat(vieilles).slice(0,combien);
 }
 /* Des leurres pris parmi les lettres DEJA VUES : en proposer une que
    l'enfant n'a jamais rencontree ne teste rien, cela tire au sort. */
@@ -8646,7 +8658,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v157';
+var _VERSION_REPLI='v158';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10225,16 +10237,17 @@ function _blocEcriture(hote,o){
     _dessineSurLigne(cx,liste[n],caseX(n),baseY,PX);
     cx.restore();
   }
-  /* DE TETE : rien a repasser. La lettre grise ne parait que le temps d'un
-     coup d'oeil, quand l'enfant appuie sur « montre-moi ». Les noms des cases
-     et la ligne d'ecriture, eux, restent : ils disent QUOI ecrire, pas
-     COMMENT. */
-  var montre=false;
+  /* DE TETE : rien a repasser. Les noms des cases et la ligne d'ecriture
+     restent : ils disent QUOI ecrire, pas COMMENT.
+     La revelation se fait FORME PAR FORME. Montrer la seule isolee suffit
+     souvent a retrouver les trois autres — c'est meme tout l'interet — et un
+     bouton qui devoilerait tout d'un coup rendrait le calque a l'enfant. */
+  var montres=[];
   function guide(prog){
     cx.clearRect(0,0,CW,CH);
     /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
        d'un coup d'œil ce qu'il a écrit lui-même. */
-    if(!o.deTete||montre)for(var n=0;n<nb;n++){
+    for(var n=0;n<nb;n++)if(!o.deTete||montres[n]){
       if(n===caseAnim&&rev)cx.drawImage(_reveleJusqua(rev,prog),rev.x0,rev.y0);
       else modeleEntier(n);
     }
@@ -10327,16 +10340,20 @@ function _blocEcriture(hote,o){
      « REVOIR » a été retiré à la demande du client : l'animation tourne en
      boucle sur la case voisine, il n'y a rien à relancer. */
   petitBouton(te('↺ EFFACER'),function(){cxE.clearRect(0,0,CW,CH);});
-  /* Le filet du trace de tete : la lettre se montre deux secondes et demie,
-     puis se retire. Sans lui, l'enfant qui ne se souvient plus n'a aucune
-     porte de sortie et laisse tomber la lecon. */
+  /* Le filet du trace de tete : UN BOUTON PAR FORME, que l'enfant allume et
+     eteint a sa guise. Sans filet, celui qui ne se souvient plus n'a aucune
+     porte de sortie et laisse tomber la lecon ; avec un bouton unique qui
+     montre tout, il n'a plus qu'a repasser. */
   if(o.deTete){
-    var minuteur=null;
-    petitBouton(te('👁 MONTRE-MOI'),function(){
-      montre=true;guide(3);
-      if(minuteur)clearTimeout(minuteur);
-      minuteur=setTimeout(function(){montre=false;guide(3);},2500);
-    });
+    var nomsB=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
+    for(var ib=0;ib<nb;ib++)(function(n){
+      var b=petitBouton('👁 '+(nomsB[n]||('#'+(n+1))),function(){
+        montres[n]=!montres[n];
+        b.style.opacity=montres[n]?'1':'.55';
+        guide(3);
+      });
+      b.style.opacity='.55';
+    })(ib);
   }
   var trace=false;
   function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
@@ -10779,6 +10796,8 @@ function _decorMonde(ca,actif){
 /* DEBUT TRADUCTIONS ENFANT */
 var _TE={
 /* Les cinq exercices ajoutes a la lecon de lettre. */
+'RAPPEL {n}/{sur}':{en:'RECALL {n}/{sur}',es:'REPASO {n}/{sur}',de:'RÜCKBLICK {n}/{sur}',nl:'HERHALING {n}/{sur}',it:'RIPASSO {n}/{sur}',pt:'REVISÃO {n}/{sur}',ru:'ПОВТОРЕНИЕ {n}/{sur}',tr:'HATIRLA {n}/{sur}',zh:'复习 {n}/{sur}',id:'INGAT LAGI {n}/{sur}',ur:'دہرائی {n}/{sur}',hi:'दोहराव {n}/{sur}'},
+'LE MOT À TROU {n}/{sur}':{en:'THE MISSING PIECE {n}/{sur}',es:'LA PALABRA INCOMPLETA {n}/{sur}',de:'DAS LÜCKENWORT {n}/{sur}',nl:'HET GATENWOORD {n}/{sur}',it:'LA PAROLA BUCATA {n}/{sur}',pt:'A PALAVRA COM LACUNA {n}/{sur}',ru:'СЛОВО С ПРОПУСКОМ {n}/{sur}',tr:'EKSİK HARF {n}/{sur}',zh:'填空词 {n}/{sur}',id:'KATA RUMPANG {n}/{sur}',ur:'ادھورا لفظ {n}/{sur}',hi:'अधूरा शब्द {n}/{sur}'},
 '👁 MONTRE-MOI':{en:'👁 SHOW ME',es:'👁 MUÉSTRAME',de:'👁 ZEIG MIR',nl:'👁 LAAT ZIEN',it:'👁 MOSTRAMI',pt:'👁 MOSTRA-ME',ru:'👁 ПОКАЖИ',tr:'👁 GÖSTER',zh:'👁 给我看',id:'👁 TUNJUKKAN',ur:'👁 دکھاؤ',hi:'👁 दिखाओ'},
 '🎯 Il y en a {n} à trouver':{en:'🎯 There are {n} to find',es:'🎯 Hay {n} para encontrar',de:'🎯 Es gibt {n} zu finden',nl:'🎯 Er zijn er {n} te vinden',it:'🎯 Ce ne sono {n} da trovare',pt:'🎯 Há {n} para encontrar',ru:'🎯 Нужно найти {n}',tr:'🎯 Bulunacak {n} tane var',zh:'🎯 要找出 {n} 个',id:'🎯 Ada {n} yang harus ditemukan',ur:'🎯 {n} تلاش کرنے ہیں',hi:'🎯 {n} ढूँढ़ने हैं'},
 'RAPPEL':{en:'RECALL',es:'REPASO',de:'RÜCKBLICK',nl:'HERHALING',it:'RIPASSO',pt:'REVISÃO',ru:'ПОВТОРЕНИЕ',tr:'HATIRLA',zh:'复习',id:'INGAT LAGI',ur:'دہرائی',hi:'दोहराव'},
@@ -12004,10 +12023,18 @@ function _boyScene(ca,reprise){
   api.trou=function(etape,html,fr,droite,gauche,options,cible,indice){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
+      /* Marques pour la regle de paysage court : ce sont ces trois pieces —
+         le mot, la note et les cibles — qui poussaient le cadre sous le bord
+         de l'ecran sur un telephone couche. */
+      p.classList.add('ecran-trou');
       var mot=document.createElement('div');
+      mot.className='trou-mot';
+      /* Le mot suit la HAUTEUR disponible, pas une taille fixe : a 3,6 rem il
+         poussait les cibles sous le bord de l'ecran en paysage, ou un
+         telephone couche n'offre que 360 a 420 px. */
       mot.style.cssText='direction:rtl;display:flex;align-items:center;justify-content:center;'
-        +'gap:2px;font-family:"Scheherazade New",serif;font-size:3.6rem;line-height:1.5;'
-        +'margin:6px 0 2px';
+        +'gap:2px;font-family:"Scheherazade New",serif;line-height:1.35;'
+        +'font-size:clamp(1.9rem,11vh,3.4rem);margin:4px 0 2px';
       function bout(txt){
         var d=document.createElement('span');d.textContent=txt;mot.appendChild(d);
       }
@@ -12026,7 +12053,7 @@ function _boyScene(ca,reprise){
       }
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var r=document.createElement('div');
-      r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
+      r.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;direction:rtl';
       var repondu=false;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
@@ -12257,14 +12284,15 @@ function _boyLetterCourse(ca,idx,premiere){
      deux a quatre lecons plus tot. C'est ce rappel-la qui fait tenir la
      memoire, bien plus qu'un exercice de plus a la fin : au moment ou l'on
      peine a retrouver quelque chose, on le grave. */
-  var _rev=_lettreARevoir(idx);
-  if(_rev){
-    sc.push(B.controle(te('RAPPEL'),
+  var _revs=_lettresARevoir(idx,3);
+  _revs.forEach(function(_rev,_n){
+    var _t=_revs.length>1?teF('RAPPEL {n}/{sur}',{n:_n+1,sur:_revs.length}):te('RAPPEL');
+    sc.push(B.controle(_t,
       teF('Tu te souviens ?<br>Où est {lettre} ? 🧠',{lettre:b(_rev.name)}),
       teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name}),
       [_rev.ar].concat(_leurresLettre(_rev,idx,2).map(function(x){return x.ar;})),
       _rev.ar));
-  }
+  });
   var jumelle=_CL_JUMELLES[A];
   if(jumelle){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
@@ -12516,23 +12544,30 @@ function _boyLetterCourse(ca,idx,premiere){
   if(aMontrer.indexOf(3)>=0)_places.push(2);      /* fin */
   if(_places.length&&!formeUnique){
     var _cmp=(A==='ب')?'ت':'ب';                   /* il s'attache des deux côtés */
-    var _g=_places[Math.floor(Math.random()*_places.length)];
-    var _cases=[_cmp,_cmp,_cmp];_cases[_g]=A;
-    var _dr=_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:'');
-    var _ga=((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join('');
-    /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
-       s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
-    var _iF=(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3);
     var _opts=[],_vus={};
     aMontrer.forEach(function(n){
       var f=formes[n].form;
       if(!_vus[f]){_vus[f]=1;_opts.push(f);}
     });
-    var _ou=[te('au début du mot'),te('au milieu du mot'),te('à la fin du mot')][_g];
-    sc.push(B.trou(te('LE MOT À TROU'),
-      TB('Quelle <b>forme</b><br>manque ici ? 🧩'),
-      te('Quelle forme manque dans ce mot ?'),
-      _dr,_ga,_opts,formes[_iF].form,_ou));
+    /* UNE QUESTION PAR PLACE. La règle porte sur les trois places du mot :
+       n'en tirer qu'une au sort en laissait deux jamais demandées. Elles sont
+       mélangées pour que l'ordre ne devienne pas une réponse en soi. */
+    _places.slice().sort(function(){return Math.random()-.5;}).forEach(function(_g,_n){
+      var _cases=[_cmp,_cmp,_cmp];_cases[_g]=A;
+      var _dr=_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:'');
+      var _ga=((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join('');
+      /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
+         s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
+      var _iF=(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3);
+      var _ou=[te('au début du mot'),te('au milieu du mot'),te('à la fin du mot')][_g];
+      var _t=(_places.length>1)
+        ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_places.length})
+        : te('LE MOT À TROU');
+      sc.push(B.trou(_t,
+        TB('Quelle <b>forme</b><br>manque ici ? 🧩'),
+        te('Quelle forme manque dans ce mot ?'),
+        _dr,_ga,_opts,formes[_iF].form,_ou));
+    });
   }
 
   /* ── LE TRI ──
