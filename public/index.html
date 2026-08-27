@@ -3205,9 +3205,12 @@ async function doEssai(){
   if(pwd.length<6){errEl.textContent=t('err_pwd_len');return;}
   const av=btn.textContent;btn.disabled=true;btn.textContent=t('creating');
   try{
-    const res=await fetch(`${API_URL}/api/essai`,{
+    /* La meme route que l'inscription payante, avec un drapeau : le plan
+       Vercel plafonne les fonctions a douze, et une route de plus empechait
+       tout deploiement — sans le moindre message. */
+    const res=await fetch(`${API_URL}/api/register`,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email,password:pwd})
+      body:JSON.stringify({email,password:pwd,essai:true})
     });
     const data=await res.json();
     if(data.success){
