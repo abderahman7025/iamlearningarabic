@@ -3115,11 +3115,68 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media(orientation:landscape) and (min-width:640px){
   .boy-titre{font-size:1.75rem;line-height:1.6;max-width:34em}
 }
-/* Une phrase de quatre lignes tient sur deux en paysage : on cache une
-   coupure sur deux. Les coupures restantes gardent le découpage voulu —
-   ce n'est pas un retour à la ligne automatique. */
+/* L'ECRAN DU CHOIX DE LA LETTRE. En paysage l'ecran fait moins de 400 px de
+   haut : quatre cartes empilees plus le bouton n'y tiennent pas, et la lettre
+   en cours — celle qui clignote — tombait sous le bord. Le client ne voyait
+   donc pas ou cliquer. Deux colonnes, et les quatre lettres tiennent d'un
+   coup, bouton compris. En portrait la colonne unique reste la bonne mise en
+   page : c'est la hauteur qui abonde, pas la largeur. */
+.child-letters{display:grid;grid-template-columns:1fr;gap:12px;align-items:stretch}
+.child-letters>.child-card{margin-bottom:0}
+@media(orientation:landscape) and (min-width:560px){
+  .child-letters{grid-template-columns:1fr 1fr}
+}
+/* Un telephone couche n'a que ~390 px de haut, et cette page NE DEFILE PAS :
+   ce qui depasse est perdu, y compris le bouton « Retour a la carte », qui
+   tombait 48 px sous le bord. On resserre l'entete et les cartes pour que les
+   quatre lettres et le bouton tiennent ensemble. */
+@media(orientation:landscape) and (max-height:460px){
+  /* `!important` a contrecoeur : ces trois elements recoivent leurs tailles
+     EN LIGNE depuis `_boyLetterPicker`, et un style en ligne bat toute regle
+     de feuille. Le reecrire en JS demanderait de suivre la rotation de
+     l'appareil a la main ; la media query le fait toute seule. */
+  .child-choix .child-titre{font-size:1.1rem!important;margin-bottom:2px!important}
+  .child-choix .child-sous{font-size:.8rem!important;margin-bottom:8px!important}
+  .child-letters{gap:8px}
+  .child-letters>.child-card{padding:8px 12px!important}
+  .child-choix .rbtn{padding:9px!important;font-size:.92rem!important}
+  /* ── ET SURTOUT : ON PARTAGE LA HAUTEUR, ON NE LA COMPTE PAS ──
+     Rogner les marges au pixel pres marchait pour le garcon et ratait de
+     53 px pour la fille, dont les cartes sont plus hautes. On empile donc la
+     page en colonne sur la hauteur exacte de l'ecran ; la grille prend ce qui
+     reste et ses rangees se partagent la place, si bien que le bouton est
+     TOUJOURS visible, quel que soit l'habillage ou le nombre de lettres.
+     `min-height:0` est indispensable : sans lui une piste flex refuse de
+     descendre sous la taille de son contenu et le debordement revient. */
+  /* `.child-wrap` porte 72 px de marge en haut et 60 en bas : sur un ecran de
+     390 px, ces 132 px sont la moitie de la place utile. On les rend au
+     contenu — la barre du haut est deja compensee par le padding de `.ca`. */
+  .child-choix{padding-top:4px!important;padding-bottom:6px!important}
+  /* ET LE FILET DE SECURITE : la page DEFILE. Deux colonnes et un entete
+     resserre suffisent pour quatre lettres, mais l'habillage de la fille
+     descend le contenu de 104 px et une ile plus fournie deborderait encore.
+     Sans defilement, ce qui depasse est simplement perdu — c'est ainsi que le
+     bouton « Retour a la carte » devenait inatteignable. */
+  .ca{overflow-y:auto}
+  .child-letters>.child-card .child-glyphe{font-size:2.1rem!important}
+  .child-letters>.child-card .child-emoji{font-size:1.9rem!important}
+}
+
+/* En paysage, la place ne manque plus : les coupures écrites pour le portrait
+   n'ont plus lieu d'être et le texte se répartit tout seul sur la largeur.
+
+   On les cachait « une sur deux », ce qui donnait des lignes de deux mots
+   suivies de lignes pleines — le client l'a vu et l'a dit. On les cache donc
+   TOUTES, et `text-wrap:balance` egalise ce qui reste.
+
+   Deux exceptions. `br.dur` marque une coupure qui porte du sens : deux
+   affirmations mises en regard ne doivent pas se fondre en un paragraphe.
+   Et une coupure cachee doit laisser un ESPACE, sans quoi les mots se
+   collent — « vaut pourtoutes les lettres ». C'est `titre()` qui pose cet
+   espace dans le texte ; ici on ne fait que masquer. */
 @media(orientation:landscape){
-  .boy-titre.titre-long br:nth-of-type(odd){display:none}
+  .boy-titre.titre-long br:not(.dur){display:none}
+  .boy-titre.titre-long{text-wrap:balance}
 }
 }
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
@@ -3205,6 +3262,17 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .boy-jauge{margin-bottom:6px}
   .boy-cible{width:clamp(64px,22vh,104px);height:clamp(64px,22vh,104px);
     font-size:clamp(1.5rem,9vh,2.6rem)}
+  /* ── QUAND LA GRILLE EST FOURNIE ──
+     Le tri des formes va jusqu'a DOUZE cases. A 86 px elles tombaient en
+     quatre rangees de trois qui descendaient a 494 px sur un ecran de 390 :
+     six cases sur douze etaient hors de l'ecran, et la consigne avec. Or
+     l'exercice demande de toucher TOUTES les bonnes formes — la moitie
+     etait donc hors d'atteinte. C'est ce que le client a vu sur le sin et
+     sur le ra, les deux lettres dont la grille est la plus remplie.
+     Plus petites, elles passent a cinq par rangee et tiennent en trois. */
+  .cibles-nombreuses{gap:10px!important}
+  .cibles-nombreuses .boy-cible{width:clamp(46px,15vh,72px);height:clamp(46px,15vh,72px);
+    font-size:clamp(1.05rem,6.4vh,1.9rem)}
   .boy-titre{line-height:1.5}
   /* LE MOT A TROU. Un mot en gros, une note et quatre cibles a la suite : sur
      un telephone couche de 380 px de haut, la derniere rangee passait sous le
@@ -7905,32 +7973,72 @@ var islandDefs=[
     wrap.style.padding='0 0 80px';
     globeDiv.style.alignItems='flex-start';
 
-    var posPattern=['center','right','center','left'];
+    /* ── TROIS MONDES PAR RANGEE : GAUCHE, MILIEU, DROITE ──
+       La carte suivait un cycle de quatre positions — centre, droite, centre,
+       gauche — dans une colonne unique, et chaque monde pouvait prendre la
+       MOITIE de la largeur : en plein ecran on voyait deux astres enormes,
+       decentres, et il fallait defiler pour le reste. C'est ce que le client
+       a signale.
+
+       Une vraie grille de trois colonnes remplace tout ca. Elle centre d'elle
+       meme, chaque monde tient dans sa case, et le trajet du vaisseau suit
+       sans rien changer : il se calcule a partir de la position REELLE des
+       cartes, pas de la regle qui les place. */
     var isleCards=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
-    var IW=Math.min(Math.round(DW*0.28),260);
-    globeDiv.style.gap='40px';
+    globeDiv.style.display='grid';
+    globeDiv.style.gridTemplateColumns='repeat(3,1fr)';
+    globeDiv.style.justifyItems='center';
+    globeDiv.style.alignItems='center';
+    globeDiv.style.gap='18px 10px';
+    /* Un tiers de la largeur, moins la gouttiere — et jamais plus haut que
+       40 % de l'ecran, pour que deux rangees restent visibles ensemble. */
+    var IW=Math.min(Math.round(DW/3)-24,240);
+    var IH=Math.min(230,Math.round(DH*0.40));
 
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
       el.onclick=null;
-      /* En paysage, la hauteur du decor est posee en dur : le facteur de
-         l'habillage doit donc s'appliquer ici aussi, sinon les planetes
-         retrouvent la taille des iles des que l'ecran est large. */
-      var bigI=[2,6,7,8];
-      var IWi=bigI.indexOf(i)>=0?Math.min(IW*2,Math.round(DW*0.5)):Math.round(IW*1.5);
-      el.style.width=Math.round(IWi*_HAB.decor)+'px';
+      /* La LARGEUR est celle de la colonne, sans plus : la multiplier par le
+         facteur `decor` (1,5 chez le garcon) donnait des cartes de 360 px
+         dans des colonnes de 281, et la grille se cassait en rangees de 3
+         puis 2. Ce facteur existe pour une autre raison — une planete est
+         dessinee au milieu d'un carre, avec du vide autour, la ou une ile
+         remplit son cadre. Il ne joue donc que sur la HAUTEUR du dessin. */
+      el.style.width=IW+'px';
       var imgI=el.querySelector('.isle-img');
-      if(imgI)imgI.style.height=Math.round(Math.min(bigI.indexOf(i)>=0?440:330,Math.round(DH*0.5))*_HAB.decor)+'px';
-      el.style.flexShrink='0';
+      if(imgI)imgI.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';
+      el.style.margin='0';
+      el.style.alignSelf='center';
       el.style.position='relative';
       el.style.zIndex='5';
-      var pos=posPattern[i%4];
-      if(pos==='right'){el.style.marginLeft='auto';el.style.marginRight='0';el.style.alignSelf='';}
-      else if(pos==='left'){el.style.marginLeft='0';el.style.marginRight='auto';el.style.alignSelf='';}
-      else{el.style.marginLeft='';el.style.marginRight='';el.style.alignSelf='center';}
+    });
+    /* ── LES CARTES « JEU » ──
+       Elles prenaient une case comme un monde, et les rangees tombaient a 3,
+       puis 2. Leur donner la rangee entiere ne suffit pas : un bloc pleine
+       largeur ne peut demarrer qu'en premiere colonne, si bien que le monde
+       juste avant restait SEUL sur sa ligne — 3, 1, 3, 1.
+
+       On les glisse donc a la fin de la rangee commencee. L'ordre du parcours
+       tient toujours : le jeu vient toujours apres les memes mondes, un ou
+       deux plus tard seulement, et les mondes restent trois par trois. */
+    Array.from(globeDiv.querySelectorAll('.isle-mg')).forEach(function(el){
+      el.style.gridColumn='1 / -1';el.style.margin='0';el.style.width='100%';
+      var avant=0,n;
+      for(n=0;n<isleCards.length;n++){
+        if(isleCards[n].compareDocumentPosition(el)&Node.DOCUMENT_POSITION_FOLLOWING)avant++;
+      }
+      /* le dernier monde de la rangee entamee */
+      var fin=Math.min(isleCards.length,Math.ceil(avant/3)*3)-1;
+      if(fin>=0&&isleCards[fin]&&isleCards[fin]!==el.previousElementSibling){
+        isleCards[fin].parentNode.insertBefore(el,isleCards[fin].nextSibling);
+      }
     });
     var bossEl=globeDiv.querySelector('.boss-isle');
-    if(bossEl){bossEl.style.marginLeft='auto';bossEl.style.marginRight='auto';bossEl.style.zIndex='5';}
+    if(bossEl){bossEl.style.gridColumn='1 / -1';bossEl.style.margin='0 auto';
+      bossEl.style.zIndex='5';
+      bossEl.style.width=IW+'px';
+      var bImg=bossEl.querySelector('.isle-img');
+      if(bImg)bImg.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';}
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     _quandCartePrete(ca,1500,function(){
@@ -8608,8 +8716,13 @@ function _boyValideSession(sid){
     var ac=st.accuracy||(st.accuracy={});
     ac[sid]={c:1,t:1};
     localStorage.setItem('arab_acc',JSON.stringify(ac));
-    var sc=st.scores||(st.scores={});
-    if(sc[sid]===undefined)sc[sid]=100;
+    /* Le score AFFICHE vient du carnet ; l'accuracy juste au-dessus reste a
+       1/1 pour que l'ile se debloque quoi qu'il arrive. Sans carnet — une
+       ile faite avant que ce compte existe — on garde les 100 % d'avant. */
+    var sc=st.scores||(st.scores={}),note=null;
+    try{note=JSON.parse(localStorage.getItem('boy_note_'+sid)||'null');}catch(e){}
+    var pct=(note&&note.t>0)?Math.round(100*note.c/note.t):100;
+    sc[sid]=Math.max(sc[sid]||0,pct);
     localStorage.setItem('arab_scores',JSON.stringify(sc));
   }catch(e){}
 }
@@ -8647,13 +8760,13 @@ function _boyLetterPicker(ca,session){
      de la lettre, pas seulement dans le cours. */
   _fondEnfant(true);
   _decorMonde(ca,true);
-  var wrap=document.createElement('div');wrap.className='child-wrap';wrap.style.textAlign='center';
+  var wrap=document.createElement('div');wrap.className='child-wrap child-choix';wrap.style.textAlign='center';
   wrap.style.position='relative';wrap.style.zIndex='1';
 
-  var titre=document.createElement('div');
+  var titre=document.createElement('div');titre.className='child-titre';
   titre.style.cssText='font-size:1.3rem;font-weight:900;color:var(--k2);margin-bottom:4px';
   titre.textContent=session.title||'Les lettres';wrap.appendChild(titre);
-  var sous=document.createElement('div');
+  var sous=document.createElement('div');sous.className='child-sous';
   sous.style.cssText='font-size:.9rem;color:var(--k2);opacity:.75;margin-bottom:16px;font-weight:700';
   sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
   try{speakText(t('say_choose_letter'),_voixEnfant(),null);}catch(e){}
@@ -8665,6 +8778,12 @@ function _boyLetterPicker(ca,session){
   var indices=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
                 .filter(function(i){return i>=0;});
   var premiereOuverte=-1;
+  var grille=document.createElement('div');grille.className='child-letters';
+  wrap.appendChild(grille);
+  /* La carte a faire, gardee pour l'amener sous les yeux une fois la page
+     construite : la connaitre pendant la boucle ne suffit pas, elle n'est
+     pas encore mesurable. */
+  var carteAFaire=null;
 
   indices.forEach(function(idx,rang){
     var L=CHILD_LETTERS[idx];
@@ -8675,12 +8794,13 @@ function _boyLetterPicker(ca,session){
     if(aFaire&&premiereOuverte<0)premiereOuverte=rang;
 
     var carte=document.createElement('div');carte.className='child-card';
-    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:12px;'
+    carte.style.cssText='display:flex;align-items:center;gap:14px;padding:14px 16px;'
       +'text-align:left;'+(ouverte?'cursor:pointer;':'opacity:.45;')
       +(aFaire?'border:3px solid var(--k1);box-shadow:0 0 0 0 rgba(var(--kA),.5);animation:kidPulse 1.8s infinite;':'');
-    var em=document.createElement('div');em.style.cssText='font-size:2.6rem;line-height:1';
+    var em=document.createElement('div');em.className='child-emoji';
+    em.style.cssText='font-size:2.6rem;line-height:1';
     em.textContent=ouverte?L.emoji:'🔒';carte.appendChild(em);
-    var lettre=document.createElement('div');
+    var lettre=document.createElement('div');lettre.className='child-glyphe';
     lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
     lettre.textContent=L.ar;carte.appendChild(lettre);
     var infos=document.createElement('div');infos.style.cssText='flex:1';
@@ -8693,8 +8813,15 @@ function _boyLetterPicker(ca,session){
         /* le compte a rebours DECOLLAGE n'apparait que sur la 1re lettre */
         _boyLetterCourse(ca,idx,rang===0);};
     }
-    wrap.appendChild(carte);
+    if(aFaire&&!carteAFaire)carteAFaire=carte;
+    grille.appendChild(carte);
   });
+
+  /* On amene la lettre en cours dans le champ de vision. Meme a deux
+     colonnes, une session longue peut depasser d'un ecran bas. */
+  if(carteAFaire)setTimeout(function(){
+    try{carteAFaire.scrollIntoView({block:'center',behavior:'smooth'});}catch(e){}
+  },120);
 
   var retour=document.createElement('button');retour.className='rbtn rbtn-m';
   retour.style.cssText='width:100%;padding:14px;font-size:1rem;margin-top:6px';
@@ -8707,7 +8834,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v177';
+var _VERSION_REPLI='v178';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9588,12 +9715,20 @@ function _bandeLiaison(){
      et à 0,214 pour le bāʾ final.
 
    Tout le reste de l'alphabet garde la mesure automatique. */
+/* La largeur du trait de liaison, en em, forme par forme. Mesuree sur le
+   dessin de la police a 240 px : on part du bord droit et on avance tant que
+   l'encre reste dans la bande du trait ; la ou elle en sort, la lettre
+   commence. Les valeurs portent une petite marge en plus, parce que couper
+   un cheveu trop court LAISSE UN BOUT DE TRAIT visible — ce que le client a
+   vu sur le ba de la page deduction et sur le kaf fin — alors que couper un
+   cheveu trop long ne se voit pas : le calque du trait repasse par-dessus.
+   Mesures : ba fin 0,237 ; kaf fin 0,200 ; ta fin 0,237. */
 var _LIAISON_EM={
-  'ك|milieu':0.20, 'ك|fin':0.20,
+  'ك|milieu':0.20, 'ك|fin':0.218,
   'ط|milieu':0.164,'ظ|milieu':0.164,
   'ج|fin':0.18,'ح|fin':0.18,'خ|fin':0.18,
   'ج|milieu':0.26,'ح|milieu':0.26,'خ|milieu':0.26,
-  'ب|fin':0.214,'ت|fin':0.214,'ث|fin':0.214,
+  'ب|fin':0.255,'ت|fin':0.255,'ث|fin':0.255,
   'ب|milieu':0.171,'ت|milieu':0.171,'ث|milieu':0.171,
   'ي|milieu':0.171
 };
@@ -10304,7 +10439,24 @@ function _blocEcriture(hote,o){
   cvM.style.cssText='display:block;width:100%;height:auto';
   var cvE=document.createElement('canvas');cvE.width=CW;cvE.height=CH;
   cvE.style.cssText='position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none';
-  boite.appendChild(cvM);boite.appendChild(cvE);el.appendChild(boite);
+  boite.appendChild(cvM);boite.appendChild(cvE);
+  /* ── LE MODELE, AU-DESSUS ──
+     Quand l'enfant demandait a revoir une forme, elle s'affichait SOUS son
+     propre trace, exactement au meme endroit : les deux encres se
+     superposaient et il n'y avait plus rien a comparer. Le rappel a donc sa
+     bande a lui, au-dessus de la zone d'ecriture — le modele d'un cote, ce
+     que l'enfant a ecrit de l'autre, l'un sous l'autre. */
+  var cvR=null,cxR=null,RH=0;
+  if(o.deTete){
+    RH=Math.round(CH*0.58);
+    cvR=document.createElement('canvas');cvR.width=CW;cvR.height=RH;
+    cvR.style.cssText='display:none;width:'+CW+'px;max-width:100%;height:auto;'
+      +'margin:0 auto 4px;border-radius:12px;background:rgba('+_HAB.rgb+',.05);'
+      +'border:2px dashed rgba('+_HAB.rgb+',.28)';
+    el.appendChild(cvR);
+    cxR=cvR.getContext('2d');
+  }
+  el.appendChild(boite);
   hote.appendChild(el);
   var cx=cvM.getContext('2d'),cxE=cvE.getContext('2d');
   /* Un signe seul descend bien plus bas que le corps d'une lettre :
@@ -10331,14 +10483,34 @@ function _blocEcriture(hote,o){
      souvent a retrouver les trois autres — c'est meme tout l'interet — et un
      bouton qui devoilerait tout d'un coup rendrait le calque a l'enfant. */
   var montres=[];
+  /* Les formes demandees, redessinees dans la bande du haut. Elles gardent
+     leur colonne : la case tout a droite reste l'isolee, comme en bas, pour
+     que l'oeil aille droit du modele a ce qu'il a ecrit. */
+  function dessineRappel(){
+    if(!cxR)return;
+    cxR.clearRect(0,0,CW,RH);
+    var PR=Math.round(PX*0.80),baseR=Math.round(RH*0.70),vus=0;
+    for(var n=0;n<nb;n++)if(montres[n]){
+      vus++;
+      cxR.save();
+      cxR.font=PR+"px 'Scheherazade New',serif";
+      cxR.textBaseline='alphabetic';cxR.textAlign='center';cxR.fillStyle=_TRACE_GRIS;
+      _dessineSurLigne(cxR,liste[n],caseX(n),baseR,PR);
+      cxR.restore();
+    }
+    cvR.style.display=vus?'block':'none';
+  }
   function guide(prog){
     cx.clearRect(0,0,CW,CH);
     /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
        d'un coup d'œil ce qu'il a écrit lui-même. */
-    for(var n=0;n<nb;n++)if(!o.deTete||montres[n]){
+    /* De tete, la couche du modele reste VIDE : ce que l'enfant voit dans le
+       cadre, c'est son seul trace. Le rappel est dans la bande du haut. */
+    if(!o.deTete)for(var n=0;n<nb;n++){
       if(n===caseAnim&&rev)cx.drawImage(_reveleJusqua(rev,prog),rev.x0,rev.y0);
       else modeleEntier(n);
     }
+    dessineRappel();
     if(o.nomme){
       cx.save();cx.font='600 '+Math.round(12*k)+'px Outfit,sans-serif';cx.textAlign='center';
       cx.fillStyle='rgba('+_HAB.rgbF+',.55)';
@@ -10948,8 +11120,8 @@ var _TE={
 'Allonger ou non<br>peut <b>changer le sens</b> ! ⚠️':{en:'Holding it or not<br>can <b>change the meaning</b>! ⚠️',es:'Alargar o no<br>¡puede <b>cambiar el sentido</b>! ⚠️',de:'Lang oder kurz<br>kann die <b>Bedeutung ändern</b>! ⚠️',nl:'Lang of kort<br>kan de <b>betekenis veranderen</b>! ⚠️',it:'Allungare o no<br>può <b>cambiare il senso</b>! ⚠️',pt:'Alongar ou não<br>pode <b>mudar o sentido</b>! ⚠️',ru:'Долгота может<br><b>изменить смысл</b>! ⚠️',tr:'Uzatmak ya da uzatmamak<br><b>anlamı değiştirir</b>! ⚠️',zh:'读长还是读短，<br>会<b>改变意思</b>！⚠️',id:'Panjang atau pendek<br>bisa <b>mengubah arti</b>! ⚠️',ur:'لمبا یا چھوٹا پڑھنا<br><b>معنی بدل دیتا</b> ہے! ⚠️',hi:'लंबा या छोटा बोलना<br><b>अर्थ बदल देता</b> है! ⚠️'},
 'Allonger ou non peut complètement changer le sens.':{en:'Holding a vowel or not can completely change the meaning.',es:'Alargar o no puede cambiar completamente el sentido.',de:'Lang oder kurz kann die Bedeutung völlig ändern.',nl:'Lang of kort kan de betekenis volledig veranderen.',it:'Allungare o no può cambiare completamente il senso.',pt:'Alongar ou não pode mudar completamente o sentido.',ru:'Долгота может полностью изменить смысл.',tr:'Uzatmak ya da uzatmamak anlamı tamamen değiştirebilir.',zh:'读长还是读短，会完全改变意思。',id:'Panjang atau pendek bisa mengubah arti sepenuhnya.',ur:'لمبا یا چھوٹا پڑھنا معنی بالکل بدل سکتا ہے۔',hi:'लंबा या छोटा बोलना अर्थ पूरी तरह बदल सकता है।'},
 'ÉTAPE 5 · EXEMPLE':{en:'STEP 5 · EXAMPLE',es:'PASO 5 · EJEMPLO',de:'SCHRITT 5 · BEISPIEL',nl:'STAP 5 · VOORBEELD',it:'TAPPA 5 · ESEMPIO',pt:'ETAPA 5 · EXEMPLO',ru:'ШАГ 5 · ПРИМЕР',tr:'ADIM 5 · ÖRNEK',zh:'第 5 步 · 例子',id:'LANGKAH 5 · CONTOH',ur:'مرحلہ ۵ · مثال',hi:'चरण 5 · उदाहरण'},
-'Par exemple,<br>sans prolonger :<br><b>je t\'aime</b> ❤️':{en:'For example,<br>without holding it:<br><b>I love you</b> ❤️',es:'Por ejemplo,<br>sin alargar:<br><b>te quiero</b> ❤️',de:'Zum Beispiel,<br>ohne Dehnung:<br><b>ich liebe dich</b> ❤️',nl:'Bijvoorbeeld,<br>zonder verlenging:<br><b>ik hou van je</b> ❤️',it:'Per esempio,<br>senza allungare:<br><b>ti amo</b> ❤️',pt:'Por exemplo,<br>sem alongar:<br><b>amo-te</b> ❤️',ru:'Например,<br>без долготы:<br><b>я тебя люблю</b> ❤️',tr:'Örneğin,<br>uzatmadan:<br><b>seni seviyorum</b> ❤️',zh:'比如，<br>不读长：<br><b>我爱你</b> ❤️',id:'Misalnya,<br>tanpa dipanjangkan:<br><b>aku sayang kamu</b> ❤️',ur:'مثلاً،<br>بغیر مدّ کے:<br><b>میں تم سے محبت کرتا ہوں</b> ❤️',hi:'जैसे,<br>बिना लंबा किए:<br><b>मैं तुमसे प्यार करता हूँ</b> ❤️'},
-'Par exemple, sans prolonger : je t\'aime.':{en:'For example, without holding it: I love you.',es:'Por ejemplo, sin alargar: te quiero.',de:'Zum Beispiel, ohne Dehnung: ich liebe dich.',nl:'Bijvoorbeeld, zonder verlenging: ik hou van je.',it:'Per esempio, senza allungare: ti amo.',pt:'Por exemplo, sem alongar: amo-te.',ru:'Например, без долготы: я тебя люблю.',tr:'Örneğin, uzatmadan: seni seviyorum.',zh:'比如，不读长：我爱你。',id:'Misalnya, tanpa dipanjangkan: aku sayang kamu.',ur:'مثلاً، بغیر مدّ کے: میں تم سے محبت کرتا ہوں۔',hi:'जैसे, बिना लंबा किए: मैं तुमसे प्यार करता हूँ।'},
+'Par exemple,<br>sans prolonger :<br><b>je t\'aime vraiment</b> ❤️':{en:'For example,<br>without holding it:<br><b>I really love you</b> ❤️',es:'Por ejemplo,<br>sin alargar:<br><b>te quiero de verdad</b> ❤️',de:'Zum Beispiel,<br>ohne Dehnung:<br><b>ich liebe dich wirklich</b> ❤️',nl:'Bijvoorbeeld,<br>zonder verlenging:<br><b>ik hou echt van je</b> ❤️',it:'Per esempio,<br>senza allungare:<br><b>ti amo davvero</b> ❤️',pt:'Por exemplo,<br>sem alongar:<br><b>amo-te mesmo</b> ❤️',ru:'Например,<br>без долготы:<br><b>я правда тебя люблю</b> ❤️',tr:'Örneğin,<br>uzatmadan:<br><b>seni gerçekten seviyorum</b> ❤️',zh:'比如，<br>不读长：<br><b>我真的爱你</b> ❤️',id:'Misalnya,<br>tanpa dipanjangkan:<br><b>aku benar-benar sayang kamu</b> ❤️',ur:'مثلاً،<br>بغیر مدّ کے:<br><b>میں واقعی تم سے محبت کرتا ہوں</b> ❤️',hi:'जैसे,<br>बिना लंबा किए:<br><b>मैं सचमुच तुमसे प्यार करता हूँ</b> ❤️'},
+'Par exemple, sans prolonger : je t\'aime vraiment.':{en:'For example, without holding it: I really love you.',es:'Por ejemplo, sin alargar: te quiero de verdad.',de:'Zum Beispiel, ohne Dehnung: ich liebe dich wirklich.',nl:'Bijvoorbeeld, zonder verlenging: ik hou echt van je.',it:'Per esempio, senza allungare: ti amo davvero.',pt:'Por exemplo, sem alongar: amo-te mesmo.',ru:'Например, без долготы: я правда тебя люблю.',tr:'Örneğin, uzatmadan: seni gerçekten seviyorum.',zh:'比如，不读长：我真的爱你。',id:'Misalnya, tanpa dipanjangkan: aku benar-benar sayang kamu.',ur:'مثلاً، بغیر مدّ کے: میں واقعی تم سے محبت کرتا ہوں۔',hi:'जैसे, बिना लंबा किए: मैं सचमुच तुमसे प्यार करता हूँ।'},
 'ÉTAPE 6 · EXEMPLE':{en:'STEP 6 · EXAMPLE',es:'PASO 6 · EJEMPLO',de:'SCHRITT 6 · BEISPIEL',nl:'STAP 6 · VOORBEELD',it:'TAPPA 6 · ESEMPIO',pt:'ETAPA 6 · EXEMPLO',ru:'ШАГ 6 · ПРИМЕР',tr:'ADIM 6 · ÖRNEK',zh:'第 6 步 · 例子',id:'LANGKAH 6 · CONTOH',ur:'مرحلہ ۶ · مثال',hi:'चरण 6 · उदाहरण'},
 'Alors qu\'en prolongeant :<br><b>je ne t\'aime pas</b> 💔':{en:'But if you hold it:<br><b>I do not love you</b> 💔',es:'Pero alargando:<br><b>no te quiero</b> 💔',de:'Mit Dehnung dagegen:<br><b>ich liebe dich nicht</b> 💔',nl:'Maar met verlenging:<br><b>ik hou niet van je</b> 💔',it:'Mentre allungando:<br><b>non ti amo</b> 💔',pt:'Mas alongando:<br><b>não te amo</b> 💔',ru:'А с долготой:<br><b>я тебя не люблю</b> 💔',tr:'Uzatınca ise:<br><b>seni sevmiyorum</b> 💔',zh:'但读长了：<br><b>我不爱你</b> 💔',id:'Tetapi kalau dipanjangkan:<br><b>aku tidak sayang kamu</b> 💔',ur:'مگر مدّ کے ساتھ:<br><b>میں تم سے محبت نہیں کرتا</b> 💔',hi:'पर लंबा करने पर:<br><b>मैं तुमसे प्यार नहीं करता</b> 💔'},
 'Alors qu\'en prolongeant : je ne t\'aime pas.':{en:'But if you hold it: I do not love you.',es:'Pero alargando: no te quiero.',de:'Mit Dehnung dagegen: ich liebe dich nicht.',nl:'Maar met verlenging: ik hou niet van je.',it:'Mentre allungando: non ti amo.',pt:'Mas alongando: não te amo.',ru:'А с долготой: я тебя не люблю.',tr:'Uzatınca ise: seni sevmiyorum.',zh:'但读长了：我不爱你。',id:'Tetapi kalau dipanjangkan: aku tidak sayang kamu.',ur:'مگر مدّ کے ساتھ: میں تم سے محبت نہیں کرتا۔',hi:'पर लंबा करने पर: मैं तुमसे प्यार नहीं करता।'},
@@ -10994,7 +11166,7 @@ var _TE={
 'Jad-d, ça veut dire grand-père.':{en:'Jadd means grandfather.',es:'Yad-d quiere decir abuelo.',de:'Dschadd heißt Großvater.',nl:'Djadd betekent opa.',it:'Giadd vuol dire nonno.',pt:'Jadd quer dizer avô.',ru:'«Джадд» значит «дедушка».',tr:'Cedd, dede demektir.',zh:'“Jadd”的意思是爷爷。',id:'“Jadd” artinya kakek.',ur:'«جَدّ» کا مطلب دادا ہے۔',hi:'“जद्द” का अर्थ है दादा।'},
 'Trace <b>جَدّ</b> ✍️':{en:'Write <b>جَدّ</b> ✍️',es:'Traza <b>جَدّ</b> ✍️',de:'Schreibe <b>جَدّ</b> ✍️',nl:'Schrijf <b>جَدّ</b> ✍️',it:'Traccia <b>جَدّ</b> ✍️',pt:'Traça <b>جَدّ</b> ✍️',ru:'Напиши <b>جَدّ</b> ✍️',tr:'<b>جَدّ</b> yaz ✍️',zh:'写出 <b>جَدّ</b> ✍️',id:'Tulis <b>جَدّ</b> ✍️',ur:'<b>جَدّ</b> لکھو ✍️',hi:'<b>جَدّ</b> लिखो ✍️'},
 'ÉTAPE 14 · NE PAS CONFONDRE':{en:'STEP 14 · DON\'T MIX THEM UP',es:'PASO 14 · NO CONFUNDIR',de:'SCHRITT 14 · NICHT VERWECHSELN',nl:'STAP 14 · NIET VERWARREN',it:'TAPPA 14 · NON CONFONDERE',pt:'ETAPA 14 · NÃO CONFUNDIR',ru:'ШАГ 14 · НЕ ПУТАЙ',tr:'ADIM 14 · KARIŞTIRMA',zh:'第 14 步 · 不要混淆',id:'LANGKAH 14 · JANGAN KELIRU',ur:'مرحلہ ۱۴ · فرق یاد رکھو',hi:'चरण 14 · भ्रम न करो'},
-'Chapeau = on insiste<br>sur la <b>lettre</b>.<br>Prolongation = on insiste<br>sur la <b>voyelle</b>.':{en:'Hat = press on the <b>letter</b>.<br>Long vowel = press on<br>the <b>vowel</b>.',es:'Sombrerito = insistir<br>en la <b>letra</b>.<br>Prolongación = insistir<br>en la <b>vocal</b>.',de:'Hütchen = den <b>Buchstaben</b><br>betonen.<br>Dehnung = den <b>Vokal</b><br>betonen.',nl:'Hoedje = druk op de <b>letter</b>.<br>Verlenging = druk op<br>de <b>klinker</b>.',it:'Cappellino = si insiste<br>sulla <b>lettera</b>.<br>Allungamento = si insiste<br>sulla <b>vocale</b>.',pt:'Chapeuzinho = insistir<br>na <b>letra</b>.<br>Prolongamento = insistir<br>na <b>vogal</b>.',ru:'Шапочка — дольше<br><b>букву</b>.<br>Долгота — дольше<br><b>гласный</b>.',tr:'Şapka = <b>harfe</b> basılır.<br>Uzatma = <b>sesliye</b><br>basılır.',zh:'帽子＝加重<b>字母</b>。<br>长音＝加长<b>元音</b>。',id:'Topi = tekan <b>hurufnya</b>.<br>Panjang = tekan<br><b>vokalnya</b>.',ur:'ٹوپی = <b>حرف</b> پر زور۔<br>مدّ = <b>حرکت</b> پر زور۔',hi:'टोपी = <b>अक्षर</b> पर ज़ोर।<br>दीर्घ = <b>स्वर</b> पर ज़ोर।'},
+'Chapeau = on insiste<br>sur la <b>lettre</b>.<br class="dur">Prolongation = on insiste<br>sur la <b>voyelle</b>.':{en:'Hat = press on the <b>letter</b>.<br>Long vowel = press on<br>the <b>vowel</b>.',es:'Sombrerito = insistir<br>en la <b>letra</b>.<br>Prolongación = insistir<br>en la <b>vocal</b>.',de:'Hütchen = den <b>Buchstaben</b><br>betonen.<br>Dehnung = den <b>Vokal</b><br>betonen.',nl:'Hoedje = druk op de <b>letter</b>.<br>Verlenging = druk op<br>de <b>klinker</b>.',it:'Cappellino = si insiste<br>sulla <b>lettera</b>.<br>Allungamento = si insiste<br>sulla <b>vocale</b>.',pt:'Chapeuzinho = insistir<br>na <b>letra</b>.<br>Prolongamento = insistir<br>na <b>vogal</b>.',ru:'Шапочка — дольше<br><b>букву</b>.<br>Долгота — дольше<br><b>гласный</b>.',tr:'Şapka = <b>harfe</b> basılır.<br>Uzatma = <b>sesliye</b><br>basılır.',zh:'帽子＝加重<b>字母</b>。<br>长音＝加长<b>元音</b>。',id:'Topi = tekan <b>hurufnya</b>.<br>Panjang = tekan<br><b>vokalnya</b>.',ur:'ٹوپی = <b>حرف</b> پر زور۔<br>مدّ = <b>حرکت</b> پر زور۔',hi:'टोपी = <b>अक्षर</b> पर ज़ोर।<br>दीर्घ = <b>स्वर</b> पर ज़ोर।'},
 'Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.':{en:'The hat: you press on the letter. The long vowel: you press on the vowel.',es:'El sombrerito: se insiste en la letra. La prolongación: se insiste en la vocal.',de:'Das Hütchen betont den Buchstaben, die Dehnung den Vokal.',nl:'Het hoedje: druk op de letter. De verlenging: druk op de klinker.',it:'Il cappellino: si insiste sulla lettera. L\'allungamento: sulla vocale.',pt:'O chapeuzinho: insiste-se na letra. O prolongamento: na vogal.',ru:'Шапочка — дольше буква. Долгота — дольше гласный.',tr:'Şapka: harfe basılır. Uzatma: sesliye basılır.',zh:'帽子是加重字母，长音是加长元音。',id:'Topi: hurufnya ditekan. Panjang: vokalnya ditekan.',ur:'ٹوپی: حرف پر زور۔ مدّ: حرکت پر زور۔',hi:'टोपी: अक्षर पर ज़ोर। दीर्घ: स्वर पर ज़ोर।'},
 'Prolongations <b>maîtrisées</b> !<br>🎖️':{en:'Long vowels <b>mastered</b>!<br>🎖️',es:'¡Prolongaciones <b>dominadas</b>!<br>🎖️',de:'Dehnungen <b>gemeistert</b>!<br>🎖️',nl:'Verlengingen <b>onder de knie</b>!<br>🎖️',it:'Allungamenti <b>imparati</b>!<br>🎖️',pt:'Prolongamentos <b>dominados</b>!<br>🎖️',ru:'Долгие гласные <b>освоены</b>!<br>🎖️',tr:'Uzatmalar <b>tamam</b>!<br>🎖️',zh:'长音<b>掌握了</b>！<br>🎖️',id:'Bacaan panjang <b>dikuasai</b>!<br>🎖️',ur:'مدّ <b>سیکھ لی</b>!<br>🎖️',hi:'दीर्घ स्वर <b>सीख लिए</b>!<br>🎖️'},
 'ÉTAPE 1 · IDENTIFICATION':{en:'STEP 1 · WHO IS IT',es:'PASO 1 · IDENTIFICACIÓN',de:'SCHRITT 1 · ERKENNEN',nl:'STAP 1 · HERKENNEN',it:'TAPPA 1 · IDENTIFICAZIONE',pt:'ETAPA 1 · IDENTIFICAÇÃO',ru:'ШАГ 1 · ЗНАКОМСТВО',tr:'ADIM 1 · TANIMA',zh:'第 1 步 · 认识它',id:'LANGKAH 1 · MENGENALI',ur:'مرحلہ ۱ · پہچان',hi:'चरण 1 · पहचान'},
@@ -11116,7 +11288,7 @@ var _TE={
 'Nouvelle lettre :<br>{lettre} 🎯':{en:'New letter:<br>{lettre} 🎯',es:'Nueva letra:<br>{lettre} 🎯',de:'Neuer Buchstabe:<br>{lettre} 🎯',nl:'Nieuwe letter:<br>{lettre} 🎯',it:'Nuova lettera:<br>{lettre} 🎯',pt:'Nova letra:<br>{lettre} 🎯',ru:'Новая буква:<br>{lettre} 🎯',tr:'Yeni harf:<br>{lettre} 🎯',zh:'新字母：<br>{lettre} 🎯',id:'Huruf baru:<br>{lettre} 🎯',ur:'نیا حرف:<br>{lettre} 🎯',hi:'नया अक्षर:<br>{lettre} 🎯'},
 '{mission} du moment : la lettre {lettre}':{en:'Your {mission} right now: the letter {lettre}',es:'{mission} del momento: la letra {lettre}',de:'{mission} gerade: der Buchstabe {lettre}',nl:'{mission} van nu: de letter {lettre}',it:'{mission} del momento: la lettera {lettre}',pt:'{mission} do momento: a letra {lettre}',ru:'{mission} сейчас: буква {lettre}',tr:'Şimdiki {mission}: {lettre} harfi',zh:'现在的{mission}：字母 {lettre}',id:'{mission} saat ini: huruf {lettre}',ur:'اِس وقت کی {mission}: حرف {lettre}',hi:'अभी का {mission}: अक्षर {lettre}'},
 '{mission} · UN AIR CONNU':{en:'{mission} · LOOKS FAMILIAR',es:'{mission} · UN AIRE CONOCIDO',de:'{mission} · KOMMT BEKANNT VOR',nl:'{mission} · KOMT BEKEND VOOR',it:'{mission} · UN\'ARIA NOTA',pt:'{mission} · UM AR CONHECIDO',ru:'{mission} · ЗНАКОМЫЙ ВИД',tr:'{mission} · TANIDIK GELİYOR',zh:'{mission} · 似曾相识',id:'{mission} · TAMPAK TIDAK ASING',ur:'{mission} · جانی پہچانی شکل',hi:'{mission} · जानी-पहचानी शक्ल'},
-'{lettre} s\'écrit exactement<br>comme {ref},<br>{detail} 👀':{en:'{lettre} is written exactly<br>like {ref},<br>{detail} 👀',es:'{lettre} se escribe igual<br>que {ref},<br>{detail} 👀',de:'{lettre} schreibt man genau<br>wie {ref},<br>{detail} 👀',nl:'{lettre} schrijf je precies<br>als {ref},<br>{detail} 👀',it:'{lettre} si scrive esattamente<br>come {ref},<br>{detail} 👀',pt:'{lettre} escreve-se igual<br>a {ref},<br>{detail} 👀',ru:'{lettre} пишется точно так же,<br>как {ref},<br>{detail} 👀',tr:'{lettre}, tam olarak<br>{ref} gibi yazılır,<br>{detail} 👀',zh:'{lettre} 的写法<br>和 {ref} 完全一样，<br>{detail} 👀',id:'{lettre} ditulis persis<br>seperti {ref},<br>{detail} 👀',ur:'{lettre} بالکل {ref}<br>جیسا لکھا جاتا ہے،<br>{detail} 👀',hi:'{lettre} बिलकुल {ref}<br>जैसा लिखा जाता है,<br>{detail} 👀'},
+'{lettre} s\'écrit exactement comme {ref},<br>{detail} 👀':{en:'{lettre} is written exactly<br>like {ref},<br>{detail} 👀',es:'{lettre} se escribe igual<br>que {ref},<br>{detail} 👀',de:'{lettre} schreibt man genau<br>wie {ref},<br>{detail} 👀',nl:'{lettre} schrijf je precies<br>als {ref},<br>{detail} 👀',it:'{lettre} si scrive esattamente<br>come {ref},<br>{detail} 👀',pt:'{lettre} escreve-se igual<br>a {ref},<br>{detail} 👀',ru:'{lettre} пишется точно так же,<br>как {ref},<br>{detail} 👀',tr:'{lettre}, tam olarak<br>{ref} gibi yazılır,<br>{detail} 👀',zh:'{lettre} 的写法<br>和 {ref} 完全一样，<br>{detail} 👀',id:'{lettre} ditulis persis<br>seperti {ref},<br>{detail} 👀',ur:'{lettre} بالکل {ref}<br>جیسا لکھا جاتا ہے،<br>{detail} 👀',hi:'{lettre} बिलकुल {ref}<br>जैसा लिखा जाता है,<br>{detail} 👀'},
 'La lettre {lettre} s\'écrit exactement comme la lettre {ref}, {detail}.':{en:'The letter {lettre} is written exactly like the letter {ref}, {detail}.',es:'La letra {lettre} se escribe igual que la letra {ref}, {detail}.',de:'Der Buchstabe {lettre} wird genau wie der Buchstabe {ref} geschrieben, {detail}.',nl:'De letter {lettre} schrijf je precies als de letter {ref}, {detail}.',it:'La lettera {lettre} si scrive esattamente come la lettera {ref}, {detail}.',pt:'A letra {lettre} escreve-se igual à letra {ref}, {detail}.',ru:'Буква {lettre} пишется точно так же, как буква {ref}, {detail}.',tr:'{lettre} harfi, tam olarak {ref} harfi gibi yazılır, {detail}.',zh:'字母 {lettre} 的写法和字母 {ref} 完全一样，{detail}。',id:'Huruf {lettre} ditulis persis seperti huruf {ref}, {detail}.',ur:'حرف {lettre} بالکل حرف {ref} جیسا لکھا جاتا ہے، {detail}۔',hi:'अक्षर {lettre} बिलकुल अक्षर {ref} जैसा लिखा जाता है, {detail}।'},
 'Voici {lettre}.<br>Elle s\'écrit <b>toujours</b> ainsi.':{en:'This is {lettre}.<br>It is <b>always</b> written this way.',es:'Esta es {lettre}.<br>Se escribe <b>siempre</b> así.',de:'Das ist {lettre}.<br>Er wird <b>immer</b> so geschrieben.',nl:'Dit is {lettre}.<br>Hij wordt <b>altijd</b> zo geschreven.',it:'Ecco {lettre}.<br>Si scrive <b>sempre</b> così.',pt:'Esta é {lettre}.<br>Escreve-se <b>sempre</b> assim.',ru:'Это {lettre}.<br>Она <b>всегда</b> пишется так.',tr:'İşte {lettre}.<br><b>Her zaman</b> böyle yazılır.',zh:'这是 {lettre}。<br>它<b>永远</b>这样写。',id:'Ini {lettre}.<br><b>Selalu</b> ditulis begini.',ur:'یہ {lettre} ہے۔<br>یہ <b>ہمیشہ</b> ایسے لکھا جاتا ہے۔',hi:'यह {lettre} है।<br>यह <b>हमेशा</b> ऐसे लिखा जाता है।'},
 'Voici {lettre}.<br><b>Isolée</b>, elle s\'écrit ainsi.':{en:'This is {lettre}.<br><b>On its own</b>, it is written like this.',es:'Esta es {lettre}.<br><b>Aislada</b>, se escribe así.',de:'Das ist {lettre}.<br><b>Allein</b> stehend schreibt man ihn so.',nl:'Dit is {lettre}.<br><b>Los</b> schrijf je hem zo.',it:'Ecco {lettre}.<br><b>Isolata</b>, si scrive così.',pt:'Esta é {lettre}.<br><b>Isolada</b>, escreve-se assim.',ru:'Это {lettre}.<br><b>Отдельно</b> она пишется так.',tr:'İşte {lettre}.<br><b>Tek başına</b> böyle yazılır.',zh:'这是 {lettre}。<br><b>单独</b>时这样写。',id:'Ini {lettre}.<br><b>Sendirian</b>, ditulis begini.',ur:'یہ {lettre} ہے۔<br><b>تنہا</b> ایسے لکھا جاتا ہے۔',hi:'यह {lettre} है।<br><b>अकेले</b> ऐसे लिखा जाता है।'},
@@ -11133,8 +11305,8 @@ var _TE={
 'Parfois, tu verras<br>la hamzah sur le {lettre} 🪑':{en:'Sometimes you will see<br>the hamza on the {lettre} 🪑',es:'A veces verás<br>la hamza sobre el {lettre} 🪑',de:'Manchmal siehst du<br>die Hamza auf dem {lettre} 🪑',nl:'Soms zie je<br>de hamza op de {lettre} 🪑',it:'A volte vedrai<br>la hamza sul {lettre} 🪑',pt:'Às vezes verás<br>a hamza sobre o {lettre} 🪑',ru:'Иногда ты увидишь<br>хамзу на {lettre} 🪑',tr:'Bazen hamzeyi<br>{lettre} üstünde göreceksin 🪑',zh:'有时你会看到<br>哈姆扎写在 {lettre} 上 🪑',id:'Kadang kamu melihat<br>hamzah di atas {lettre} 🪑',ur:'کبھی ہمزہ کو<br>{lettre} کے اوپر دیکھو گے 🪑',hi:'कभी हमज़ा को<br>{lettre} के ऊपर देखोगे 🪑'},
 'Parfois, tu verras la hamzah sur le {lettre}.':{en:'Sometimes you will see the hamza on the {lettre}.',es:'A veces verás la hamza sobre el {lettre}.',de:'Manchmal siehst du die Hamza auf dem {lettre}.',nl:'Soms zie je de hamza op de {lettre}.',it:'A volte vedrai la hamza sul {lettre}.',pt:'Às vezes verás a hamza sobre o {lettre}.',ru:'Иногда ты увидишь хамзу на {lettre}.',tr:'Bazen hamzeyi {lettre} üstünde göreceksin.',zh:'有时你会看到哈姆扎写在 {lettre} 上。',id:'Kadang kamu melihat hamzah di atas {lettre}.',ur:'کبھی ہمزہ کو {lettre} کے اوپر دیکھو گے۔',hi:'कभी हमज़ा को {lettre} के ऊपर देखोगे।'},
 'SUPPORT {n}/3 · TRACÉ':{en:'SEAT {n}/3 · WRITING',es:'SOPORTE {n}/3 · TRAZO',de:'TRÄGER {n}/3 · SCHREIBEN',nl:'DRAGER {n}/3 · SCHRIJVEN',it:'SUPPORTO {n}/3 · TRACCIATO',pt:'SUPORTE {n}/3 · TRAÇADO',ru:'ОПОРА {n}/3 · ПИСЬМО',tr:'KÜRSÜ {n}/3 · YAZMA',zh:'座位 {n}/3 · 书写',id:'DUDUKAN {n}/3 · MENULIS',ur:'کرسی {n}/۳ · لکھائی',hi:'आधार {n}/3 · लेखन'},
-'Signe {nom} :<br>ça fait {son}':{en:'The {nom} mark:<br>it says {son}',es:'Signo {nom}:<br>suena {son}',de:'Zeichen {nom}:<br>das klingt wie {son}',nl:'Teken {nom}:<br>dat klinkt als {son}',it:'Segno {nom}:<br>suona {son}',pt:'Sinal {nom}:<br>soa {son}',ru:'Знак {nom}:<br>звучит {son}',tr:'{nom} işareti:<br>sesi {son}',zh:'{nom} 符号：<br>读作 {son}',id:'Tanda {nom}:<br>bunyinya {son}',ur:'{nom} علامت:<br>آواز {son}',hi:'{nom} चिह्न:<br>ध्वनि {son}'},
-'Signe {nom}, ça fait {son}':{en:'The {nom} mark: it says {son}',es:'Signo {nom}, suena {son}',de:'Zeichen {nom}, das klingt wie {son}',nl:'Teken {nom}, dat klinkt als {son}',it:'Segno {nom}, suona {son}',pt:'Sinal {nom}, soa {son}',ru:'Знак {nom} — звучит {son}',tr:'{nom} işareti, sesi {son}',zh:'{nom} 符号，读作 {son}',id:'Tanda {nom}, bunyinya {son}',ur:'{nom} علامت، آواز {son}',hi:'{nom} चिह्न, ध्वनि {son}'},
+'Avec cette voyelle :<br>ça fait {son}':{en:'With this vowel:<br>it says {son}',es:'Con esta vocal:<br>suena {son}',de:'Mit diesem Vokal:<br>das klingt wie {son}',nl:'Met deze klinker:<br>dat klinkt als {son}',it:'Con questa vocale:<br>suona {son}',pt:'Com esta vogal:<br>soa {son}',ru:'С этой огласовкой:<br>звучит {son}',tr:'Bu hareke ile:<br>sesi {son}',zh:'加上这个符号：<br>读作 {son}',id:'Dengan vokal ini:<br>bunyinya {son}',ur:'اس حرکت کے ساتھ:<br>آواز {son}',hi:'इस स्वर के साथ:<br>ध्वनि {son}'},
+'Avec cette voyelle, ça fait {son}':{en:'With this vowel, it says {son}',es:'Con esta vocal, suena {son}',de:'Mit diesem Vokal, das klingt wie {son}',nl:'Met deze klinker, dat klinkt als {son}',it:'Con questa vocale, suona {son}',pt:'Com esta vogal, soa {son}',ru:'С этой огласовкой звучит {son}',tr:'Bu hareke ile sesi {son}',zh:'加上这个符号，读作 {son}',id:'Dengan vokal ini, bunyinya {son}',ur:'اس حرکت کے ساتھ آواز {son}',hi:'इस स्वर के साथ ध्वनि {son}'},
 'VOYELLE {n}/3 · TRACÉ':{en:'VOWEL {n}/3 · WRITING',es:'VOCAL {n}/3 · TRAZO',de:'VOKAL {n}/3 · SCHREIBEN',nl:'KLINKER {n}/3 · SCHRIJVEN',it:'VOCALE {n}/3 · TRACCIATO',pt:'VOGAL {n}/3 · TRAÇADO',ru:'ОГЛАСОВКА {n}/3 · ПИСЬМО',tr:'HAREKE {n}/3 · YAZMA',zh:'元音 {n}/3 · 书写',id:'VOKAL {n}/3 · MENULIS',ur:'حرکت {n}/۳ · لکھائی',hi:'स्वर {n}/3 · लेखन'},
 'Trace cette syllabe dans {ou}.':{en:'Write this syllable {ou}.',es:'Traza esta sílaba {ou}.',de:'Schreibe diese Silbe {ou}.',nl:'Schrijf deze lettergreep {ou}.',it:'Traccia questa sillaba {ou}.',pt:'Traça esta sílaba {ou}.',ru:'Напиши этот слог {ou}.',tr:'Bu heceyi {ou} yaz.',zh:'{ou}写出这个音节。',id:'Tulis suku kata ini {ou}.',ur:'یہ حرفی جوڑ {ou} لکھو۔',hi:'यह अक्षर-जोड़ {ou} लिखो।'},
 'CONTRÔLE {n}':{en:'CHECK {n}',es:'CONTROL {n}',de:'TEST {n}',nl:'CHECK {n}',it:'VERIFICA {n}',pt:'TESTE {n}',ru:'ПРОВЕРКА {n}',tr:'KONTROL {n}',zh:'检查 {n}',id:'UJI {n}',ur:'جانچ {n}',hi:'जाँच {n}'},
@@ -11156,8 +11328,8 @@ var _TE={
 'Bravo ! 🎉<br>Tu as validé<br>{missions} !<br>Teste tes connaissances<br>dans la rubrique {lien} 🏅':{en:'Well done! 🎉<br>You completed<br>{missions}!<br>Test what you know<br>in the {lien} section 🏅',es:'¡Bravo! 🎉<br>Has completado<br>{missions}.<br>Pon a prueba lo aprendido<br>en la sección {lien} 🏅',de:'Bravo! 🎉<br>Du hast {missions}<br>geschafft!<br>Teste dein Wissen<br>im Bereich {lien} 🏅',nl:'Goed zo! 🎉<br>Je hebt {missions}<br>afgerond!<br>Test je kennis<br>bij {lien} 🏅',it:'Bravo! 🎉<br>Hai completato<br>{missions}!<br>Metti alla prova<br>nella sezione {lien} 🏅',pt:'Boa! 🎉<br>Concluíste<br>{missions}!<br>Testa os teus conhecimentos<br>na secção {lien} 🏅',ru:'Молодец! 🎉<br>Ты прошёл<br>{missions}!<br>Проверь себя<br>в разделе {lien} 🏅',tr:'Aferin! 🎉<br>{missions} tamamladın!<br>Bildiklerini<br>{lien} bölümünde dene 🏅',zh:'太棒了！🎉<br>你完成了<br>{missions}！<br>到{lien}板块<br>测测你的水平 🏅',id:'Hebat! 🎉<br>Kamu menyelesaikan<br>{missions}!<br>Uji kemampuanmu<br>di bagian {lien} 🏅',ur:'شاباش! 🎉<br>تم نے {missions}<br>مکمل کر لیے!<br>اپنی مہارت<br>{lien} حصے میں آزماؤ 🏅',hi:'शाबाश! 🎉<br>तुमने {missions}<br>पूरे कर लिए!<br>अपनी समझ<br>{lien} भाग में परखो 🏅'},
 'Exercices':{en:'Exercises',es:'Ejercicios',de:'Übungen',nl:'Oefeningen',it:'Esercizi',pt:'Exercícios',ru:'Упражнения',tr:'Alıştırmalar',zh:'练习',id:'Latihan',ur:'مشقیں',hi:'अभ्यास'},
 'Bravo ! Tu as validé toutes les {missions} ! Teste tes connaissances dans la rubrique Exercices.':{en:'Well done! You completed all the {missions}! Test what you know in the Exercises section.',es:'¡Bravo! Has completado todas las {missions}. Pon a prueba lo aprendido en la sección Ejercicios.',de:'Bravo! Du hast alle {missions} geschafft! Teste dein Wissen im Bereich Übungen.',nl:'Goed zo! Je hebt alle {missions} afgerond! Test je kennis bij Oefeningen.',it:'Bravo! Hai completato tutte le {missions}! Mettiti alla prova nella sezione Esercizi.',pt:'Boa! Concluíste todas as {missions}! Testa os teus conhecimentos na secção Exercícios.',ru:'Молодец! Ты прошёл все {missions}! Проверь себя в разделе «Упражнения».',tr:'Aferin! Bütün {missions} tamamladın! Bildiklerini Alıştırmalar bölümünde dene.',zh:'太棒了！你完成了所有{missions}！到练习板块测测你的水平。',id:'Hebat! Kamu menyelesaikan semua {missions}! Uji kemampuanmu di bagian Latihan.',ur:'شاباش! تم نے سب {missions} مکمل کر لیے! اپنی مہارت مشقیں حصے میں آزماؤ۔',hi:'शाबाश! तुमने सब {missions} पूरे कर लिए! अपनी समझ अभ्यास भाग में परखो।'},
-'Bravo ! 🎉<br>Tu as fini ta {mission} !<br>À très vite pour une<br><b>prochaine aventure</b> ! {embleme}':{en:'Well done! 🎉<br>You finished your {mission}!<br>See you soon for the<br><b>next adventure</b>! {embleme}',es:'¡Bravo! 🎉<br>Has terminado tu {mission}.<br>¡Hasta pronto para la<br><b>próxima aventura</b>! {embleme}',de:'Bravo! 🎉<br>Du hast deine {mission} geschafft!<br>Bis bald zum<br><b>nächsten Abenteuer</b>! {embleme}',nl:'Goed zo! 🎉<br>Je hebt je {mission} af!<br>Tot snel bij het<br><b>volgende avontuur</b>! {embleme}',it:'Bravo! 🎉<br>Hai finito la tua {mission}!<br>A presto per la<br><b>prossima avventura</b>! {embleme}',pt:'Boa! 🎉<br>Terminaste a tua {mission}!<br>Até já para a<br><b>próxima aventura</b>! {embleme}',ru:'Молодец! 🎉<br>Ты закончил своё {mission}!<br>До скорого — впереди<br><b>новое приключение</b>! {embleme}',tr:'Aferin! 🎉<br>{mission} tamamlandı!<br><b>Yeni bir maceraya</b><br>yakında görüşürüz! {embleme}',zh:'太棒了！🎉<br>你完成了{mission}！<br>下一次<b>冒险</b><br>再见！{embleme}',id:'Hebat! 🎉<br>{mission} selesai!<br>Sampai jumpa di<br><b>petualangan berikutnya</b>! {embleme}',ur:'شاباش! 🎉<br>تمہاری {mission} مکمل!<br><b>اگلی مہم</b> میں<br>جلد ملیں گے! {embleme}',hi:'शाबाश! 🎉<br>तुम्हारा {mission} पूरा!<br><b>अगले सफ़र</b> में<br>जल्द मिलेंगे! {embleme}'},
-'Bravo ! Tu as fini ta {mission} ! À très vite pour une prochaine aventure !':{en:'Well done! You finished your {mission}! See you soon for the next adventure!',es:'¡Bravo! Has terminado tu {mission}. ¡Hasta pronto para la próxima aventura!',de:'Bravo! Du hast deine {mission} geschafft! Bis bald zum nächsten Abenteuer!',nl:'Goed zo! Je hebt je {mission} af! Tot snel bij het volgende avontuur!',it:'Bravo! Hai finito la tua {mission}! A presto per la prossima avventura!',pt:'Boa! Terminaste a tua {mission}! Até já para a próxima aventura!',ru:'Молодец! Ты закончил своё {mission}! До скорого — впереди новое приключение!',tr:'Aferin! {mission} tamamlandı! Yeni bir maceraya yakında görüşürüz!',zh:'太棒了！你完成了{mission}！下一次冒险再见！',id:'Hebat! {mission} selesai! Sampai jumpa di petualangan berikutnya!',ur:'شاباش! تمہاری {mission} مکمل! اگلی مہم میں جلد ملیں گے!',hi:'शाबाश! तुम्हारा {mission} पूरा! अगले सफ़र में जल्द मिलेंगे!'},
+'Bravo ! 🎉<br>Tu as fini cette {mission} !<br>À très vite pour une <b>prochaine aventure</b> ! {embleme}':{en:'Well done! 🎉<br>You finished your {mission}!<br>See you soon for the<br><b>next adventure</b>! {embleme}',es:'¡Bravo! 🎉<br>Has terminado tu {mission}.<br>¡Hasta pronto para la<br><b>próxima aventura</b>! {embleme}',de:'Bravo! 🎉<br>Du hast deine {mission} geschafft!<br>Bis bald zum<br><b>nächsten Abenteuer</b>! {embleme}',nl:'Goed zo! 🎉<br>Je hebt je {mission} af!<br>Tot snel bij het<br><b>volgende avontuur</b>! {embleme}',it:'Bravo! 🎉<br>Hai finito la tua {mission}!<br>A presto per la<br><b>prossima avventura</b>! {embleme}',pt:'Boa! 🎉<br>Terminaste a tua {mission}!<br>Até já para a<br><b>próxima aventura</b>! {embleme}',ru:'Молодец! 🎉<br>Ты закончил своё {mission}!<br>До скорого — впереди<br><b>новое приключение</b>! {embleme}',tr:'Aferin! 🎉<br>{mission} tamamlandı!<br><b>Yeni bir maceraya</b><br>yakında görüşürüz! {embleme}',zh:'太棒了！🎉<br>你完成了{mission}！<br>下一次<b>冒险</b><br>再见！{embleme}',id:'Hebat! 🎉<br>{mission} selesai!<br>Sampai jumpa di<br><b>petualangan berikutnya</b>! {embleme}',ur:'شاباش! 🎉<br>تمہاری {mission} مکمل!<br><b>اگلی مہم</b> میں<br>جلد ملیں گے! {embleme}',hi:'शाबाश! 🎉<br>तुम्हारा {mission} पूरा!<br><b>अगले सफ़र</b> में<br>जल्द मिलेंगे! {embleme}'},
+'Bravo ! Tu as fini cette {mission} ! À très vite pour une prochaine aventure !':{en:'Well done! You finished your {mission}! See you soon for the next adventure!',es:'¡Bravo! Has terminado tu {mission}. ¡Hasta pronto para la próxima aventura!',de:'Bravo! Du hast deine {mission} geschafft! Bis bald zum nächsten Abenteuer!',nl:'Goed zo! Je hebt je {mission} af! Tot snel bij het volgende avontuur!',it:'Bravo! Hai finito la tua {mission}! A presto per la prossima avventura!',pt:'Boa! Terminaste a tua {mission}! Até já para a próxima aventura!',ru:'Молодец! Ты закончил своё {mission}! До скорого — впереди новое приключение!',tr:'Aferin! {mission} tamamlandı! Yeni bir maceraya yakında görüşürüz!',zh:'太棒了！你完成了{mission}！下一次冒险再见！',id:'Hebat! {mission} selesai! Sampai jumpa di petualangan berikutnya!',ur:'شاباش! تمہاری {mission} مکمل! اگلی مہم میں جلد ملیں گے!',hi:'शाबाश! तुम्हारा {mission} पूरा! अगले सफ़र में जल्द मिलेंगे!'},
 'ISOLÉE':{en:'ON ITS OWN',es:'SOLA',de:'ALLEIN',nl:'ALLEEN',it:'DA SOLA',pt:'SOZINHA',ru:'ОТДЕЛЬНО',tr:'TEK BAŞINA',zh:'独立',id:'SENDIRI',ur:'الگ',hi:'अकेला'},
 'DÉBUT':{en:'START',es:'PRINCIPIO',de:'ANFANG',nl:'BEGIN',it:'INIZIO',pt:'INÍCIO',ru:'НАЧАЛО',tr:'BAŞTA',zh:'词首',id:'AWAL',ur:'شروع',hi:'शुरू'},
 'MILIEU':{en:'MIDDLE',es:'MEDIO',de:'MITTE',nl:'MIDDEN',it:'MEZZO',pt:'MEIO',ru:'СЕРЕДИНА',tr:'ORTADA',zh:'词中',id:'TENGAH',ur:'درمیان',hi:'मध्य'},
@@ -11278,6 +11450,39 @@ var _VOIX={fr:'fr-FR',en:'en-US',es:'es-ES',de:'de-DE',nl:'nl-NL',it:'it-IT',
            pt:'pt-PT',ru:'ru-RU',tr:'tr-TR',zh:'zh-CN',id:'id-ID',ur:'ur-PK',hi:'hi-IN'};
 function _voixEnfant(){return _VOIX[st.lang]||'fr-FR';}
 
+/* ── « TRACE CECI, TRACE CELA » ──
+   La consigne du trace est la meme a chaque case, et il y en a des dizaines
+   par lecon. Passe les premieres fois elle n'apprend plus rien : l'enfant
+   voit le modele et le doigt part tout seul. On ne la dit donc que pour les
+   deux tout premiers traces de la CARTE — le temps de comprendre ce qu'on
+   attend de lui — puis plus jamais. Le compte survit a la session : sinon
+   la consigne reviendrait a chaque ouverture de l'application. */
+/* ── LE SCORE DE L'ENFANT ──
+   Les exercices ne commandent PAS la progression : c'est la regle du client,
+   et elle ne bouge pas. Mais ils doivent compter, sinon une carte entierement
+   finie affiche 0 % — ce qu'il a vu. On note donc, ile par ile, les reponses
+   justes DU PREMIER COUP. Une bonne reponse trouvee apres deux erreurs ne
+   compte pas : ce serait noter l'obstination, pas le savoir.
+
+   Ce carnet ne sert qu'a l'affichage. Le deblocage des iles continue de lire
+   `st.accuracy`, ou l'ile finie vaut 1/1 quoi qu'il arrive. */
+function _noteExo(bon){
+  var ses=(typeof _boySession!=='undefined')?_boySession:null;
+  if(!ses||ses.id===undefined||ses.id===null)return;
+  var cle='boy_note_'+ses.id,n={c:0,t:0};
+  try{n=JSON.parse(localStorage.getItem(cle)||'{"c":0,"t":0}')||{c:0,t:0};}catch(e){}
+  n.t++;if(bon)n.c++;
+  try{localStorage.setItem(cle,JSON.stringify(n));}catch(e){}
+}
+
+function _diraLeTrace(){
+  var n=0;
+  try{n=parseInt(localStorage.getItem('boy_traces_dits')||'0',10)||0;}catch(e){}
+  if(n>=2)return false;
+  try{localStorage.setItem('boy_traces_dits',String(n+1));}catch(e){}
+  return true;
+}
+
 function _boyScene(ca,reprise){
   _HAB=_habDuProfil();
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
@@ -11365,10 +11570,16 @@ function _boyScene(ca,reprise){
   }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';
-    t.innerHTML=_airAutourArabe(_sansCercle(html));
+    /* UN ESPACE DERRIERE CHAQUE COUPURE. En paysage la CSS cache les
+       coupures (voir la feuille de style) ; un `display:none` retire alors
+       le saut ET la separation, et les mots se collent : « vaut pourtoutes
+       les lettres », « on insistesur la lettre ». L'espace pose ici survit
+       au masquage. En portrait il ne se voit pas : une espace en debut de
+       ligne est supprimee par le rendu. */
+    t.innerHTML=_airAutourArabe(_sansCercle(html)).replace(/(<br[^>]*>)/gi,'$1 ');
     /* Les coupures de ligne sont écrites dans le texte, pour le portrait où
-       la largeur manque. Une phrase de quatre lignes en gagne deux en
-       paysage : la CSS y cache une coupure sur deux. */
+       la largeur manque. En paysage elles disparaissent et le texte se
+       repartit sur la largeur — sauf celles marquees `dur`. */
     if((t.innerHTML.match(/<br\s*\/?>/gi)||[]).length>=3)t.classList.add('titre-long');
     p.appendChild(t);
     /* fr === false : la scène dit elle-même sa phrase, morceau par morceau,
@@ -11690,7 +11901,9 @@ function _boyScene(ca,reprise){
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
   api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases,deTete){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);
+      /* La consigne parlee ne sert que les deux premieres fois — voir
+         `_diraLeTrace`. Le texte, lui, reste toujours affiche. */
+      var p=panneau(etape);titre(p,html,_diraLeTrace()?fr:false);
       var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
          page, au lieu d'un seul essai. */
@@ -11867,7 +12080,7 @@ function _boyScene(ca,reprise){
       }
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px';
-      var repondu=false;
+      var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
         b.textContent=_sansCercle(o.g);
@@ -11877,6 +12090,8 @@ function _boyScene(ca,reprise){
         if(_signeSeul(o.g))b.style.fontSize='4.2rem';
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
+          /* Le tout premier clic decide de la note. */
+          if(premier){premier=false;_noteExo(o.g===cible);}
           N.stop();N.dire(o.s);
           if(o.g===cible){repondu=true;b.classList.add('ok');
             if(typeof playBravo==='function')playBravo();
@@ -12059,13 +12274,18 @@ function _boyScene(ca,reprise){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
-      var reste=cibles.slice();
+      var reste=cibles.slice(),_premierTri=true;
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
+      /* Au-dela de six cases, elles ne tiennent plus a l'ecran couche : la
+         feuille de style les resserre (voir `.cibles-nombreuses`). */
+      if(opts.length>6)r.classList.add('cibles-nombreuses');
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var c=document.createElement('div');c.className='boy-cible';c.textContent=o.g;
         c.onclick=function(){
           if(c.classList.contains('ok')||c.classList.contains('ko'))return;
+          /* Le tout premier clic de la grille decide de la note. */
+          if(_premierTri){_premierTri=false;_noteExo(cibles.indexOf(o.g)>=0);}
           N.stop();N.dire(o.s);
           if(cibles.indexOf(o.g)>=0){
             c.classList.add('ok');
@@ -12107,12 +12327,14 @@ function _boyScene(ca,reprise){
       p.appendChild(rj);
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
-      var repondu=false;
+      var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
         b.textContent=_sansCercle(o.g);
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
+          /* Le tout premier clic decide de la note. */
+          if(premier){premier=false;_noteExo(o.g===cible);}
           N.stop();
           if(o.g===cible){repondu=true;b.classList.add('ok');
             N.dire(o.s);
@@ -12167,12 +12389,14 @@ function _boyScene(ca,reprise){
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;direction:rtl';
-      var repondu=false;
+      var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
         b.textContent=_sansCercle(o.g);
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
+          /* Le tout premier clic decide de la note. */
+          if(premier){premier=false;_noteExo(o.g===cible);}
           N.stop();
           if(o.g===cible){
             repondu=true;b.classList.add('ok');
@@ -12298,8 +12522,8 @@ function _boyProlongCourse(ca){
       te('Avec un alif, le son devient long.')),
     B.brief(te('ÉTAPE 4 · ENJEU'),TB('Allonger ou non<br>peut <b>changer le sens</b> ! ⚠️'),
       te('Allonger ou non peut complètement changer le sens.')),
-    B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',TB('Par exemple,<br>sans prolonger :<br><b>je t\'aime</b> ❤️'),
-      te('Par exemple, sans prolonger : je t\'aime.')),
+    B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',TB('Par exemple,<br>sans prolonger :<br><b>je t\'aime vraiment</b> ❤️'),
+      te('Par exemple, sans prolonger : je t\'aime vraiment.')),
     B.obs(te('ÉTAPE 6 · EXEMPLE'),'لَا أُحِبُّك','لَا أُحِبُّك',TB('Alors qu\'en prolongeant :<br><b>je ne t\'aime pas</b> 💔'),
       te('Alors qu\'en prolongeant : je ne t\'aime pas.')),
     /* De droite à gauche, comme on les lit : bā, bī, bū. Chaque syllabe
@@ -12353,7 +12577,7 @@ function _boyProlongCourse(ca){
       te('Avec ce petit chapeau, on insiste sur la lettre.')),
     B.obs(te('ÉTAPE 13 · EXEMPLE'),'جَدّ','جَدّ',TB('<b>جَدّ</b> :<br>ça veut dire<br><b>grand-père</b> 👴'),te('Jad-d, ça veut dire grand-père.')),
     B.tracer(te('ÉTAPE 13 · TRACÉ'),'جَدّ',TB('Trace <b>جَدّ</b> ✍️'),'Trace jadd.',2),
-    B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br>Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
+    B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br class="dur">Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
       te('Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.')),
     function(api){_boyValideSession(_boySession&&_boySession.id);
       B.mission(TB('Prolongations <b>maîtrisées</b> !<br>🎖️'),
@@ -12418,7 +12642,7 @@ function _boyLetterCourse(ca,idx,premiere){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
     if(ref){
       sc.push(B.brief(teF('{mission} · UN AIR CONNU',{mission:_HAB.mission}),
-        teF('{lettre} s\'écrit exactement<br>comme {ref},<br>{detail} 👀',{lettre:b(L.name),ref:b(ref.name),detail:b(jumelle.point)}),
+        teF('{lettre} s\'écrit exactement comme {ref},<br>{detail} 👀',{lettre:b(L.name),ref:b(ref.name),detail:b(jumelle.point)}),
         teF('La lettre {lettre} s\'écrit exactement comme la lettre {ref}, {detail}.',{lettre:L.name,ref:ref.name,detail:jumelle.point})));
     }
   }
@@ -12544,7 +12768,11 @@ function _boyLetterCourse(ca,idx,premiere){
     te('Voyons maintenant la lettre avec ses voyelles.')));
   [['َ','a',te('au-dessus')],['ِ','i',te('en-dessous')],['ُ','ou',te('au-dessus')]].forEach(function(v,n){
     sc.push(B.obs(teF('VOYELLE {n}/3',{n:n+1}),A+v[0],A+v[0],
-      teF('Signe {nom} :<br>ça fait {son}',{nom:b(v[2]),son:q(v[1])}),teF('Signe {nom}, ça fait {son}',{nom:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
+      /* On ne nomme plus la position du signe — « Signe au-dessus », « Signe
+         en-dessous ». L'enfant a le signe sous les yeux : lui dire ou il est
+         n'apprend rien, et la phrase partait sur un mot technique. */
+      teF('Avec cette voyelle :<br>ça fait {son}',{son:q(v[1])}),
+      teF('Avec cette voyelle, ça fait {son}',{son:(lat+v[1]).toLowerCase()}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
       teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:b((lat+v[1]).toLowerCase()),ou:b(combien)}),
@@ -12682,20 +12910,32 @@ function _boyLetterCourse(ca,idx,premiere){
     /* UNE QUESTION PAR PLACE. La règle porte sur les trois places du mot :
        n'en tirer qu'une au sort en laissait deux jamais demandées. Elles sont
        mélangées pour que l'ordre ne devienne pas une réponse en soi. */
-    _places.slice().sort(function(){return Math.random()-.5;}).forEach(function(_g,_n){
+    var _questions=_places.map(function(_g){
       var _cases=[_cmp,_cmp,_cmp];_cases[_g]=A;
-      var _dr=_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:'');
-      var _ga=((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join('');
       /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
          s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
-      var _iF=(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3);
-      var _t=(_places.length>1)
-        ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_places.length})
+      return {dr:_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:''),
+              ga:((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join(''),
+              iF:(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3)};
+    });
+    /* ── LA FORME ISOLÉE, EN PLEIN MOT ──
+       Six lettres ne s'accrochent pas a la suivante : ا د ذ ر ز و. Celle qui
+       les suit repart de zero et reprend sa forme ISOLEE, meme au milieu d'un
+       mot. C'est la seule place ou l'isolee est la bonne reponse, et
+       l'exercice ne la demandait jamais : son compagnon s'attachait toujours
+       des deux cotes, si bien qu'une des quatre formes n'etait plus qu'un
+       leurre permanent. On ajoute donc le mot qui la reclame — deux lettres,
+       puis une bloquante, puis la notre en derniere place. */
+    var _bloq=(A==='د')?'ر':'د';
+    _questions.push({dr:_cmp+_bloq, ga:'', iF:0});
+    _questions.sort(function(){return Math.random()-.5;}).forEach(function(_q,_n){
+      var _t=(_questions.length>1)
+        ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_questions.length})
         : te('LE MOT À TROU');
       sc.push(B.trou(_t,
         TB('Quelle <b>forme</b><br>manque ici ? 🧩'),
         te('Quelle forme manque dans ce mot ?'),
-        _dr,_ga,_opts,formes[_iF].form));
+        _q.dr,_q.ga,_opts,formes[_q.iF].form));
     });
   }
 
@@ -12757,8 +12997,8 @@ function _boyLetterCourse(ca,idx,premiere){
     }else if(ile.finie){
       /* Île terminée : on annonce la mission finie et on ramène l'enfant à la
          carte sans qu'il ait à appuyer — le temps de lire, pas plus. */
-      B.mission(TBF('Bravo ! 🎉<br>Tu as fini ta {mission} !<br>À très vite pour une<br><b>prochaine aventure</b> ! {embleme}',{mission:b(_HAB.missionMin.toLowerCase()),embleme:_HAB.veh}),
-        teF('Bravo ! Tu as fini ta {mission} ! À très vite pour une prochaine aventure !',{mission:_HAB.missionMin.toLowerCase()}),
+      B.mission(TBF('Bravo ! 🎉<br>Tu as fini cette {mission} !<br>À très vite pour une <b>prochaine aventure</b> ! {embleme}',{mission:b(_HAB.missionMin.toLowerCase()),embleme:_HAB.veh}),
+        teF('Bravo ! Tu as fini cette {mission} ! À très vite pour une prochaine aventure !',{mission:_HAB.missionMin.toLowerCase()}),
         function(){renderSessionsMap(ca);},_HAB.carte)(api);
       /* Le retour automatique ne doit valoir QUE pour cet écran-là : si
          l'enfant a déjà ouvert une autre île entre-temps, son cours se
