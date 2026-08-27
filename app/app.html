@@ -6831,18 +6831,47 @@ function _volCarte(o){
      suit la distance — on ne met pas le meme temps pour traverser deux
      etapes que dix — mais elle reste bornee : il faut que ce soit
      regardable sans etre interminable. */
+  /* ── LA TRAJECTOIRE : UNE ONDULATION AUTOUR DE LA LIGNE DROITE ──
+     D'un monde a son voisin, le vaisseau suivait la courbe dessinee sur la
+     carte : elle part dans un sens, se reprend, se reprend encore, et le
+     mouvement se lit comme trois morceaux colles bout a bout. Le client veut
+     une seule onde : la ligne droite du depart a l'arrivee, et le vaisseau
+     qui ondule autour, en trois ventres.
+
+     L'ecart lateral vaut `amp · sin(pi·e) · sin(3pi·e)`. Le second facteur
+     donne les trois ventres ; le premier est une ENVELOPPE qui les eteint aux
+     deux bouts. Sans elle, l'ecart aurait encore de la vitesse laterale a
+     l'arrivee et le vaisseau s'y presenterait de biais, avec la cassure que
+     le client decrit. Avec elle, la vitesse laterale est nulle au depart
+     comme a l'arrivee : on part et on arrive dans l'axe. */
+  function ecartOnde(e,amp){return amp*Math.sin(Math.PI*e)*Math.sin(3*Math.PI*e);}
+  function penteOnde(e,amp){
+    return amp*(Math.PI*Math.cos(Math.PI*e)*Math.sin(3*Math.PI*e)
+               +3*Math.PI*Math.sin(Math.PI*e)*Math.cos(3*Math.PI*e));
+  }
   function volDroit(de,vers,fini,duree){
-    var dist=Math.sqrt((vers.x-de.x)*(vers.x-de.x)+(vers.y-de.y)*(vers.y-de.y));
+    var vx=vers.x-de.x, vy=vers.y-de.y;
+    var dist=Math.sqrt(vx*vx+vy*vy)||1;
     var D=duree||Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
-    var cap=Math.atan2(vers.y-de.y,vers.x-de.x)*180/Math.PI;
-    /* En descendant, la ligne droite CONTINUE l'arc de sortie : elle reprend
-       le cap ou il l'a laissee, sinon la fusee se remettrait droite entre les
-       deux. Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
+    /* La normale a la ligne, et une amplitude proportionnee au trajet : une
+       ondulation de meme largeur sur un saut court et sur la traversee de la
+       carte ne se lirait pas de la meme facon. */
+    var nx=-vy/dist, ny=vx/dist;
+    var amp=Math.min(70,dist*0.11);
+    /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
+       ou il l'a laissee, sinon la fusee se remettrait droite entre les deux.
+       Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
     var capEntree=contournera?(anglePose-90):null;
     var t0=Date.now();
     function tic(){
-      var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
-      var x=de.x+(vers.x-de.x)*e,y=de.y+(vers.y-de.y)*e;
+      var u=Math.min(1,(Date.now()-t0)/D);
+      /* Un seul elan : on ne freine que si rien ne suit. */
+      var e=elan(u,true,!contournera);
+      var o1=ecartOnde(e,amp);
+      var x=de.x+vx*e+nx*o1, y=de.y+vy*e+ny*o1;
+      /* Le nez suit la tangente de l'onde, pas la corde. */
+      var d1=penteOnde(e,amp);
+      var cap=Math.atan2(vy+ny*d1,vx+nx*d1)*180/Math.PI;
       var c=cap;
       if(capEntree!==null&&u<0.22){
         var k=u/0.22, ec=cap-capEntree;
@@ -7544,7 +7573,13 @@ function _volCarte(o){
        serpenter le vaisseau d'un bord a l'autre, alors qu'il va tout droit
        quelque part. Le client veut une ligne. Le decollage et l'approche,
        eux, ne changent pas : ce sont des phases a part. */
-    if(file.length>1){
+    /* ── QUAND SUIT-ON LA COURBE, QUAND ONDULE-T-ON ? ──
+       En portrait, un ruban est dessine entre les mondes : le vaisseau doit
+       le suivre, sinon il vole a cote de son propre chemin. En paysage il n'y
+       a rien de dessine entre eux — les liaisons sont masquees — et c'est la
+       que le client voyait le vol se casser en trois morceaux. On y prend
+       donc la ligne droite, avec son ondulation. */
+    if(file.length>1||o.ondule){
       var der=file[file.length-1];
       /* On vise le SOMMET de l'etape, pas son milieu : c'est la qu'on se
          pose, et le trajet doit y mener directement. */
@@ -8232,6 +8267,9 @@ var islandDefs=[
         equipage:eq,decalageX:Math.round(TEQ*0.5),decalageY:TEQ,
         demiAssise:Math.round(TEQ*0.279),depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
+        /* Voir `allerA` : en paysage rien n'est dessine entre les mondes, le
+           vol prend donc la ligne droite et l'onde. */
+        ondule:true,
         dureeTotale:9000,camera:true,
         pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null,
         pilotePour:function(i){
@@ -9000,7 +9038,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v180';
+var _VERSION_REPLI='v181';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10675,12 +10713,16 @@ function _blocEcriture(hote,o){
       _dessineSurLigne(cx,liste[n],caseX(n),baseR,PR);
       cx.restore();
     }
-    /* Un trait leger separe le rappel de la zone d'ecriture : sans lui les
-       deux encres se lisent comme une seule. */
+    /* LA LIGNE D'ECRITURE DES MODELES. Elle etait posee sous la bande, entre
+       le rappel et la zone de trace : a cet endroit elle ne separait rien,
+       elle ressemblait a une seconde ligne d'ecriture et l'enfant pouvait
+       croire qu'il fallait ecrire dessus. Elle passe donc SOUS LES MODELES
+       eux-memes, exactement la ou ils reposent, et s'efface un peu : elle
+       montre l'assise des lettres montrees, elle n'invite pas a ecrire. */
     if(vus){
       cx.save();
-      cx.strokeStyle='rgba('+_HAB.rgb+',.22)';cx.lineWidth=1.5*k;
-      cx.beginPath();cx.moveTo(14*k,BANDE-2);cx.lineTo(CW-14*k,BANDE-2);cx.stroke();
+      cx.strokeStyle='rgba('+_HAB.rgb+',.13)';cx.lineWidth=1.5*k;
+      cx.beginPath();cx.moveTo(14*k,baseR);cx.lineTo(CW-14*k,baseR);cx.stroke();
       cx.restore();
     }
   }
