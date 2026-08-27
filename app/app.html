@@ -7539,7 +7539,16 @@ function _volCarte(o){
     /* « Si la trajectoire est verticale, la question ne se pose pas. » */
     volVertical=(Math.abs(_vers.x-_de.x)<14);
     astreArrivee=_vers;
-    contournera=descente&&!!o.aligne;
+    /* ── LE CONTOURNEMENT N'A PLUS LIEU D'ETRE EN PAYSAGE ──
+       Il avait ete demande quand la carte s'etirait en une colonne unique et
+       que la fusee piquait droit sur un astre enorme : elle en faisait le
+       tour par dessous pour se poser dessus. Sur la carte a trois colonnes,
+       le client a dessine ce qu'il attend — une seule onde d'un monde a
+       l'autre, sans boucle — et note que la licorne le fait deja. La licorne
+       ne contourne pas : c'est cette boucle, et elle seule, qui distinguait
+       encore les deux. En portrait, ou le vol suit le ruban dessine, elle
+       reste. */
+    contournera=descente&&!!o.aligne&&!o.ondule;
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
     /* ── LE TRAJET EN DESCENDANT ──
@@ -8220,7 +8229,16 @@ var islandDefs=[
       if(centers.length>0){
         /* Le depart du toboggan descend : accrochee tout en haut, la fille
            etait coupee par le bord de la carte. */
-        var avX=gW*0.05,avY=_HAB.arcEnCiel?170:60;
+        /* LE DEPART. A 5 % du bord gauche, l'enfant se posait par-dessus le
+           premier monde, qui occupe justement la colonne de gauche : il n'y a
+           pas de place de ce cote. En paysage on part donc du MILIEU de la
+           largeur, au-dessus de tout ; le portrait, lui, garde son coin —
+           la premiere ile y est decalee a droite. */
+        /* La hauteur du depart. 60 px suffisaient quand le vaisseau etait
+           ancre plus bas ; ancre a sa propre hauteur, il commencait 19 px
+           AU-DESSUS du haut de la carte et restait invisible. Le plancher a
+           110 le garde entier dans le cadre, quel que soit l'habillage. */
+        var avX=Math.round(gW*0.5),avY=Math.max(110,_HAB.arcEnCiel?170:60);
         var _f0=_finToboggan(isleCards[0],centers[0]);
         var t0x=_f0.x,t0y=_f0.y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
@@ -8285,6 +8303,18 @@ var islandDefs=[
          l'écran dès la première image affichée, sans saut. */
       var _cad=document.getElementById('ca');
       if(_cad)_centreDeuxIles(_cad,isleCards,charIdx,charEl);
+      /* ── ET L'EQUIPAGE DANS LA VUE ──
+         Le centrage porte sur les MONDES ; le vaisseau, lui, se tient au
+         sommet du sien, au-dessus de son centre. Sur la carte resserree,
+         mesure faite, il tombait 106 px au-dessus du bord haut : on voyait
+         la planete, mais ni la fusee ni l'enfant. On rattrape donc le
+         defilement pour qu'il soit toujours dedans, avec une marge. */
+      if(_cad&&charEl){
+        var _te=parseFloat(charEl.style.top||0),_he=charEl.offsetHeight||80;
+        if(_te<_cad.scrollTop+36)_cad.scrollTop=Math.max(0,_te-36);
+        else if(_te+_he>_cad.scrollTop+_cad.clientHeight-16)
+          _cad.scrollTop=_te+_he-_cad.clientHeight+16;
+      }
       /* Retour d'un cours : il remonte par la porte de lumière. */
       setTimeout(function(){vol.porteRetour();},220);
       wrap.style.visibility='';
@@ -9043,7 +9073,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v182';
+var _VERSION_REPLI='v183';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
