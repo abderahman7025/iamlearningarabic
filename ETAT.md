@@ -489,15 +489,26 @@ voix. Inversé, chaque étape jette le travail de la précédente — traduire
 les voix sur des textes qui vont changer.
 
 **Où on en est.** Le garçon est fini et validé : moteur, habillage,
-planètes, vol, atterrissage. La fille a maintenant les siens : douze
-mondes, fond pastel, licorne, couronne à partir du monde 2 — chantier
-1 ter fait le 19 août, **en attente de la validation du client**.
+planètes, vol, atterrissage. La fille aussi : douze mondes, fond pastel,
+licorne, couronne à partir du monde 2 — **validés par le client le 27 août
+2026**.
 
-**LE CHANTIER OUVERT est donc le 2, les traductions.** L'arabe des
-enregistrements peut partir en parallèle, il ne dépend de rien (voir
-chantier 3). Ce que le client dira des douze mondes dessinés passe avant :
-s'il veut de vraies illustrations, elles se déposent dans `public/images/`
-sans toucher au code.
+Les traductions sont faites : la table `_TE` porte plus de trois cents
+entrées en treize langues, les nouveaux écrans compris.
+
+**LE SEUL CHANTIER OUVERT est le 3, LES VOIX.** `ADMIN_SOUNDS` compte
+370 sons ; le studio d'enregistrement est dans l'application et les fichiers
+vont sur Supabase (`AUDIO_URLS`). Tant qu'ils manquent, tout l'arabe passe
+par la synthèse vocale du navigateur, qui le prononce mal et parfois pas du
+tout selon l'appareil.
+
+**Abandonné par le client, ne pas y revenir :**
+- l'ORDRE D'APPARITION des lettres modèles dans le canvas — le geste qui
+  écrit la lettre trait par trait. Reprises v133 à v143 sur le wāw milieu et
+  fin, le ṭāʾ début et fin, le ʿayn fin ; « laisse les lettres comme elles
+  sont actuellement, stop » ;
+- le TRAIT DE LIAISON sur les lettres autres que celles déjà traitées : la
+  liste n'a jamais été donnée.
 
 ### FAIT — Chantier 1 bis : la fille sur le moteur du garçon, univers licorne
 
