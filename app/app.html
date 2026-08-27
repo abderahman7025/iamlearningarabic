@@ -8050,6 +8050,16 @@ var islandDefs=[
              manque, c'est-a-dire couche. Ici on rend la version d'avant. */
           var avX=gW*0.08,avY=_HAB.arcEnCiel?150:40;
           var t0x=centersM[0].x,t0y=centersM[0].y;
+          /* LA FIN DU CHEMIN SE CACHE DANS LE MONDE. Elle tombait aux trois
+             quarts de la carte — mesure : y=328 quand le corps de l'astre
+             s'arrete a 307 — et ressortait donc par en dessous. On remonte le
+             chemin ENTIER, sa forme intacte, juste assez pour que son bout
+             arrive au coeur de l'astre, ou le dessin le recouvre. */
+          var _somM=null; try{_somM=_sommetEtape(isleCardsMob[0]);}catch(e){}
+          if(_somM&&_somM.r){
+            var _monte=t0y-(_somM.y+_somM.r);
+            if(_monte>0){avY-=_monte;t0y-=_monte;}
+          }
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           var mid0mx=(avX+t0x)*0.5;
           segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
@@ -8093,6 +8103,14 @@ var islandDefs=[
         if(segsMob.length>0){
           var _ca=document.getElementById('ca');
           if(_ca)_centreDeuxIles(_ca,isleCardsMob,charIdxM,charElMob);
+          /* Et l'enfant dans la vue, comme sur la carte couchee : le centrage
+             porte sur les mondes, lui se tient au-dessus du sien. */
+          if(_ca&&charElMob){
+            var _tm=parseFloat(charElMob.style.top||0),_hm=charElMob.offsetHeight||110;
+            if(_tm<_ca.scrollTop+16)_ca.scrollTop=Math.max(0,_tm-16);
+            else if(_tm+_hm>_ca.scrollTop+_ca.clientHeight-16)
+              _ca.scrollTop=_tm+_hm-_ca.clientHeight+16;
+          }
           /* Retour d'un cours : il remonte par la porte de lumière. */
           setTimeout(function(){volM.porteRetour();},220);
         }
@@ -8274,7 +8292,14 @@ var islandDefs=[
            premier. Faute de deuxieme monde, on retombe au milieu. */
         var _m2=isleCards[1];
         var avX=Math.round(_m2?(_m2.offsetLeft+_m2.offsetWidth/2):gW*0.5);
-        var avY=Math.round(t0y);
+        /* Le ruban a une EPAISSEUR : sa bande la plus large fait 38 px, donc
+           19 de part et d'autre de la ligne. Posee sur le sommet du monde, la
+           ligne y mettait le MILIEU du ruban et sa moitie haute depassait
+           au-dessus. On descend de ces 19 px : c'est le HAUT du ruban qui
+           arrive alors sur le haut du monde. */
+        var _demiRuban=19;
+        var avY=Math.round(t0y)+_demiRuban;
+        t0y=Math.round(t0y)+_demiRuban;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
         /* ── UN CHEMIN DROIT ──
            La courbe partait du milieu du haut, plongeait vers la droite puis
@@ -9109,7 +9134,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v185';
+var _VERSION_REPLI='v186';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
