@@ -40,8 +40,11 @@ module.exports = async (req, res) => {
     .eq('email', cleanEmail)
     .single();
 
+  /* Un compte GRATUIT se connecte aussi : c'est `paid` qui bornera son acces
+     a la lecon offerte, pas la porte d'entree. Refuser la connexion ici
+     laisserait l'essayeur dehors avec un mot de passe qu'il vient de choisir. */
   // Réponse volontairement vague pour ne pas révéler si l'email existe
-  if (!user || !user.paid) {
+  if (!user) {
     recordFailedLogin(cleanEmail);
     return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
   }
@@ -76,5 +79,5 @@ module.exports = async (req, res) => {
   const token = generateToken(cleanEmail, 24 * 60 * 60); // 24h expiration
   logEvent('login_success', { email: cleanEmail, ip, is_admin: isAdmin });
 
-  res.json({ success: true, token, email: user.email });
+  res.json({ success: true, token, email: user.email, paid: !!user.paid });
 };

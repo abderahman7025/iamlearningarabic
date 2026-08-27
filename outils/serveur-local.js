@@ -104,6 +104,9 @@ const serveur = http.createServer((req, res) => {
   if (chemin === '/capture' && req.method === 'POST')
     return depose(req, res, url.searchParams.get('f'));
   if (chemin === '/banc') return pageApplication(res, 'banc.html', true);
+  /* La version d'essai, pour la verifier comme le fait un compte gratuit. */
+  if (chemin === '/essai' || chemin.indexOf('/essai/') === 0)
+    return pageApplication(res, 'app-essai.html', true);
   /* Le banc appelle /app?f=… ; l'application elle-même arrive par ses
      adresses de profil. Dans les deux cas c'est app/app.html. */
   if (chemin === '/app' || /^\/(fille|garcon|adulte|girl|boy|adult|interface|cours|admin)(\/|$)/.test(chemin))

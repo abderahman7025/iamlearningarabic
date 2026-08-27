@@ -102,6 +102,7 @@ module.exports = async (req, res) => {
   const navigation = estUneNavigation(req);
   const suite = cheminDemande(req);
 
+  let essai = false;
   const token = jetonDeLaRequete(req);
   if (!token) {
     logEvent('app_no_token', { ip });
@@ -122,11 +123,14 @@ module.exports = async (req, res) => {
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const { data: user } = await supabase
       .from('users').select('email, paid').eq('email', email.toLowerCase()).single();
-    if (!user || !user.paid) {
-      logEvent('app_not_paid', { ip, email });
+    if (!user) {
+      logEvent('app_inconnu', { ip, email });
       if (navigation) return versPagePublique(req, res, null);
-      return res.status(403).json({ error: 'Accès réservé aux comptes actifs.' });
+      return res.status(403).json({ error: 'Compte introuvable.' });
     }
+    /* UN COMPTE GRATUIT entre, mais en ESSAI : l'application le saura par le
+       drapeau pose plus bas et ne lui ouvrira que la premiere lecon. */
+    essai = !user.paid;
   } catch (e) {
     console.error('[App] Vérification du compte impossible :', e.message);
     return res.status(500).json({ error: 'Vérification impossible.' });
@@ -134,8 +138,12 @@ module.exports = async (req, res) => {
 
   // Le banc d'essai : même porte, même vérification, un seul compte.
   const veutLeBanc = !!(req.query && req.query.banc);
+  /* UN COMPTE GRATUIT RECOIT UN AUTRE FICHIER. Pas le meme avec un verrou :
+     un verrou ecrit dans le fichier qu'on donne au visiteur se retire en
+     trois clics. `app-essai.html` est fabrique par `outils/allege.js` et ne
+     CONTIENT PAS les lecons payantes — il n'y a rien a deverrouiller. */
   const fichier = (veutLeBanc && BANC_AUTORISE.indexOf(email.toLowerCase()) >= 0)
-    ? 'banc.html' : 'app.html';
+    ? 'banc.html' : (essai ? 'app-essai.html' : 'app.html');
 
   const html = lireFichier(fichier);
   if (!html) {
@@ -146,6 +154,6 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   // jamais mis en cache par un intermédiaire : le contenu est réservé
   res.setHeader('Cache-Control', 'private, no-store');
-  logEvent('app_served', { ip, email, fichier });
+  logEvent('app_served', { ip, email, fichier, essai });
   return res.status(200).send(html);
 };
