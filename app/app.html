@@ -8658,7 +8658,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v159';
+var _VERSION_REPLI='v160';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9065,17 +9065,19 @@ var _TRACE_MODELE={
              [0.02,-0.22],[0.18,-0.30],[0.28,-0.22],[0.24,-0.08],[0.04,-0.05],
              [-0.20,-0.05],[-0.42,-0.05]],
             [[-0.14,-0.72],[-0.14,-0.40],[-0.14,-0.06]]],
-    /* Comme le début du ṣād fin : le trait de liaison, on continue sur le BAS
-       de la boucle, on remonte pour son haut, on repasse par le bas, et le
-       petit trait horizontal de gauche vient seulement là. Il partait avant,
-       parce que le geste filait jusqu'à −0,08 avant de monter. */
-    /* Le geste du MILIEU, privé de son dernier point — le trait de liaison
-       qui suit la lettre, absent de la forme finale — et porté sur la boucle
-       de celle-ci : 1,037 en x, 1 en y. */
-    fin:[[[0.444,-0.05],[0.268,-0.05],[0.061,-0.05],[-0.084,-0.06],
-          [0.072,-0.278],[0.210,-0.289],[0.264,-0.213],[0.182,-0.130],[0.061,-0.05],
-          [-0.188,-0.05],[-0.400,-0.05]],
-         [[-0.126,-0.72],[-0.126,-0.40],[-0.126,-0.06]]]
+    /* LE ṬĀʾ FIN EST LE MILIEU SANS SON TRAIT DE LIAISON À GAUCHE — le client
+       l'a dit, et la mesure le confirme : d'une forme à l'autre l'encre ne
+       fait que se DÉPLACER de 0,025 em vers la droite (bord droit 0,425 →
+       0,455, bord gauche −0,430 → −0,410). Le long trait vers la gauche, lui,
+       n'est PAS une liaison : c'est le pied du ṭāʾ, il existe déjà sur
+       l'isolée. On ne retire donc aucun point.
+
+       Ce sont EXACTEMENT les points du milieu, tous décalés de +0,025. Ils
+       avaient été mis à l'échelle (1,037 en x), ce qui déformait la boucle. */
+    fin:[[[0.435,-0.05],[0.265,-0.05],[0.065,-0.05],[-0.075,-0.06],
+          [0.045,-0.22],[0.205,-0.30],[0.305,-0.22],[0.265,-0.08],[0.065,-0.05],
+          [-0.175,-0.05],[-0.395,-0.05]],
+         [[-0.115,-0.72],[-0.115,-0.40],[-0.115,-0.06]]]
   },
   /* ع غ — les deux « c » sans lever ; ses formes ne se déduisent pas */
   'ع':{
@@ -9330,15 +9332,23 @@ var _TRACE_MODELE={
     seule:[[[0.13,-0.08],[0.06,-0.04],[-0.01,-0.09],[-0.03,-0.17],[0.01,-0.24],
             [0.08,-0.27],[0.14,-0.22],[0.15,-0.14],[0.13,-0.07],
             [0.14,0.03],[0.10,0.13],[0.02,0.22],[-0.10,0.28],[-0.24,0.27]]],
-    /* Le trait de liaison arrive par la droite, ON LÈVE LE CRAYON, puis
-       EXACTEMENT le geste de l'isolée — ses points, dans son ordre, sans
-       rien déplacer. D'un seul tenant, le pinceau finissait la liaison en
-       frôlant le flanc de la boucle et l'allumait avant l'heure ; c'est le
-       même défaut que sur le fā fin, et la même correction. */
-    fin:[[[0.27,-0.047],[0.20,-0.047],[0.13,-0.047],
-          [0.048,-0.094],[0.002,-0.051],[-0.055,-0.093],[-0.045,-0.148],[-0.019,-0.181],
-          [0.017,-0.201],[0.052,-0.177],[0.074,-0.134],[0.089,-0.048],
-          [0.079,0.030],[0.040,0.128],[-0.038,0.217],[-0.156,0.277],[-0.293,0.267]]]
+    /* LE WĀW FIN EST L'ISOLÉ AVEC UN TRAIT DE LIAISON — le client l'a dit, et
+       la mesure le confirme : d'une forme à l'autre l'encre ne fait que se
+       DÉPLACER de 0,065 em vers la gauche (bord gauche −0,260 → −0,325), la
+       chaîne s'étant élargie d'un tatweel à droite.
+
+       Ce sont donc EXACTEMENT les points de l'isolée, tous décalés de −0,065,
+       et rien d'autre. Ils avaient été redessinés à la main, et la boucle s'en
+       trouvait déformée.
+
+       Et le trait de liaison est un TRAIT À PART. Le commentaire d'avant
+       annonçait qu'on levait le crayon, mais les points étaient dans un seul
+       tableau : le pinceau finissait donc la liaison en frôlant le flanc de la
+       boucle, et l'allumait avant l'heure. Deux tableaux, deux traits. */
+    fin:[[[0.275,-0.047],[0.200,-0.047],[0.130,-0.047]],
+         [[0.065,-0.08],[-0.005,-0.04],[-0.075,-0.09],[-0.095,-0.17],[-0.055,-0.24],
+          [0.015,-0.27],[0.075,-0.22],[0.085,-0.14],[0.065,-0.07],
+          [0.075,0.03],[0.035,0.13],[-0.045,0.22],[-0.165,0.28],[-0.305,0.27]]]
   },
   /* ي — le serpentin d'un seul trait, en partant du haut à droite ; au
      milieu, elle s'écrit comme le bā */
