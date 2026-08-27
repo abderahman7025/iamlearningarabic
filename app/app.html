@@ -8660,7 +8660,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v164';
+var _VERSION_REPLI='v165';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13185,13 +13185,14 @@ function _entrainementAdulte(ca,s,idx){
     var reste=bonnes.slice(), fini=false;
     choix.slice().sort(function(){return Math.random()-.5;}).forEach(function(c){
       var b=document.createElement('div');
-      /* `color:inherit` — et surtout PAS de blanc en dur. Le module de
-         l'interface adulte est pose sur du CLAIR (`rgba(255,255,255,.82)`) :
-         un texte blanc y etait invisible. En heritant, la case suit la
-         couleur du module, sombre ici, claire ailleurs. */
+      /* LES REPONSES EN OR, l'enonce a l'encre : l'oeil separe d'un coup ce
+         qu'on demande de ce qu'on propose. C'est l'or de l'interface —
+         `var(--gold)` — et non une teinte a part, pour qu'il suive le theme.
+         Surtout PAS de blanc en dur : le module de l'interface adulte est
+         pose sur du CLAIR, un texte blanc y disparaissait. */
       b.style.cssText='min-width:62px;height:62px;display:flex;align-items:center;'
         +'justify-content:center;padding:0 10px;border-radius:14px;cursor:pointer;'
-        +'font-family:"Scheherazade New",serif;font-size:2rem;color:inherit;'
+        +'font-family:"Scheherazade New",serif;font-size:2rem;color:var(--gold);'
         +'background:rgba(184,134,11,.10);border:1px solid rgba(184,134,11,.35);'
         +'transition:all .18s ease';
       b.textContent=c;
