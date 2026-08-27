@@ -6356,6 +6356,38 @@ function _encreProfil(){
        : st.profile==='adult'? '#b8860b' : '#f5c842';
 }
 var _QUEUES={};
+/* ── LE BAS DU DESSIN ─────────────────────────────────────────────────
+   L'arriere de la fusee, les pieds de la licorne : le meme point, le bord
+   inferieur de la matiere. On rend son milieu horizontal et sa hauteur, en
+   fractions de l'IMAGE — c'est l'appelant qui connait le cadrage. */
+var _BAS_DESSIN={};
+function _basDuDessin(img){
+  var src=img&&img.getAttribute&&img.getAttribute('src');
+  if(!src||!img.naturalWidth)return null;
+  if(_BAS_DESSIN[src]!==undefined)return _BAS_DESSIN[src];
+  var r=null;
+  try{
+    var L=200, H=Math.max(1,Math.round(img.naturalHeight*L/img.naturalWidth));
+    var c=document.createElement('canvas');c.width=L;c.height=H;
+    var g=c.getContext('2d');g.drawImage(img,0,0,L,H);
+    var d=g.getImageData(0,0,L,H).data;
+    function plein(x,y){return d[(y*L+x)*4+3]>40;}
+    var y1=-1,y0=H;
+    for(var y=H-1;y>=0;y--){for(var x=0;x<L;x++)if(plein(x,y)){if(y>y1)y1=y;if(y<y0)y0=y;break;}}
+    if(y1<0)throw 0;
+    /* Le milieu de la matiere sur la derniere bande : entre les patins de la
+       fusee, entre les sabots de la licorne. */
+    var ep=Math.max(2,Math.round((y1-y0+1)*0.05)), somme=0,n=0;
+    for(var k=0;k<ep;k++){
+      var yy=y1-k; if(yy<0)break;
+      for(var xx=0;xx<L;xx++)if(plein(xx,yy)){somme+=xx;n++;}
+    }
+    if(!n)throw 0;
+    r={fx:(somme/n)/L, fy:y1/H};
+  }catch(e){ r=null; }
+  if(r)_BAS_DESSIN[src]=r;   /* jamais un echec : l'image peut n'etre pas prete */
+  return r;
+}
 function _queueDuDessin(img,versLaDroite){
   var src=img&&img.getAttribute&&img.getAttribute('src');
   if(!src||!img.naturalWidth)return null;
@@ -6621,7 +6653,7 @@ function _volCarte(o){
     if(!eq.aVaisseau)return;
     vaisseauHabite(true);
     eq.vaisseau.style.opacity='1';
-    eq.vaisseau.style.transform='';
+    leveLa(0);
     eq.pilote.style.opacity='0';
     eq.pilote.style.transform='translateY(14%) scale(.72)';
     if(eq.flamme)eq.flamme.style.display='block';
@@ -6637,7 +6669,7 @@ function _volCarte(o){
     var debout=(pose===undefined)?(idx>=1):pose;
     habillePilote();
     vaisseauHabite(!debout);
-    eq.vaisseau.style.transform='';
+    leveLa(0);
     eq.vaisseau.style.opacity='1';
     eq.pilote.style.opacity=debout?'1':'0';
     eq.pilote.style.transform=debout?'translateY(0) scale(1)':'translateY(14%) scale(.72)';
@@ -6680,7 +6712,7 @@ function _volCarte(o){
     /* Elle s'eleve un peu : elle arrive AU-DESSUS du sommet, et c'est de
        la qu'elle descendra se poser. Meme hauteur que la tenue en vol
        stationnaire, sinon on la voit remonter avant d'atterrir. */
-    if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
+    if(eq.aVaisseau)leveLa(0.34);
     enApproche=!!o.aligne;dernierPoint=null;
     var t0=Date.now(),D=o.dureeApproche||900;
     /* Elle vole encore : son nez reste dans le sens de la marche, et elle
@@ -6841,10 +6873,10 @@ function _volCarte(o){
     if(!eq.aVaisseau){if(fini)fini();return;}
     if(eq.flamme)eq.flamme.style.display='none';
     habillePilote();
-    eq.vaisseau.style.transform='translateY(-34%)';
+    leveLa(0.34);
     eq.pilote.style.transform='translateY(-34%) scale(.72)';
     setTimeout(function(){
-      eq.vaisseau.style.transform='';          /* elle se pose */
+      leveLa(0);                               /* elle se pose */
       setTimeout(function(){
         vaisseauHabite(false);                 /* il quitte le hublot */
         eq.pilote.style.opacity='1';           /* et parait devant elle */
@@ -6875,6 +6907,15 @@ function _volCarte(o){
   /* La verticale que vise le redressement en cours, et le fait qu'il ait
      lieu : tant qu'il dure, la fusee pivote sur place et ne seme pas. */
   var droitFige=null, angleFige=null, manoeuvre=false;
+  /* De combien la monture est SOULEVEE dans sa boite. Elle l'est a
+     l'approche, dans la boucle et a la pose ; son arriere monte d'autant, et
+     la trainee doit suivre — sinon le feu se detache pendant tout le
+     contournement. */
+  var leve=0;
+  function leveLa(v){
+    leve=v;
+    if(eq.vaisseau)eq.vaisseau.style.transform=v?('translateY('+(-v*100).toFixed(0)+'%)'):'';
+  }
   /* Le trajet en cours monte-t-il ? descend-il ? Les deux ne se volent pas
      de la meme facon : voir `poser` et `contourne`. */
   var montee=false, descente=false, volVertical=false, astreArrivee=null;
@@ -6976,22 +7017,35 @@ function _volCarte(o){
        dessin de la licorne, `eq.pilote` la fille elle-meme — invisible en
        vol. Tant qu'elle n'a pas gagne sa licorne, il n'y a pas de queue et
        le ruban reste sous elle. */
+    /* D'OU CELA SORT, exactement. Tout se mesure dans le dessin : lui seul
+       sait ou est son arriere, et il change au fil du jeu.
+         la fusee   — le BAS du dessin, sa tuyere. Elle sortait avant a 0,80
+           fois la hauteur de la boite, c'est-a-dire a la pointe de la
+           FLAMME ; celle-ci a ete retiree en v150, et le feu se retrouvait
+           detache ;
+         la licorne qui MONTE — ses PIEDS, le bas du dessin lui aussi ;
+         la licorne autrement — sa QUEUE, a l'arriere, a mi-hauteur, du cote
+           oppose a la marche. */
     var monture=eq.image;
-    if(!(_HAB&&_HAB.traineeFeu)&&monture&&monture.naturalWidth){
-      var q=_queueDuDessin(monture,sensVol>0);
+    if(monture&&monture.naturalWidth){
+      var feu=!!(_HAB&&_HAB.traineeFeu);
+      var q=(feu||montee)?_basDuDessin(monture):_queueDuDessin(monture,sensVol>0);
       if(q){
         var im=monture, bw=im.offsetWidth||dy, bh=im.offsetHeight||dy;
         /* `object-fit:contain` : meme reduction dans les deux sens, centre. */
         var e=Math.min(bw/im.naturalWidth,bh/im.naturalHeight);
         var vw=im.naturalWidth*e, vh=im.naturalHeight*e;
-        /* Ecart au centre de la BOITE, avant rotation. */
+        /* Ecart au centre de la BOITE, avant rotation. La monture est parfois
+           SOULEVEE dans sa boite : son arriere monte d'autant. */
         var ex=((bw-vw)/2+q.fx*vw)-bw/2;
-        var ey=((bh-vh)/2+q.fy*vh)-bh/2;
+        var ey=((bh-vh)/2+q.fy*vh)-bh/2-leve*bh;
         var co=Math.cos(t), si=Math.sin(t);
         return {x:x+(ex*co-ey*si), y:cy+(ex*si+ey*co)};
       }
     }
-    var r=(_HAB&&_HAB.traineeFeu)?dy*0.80:dy*0.5;
+    /* Le dessin n'est pas encore mesurable : le bas de la boite fera
+       l'affaire le temps qu'il charge. */
+    var r=dy*0.5;
     return {x:x-r*Math.sin(t), y:cy+r*Math.cos(t)};
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
@@ -7219,7 +7273,7 @@ function _volCarte(o){
   }
   function contourne(b,fini){
     /* Meme tenue que pendant l'approche : elle vole encore. */
-    if(eq.aVaisseau)eq.vaisseau.style.transform='translateY(-34%)';
+    if(eq.aVaisseau)leveLa(0.34);
     /* Le cap avec lequel le vol vient de se presenter : `anglePose` est la
        rotation appliquee, et le cap vaut quatre-vingt-dix degres de moins. */
     var capEntree=o.aligne?(anglePose-90):null;
@@ -8572,7 +8626,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v155';
+var _VERSION_REPLI='v156';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
