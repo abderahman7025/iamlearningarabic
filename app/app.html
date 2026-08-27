@@ -6333,6 +6333,67 @@ function _fondEnfant(actif){
    Saturne 24 % (23), comete 33 % (34,5).
    Le seuil d'opacite, lui, fait ignorer le halo, peint en transparence. */
 var _HAUTS_DECOR={};
+/* ── OU EST LA QUEUE DE LA LICORNE ────────────────────────────────────
+   L'arc-en-ciel doit en sortir, pas de sous ses sabots. La queue est a
+   l'ARRIERE du dessin — le cote oppose a la marche — et a mi-hauteur. On la
+   trouve en lisant l'alpha : on prend la bande la plus externe du cote
+   arriere, et on retient le milieu de la matiere qui s'y trouve.
+
+   Rendu en fractions de l'IMAGE, pas de la boite : c'est l'appelant qui
+   connait le cadrage `object-fit:contain`. Garde en cache — le dessin d'une
+   licorne ne bouge pas. */
+/* ── LA COULEUR DE L'ENCRE ─────────────────────────────────────────────
+   Violet pastel pour la fille, bleu turquoise pour le garcon — la demande du
+   client. Elle etait recopiee a quatre endroits ; un seul les sert tous, et
+   une prochaine retouche ne pourra plus en oublier un. */
+function _encreProfil(){
+  /* Le canvas est POSE SUR DU SOMBRE — `rgba(10,7,24,.75)` — et non sur du
+     blanc : de vrais pastels y sont donc les plus lisibles, pas les teintes
+     soutenues. Contrastes mesures sur ce fond : violet 8,1 et turquoise
+     10,6, la ou les versions foncees tombaient a 5,3. */
+  return st.profile==='girl' ? '#b39ddb'   /* violet pastel */
+       : st.profile==='boy'  ? '#4dd0e1'   /* bleu turquoise */
+       : st.profile==='adult'? '#b8860b' : '#f5c842';
+}
+var _QUEUES={};
+function _queueDuDessin(img,versLaDroite){
+  var src=img&&img.getAttribute&&img.getAttribute('src');
+  if(!src||!img.naturalWidth)return null;
+  var cle=src+(versLaDroite?'|d':'|g');
+  if(_QUEUES[cle]!==undefined)return _QUEUES[cle];
+  var r=null;
+  try{
+    /* Deux cents pixels de large suffisent : on cherche une hauteur, pas un
+       contour. Mesurer un million de pixels pour cela serait du gachis. */
+    var L=200, H=Math.max(1,Math.round(img.naturalHeight*L/img.naturalWidth));
+    var c=document.createElement('canvas');c.width=L;c.height=H;
+    var g=c.getContext('2d');g.drawImage(img,0,0,L,H);
+    var d=g.getImageData(0,0,L,H).data;
+    function plein(x,y){return d[(y*L+x)*4+3]>40;}
+    var x0=L,x1=-1,y0=H,y1=-1;
+    for(var y=0;y<H;y++)for(var x=0;x<L;x++)if(plein(x,y)){
+      if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y;}
+    if(x1<0)throw 0;
+    /* L'ARRIERE : a gauche quand elle va vers la droite. */
+    var bord=versLaDroite?x0:x1, pas=versLaDroite?1:-1;
+    var ep=Math.max(2,Math.round((x1-x0+1)*0.06));
+    var somme=0,n=0;
+    for(var k=0;k<ep;k++){
+      var xx=bord+pas*k;
+      if(xx<0||xx>=L)break;
+      for(var yy=y0;yy<=y1;yy++)if(plein(xx,yy)){somme+=yy;n++;}
+    }
+    if(!n)throw 0;
+    r={fx:bord/L, fy:(somme/n)/H};
+  }catch(e){ r=null; }
+  /* On ne garde QUE les mesures reussies. Le dessin change de sens en plein
+     vol : la nouvelle image n'est pas toujours chargee au moment ou on la
+     mesure, et retenir cet echec-la condamnerait le ruban a sortir des
+     sabots pour tout le reste de la partie. */
+  if(r)_QUEUES[cle]=r;
+  return r;
+}
+
 function _hautDuDessin(img){
   var cle=img.getAttribute('src')||'';
   if(_HAUTS_DECOR[cle]!==undefined)return _HAUTS_DECOR[cle];
@@ -6897,10 +6958,34 @@ function _volCarte(o){
     /* Rien pendant la manoeuvre : la fusee pivote, la tuyere balaie un arc,
        et le feu ferait un cercle autour de l'astre. */
     if(manoeuvre||enApproche)return null;
-    var r=(_HAB&&_HAB.traineeFeu)?dy*0.80:dy*0.5;
     var t=anglePose*Math.PI/180;
     var cy=y-dy/2;                    /* le centre de la boite, autour duquel
                                          la rotation se fait */
+    /* SOUS LA LICORNE, l'arc-en-ciel sort de sa QUEUE — a l'arriere du
+       dessin, a mi-hauteur — et non de sous ses sabots. Le point se mesure
+       dans l'image, car il change avec le sens de marche et avec le dessin
+       lui-meme : la licorne seule, celle qui porte la fille, celle a
+       couronne n'ont pas la queue a la meme hauteur. */
+    /* C'est la MONTURE qui a une queue, pas l'enfant : `eq.image` est le
+       dessin de la licorne, `eq.pilote` la fille elle-meme — invisible en
+       vol. Tant qu'elle n'a pas gagne sa licorne, il n'y a pas de queue et
+       le ruban reste sous elle. */
+    var monture=eq.image;
+    if(!(_HAB&&_HAB.traineeFeu)&&monture&&monture.naturalWidth){
+      var q=_queueDuDessin(monture,sensVol>0);
+      if(q){
+        var im=monture, bw=im.offsetWidth||dy, bh=im.offsetHeight||dy;
+        /* `object-fit:contain` : meme reduction dans les deux sens, centre. */
+        var e=Math.min(bw/im.naturalWidth,bh/im.naturalHeight);
+        var vw=im.naturalWidth*e, vh=im.naturalHeight*e;
+        /* Ecart au centre de la BOITE, avant rotation. */
+        var ex=((bw-vw)/2+q.fx*vw)-bw/2;
+        var ey=((bh-vh)/2+q.fy*vh)-bh/2;
+        var co=Math.cos(t), si=Math.sin(t);
+        return {x:x+(ex*co-ey*si), y:cy+(ex*si+ey*co)};
+      }
+    }
+    var r=(_HAB&&_HAB.traineeFeu)?dy*0.80:dy*0.5;
     return {x:x-r*Math.sin(t), y:cy+r*Math.cos(t)};
   }
   /* La traînée : de petits grains qui s'effacent. Ils sont posés DANS le
@@ -8480,7 +8565,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v152';
+var _VERSION_REPLI='v153';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12996,8 +13081,8 @@ function renderAudioExercise(ca,qs,session){
         function mPos(e){const r=miniCanvas.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX;const cy=e.touches?e.touches[0].clientY:e.clientY;return{x:cx-r.left,y:cy-r.top};}
         miniCanvas.addEventListener('mousedown',e=>{mDrawing=true;const p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);});
         miniCanvas.addEventListener('touchstart',e=>{e.preventDefault();mDrawing=true;const p=mPos(e);mctx.beginPath();mctx.moveTo(p.x,p.y);},{passive:false});
-        miniCanvas.addEventListener('mousemove',e=>{if(!mDrawing)return;const p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle=(st.profile==='girl'?'#c2185b':st.profile==='boy'?'#0288d1':st.profile==='adult'?'#b8860b':'#f5c842');mctx.lineTo(p.x,p.y);mctx.stroke();mctx.beginPath();mctx.moveTo(p.x,p.y);});
-        miniCanvas.addEventListener('touchmove',e=>{e.preventDefault();if(!mDrawing)return;const p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle=(st.profile==='girl'?'#c2185b':st.profile==='boy'?'#0288d1':st.profile==='adult'?'#b8860b':'#f5c842');mctx.lineTo(p.x,p.y);mctx.stroke();mctx.beginPath();mctx.moveTo(p.x,p.y);},{passive:false});
+        miniCanvas.addEventListener('mousemove',e=>{if(!mDrawing)return;const p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle=_encreProfil();mctx.lineTo(p.x,p.y);mctx.stroke();mctx.beginPath();mctx.moveTo(p.x,p.y);});
+        miniCanvas.addEventListener('touchmove',e=>{e.preventDefault();if(!mDrawing)return;const p=mPos(e);mctx.lineWidth=4;mctx.strokeStyle=_encreProfil();mctx.lineTo(p.x,p.y);mctx.stroke();mctx.beginPath();mctx.moveTo(p.x,p.y);},{passive:false});
         miniCanvas.addEventListener('mouseup',()=>{mDrawing=false;mctx.beginPath();});
         miniCanvas.addEventListener('touchend',()=>{mDrawing=false;mctx.beginPath();});
         miniCanvas.addEventListener('mouseleave',()=>{mDrawing=false;mctx.beginPath();});
@@ -13137,7 +13222,7 @@ function renderAudioExercise(ca,qs,session){
 // EXERCISE PAGE — 200 questions audio
 function renderExPage(ca){
   ca.innerHTML='';
-  var inkColor=st.profile==='girl'?'#c2185b':st.profile==='boy'?'#0288d1':st.profile==='adult'?'#b8860b':'#f5c842';
+  var inkColor=_encreProfil();
   var hdr=document.createElement('div');
   hdr.style.cssText='background:linear-gradient(135deg,var(--gold),#b8860b);border-radius:16px;padding:16px 18px;margin-bottom:14px;color:#000;text-align:center';
   hdr.innerHTML='<div style="font-weight:800;font-size:1.1rem;margin-bottom:4px">'+t('ex200_title')+'</div>';
@@ -13383,7 +13468,7 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
   let showGuide = true;
   let hasDrawn = false;
   // Couleur d'encre selon le profil : noir pour enfants (fond blanc), blanc pour adulte (fond sombre → défaut original)
-  let profileInkColor = st.profile==='girl' ? '#c2185b' : st.profile==='boy' ? '#0288d1' : st.profile==='adult' ? '#b8860b' : 'white';
+  let profileInkColor = (st.profile==='girl'||st.profile==='boy'||st.profile==='adult') ? _encreProfil() : 'white';
   let color = profileInkColor;
   let currentLetterForm = letterAr;
   /* La forme choisie et la voyelle choisie, séparément : le modèle est
