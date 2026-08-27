@@ -8658,7 +8658,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v158';
+var _VERSION_REPLI='v159';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10331,10 +10331,10 @@ function _blocEcriture(hote,o){
   /* `width:auto` est indispensable : la classe boy-btn étale un bouton sur
      toute la largeur, et dans une barre qui revient à la ligne les boutons
      s'empilaient alors les uns sous les autres. */
-  function petitBouton(txt,fn){
+  function petitBouton(txt,fn,ou){
     var b=document.createElement('button');b.className='boy-btn sec';
     b.style.cssText+=';width:auto;padding:9px 8px;font-size:.8rem;margin:0;white-space:nowrap';
-    b.textContent=txt;b.onclick=fn;barre.appendChild(b);return b;
+    b.textContent=txt;b.onclick=fn;(ou||barre).appendChild(b);return b;
   }
   /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste.
      « REVOIR » a été retiré à la demande du client : l'animation tourne en
@@ -10346,12 +10346,22 @@ function _blocEcriture(hote,o){
      montre tout, il n'a plus qu'a repasser. */
   if(o.deTete){
     var nomsB=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
+    /* LEUR PROPRE RANGEE, EN ECRITURE ARABE. Ils commandent les cases du
+       canvas, lesquelles vont de droite a gauche — la case 0, l'isolee, est
+       tout a DROITE (voir `caseX`). Il ne suffit pas de les ranger a
+       l'envers : a cinq boutons la barre revient a la ligne, et le dernier
+       repassait a gauche. En `direction:rtl`, le retour a la ligne suit le
+       meme sens qu'eux. */
+    var rangee=document.createElement('div');
+    rangee.style.cssText='display:flex;gap:6px;justify-content:center;flex-wrap:wrap;'
+      +'margin-top:6px;direction:rtl';
+    el.appendChild(rangee);
     for(var ib=0;ib<nb;ib++)(function(n){
       var b=petitBouton('👁 '+(nomsB[n]||('#'+(n+1))),function(){
         montres[n]=!montres[n];
         b.style.opacity=montres[n]?'1':'.55';
         guide(3);
-      });
+      },rangee);
       b.style.opacity='.55';
     })(ib);
   }
@@ -10796,6 +10806,8 @@ function _decorMonde(ca,actif){
 /* DEBUT TRADUCTIONS ENFANT */
 var _TE={
 /* Les cinq exercices ajoutes a la lecon de lettre. */
+'Où est {lettre} ? 🧠':{en:'Where is {lettre}? 🧠',es:'¿Dónde está {lettre}? 🧠',de:'Wo ist {lettre}? 🧠',nl:'Waar is {lettre}? 🧠',it:'Dov\'è {lettre}? 🧠',pt:'Onde está {lettre}? 🧠',ru:'Где {lettre}? 🧠',tr:'{lettre} nerede? 🧠',zh:'{lettre} 在哪里？🧠',id:'Di mana {lettre}? 🧠',ur:'{lettre} کہاں ہے؟ 🧠',hi:'{lettre} कहाँ है? 🧠'},
+'Où est la lettre {lettre} ?':{en:'Where is the letter {lettre}?',es:'¿Dónde está la letra {lettre}?',de:'Wo ist der Buchstabe {lettre}?',nl:'Waar is de letter {lettre}?',it:'Dov\'è la lettera {lettre}?',pt:'Onde está a letra {lettre}?',ru:'Где буква {lettre}?',tr:'{lettre} harfi nerede?',zh:'{lettre} 这个字母在哪里？',id:'Di mana huruf {lettre}?',ur:'حرف {lettre} کہاں ہے؟',hi:'अक्षर {lettre} कहाँ है?'},
 'RAPPEL {n}/{sur}':{en:'RECALL {n}/{sur}',es:'REPASO {n}/{sur}',de:'RÜCKBLICK {n}/{sur}',nl:'HERHALING {n}/{sur}',it:'RIPASSO {n}/{sur}',pt:'REVISÃO {n}/{sur}',ru:'ПОВТОРЕНИЕ {n}/{sur}',tr:'HATIRLA {n}/{sur}',zh:'复习 {n}/{sur}',id:'INGAT LAGI {n}/{sur}',ur:'دہرائی {n}/{sur}',hi:'दोहराव {n}/{sur}'},
 'LE MOT À TROU {n}/{sur}':{en:'THE MISSING PIECE {n}/{sur}',es:'LA PALABRA INCOMPLETA {n}/{sur}',de:'DAS LÜCKENWORT {n}/{sur}',nl:'HET GATENWOORD {n}/{sur}',it:'LA PAROLA BUCATA {n}/{sur}',pt:'A PALAVRA COM LACUNA {n}/{sur}',ru:'СЛОВО С ПРОПУСКОМ {n}/{sur}',tr:'EKSİK HARF {n}/{sur}',zh:'填空词 {n}/{sur}',id:'KATA RUMPANG {n}/{sur}',ur:'ادھورا لفظ {n}/{sur}',hi:'अधूरा शब्द {n}/{sur}'},
 '👁 MONTRE-MOI':{en:'👁 SHOW ME',es:'👁 MUÉSTRAME',de:'👁 ZEIG MIR',nl:'👁 LAAT ZIEN',it:'👁 MOSTRAMI',pt:'👁 MOSTRA-ME',ru:'👁 ПОКАЖИ',tr:'👁 GÖSTER',zh:'👁 给我看',id:'👁 TUNJUKKAN',ur:'👁 دکھاؤ',hi:'👁 दिखाओ'},
@@ -12020,7 +12032,11 @@ function _boyScene(ca,reprise){
      Les deux morceaux du mot portent un TATWEEL du cote coupe : sans lui, la
      lettre qui borde le trou reprendrait la forme qu'elle a en fin de mot, et
      le mot mentirait sur ce qu'il montre. */
-  api.trou=function(etape,html,fr,droite,gauche,options,cible,indice){
+  /* Aucun INDICE sous le mot. Ecrire « au milieu du mot » revenait a donner
+     la reponse : l'enfant qui n'a rien compris devine, et l'exercice ne
+     mesure plus rien. Le mot lui-meme dit ou est le trou — c'est a lui de le
+     lire. */
+  api.trou=function(etape,html,fr,droite,gauche,options,cible){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       /* Marques pour la regle de paysage court : ce sont ces trois pieces —
@@ -12047,10 +12063,6 @@ function _boyScene(ca,reprise){
       mot.appendChild(creux);
       if(gauche)bout(gauche);
       p.appendChild(mot);
-      if(indice){
-        var nt=document.createElement('div');nt.className='boy-note';nt.textContent=indice;
-        p.appendChild(nt);
-      }
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;direction:rtl';
@@ -12287,9 +12299,13 @@ function _boyLetterCourse(ca,idx,premiere){
   var _revs=_lettresARevoir(idx,3);
   _revs.forEach(function(_rev,_n){
     var _t=_revs.length>1?teF('RAPPEL {n}/{sur}',{n:_n+1,sur:_revs.length}):te('RAPPEL');
+    /* « Tu te souviens ? » n'ouvre que la PREMIERE : repose a chaque question
+       elle devient un tic de langage, et la consigne se perd derriere. */
     sc.push(B.controle(_t,
-      teF('Tu te souviens ?<br>Où est {lettre} ? 🧠',{lettre:b(_rev.name)}),
-      teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name}),
+      _n===0?teF('Tu te souviens ?<br>Où est {lettre} ? 🧠',{lettre:b(_rev.name)})
+            :teF('Où est {lettre} ? 🧠',{lettre:b(_rev.name)}),
+      _n===0?teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name})
+            :teF('Où est la lettre {lettre} ?',{lettre:_rev.name}),
       [_rev.ar].concat(_leurresLettre(_rev,idx,2).map(function(x){return x.ar;})),
       _rev.ar));
   });
@@ -12559,14 +12575,13 @@ function _boyLetterCourse(ca,idx,premiere){
       /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
          s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
       var _iF=(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3);
-      var _ou=[te('au début du mot'),te('au milieu du mot'),te('à la fin du mot')][_g];
       var _t=(_places.length>1)
         ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_places.length})
         : te('LE MOT À TROU');
       sc.push(B.trou(_t,
         TB('Quelle <b>forme</b><br>manque ici ? 🧩'),
         te('Quelle forme manque dans ce mot ?'),
-        _dr,_ga,_opts,formes[_iF].form,_ou));
+        _dr,_ga,_opts,formes[_iF].form));
     });
   }
 
