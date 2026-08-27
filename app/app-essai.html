@@ -5364,6 +5364,7 @@ function navToPage(page){
   renderPage(page,true);
 }
 function renderPage(page,fwd){
+  _barreEssai();
   repriseNoter({type:'page',page:page});
   const ca=document.getElementById('ca');transitionCA(fwd!==false);ca.scrollTop=0;
   /* Chaque page repart du fond de base de l'enfant : l'espace pour le
@@ -7594,7 +7595,14 @@ var islandDefs=[
       return ALL_S.find(function(s){return s.id===sid;})||null;
     }).filter(Boolean);
     var doneCount=isleSessions.filter(function(s){return (st.scores[s.id]||0)>=80;}).length;
-    var isLocked=!prevIslandDone;
+    /* EN ESSAI, tout ce qui n'est pas offert est verrouillé — quel que soit
+       l'avancement : le contenu n'est pas dans le fichier. */
+    /* Une ile dont les lecons ne sont plus dans le fichier a une liste VIDE :
+       `some` y repond faux, et elle passait pour ouverte. C'est justement
+       celle-la qu'il faut verrouiller. */
+    var isLocked=!prevIslandDone
+      ||(_enEssai()&&(!isleSessions.length
+        ||isleSessions.some(function(x){return !_sessionOfferte(x.id);})));
     var isComplete=doneCount===isleSessions.length;
 
     // Card île (layout centré)
@@ -8438,6 +8446,44 @@ var CHILD_LETTERS=[
 ];
 
 /* Correspondance île → indices dans CHILD_LETTERS */
+/* ── LE MODE ESSAI ────────────────────────────────────────────────────
+   Posé par le SERVEUR dans `app-essai.html`, jamais par le navigateur : le
+   client ne doit pas pouvoir se déclarer payant.
+
+   Les leçons offertes sont les voyelles et la première leçon de lettres —
+   ا و ي. Le reste n'est pas dans le fichier ; on le verrouille pour que
+   l'absence se lise comme une invitation et non comme une panne. */
+function _enEssai(){ return typeof window!=='undefined' && window.__ESSAI===1; }
+var _SESSIONS_OFFERTES=[0,1];
+function _sessionOfferte(id){
+  return !_enEssai() || _SESSIONS_OFFERTES.indexOf(id)>=0;
+}
+/* La porte de sortie : la page qui vend. Toujours en bas de l'écran pendant
+   l'essai — celui qui vient d'écrire sa première lettre est celui qui achète,
+   pas celui qui aura fermé l'onglet. */
+function _barreEssai(){
+  if(!_enEssai()||document.getElementById('barre-essai'))return;
+  var b=document.createElement('div');
+  b.id='barre-essai';
+  b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9000;'
+    +'display:flex;align-items:center;justify-content:center;gap:12px;'
+    +'flex-wrap:wrap;padding:10px 14px;'
+    +'background:linear-gradient(180deg,rgba(10,7,24,.0),rgba(10,7,24,.92) 38%);'
+    +'font-family:Outfit,system-ui,sans-serif;pointer-events:none';
+  var t=document.createElement('span');
+  t.textContent=te('Version d\u2019essai');
+  t.style.cssText='color:#f2ecdf;font-size:.86rem;opacity:.9';
+  var a=document.createElement('a');
+  a.href='/';
+  a.textContent=te('D\u00e9bloquer tout le cours');
+  a.style.cssText='pointer-events:auto;text-decoration:none;padding:10px 20px;'
+    +'border-radius:50px;background:#f5c842;color:#221803;'
+    +'font:700 .88rem Outfit,system-ui,sans-serif;'
+    +'box-shadow:0 6px 20px rgba(245,200,66,.35)';
+  b.appendChild(t);b.appendChild(a);
+  document.body.appendChild(b);
+}
+
 var CHILD_ISLAND_LETTERS=[
   [],              // 0: SV  — voyelles (pas de lettres)
   [0,1,2],         // 1: SA  — ا و ي
@@ -8622,7 +8668,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v171';
+var _VERSION_REPLI='v172';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12762,6 +12808,20 @@ function renderSessions(ca){
     /* La carte s'ouvre en grand avant de laisser la place à la leçon :
        le geste reliait déjà les deux écrans, on le garde. */
     var carte=ligne.querySelector('.par-carte');
+    if(!_sessionOfferte(s.id)){
+      /* Verrouillée : on la montre, éteinte, et on emmène vers la page qui
+         vend plutôt que d'ouvrir une leçon vide.
+         PAS de `return` ici : on est dans un `forEach`, et sortir sauterait
+         tout ce qui suit dans le tour — la ligne n'etait alors jamais posee
+         et la carte disparaissait de la liste. */
+      carte.style.filter='grayscale(.85) brightness(.6)';
+      carte.style.opacity='.55';
+      var cad=document.createElement('div');
+      cad.textContent='🔒';
+      cad.style.cssText='position:absolute;top:8px;right:10px;font-size:1.1rem';
+      carte.style.position='relative';carte.appendChild(cad);
+      carte.onclick=function(){window.location.href='/';};
+    }else
     carte.onclick=function(){
       var r=carte.getBoundingClientRect();
       var clone=document.createElement('div');
