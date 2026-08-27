@@ -8512,6 +8512,26 @@ var CHILD_ISLAND_LABELS=[
 var _boySession=null;
 
 /* Index dans CHILD_LETTERS à partir de la lettre arabe */
+/* ── QUOI REVISER, ET CONTRE QUOI ─────────────────────────────────────
+   Le rappel espace : on ne redemande pas la lettre du jour — elle vient
+   d'etre vue et ne prouve rien — mais une lettre de deux a quatre lecons en
+   arriere, celle qui est en train de s'effacer. */
+function _lettreARevoir(idx){
+  var haut=idx-2, bas=Math.max(0,idx-4);
+  if(haut<0)return null;
+  return CHILD_LETTERS[bas+Math.floor(Math.random()*(haut-bas+1))]||null;
+}
+/* Des leurres pris parmi les lettres DEJA VUES : en proposer une que
+   l'enfant n'a jamais rencontree ne teste rien, cela tire au sort. */
+function _leurresLettre(cible,idx,combien){
+  var pool=CHILD_LETTERS.slice(0,Math.max(1,idx+1)).filter(function(x){
+    return x.ar!==cible.ar;});
+  /* Trop tot dans le parcours pour avoir de quoi choisir : on complete avec
+     la suite de l'alphabet, faute de mieux. */
+  if(pool.length<combien)pool=CHILD_LETTERS.filter(function(x){return x.ar!==cible.ar;});
+  pool=pool.slice().sort(function(){return Math.random()-.5;});
+  return pool.slice(0,combien);
+}
 function _childIdxOf(ar){
   for(var i=0;i<CHILD_LETTERS.length;i++){if(CHILD_LETTERS[i].ar===ar)return i;}
   return -1;
@@ -8626,7 +8646,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v156';
+var _VERSION_REPLI='v157';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10205,11 +10225,16 @@ function _blocEcriture(hote,o){
     _dessineSurLigne(cx,liste[n],caseX(n),baseY,PX);
     cx.restore();
   }
+  /* DE TETE : rien a repasser. La lettre grise ne parait que le temps d'un
+     coup d'oeil, quand l'enfant appuie sur « montre-moi ». Les noms des cases
+     et la ligne d'ecriture, eux, restent : ils disent QUOI ecrire, pas
+     COMMENT. */
+  var montre=false;
   function guide(prog){
     cx.clearRect(0,0,CW,CH);
     /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
        d'un coup d'œil ce qu'il a écrit lui-même. */
-    for(var n=0;n<nb;n++){
+    if(!o.deTete||montre)for(var n=0;n<nb;n++){
       if(n===caseAnim&&rev)cx.drawImage(_reveleJusqua(rev,prog),rev.x0,rev.y0);
       else modeleEntier(n);
     }
@@ -10302,6 +10327,17 @@ function _blocEcriture(hote,o){
      « REVOIR » a été retiré à la demande du client : l'animation tourne en
      boucle sur la case voisine, il n'y a rien à relancer. */
   petitBouton(te('↺ EFFACER'),function(){cxE.clearRect(0,0,CW,CH);});
+  /* Le filet du trace de tete : la lettre se montre deux secondes et demie,
+     puis se retire. Sans lui, l'enfant qui ne se souvient plus n'a aucune
+     porte de sortie et laisse tomber la lecon. */
+  if(o.deTete){
+    var minuteur=null;
+    petitBouton(te('👁 MONTRE-MOI'),function(){
+      montre=true;guide(3);
+      if(minuteur)clearTimeout(minuteur);
+      minuteur=setTimeout(function(){montre=false;guide(3);},2500);
+    });
+  }
   var trace=false;
   function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
     return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
@@ -10742,6 +10778,24 @@ function _decorMonde(ca,actif){
    couleur dans la phrase aurait obligé à la retraduire treize fois. */
 /* DEBUT TRADUCTIONS ENFANT */
 var _TE={
+/* Les cinq exercices ajoutes a la lecon de lettre. */
+'👁 MONTRE-MOI':{en:'👁 SHOW ME',es:'👁 MUÉSTRAME',de:'👁 ZEIG MIR',nl:'👁 LAAT ZIEN',it:'👁 MOSTRAMI',pt:'👁 MOSTRA-ME',ru:'👁 ПОКАЖИ',tr:'👁 GÖSTER',zh:'👁 给我看',id:'👁 TUNJUKKAN',ur:'👁 دکھاؤ',hi:'👁 दिखाओ'},
+'🎯 Il y en a {n} à trouver':{en:'🎯 There are {n} to find',es:'🎯 Hay {n} para encontrar',de:'🎯 Es gibt {n} zu finden',nl:'🎯 Er zijn er {n} te vinden',it:'🎯 Ce ne sono {n} da trovare',pt:'🎯 Há {n} para encontrar',ru:'🎯 Нужно найти {n}',tr:'🎯 Bulunacak {n} tane var',zh:'🎯 要找出 {n} 个',id:'🎯 Ada {n} yang harus ditemukan',ur:'🎯 {n} تلاش کرنے ہیں',hi:'🎯 {n} ढूँढ़ने हैं'},
+'RAPPEL':{en:'RECALL',es:'REPASO',de:'RÜCKBLICK',nl:'HERHALING',it:'RIPASSO',pt:'REVISÃO',ru:'ПОВТОРЕНИЕ',tr:'HATIRLA',zh:'复习',id:'INGAT LAGI',ur:'دہرائی',hi:'दोहराव'},
+'Tu te souviens ?<br>Où est {lettre} ? 🧠':{en:'Do you remember?<br>Where is {lettre}? 🧠',es:'¿Te acuerdas?<br>¿Dónde está {lettre}? 🧠',de:'Erinnerst du dich?<br>Wo ist {lettre}? 🧠',nl:'Weet je het nog?<br>Waar is {lettre}? 🧠',it:'Ti ricordi?<br>Dov\'è {lettre}? 🧠',pt:'Lembras-te?<br>Onde está {lettre}? 🧠',ru:'Помнишь?<br>Где {lettre}? 🧠',tr:'Hatırlıyor musun?<br>{lettre} nerede? 🧠',zh:'还记得吗？<br>{lettre} 在哪里？🧠',id:'Masih ingat?<br>Di mana {lettre}? 🧠',ur:'یاد ہے؟<br>{lettre} کہاں ہے؟ 🧠',hi:'याद है?<br>{lettre} कहाँ है? 🧠'},
+'Tu te souviens ? Où est la lettre {lettre} ?':{en:'Do you remember? Where is the letter {lettre}?',es:'¿Te acuerdas? ¿Dónde está la letra {lettre}?',de:'Erinnerst du dich? Wo ist der Buchstabe {lettre}?',nl:'Weet je het nog? Waar is de letter {lettre}?',it:'Ti ricordi? Dov\'è la lettera {lettre}?',pt:'Lembras-te? Onde está a letra {lettre}?',ru:'Помнишь? Где буква {lettre}?',tr:'Hatırlıyor musun? {lettre} harfi nerede?',zh:'还记得吗？{lettre} 这个字母在哪里？',id:'Masih ingat? Di mana huruf {lettre}?',ur:'یاد ہے؟ حرف {lettre} کہاں ہے؟',hi:'याद है? अक्षर {lettre} कहाँ है?'},
+'ÉCOUTE':{en:'LISTEN',es:'ESCUCHA',de:'HÖREN',nl:'LUISTEREN',it:'ASCOLTA',pt:'ESCUTA',ru:'СЛУШАЙ',tr:'DİNLE',zh:'听一听',id:'DENGARKAN',ur:'سنو',hi:'सुनो'},
+'Écoute bien 👂<br>Touche la bonne lettre':{en:'Listen carefully 👂<br>Tap the right letter',es:'Escucha bien 👂<br>Toca la letra correcta',de:'Hör gut zu 👂<br>Tippe den richtigen Buchstaben an',nl:'Luister goed 👂<br>Tik de juiste letter aan',it:'Ascolta bene 👂<br>Tocca la lettera giusta',pt:'Escuta bem 👂<br>Toca na letra certa',ru:'Слушай внимательно 👂<br>Нажми нужную букву',tr:'İyi dinle 👂<br>Doğru harfe dokun',zh:'仔细听 👂<br>点一下正确的字母',id:'Dengarkan baik-baik 👂<br>Sentuh huruf yang benar',ur:'غور سے سنو 👂<br>صحیح حرف چھوؤ',hi:'ध्यान से सुनो 👂<br>सही अक्षर छुओ'},
+'Écoute bien, et touche la bonne lettre.':{en:'Listen carefully, and tap the right letter.',es:'Escucha bien y toca la letra correcta.',de:'Hör gut zu und tippe den richtigen Buchstaben an.',nl:'Luister goed en tik de juiste letter aan.',it:'Ascolta bene e tocca la lettera giusta.',pt:'Escuta bem e toca na letra certa.',ru:'Слушай внимательно и нажми нужную букву.',tr:'İyi dinle ve doğru harfe dokun.',zh:'仔细听，然后点一下正确的字母。',id:'Dengarkan baik-baik, lalu sentuh huruf yang benar.',ur:'غور سے سنو اور صحیح حرف چھوؤ۔',hi:'ध्यान से सुनो और सही अक्षर छुओ।'},
+'LE MOT À TROU':{en:'THE MISSING PIECE',es:'LA PALABRA INCOMPLETA',de:'DAS LÜCKENWORT',nl:'HET GATENWOORD',it:'LA PAROLA BUCATA',pt:'A PALAVRA COM LACUNA',ru:'СЛОВО С ПРОПУСКОМ',tr:'EKSİK HARF',zh:'填空词',id:'KATA RUMPANG',ur:'ادھورا لفظ',hi:'अधूरा शब्द'},
+'Quelle <b>forme</b><br>manque ici ? 🧩':{en:'Which <b>form</b><br>is missing here? 🧩',es:'¿Qué <b>forma</b><br>falta aquí? 🧩',de:'Welche <b>Form</b><br>fehlt hier? 🧩',nl:'Welke <b>vorm</b><br>ontbreekt hier? 🧩',it:'Quale <b>forma</b><br>manca qui? 🧩',pt:'Que <b>forma</b><br>falta aqui? 🧩',ru:'Какая <b>форма</b><br>здесь пропущена? 🧩',tr:'Burada hangi <b>biçim</b><br>eksik? 🧩',zh:'这里缺哪个<b>字形</b>？🧩',id:'<b>Bentuk</b> mana<br>yang hilang di sini? 🧩',ur:'یہاں کون سی <b>شکل</b><br>غائب ہے؟ 🧩',hi:'यहाँ कौन-सा <b>रूप</b><br>ग़ायब है? 🧩'},
+'Quelle forme manque dans ce mot ?':{en:'Which form is missing from this word?',es:'¿Qué forma falta en esta palabra?',de:'Welche Form fehlt in diesem Wort?',nl:'Welke vorm ontbreekt in dit woord?',it:'Quale forma manca in questa parola?',pt:'Que forma falta nesta palavra?',ru:'Какая форма пропущена в этом слове?',tr:'Bu kelimede hangi biçim eksik?',zh:'这个词里缺哪个字形？',id:'Bentuk mana yang hilang dari kata ini?',ur:'اس لفظ میں کون سی شکل غائب ہے؟',hi:'इस शब्द में कौन-सा रूप ग़ायब है?'},
+'LE TRI':{en:'SORT THEM OUT',es:'LA CLASIFICACIÓN',de:'DAS SORTIEREN',nl:'SORTEREN',it:'LO SMISTAMENTO',pt:'A TRIAGEM',ru:'СОРТИРОВКА',tr:'AYIKLAMA',zh:'分一分',id:'MEMILAH',ur:'چھانٹی',hi:'छाँटो'},
+'Touche <b>toutes</b><br>les formes de {lettre} ! 🧺':{en:'Tap <b>all</b><br>the forms of {lettre}! 🧺',es:'¡Toca <b>todas</b><br>las formas de {lettre}! 🧺',de:'Tippe <b>alle</b><br>Formen von {lettre} an! 🧺',nl:'Tik <b>alle</b><br>vormen van {lettre} aan! 🧺',it:'Tocca <b>tutte</b><br>le forme di {lettre}! 🧺',pt:'Toca <b>todas</b><br>as formas de {lettre}! 🧺',ru:'Нажми <b>все</b><br>формы буквы {lettre}! 🧺',tr:'{lettre} harfinin <b>bütün</b><br>biçimlerine dokun! 🧺',zh:'点出 {lettre} 的<b>所有</b>字形！🧺',id:'Sentuh <b>semua</b><br>bentuk {lettre}! 🧺',ur:'{lettre} کی <b>تمام</b><br>شکلیں چھوؤ! 🧺',hi:'{lettre} के <b>सभी</b><br>रूप छुओ! 🧺'},
+'Touche toutes les formes de la lettre {lettre}.':{en:'Tap all the forms of the letter {lettre}.',es:'Toca todas las formas de la letra {lettre}.',de:'Tippe alle Formen des Buchstabens {lettre} an.',nl:'Tik alle vormen van de letter {lettre} aan.',it:'Tocca tutte le forme della lettera {lettre}.',pt:'Toca todas as formas da letra {lettre}.',ru:'Нажми все формы буквы {lettre}.',tr:'{lettre} harfinin bütün biçimlerine dokun.',zh:'点出字母 {lettre} 的所有字形。',id:'Sentuh semua bentuk huruf {lettre}.',ur:'حرف {lettre} کی تمام شکلیں چھوؤ۔',hi:'अक्षर {lettre} के सभी रूप छुओ।'},
+'ÉTAPE FINALE · DE TÊTE':{en:'FINAL STEP · FROM MEMORY',es:'ETAPA FINAL · DE MEMORIA',de:'LETZTER SCHRITT · AUS DEM KOPF',nl:'LAATSTE STAP · UIT JE HOOFD',it:'TAPPA FINALE · A MEMORIA',pt:'ETAPA FINAL · DE MEMÓRIA',ru:'ПОСЛЕДНИЙ ШАГ · ПО ПАМЯТИ',tr:'SON AŞAMA · EZBERDEN',zh:'最后一步 · 凭记忆',id:'LANGKAH TERAKHIR · DARI INGATAN',ur:'آخری مرحلہ · یاد سے',hi:'अंतिम चरण · याद से'},
+'De tête, maintenant !<br>{lettre} dans {ou} ✍️':{en:'From memory now!<br>{lettre} in {ou} ✍️',es:'¡Ahora de memoria!<br>{lettre} en {ou} ✍️',de:'Jetzt aus dem Kopf!<br>{lettre} in {ou} ✍️',nl:'Nu uit je hoofd!<br>{lettre} in {ou} ✍️',it:'Ora a memoria!<br>{lettre} in {ou} ✍️',pt:'Agora de memória!<br>{lettre} em {ou} ✍️',ru:'Теперь по памяти!<br>{lettre} в {ou} ✍️',tr:'Şimdi ezberden!<br>{ou} {lettre} ✍️',zh:'现在凭记忆！<br>{ou}写 {lettre} ✍️',id:'Sekarang dari ingatan!<br>{lettre} dalam {ou} ✍️',ur:'اب یاد سے!<br>{ou} {lettre} ✍️',hi:'अब याद से!<br>{ou} {lettre} ✍️'},
+'De tête, maintenant : écris cette lettre dans {ou}.':{en:'From memory now: write this letter in {ou}.',es:'Ahora de memoria: escribe esta letra en {ou}.',de:'Jetzt aus dem Kopf: schreibe diesen Buchstaben in {ou}.',nl:'Nu uit je hoofd: schrijf deze letter in {ou}.',it:'Ora a memoria: scrivi questa lettera in {ou}.',pt:'Agora de memória: escreve esta letra em {ou}.',ru:'Теперь по памяти: напиши эту букву в {ou}.',tr:'Şimdi ezberden: bu harfi {ou} yaz.',zh:'现在凭记忆：{ou}写这个字母。',id:'Sekarang dari ingatan: tulis huruf ini dalam {ou}.',ur:'اب یاد سے: یہ حرف {ou} لکھو۔',hi:'अब याद से: यह अक्षर {ou} लिखो।'},
 'Où est le son <b>« an »</b> ?':{en:'Where is the <b>“an”</b> sound?',es:'¿Dónde está el sonido <b>«an»</b>?',de:'Wo ist der <b>„an“</b>-Laut?',nl:'Waar is de <b>“an”</b>-klank?',it:'Dov\'è il suono <b>«an»</b>?',pt:'Onde está o som <b>«an»</b>?',ru:'Где звук <b>«ан»</b>?',tr:'<b>“an”</b> sesi nerede?',zh:'<b>“an”</b> 的音在哪里？',id:'Mana bunyi <b>“an”</b>?',ur:'<b>«اَن»</b> کی آواز کہاں ہے؟',hi:'<b>“अन”</b> ध्वनि कहाँ है?'},
 'Où est le son « an » ?':{en:'Where is the “an” sound?',es:'¿Dónde está el sonido «an»?',de:'Wo ist der „an“-Laut?',nl:'Waar is de “an”-klank?',it:'Dov\'è il suono «an»?',pt:'Onde está o som «an»?',ru:'Где звук «ан»?',tr:'“an” sesi nerede?',zh:'“an”的音在哪里？',id:'Mana bunyi “an”?',ur:'«اَن» کی آواز کہاں ہے؟',hi:'“अन” ध्वनि कहाँ है?'},
 'Où est le son <b>« oun »</b> ?':{en:'Where is the <b>“oon”</b> sound?',es:'¿Dónde está el sonido <b>«un»</b>?',de:'Wo ist der <b>„un“</b>-Laut?',nl:'Waar is de <b>“oen”</b>-klank?',it:'Dov\'è il suono <b>«un»</b>?',pt:'Onde está o som <b>«un»</b>?',ru:'Где звук <b>«ун»</b>?',tr:'<b>“un”</b> sesi nerede?',zh:'<b>“un”</b> 的音在哪里？',id:'Mana bunyi <b>“un”</b>?',ur:'<b>«اُن»</b> کی آواز کہاں ہے؟',hi:'<b>“उन”</b> ध्वनि कहाँ है?'},
@@ -11502,7 +11556,7 @@ function _boyScene(ca,reprise){
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
-  api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases){
+  api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases,deTete){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
@@ -11524,7 +11578,7 @@ function _boyScene(ca,reprise){
       function siEcrit(){aEcrit=true;suivants.forEach(function(b){b.style.opacity='1';});}
       function veilleuse(b){suivants.push(b);b.style.opacity=aEcrit?'1':'.45';return b;}
       var commun={liste:liste,signeSeul:signeSeul,nomme:Array.isArray(glyph),
-                  nomsCases:nomsCases,siEcrit:siEcrit};
+                  nomsCases:nomsCases,siEcrit:siEcrit,deTete:!!deTete};
       function opts(sup){var o={},n;for(n in commun)o[n]=commun[n];
         for(n in sup||{})o[n]=sup[n];return o;}
       /* Le bloc du panneau, à la taille où le client a réglé les gestes. */
@@ -11898,7 +11952,101 @@ function _boyScene(ca,reprise){
       });
       p.appendChild(r);
       var n=document.createElement('div');n.className='boy-note';
-      n.textContent='🎯 Il y en a '+cibles.length+' à trouver';p.appendChild(n);
+      n.textContent=teF('🎯 Il y en a {n} à trouver',{n:cibles.length});p.appendChild(n);
+    };
+  };
+
+  /* ── ECOUTE ET CHOISIS ──
+     Le son, et rien d'autre : pas de lettre a lire, pas de consigne ecrite a
+     dechiffrer. L'enfant entend et designe. Le bouton de reecoute est
+     TOUJOURS la — `controle` ne le montre que s'il existe un enregistrement,
+     or la synthese vocale suffit ici et se manque facilement. */
+  api.ecoute=function(etape,html,fr,options,cible,son){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+      var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var t=opts.filter(function(o){return o.g===cible;})[0];
+      var sonCible=son||(t?t.s:cible);
+      N.plusTard(function(){N.dire(sonCible);},700);
+      var rj=document.createElement('button');rj.className='boy-btn sec';
+      rj.style.cssText+=';padding:10px;font-size:1.2rem;margin-top:6px';
+      rj.textContent=te('🔊 RÉÉCOUTER');
+      rj.onclick=function(){N.stop();N.dire(sonCible);};
+      p.appendChild(rj);
+      var r=document.createElement('div');
+      r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
+      var repondu=false;
+      opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
+        var b=document.createElement('div');b.className='boy-cible';
+        b.textContent=_sansCercle(o.g);
+        b.onclick=function(){
+          if(repondu||b.classList.contains('ko'))return;
+          N.stop();
+          if(o.g===cible){repondu=true;b.classList.add('ok');
+            N.dire(o.s);
+            if(typeof playBravo==='function')playBravo();
+            N.plusTard(suivant,850);}
+          else{b.classList.add('ko');if(typeof playError==='function')playError();}
+        };
+        r.appendChild(b);
+      });
+      p.appendChild(r);
+    };
+  };
+
+  /* ── LE MOT A TROU ──
+     Un mot de trois lettres, une case vide, et l'enfant choisit la FORME qui
+     y va. C'est la regle qui commande tout le cours.
+
+     Les deux morceaux du mot portent un TATWEEL du cote coupe : sans lui, la
+     lettre qui borde le trou reprendrait la forme qu'elle a en fin de mot, et
+     le mot mentirait sur ce qu'il montre. */
+  api.trou=function(etape,html,fr,droite,gauche,options,cible,indice){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+      var mot=document.createElement('div');
+      mot.style.cssText='direction:rtl;display:flex;align-items:center;justify-content:center;'
+        +'gap:2px;font-family:"Scheherazade New",serif;font-size:3.6rem;line-height:1.5;'
+        +'margin:6px 0 2px';
+      function bout(txt){
+        var d=document.createElement('span');d.textContent=txt;mot.appendChild(d);
+      }
+      if(droite)bout(droite);
+      var creux=document.createElement('span');
+      creux.textContent='؟';
+      creux.style.cssText='display:inline-flex;align-items:center;justify-content:center;'
+        +'min-width:1.1em;padding:0 .08em;border:3px dashed rgba('+_HAB.rgbF+',.75);'
+        +'border-radius:12px;color:rgba('+_HAB.rgbF+',.75)';
+      mot.appendChild(creux);
+      if(gauche)bout(gauche);
+      p.appendChild(mot);
+      if(indice){
+        var nt=document.createElement('div');nt.className='boy-note';nt.textContent=indice;
+        p.appendChild(nt);
+      }
+      var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      var r=document.createElement('div');
+      r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
+      var repondu=false;
+      opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
+        var b=document.createElement('div');b.className='boy-cible';
+        b.textContent=_sansCercle(o.g);
+        b.onclick=function(){
+          if(repondu||b.classList.contains('ko'))return;
+          N.stop();
+          if(o.g===cible){
+            repondu=true;b.classList.add('ok');
+            /* La bonne forme prend la place du trou : l'enfant VOIT le mot se
+               refermer, ce qu'une simple pastille verte ne montre pas. */
+            creux.style.border='3px solid rgba('+_HAB.rgbF+',.9)';
+            creux.textContent=_sansCercle(o.g);
+            if(typeof playBravo==='function')playBravo();
+            N.plusTard(suivant,1100);
+          }else{b.classList.add('ko');if(typeof playError==='function')playError();}
+        };
+        r.appendChild(b);
+      });
+      p.appendChild(r);
     };
   };
   return api;
@@ -12104,6 +12252,19 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
+  /* ── LE RAPPEL ──
+     Avant d'ouvrir la lecon du jour, une question eclair sur une lettre vue
+     deux a quatre lecons plus tot. C'est ce rappel-la qui fait tenir la
+     memoire, bien plus qu'un exercice de plus a la fin : au moment ou l'on
+     peine a retrouver quelque chose, on le grave. */
+  var _rev=_lettreARevoir(idx);
+  if(_rev){
+    sc.push(B.controle(te('RAPPEL'),
+      teF('Tu te souviens ?<br>Où est {lettre} ? 🧠',{lettre:b(_rev.name)}),
+      teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name}),
+      [_rev.ar].concat(_leurresLettre(_rev,idx,2).map(function(x){return x.ar;})),
+      _rev.ar));
+  }
   var jumelle=_CL_JUMELLES[A];
   if(jumelle){
     var ref=CHILD_LETTERS[_childIdxOf(jumelle.comme)];
@@ -12331,12 +12492,83 @@ function _boyLetterCourse(ca,idx,premiere){
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     api.bouton(p,te('SUIVANT ▸'),api.suivant);
   });
+  /* ── ÉCOUTE ET CHOISIS ──
+     Le son, et rien d'autre. Tous les autres contrôles donnent la réponse à
+     lire quelque part sur l'écran ; celui-ci ne passe que par l'oreille. */
+  if(!formeUnique){
+    sc.push(B.ecoute(te('ÉCOUTE'),TB('Écoute bien 👂<br>Touche la bonne lettre'),
+      te('Écoute bien, et touche la bonne lettre.'),
+      [A].concat(_leurresLettre(L,idx,2).map(function(x){return x.ar;})),A));
+  }
+
+  /* ── LE MOT À TROU ──
+     Le cours explique que la forme dépend de la PLACE dans le mot, et ne le
+     demande jamais. Ici, un mot de trois lettres, une case vide.
+
+     Le mot est bâti avec un COMPAGNON qui s'attache des deux côtés : la
+     forme attendue se déduit alors de la seule place, sans avoir à relire le
+     mot. Les morceaux portent un tatweel du côté coupé, pour garder la forme
+     qu'ils auraient si le mot était entier — mais du côté GAUCHE seulement si
+     notre lettre s'attache à la suivante, sinon le mot mentirait. */
+  var _places=[];
+  if(aMontrer.indexOf(1)>=0)_places.push(0);      /* début de mot */
+  if(aMontrer.indexOf(2)>=0)_places.push(1);      /* milieu */
+  if(aMontrer.indexOf(3)>=0)_places.push(2);      /* fin */
+  if(_places.length&&!formeUnique){
+    var _cmp=(A==='ب')?'ت':'ب';                   /* il s'attache des deux côtés */
+    var _g=_places[Math.floor(Math.random()*_places.length)];
+    var _cases=[_cmp,_cmp,_cmp];_cases[_g]=A;
+    var _dr=_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:'');
+    var _ga=((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join('');
+    /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
+       s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
+    var _iF=(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3);
+    var _opts=[],_vus={};
+    aMontrer.forEach(function(n){
+      var f=formes[n].form;
+      if(!_vus[f]){_vus[f]=1;_opts.push(f);}
+    });
+    var _ou=[te('au début du mot'),te('au milieu du mot'),te('à la fin du mot')][_g];
+    sc.push(B.trou(te('LE MOT À TROU'),
+      TB('Quelle <b>forme</b><br>manque ici ? 🧩'),
+      te('Quelle forme manque dans ce mot ?'),
+      _dr,_ga,_opts,formes[_iF].form,_ou));
+  }
+
+  /* ── LE TRI ──
+     Une grille où plusieurs réponses sont bonnes : on teste les quatre formes
+     d'un coup, au lieu d'en demander une seule. Les leurres sont des formes
+     d'autres lettres DÉJÀ VUES — un intrus jamais rencontré ne se distingue
+     pas, il s'élimine au hasard. */
+  var _cibles=[],_dedans={};
+  aMontrer.forEach(function(n){
+    var f=formes[n].form;
+    if(!_dedans[f]){_dedans[f]=1;_cibles.push(f);}
+  });
+  if(_cibles.length>=2){
+    var _grille=_cibles.slice();
+    _leurresLettre(L,idx,3).forEach(function(x){
+      var xa=_AF[x.ar]||{i:x.ar,m:x.ar,f:x.ar};
+      _childForms(x,xa).forEach(function(fo){
+        if(_grille.length<12&&!_dedans[fo.form]){_dedans[fo.form]=1;_grille.push(fo.form);}
+      });
+    });
+    sc.push(B.controleMulti(te('LE TRI'),
+      teF('Touche <b>toutes</b><br>les formes de {lettre} ! 🧺',{lettre:b(L.name)}),
+      teF('Touche toutes les formes de la lettre {lettre}.',{lettre:L.name}),
+      _grille,_cibles));
+  }
+
   /* Le dernier tracé reprend les quatre formes, dans le sens de lecture :
      c'est le moment où l'enfant montre qu'il sait écrire la lettre partout,
-     pas seulement seule. */
-  sc.push(B.tracer(te('ÉTAPE FINALE · TRACÉ'),formesMontrees(),
-    teF('Trace une dernière fois<br>{lettre}<br>dans {ou} ✍️',{lettre:b(L.name),ou:b(combien)}),
-    teF('Trace une dernière fois cette lettre, dans {ou}.',{ou:combien}),null,nomsMontres));
+     pas seulement seule.
+     DE TÊTE : plus de lettre grise à repasser. C'est l'effort de rappel qui
+     grave le tracé, pas le calque. Le bouton « montre-moi » reste là pour
+     celui qui bloque — sans lui, l'enfant coincé abandonne la leçon. */
+  sc.push(B.tracer(te('ÉTAPE FINALE · DE TÊTE'),formesMontrees(),
+    teF('De tête, maintenant !<br>{lettre} dans {ou} ✍️',{lettre:b(L.name),ou:b(combien)}),
+    teF('De tête, maintenant : écris cette lettre dans {ou}.',{ou:combien}),
+    null,nomsMontres,true));
   sc.push(function(api){
     var ile=_boyLettreFinie(_boySession,idx);
     /* Dernière île du parcours : plus rien après elle. */
