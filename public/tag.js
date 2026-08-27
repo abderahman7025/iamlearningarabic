@@ -27,12 +27,11 @@
      Tag Manager tant qu'on n'a qu'une balise à poser. */
   var BALISE = 'AW-18410302853';
 
-  /* L'ÉTIQUETTE de l'action de conversion « Achat », à créer dans Google Ads
-     (Objectifs → Conversions → Nouvelle action → Site web → manuel). Elle
-     ressemble à `AW-18410302853/AbC-D_efGhIj`. Tant qu'elle est vide, la
-     vente est bien poussée dans le dataLayer mais rien n'est envoyé à Ads :
-     on ne devine pas une étiquette, et une mauvaise ne remonterait rien. */
-  var CONVERSION = '';
+  /* L'ÉTIQUETTE de l'action de conversion « Achat », donnée par Google Ads.
+     L'extrait qu'il propose envoie une valeur fixe de 1,00 € ; on lui passe
+     le MONTANT RÉEL et l'identifiant du paiement Stripe à la place — c'est
+     ce qui permet le retour sur dépense et l'écart des doublons. */
+  var CONVERSION = 'AW-18410302853/QMUDCOKz5OccEIXb28pE';
 
   /* Facultatif : un conteneur Tag Manager, le jour où il y aura plusieurs
      balises à gérer (GA4, Meta, Clarity). Les deux peuvent coexister. */
