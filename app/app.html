@@ -7380,7 +7380,18 @@ function _volCarte(o){
       return {x:p.x,y:p.y+(p.r-Math.sqrt(Math.max(0,p.r*p.r-w*w))),r:p.r};
     }
     if(i>=segs.length){var f=segs[segs.length-1];return{x:f.x3,y:f.y3};}
-    var s=segs[i];return{x:s.x0,y:s.y0};
+    var s=segs[i];
+    /* LE DEPART DANS LE CIEL. Le chemin commence a la hauteur du premier
+       monde, tout en haut de la carte ; l'enfant, lui, est ancre par ses
+       PIEDS et occupe toute sa hauteur au-dessus de ce point — il sortait
+       donc du cadre par le haut. On le descend juste assez pour qu'il tienne
+       entier. Le chemin dessine, lui, ne bouge pas : c'est le repere que le
+       client a fixe. */
+    if(i===0){
+      var mini=(dy||0)+6;
+      if(s.y0<mini)return{x:s.x0,y:mini};
+    }
+    return{x:s.x0,y:s.y0};
   }
   function placerA(i){
     if(!segs.length)return;
@@ -8032,19 +8043,17 @@ var islandDefs=[
         var cpMRight=Math.min(gW*0.95,maxMX+80);
         var cpMLeft=Math.max(gW*0.05,minMX-80);
         if(isleCardsMob.length>0){
+          /* EN PORTRAIT, RIEN N'A CHANGE : le chemin part tout a gauche et
+             tout en haut, et rejoint le premier monde par la courbe d'origine.
+             J'y avais porte, en meme temps qu'en paysage, l'arrivee sur le
+             sommet de l'astre ; le client n'en voulait que la ou la place
+             manque, c'est-a-dire couche. Ici on rend la version d'avant. */
           var avX=gW*0.08,avY=_HAB.arcEnCiel?150:40;
-          var _f0m=_finToboggan(isleCardsMob[0],centersM[0]);
-          var t0x=_f0m.x,t0y=_f0m.y;
+          var t0x=centersM[0].x,t0y=centersM[0].y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           var mid0mx=(avX+t0x)*0.5;
-          /* PAR-DESSUS, PAS PAR-DESSOUS. Le dernier point de controle etait
-             sous l'arrivee : le ruban remontait vers le sommet en rasant le
-             flanc de l'astre, donc en le mordant. On le place en HAUT et en
-             retrait, si bien que la courbe passe au-dessus puis redescend se
-             poser — le geste meme de la licorne, qui arrive par le ciel. */
-          var _c2xM=t0x-(t0x-avX)*0.25, _c2yM=t0y-45;
-          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:_c2xM,cpy2:_c2yM,x3:t0x,y3:t0y});
-          var _d0m='M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+_c2xM+','+_c2yM+' '+t0x+','+t0y;
+          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
+          var _d0m='M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y;
           drawMobPath(_d0m, lk0);
           _arcEnCiel(svg,_d0m);
         }
@@ -8255,9 +8264,17 @@ var islandDefs=[
            ancre plus bas ; ancre a sa propre hauteur, il commencait 19 px
            AU-DESSUS du haut de la carte et restait invisible. Le plancher a
            110 le garde entier dans le cadre, quel que soit l'habillage. */
-        var avX=Math.round(gW*0.5),avY=Math.max(110,_HAB.arcEnCiel?170:60);
         var _f0=_finToboggan(isleCards[0],centers[0]);
         var t0x=_f0.x,t0y=_f0.y;
+        /* ── OU COMMENCE LE CHEMIN, COUCHE ──
+           Deux reperes donnes par le client : la MEME ABSCISSE que le monde 2
+           — celui de la couronne, au milieu de la largeur — et la MEME
+           ORDONNEE que le monde 1, celui des licornes, tout en haut a gauche.
+           Le chemin est donc horizontal, du dessus du deuxieme monde jusqu'au
+           premier. Faute de deuxieme monde, on retombe au milieu. */
+        var _m2=isleCards[1];
+        var avX=Math.round(_m2?(_m2.offsetLeft+_m2.offsetWidth/2):gW*0.5);
+        var avY=Math.round(t0y);
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
         /* ── UN CHEMIN DROIT ──
            La courbe partait du milieu du haut, plongeait vers la droite puis
@@ -9092,7 +9109,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v184';
+var _VERSION_REPLI='v185';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
