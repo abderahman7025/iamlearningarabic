@@ -1843,3 +1843,15 @@ page et URL propres, indexables. Elles se rangent à côté de
   `opacity:.5`, mais `@keyframes rocketLaunch` remettait `opacity:1` a
   chaque etape : les fusees du decor etaient opaques. Un plafond
   d'opacite se pose DANS les images-cles, jamais a cote.
+- **Le decalage entre deux formes d'une lettre se mesure SUR LA LETTRE, pas
+  sur les bords de la chaine.** Le tatweel n'a pas la meme longueur d'une
+  forme a l'autre : compare bord a bord, le ta fin semblait decale de 0,025 em
+  par rapport au milieu, alors que sa barre verticale et sa boucle le sont de
+  0,060. On superpose les deux encres et on aligne sur un trait de la LETTRE
+  — ici la barre. Mal places de 0,035, les points tombaient a cote de leur
+  encre et `_cheminSurEncre` prenait un raccourci par la barre, qui
+  s'allumait avant l'heure (v160-161).
+- **Deux tableaux, deux traits.** Un commentaire peut annoncer qu'on leve le
+  crayon sans que les donnees le fassent : le waw fin avait sa liaison et sa
+  boucle dans un SEUL sous-tableau, et le pinceau allumait la boucle en
+  finissant la liaison. Verifier les donnees, pas le commentaire.

@@ -8658,7 +8658,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v160';
+var _VERSION_REPLI='v161';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9066,18 +9066,27 @@ var _TRACE_MODELE={
              [-0.20,-0.05],[-0.42,-0.05]],
             [[-0.14,-0.72],[-0.14,-0.40],[-0.14,-0.06]]],
     /* LE ṬĀʾ FIN EST LE MILIEU SANS SON TRAIT DE LIAISON À GAUCHE — le client
-       l'a dit, et la mesure le confirme : d'une forme à l'autre l'encre ne
-       fait que se DÉPLACER de 0,025 em vers la droite (bord droit 0,425 →
-       0,455, bord gauche −0,430 → −0,410). Le long trait vers la gauche, lui,
-       n'est PAS une liaison : c'est le pied du ṭāʾ, il existe déjà sur
-       l'isolée. On ne retire donc aucun point.
+       l'a dit. Restait à savoir DE COMBIEN l'encre se déplace, et cela ne se lit
+       PAS sur les bords de la chaîne : le tatweel de droite n'a pas la même
+       longueur dans les deux formes, et j'en avais tiré 0,025 — la moitié du
+       compte.
 
-       Ce sont EXACTEMENT les points du milieu, tous décalés de +0,025. Ils
-       avaient été mis à l'échelle (1,037 en x), ce qui déformait la boucle. */
-    fin:[[[0.435,-0.05],[0.265,-0.05],[0.065,-0.05],[-0.075,-0.06],
-          [0.045,-0.22],[0.205,-0.30],[0.305,-0.22],[0.265,-0.08],[0.065,-0.05],
-          [-0.175,-0.05],[-0.395,-0.05]],
-         [[-0.115,-0.72],[-0.115,-0.40],[-0.115,-0.06]]]
+       On superpose donc les deux encres et on aligne SUR LA LETTRE :
+         la barre verticale, bord gauche : −0,225 → −0,165, soit +0,060 ;
+         la boucle, milieu               : +0,046 → +0,101, soit +0,055 ;
+       et la boucle ne change ni de hauteur (0,240 dans les deux) ni de
+       largeur. C'est un simple déplacement de 0,06 em vers la droite.
+
+       Mal placés de 0,035, les points de la boucle tombaient à côté de leur
+       encre : le chemin plaqué prenait alors un raccourci PAR LA BARRE, et
+       celle-ci s'allumait avant son heure — c'est ce que le client voyait.
+
+       Le long trait vers la gauche, lui, n'est PAS une liaison : c'est le pied
+       du ṭāʾ, il existe déjà sur l'isolée. On ne retire aucun point. */
+    fin:[[[0.470,-0.05],[0.300,-0.05],[0.100,-0.05],[-0.040,-0.06],
+          [0.080,-0.22],[0.240,-0.30],[0.340,-0.22],[0.300,-0.08],[0.100,-0.05],
+          [-0.140,-0.05],[-0.360,-0.05]],
+         [[-0.080,-0.72],[-0.080,-0.40],[-0.080,-0.06]]]
   },
   /* ع غ — les deux « c » sans lever ; ses formes ne se déduisent pas */
   'ع':{
