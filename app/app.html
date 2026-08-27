@@ -3292,6 +3292,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .ca{padding:48px 14px 6px !important}
   .boy-wrap{padding-top:6px;padding-bottom:4px}
   .boy-panel{padding-top:8px;padding-bottom:8px;margin-bottom:2px}
+  /* Le cadre d'ecriture garde sa pleine taille : c'est la page qui defile
+     quand elle ne tient pas, plutot que le cadre qui retrecit. */
+  .ca{overflow-y:auto}
   .boy-jauge{margin-bottom:6px}
   .boy-cible{width:clamp(64px,22vh,104px);height:clamp(64px,22vh,104px);
     font-size:clamp(1.5rem,9vh,2.6rem)}
@@ -7278,6 +7281,23 @@ function _volCarte(o){
   /* Décollage, croisière, atterrissage : lent aux deux bouts, rapide au
      milieu. C'est ce que la vitesse constante d'avant ne donnait pas. */
   function adouci(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+  /* ── UN SEUL ELAN, D'UN BOUT A L'AUTRE ──
+     `adouci` part de zero et revient a zero. Enchainee trois fois — le vol,
+     puis le contournement du monde, puis la pose — elle donnait trois arrets
+     nets : c'est le « mouvement en trois phases saccadees » du client.
+
+     Ce profil-ci n'accelere qu'au tout DEBUT du voyage et ne freine qu'a sa
+     toute FIN ; entre deux phases la vitesse se conserve, et le deplacement
+     se lit d'un seul tenant. La division par `L` garde la distance totale
+     exacte : sans elle, retirer une phase d'elan raccourcirait le trajet. */
+  function elan(u,demarre,freine){
+    var a=demarre?0.30:0, b=freine?0.30:0, c=1-a-b, L=a/2+c+b/2, d;
+    if(a&&u<a)          d=(u*u)/(2*a);
+    else if(u<a+c)      d=a/2+(u-a);
+    else if(b){var v=(u-a-c)/b; d=a/2+c+b*(v-v*v/2);}
+    else                d=a/2+c;
+    return Math.max(0,Math.min(1,d/L));
+  }
   /* La camera suit la fusee. Sans elle, un long voyage se joue hors de
      l'ecran : on clique, il ne se passe rien de visible, et le cours
      s'ouvre. On garde le vaisseau au milieu de la hauteur visible. */
@@ -7427,7 +7447,9 @@ function _volCarte(o){
     var capEntree=o.aligne?(anglePose-90):null;
     var t0=Date.now();
     function tic(){
-      var u=Math.min(1,(Date.now()-t0)/BOUCLE_DUREE),e=adouci(u);
+      /* Le contournement prend le vol en marche : il ne repart pas de zero,
+         mais c'est lui qui freine, puisque la pose vient juste apres. */
+      var u=Math.min(1,(Date.now()-t0)/BOUCLE_DUREE),e=elan(u,false,true);
       var phi=b.phi+b.sens*BOUCLE_TOUR*e;
       var p=pointBoucle(b,phi);
       /* La tangente au cercle, dans le sens du parcours. */
@@ -7560,8 +7582,11 @@ function _volCarte(o){
       var item=file[n];
       if(!item){idx=cible;arriver(fini);return;}
       u=Math.min(1,(Date.now()-debut)/DUREE);
-      var t=item.sens>0?adouci(u):1-adouci(u);
-      var p=versSommet(_bezier(t,item.seg),n===file.length-1,adouci(u));
+      /* On ne s'elance qu'au premier saut, et on ne freine que si rien ne
+         suit — ni contournement, ni saut de plus. */
+      var e=elan(u,n===0,(n===file.length-1)&&!contournera);
+      var t=item.sens>0?e:1-e;
+      var p=versSommet(_bezier(t,item.seg),n===file.length-1,e);
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
       /* On se penche en décollant, on se redresse en se posant. Sans ce
          redressement, le personnage arrivait sur l'étape encore couché à
@@ -8030,6 +8055,10 @@ var islandDefs=[
        40 % de l'ecran, pour que deux rangees restent visibles ensemble. */
     var IW=Math.min(Math.round(DW/3)-24,240);
     var IH=Math.min(230,Math.round(DH*0.40));
+    /* La hauteur a laquelle un monde est REELLEMENT dessine. Elle sert aussi a
+       regler l'equipage : la fusee et l'enfant doivent maigrir avec les
+       mondes, sinon ils ecrasent la carte des qu'elle se resserre. */
+    var hMonde=Math.round(Math.min(IH*_HAB.decor,DH*0.42));
 
     isleCards.forEach(function(el,i){
       el._desktopOrigClick=el.onclick;
@@ -8042,7 +8071,7 @@ var islandDefs=[
          remplit son cadre. Il ne joue donc que sur la HAUTEUR du dessin. */
       el.style.width=IW+'px';
       var imgI=el.querySelector('.isle-img');
-      if(imgI)imgI.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';
+      if(imgI)imgI.style.height=hMonde+'px';
       el.style.margin='0';
       el.style.alignSelf='center';
       el.style.position='relative';
@@ -8063,14 +8092,18 @@ var islandDefs=[
        hauteur de leur contenu — pas un ecran entier pour un bouton. Les
        rangees sont donc dimensionnees UNE PAR UNE, dans l'ordre du parcours,
        et non par `grid-auto-rows` qui les traiterait toutes pareil. */
-    var bande=Math.max(300,Math.round(DH*0.92));
-    /* On numerote d'abord les mondes : trois par groupe, un groupe par ecran.
-       Les blocs pleine largeur — jeux et monde final — viennent ENSUITE se
-       loger apres le groupe qu'ils suivent. Les placer au fil du DOM cassait
-       le groupe en cours et laissait un monde seul sur sa rangee. */
-    var groupeDe={},nbGroupes=0;
-    isleCards.forEach(function(el,i){groupeDe[i]=Math.floor(i/3);});
-    nbGroupes=Math.ceil(isleCards.length/3);
+    /* ── GAUCHE, MILIEU, DROITE, MILIEU, GAUCHE… ──
+       Chaque monde descend d'un cran et change de colonne, en va-et-vient.
+       Le motif 1-2-3-2 se repete : deux mondes qui se suivent ne sont donc
+       JAMAIS dans la meme colonne — la Terre ne peut plus se retrouver juste
+       sous Venus, ce que le client a vu.
+
+       Un monde par rangee, haute d'un tiers d'ecran : trois tiennent a l'ecran
+       a la fois, et le chemin descend regulierement au lieu de se ranger par
+       paquets. Les blocs pleine largeur — jeux, monde final — prennent leur
+       propre rangee, a la hauteur de leur contenu. */
+    var COLONNES=[1,2,3,2];
+    var pas=Math.max(96,Math.round(DH*0.30));
     var blocs=Array.from(globeDiv.children).filter(function(el){
       return el.classList&&(el.classList.contains('isle-mg')
              ||el.classList.contains('boss-isle'));});
@@ -8079,22 +8112,23 @@ var islandDefs=[
       var n=0;
       isleCards.forEach(function(m){
         if(m.compareDocumentPosition(el)&Node.DOCUMENT_POSITION_FOLLOWING)n++;});
-      return Math.min(nbGroupes-1,Math.max(0,Math.ceil(n/3)-1));
+      return n;
     });
-    /* la liste des rangees, dans l'ordre : groupe 0, ses blocs, groupe 1... */
-    var tailles=[],rangDuGroupe={},rangDuBloc={},r=0;
-    for(var g=0;g<nbGroupes;g++){
-      tailles.push(bande+'px'); rangDuGroupe[g]=++r;
+    var tailles=[],rangDuMonde={},rangDuBloc={},r=0;
+    for(var i=0;i<isleCards.length;i++){
+      tailles.push(pas+'px'); rangDuMonde[i]=++r;
       blocs.forEach(function(el,bi){
-        if(apres[bi]===g){tailles.push('auto');rangDuBloc[bi]=++r;}
+        if(apres[bi]===i+1){tailles.push('auto');rangDuBloc[bi]=++r;}
       });
     }
+    /* un bloc qui arriverait avant tout monde */
+    blocs.forEach(function(el,bi){
+      if(rangDuBloc[bi]===undefined){tailles.push('auto');rangDuBloc[bi]=++r;}
+    });
     isleCards.forEach(function(el,i){
-      var g=groupeDe[i],pos=i%3;
-      /* un groupe sur deux repart de la droite : le chemin serpente */
-      el.style.gridColumn=String((g%2===0)?(pos+1):(3-pos));
-      el.style.gridRow=String(rangDuGroupe[g]);
-      el.style.alignSelf=['start','center','end'][pos];
+      el.style.gridColumn=String(COLONNES[i%COLONNES.length]);
+      el.style.gridRow=String(rangDuMonde[i]);
+      el.style.alignSelf='start';
       el.style.margin='0';
     });
     blocs.forEach(function(el,bi){
@@ -8106,10 +8140,13 @@ var islandDefs=[
       if(el.classList.contains('boss-isle')){
         el.style.width=IW+'px';
         var bImg=el.querySelector('.isle-img');
-        if(bImg)bImg.style.height=Math.round(Math.min(IH*_HAB.decor,DH*0.42))+'px';
+        if(bImg)bImg.style.height=hMonde+'px';
       }else{ el.style.width='100%'; }
     });
     globeDiv.style.gridTemplateRows=tailles.join(' ');
+    /* Une rangee fait moins que la hauteur d'un monde : le dernier deborde
+       donc sous la derniere rangee, et serait coupe sans cette reserve. */
+    globeDiv.style.paddingBottom=IH+'px';
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
 
     _quandCartePrete(ca,1500,function(){
@@ -8175,7 +8212,14 @@ var islandDefs=[
       }
 
       // Avatar
-      var eq=_equipage(140,!_montureGagnee);
+      /* ── L'EQUIPAGE SUIT LA TAILLE DES MONDES ──
+         140 px etait juste quand un monde s'affichait sur 292 px de haut ;
+         resserree a trois colonnes, la carte n'en donne plus que 164, et la
+         fusee y devenait enorme. On garde donc le meme rapport — un peu moins
+         de la moitie d'un monde — et tous les reglages qui en decoulent : le
+         point d'ancrage, l'assise, l'epaisseur de la trainee. */
+      var TEQ=Math.max(64,Math.round(hMonde*0.48));
+      var eq=_equipage(TEQ,!_montureGagnee);
       var charEl=eq.el;
       globeDiv.appendChild(charEl);
 
@@ -8184,8 +8228,9 @@ var islandDefs=[
       _poserObjets(globeDiv,isleCards,_etapeFaite);
       _poserBetes(globeDiv,isleCards);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
-        epaisseurTrainee:18,
-        equipage:eq,decalageX:70,decalageY:140,demiAssise:39,depart:charIdx,
+        epaisseurTrainee:Math.max(8,Math.round(18*TEQ/140)),
+        equipage:eq,decalageX:Math.round(TEQ*0.5),decalageY:TEQ,
+        demiAssise:Math.round(TEQ*0.279),depart:charIdx,
         trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
         dureeTotale:9000,camera:true,
         pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCards[i-1]);}:null,
@@ -8763,6 +8808,30 @@ function _lettresARevoir(idx,combien){
 }
 /* Des leurres pris parmi les lettres DEJA VUES : en proposer une que
    l'enfant n'a jamais rencontree ne teste rien, cela tire au sort. */
+/* ── UN COMPAGNON DEJA CONNU ──
+   Le mot a trou se batit avec deux autres lettres. Si l'une d'elles n'a pas
+   encore ete vue, l'enfant ne sait pas si elle s'attache : il ne PEUT pas
+   deduire la forme du trou, il devine. C'est ce que le client a releve — un
+   dal dans le mot de la lecon sur le ba.
+
+   On cherche donc parmi les lettres deja rencontrees, en partant de la plus
+   recente : ce sont les mieux sues. `liante` demande une lettre qui s'accroche
+   des DEUX cotes (plus de deux formes distinctes) ; sinon on veut au
+   contraire une lettre qui ne s'attache pas a la suivante, celle qui force la
+   forme isolee. Rien de disponible : on rend `null`, et la question qui en
+   dependait ne se pose pas — mieux vaut un exercice en moins qu'un exercice
+   qui ment. */
+function _compagnonConnu(idx,sauf,liante){
+  var vues=CHILD_LETTERS.slice(0,Math.max(1,idx+1));
+  for(var i=vues.length-1;i>=0;i--){
+    var x=vues[i];
+    if(x.ar===sauf)continue;
+    var n=_dedupForms(x,_AF[x.ar]||{i:x.ar,m:x.ar,f:x.ar}).length;
+    if(liante?(n>2):(n<=2))return x.ar;
+  }
+  return null;
+}
+
 function _leurresLettre(cible,idx,combien){
   var pool=CHILD_LETTERS.slice(0,Math.max(1,idx+1)).filter(function(x){
     return x.ar!==cible.ar;});
@@ -8889,6 +8958,31 @@ function _boyLetterPicker(ca,session){
     grille.appendChild(carte);
   });
 
+  /* ── LA PAGE OCCUPE L'ECRAN, PAS SEULEMENT SON HAUT ──
+     Cartes et bouton se serraient en haut et laissaient un grand vide en bas.
+     On donne au bloc la hauteur qui reste vraiment sous lui, et on repartit
+     ce qu'il contient dessus. La hauteur se prend en pixels de MISE EN PAGE
+     (`offsetTop` de proche en proche) : la page porte une animation de
+     bascule, et les rectangles a l'ecran sont alors deformes. */
+  if(window.innerWidth>window.innerHeight&&window.innerHeight<=460){
+    var haut=0,n=wrap;
+    while(n){haut+=n.offsetTop;n=n.offsetParent;}
+    /* 22 px de garde : la marge propre du bouton et les arrondis de la mise
+       en page se glissent sous la hauteur calculee, et le bas depassait de
+       cinq pixels. */
+    var libre=window.innerHeight-haut-22;
+    /* On n'etire le bloc que si son contenu y tient : sinon on l'ecraserait
+       ou on le ferait deborder. Mesure faite AVANT de fixer la hauteur, sans
+       quoi on lirait celle qu'on vient d'imposer. */
+    wrap.style.display='flex';
+    wrap.style.flexDirection='column';
+    var naturel=wrap.offsetHeight;
+    if(libre>170&&naturel<=libre){
+      wrap.style.height=libre+'px';
+      wrap.style.justifyContent='space-evenly';
+    }
+  }
+
   /* On amene la lettre en cours dans le champ de vision. Meme a deux
      colonnes, une session longue peut depasser d'un ecran bas. */
   if(carteAFaire)setTimeout(function(){
@@ -8906,7 +9000,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v179';
+var _VERSION_REPLI='v180';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10526,16 +10620,12 @@ function _blocEcriture(hote,o){
 
   var el=document.createElement('div');el.style.cssText='width:100%';
   var boite=document.createElement('div');
-  /* LE CADRE NE DOIT JAMAIS DEPASSER L'ECRAN. Il est dessine a une taille
-     fixe puis reduit a la largeur disponible — mais rien ne bornait sa
-     HAUTEUR : couche, avec un titre au-dessus et des boutons en dessous, il
-     sortait par le bas. Comme son rapport largeur/hauteur est connu, plafonner
-     la largeur revient a plafonner la hauteur. Les 150 px reserves sont ceux
-     de la barre, du titre et des boutons ; en portrait la hauteur ne manque
-     pas et c'est `100%` qui l'emporte. */
-  boite.style.cssText='position:relative;width:'+CW+'px;'
-    +'max-width:min(100%,calc((100vh - 150px) * '+(CW/CH).toFixed(3)+'));'
-    +'margin:6px auto;'
+  /* Le cadre prend TOUTE la largeur qu'on lui laisse — c'est la taille a
+     laquelle l'enfant ecrit, et le client la veut grande. J'avais plafonne sa
+     largeur par la hauteur libre pour l'empecher de deborder : cela revenait
+     a retrecir la zone d'ecriture, ce qu'il a vu tout de suite. Le
+     debordement se regle ailleurs, en laissant le panneau defiler. */
+  boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
     +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba('+_HAB.rgb+',.30)';
   var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
   cvM.style.cssText='display:block;width:100%;height:auto';
@@ -12995,7 +13085,10 @@ function _boyLetterCourse(ca,idx,premiere){
   if(aMontrer.indexOf(2)>=0)_places.push(1);      /* milieu */
   if(aMontrer.indexOf(3)>=0)_places.push(2);      /* fin */
   if(_places.length&&!formeUnique){
-    var _cmp=(A==='ب')?'ت':'ب';                   /* il s'attache des deux côtés */
+    /* Un compagnon DEJA VU, qui s'attache des deux cotes. Faute de mieux —
+       les toutes premieres lecons — la lettre du jour se sert d'elle-meme :
+       le mot ne montre alors qu'elle, ce qui reste juste et connu. */
+    var _cmp=_compagnonConnu(idx,A,true)||A;
     var _opts=[],_vus={};
     aMontrer.forEach(function(n){
       var f=formes[n].form;
@@ -13020,9 +13113,9 @@ function _boyLetterCourse(ca,idx,premiere){
        des deux cotes, si bien qu'une des quatre formes n'etait plus qu'un
        leurre permanent. On ajoute donc le mot qui la reclame — deux lettres,
        puis une bloquante, puis la notre en derniere place. */
-    var _bloq=(A==='د')?'ر':'د';
-    _questions.push({dr:_cmp+_bloq, ga:'', iF:0});
-    _questions.sort(function(){return Math.random()-.5;}).forEach(function(_q,_n){
+    var _bloq=_compagnonConnu(idx,A,false);
+    if(_bloq)_questions.push({dr:_cmp+_bloq, ga:'', iF:0});
+    if(_questions.length)_questions.sort(function(){return Math.random()-.5;}).forEach(function(_q,_n){
       var _t=(_questions.length>1)
         ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_questions.length})
         : te('LE MOT À TROU');
