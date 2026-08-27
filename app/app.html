@@ -6655,7 +6655,7 @@ function _volCarte(o){
     /* En descendant, la ligne droite CONTINUE l'arc de sortie : elle reprend
        le cap ou il l'a laissee, sinon la fusee se remettrait droite entre les
        deux. Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
-    var capEntree=(o.aligne&&descente)?(anglePose-90):null;
+    var capEntree=contournera?(anglePose-90):null;
     var t0=Date.now();
     function tic(){
       var u=Math.min(1,(Date.now()-t0)/D),e=adouci(u);
@@ -6666,7 +6666,7 @@ function _volCarte(o){
         while(ec>180)ec-=360; while(ec<-180)ec+=360;
         c=capEntree+ec*k;
       }
-      poser(x,y,c,descente?1:Math.min(1,u/0.14,redresse(u)));
+      poser(x,y,c,contournera?1:Math.min(1,u/0.14,redresse(u)));
       var q=queue(x,y);if(q)grain(q.x,q.y);else dernierPoint=null;camera(y);
       if(u>=1){fini();return;}
       raf=requestAnimationFrame(tic);
@@ -6878,6 +6878,12 @@ function _volCarte(o){
   /* Le trajet en cours monte-t-il ? descend-il ? Les deux ne se volent pas
      de la meme facon : voir `poser` et `contourne`. */
   var montee=false, descente=false, volVertical=false, astreArrivee=null;
+  /* L'ARC DE SORTIE ET LE CONTOURNEMENT NE SONT QUE POUR LA FUSEE. La
+     licorne arrive DIRECTEMENT au-dessus de son monde, comme avant. Ce qui
+     les separe est `aligne` : une fusee a un nez qui doit pointer ou elle
+     va, une licorne non. La licorne a pourtant, elle aussi, un sommet et un
+     rayon (`poseSommet`), si bien que la boucle savait s'armer pour elle. */
+  var contournera=false;
   /* Le penche en montant. « Legerement » : de quoi montrer la direction,
      pas de quoi coucher la fusee. */
   var MONTEE_PENCHE=14;
@@ -7246,7 +7252,7 @@ function _volCarte(o){
   function arriver(fini,depuis){
     /* En descendant, l'arrivee EST le contournement : le vol s'est arrete a
        l'entree de la boucle, elle le prend de la jusqu'au sommet. */
-    if(descente){
+    if(contournera){
       var b=entreeBoucle(idx);
       if(b){contourne(b,function(){poserPilote(fini);});return;}
     }
@@ -7275,13 +7281,14 @@ function _volCarte(o){
     /* « Si la trajectoire est verticale, la question ne se pose pas. » */
     volVertical=(Math.abs(_vers.x-_de.x)<14);
     astreArrivee=_vers;
+    contournera=descente&&!!o.aligne;
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
     /* ── LE TRAJET EN DESCENDANT ──
        Un arc de cercle du cote ou l'on va, puis tout droit sur l'astre
        d'arrivee, puis on le contourne par l'autre cote. Rien n'est dessine
        sur la carte du garcon : la fusee est libre de sa route. */
-    if(descente&&o.aligne){
+    if(contournera){
       var _sortie=sortieAstre(idx), _entree=entreeBoucle(cible);
       if(_sortie&&_entree){
         idx=cible;
@@ -7317,7 +7324,7 @@ function _volCarte(o){
       var der=file[file.length-1];
       /* On vise le SOMMET de l'etape, pas son milieu : c'est la qu'on se
          pose, et le trajet doit y mener directement. */
-      var but=(descente&&entreeBoucle(cible))||ouSePoser(cible)
+      var but=(contournera&&entreeBoucle(cible))||ouSePoser(cible)
               ||{x:der.sens>0?der.seg.x3:der.seg.x0,
                  y:der.sens>0?der.seg.y3:der.seg.y0};
       var ici={x:parseFloat(el.style.left||0)+dx,y:parseFloat(el.style.top||0)+dy};
@@ -7334,7 +7341,7 @@ function _volCarte(o){
        vol y arrive de lui-meme. */
     /* En descendant, la courbe ne mene plus au sommet mais a l'entree de la
        boucle : c'est elle qui finira le travail. */
-    var butFinal=(descente&&entreeBoucle(cible))||ouSePoser(cible);
+    var butFinal=(contournera&&entreeBoucle(cible))||ouSePoser(cible);
     var finSeg=file.length?file[file.length-1]:null;
     var centreFin=finSeg?(finSeg.sens>0?{x:finSeg.seg.x3,y:finSeg.seg.y3}:{x:finSeg.seg.x0,y:finSeg.seg.y0}):null;
     function versSommet(p,dernier,t){
@@ -7359,7 +7366,7 @@ function _volCarte(o){
          24° et y restait planté de travers le temps d'un battement. */
       /* En descendant, la BOUCLE prend le relais et repart a l'horizontale :
          se redresser ici ferait un a-coup de 90 degres a l'entree. */
-      poser(p.x,p.y,deg,descente?Math.min(1,u/0.26):Math.min(1,u/0.26,redresse(u)));
+      poser(p.x,p.y,deg,contournera?Math.min(1,u/0.26):Math.min(1,u/0.26,redresse(u)));
       var q=queue(p.x,p.y);if(q)grain(q.x,q.y);else dernierPoint=null;
       camera(p.y);
       if(u>=1){
@@ -8565,7 +8572,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v153';
+var _VERSION_REPLI='v154';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
