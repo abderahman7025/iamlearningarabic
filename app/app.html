@@ -8658,7 +8658,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v161';
+var _VERSION_REPLI='v162';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9083,10 +9083,30 @@ var _TRACE_MODELE={
 
        Le long trait vers la gauche, lui, n'est PAS une liaison : c'est le pied
        du ṭāʾ, il existe déjà sur l'isolée. On ne retire aucun point. */
-    fin:[[[0.470,-0.05],[0.300,-0.05],[0.100,-0.05],[-0.040,-0.06],
-          [0.080,-0.22],[0.240,-0.30],[0.340,-0.22],[0.300,-0.08],[0.100,-0.05],
-          [-0.140,-0.05],[-0.360,-0.05]],
-         [[-0.080,-0.72],[-0.080,-0.40],[-0.080,-0.06]]]
+    /* UN GESTE DENSE, ET CHAQUE POINT COLLÉ SUR L'ENCRE.
+       Onze points suffisaient au milieu, pas ici : le pinceau ne fait que
+       0,026 em de rayon, et entre deux points éloignés il saute. Les pixels
+       qu'il n'a pas touchés reprennent le rang de leur voisin d'encre — et
+       sur le ṭāʾ fin, ce voisin était le trait de liaison, déjà allumé. Un
+       éclat s'allumait donc au milieu de la lettre dès 35 %, mesuré, là où le
+       milieu ne montrait rien.
+       Trois points sont donc intercalés entre chaque couple, et chacun est
+       ramené sur le trait le plus proche. Ce ne sont pas des chiffres posés à
+       la main : ils sont calculés depuis l'encre de la police. */
+    /* LE ṬĀʾ FIN, C'EST LE GESTE DU MILIEU, MOT POUR MOT.
+       Le client le dit : la meme lettre, sans le trait de liaison de gauche.
+       Toutes mes tentatives de deplacer ou de densifier les points ont
+       echoue — 0,025 puis 0,060 em, puis trois points intercales, et a chaque
+       fois un eclat s'allumait au milieu de la lettre avant l'heure.
+       Or le moteur RAMENE DEJA chaque point sur l'encre la plus proche, dans
+       un rayon de 0,14 em, et les deux formes ne sont ecartees que de 0,06.
+       Le geste du milieu se pose donc tout seul sur l'encre du fin, sans
+       qu'aucun chiffre ait a bouger. C'est la lecture litterale de ce que le
+       client demandait : superposer les deux formes. */
+    fin:[[[0.41,-0.05],[0.24,-0.05],[0.04,-0.05],[-0.10,-0.06],
+             [0.02,-0.22],[0.18,-0.30],[0.28,-0.22],[0.24,-0.08],[0.04,-0.05],
+             [-0.20,-0.05],[-0.42,-0.05]],
+            [[-0.14,-0.72],[-0.14,-0.40],[-0.14,-0.06]]]
   },
   /* ع غ — les deux « c » sans lever ; ses formes ne se déduisent pas */
   'ع':{

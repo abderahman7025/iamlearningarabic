@@ -1855,3 +1855,16 @@ page et URL propres, indexables. Elles se rangent à côté de
   crayon sans que les donnees le fassent : le waw fin avait sa liaison et sa
   boucle dans un SEUL sous-tableau, et le pinceau allumait la boucle en
   finissant la liaison. Verifier les donnees, pas le commentaire.
+- **Une forme voisine se copie TELLE QUELLE, on ne la deplace pas.**
+  `_cheminSurEncre` ramene deja chaque point du geste sur l'encre la plus
+  proche, dans un rayon de 0,14 em. Deux formes d'une meme lettre etant
+  ecartees de bien moins que cela, le geste de l'une se pose tout seul sur
+  l'encre de l'autre. Le ta fin a coute quatre versions (v159 a v162) a
+  deplacer des coordonnees — 0,025 puis 0,060, puis des points intercales —
+  qui n'avaient qu'a rester ou elles etaient : chaque deplacement allumait un
+  eclat au milieu de la lettre avant l'heure.
+- **Les pourcentages par zone ne prouvent rien sur un trace.** Ils disaient
+  que le ta fin et le ta milieu se comportaient pareil alors que l'un montrait
+  un eclat parasite. Ce qui prouve, c'est le DESSIN, image par image : rendre
+  le trace en texte (une grille de # et de .) et comparer la forme corrigee a
+  sa reference au meme pourcentage.
