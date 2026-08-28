@@ -8668,7 +8668,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v175';
+var _VERSION_REPLI='v176';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12339,6 +12339,9 @@ function _boyLetterCourse(ca,idx,premiere){
   function q(s){return b('« '+(lat+s).toLowerCase()+' »');}
   var A=L.ar,S=A+'ْ';
   var sc=[];
+  /* Ce que l'ecran du mot a enregistre : la lettre, et si l'ile etait deja
+     finie avant elle. */
+  var _ileFaite=null;
 
   sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,teF('Nouvelle lettre :<br>{lettre} 🎯',{lettre:b(L.name)}),
     teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),premiere?_HAB.partir:te('SUIVANT ▸')));
@@ -12588,6 +12591,16 @@ function _boyLetterCourse(ca,idx,premiere){
     var e=document.createElement('div');e.style.cssText='font-size:4rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
     api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
+    /* ── LA LETTRE EST ACQUISE ICI, PAS A LA FIN ──
+       Le cours est vu : la lettre compte. Les exercices qui suivent restent
+       obligatoires pour avancer, mais ils ne decident plus de rien — un
+       enfant qui s'arrete au milieu du tri garde ce qu'il a appris, et son
+       ile se validera quand meme.
+       Marquer a la derniere image faisait perdre la lecon entiere a qui
+       abandonnait en route, et c'est ce qui laissait des iles fermees alors
+       que le cours avait ete fait. L'appel est sans effet s'il se repete :
+       la lettre n'est ajoutee qu'une fois. */
+    try{_ileFaite=_boyLettreFinie(_boySession,idx);}catch(e){}
     api.bouton(p,te('SUIVANT ▸'),api.suivant);
   });
   /* ── ÉCOUTE ET CHOISIS ──
@@ -12674,7 +12687,11 @@ function _boyLetterCourse(ca,idx,premiere){
     teF('De tête, maintenant : écris cette lettre dans {ou}.',{ou:combien}),
     null,nomsMontres,true));
   sc.push(function(api){
-    var ile=_boyLettreFinie(_boySession,idx);
+    /* Le resultat vient de l'ecran du mot, ou la lettre a ete enregistree.
+       Rappeler la fonction ici repondrait « tu la revises » a un enfant qui
+       vient de la decouvrir : `deja` est lu AVANT l'enregistrement, et il
+       serait vrai au second appel. */
+    var ile=_ileFaite||_boyLettreFinie(_boySession,idx);
     /* Dernière île du parcours : plus rien après elle. */
     var derniereIle=!!(_boySession&&ALL_S.indexOf(_boySession)===ALL_S.length-1);
     /* Une île qu'on vient de terminer appelle la suite de l'aventure. Une
