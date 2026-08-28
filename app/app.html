@@ -8714,7 +8714,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v173';
+var _VERSION_REPLI='v174';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10772,7 +10772,13 @@ var _HABILLAGES={
        boite : la meme taille que dans la composition ou elle monte sa
        licorne. `gauche` est la position CENTREE — (100-52)/2 = 24 — et
        `piloteDecale` la deplace ensuite de 23 points selon le sens. */
-    piloteBoite:{gauche:24,largeur:52,hauteur:100},
+    /* 55 % — pas 100. A pleine boite la fille faisait UNE FOIS ET DEMIE sa
+       licorne une fois celle-ci posee : mesure, 139 px contre 89. La monture
+       est reduite par `montureEchelle` quand elle se gare, la fille ne
+       l'etait pas. A 55 % elle fait 76 px, soit 0,86 fois sa licorne — une
+       enfant a cote d'un poney, le garrot a la poitrine.
+       Reperes : l'astronaute du garcon est a 56 %, et c'est la meme scene. */
+    piloteBoite:{gauche:24,largeur:52,hauteur:55},
     piloteDecale:23,
     /* La monture posée est réduite pour retrouver la taille qu'elle a en
        vol : l'image de vol porte la licorne ET la fille, donc elle est
