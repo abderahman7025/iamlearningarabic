@@ -6583,6 +6583,31 @@ function _sommetEtape(carte){
           r:Math.max(1,(0.5-haut)*vh)};
 }
 
+/* LA OU LE TOBOGGAN S'ARRETE. Les centres des cartes tombent aux trois quarts
+   de leur hauteur, donc DANS l'astre : un ruban de 38 px y arrivait en le
+   traversant. Il vise desormais le SOMMET, la ou l'enfant se pose vraiment.
+
+   Le sommet se mesure sur le dessin, et un dessin pas encore charge ne se
+   mesure pas — c'est le cas a la premiere visite, cache vide. On rend alors
+   l'ancien point pour ne pas casser le trace, et on redessine la carte des
+   que l'image arrive : sans cela le ruban resterait faux jusqu'au prochain
+   rendu. `_redessinArme` empeche d'en armer deux. */
+var _redessinArme=false;
+function _finToboggan(carte,defaut){
+  var som=null; try{som=_sommetEtape(carte);}catch(e){}
+  if(som&&som.y)return{x:som.x,y:som.y};
+  var img=carte&&carte.querySelector('.isle-img');
+  if(img&&!_redessinArme){
+    _redessinArme=true;
+    img.addEventListener('load',function(){
+      _redessinArme=false;
+      var ca=document.getElementById('ca');
+      if(ca&&st._curPage==='sessions-map')renderSessionsMap(ca);
+    },{once:true});
+  }
+  return defaut;
+}
+
 /* Vrai quand on vient de descendre dans un monde par la porte de lumière :
    au retour sur la carte, l'enfant en ressort au lieu d'apparaître. */
 var _porteRetour=false;
@@ -7813,11 +7838,18 @@ var islandDefs=[
         var cpMLeft=Math.max(gW*0.05,minMX-80);
         if(isleCardsMob.length>0){
           var avX=gW*0.08,avY=_HAB.arcEnCiel?150:40;
-          var t0x=centersM[0].x,t0y=centersM[0].y;
+          var _f0m=_finToboggan(isleCardsMob[0],centersM[0]);
+          var t0x=_f0m.x,t0y=_f0m.y;
           var lk0=isleCardsMob[0]&&isleCardsMob[0].classList.contains('locked-isle');
           var mid0mx=(avX+t0x)*0.5;
-          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-          var _d0m='M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y;
+          /* PAR-DESSUS, PAS PAR-DESSOUS. Le dernier point de controle etait
+             sous l'arrivee : le ruban remontait vers le sommet en rasant le
+             flanc de l'astre, donc en le mordant. On le place en HAUT et en
+             retrait, si bien que la courbe passe au-dessus puis redescend se
+             poser — le geste meme de la licorne, qui arrive par le ciel. */
+          var _c2xM=t0x-(t0x-avX)*0.25, _c2yM=t0y-45;
+          segsMob.push({x0:avX,y0:avY,cpx1:mid0mx,cpy1:avY+(t0y-avY)*0.15,cpx2:_c2xM,cpy2:_c2yM,x3:t0x,y3:t0y});
+          var _d0m='M '+avX+','+avY+' C '+mid0mx+','+(avY+(t0y-avY)*0.15)+' '+_c2xM+','+_c2yM+' '+t0x+','+t0y;
           drawMobPath(_d0m, lk0);
           _arcEnCiel(svg,_d0m);
         }
@@ -7933,11 +7965,18 @@ var islandDefs=[
         /* Le depart du toboggan descend : accrochee tout en haut, la fille
            etait coupee par le bord de la carte. */
         var avX=gW*0.05,avY=_HAB.arcEnCiel?170:60;
-        var t0x=centers[0].x,t0y=centers[0].y;
+        var _f0=_finToboggan(isleCards[0],centers[0]);
+        var t0x=_f0.x,t0y=_f0.y;
         var lk0=isleCards[0]&&isleCards[0].classList.contains('locked-isle');
         var mid0x=(avX+t0x)*0.5,mid0y=(avY+t0y)*0.5;
-        segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:t0x,cpy2:t0y-(t0y-avY)*0.3,x3:t0x,y3:t0y});
-        var _d0='M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+t0x+','+(t0y-(t0y-avY)*0.3)+' '+t0x+','+t0y;
+        /* PAR-DESSUS, PAS PAR-DESSOUS. Le dernier point de controle etait
+           sous l'arrivee : le ruban remontait vers le sommet en rasant le
+           flanc de l'astre, donc en le mordant. On le place en HAUT et en
+           retrait, si bien que la courbe passe au-dessus puis redescend se
+           poser — le geste meme de la licorne, qui arrive par le ciel. */
+        var _c2xL=t0x-(t0x-avX)*0.25, _c2yL=t0y-45;
+        segments.push({x0:avX,y0:avY,cpx1:mid0x,cpy1:avY+(t0y-avY)*0.15,cpx2:_c2xL,cpy2:_c2yL,x3:t0x,y3:t0y});
+        var _d0='M '+avX+','+avY+' C '+mid0x+','+(avY+(t0y-avY)*0.15)+' '+_c2xL+','+_c2yL+' '+t0x+','+t0y;
         drawPath(_d0, lk0);
         /* LE TOBOGGAN : le seul chemin dessine de la carte, du coin haut a
            gauche jusqu'au premier monde. */
@@ -8668,7 +8707,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v176';
+var _VERSION_REPLI='v177';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10726,12 +10765,14 @@ var _HABILLAGES={
        boite : la meme taille que dans la composition ou elle monte sa
        licorne. `gauche` est la position CENTREE — (100-52)/2 = 24 — et
        `piloteDecale` la deplace ensuite de 23 points selon le sens. */
-    /* 55 % — pas 100. A pleine boite la fille faisait UNE FOIS ET DEMIE sa
-       licorne une fois celle-ci posee : mesure, 139 px contre 89. La monture
-       est reduite par `montureEchelle` quand elle se gare, la fille ne
-       l'etait pas. A 55 % elle fait 77 px, soit 0,87 fois sa licorne.
-       Repere : l'astronaute du garcon est a 56 %, meme scene. */
-    piloteBoite:{gauche:24,largeur:52,hauteur:55},
+    /* 100 — pleine boite, et c'est la valeur d'origine. Je l'avais baissee a
+       55 en croyant la fille trop grande a cote de sa licorne : c'etait une
+       erreur, et elle se voyait. Le dessin en vol donne la proportion vraie —
+       tete de la fille tout en haut, garrot de la licorne aux deux tiers : la
+       monture lui arrive a la taille, c'est un poney. La rapetisser une fois
+       posee la faisait CHANGER de taille en descendant, ce que le client a
+       vu tout de suite. Elle fait 139 px debout, la licorne 89 : c'est juste. */
+    piloteBoite:{gauche:24,largeur:52,hauteur:100},
     piloteDecale:23,
     /* La monture posée est réduite pour retrouver la taille qu'elle a en
        vol : l'image de vol porte la licorne ET la fille, donc elle est
@@ -10741,6 +10782,12 @@ var _HABILLAGES={
        (840 px) rapportee a celle de la composition ou elle porte la fille
        (1327 px). Les dessins du client etant tous a la meme echelle, ce
        rapport garde entre elles la taille qu'elles ont ensemble. */
+    /* 63,3 % — et ce n'est pas un tatonnement. Les deux dessins portent la
+       licorne a la MEME taille en pixels (800x840), mais dans des images de
+       hauteurs differentes : 1327 en vol, 840 posee. A `object-fit:contain`
+       dans la meme boite, la seconde parait donc bien plus grosse. 840/1327
+       = 0,633 rend la difference exactement : mesure, 89 px de haut dans les
+       deux cas. Y toucher fait grossir la licorne quand elle se pose. */
     montureEchelle:0.633,
     /* Une licorne n'a pas de réacteur. */
     flamme:false,
