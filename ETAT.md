@@ -1893,3 +1893,46 @@ page et URL propres, indexables. Elles se rangent à côté de
   `app.html` : `node outils/allege.js`. Ce n'est PAS un script `build` de
   `package.json` — en ajouter un bascule Vercel dans un autre mode de
   construction.
+
+---
+
+## À FAIRE — Landing page animée (scroll cinématique)
+
+**Décidé le 29 août 2026.** Inspiré d'un reel Instagram (@brandonthewebdev)
+montrant un site de costumes sur mesure : fond noir, pièces qui s'assemblent
+au scroll, zoom sur les détails, typographie serif luxe.
+
+### Ce que ça donnera pour iamlearningarabic
+
+- **Fond noir cinématique**, lumière dramatique
+- Une **lettre arabe flotte et s'écrit elle-même** au scroll (réutilise le
+  moteur d'animation déjà en place dans l'app)
+- **Zoom sur le tracé** — la main qui guide, la lettre qui se forme
+- La **carte de voyage** (planètes / mondes) qui apparaît du fond comme une
+  galaxie
+- Les personnages (fusée, licorne) qui traversent l'écran
+- Typographie élégante, tagline fort, CTA vers l'inscription
+
+### Ce dont j'ai besoin
+
+Rien de nouveau à photographier. J'utilise :
+- Les images déjà dans `public/images/` (planètes, mondes, personnages)
+- Des captures du vrai rendu de l'app (je les prends via le serveur local)
+- Le logo existant
+
+### Comment le construire
+
+Nouvelle page `public/landing.html` (ou remplacer `public/index.html` si
+le client veut), avec GSAP ScrollTrigger — même techno que le site du reel.
+La page publique actuelle (vente/connexion) reste intacte en parallèle.
+
+### Séquence cinématique clé (dictée le 29 août 2026)
+
+Zoom sur la lettre arabe en train de se tracer → dézoom progressif →
+une **main de garçon** apparaît qui passe sur la lettre → on recule encore →
+on découvre l'enfant sur sa tablette, on voit bien qu'il est sur le site.
+
+Tout simulé en CSS/GSAP (scale + layers superposés). Aucune vraie vidéo
+nécessaire — les éléments du site servent de décor.
+
+### Statut : EN ATTENTE — à faire dans la conversation iamlearningarabic
