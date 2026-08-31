@@ -3116,7 +3116,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-scene{position:relative;width:100%;max-width:520px;margin:8px auto 4px;
   height:min(300px,var(--sc-l,340px) * 0.78);border-radius:16px;background:#fff;
   border:3px solid rgba(var(--sk-rgb),.30);overflow:hidden}
-.sc-piste{position:absolute;left:18px;right:18px;top:64%;height:0;
+/* La ligne remonte a 52 % : a 64 % la kasra, ecrite en grand, sortait par le
+   bas du cadre. Tout ce qui s'y accroche remonte avec elle. */
+.sc-piste{position:absolute;left:18px;right:18px;top:52%;height:0;
   border-top:2px dashed rgba(var(--sk-rgb),.42);opacity:0;transition:opacity .3s ease}
 .sc-piste.vu{opacity:1}
 /* LA LETTRE EST POSEE SUR LA LIGNE, elle ne flotte pas au-dessus. Elle est
@@ -3124,16 +3126,28 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    piste, a 64 %, et le calque remonte de sa propre hauteur. Le point du ba,
    qui pend sous la ligne, deborde alors comme il se doit.
    Et elle est GRANDE : un tiers de la largeur du cadre, comme demande. */
-.sc-calque{position:absolute;left:0;right:0;top:64%;text-align:center;direction:rtl;
-  font-family:'Scheherazade New',serif;font-size:calc(var(--sc-l,340px) / 3);
+/* LA LETTRE FAIT LA MOITIE DE LA LARGEUR DU CADRE, et elle est posee SUR la
+   ligne d'ecriture : elle est ancree par sa ligne de base, le point du ba
+   pendant dessous comme il se doit. */
+.sc-calque{position:absolute;left:0;right:0;top:52%;text-align:center;direction:rtl;
+  font-family:'Scheherazade New',serif;font-size:calc(var(--sc-l,340px) / 2);
   line-height:1;transform:translateY(-0.78em);
   color:var(--sk-fonce);opacity:0;transition:opacity .32s ease}
 .sc-calque.vu{opacity:1}
-/* Un signe montre seul est ENORME lui aussi : un tiers de la largeur. */
+/* Un signe POSE SUR LA LETTRE suit la taille de la lettre : c'est ainsi qu'il
+   garde la proportion qu'il a dans l'ecriture. */
 .sc-flot{position:absolute;transform:translate(-50%,-50%);direction:rtl;
-  font-family:'Scheherazade New',serif;font-size:calc(var(--sc-l,340px) / 3);
+  font-family:'Scheherazade New',serif;font-size:calc(var(--sc-l,340px) / 2);
   line-height:1;opacity:0;white-space:nowrap;
   transition:opacity .3s ease,left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1)}
+/* Un signe montre SEUL, lui, fait UN TIERS de la largeur du cadre — mais un
+   signe est un petit trait dans sa police : pour que son ENCRE atteigne ce
+   tiers, il faut l'ecrire bien plus gros que la lettre. Mesure : une damma
+   occupe 0,235 em de large, il faut donc 1,42 fois la largeur voulue. */
+/* Sa police est calculee au rendu, a partir de la largeur de son encre —
+   voir `tailleDuSigneSeul`. Un signe est un petit trait dans une grande
+   boite : sa taille de police ne dit rien de ce qu'on voit. */
+.sc-flot.seul{font-size:var(--sc-seul,120px)}
 .sc-flot.vu{opacity:1}
 .sc-flot.bat{animation:scBat 1.1s ease-in-out infinite}
 @keyframes scBat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.16)}}
@@ -3162,14 +3176,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    seul en bout de phrase — « lettre », « petit », « aucune » — ce que le
    client refuse a juste titre. Il vaut pour TOUS les titres du cours, pas
    seulement les longs. */
-.boy-titre{font-size:1.28rem;font-weight:900;color:var(--sk-fonce);line-height:1.9;letter-spacing:.01em;
-  text-align:center;margin:0 auto 18px;max-width:22em;text-wrap:balance}
+.boy-titre{font-size:1.28rem;font-weight:900;color:var(--sk-fonce);line-height:1.45;letter-spacing:.01em;
+  text-align:center;margin:0 auto 18px;max-width:none}
+/* Une ligne du client : elle occupe sa propre ligne, et rien ne la coupe. */
+.boy-ligne{display:block;white-space:nowrap}
 /* ── Deux colonnes, en paysage ──
    La phrase à gauche, ce qu'elle montre à droite, les boutons en bas sur
    toute la largeur. La hauteur ainsi gagnée sert à écrire BEAUCOUP plus
    gros, sur des lignes bien plus longues : en paysage, le texte tenait sur
    quatre mots par ligne au milieu d'un écran vide. */
-.boy-2col{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+/* Deux parts pour le texte, une pour le cadre : a parts egales, la colonne de
+   gauche ne laissait la place que pour une police de 16 px une fois les
+   coupures du client respectees. */
+.boy-2col{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
   column-gap:26px;align-items:center;margin-bottom:6px}
 .boy-2col .boy-col-d{display:flex;flex-direction:column;
   align-items:center;justify-content:center;min-width:0}
@@ -3277,10 +3296,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Et une coupure cachee doit laisser un ESPACE, sans quoi les mots se
    collent — « vaut pourtoutes les lettres ». C'est `titre()` qui pose cet
    espace dans le texte ; ici on ne fait que masquer. */
-@media(orientation:landscape){
-  .boy-titre.titre-long br:not(.dur){display:none}
-  .boy-titre.titre-long{text-wrap:balance}
-}
+/* LES COUPURES DE LIGNE SONT CELLES DU CLIENT. On les cachait en paysage pour
+   gagner de la place ; il les donne desormais ligne par ligne, et elles sont
+   respectees telles quelles. Seuls les textes qui n'en portent pas sont
+   equilibres automatiquement — voir `.boy-titre`. */
 }
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
@@ -9235,7 +9254,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v189';
+var _VERSION_REPLI='v190';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12095,7 +12114,15 @@ function _boyScene(ca,reprise){
        les lettres », « on insistesur la lettre ». L'espace pose ici survit
        au masquage. En portrait il ne se voit pas : une espace en debut de
        ligne est supprimee par le rendu. */
-    t.innerHTML=_airAutourArabe(_sansCercle(html)).replace(/(<br\b[^>]*>)/gi,'$1 ');
+    /* CHAQUE LIGNE ECRITE DEVIENT UN BLOC QUI NE SE REPLIE PAS. Le client
+       donne ses textes ligne par ligne ; en laissant le navigateur les
+       recouper, deux lignes en devenaient trois et aucune taille de police
+       n'etait stable. Ici le compte est exact par construction, et c'est la
+       police qui s'adapte — voir `remplitLaLargeur`. */
+    var _lignes=_airAutourArabe(_sansCercle(html)).split(/<br\b[^>]*>/i);
+    t.innerHTML=_lignes.map(function(l){
+      return '<span class="boy-ligne">'+l+'</span>';
+    }).join('');
     /* Les coupures de ligne sont écrites dans le texte, pour le portrait où
        la largeur manque. En paysage elles disparaissent et le texte se
        repartit sur la largeur — sauf celles marquees `dur`. */
@@ -12104,8 +12131,42 @@ function _boyScene(ca,reprise){
     /* fr === false : la scène dit elle-même sa phrase, morceau par morceau,
        pour caler une animation dessus (voir le tableau des formes). */
     if(fr!==false)N.plusTard(function(){N.dire(fr||html);},420);
+    /* ── LA PLUS GRANDE POLICE QUI REMPLIT LA COLONNE ──
+       Le client veut le texte ecrit aussi grand que la place le permet, ses
+       coupures de ligne etant respectees telles quelles. On part donc de la
+       taille voulue et on la reduit — ou on l'augmente — jusqu'a ce que la
+       LIGNE LA PLUS LARGE touche le bord de sa colonne.
+
+       On mesure la ligne la plus large avec un Range : `offsetWidth` rendrait
+       la largeur du bloc, pas celle du texte, et une ligne courte ne dirait
+       rien. Trois passes suffisent a converger, et on borne pour ne jamais
+       tomber sous le lisible ni depasser le raisonnable. */
+    /* Rien ici : la mise a la taille se fait dans `go()`, une fois la page
+       passee en deux colonnes. Mesuree avant, elle voyait une colonne large
+       et le texte se repliait ensuite. */
     return t;
   }
+  function remplitLaLargeur(t){
+    if(!t||!t.isConnected)return;
+    var col=t.parentNode&&t.parentNode.clientWidth;
+    if(!col||col<80)return;
+    var lignes=t.querySelectorAll('.boy-ligne');
+    if(!lignes.length)return;
+    /* On mesure a une taille de reference, puis on met a l'echelle d'un seul
+       coup : les blocs ne se repliant pas, leur largeur est proportionnelle a
+       la police et le calcul est exact. */
+    var REF=40;
+    t.style.fontSize=REF+'px';
+    var large=0;
+    [].slice.call(lignes).forEach(function(l){
+      var w=l.getBoundingClientRect().width;
+      if(w>large)large=w;
+    });
+    if(large<4){t.style.fontSize='';return;}
+    var px=Math.max(15,Math.min(52,REF*(col*0.97)/large));
+    t.style.fontSize=px.toFixed(1)+'px';
+  }
+
   /* Le mot mis en avant dans une phrase. Il s'appelle encore « bleu » dans
      les cours, par habitude : sa couleur, elle, vient de l'habillage. */
   function bleu(s){return '<span style="color:var(--sk-vif)">'+s+'</span>';}
@@ -12412,7 +12473,20 @@ function _boyScene(ca,reprise){
   window.addEventListener('resize',relanceAjuste);
   window.addEventListener('orientationchange',relanceAjuste);
   if(window.visualViewport)window.visualViewport.addEventListener('resize',relanceAjuste);
-  function go(){N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();ca.scrollTop=0;deuxColonnes();ajusteEcran();ajusteBientot();if(_repriseSuivie)repriseScene(i);}
+  function go(){
+    N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
+    ca.scrollTop=0;deuxColonnes();
+    /* La taille du texte se decide APRES le passage en deux colonnes : c'est
+       la largeur de sa colonne qui la commande. On la reprend un peu plus
+       tard, quand la police arabe est arrivee et que tout s'est pose. */
+    calibreLesTextes();
+    ajusteEcran();ajusteBientot();
+    N.plusTard(calibreLesTextes,120);N.plusTard(calibreLesTextes,500);
+    if(_repriseSuivie)repriseScene(i);
+  }
+  function calibreLesTextes(){
+    [].slice.call(wrap.querySelectorAll('.boy-titre')).forEach(remplitLaLargeur);
+  }
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
@@ -12456,9 +12530,33 @@ function _boyScene(ca,reprise){
       /* La taille des lettres suit la LARGEUR REELLE du cadre — un tiers,
          comme le client la veut. On la mesure une fois pose, et de nouveau
          si l'appareil tourne. */
+      /* Le rapport entre l'ENCRE d'un signe et sa taille de police. Mesure une
+         fois sur la police reelle : une damma occupe 0,235 em de large, un
+         trait bien moins. C'est ce rapport qui permet de dire quelle police
+         donne une encre d'un tiers de cadre. */
+      function partEncre(signe){
+        try{
+          var T=160,W=520,H=420;
+          var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+          var c=cv.getContext('2d');
+          c.font=T+"px 'Scheherazade New',serif";
+          c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle='#000';
+          c.fillText(signe,W/2,H*0.7);
+          var d=c.getImageData(0,0,W,H).data,g=W,dr=-1;
+          for(var x=0;x<W;x++){
+            for(var y=0;y<H;y++){
+              if(d[(y*W+x)*4+3]>30){if(x<g)g=x;if(x>dr)dr=x;break;}
+            }
+          }
+          return (dr>g)?((dr-g+1)/T):0.24;
+        }catch(e){return 0.24;}
+      }
       function calibre(){
         var l=sc.offsetWidth||340;
         sc.style.setProperty('--sc-l',l+'px');
+        /* La police qui donne une encre d'un tiers de la largeur du cadre. */
+        var pr=(plan.flottants&&plan.flottants.length)?partEncre(plan.flottants[0].m):0.24;
+        sc.style.setProperty('--sc-seul',Math.round((l/3)/pr)+'px');
       }
       /* Le cadre grandit quand `ajusteEcran` met la page a l'echelle : mesure
          trop tot, la taille des lettres restait celle d'un cadre plus etroit.
@@ -12485,9 +12583,15 @@ function _boyScene(ca,reprise){
       function pose(n){
         var e=etapes[n]||{},L=e.L||[],F=e.F||[];
         calques.forEach(function(c,k){c.classList.toggle('vu',L.indexOf(k)>=0);});
+        /* SEUL OU SUR LA LETTRE. Un signe montre seul fait un tiers de la
+           largeur du cadre ; pose sur la lettre, il suit la taille de
+           celle-ci et garde sa proportion d'ecriture. L'etat le dit : sans
+           aucune lettre a l'ecran, le signe est seul. */
+        var seul=(L.length===0);
         flot.forEach(function(f,k){
           var on=F.indexOf(k)>=0;
           f.classList.toggle('vu',on);
+          f.classList.toggle('seul',seul);
           f.classList.toggle('bat',on&&!!e.bat);
           if(e.fx!==undefined&&k===0){f.style.left=e.fx+'%';f.style.top=e.fy+'%';}
           else if(!on){f.style.left=f._x+'%';f.style.top=f._y+'%';}
@@ -13079,18 +13183,20 @@ function _boyVowelCourse(ca){
   var TF=_vw('ً'),TK=_vw('ٍ'),TD=_vw('ٌ');
   var SK=_vw('ْ');
 
-  /* Les couleurs des trois signes, reprises du cours sur les prolongations :
-     un signe garde sa couleur d'un bout a l'autre du parcours. */
+  /* Les couleurs des trois signes, reprises du cours sur les prolongations. */
   var CFA='#e65100', CDA='#2e7d32', CKA='#6a1b9a';
 
   var LB='ب';
   var LBF=LB+'َ', LBK=LB+'ِ', LBD=LB+'ُ', LBS=LB+'ْ';
   var mF='َ', mK='ِ', mD='ُ';
 
-  /* Les trois hauteurs, en pourcentage du cadre. La kasra sortait par le bas
-     a 84 % : un signe fait un tiers de la LARGEUR, ce qui est enorme, et son
-     centre doit rester assez haut pour qu'il tienne entier. */
-  var HAUT=27, MILIEU=50, BAS=76;
+  /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
+     les signes se tiennent tout pres d'elle, au-dessus et en dessous. */
+  var HAUT=36, MILIEU=50, BAS=66;
+  /* Le second signe d'un tanwin. Pour la damma il se pose A COTE — c'est
+     ainsi qu'on l'ecrit. Pour la fatha et la kasra, deux traits, il se pose
+     JUSTE AU-DESSUS du premier, presque colle. */
+  var HAUT2=HAUT-11, BAS2=BAS-11;
 
   var CHAMP=(st.profile==='girl')?'championne':'champion',
       UNE=(st.profile==='girl')?'une':'un',
@@ -13098,21 +13204,21 @@ function _boyVowelCourse(ca){
 
   B.run([
     B.brief(_HAB.mission+' 1 · '+_HAB.depart,
-      TB('Aujourd’hui : les <b>voyelles</b>'),
+      TB('Aujourd’hui :<br>les <b>voyelles</b>'),
       te('Aujourd’hui : les voyelles.'),_HAB.partir),
 
     B.brief(te('ÉTAPE 1'),
-      TB('Pour comprendre les voyelles, on a besoin d’une <b>lettre</b>.'),
+      TB('Pour comprendre les voyelles,<br>on a besoin d’une <b>lettre</b>.'),
       te('Pour comprendre les voyelles, on a besoin d\'une lettre.')),
 
     B.illustre(te('ÉTAPE 1 · LA LETTRE'),
-      TB('Prenons la lettre <b>« ba »</b>. Seule, elle se dit « <b>b</b> ».'),
+      TB('Prenons la lettre <b>« ba »</b>.<br>Seule, elle se dit « <b>b</b> ».'),
       te('Prenons la lettre ba. Seule, elle se dit b.'),
       {calques:[LB],
        scene:[{P:1,d:900},{L:[0],P:1,d:1400},{L:[0],P:1,t:'ba',d:2200}]}),
 
     B.illustre(te('ÉTAPE 2'),
-      TB('Une voyelle, c’est un petit <b>signe</b>.'),
+      TB('Une voyelle, c’est<br>un petit <b>signe</b>.'),
       te('Une voyelle, c\'est un petit signe.'),
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:40,y:HAUT},{m:mF,c:CFA,x:60,y:HAUT},
@@ -13121,11 +13227,11 @@ function _boyVowelCourse(ca){
               {L:[0],P:1,F:[0,1,2],bat:1,d:3200}]}),
 
     B.brief(te('ÉTAPE 3'),
-      TB('Il existe seulement <b>3 voyelles</b> :'),
+      TB('Il existe seulement<br><b>3 voyelles</b> :'),
       te('Il existe seulement trois voyelles.')),
 
     B.illustre(te('ÉTAPE 3 · LA PREMIÈRE'),
-      TB('Voici la première : elle se dit « <b>ou</b> ». Elle est toujours <b>au dessus</b>.'),
+      TB('Voici la première :<br>elle se dit « <b>ou</b> ». Elle<br>est toujours <b>au dessus</b>.'),
       te('Voici la première : elle se dit ou. Elle est toujours au dessus.'),
       {calques:[LB,LBD],
        flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
@@ -13136,26 +13242,27 @@ function _boyVowelCourse(ca){
               {L:[1],P:1,t:'bou',d:2200}]}),
 
     B.repete(te('ÉTAPE 3 · À TON TOUR'),
-      TB('Répète après moi : <b>« bou »</b>'),
+      TB('Répète après moi :<br><b>« bou »</b>'),
       te('Répète après moi : bou.'),
       {calques:[LBD],scene:[{L:[0],P:1,t:'bou',d:4000}]}),
 
+    /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
-      TB('Si ce trait est au dessus d’une lettre, il se prononce « <b>a</b> ».'),
+      TB('Si ce trait est au dessus<br>d’une lettre, il se<br>prononce « <b>a</b> ».'),
       te('Si ce trait est au dessus d\'une lettre, il se prononce a.'),
       {calques:[LB,LBF],
        flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:1800},
+       scene:[{F:[0],d:2200},
               {L:[0],P:1,d:1000},
               {L:[1],P:1,t:'ba',d:2200}]}),
 
     B.repete(te('ÉTAPE 4 · À TON TOUR'),
-      TB('On a là le son <b>« ba »</b>. Répète après moi : <b>« ba »</b>'),
+      TB('On a là le son <b>« ba »</b>.<br>Répète après moi : <b>« ba »</b>'),
       te('On a là le son ba. Répète après moi : ba.'),
       {calques:[LBF],scene:[{L:[0],P:1,t:'ba',d:4000}]}),
 
     B.illustre(te('ÉTAPE 5'),
-      TB('En revanche, si ce trait est en dessous d’une lettre, il se dit « <b>i</b> ».'),
+      TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
       te('En revanche, si ce trait est en dessous d\'une lettre, il se dit i.'),
       {calques:[LB,LBF,LBK],
        scene:[{L:[1],P:1,t:'ba',d:1600},
@@ -13163,16 +13270,16 @@ function _boyVowelCourse(ca){
               {L:[2],P:1,t:'bi',d:2200}]}),
 
     B.repete(te('ÉTAPE 5 · À TON TOUR'),
-      TB('On a alors le son <b>« bi »</b>. Répète après moi : <b>« bi »</b>'),
+      TB('On a alors le son <b>« bi »</b>.<br>Répète après moi : <b>« bi »</b>'),
       te('On a alors le son bi. Répète après moi : bi.'),
       {calques:[LBK],scene:[{L:[0],P:1,t:'bi',d:4000}]}),
 
     B.brief(te('ÉCRITURE'),
-      TB('Maintenant, on va les <b>écrire</b> ! Tu es '+PRET+' ?'),
+      TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
       te('Maintenant, on va les écrire ! Tu es '+PRET+' ?'),_HAB.partir),
 
     B.illustre(te('ÉCRITURE · LA ḌAMMA'),
-      TB('Te souviens-tu de lui ?'),
+      TB('Te souviens-tu<br>de lui ?'),
       te('On commence par ce symbole. Te souviens-tu de lui ?'),
       {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
        scene:[{F:[0],d:3200},{F:[0],t:'ou',d:2000}]}),
@@ -13180,22 +13287,18 @@ function _boyVowelCourse(ca){
       TB('Repasse sur les <b>modèles</b> ✍️'),te('Repasse sur les modèles.')),
 
     B.illustre(te('ÉCRITURE · LA FATḤA'),
-      TB('Au dessus de la lettre, on dit comment ?'),
+      TB('Au dessus de la lettre,<br>on dit comment ?'),
       te('On passe à ce symbole. Au dessus de la lettre, on dit comment ?'),
-      {flottants:[{m:mF,c:CFA,x:50,y:BAS}],
-       scene:[{F:[0],P:1,d:1000},
-              {F:[0],P:1,fx:50,fy:HAUT,d:3200},
-              {F:[0],P:1,fx:50,fy:HAUT,t:'a',d:2000}]}),
+      {flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
+       scene:[{F:[0],d:3200},{F:[0],t:'a',d:2000}]}),
     B.tracer(te('ÉCRITURE · LA FATḤA'),F,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
     B.illustre(te('ÉCRITURE · LA KASRA'),
-      TB('Sous la lettre, on prononce ?'),
+      TB('Sous la lettre,<br>on prononce ?'),
       te('Enfin, ce symbole. Sous la lettre, on prononce ?'),
-      {flottants:[{m:mK,c:CKA,x:50,y:HAUT}],
-       scene:[{F:[0],P:1,d:1000},
-              {F:[0],P:1,fx:50,fy:BAS,d:3200},
-              {F:[0],P:1,fx:50,fy:BAS,t:'i',d:2000}]}),
+      {flottants:[{m:mK,c:CKA,x:50,y:MILIEU}],
+       scene:[{F:[0],d:3200},{F:[0],t:'i',d:2000}]}),
     B.tracer(te('ÉCRITURE · LA KASRA'),K,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
@@ -13210,38 +13313,38 @@ function _boyVowelCourse(ca){
       te('Tu es '+UNE+' '+CHAMP+' !')),
 
     B.illustre(te('LE SECRET'),
-      TB('Comme tu connais très bien les 3 voyelles, je vais te dévoiler un <b>secret</b> :'),
+      TB('Comme tu connais très bien<br>les 3 voyelles, je vais te<br>dévoiler un <b>secret</b> :'),
       te('Comme tu connais très bien les trois voyelles, je vais te dévoiler un secret.'),
       {calques:[LB],
        scene:[{L:[0],P:1,d:1200},{L:[0],P:1,d:2200}]}),
 
-    /* Le PREMIER signe ne bouge pas : c'est le second qui vient se poser a
-       cote de lui, presque jointif. Il se decalait, et le client l'a vu. */
+    /* La damma se double A COTE. Le premier signe ne bouge pas. */
     B.illustre(te('LE SECRET · « OUN »'),
-      TB('On peut avoir <b>deux fois</b> le même symbole sur une même lettre.'),
+      TB('On peut avoir <b>deux fois</b><br>le même symbole<br>sur une même lettre.'),
       te('On peut avoir deux fois le même symbole sur une même lettre. Bou devient boun.'),
       {calques:[LB],
-       flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:44,y:HAUT}],
+       flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
        scene:[{L:[0],P:1,F:[0],t:'bou',d:1800},
               {L:[0],P:1,F:[0,1],t:'boun',d:2400}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
+    /* Deux traits : le second se pose JUSTE AU-DESSUS du premier. */
     B.illustre(te('DOUBLEMENT · « AN »'),
-      TB('« ba » devient « <b>ban</b> ».'),
+      TB('« ba » devient<br>« <b>ban</b> ».'),
       te('Ba devient ban.'),
       {calques:[LB],
-       flottants:[{m:mF,c:CFA,x:50,y:HAUT},{m:mF,c:CFA,x:44,y:HAUT}],
+       flottants:[{m:mF,c:CFA,x:50,y:HAUT},{m:mF,c:CFA,x:50,y:HAUT2}],
        scene:[{L:[0],P:1,F:[0],t:'ba',d:1800},
               {L:[0],P:1,F:[0,1],t:'ban',d:2400}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     B.illustre(te('DOUBLEMENT · « IN »'),
-      TB('« bi » devient « <b>bin</b> ».'),
+      TB('« bi » devient<br>« <b>bin</b> ».'),
       te('Bi devient bin.'),
       {calques:[LB],
-       flottants:[{m:mK,c:CKA,x:50,y:BAS},{m:mK,c:CKA,x:44,y:BAS}],
+       flottants:[{m:mK,c:CKA,x:50,y:BAS},{m:mK,c:CKA,x:50,y:BAS2}],
        scene:[{L:[0],P:1,F:[0],t:'bi',d:1800},
               {L:[0],P:1,F:[0,1],t:'bin',d:2400}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
@@ -13254,13 +13357,14 @@ function _boyVowelCourse(ca){
     ]),
 
     B.illustre(te('LE SOUKOUN'),
-      TB('Tu te rappelles de la lettre « ba » ? Seul, on dit « <b>b</b> ».'),
+      TB('Tu te rappelles de la<br>lettre « ba » ? Seul,<br>on dit « <b>b</b> ».'),
       te('Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.'),
       {calques:[LB],
        scene:[{P:1,d:800},{L:[0],P:1,d:1300},{L:[0],P:1,t:'b',d:2000}]}),
 
+    /* Quatre lignes, comme le client les a ecrites — mais ecrites en grand. */
     B.illustre(te('LE SOUKOUN · LE PETIT ROND'),
-      TB('Parfois tu trouveras ce petit rond au dessus. Il n’a aucune prononciation. On dira toujours « <b>b</b> ».'),
+      TB('Parfois tu trouveras ce<br>petit rond au dessus. Il n’a<br>aucune prononciation.<br>On dira toujours « <b>b</b> ».'),
       te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.'),
       {calques:[LB,LBS],
        scene:[{L:[0],P:1,d:1000},
@@ -13268,7 +13372,7 @@ function _boyVowelCourse(ca){
               {L:[1],P:1,t:'b',d:2200}]}),
 
     B.repete(te('LE SOUKOUN · À TON TOUR'),
-      TB('Répète après moi : <b>« b »</b>'),
+      TB('Répète après moi :<br><b>« b »</b>'),
       te('Répète après moi : b.'),
       {calques:[LBS],scene:[{L:[0],P:1,t:'b',d:4000}]}),
 
@@ -13276,7 +13380,7 @@ function _boyVowelCourse(ca){
       TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission(TB('Tu <b>maîtrises</b> les voyelles !'),
+      B.mission(TB('Tu <b>maîtrises</b><br>les voyelles !'),
         te('Tu maîtrises les voyelles !'))(api);}
   ]);
 }
