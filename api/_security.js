@@ -23,7 +23,13 @@ function setSecurityHeaders(res) {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  /* `microphone=(self)` et non `microphone=()` : une liste VIDE ne veut pas
+     dire « pas de restriction » mais « personne, pas meme moi ». Le studio
+     d'enregistrement recevait donc « permission denied » quoi que
+     l'utilisateur autorise dans son navigateur ou son telephone. `self`
+     ouvre le micro a la seule origine du site — aucun tiers, aucune iframe.
+     La camera et la geolocalisation restent fermees a tout le monde. */
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(self), camera=()');
 }
 
 // ── Rate limiter en mémoire (par instance serverless) ────────────────────────
