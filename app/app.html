@@ -3086,6 +3086,58 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-panel{position:relative;overflow:hidden;text-align:center;background:linear-gradient(158deg,#ffffff 0%,var(--sk-pale) 100%);
   border:3px solid rgba(var(--sk-rgb),.30);border-radius:22px;padding:26px 18px;margin-bottom:14px;
   box-shadow:0 10px 26px rgba(var(--sk-rgb-f),.16);animation:bAppear .38s ease both}
+/* ── LE PERSONNAGE, SUR CHAQUE ECRAN ──
+   L'enfant traverse le cours avec quelqu'un. Il etait absent de tout ce qui
+   n'etait pas la carte : les ecrans de lecon n'avaient personne dedans. Il
+   se tient en bas a gauche, hors du chemin du texte et des boutons, et ne
+   prend aucun clic. */
+.boy-perso{position:absolute;left:10px;bottom:8px;width:clamp(38px,9vw,58px);
+  pointer-events:none;opacity:.96;z-index:2;
+  animation:persoSouffle 3.6s ease-in-out infinite}
+@keyframes persoSouffle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+/* La recompense : elle jaillit au-dessus de lui quand la reponse est juste —
+   des coeurs pour la fille, des biceps pour le garcon. */
+.boy-bravo{position:absolute;left:10px;bottom:calc(8px + clamp(38px,9vw,58px));
+  width:clamp(38px,9vw,58px);text-align:center;font-size:1.05rem;line-height:1.2;
+  pointer-events:none;z-index:3;opacity:0;transform:translateY(8px) scale(.6);
+  transition:opacity .28s ease,transform .5s cubic-bezier(.34,1.56,.64,1)}
+.boy-bravo.vu{opacity:1;transform:translateY(0) scale(1)}
+
+
+
+/* ── LA SCENE ILLUSTREE ──
+   Une regle se montre ici, elle ne se raconte pas. Tout y est fait avec les
+   lettres elles-memes : rien a traduire, net a toute taille. */
+.boy-scene{position:relative;width:100%;max-width:520px;margin:8px auto 4px;
+  height:clamp(150px,32vh,206px);border-radius:16px;background:#fff;
+  border:3px solid rgba(var(--sk-rgb),.30);overflow:hidden}
+.sc-piste{position:absolute;left:18px;right:18px;top:62%;height:0;
+  border-top:2px dashed rgba(var(--sk-rgb),.42);opacity:0;transition:opacity .3s ease}
+.sc-piste.vu{opacity:1}
+.sc-calque{position:absolute;left:0;right:0;top:12%;text-align:center;direction:rtl;
+  font-family:'Scheherazade New',serif;font-size:clamp(52px,13vh,84px);line-height:1;
+  color:var(--sk-fonce);opacity:0;transition:opacity .32s ease}
+.sc-calque.vu{opacity:1}
+.sc-flot{position:absolute;transform:translate(-50%,-50%);direction:rtl;
+  font-family:'Scheherazade New',serif;font-size:clamp(38px,9vh,60px);line-height:1;
+  opacity:0;white-space:nowrap;
+  transition:opacity .3s ease,left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.4,0,.2,1)}
+.sc-flot.vu{opacity:1}
+.sc-flot.bat{animation:scBat 1.1s ease-in-out infinite}
+@keyframes scBat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.16)}}
+.sc-croix{position:absolute;transform:translate(-50%,-50%);font-size:clamp(30px,7vh,46px);
+  font-weight:900;color:#d92d20;opacity:0;transition:opacity .2s ease;line-height:1}
+.sc-croix.vu{opacity:1}
+.sc-etiq{position:absolute;left:0;right:0;bottom:9px;text-align:center;
+  font-family:Outfit,sans-serif;font-size:.9rem;font-weight:800;
+  color:rgba(var(--sk-rgb-f),.8);opacity:0;transition:opacity .3s ease}
+.sc-etiq.vu{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  .boy-perso{animation:none}
+  .sc-calque,.sc-flot,.sc-croix,.sc-etiq,.sc-piste,.boy-bravo{transition:none}
+  .sc-flot.bat{animation:none}
+}
+
 .boy-panel::before{content:'';position:absolute;left:0;right:0;height:34%;
   background:linear-gradient(180deg,rgba(var(--sk-rgb),0),rgba(var(--sk-rgb),.10),rgba(var(--sk-rgb),0));
   animation:bScan 4.5s linear infinite;pointer-events:none}
@@ -7695,6 +7747,26 @@ function _volCarte(o){
    exactement la même chose en rose), et chaque correction était donc à
    faire deux fois. Ce qui les distingue tient maintenant dans l'habillage :
    les images du décor, la couleur de la traînée, le titre. */
+/* ── LE COMPTE DU PROPRIETAIRE VOIT TOUT ──
+   Pour relire une lecon, verifier une correction ou preparer un enregistrement,
+   il faut pouvoir ouvrir n'importe quel monde sans avoir a refaire les
+   precedents. Cette porte ne protege rien : l'application entiere exige deja
+   un compte paye pour se charger, et ce qu'elle ouvre ici n'est que l'ORDRE
+   des lecons, pas un contenu reserve. C'est un confort de travail, pas une
+   frontiere de securite — et c'est pour cela qu'un simple courriel suffit. */
+var _COMPTES_OUVERTS=['abder.jah@hotmail.com'];
+/* L'embleme du monde ou l'enfant se trouve — la goutte, le bateau, la fleur.
+   Il sert a habiller les canvas de trace : le cours doit sentir le monde
+   qu'on traverse, pas une page blanche. Rempli au rendu de la carte, la
+   seule ou l'on sache quelle session appartient a quelle ile. */
+var _ICONE_MONDE={};
+function _toutOuvert(){
+  try{
+    var m=(localStorage.getItem('arab_email')||'').trim().toLowerCase();
+    return !!m&&_COMPTES_OUVERTS.indexOf(m)>=0;
+  }catch(e){return false;}
+}
+
 function renderSessionsMap(ca){
   _HAB=_habDuProfil();
   _migreProgressionFille();
@@ -7867,11 +7939,12 @@ var islandDefs=[
 
   islandDefs.forEach(function(isle,isleIdx){
     // Statut des sessions de cette île
+    isle.sids.forEach(function(sid){_ICONE_MONDE[sid]=isle.icon;});
     var isleSessions=isle.sids.map(function(sid){
       return ALL_S.find(function(s){return s.id===sid;})||null;
     }).filter(Boolean);
     var doneCount=isleSessions.filter(function(s){return (st.scores[s.id]||0)>=80;}).length;
-    var isLocked=!prevIslandDone;
+    var isLocked=!prevIslandDone&&!_toutOuvert();
     var isComplete=doneCount===isleSessions.length;
 
     // Card île (layout centré)
@@ -7919,7 +7992,7 @@ var islandDefs=[
     // Mini-jeu après cette île ?
     var mg=mgDefs.find(function(m){return m.after===isleIdx;});
     if(mg){
-      var mgUnlocked=isComplete;
+      var mgUnlocked=isComplete||_toutOuvert();
       var mgCard=document.createElement('div');
       mgCard.className='isle-mg'+(mgUnlocked?'':' locked-mg');
       mgCard.style.position='relative';mgCard.style.zIndex='5';
@@ -7943,7 +8016,7 @@ var islandDefs=[
   // Le scroll vers le gugus est géré directement après le placement initial (dans les setTimeout des cartes)
 
   // Boss final — Grand Quiz
-  var allDone=doneSessions===totalSessions;
+  var allDone=(doneSessions===totalSessions)||_toutOuvert();
   var boss=document.createElement('div');
   boss.className='sess-island boss-isle'+(allDone?'':' locked-isle');
   boss.innerHTML='<div class="isle-hd"><div class="isle-ico">🏆</div><div class="isle-info"><div class="isle-name" style="font-size:1rem">'+({'fr':'Le Grand Quiz Final','en':'The Final Grand Quiz','es':'El Gran Quiz Final','de':'Das Große Abschlussquiz','nl':'Het Grote Eindquiz','it':'Il Grande Quiz Finale','pt':'O Grande Quiz Final','ru':'Финальный Большой Квиз','tr':'Büyük Final Quizi','zh':'最终大测验','id':'Kuis Besar Final','ur':'آخری بڑا کوئز','hi':'अंतिम महाक्विज'}[st.lang]||'Le Grand Quiz Final')+'</div><div class="isle-sub" style="font-family:inherit;font-size:.72rem">'+(allDone?'200 questions — Niveau maître':(t('finish_all')||'Termine toutes les îles'))+'</div></div><div class="isle-badge" style="color:'+(allDone?'#f5c842':'rgba(255,255,255,.3)')+'">'+(allDone?'⚡ START':'🔒')+'</div></div>';
@@ -9134,7 +9207,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v186';
+var _VERSION_REPLI='v187';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10735,6 +10808,13 @@ function _armePleinEcran(el){
 function _blocEcriture(hote,o){
   var liste=o.liste,nb=liste.length;
   var CW0=520,CH0=o.signeSeul?250:220;
+  /* Un signe montre seul recoit un cadre plus haut : a la taille d'une lettre
+     il serait minuscule. Couche, l'ecran n'a que ~390 px et ce cadre-la
+     depassait de 78 px — mesure faite sur les quatre ecrans concernes. On le
+     ramene alors a la hauteur commune ; le signe reste grand, c'est le vide
+     autour de lui qu'on retire. */
+  if(window.innerWidth>window.innerHeight&&window.innerHeight<=460)
+    CH0=Math.min(CH0,168);
   /* ── LA BANDE DU RAPPEL, DANS LE CADRE ──
      De tete, l'enfant peut demander a revoir une forme. Elle s'affichait SOUS
      son propre trace, au meme endroit : les deux encres se superposaient et
@@ -10822,8 +10902,33 @@ function _blocEcriture(hote,o){
       cx.restore();
     }
   }
+  /* ── LE MONDE OU L'ON SE TROUVE, EN FILIGRANE ──
+     Le cadre d'ecriture etait une page blanche : rien n'y rappelait l'ile ou
+     l'enfant se trouve. On y seme l'embleme du monde — la goutte, le bateau,
+     la fleur — assez pale pour ne jamais concurrencer le modele a repasser
+     ni l'encre de l'enfant. Les positions sont fixes et hors de la zone
+     d'ecriture : au ras des quatre coins. */
+  var _embleme=null;
+  try{_embleme=_ICONE_MONDE[_boySession&&_boySession.id];}catch(e){}
+  function decorMonde(){
+    if(!_embleme)return;
+    cx.save();
+    cx.globalAlpha=0.10;
+    cx.textAlign='center';cx.textBaseline='middle';
+    var T=Math.round(26*k);
+    cx.font=T+'px serif';
+    [[0.09,0.16],[0.91,0.20],[0.16,0.88],[0.84,0.84]].forEach(function(q,i){
+      cx.save();
+      cx.translate(CW*q[0],CH*q[1]);
+      cx.rotate((i%2?1:-1)*0.18);
+      cx.fillText(_embleme,0,0);
+      cx.restore();
+    });
+    cx.restore();
+  }
   function guide(prog){
     cx.clearRect(0,0,CW,CH);
+    decorMonde();
     /* Le modèle en gris-bleu, l'encre de l'enfant en orange : il voit
        d'un coup d'œil ce qu'il a écrit lui-même. */
     /* De tete, la couche du modele reste VIDE : ce que l'enfant voit dans le
@@ -11049,6 +11154,8 @@ var _HABILLAGES={
     /* La meme fusee, hublot vide : celle qu'on voit une fois l'enfant sorti. */
     vaisseauVide:'/images/fusee-vide.png',
     pilote:'/images/astronaute-garcon.png',
+    /* Ce qui jaillit quand l'enfant a juste : des biceps pour lui. */
+    bravo:'💪',
     /* PLUS DE FLAMME SOUS LA FUSEE : la trainee de feu la remplace, et deux
        feux au meme endroit se font de l'ombre. */
     flamme:false,
@@ -11137,6 +11244,8 @@ var _HABILLAGES={
        dessins existaient pourtant : on les declare, comme pour la monture.
        `gd` = de gauche a droite, donc tournee vers la droite. */
     pilote:'/images/fille-couronne.png?v=133',
+    /* Ce qui jaillit quand l'enfant a juste : des coeurs pour elle. */
+    bravo:'💗',
     piloteSens:{gd:'/images/fille-couronne.png?v=133',
                 dg:'/images/fille-couronne-dg.png?v=133'},
     piloteSansCouronne:'/images/fille-seule.png?v=133',
@@ -11850,8 +11959,29 @@ function _boyScene(ca,reprise){
       var e=document.createElement('div');e.className='boy-step';
       e.innerHTML='<i></i>'+etape+'<i></i>';p.appendChild(e);
     }
+    /* L'ENFANT TRAVERSE LE COURS AVEC QUELQU'UN. Il n'apparaissait que sur la
+       carte ; les ecrans de lecon n'avaient personne dedans. On le pose ici,
+       une fois, pour tous les ecrans a la fois — briefing, observation,
+       trace, controle. */
+    var perso=_HAB.piloteSansCouronne||_HAB.pilote;
+    if(perso){
+      var im=document.createElement('img');
+      im.className='boy-perso';im.src=perso;im.alt='';im.setAttribute('aria-hidden','true');
+      p.appendChild(im);
+      var br=document.createElement('div');br.className='boy-bravo';
+      p.appendChild(br);p._bravo=br;
+    }
     wrap.appendChild(p);_dernierPanneau=p;return p;
   }
+  /* La recompense au-dessus du personnage : des coeurs pour la fille, des
+     bras pour le garcon. Elle jaillit, tient un instant, et s'efface. */
+  function bravo(p,combien){
+    var el=p&&p._bravo;if(!el)return;
+    el.textContent=(_HAB.bravo||'⭐').repeat(combien||1);
+    el.classList.add('vu');
+    N.plusTard(function(){el.classList.remove('vu');},2200);
+  }
+  api.bravo=bravo;
   /* Revoir l'écran précédent : on passe à l'écran suivant, et il arrive
      qu'on veuille relire celui d'avant. Ajouté après le rendu de la scène,
      donc valable pour toutes — briefing, hublot, piste, tracé, contrôle. */
@@ -12215,6 +12345,76 @@ function _boyScene(ca,reprise){
       bouton(p,label||te('SUIVANT ▸'),suivant);
     };
   };
+  /* ── UN ECRAN QUI MONTRE ────────────────────────────────────────────
+     Une regle expliquee en mots ne dit rien a un enfant qui ne lit pas
+     encore. Cette scene joue une petite animation faite avec les LETTRES
+     elles-memes : la lettre, les signes qui se posent, se deplacent, se
+     doublent. Rien n'y est une image — donc rien a traduire dans les treize
+     langues, et net a toute taille.
+
+     Un plan est une liste d'etats, joues l'un apres l'autre. Chacun dit :
+       L   les calques visibles. Un calque porte la syllabe ENTIERE ; ils se
+           croisent en opacite, et comme la lettre y est dessinee a
+           l'identique, seul le SIGNE parait apparaitre. C'est la seule facon
+           sure d'animer une marque arabe sans la detacher de sa lettre.
+       F   les signes flottants visibles, ceux qu'on deplace ou qu'on double.
+       fx,fy  ou glisse le premier signe flottant (en % et en %).
+       P   la ligne d'ecriture est-elle la.
+       X   une croix rouge, et ou : ce qu'il ne faut pas faire.
+       R   la recompense jaillit au-dessus du personnage.
+       t   la legende, sous la scene.
+       d   la duree de l'etat.
+     Le dernier etat reste a l'ecran : la scene n'est jamais vide. */
+  api.illustre=function(etape,html,fr,plan,label){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+
+      var sc=document.createElement('div');sc.className='boy-scene';
+      var piste=document.createElement('div');piste.className='sc-piste';sc.appendChild(piste);
+
+      var calques=(plan.calques||[]).map(function(t){
+        var c=document.createElement('div');c.className='sc-calque';
+        c.textContent=t;sc.appendChild(c);return c;});
+
+      var flot=(plan.flottants||[]).map(function(f){
+        var d=document.createElement('div');d.className='sc-flot';
+        d.textContent=f.m;d.style.color=f.c||'var(--sk-vif)';
+        d.style.left=f.x+'%';d.style.top=f.y+'%';
+        d._x=f.x;d._y=f.y;sc.appendChild(d);return d;});
+
+      var croix=document.createElement('div');croix.className='sc-croix';
+      croix.textContent='✕';sc.appendChild(croix);
+      var etiq=document.createElement('div');etiq.className='sc-etiq';sc.appendChild(etiq);
+      p.appendChild(sc);
+
+      var etapes=plan.scene||[];
+      function pose(n){
+        var e=etapes[n]||{},L=e.L||[],F=e.F||[];
+        calques.forEach(function(c,k){c.classList.toggle('vu',L.indexOf(k)>=0);});
+        flot.forEach(function(f,k){
+          var on=F.indexOf(k)>=0;
+          f.classList.toggle('vu',on);
+          f.classList.toggle('bat',on&&!!e.bat);
+          if(e.fx!==undefined&&k===0){f.style.left=e.fx+'%';f.style.top=e.fy+'%';}
+          else if(!on){f.style.left=f._x+'%';f.style.top=f._y+'%';}
+        });
+        piste.classList.toggle('vu',!!e.P);
+        if(e.X){croix.style.left=e.X[0]+'%';croix.style.top=e.X[1]+'%';}
+        croix.classList.toggle('vu',!!e.X);
+        etiq.textContent=e.t||'';etiq.classList.toggle('vu',!!e.t);
+        if(e.R)bravo(p,e.R);
+      }
+      var n=0;
+      (function joue(){
+        pose(n);
+        var d=(etapes[n]&&etapes[n].d)||1200;n++;
+        if(n<etapes.length)N.plusTard(joue,d);
+      })();
+
+      bouton(p,label||te('SUIVANT ▸'),suivant);
+    };
+  };
+
   /* Observation : texte + hublot */
   api.obs=function(etape,glyph,son,html,fr,note,ligne,socle,accent){
     return function(){
@@ -12757,70 +12957,213 @@ function _boyVowelCourse(ca){
   var F=_vw('َ'),K=_vw('ِ'),D=_vw('ُ');
   var TF=_vw('ً'),TK=_vw('ٍ'),TD=_vw('ٌ');
   var SK=_vw('ْ');
-  function q(s){return b('« '+s+' »');}
+
+  /* ── LES COULEURS DES TROIS SIGNES ──
+     Les memes que le cours sur les prolongations : un signe garde sa couleur
+     d'un bout a l'autre du parcours, sinon l'enfant apprend deux codes. */
+  var CFA='#e65100', CDA='#2e7d32', CKA='#6a1b9a';
+
+  /* La lettre qui porte tout le cours, et ses quatre etats. */
+  var LB='ب';
+  var LBF=LB+'َ', LBK=LB+'ِ', LBD=LB+'ُ', LBS=LB+'ْ';
+
+  /* Un signe montre seul se dessine NU. Mesure faite sur la police : sa
+     boite tient dans 0,27 em, la ou le cercle pointille qu'on lui mettait
+     autrefois en imposait 0,50 — il n'avait aucune raison d'etre. */
+  var mF='َ', mK='ِ', mD='ُ';
+
+  /* Les trois hauteurs de la scene, en pourcentage : au-dessus de la lettre,
+     sur la ligne d'ecriture, en dessous. */
+  var HAUT=22, MILIEU=46, BAS=80;
 
   B.run([
-    B.brief(_HAB.mission+' 1 · '+_HAB.depart,TB('Aujourd\'hui :<br>les <b>voyelles</b> 🎯'),
+    B.brief(_HAB.mission+' 1 · '+_HAB.depart,
+      TB('Aujourd&rsquo;hui :<br>les <b>voyelles</b> 🎯'),
       teF('{mission} du jour : les voyelles.',{mission:_HAB.missionMin}),_HAB.partir),
-    B.obs(te('ÉTAPE 1 · REPÉRAGE'),[[F,'a'],[D,'ou'],[K,'i']],null,
-      TB('Une voyelle,<br>c\'est un petit <b>signe</b>.'),
-      te('Une voyelle, c\'est un petit signe.'),null),
-    B.brief(te('ÉTAPE 2 · POSITION'),TB('Elle se place <b>sur</b>,<br>ou <b>sous</b> la lettre.'),
-      te('Elle se place sur, ou sous la lettre.')),
-    B.brief(te('ÉTAPE 3 · ORDRE'),TB('On dit d\'abord la <b>lettre</b>,<br><b>PUIS</b> la voyelle.'),
-      te('Attention à l\'ordre : on prononce d\'abord la lettre, puis la voyelle.')),
-    B.brief(te('ÉTAPE 4 · INVENTAIRE'),TB('Il en existe<br>seulement <b>3</b> ! 🖐️'),
-      te('Il existe seulement trois voyelles.')),
-    B.obs(te('ÉTAPE 6 · FATḤA'),F,'a',TB('Un trait au-<b>dessus</b> :<br>ça fait <b>\u00ab a \u00bb</b> ☀️'),
-      te('Un trait au-dessus, ça fait « a »'),null,true),
-    B.tracer(te('ÉTAPE 6 · TRACÉ'),F,TB('À toi de tracer<br>la <b>fatḥa</b> ✍️'),te('À toi de tracer la fatha.')),
-    B.obs(te('ÉTAPE 7 · ḌAMMA'),D,'ou',TB('Une boucle au-<b>dessus</b> :<br>ça fait <b>\u00ab ou \u00bb</b> 🌙'),
-      te('Une boucle au-dessus, ça fait « ou »'),null,true),
-    B.tracer(te('ÉTAPE 7 · TRACÉ'),D,TB('À toi de tracer<br>la <b>ḍamma</b> ✍️'),te('À toi de tracer la damma.')),
-    B.obs(te('ÉTAPE 8 · KASRA'),K,'i',TB('Un trait en-<b>dessous</b> :<br>ça fait <b>\u00ab i \u00bb</b> ⭐'),
-      te('Un trait en-dessous, ça fait « i »'),null,true),
-    B.tracer(te('ÉTAPE 8 · TRACÉ'),K,TB('À toi de tracer<br>la <b>kasra</b> ✍️'),te('À toi de tracer la kasra.')),
 
-    /* Ordre tiré au sort : toujours a, puis i, puis ou, et l'enfant répond de
-       mémoire sans plus écouter. */
+    /* ── ETAPE 0 : LA LETTRE ──
+       On ne peut rien montrer d'une voyelle sans une lettre pour la porter.
+       Elle arrive donc d'abord, seule, sur sa ligne. */
+    B.illustre(te('ÉTAPE 0 · LA LETTRE'),
+      TB('Pour comprendre les voyelles,<br>il faut une <b>lettre</b>.<br>Seule, elle se dit « <b>b</b> ».'),
+      te('Pour comprendre les voyelles, on a besoin d&rsquo;une lettre. Prenons la lettre ba. Seule, elle se prononce b.'),
+      {calques:[LB],
+       scene:[{P:1,d:600},{L:[0],P:1,d:1200},{L:[0],P:1,t:'« b »',d:2200}]}),
+
+    /* ── ETAPE 1 : REPERAGE ──
+       Les trois signes battent autour de la lettre : ce qui bouge se
+       remarque, et leur PLACE se voit avant qu'on en parle. */
+    B.illustre(te('ÉTAPE 1 · REPÉRAGE'),
+      TB('Une voyelle,<br>c&rsquo;est un petit <b>signe</b>.'),
+      te('Une voyelle, c&rsquo;est un petit signe.'),
+      {calques:[LB],
+       flottants:[{m:mD,c:CDA,x:38,y:HAUT},{m:mF,c:CFA,x:62,y:HAUT},
+                  {m:mK,c:CKA,x:50,y:BAS}],
+       scene:[{L:[0],P:1,d:700},
+              {L:[0],P:1,F:[0,1,2],bat:1,t:te('trois petits signes'),d:3000}]}),
+
+    /* ══ LES TROIS VOYELLES, UNE PAR ECRAN ══════════════════════════
+       Chacune a son ecran, son son, son bravo. Trois voyelles, trois fois le
+       meme geste : c'est ce qui les rend comparables. */
+
+    /* La damma. On montre d'abord ce qu'il NE FAUT PAS faire — le signe sous
+       la lettre, barre de rouge — puis il remonte a sa place. Une regle
+       qu'on a vu enfreindre se retient mieux qu'une regle enoncee. */
+    B.illustre(te('ÉTAPE 2 · LA ḌAMMA'),
+      TB('La premi&egrave;re se dit « <b>ou</b> ».<br>Elle est <b>toujours au-dessus</b>.'),
+      te('Voici la premiere voyelle. Elle se prononce ou, et se place toujours au-dessus de la lettre. On obtient le son bou.'),
+      {calques:[LB,LBD],
+       flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
+       scene:[{F:[0],t:'« ou »',d:1600},
+              {F:[0],L:[0],P:1,fx:50,fy:BAS,d:1000},
+              {F:[0],L:[0],P:1,fx:50,fy:BAS,X:[50,BAS],t:te('jamais en dessous'),d:1500},
+              {F:[0],L:[0],P:1,fx:50,fy:HAUT,t:te('toujours au-dessus'),d:1200},
+              {L:[1],P:1,t:'« bou »',d:1600},
+              {L:[1],P:1,R:2,t:te('bravo !'),d:2000}]}),
+    B.brief(te('ÉTAPE 2 · À TON TOUR'),
+      TB('R&eacute;p&egrave;te apr&egrave;s moi :<br><b>« bou »</b>'),
+      te('Repete apres moi : bou.')),
+
+    /* Le trait, au-dessus : « a ». */
+    B.illustre(te('ÉTAPE 3 · LE TRAIT, AU-DESSUS'),
+      TB('Ce trait au-<b>dessus</b><br>se dit « <b>a</b> ».'),
+      te('Voici le deuxieme symbole. Au-dessus de la lettre, il se prononce a. On a alors le son ba.'),
+      {calques:[LB,LBF],
+       flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
+       scene:[{F:[0],d:1500},
+              {L:[0],P:1,d:900},
+              {L:[1],P:1,t:'« ba »',d:1700},
+              {L:[1],P:1,R:2,t:te('bravo !'),d:1900}]}),
+    B.brief(te('ÉTAPE 3 · À TON TOUR'),
+      TB('R&eacute;p&egrave;te apr&egrave;s moi :<br><b>« ba »</b>'),
+      te('Repete apres moi : ba.')),
+
+    /* LE MEME TRAIT, en dessous : « i ». Un seul dessin, deux sons selon sa
+       place — c'est la comparaison qui enseigne, pas la phrase. */
+    B.illustre(te('ÉTAPE 4 · LE MÊME TRAIT, DESSOUS'),
+      TB('Le <b>m&ecirc;me</b> trait, en <b>dessous</b>,<br>se dit « <b>i</b> ».'),
+      te('En revanche, en dessous de la lettre, il se dit i. On a alors le son bi.'),
+      {calques:[LB,LBF,LBK],
+       scene:[{L:[1],P:1,t:'« ba »',d:1500},
+              {L:[0],P:1,d:600},
+              {L:[2],P:1,t:'« bi »',d:1800},
+              {L:[2],P:1,R:2,t:te('c&rsquo;est tr&egrave;s bien !'),d:1900}]}),
+    B.brief(te('ÉTAPE 4 · À TON TOUR'),
+      TB('&Agrave; toi de dire :<br><b>« bi »</b>'),
+      te('A toi de dire : bi.')),
+
+    /* ══ ON ECRIT ═══════════════════════════════════════════════════ */
+    B.brief(te('ÉCRITURE · PRÊT ?'),
+      TB('Maintenant,<br>on va les <b>&eacute;crire</b> !'),
+      te('Maintenant, on va les ecrire ! Tu es pret ?'),_HAB.partir),
+
+    B.illustre(te('ÉCRITURE · LA ḌAMMA'),
+      TB('Te souviens-tu<br>de ce signe ?&hellip;<br>C&rsquo;est « <b>ou</b> ».'),
+      te('On commence par ce symbole. Te souviens-tu de lui ? C&rsquo;est le son ou.'),
+      {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
+       scene:[{F:[0],t:te('tu te souviens ?'),d:1900},
+              {F:[0],t:'« ou »',d:1700}]}),
+    B.tracer(te('ÉCRITURE · LA ḌAMMA'),D,
+      TB('Repasse sur les <b>mod&egrave;les</b> ✍️'),te('Repasse sur les modeles.')),
+
+    B.illustre(te('ÉCRITURE · LA FATḤA'),
+      TB('Au-<b>dessus</b> de la lettre,<br>on dit comment ?&hellip;<br>« <b>a</b> ».'),
+      te('On passe a ce symbole. Au-dessus de la lettre, on dit comment ? A.'),
+      {flottants:[{m:mF,c:CFA,x:50,y:BAS}],
+       scene:[{F:[0],P:1,d:900},
+              {F:[0],P:1,fx:50,fy:HAUT,t:te('au-dessus'),d:1500},
+              {F:[0],P:1,fx:50,fy:HAUT,t:'« a »',d:1700}]}),
+    B.tracer(te('ÉCRITURE · LA FATḤA'),F,
+      TB('&Agrave; toi de l&rsquo;<b>&eacute;crire</b> ✍️'),te('A toi de l&rsquo;ecrire.')),
+
+    B.illustre(te('ÉCRITURE · LA KASRA'),
+      TB('<b>Sous</b> la lettre,<br>on prononce ?&hellip;<br>« <b>i</b> ».'),
+      te('Enfin, ce symbole. Sous la lettre, on prononce ? I.'),
+      {flottants:[{m:mK,c:CKA,x:50,y:HAUT}],
+       scene:[{F:[0],P:1,d:900},
+              {F:[0],P:1,fx:50,fy:BAS,t:te('en dessous'),d:1500},
+              {F:[0],P:1,fx:50,fy:BAS,t:'« i »',d:1700}]}),
+    B.tracer(te('ÉCRITURE · LA KASRA'),K,
+      TB('&Agrave; toi de l&rsquo;<b>&eacute;crire</b> ✍️'),te('A toi de l&rsquo;ecrire.')),
+
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab a \u00bb</b> ?'),te('Où est le son « a » ?'),[F,K,D],F),
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab i \u00bb</b> ?'),te('Où est le son « i » ?'),[F,K,D],K),
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab ou \u00bb</b> ?'),te('Où est le son « ou » ?'),[F,K,D],D)
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« a »</b> ?'),te('Où est le son « a » ?'),[F,K,D],F),
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« i »</b> ?'),te('Où est le son « i » ?'),[F,K,D],K),
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« ou »</b> ?'),te('Où est le son « ou » ?'),[F,K,D],D)
     ]),
 
-    /* Cet écran parle du NOM des voyelles : on joue donc le nom quand
-       l'enfant appuie dessus, pas le son — il vient de l'entendre trois
-       écrans plus haut. */
-    B.surPiste(te('ÉTAPE 9 · NOMS'),TB('Elles ont un <b>nom</b>,<br>mais retiens le <b>SON</b> !'),
-      te('Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.'),
-      [[F,'fatḥa','fatha'],[D,'ḍamma','damma']],[[K,'kasra','kasra']]),
+    B.illustre(te('BRAVO'),
+      TB('Tu es un <b>champion</b> !'),te('Tu es un champion !'),
+      {scene:[{d:600},{R:3,t:te('champion !'),d:2600}]}),
 
-    B.brief(te('ÉTAPE 10 · DOUBLEMENT'),TB('Si on <b>double</b> une voyelle,<br>on ajoute le son <b>\u00ab n \u00bb</b> 👃'),
-      te('Si on double une voyelle, on ajoute le son « n »')),
-    B.obs(te('ÉTAPE 12 · TANWĪN'),TF,'anne',TB('Deux traits au-dessus :<br><b>\u00ab a \u00bb</b> devient <b>\u00ab an \u00bb</b>'),
-      te('Deux traits au-dessus : « a » devient « an »')),
-    B.tracer(te('ÉTAPE 12 · TRACÉ'),TF,TB('Trace les <b>deux traits</b> ✍️'),te('Trace les deux traits.')),
-    B.obs(te('ÉTAPE 13 · TANWĪN'),TD,'oune',TB('Deux boucles au-dessus :<br><b>\u00ab ou \u00bb</b> devient <b>\u00ab oun \u00bb</b>'),
-      te('Deux boucles au-dessus : « ou » devient « oun »')),
-    B.tracer(te('ÉTAPE 13 · TRACÉ'),TD,TB('Trace les <b>deux boucles</b> ✍️'),te('Trace les deux boucles.')),
-    B.obs(te('ÉTAPE 14 · TANWĪN'),TK,'inne',TB('Deux traits en-dessous :<br><b>\u00ab i \u00bb</b> devient <b>\u00ab in \u00bb</b>'),
-      te('Deux traits en-dessous : « i » devient « in »')),
-    B.tracer(te('ÉTAPE 14 · TRACÉ'),TK,TB('Trace les <b>deux traits</b> ✍️'),te('Trace les deux traits.')),
+    /* ══ LE SECRET : DOUBLER LE SIGNE ════════════════════════════════
+       Le tanwin s'ecrit ici en DEUX SIGNES DISTINCTS, presque jointifs, et
+       non avec le caractere unique. Mesure faite sur la police : ce
+       caractere ne fait que 1,13 fois la largeur d'un signe simple — c'est
+       une ligature compressee, et l'enfant n'y voit pas le doublement. Deux
+       signes cote a cote le lui montrent. */
+    B.illustre(te('LE SECRET'),
+      TB('Tu les connais bien !<br>Voici un <b>secret</b> :<br>le signe peut venir <b>deux fois</b>.'),
+      te('Comme tu connais tres bien les trois voyelles, je vais te devoiler un secret : on peut avoir deux fois le meme symbole sur une meme lettre.'),
+      {calques:[LB],
+       scene:[{L:[0],P:1,d:1000},
+              {L:[0],P:1,t:te('deux fois le même signe…'),d:2300}]}),
+
+    B.illustre(te('DOUBLEMENT · « OUN »'),
+      TB('« bou » devient<br>« <b>boun</b> ».'),
+      te('Bou devient boun. Ceci est le son oun.'),
+      {calques:[LB],
+       flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
+       scene:[{L:[0],P:1,F:[0],t:'« bou »',d:1500},
+              {L:[0],P:1,F:[0,1],fx:57,fy:HAUT,t:'« boun »',d:2000},
+              {L:[0],P:1,F:[0,1],fx:57,fy:HAUT,R:2,t:te('bravo !'),d:1800}]}),
+    B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
+      TB('&Agrave; toi d&rsquo;<b>&eacute;crire</b> ✍️'),te('A toi d&rsquo;ecrire.')),
+
+    B.illustre(te('DOUBLEMENT · « AN »'),
+      TB('« ba » devient<br>« <b>ban</b> ».'),
+      te('Ba devient ban. Ceci est le son an.'),
+      {calques:[LB],
+       flottants:[{m:mF,c:CFA,x:50,y:HAUT},{m:mF,c:CFA,x:43,y:HAUT}],
+       scene:[{L:[0],P:1,F:[0],t:'« ba »',d:1500},
+              {L:[0],P:1,F:[0,1],fx:57,fy:HAUT,t:'« ban »',d:2000},
+              {L:[0],P:1,F:[0,1],fx:57,fy:HAUT,R:2,t:te('bravo !'),d:1800}]}),
+    B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
+      TB('&Agrave; toi d&rsquo;<b>&eacute;crire</b> ✍️'),te('A toi d&rsquo;ecrire.')),
+
+    B.illustre(te('DOUBLEMENT · « IN »'),
+      TB('« bi » devient<br>« <b>bin</b> ».'),
+      te('Bi devient bin. Ceci est le son in.'),
+      {calques:[LB],
+       flottants:[{m:mK,c:CKA,x:50,y:BAS},{m:mK,c:CKA,x:43,y:BAS}],
+       scene:[{L:[0],P:1,F:[0],t:'« bi »',d:1500},
+              {L:[0],P:1,F:[0,1],fx:57,fy:BAS,t:'« bin »',d:2000},
+              {L:[0],P:1,F:[0,1],fx:57,fy:BAS,R:2,t:te('bravo !'),d:1800}]}),
+    B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
+      TB('&Agrave; toi d&rsquo;<b>&eacute;crire</b> ✍️'),te('A toi d&rsquo;ecrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab an \u00bb</b> ?'),te('Où est le son « an » ?'),[TF,TK,TD],TF),
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab oun \u00bb</b> ?'),te('Où est le son « oun » ?'),[TF,TK,TD],TD),
-      B.controle('CONTRÔLE',TB('Où est le son <b>\u00ab in \u00bb</b> ?'),te('Où est le son « in » ?'),[TF,TK,TD],TK)
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« an »</b> ?'),te('Où est le son « an » ?'),[TF,TK,TD],TF),
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« oun »</b> ?'),te('Où est le son « oun » ?'),[TF,TK,TD],TD),
+      B.controle('CONTRÔLE',TB('O&ugrave; est le son <b>« in »</b> ?'),te('Où est le son « in » ?'),[TF,TK,TD],TK)
     ]),
 
-    B.obs(te('ÉTAPE 15 · SOUKOUN'),SK,null,TB('Un petit rond :<br>on ne prononce que<br>le <b>son de la lettre</b> ⭕'),
-      te('Un petit rond : on ne prononce que le son de la lettre.'),te('⭕ Pas de voyelle')),
-    B.tracer(te('ÉTAPE 15 · TRACÉ'),SK,TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
+    /* ── LE SOUKOUN ──
+       Ce qu'il faut comprendre, c'est que RIEN NE CHANGE. On le montre donc :
+       la lettre dit « b », le rond se pose, elle dit encore « b ». */
+    B.illustre(te('ÉTAPE 15 · SOUKOUN'),
+      TB('Ce petit rond ne se dit <b>pas</b>.<br>On dira toujours « <b>b</b> ».'),
+      te('Tu te rappelles de la lettre ba ? Seule, on dit b. Parfois tu trouveras ce petit rond au-dessus. Il n&rsquo;a aucune prononciation : on dira toujours b.'),
+      {calques:[LB,LBS],
+       scene:[{L:[0],P:1,t:'« b »',d:1600},
+              {L:[1],P:1,t:'« b »',d:2000},
+              {L:[1],P:1,R:2,t:te('toujours « b »'),d:1900}]}),
+    B.tracer(te('ÉTAPE 15 · TRACÉ'),SK,
+      TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
-      B.mission(TB('Voyelles <b>maîtrisées</b> !<br>🎖️'),
-        teF('{mission} accomplie ! Tu maîtrises les voyelles.',{mission:_HAB.missionMin}))(api);}
+      B.mission(TB('Voyelles <b>ma&icirc;tris&eacute;es</b> !<br>🎖️'),
+        teF('{mission} accomplie ! Tu maitrises les voyelles.',{mission:_HAB.missionMin}))(api);}
   ]);
 }
 
