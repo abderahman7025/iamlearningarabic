@@ -3149,8 +3149,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    boite : sa taille de police ne dit rien de ce qu'on voit. */
 .sc-flot.seul{font-size:var(--sc-seul,120px)}
 .sc-flot.vu{opacity:1}
+/* Le battement passe par la taille, non par `transform` : celui-ci porte la
+   compensation d'encre, et l'animation l'ecrasait. */
 .sc-flot.bat{animation:scBat 1.1s ease-in-out infinite}
-@keyframes scBat{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.16)}}
+@keyframes scBat{0%,100%{letter-spacing:0}50%{letter-spacing:.02em}}
 .sc-croix{position:absolute;transform:translate(-50%,-50%);font-size:clamp(30px,7vh,46px);
   font-weight:900;color:#d92d20;opacity:0;transition:opacity .2s ease;line-height:1}
 .sc-croix.vu{opacity:1}
@@ -3180,6 +3182,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   text-align:center;margin:0 auto 18px;max-width:none}
 /* Une ligne du client : elle occupe sa propre ligne, et rien ne la coupe. */
 .boy-ligne{display:block;white-space:nowrap}
+/* L'ECRAN DE FIN : le texte au centre, une monture de chaque cote. */
+.fete-rangee{display:flex;align-items:center;justify-content:center;
+  gap:clamp(8px,3vw,26px);margin:6px auto 10px;max-width:100%}
+.fete-monture{width:clamp(56px,15vw,120px);height:auto;flex:none;
+  animation:feteSaut 1.8s ease-in-out infinite}
+.fete-monture:last-child{animation-delay:.9s}
+@keyframes feteSaut{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.fete-texte{flex:1 1 auto;min-width:0}
+.fete-texte .boy-titre{margin:0 auto}
+@media (prefers-reduced-motion: reduce){.fete-monture{animation:none}}
 /* ── Deux colonnes, en paysage ──
    La phrase à gauche, ce qu'elle montre à droite, les boutons en bas sur
    toute la largeur. La hauteur ainsi gagnée sert à écrire BEAUCOUP plus
@@ -9254,7 +9266,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v190';
+var _VERSION_REPLI='v191';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12534,6 +12546,40 @@ function _boyScene(ca,reprise){
          fois sur la police reelle : une damma occupe 0,235 em de large, un
          trait bien moins. C'est ce rapport qui permet de dire quelle police
          donne une encre d'un tiers de cadre. */
+      /* ── OU TOMBE L'ENCRE D'UN SIGNE ──
+         Rendu sur un canevas a une taille connue, on releve le milieu de son
+         encre par rapport au point d'ancrage. En `em`, donc valable a toute
+         taille. La ligne de base se trouve a 0,3125 em SOUS le milieu de la
+         boite de texte quand l'interligne vaut 1 : c'est de la que part la
+         compensation verticale. */
+      var _ECARTS={};
+      function ecartEncre(signe){
+        if(_ECARTS[signe])return _ECARTS[signe];
+        var r={x:0,y:0};
+        try{
+          var T=160,W=640,H=560;
+          var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+          var c=cv.getContext('2d');
+          c.font=T+"px 'Scheherazade New',serif";
+          c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle='#000';
+          var X=W/2,Y=H*0.62;
+          c.fillText(signe,X,Y);
+          var d=c.getImageData(0,0,W,H).data,g=W,dr=-1,h=H,b=-1;
+          for(var x=0;x<W;x++)for(var y=0;y<H;y++){
+            if(d[(y*W+x)*4+3]>30){if(x<g)g=x;if(x>dr)dr=x;if(y<h)h=y;if(y>b)b=y;}
+          }
+          if(dr>g){
+            r.x=(((g+dr)/2)-X)/T;
+            r.y=(((h+b)/2)-Y)/T + 0.3125;   /* ramene au centre de la boite */
+          }
+        }catch(e){}
+        _ECARTS[signe]=r;return r;
+      }
+      function poseFlottant(d){
+        var px=parseFloat(getComputedStyle(d).fontSize)||0;
+        var dx=-(d._ex||0)*px, dy=-(d._ey||0)*px;
+        d.style.transform='translate(-50%,-50%) translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
+      }
       function partEncre(signe){
         try{
           var T=160,W=520,H=420;
@@ -12557,6 +12603,7 @@ function _boyScene(ca,reprise){
         /* La police qui donne une encre d'un tiers de la largeur du cadre. */
         var pr=(plan.flottants&&plan.flottants.length)?partEncre(plan.flottants[0].m):0.24;
         sc.style.setProperty('--sc-seul',Math.round((l/3)/pr)+'px');
+        flot.forEach(poseFlottant);
       }
       /* Le cadre grandit quand `ajusteEcran` met la page a l'echelle : mesure
          trop tot, la taille des lettres restait celle d'un cadre plus etroit.
@@ -12572,7 +12619,11 @@ function _boyScene(ca,reprise){
         var d=document.createElement('div');d.className='sc-flot';
         d.textContent=f.m;d.style.color=f.c||'var(--sk-vif)';
         d.style.left=f.x+'%';d.style.top=f.y+'%';
-        d._x=f.x;d._y=f.y;sc.appendChild(d);return d;});
+        d._x=f.x;d._y=f.y;
+        /* Ou tombe son encre par rapport a son ancrage, en em. */
+        var e=ecartEncre(f.m);
+        d._ex=e.x;d._ey=e.y;
+        sc.appendChild(d);return d;});
 
       var croix=document.createElement('div');croix.className='sc-croix';
       croix.textContent='✕';sc.appendChild(croix);
@@ -12592,6 +12643,9 @@ function _boyScene(ca,reprise){
           var on=F.indexOf(k)>=0;
           f.classList.toggle('vu',on);
           f.classList.toggle('seul',seul);
+          /* La taille change entre « seul » et « sur la lettre » : la
+             compensation, qui en depend, se repose a chaque fois. */
+          poseFlottant(f);
           f.classList.toggle('bat',on&&!!e.bat);
           if(e.fx!==undefined&&k===0){f.style.left=e.fx+'%';f.style.top=e.fy+'%';}
           else if(!on){f.style.left=f._x+'%';f.style.top=f._y+'%';}
@@ -13016,10 +13070,31 @@ function _boyScene(ca,reprise){
     return function(){
       if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
       var p=panneau(_HAB.accompli);
-      var f=document.createElement('div');
-      f.style.cssText='font-size:3.6rem;animation:bFusee 1.6s ease-in-out infinite';
-      f.textContent=_HAB.veh;p.appendChild(f);
-      titre(p,html,fr);
+      p.classList.add('boy-fete');
+      /* ── L'ECRAN DE FIN ──
+         Deux montures encadrent le texte, l'une regardant l'autre : la
+         licorne chez la fille, la fusee vide chez le garcon. Le personnage
+         pose dans le coin s'efface ici — il ferait un troisieme dessin —
+         et l'emoji qui tenait lieu de vaisseau disparait : ce sont les
+         dessins du client qui font la fete. */
+      var perso=p.querySelector('.boy-perso');
+      if(perso)perso.style.display='none';
+      var rangee=document.createElement('div');rangee.className='fete-rangee';
+      function monture(sens){
+        var src=(_HAB.vaisseauVideSens&&_HAB.vaisseauVideSens[sens])||_HAB.vaisseauVide;
+        if(!src)return null;
+        var im=document.createElement('img');im.className='fete-monture';
+        im.src=src;im.alt='';im.setAttribute('aria-hidden','true');
+        return im;
+      }
+      var g=monture('gd'),d=monture('dg');
+      if(g)rangee.appendChild(g);
+      var creux=document.createElement('div');creux.className='fete-texte';
+      rangee.appendChild(creux);
+      if(d)rangee.appendChild(d);
+      p.appendChild(rangee);
+      /* Le texte se pose ENTRE les deux montures. */
+      titre(creux,html,fr);
       bouton(p,label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});
     };
   };
@@ -13192,11 +13267,16 @@ function _boyVowelCourse(ca){
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
      les signes se tiennent tout pres d'elle, au-dessus et en dessous. */
-  var HAUT=36, MILIEU=50, BAS=66;
+  /* Mesure sur la police : dans « بُ » la damma occupe de -0,69 a -0,38 em,
+     son milieu est donc a 0,535 em au-dessus de la ligne — c'est la qu'elle
+     se pose naturellement, et c'est HAUT. Le point du ba descend a 0,217 em
+     sous la ligne : un signe pose DESSOUS doit passer plus bas encore, d'ou
+     BAS. Les deux sont exprimes en pourcentage du cadre. */
+  var HAUT=9, MILIEU=50, BAS=82;
   /* Le second signe d'un tanwin. Pour la damma il se pose A COTE — c'est
      ainsi qu'on l'ecrit. Pour la fatha et la kasra, deux traits, il se pose
      JUSTE AU-DESSUS du premier, presque colle. */
-  var HAUT2=HAUT-11, BAS2=BAS-11;
+  var HAUT2=HAUT-9, BAS2=BAS-9;
 
   var CHAMP=(st.profile==='girl')?'championne':'champion',
       UNE=(st.profile==='girl')?'une':'un',
