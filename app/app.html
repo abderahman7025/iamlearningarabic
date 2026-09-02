@@ -9290,7 +9290,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v193';
+var _VERSION_REPLI='v194';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12802,26 +12802,55 @@ function _boyScene(ca,reprise){
         }catch(e){}
         _ECARTS[signe]=r;return r;
       }
+      /* La ligne d'ecriture, en pourcentage du cadre — voir `.sc-piste`. */
+      var LIGNE=52;
       function poseFlottant(d){
         /* `textContent` traverse la couche interieure : rien a changer. */
+        /* ── UN SIGNE MONTRE SEUL TIENT DU BON COTE DE LA LIGNE ──
+           Le client le veut large d'un tiers du cadre. Mais une damma est
+           plus HAUTE que large (0,29 em contre 0,235) : a cette largeur son
+           encre ne rentre pas dans la place laissee au-dessus de la ligne, et
+           le dessin traversait celle-ci alors que la phrase dit « toujours au
+           dessus ». On le reduit alors juste ce qu'il faut — quelques pour
+           cent — alors que le tiers reste la regle partout ailleurs. */
+        d.style.fontSize='';
+        var H=sc.clientHeight||0;
+        var pc=parseFloat(d.style.top)||0;
+        var eh=d._eh||0.3;
         var px=parseFloat(getComputedStyle(d).fontSize)||0;
+        /* Le battement grossit le signe d'un quart : on lui reserve la place
+           SEULEMENT quand il bat, sinon on retrecissait tous les autres pour
+           rien. Le battement est pose avant cet appel, la classe est sure. */
+        var jeu=d.classList.contains('bat')?1.3:1.02;
+        var cote=0;                       /* -1 au-dessus, +1 en dessous */
+        if(d.classList.contains('seul')&&piste.classList.contains('vu')){
+          if(pc<LIGNE-6)cote=-1;else if(pc>LIGNE+6)cote=1;
+        }
+        if(H&&px&&cote){
+          var place=H*(cote<0?LIGNE:(100-LIGNE))/100;
+          var max=(place-Math.min(6,H*0.02))/(eh*jeu);
+          if(max>40&&max<px){px=Math.round(max);d.style.fontSize=px+'px';}
+        }
         var dx=-(d._ex||0)*px, dy=-(d._ey||0)*px;
-        /* ── AUCUN SIGNE NE DEBORDE DU CADRE ──
+        /* ── ET AUCUN SIGNE NE DEBORDE DU CADRE ──
            Une voyelle ecrite au tiers de la largeur est haute, et le
            battement la grossit encore d'un quart : posee a 9 % du haut,
            elle se faisait couper par le bord. On mesure donc son encre et,
            SI ELLE NE TIENT PAS, on la rentre — juste ce qu'il faut. Quand
            il y a la place, rien ne bouge : les hauteurs demandees sont
            respectees. */
-        var H=sc.clientHeight||0;
         if(H&&px){
-          var pc=parseFloat(d.style.top)||0;
-          /* On reserve toujours la place du battement, meme quand il ne bat
-             pas encore : sinon le signe sauterait au moment ou il commence. */
-          var demi=((d._eh||0.3)*px/2)*1.3;
+          var demi=(eh*px/2)*jeu;
           var marge=Math.min(6,H*0.02);
-          var vise=H*pc/100, cale=Math.min(Math.max(vise,demi+marge),H-demi-marge);
-          if(cale>demi+marge||vise<demi+marge)dy+=(cale-vise);
+          var bas=demi+marge, haut=H-demi-marge;
+          if(cote<0)haut=Math.min(haut,H*LIGNE/100-demi);
+          else if(cote>0)bas=Math.max(bas,H*LIGNE/100+demi);
+          if(haut<bas){var m=(haut+bas)/2;bas=haut=m;}
+          var vise=H*pc/100, cale=Math.min(Math.max(vise,bas),haut);
+          dy+=(cale-vise);
+          /* Ou l'encre a fini par tomber, en pourcentage du cadre : la croix
+             s'en sert pour barrer le signe et non son ancrage. */
+          d._cy=cale/H*100;d._cx=parseFloat(d.style.left)||50;
         }
         d.style.transform='translate(-50%,-50%) translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
       }
@@ -12892,24 +12921,51 @@ function _boyScene(ca,reprise){
           var on=F.indexOf(k)>=0;
           f.classList.toggle('vu',on);
           f.classList.toggle('seul',seul);
+          f.classList.toggle('bat',on&&!!e.bat);
+          /* LA PLACE D'ABORD, LA COMPENSATION ENSUITE. L'inverse calait le
+             signe pour l'ancienne hauteur, puis on le deplacait : la damma
+             qui remonte au-dessus de la ligne se faisait couper par le haut
+             du cadre. */
+          if(e.fx!==undefined&&k===0){f.style.left=e.fx+'%';f.style.top=e.fy+'%';}
+          else if(!on){f.style.left=f._x+'%';f.style.top=f._y+'%';}
           /* La taille change entre « seul » et « sur la lettre » : la
              compensation, qui en depend, se repose a chaque fois. */
           poseFlottant(f);
-          f.classList.toggle('bat',on&&!!e.bat);
-          if(e.fx!==undefined&&k===0){f.style.left=e.fx+'%';f.style.top=e.fy+'%';}
-          else if(!on){f.style.left=f._x+'%';f.style.top=f._y+'%';}
         });
         piste.classList.toggle('vu',!!e.P);
         if(e.X){croix.style.left=e.X[0]+'%';croix.style.top=e.X[1]+'%';}
         croix.classList.toggle('vu',!!e.X);
+        /* ── LA CROIX SE POSE SUR LE SIGNE, PAS SUR SON ANCRAGE ──
+           Le signe a pu etre rentre dans le cadre pour ne pas se faire
+           couper : sa croix, restee a l'ancrage, tombait alors a cote. On la
+           replace donc sur l'ENCRE qu'elle doit barrer, une fois posee. */
+        if(e.X)surLeSigne();
         etiq.textContent=e.t||'';etiq.classList.toggle('vu',!!e.t);
         if(e.R)bravo(p,e.R);
+      }
+      function surLeSigne(){
+        var vu=null;
+        flot.forEach(function(f){if(f.classList.contains('vu')&&!vu)vu=f;});
+        /* On ne mesure PAS la boite du signe : celle d'un caractere isole fait
+           la hauteur d'une ligne de texte, sans rapport avec son encre. On
+           reprend le point ou `poseFlottant` a fini par poser cette encre. */
+        if(!vu||vu._cy===undefined)return;
+        croix.style.left=vu._cx.toFixed(2)+'%';
+        croix.style.top =vu._cy.toFixed(2)+'%';
       }
       var n=0;
       (function joue(){
         pose(n);
-        var d=(etapes[n]&&etapes[n].d)||1200;n++;
-        if(n<etapes.length)N.plusTard(joue,d);
+        var e=etapes[n]||{},d=e.d||1200;n++;
+        if(n>=etapes.length)return;
+        /* ── UN ETAT PEUT PORTER SA PROPRE PAROLE ──
+           `dit` fait dire la phrase au moment ou l'etat se pose, et n'avance
+           qu'une fois qu'elle est finie. C'est ainsi que la lettre parait
+           EXACTEMENT quand la voix la nomme : une duree fixe ne peut pas le
+           garantir, la parole n'ayant pas la meme longueur d'un appareil a
+           l'autre, ni la synthese et l'enregistrement du client. */
+        if(e.dit){N.dire(e.dit);N.plusTard(function(){N.surSilence(joue);},250);}
+        else N.plusTard(joue,d);
       })();
   }
   api.illustre=function(etape,html,fr,plan,label){
@@ -13573,51 +13629,65 @@ function _boyVowelCourse(ca){
     B.illustre(te('ÉTAPE 3 · LA PREMIÈRE'),
       TB('Voici la première :<br>elle se dit « <b>ou</b> ». Elle<br>est toujours <b>au dessus</b>.'),
       te('Voici la première : elle se dit ou. Elle est toujours au dessus.'),
-      {calques:[LB,LBD],
-       flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
+      /* PAS DE LETTRE ICI : on presente la voyelle, elle seule. Elle reste
+         donc en grand d'un bout a l'autre — descendue sous la ligne, barree,
+         puis remontee au-dessus, qui est sa place. La lettre viendra a la
+         page suivante, quand on assemblera le son. */
+      /* Sans ligne d'ecriture : c'est le DEPLACEMENT qui dit « en bas » puis
+         « au dessus », et le signe garde ainsi sa taille d'un bout a l'autre.
+         Une ligne l'obligerait a se ranger d'un cote, donc a retrecir — le
+         client le veut tres gros, comme au debut. */
+      {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
        scene:[{F:[0],t:'ou',d:1800},
-              {F:[0],L:[0],P:1,fx:50,fy:BAS,d:1100},
-              {F:[0],L:[0],P:1,fx:50,fy:BAS,X:[50,BAS],d:1500},
-              {F:[0],L:[0],P:1,fx:50,fy:HAUT,d:1300},
-              {L:[1],P:1,t:'bou',d:2200}]}),
+              {F:[0],fx:50,fy:BAS,d:1100},
+              {F:[0],fx:50,fy:BAS,X:[50,BAS],d:1500},
+              {F:[0],fx:50,fy:HAUT,d:2400}]}),
 
+    /* ── ON ASSEMBLE LE SON, A VOIX HAUTE ──
+       La lettre parait quand la voix dit « b », la voyelle quand elle dit
+       « ou » : c'est l'addition elle-meme qu'on montre. Rien n'est dit par
+       le titre — toute la parole est portee par la scene, dans l'ordre. */
     B.repete(te('ÉTAPE 3 · À TON TOUR'),
-      TB('On a là le son <b>« bou »</b>.<br>Répète après moi : <b>« bou »</b>'),
-      te('On a là le son bou. Répète après moi : bou.'),
-      {calques:[LBD],scene:[{L:[0],P:1,t:'bou',d:4000}]}),
+      TB('<b>« b »</b> + <b>« ou »</b>, ça fait <b>« bou »</b>.<br>Répète après moi : <b>« bou »</b>'),
+      false,
+      {calques:[LB,LBD],
+       scene:[{L:[0],P:1,dit:te('b')},
+              {L:[1],P:1,dit:te('ou')},
+              {L:[1],P:1,t:'bou',dit:te('Ça fait bou. Répète après moi : bou.')}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
       TB('Si ce trait est au dessus<br>d’une lettre, il se<br>prononce « <b>a</b> ».'),
       te('Si ce trait est au dessus d\'une lettre, il se prononce a.'),
-      {calques:[LB,LBF],
-       flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
-       /* La ligne d'ecriture est la des le debut, et le trait se montre
-          AU-DESSUS d'elle : c'est de cela qu'on parle. */
-       scene:[{F:[0],P:1,d:2200},
-              {L:[0],P:1,d:1000},
-              {L:[1],P:1,t:'ba',d:2200}]}),
+      /* La ligne d'ecriture est la des le debut, et le trait se montre
+         AU-DESSUS d'elle : c'est de cela qu'on parle. Aucune lettre — la
+         phrase presente le TRAIT, et il reste grand jusqu'au bout. */
+      {flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
+       scene:[{F:[0],P:1,d:2600},{F:[0],P:1,d:2600}]}),
 
     B.repete(te('ÉTAPE 4 · À TON TOUR'),
-      TB('On a là le son <b>« ba »</b>.<br>Répète après moi : <b>« ba »</b>'),
-      te('On a là le son ba. Répète après moi : ba.'),
-      {calques:[LBF],scene:[{L:[0],P:1,t:'ba',d:4000}]}),
+      TB('<b>« b »</b> + <b>« a »</b>, ça fait <b>« ba »</b>.<br>Répète après moi : <b>« ba »</b>'),
+      false,
+      {calques:[LB,LBF],
+       scene:[{L:[0],P:1,dit:te('b')},
+              {L:[1],P:1,dit:te('a')},
+              {L:[1],P:1,t:'ba',dit:te('Ça fait ba. Répète après moi : ba.')}]}),
 
     B.illustre(te('ÉTAPE 5'),
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
       te('En revanche, si ce trait est en dessous d\'une lettre, il se dit i.'),
-      {calques:[LB,LBF,LBK],
-       flottants:[{m:mK,c:CKA,x:50,y:BAS}],
-       /* Le meme trait, montre SOUS la ligne avant de se poser. */
-       scene:[{L:[1],P:1,t:'ba',d:1600},
-              {L:[0],P:1,d:700},
-              {F:[0],P:1,d:1400},
-              {L:[2],P:1,t:'bi',d:2200}]}),
+      /* Le meme trait, montre SOUS la ligne, et lui seul : comme pour la
+         fatha, c'est le trait qu'on presente, pas la syllabe. */
+      {flottants:[{m:mK,c:CKA,x:50,y:BAS}],
+       scene:[{F:[0],P:1,d:2600},{F:[0],P:1,d:2600}]}),
 
     B.repete(te('ÉTAPE 5 · À TON TOUR'),
-      TB('On a alors le son <b>« bi »</b>.<br>Répète après moi : <b>« bi »</b>'),
-      te('On a alors le son bi. Répète après moi : bi.'),
-      {calques:[LBK],scene:[{L:[0],P:1,t:'bi',d:4000}]}),
+      TB('<b>« b »</b> + <b>« i »</b>, ça fait <b>« bi »</b>.<br>Répète après moi : <b>« bi »</b>'),
+      false,
+      {calques:[LB,LBK],
+       scene:[{L:[0],P:1,dit:te('b')},
+              {L:[1],P:1,dit:te('i')},
+              {L:[1],P:1,t:'bi',dit:te('Ça fait bi. Répète après moi : bi.')}]}),
 
     B.brief(te('ÉCRITURE'),
       TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
@@ -16651,40 +16721,50 @@ s0.parentNode.insertBefore(s1,s0);
 var ADMIN_SOUNDS = [
   /* ── LES PHRASES DU COURS DES VOYELLES ──
      Le client les dit de sa voix : la synthese du navigateur prononce mal
-     le francais. La cle est la phrase EXACTE que le cours fait dire. */
+     le francais, et ne sait pas dire un son isole comme « b ».
+     LA CLE EST LA PHRASE EXACTE, accents compris : c'est sur elle que
+     l'enregistrement est retrouve. Cette liste se regenere depuis le cours
+     (scratchpad/studio_voyelles.py) — ne pas la retaper a la main. */
   {ar:'Aujourd’hui : les voyelles.',label:'Aujourd’hui : les voyelles.'},
-  {ar:'Pour comprendre les voyelles, on a besoin d\'une lettre.',label:'Pour comprendre les voyelles, on a besoin d\'…'},
+  {ar:'Pour comprendre les voyelles, on a besoin d\'une lettre.',label:'Pour comprendre les voyelles, on a besoin d…'},
   {ar:'Prenons la lettre ba. Seule, elle se dit b.',label:'Prenons la lettre ba. Seule, elle se dit b.'},
   {ar:'Une voyelle, c\'est un petit signe.',label:'Une voyelle, c\'est un petit signe.'},
   {ar:'Il existe seulement trois voyelles.',label:'Il existe seulement trois voyelles.'},
-  {ar:'Voici la premiere : elle se dit ou. Elle est toujours au dessus.',label:'Voici la premiere : elle se dit ou. Elle est…'},
-  {ar:'Repete apres moi : bou.',label:'Repete apres moi : bou.'},
-  {ar:'Si ce trait est au dessus d\'une lettre, il se prononce a.',label:'Si ce trait est au dessus d\'une lettre, il s…'},
-  {ar:'On a la le son ba. Repete apres moi : ba.',label:'On a la le son ba. Repete apres moi : ba.'},
-  {ar:'En revanche, si ce trait est en dessous d\'une lettre, il se dit i.',label:'En revanche, si ce trait est en dessous d\'un…'},
-  {ar:'On a alors le son bi. Repete apres moi : bi.',label:'On a alors le son bi. Repete apres moi : bi.'},
-  {ar:'Maintenant, on va les ecrire ! Tu es pret ?',label:'Maintenant, on va les ecrire ! Tu es pret ?'},
-  {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu d…'},
-  {ar:'Repasse sur les modeles.',label:'Repasse sur les modeles.'},
-  {ar:'On passe a ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe a ce symbole. Au dessus de la lettr…'},
-  {ar:'A toi de les ecrire.',label:'A toi de les ecrire.'},
-  {ar:'Enfin, ce symbole. Sous la lettre, on prononce ?',label:'Enfin, ce symbole. Sous la lettre, on pronon…'},
-  {ar:'Ou est le son a ?',label:'Ou est le son a ?'},
-  {ar:'Ou est le son i ?',label:'Ou est le son i ?'},
-  {ar:'Ou est le son ou ?',label:'Ou est le son ou ?'},
-  {ar:'Comme tu connais tres bien les trois voyelles, je vais te devoiler un secret.',label:'Comme tu connais tres bien les trois voyelle…'},
-  {ar:'On peut avoir deux fois le meme symbole sur une meme lettre. Bou devient boun.',label:'On peut avoir deux fois le meme symbole sur …'},
-  {ar:'A toi d\'ecrire.',label:'A toi d\'ecrire.'},
+  {ar:'Voici la première : elle se dit ou. Elle est toujours au dessus.',label:'Voici la première : elle se dit ou. Elle es…'},
+  {ar:'b',label:'b'},
+  {ar:'ou',label:'ou'},
+  {ar:'Ça fait bou. Répète après moi : bou.',label:'Ça fait bou. Répète après moi : bou.'},
+  {ar:'Si ce trait est au dessus d\'une lettre, il se prononce a.',label:'Si ce trait est au dessus d\'une lettre, il …'},
+  {ar:'a',label:'a'},
+  {ar:'Ça fait ba. Répète après moi : ba.',label:'Ça fait ba. Répète après moi : ba.'},
+  {ar:'En revanche, si ce trait est en dessous d\'une lettre, il se dit i.',label:'En revanche, si ce trait est en dessous d\'u…'},
+  {ar:'i',label:'i'},
+  {ar:'Ça fait bi. Répète après moi : bi.',label:'Ça fait bi. Répète après moi : bi.'},
+  {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu …'},
+  {ar:'Repasse sur les modèles.',label:'Repasse sur les modèles.'},
+  {ar:'On passe à ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe à ce symbole. Au dessus de la lett…'},
+  {ar:'À toi de les écrire.',label:'À toi de les écrire.'},
+  {ar:'Enfin, ce symbole. Sous la lettre, on prononce ?',label:'Enfin, ce symbole. Sous la lettre, on prono…'},
+  {ar:'Où est le son a ?',label:'Où est le son a ?'},
+  {ar:'Où est le son i ?',label:'Où est le son i ?'},
+  {ar:'Où est le son ou ?',label:'Où est le son ou ?'},
+  {ar:'Comme tu connais très bien les trois voyelles, je vais te dévoiler un secret.',label:'Comme tu connais très bien les trois voyell…'},
+  {ar:'On peut avoir deux fois le même symbole sur une même lettre. Bou devient boun.',label:'On peut avoir deux fois le même symbole sur…'},
+  {ar:'À toi d\'écrire.',label:'À toi d\'écrire.'},
   {ar:'Ba devient ban.',label:'Ba devient ban.'},
   {ar:'Bi devient bin.',label:'Bi devient bin.'},
-  {ar:'Ou est le son an ?',label:'Ou est le son an ?'},
-  {ar:'Ou est le son oun ?',label:'Ou est le son oun ?'},
-  {ar:'Ou est le son in ?',label:'Ou est le son in ?'},
-  {ar:'Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.',label:'Pour finir, tu te rappelles de la lettre ba …'},
-  {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.',label:'Parfois tu trouveras ce petit rond au dessus…'},
-  {ar:'Repete apres moi : b.',label:'Repete apres moi : b.'},
+  {ar:'Où est le son an ?',label:'Où est le son an ?'},
+  {ar:'Où est le son oun ?',label:'Où est le son oun ?'},
+  {ar:'Où est le son in ?',label:'Où est le son in ?'},
+  {ar:'Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.',label:'Pour finir, tu te rappelles de la lettre ba…'},
+  {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.',label:'Parfois tu trouveras ce petit rond au dessu…'},
+  {ar:'Répète après moi : b.',label:'Répète après moi : b.'},
   {ar:'Trace le soukoun.',label:'Trace le soukoun.'},
-  {ar:'Tu maitrises les voyelles !',label:'Tu maitrises les voyelles !'},
+  {ar:'Tu maîtrises les voyelles !',label:'Tu maîtrises les voyelles !'},
+  {ar:'Maintenant, on va les écrire ! Tu es prêt ?',label:'Maintenant, on va les écrire ! Tu es prêt ?'},
+  {ar:'Maintenant, on va les écrire ! Tu es prête ?',label:'Maintenant, on va les écrire ! Tu es prête ?'},
+  {ar:'Tu es un champion !',label:'Tu es un champion !'},
+  {ar:'Tu es une championne !',label:'Tu es une championne !'},
   {ar:'Bravo !',label:'Bravo !'},
   {ar:'ا',label:'alif'},
   {ar:'اَ',label:'a'},
