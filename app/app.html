@@ -3164,12 +3164,21 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    boite : sa taille de police ne dit rien de ce qu'on voit. */
 .sc-flot.seul{font-size:var(--sc-seul,120px)}
 .sc-flot.vu{opacity:1}
-/* Le battement passe par la taille, non par `transform` : celui-ci porte la
-   compensation d'encre, et l'animation l'ecrasait. */
-.sc-flot.bat{animation:scBat 1.1s ease-in-out infinite}
-@keyframes scBat{0%,100%{letter-spacing:0}50%{letter-spacing:.02em}}
-.sc-croix{position:absolute;transform:translate(-50%,-50%);font-size:clamp(30px,7vh,46px);
-  font-weight:900;color:#d92d20;opacity:0;transition:opacity .2s ease;line-height:1}
+/* LE BATTEMENT. Il ne peut pas passer par `transform` : celui-ci porte la
+   compensation d'encre et serait ecrase. Il ne peut pas non plus passer par
+   l'espacement, qui ne fait rien sur un signe seul — c'est ainsi que le
+   clignotement des trois voyelles avait disparu. Il vit donc dans une couche
+   INTERIEURE, qui n'a que lui a porter. */
+.sc-coeur{display:inline-block;transform-origin:center}
+.sc-flot.bat .sc-coeur{animation:scBat 1.05s ease-in-out infinite}
+@keyframes scBat{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.28);opacity:.72}}
+/* Plus grosse et bien epaisse : elle doit se voir par-dessus le signe, pas
+   se deviner. Le trait est peint deux fois, decale d'un poil, pour l'epaissir
+   au-dela de ce qu'une graisse de police permet. */
+.sc-croix{position:absolute;transform:translate(-50%,-50%);
+  font-size:clamp(52px,13vh,86px);font-weight:900;color:#d92d20;
+  text-shadow:2px 0 0 #d92d20,-2px 0 0 #d92d20,0 2px 0 #d92d20,0 -2px 0 #d92d20;
+  opacity:0;transition:opacity .2s ease;line-height:1;z-index:4}
 .sc-croix.vu{opacity:1}
 /* EN BAS A GAUCHE, pas au centre : centree, elle se posait sur le point du
    ba et on ne lisait plus ni l'un ni l'autre. */
@@ -9281,7 +9290,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v192';
+var _VERSION_REPLI='v193';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9461,6 +9470,36 @@ function _marquesDeLaLettre(lettreAr){
   });
   return dispo;
 }
+/* ── JUSQU'OU MONTE ET DESCEND L'ENCRE, AUTOUR DE LA LIGNE ──
+   Mesuree en dessinant vraiment le signe, par `_dessineSurLigne`, donc avec
+   la meme convention que le trace : ce qui est rendu ici est exactement ce
+   que l'enfant verra. Le resultat est en `em`, valable a toute taille, et
+   retenu — le rendu d'un canevas coute cher. */
+var _ENCRE_LIGNE={};
+function _encreAutourLigne(texte){
+  var cle=String(texte);
+  if(_ENCRE_LIGNE[cle])return _ENCRE_LIGNE[cle];
+  var r={haut:0.5,bas:0.3};
+  try{
+    var T=120,W=520,H=640,Y=H*0.55;
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    var c=cv.getContext('2d');
+    c.font=T+"px 'Scheherazade New',serif";
+    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle='#000';
+    _dessineSurLigne(c,cle,W/2,Y,T);
+    var d=c.getImageData(0,0,W,H).data,h=-1,b=-1;
+    for(var y=0;y<H;y++){
+      for(var x=0;x<W;x++){
+        if(d[(y*W+x)*4+3]>25){if(h<0)h=y;b=y;break;}
+      }
+    }
+    /* Signees : un signe entierement au-dessus de la ligne a une extremite
+       basse NEGATIVE, et c'est precisement cette valeur qui dit de combien
+       le descendre pour l'amener contre la ligne. */
+    if(h>=0){r={haut:(Y-h)/T,bas:(b-Y)/T};}
+  }catch(e){}
+  _ENCRE_LIGNE[cle]=r;return r;
+}
 function _descenteGlyphe(texte,px){
   var t=String(texte),corps=t.replace(_MARQUES,'');
   if(!corps&&_SOUS_LA_LIGNE.test(t))return Math.round(px*0.24);
@@ -9494,12 +9533,17 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
     if(base)cx.fillText(base,x,baseY+_descenteGlyphe(base,px));
     var y0=baseY+_descenteGlyphe(porte+simple,px);
     if(simple==='\u064f'){                       /* damma : cote a cote */
+      /* 0,10 de part et d'autre : les deux damma se touchent presque, et
+         c'est ainsi que le client les veut. */
       var ec=px*0.10;
       cx.fillText(porte+simple,x-ec,y0);
       cx.fillText(porte+simple,x+ec,y0);
     }else{                                       /* traits : l'un sur l'autre */
-      var dessus=px*0.17;                        /* fatha au-dessus */
-      var dessous=px*0.17;                       /* kasra en dessous */
+      /* Les deux traits presque colles : a 0,17 ils laissaient un blanc entre
+         eux, alors que le cadre illustre les montre jointifs. L'encre d'un
+         trait fait 0,16 em de haut ; 0,105 les rapproche sans les fondre. */
+      var dessus=px*0.105;                       /* fatha au-dessus */
+      var dessous=px*0.105;                      /* kasra en dessous */
       cx.fillText(porte+simple,x,y0);
       cx.fillText(porte+simple,x,y0+(simple==='\u0650'?dessous:-dessus));
     }
@@ -10936,7 +10980,10 @@ function _blocEcriture(hote,o){
   CH0+=BANDE0;
   /* Moins il y a de cases, plus le modèle peut être grand : un doigt
      d'enfant a besoin de place pour repasser dessus. */
-  var PX0=o.signeSeul?124:({1:150,2:126,3:104}[nb]||80);
+  /* Un signe seul se repasse mal quand il est petit : le doigt d'un enfant
+     couvre le modele. On l'ecrit donc bien plus grand que les lettres, qui,
+     elles, ont un corps. */
+  var PX0=o.signeSeul?176:({1:150,2:126,3:104}[nb]||80);
   var k=(o.dispoW||CW0)/CW0;
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
@@ -10985,6 +11032,29 @@ function _blocEcriture(hote,o){
   /* La ligne d'ecriture se place dans ce qui RESTE sous la bande, aux memes
      proportions qu'avant : la zone de trace ne retrecit pas. */
   var baseY=BANDE+Math.round((CH-BANDE)*(o.signeSeul?0.50:0.62));
+  /* ── UN SIGNE SEUL SE POSE CONTRE LA LIGNE ──
+     Une fatha s'ecrit 0,7 em AU-DESSUS de la ligne : dessinee grande dans un
+     cadre couche haut de 168 px, elle sortait entierement du canevas et le
+     modele semblait absent. Un signe seul n'a de toute facon pas de lettre
+     sous lui — rien ne justifie ce vide. On l'amene donc CONTRE la ligne :
+     juste au-dessus pour la fatha et la damma, juste en dessous pour la
+     kasra, ce que l'enfant doit justement retenir. La ligne pointillee, elle,
+     ne bouge pas. Le decalage est celui de son encre, mesure. */
+  var baseDessin=baseY,_ecart=0;
+  if(o.signeSeul){
+    var _e=_encreAutourLigne(liste[0]),_mg=Math.round(9*k),_pres=0.10;
+    if(_e.bas<0)      _ecart=-(_pres+_e.bas);        /* tout au-dessus */
+    else if(_e.haut<0)_ecart=  _pres+_e.haut;        /* tout en dessous */
+    /* Et il doit tenir : on mesure ce qu'il occupe une fois pose, et on
+       reduit la police juste assez si le cadre est trop court. */
+    /* Une fois pose, le signe monte de (haut - ecart) au-dessus de la ligne
+       et descend de (bas + ecart) en dessous : c'est cela qui doit tenir. */
+    var _h=_e.haut-_ecart, _b=_e.bas+_ecart, _max=PX;
+    if(_h>0.01)_max=Math.min(_max,(baseY-_mg)/_h);
+    if(_b>0.01)_max=Math.min(_max,(CH-baseY-_mg)/_b);
+    PX=Math.max(48,Math.round(Math.min(PX,_max)));
+    baseDessin=baseY+Math.round(_ecart*PX);
+  }
   var pas=CW/nb;
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
      garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
@@ -10997,7 +11067,7 @@ function _blocEcriture(hote,o){
     cx.save();
     cx.font=PX+"px 'Scheherazade New',serif";
     cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
-    _dessineSurLigne(cx,liste[n],caseX(n),baseY,PX);
+    _dessineSurLigne(cx,liste[n],caseX(n),baseDessin,PX);
     cx.restore();
   }
   /* DE TETE : rien a repasser. Les noms des cases et la ligne d'ecriture
@@ -11017,7 +11087,7 @@ function _blocEcriture(hote,o){
       cx.save();
       cx.font=PR+"px 'Scheherazade New',serif";
       cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
-      _dessineSurLigne(cx,liste[n],caseX(n),baseR,PR);
+      _dessineSurLigne(cx,liste[n],caseX(n),baseR+Math.round(_ecart*PR),PR);
       cx.restore();
     }
     /* LA LIGNE D'ECRITURE DES MODELES. Elle etait posee sous la bande, entre
@@ -11112,7 +11182,7 @@ function _blocEcriture(hote,o){
     var xg=Math.max(0,Math.round(CW-pas*(n+1)-pas*0.18));
     var xd=Math.min(CW,Math.round(CW-pas*n+pas*0.18));
     rev=(n>=0&&n<nb)
-      ? _revelateur(liste[n],caseX(n),baseY,PX,xg,0,xd-xg,CH)
+      ? _revelateur(liste[n],caseX(n),baseDessin,PX,xg,0,xd-xg,CH)
       : null;
     if(!rev){caseAnim=-1;guide(3);return;}
     caseAnim=n;depart=Date.now();dernier=0;
@@ -12202,37 +12272,135 @@ function _boyScene(ca,reprise){
   }
   function remplitLaLargeur(t){
     if(!t||!t.isConnected)return;
-    var col=t.parentNode&&t.parentNode.clientWidth;
+    /* LA LARGEUR DU BLOC LUI-MEME, pas celle de son parent. En paysage les
+       deux se valent ; en portrait le titre porte un `max-width` et reste
+       bien plus etroit que le panneau — mesuree sur le parent, la police
+       etait calculee pour une largeur qui n'existait pas, et les phrases
+       sortaient du cadre. */
+    function dispoLargeur(){return t.clientWidth||(t.parentNode&&t.parentNode.clientWidth)||0;}
+    var col=dispoLargeur();
     if(!col||col<80)return;
     var lignes=t.querySelectorAll('.boy-ligne');
     if(!lignes.length)return;
     /* On mesure a une taille de reference, puis on met a l'echelle d'un seul
        coup : les blocs ne se repliant pas, leur largeur est proportionnelle a
        la police et le calcul est exact. */
+    /* ── MESURER LA LIGNE, PAS LE BLOC ──
+       Une ligne est un bloc : `getBoundingClientRect` rend la largeur de la
+       COLONNE, la meme pour toutes, courtes comme longues. La verification
+       ne voyait donc jamais de depassement, et « bou » restait cache sous le
+       cadre. `scrollWidth` rend la largeur du texte, et dans la meme unite
+       que `clientWidth` — la page etant mise a l'echelle, les deux autres
+       unites ne se comparaient pas. */
+    function laPlusLarge(){
+      var m=0;
+      [].slice.call(lignes).forEach(function(l){
+        if(l.scrollWidth>m)m=l.scrollWidth;});
+      return m;
+    }
+    /* ── ON MESURE TOUJOURS SUR DES LIGNES QUI NE SE REPLIENT PAS ──
+       Une ligne deja repliee ne deborde plus : la mesure disait alors qu'elle
+       tenait, on la remettait en une seule ligne, et l'appel suivant la
+       repliait de nouveau. Le titre changeait donc d'un passage a l'autre, et
+       finissait souvent deborde. On part donc toujours de l'etat non replie,
+       et le repli est decide une seule fois, a la fin. */
+    [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='nowrap';});
+    /* ── LE PLANCHER ET LE PLAFOND SONT EN PIXELS VUS ──
+       La page entiere est mise a l'echelle : en portrait, un panneau large de
+       186 px de mise en page est agrandi deux fois pour remplir l'ecran. Un
+       plancher de 22 px de mise en page y devenait 46 px a l'ecran, et la
+       phrase sortait du cadre. On convertit donc les deux bornes par
+       l'echelle reellement appliquee. */
+    var ech=1;
+    try{
+      var cadre=t.closest('.boy-wrap,.boy-plein')||t.parentNode;
+      var w=cadre.clientWidth;
+      if(w>0){var v=cadre.getBoundingClientRect().width/w;if(v>0.2&&v<6)ech=v;}
+    }catch(e){}
+    var MIN=22/ech, MAX=56/ech;
     var REF=40;
     t.style.fontSize=REF+'px';
-    var large=0;
-    [].slice.call(lignes).forEach(function(l){
-      var w=l.getBoundingClientRect().width;
-      if(w>large)large=w;
-    });
+    var large=laPlusLarge();
     if(large<4){t.style.fontSize='';return;}
-    var px=Math.max(13,Math.min(52,REF*(col*0.96)/large));
+    /* LA PLUS GROSSE POLICE QUI NE DEBORDE PAS. Les blocs ne se repliant
+       pas, leur largeur suit la police : le calcul tombe juste du premier
+       coup, et deux passes suffisent a rattraper l'arrondi. */
+    var px=Math.max(MIN,Math.min(MAX,REF*(col*0.97)/large));
     t.style.fontSize=px.toFixed(1)+'px';
-    /* DERNIERE VERIFICATION. La colonne peut avoir change entre la mesure et
-       la pose — la page est mise a l'echelle apres coup. Si une ligne depasse
-       encore, on reduit jusqu'a ce qu'elle rentre : un mot cache sous le
-       cadre — « bien », « n'a » — est ce que le client a vu. */
-    for(var g=0;g<6;g++){
-      var trop=0;
-      [].slice.call(lignes).forEach(function(l){
-        var w=l.getBoundingClientRect().width;
-        if(w>trop)trop=w;
-      });
-      if(trop<=col*0.98||px<=13)break;
-      px=Math.max(13,px*(col*0.96)/trop);
+    for(var g=0;g<4;g++){
+      var trop=laPlusLarge(),dispo=dispoLargeur()||col;
+      if(trop<1)break;
+      var vise=px*(dispo*0.97)/trop;
+      if(Math.abs(vise-px)<0.4)break;
+      px=Math.max(MIN,Math.min(MAX,vise));
       t.style.fontSize=px.toFixed(1)+'px';
     }
+    /* Un plancher a 22 px vus : en dessous, un enfant ne lit plus. Si une
+       ligne n'y tient toujours pas, on la laisse alors se replier — mieux
+       vaut deux lignes lisibles qu'une ligne minuscule ou cachee. */
+    var large2=dispoLargeur()||col;
+    if(laPlusLarge()>large2)
+      [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='normal';});
+  }
+
+  /* ── LE TANWIN, EN DEUX SIGNES, JUSQUE DANS LES CIBLES ──
+     Une cible de controle affiche son glyphe comme du TEXTE : elle montrait
+     donc le caractere unique du tanwin, celui que le cours n'emploie nulle
+     part ailleurs. L'enfant doit reconnaitre ce qu'on lui a montre. On
+     superpose donc deux signes simples, comme partout : la damma cote a cote,
+     la fatha et la kasra l'une sur l'autre. */
+  /* ── L'ENCRE DANS LE NUAGE, DU BON COTE ──
+     Une voyelle seule s'ecrit tres haut dans sa boite de texte : centree
+     comme du texte, elle se collait au BORD SUPERIEUR du nuage. On mesure
+     donc ou tombe son encre et on la ramene dedans.
+     Mais la ramener au MILIEU effacerait la seule chose qui distingue un
+     signe du dessus d'un signe du dessous — « an » de « in » — puisqu'il n'y
+     a ici aucune lettre pour servir de repere. On la pose donc dans le HAUT
+     du nuage pour la fatha et la damma, dans le BAS pour la kasra : le nuage
+     tient lieu de ligne d'ecriture. */
+  function centreEncre(el,forme){
+    try{
+      var e=_encreAutourLigne(_sansCercle(forme));
+      var dy=0.3125+(e.bas-e.haut)/2;
+      var biais=0;
+      if(e.bas<0)biais=-0.20;            /* tout au-dessus de la ligne */
+      else if(e.haut<0)biais=0.20;       /* tout en dessous */
+      var av=el.style.transform||'';
+      el.style.transform=(av?av+' ':'')+'translateY('+(biais-dy).toFixed(3)+'em)';
+    }catch(x){}
+  }
+  function poseCible(el,forme){
+    var t=String(forme),simple=null,base='',i,c;
+    for(i=0;i<t.length;i++){
+      c=t.charAt(i);
+      if(_TANWIN_DOUBLE[c])simple=_TANWIN_DOUBLE[c];else base+=c;
+    }
+    if(!simple){
+      el.textContent='';
+      var seul=document.createElement('span');
+      seul.style.cssText='display:inline-block';
+      seul.textContent=_sansCercle(forme);
+      centreEncre(seul,forme);
+      el.appendChild(seul);
+      return;
+    }
+    base=_sansCercle(base);
+    el.textContent='';
+    var pile=document.createElement('span');
+    pile.style.cssText='position:relative;display:inline-block';
+    var cote=(simple==='ُ');
+    var a=document.createElement('span');
+    a.textContent=base+simple;
+    a.style.cssText='display:inline-block'+(cote?';transform:translateX(-0.10em)':'');
+    pile.appendChild(a);
+    var b=document.createElement('span');
+    b.textContent=base+simple;
+    b.style.cssText='position:absolute;left:0;top:0;display:inline-block;transform:'
+      +(cote?'translateX(0.10em)'
+            :'translateY('+(simple==='ِ'?'0.105em':'-0.105em')+')');
+    pile.appendChild(b);
+    centreEncre(pile,forme);
+    el.appendChild(pile);
   }
 
   /* Le mot mis en avant dans une phrase. Il s'appelle encore « bleu » dans
@@ -12629,13 +12797,32 @@ function _boyScene(ca,reprise){
           if(dr>g){
             r.x=(((g+dr)/2)-X)/T;
             r.y=(((h+b)/2)-Y)/T + 0.3125;   /* ramene au centre de la boite */
+            r.h=(b-h+1)/T;                  /* et sa hauteur, en em */
           }
         }catch(e){}
         _ECARTS[signe]=r;return r;
       }
       function poseFlottant(d){
+        /* `textContent` traverse la couche interieure : rien a changer. */
         var px=parseFloat(getComputedStyle(d).fontSize)||0;
         var dx=-(d._ex||0)*px, dy=-(d._ey||0)*px;
+        /* ── AUCUN SIGNE NE DEBORDE DU CADRE ──
+           Une voyelle ecrite au tiers de la largeur est haute, et le
+           battement la grossit encore d'un quart : posee a 9 % du haut,
+           elle se faisait couper par le bord. On mesure donc son encre et,
+           SI ELLE NE TIENT PAS, on la rentre — juste ce qu'il faut. Quand
+           il y a la place, rien ne bouge : les hauteurs demandees sont
+           respectees. */
+        var H=sc.clientHeight||0;
+        if(H&&px){
+          var pc=parseFloat(d.style.top)||0;
+          /* On reserve toujours la place du battement, meme quand il ne bat
+             pas encore : sinon le signe sauterait au moment ou il commence. */
+          var demi=((d._eh||0.3)*px/2)*1.3;
+          var marge=Math.min(6,H*0.02);
+          var vise=H*pc/100, cale=Math.min(Math.max(vise,demi+marge),H-demi-marge);
+          if(cale>demi+marge||vise<demi+marge)dy+=(cale-vise);
+        }
         d.style.transform='translate(-50%,-50%) translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)';
       }
       function partEncre(signe){
@@ -12675,12 +12862,16 @@ function _boyScene(ca,reprise){
 
       var flot=(plan.flottants||[]).map(function(f){
         var d=document.createElement('div');d.className='sc-flot';
-        d.textContent=f.m;d.style.color=f.c||'var(--sk-vif)';
+        /* La couche interieure porte le battement, la couche exterieure la
+           position et la compensation d'encre. */
+        var coeur=document.createElement('span');coeur.className='sc-coeur';
+        coeur.textContent=f.m;d.appendChild(coeur);
+        d.style.color=f.c||'var(--sk-vif)';
         d.style.left=f.x+'%';d.style.top=f.y+'%';
         d._x=f.x;d._y=f.y;
         /* Ou tombe son encre par rapport a son ancrage, en em. */
         var e=ecartEncre(f.m);
-        d._ex=e.x;d._ey=e.y;
+        d._ex=e.x;d._ey=e.y;d._eh=e.h||0.3;
         sc.appendChild(d);return d;});
 
       var croix=document.createElement('div');croix.className='sc-croix';
@@ -12951,7 +13142,7 @@ function _boyScene(ca,reprise){
       var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
-        b.textContent=_sansCercle(o.g);
+        poseCible(b,o.g);
         /* Une voyelle seule, sans son cercle de support, est un tout petit
            trait : dans une cible de 104 px il fallait la grossir pour qu'elle
            se voie et se touche. */
@@ -13170,7 +13361,8 @@ function _boyScene(ca,reprise){
          feuille de style les resserre (voir `.cibles-nombreuses`). */
       if(opts.length>6)r.classList.add('cibles-nombreuses');
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
-        var c=document.createElement('div');c.className='boy-cible';c.textContent=o.g;
+        var c=document.createElement('div');c.className='boy-cible';poseCible(c,o.g);
+        if(_signeSeul(o.g))c.style.fontSize='4.2rem';
         c.onclick=function(){
           if(c.classList.contains('ok')||c.classList.contains('ko'))return;
           /* Le tout premier clic de la grille decide de la note. */
@@ -13219,7 +13411,11 @@ function _boyScene(ca,reprise){
       var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
-        b.textContent=_sansCercle(o.g);
+        poseCible(b,o.g);
+        /* Une voyelle seule, sans son cercle de support, est un tout petit
+           trait : dans une cible de 104 px il faut la grossir pour qu'elle se
+           voie et se touche. C'etait fait sur un seul des trois exercices. */
+        if(_signeSeul(o.g))b.style.fontSize='4.2rem';
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           /* Le tout premier clic decide de la note. */
@@ -13281,7 +13477,11 @@ function _boyScene(ca,reprise){
       var repondu=false,premier=true;
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
-        b.textContent=_sansCercle(o.g);
+        poseCible(b,o.g);
+        /* Une voyelle seule, sans son cercle de support, est un tout petit
+           trait : dans une cible de 104 px il faut la grossir pour qu'elle se
+           voie et se touche. C'etait fait sur un seul des trois exercices. */
+        if(_signeSeul(o.g))b.style.fontSize='4.2rem';
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           /* Le tout premier clic decide de la note. */
@@ -13391,8 +13591,10 @@ function _boyVowelCourse(ca){
       TB('Si ce trait est au dessus<br>d’une lettre, il se<br>prononce « <b>a</b> ».'),
       te('Si ce trait est au dessus d\'une lettre, il se prononce a.'),
       {calques:[LB,LBF],
-       flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:2200},
+       flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
+       /* La ligne d'ecriture est la des le debut, et le trait se montre
+          AU-DESSUS d'elle : c'est de cela qu'on parle. */
+       scene:[{F:[0],P:1,d:2200},
               {L:[0],P:1,d:1000},
               {L:[1],P:1,t:'ba',d:2200}]}),
 
@@ -13405,8 +13607,11 @@ function _boyVowelCourse(ca){
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
       te('En revanche, si ce trait est en dessous d\'une lettre, il se dit i.'),
       {calques:[LB,LBF,LBK],
+       flottants:[{m:mK,c:CKA,x:50,y:BAS}],
+       /* Le meme trait, montre SOUS la ligne avant de se poser. */
        scene:[{L:[1],P:1,t:'ba',d:1600},
               {L:[0],P:1,d:700},
+              {F:[0],P:1,d:1400},
               {L:[2],P:1,t:'bi',d:2200}]}),
 
     B.repete(te('ÉTAPE 5 · À TON TOUR'),
@@ -13431,16 +13636,16 @@ function _boyVowelCourse(ca){
     B.illustre(te('ÉCRITURE · LA FATḤA'),
       TB('Au dessus de la lettre,<br>on dit comment ?'),
       te('On passe à ce symbole. Au dessus de la lettre, on dit comment ?'),
-      {flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
+      {flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000}]}),
     B.tracer(te('ÉCRITURE · LA FATḤA'),F,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
     B.illustre(te('ÉCRITURE · LA KASRA'),
       TB('Sous la lettre,<br>on prononce ?'),
       te('Enfin, ce symbole. Sous la lettre, on prononce ?'),
-      {flottants:[{m:mK,c:CKA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
+      {flottants:[{m:mK,c:CKA,x:50,y:BAS}],
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000}]}),
     B.tracer(te('ÉCRITURE · LA KASRA'),K,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
