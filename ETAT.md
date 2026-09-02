@@ -31,13 +31,22 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v193
+## OÙ ON EN EST — 2 septembre 2026, production en v194
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v193) :**
+**Fait et en ligne (v187 → v194) :**
+
+- **On presente la voyelle SEULE, puis on assemble le son (v194).** Les pages
+  qui expliquent un signe ne montrent plus la lettre : le trait seul, en
+  grand, jusqu'au bout. C'est la page « à ton tour » qui assemble — « b » +
+  « a », ça fait « ba » — et la lettre paraît quand la voix dit « b », la
+  voyelle quand elle dit « a ». Un état de scène peut donc porter sa propre
+  parole (`dit`) et n'avance qu'une fois qu'elle est finie : une durée fixe
+  ne synchronise rien, la parole n'ayant pas la même longueur d'un appareil
+  à l'autre ni entre la synthèse et l'enregistrement du client.
 
 - Un moteur de scènes illustrées, `api.illustre` / `sceneIllustree` : un cadre
   où des CALQUES (la syllabe entière) se fondent l'un dans l'autre et où des
@@ -1089,6 +1098,14 @@ page et URL propres, indexables. Elles se rangent à côté de
   22 px de mise en page y devenait 46 px à l'écran et la phrase sortait du
   cadre. L'échelle se lit sur le cadre lui-même
   (`rect.width / clientWidth` de `.boy-wrap` ou `.boy-plein`).
+
+- **Les cases du studio doivent être la phrase EXACTE — v194.** Elles avaient
+  été tapées à la main, sans accents : « Repete apres moi » quand le cours dit
+  « Répète après moi ». L'enregistrement est retrouvé par la phrase, au
+  caractère près — dix-huit des trente-cinq phrases n'auraient jamais joué,
+  même enregistrées. La liste se régénère depuis le cours lui-même
+  (`outils/studio-voyelles.py`), et un contrôle vérifie qu'aucune phrase
+  parlée n'est sans case. À refaire après CHAQUE changement de texte.
 
 - **Un cours enfant ne se relit pas à l'œil, il se PARCOURT — v193.** Piloter
   l'application dans le navigateur intégré, écran par écran, en paysage ET en
