@@ -8,8 +8,8 @@ Deux fichiers, désormais :
 
 | Fichier | Qui le reçoit | Contenu |
 |---|---|---|
-| `public/index.html` (211 Ko) | tout le monde | vente, connexion, inscription, paiement |
-| `app/app.html` (≈ 0,86 Mo) | **comptes payants seulement**, via `api/app.js` | toute l'application |
+| `public/index.html` (214 Ko) | tout le monde | vente, connexion, inscription, paiement |
+| `app/app.html` (≈ 1,3 Mo) | **comptes payants seulement**, via `api/app.js` | toute l'application |
 
 Après CHAQUE modification de `app/app.html` ou de `public/index.html` :
 incrémenter la version dans `public/sw.js` — **aux deux endroits** — et
@@ -17,11 +17,13 @@ dans `_VERSION_REPLI` de `app/app.html`, committer, pousser. Vercel
 déploie tout seul. Puis vérifier en ligne que `iamlearningarabic.com/sw.js`
 affiche bien le nouveau numéro.
 
-**Cette vérification passe par le NAVIGATEUR**, pas par `curl` : le bac à
-sable qui exécute les commandes n'a pas toujours accès au réseau, et `curl`
-répond alors « code http 000 » sans rien dire de plus — ce qui ressemble à
-un déploiement raté alors que tout va bien. Ouvrir l'adresse dans le
-navigateur intégré et lire les deux premières lignes.
+**Vérifier par `curl`, et se rabattre sur le navigateur.** Le bac à sable a
+souvent accès au réseau : `curl -s -H "Cache-Control: no-cache"
+https://iamlearningarabic.com/sw.js | head -2` suffit, et une attente
+`until curl … | grep -q arab-vNNN; do sleep 5; done` évite de deviner quand
+Vercel a fini. S'il répond « code http 000 », c'est le réseau qui manque, pas
+le déploiement qui a raté : ouvrir alors l'adresse dans le navigateur
+intégré et lire les deux premières lignes.
 
 Pour regarder soi-même ce qu'on vient de changer, sans passer par la
 production ni par le client : `node outils/serveur-local.js`
@@ -29,35 +31,56 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — soir du 21 août 2026, production en v129
+## OÙ ON EN EST — 2 septembre 2026, production en v193
 
-La soirée a porté sur l'interface adulte. Sont **faits et en ligne** : le code
-couleur des formes (trait de liaison en blanc, coupe en L pour ne pas emporter
-les points), le ʿayn et le ġayn sans couleur, les lettres posées sur la ligne
-d'écriture dans les canvas, les voyelles seules écartées de la ligne, la page
-des cours devenue un parcours, le modèle qui s'écrit tout seul dans les canvas
-adulte, et la rangée de voyelles sous les formes avec ses deux règles.
+Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
+règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
+place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Ce que le client doit trancher ou préciser :**
+**Fait et en ligne (v187 → v193) :**
 
-1. **Les autres lettres.** Il a dit : « il reste quelques soucis sur les autres
-   lettres non citées, on verra demain. » Lesquelles, il ne l'a pas dit. Les
-   cinq familles déjà réglées sont dans `_LIAISON_EM` ; en ajouter une ne coûte
-   qu'une ligne. La règle de référence, tirée du nūn : **le blanc s'arrête au
-   pied de la dent**, la petite verticale qui remonte appartient à la lettre.
-2. **« Les spécificités de chaque lettre »**, au pluriel. Seul le tā marbūṭa
-   sans soukoun a été nommé et fait (`_SANS_SOUKOUN`). Lui demander la suite —
-   l'alif et la hamza sans son propre ? les lettres qui ne s'attachent pas ?
-3. **Voyelle impossible : éteinte ou cachée ?** Choix fait : éteinte, pour que
-   l'élève voie qu'elle existe et qu'elle ne va pas là. À confirmer.
+- Un moteur de scènes illustrées, `api.illustre` / `sceneIllustree` : un cadre
+  où des CALQUES (la syllabe entière) se fondent l'un dans l'autre et où des
+  signes FLOTTANTS se posent où on veut, en pourcentage du cadre. Le plan
+  d'une page tient en un objet `{calques, flottants, scene:[…]}`.
+- La leçon des voyelles réécrite avec ses textes, **mot pour mot** : les
+  parenthèses de ses messages sont des commentaires, tout le reste est le
+  texte exact. Ne rien reformuler.
+- Le personnage à DROITE de chaque page, tourné vers la gauche — vers le
+  texte. La récompense est une volée : quatre ou cinq cœurs (fille) ou
+  étoiles (garçon) qui partent de sa tête dans toutes les directions.
+- L'écran de fin : deux montures encadrent le texte centré — la licorne, la
+  fusée vide — et le personnage du coin s'efface.
+- Le tanwīn s'affiche en DEUX signes partout où un enfant le voit : le
+  caractère unique est une ligature compressée (1,13 fois un signe simple),
+  l'enfant n'y lit pas le doublement. La ḍamma se double À CÔTÉ, la fatḥa et
+  la kasra l'une SUR l'autre. L'adulte garde le caractère normal.
+- Tous les mondes ouverts pour `abder.jah@hotmail.com` (`_COMPTES_OUVERTS`).
+- Le micro du studio (v186a/b) : c'est `api/_security.js` qui pose
+  `Permissions-Policy`, PAS `vercel.json` — ce fichier-là gagne toujours.
 
-**Deux habitudes prises avec lui, à garder :**
+**Le seul chantier ouvert reste LES VOIX.** `ADMIN_SOUNDS` compte 428 entrées
+(370 sons arabes + 34 phrases françaises du cours illustré). Le studio est
+dans l'application, les fichiers vont sur Supabase (`AUDIO_URLS`). Le client
+les enregistre lui-même.
+
+**À faire après :**
+- ses avis clients à mettre en page ;
+- les balises GTM, à lui expliquer une par une ; le jour où il déplace la
+  conversion Ads dans GTM, vider `CONVERSION` dans `/tag.js` **le même jour** ;
+- deux défauts d'accolades PRÉEXISTANTS dans la feuille de style (une `}` en
+  trop, un bloc non fermé) : signalés, pas corrigés à l'aveugle. Une `}`
+  orpheline fait jeter au navigateur la règle SUIVANTE — c'est ce qui avait
+  rendu `.boy-perso` sans style pendant deux versions.
+
+**Trois habitudes prises avec lui, à garder :**
 - Avant un gros chantier, annoncer le plan et attendre son avis. Les
   corrections bornées, non : celles-là se font d'un trait.
+- Quand il donne un texte, le prendre TEL QUEL. « Arrête de faire à ta
+  sauce ! » ; « n'improvise rien ».
 - Pour un réglage à l'œil, lui envoyer une planche d'images plutôt que de
-  deviner — c'est plus rapide qu'un aller-retour par la production. Et n'y
-  mettre QUE ce qu'il a demandé : les témoins « inchangés » l'ont agacé, une
-  phrase suffit à dire qu'on n'y a pas touché.
+  deviner. Et n'y mettre QUE ce qu'il a demandé : les témoins « inchangés »
+  l'ont agacé, une phrase suffit à dire qu'on n'y a pas touché.
 
 ---
 
@@ -496,11 +519,15 @@ licorne, couronne à partir du monde 2 — **validés par le client le 27 août
 Les traductions sont faites : la table `_TE` porte plus de trois cents
 entrées en treize langues, les nouveaux écrans compris.
 
-**LE SEUL CHANTIER OUVERT est le 3, LES VOIX.** `ADMIN_SOUNDS` compte
-370 sons ; le studio d'enregistrement est dans l'application et les fichiers
-vont sur Supabase (`AUDIO_URLS`). Tant qu'ils manquent, tout l'arabe passe
-par la synthèse vocale du navigateur, qui le prononce mal et parfois pas du
-tout selon l'appareil.
+**LES VOIX restent le chantier de fond.** `ADMIN_SOUNDS` compte 428 entrées
+— 370 sons arabes et 34 phrases françaises ajoutées par le cours illustré ;
+le studio d'enregistrement est dans l'application et les fichiers vont sur
+Supabase (`AUDIO_URLS`). Tant qu'ils manquent, tout passe par la synthèse
+vocale du navigateur, qui prononce mal et parfois pas du tout selon
+l'appareil. Le client les enregistre lui-même.
+
+**Le chantier EN COURS, lui, est l'illustration des leçons enfants** : voir
+« OÙ ON EN EST » en haut. La leçon des voyelles est faite et sert de patron.
 
 **Abandonné par le client, ne pas y revenir :**
 - l'ORDRE D'APPARITION des lettres modèles dans le canvas — le geste qui
@@ -1027,6 +1054,47 @@ page et URL propres, indexables. Elles se rangent à côté de
   pixel du centre de chaque disque. Un monde noir se voit en une ligne.
 
 ## Fait récemment (ne pas refaire)
+
+- **L'ENCRE d'un signe n'est pas là où sa boîte le dit — v191 à v193.** C'est
+  la leçon qui revient à chaque écran de la leçon illustrée. Une ḍamma
+  s'écrit 0,99 em AU-DESSUS de la ligne de base, une kasra 0,63 em en
+  dessous, et la ligne de base elle-même est 0,3125 em SOUS le milieu de la
+  boîte de texte quand l'interligne vaut 1. Poser un signe « au milieu » de
+  quoi que ce soit le met donc ailleurs : collé au bord du cadre, coupé, ou
+  carrément hors du canevas — à 176 px dans un cadre couché haut de 168, la
+  fatḥa modèle ne s'affichait plus DU TOUT.
+  La méthode : dessiner le signe sur un canevas à une taille connue, relever
+  la boîte de son encre, en tirer un décalage en `em`, et compenser.
+  `_encreAutourLigne(texte)` rend `{haut, bas}` SIGNÉS autour de la ligne —
+  un signe entièrement au-dessus a un `bas` négatif, et c'est cette valeur
+  qui dit de combien le descendre pour l'amener contre la ligne.
+  Et quand il n'y a AUCUNE lettre pour servir de repère — les cibles des
+  contrôles — ne pas centrer : garder le haut et le bas, sinon « an » et
+  « in » deviennent le même dessin.
+
+- **Mesurer une ligne de texte : `scrollWidth`, jamais `getBoundingClientRect`
+  — v193.** Chaque ligne écrite est un BLOC (`.boy-ligne`, `white-space:
+  nowrap`) : son rectangle rend la largeur de la COLONNE, la même pour
+  toutes, courtes comme longues. Le contrôle de débordement ne voyait donc
+  jamais rien, et des mots restaient cachés sous le cadre. `scrollWidth` rend
+  la largeur du texte, et dans la même unité que `clientWidth`.
+  Deux pièges avec : mesurer sur la largeur du TITRE, pas de son parent (en
+  portrait le titre est bien plus étroit) ; et repartir toujours de lignes
+  NON repliées, sinon la mesure dit qu'elles tiennent, on les déplie, et le
+  passage suivant les replie — le titre change d'un appel à l'autre.
+
+- **`ajusteEcran` met TOUTE la page à l'échelle : un seuil en pixels doit
+  être converti — v193.** En portrait le panneau fait 186 px de mise en page
+  et l'écran 390 : tout est agrandi deux fois. Un plancher de police de
+  22 px de mise en page y devenait 46 px à l'écran et la phrase sortait du
+  cadre. L'échelle se lit sur le cadre lui-même
+  (`rect.width / clientWidth` de `.boy-wrap` ou `.boy-plein`).
+
+- **Un cours enfant ne se relit pas à l'œil, il se PARCOURT — v193.** Piloter
+  l'application dans le navigateur intégré, écran par écran, en paysage ET en
+  portrait, fille ET garçon, en relevant les erreurs JS et les débordements :
+  c'est ce qui a montré que les modèles à repasser ne s'affichaient plus du
+  tout. Une capture de trois écrans ne l'aurait pas dit.
 
 - **Les points d'une boucle se posent SUR L'ANNEAU, par leur angle — v143.**
   C'est la clé de toute cette série. Porter un geste d'une forme à l'autre en
