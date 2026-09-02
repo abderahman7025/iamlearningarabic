@@ -3091,17 +3091,32 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    n'etait pas la carte : les ecrans de lecon n'avaient personne dedans. Il
    se tient en bas a gauche, hors du chemin du texte et des boutons, et ne
    prend aucun clic. */
-.boy-perso{position:absolute;left:6px;bottom:4px;width:46px;height:auto;
-  pointer-events:none;opacity:.96;z-index:2;transform-origin:left bottom;
+/* A DROITE, et tourne vers la gauche : il regarde le texte, pas le bord de
+   l'ecran. Le coin bas-droit est le point fixe de l'echelle inverse. */
+.boy-perso{position:absolute;right:6px;bottom:4px;width:46px;height:auto;
+  pointer-events:none;opacity:.96;z-index:2;transform-origin:right bottom;
   animation:persoSouffle 3.6s ease-in-out infinite}
 /* Le souffle passe par la MARGE : `transform` porte l'echelle inverse. */
 @keyframes persoSouffle{0%,100%{margin-bottom:0}50%{margin-bottom:3px}}
 /* La recompense : elle jaillit au-dessus de lui quand la reponse est juste —
    des coeurs pour la fille, des biceps pour le garcon. */
-.boy-bravo{position:absolute;left:6px;bottom:54px;width:46px;
-  text-align:center;font-size:1rem;line-height:1.2;transform-origin:left bottom;
-  pointer-events:none;z-index:3;opacity:0;
-  transition:opacity .28s ease}
+/* ── LA VOLEE DE RECOMPENSE ──
+   Un seul signe pose au-dessus de la tete ne disait rien. Ils sont quatre ou
+   cinq a jaillir de la tete du personnage et a s'envoler, chacun dans sa
+   direction : des coeurs pour la fille, des etoiles pour le garcon. */
+.boy-bravo{position:absolute;right:6px;bottom:52px;width:46px;height:0;
+  pointer-events:none;z-index:3;transform-origin:right bottom}
+.bravo-un{position:absolute;left:50%;bottom:0;font-size:1.15rem;line-height:1;
+  opacity:0;will-change:transform,opacity}
+.bravo-un.part{animation:bravoVol 1.5s cubic-bezier(.22,.7,.3,1) forwards}
+@keyframes bravoVol{
+  0%{opacity:0;transform:translate(-50%,0) scale(.4)}
+  18%{opacity:1}
+  70%{opacity:1}
+  100%{opacity:0;
+    transform:translate(calc(-50% + var(--vx,0px)),var(--vy,-60px)) scale(1.05)}
+}
+@media (prefers-reduced-motion: reduce){.bravo-un.part{animation-duration:.01s}}
 .boy-bravo.vu{opacity:1;transform:translateY(0) scale(1)}
 
 
@@ -9266,7 +9281,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v191';
+var _VERSION_REPLI='v192';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9469,15 +9484,25 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
     }
   }
   if(simple){
-    /* Le signe simple, deux fois, de part et d'autre du milieu. L'ecart vaut
-       un peu plus d'une demi-largeur de signe : ils se touchent presque. */
+    /* LES DEUX SIGNES SE POSENT COMME DANS LE CADRE ILLUSTRE, sans quoi
+       l'enfant repasse un dessin qui n'est pas celui qu'on vient de lui
+       montrer. La damma se double A COTE — c'est ainsi qu'on l'ecrit — et
+       serrees. La fatha et la kasra, qui sont des traits, se posent l'une
+       AU-DESSUS de l'autre, presque collees. */
     var base=t.split('').filter(function(ch){return !_TANWIN_DOUBLE[ch];}).join('');
-    var ecart=px*0.14;
+    var porte=base||'';
     if(base)cx.fillText(base,x,baseY+_descenteGlyphe(base,px));
-    var porte=base?base:'';
-    [-1,1].forEach(function(sens){
-      cx.fillText(porte+simple,x+sens*ecart,baseY+_descenteGlyphe(porte+simple,px));
-    });
+    var y0=baseY+_descenteGlyphe(porte+simple,px);
+    if(simple==='\u064f'){                       /* damma : cote a cote */
+      var ec=px*0.10;
+      cx.fillText(porte+simple,x-ec,y0);
+      cx.fillText(porte+simple,x+ec,y0);
+    }else{                                       /* traits : l'un sur l'autre */
+      var dessus=px*0.17;                        /* fatha au-dessus */
+      var dessous=px*0.17;                       /* kasra en dessous */
+      cx.fillText(porte+simple,x,y0);
+      cx.fillText(porte+simple,x,y0+(simple==='\u0650'?dessous:-dessus));
+    }
     return;
   }
   cx.fillText(t,x,baseY+_descenteGlyphe(t,px));
@@ -11243,8 +11268,8 @@ var _HABILLAGES={
     /* La meme fusee, hublot vide : celle qu'on voit une fois l'enfant sorti. */
     vaisseauVide:'/images/fusee-vide.png',
     pilote:'/images/astronaute-garcon.png',
-    /* Ce qui jaillit quand l'enfant a juste : des biceps pour lui. */
-    bravo:'💪',
+    /* Ce qui jaillit quand l'enfant a juste : des etoiles pour lui. */
+    bravo:'⭐',
     /* PLUS DE FLAMME SOUS LA FUSEE : la trainee de feu la remplace, et deux
        feux au meme endroit se font de l'ombre. */
     flamme:false,
@@ -12052,7 +12077,10 @@ function _boyScene(ca,reprise){
        carte ; les ecrans de lecon n'avaient personne dedans. On le pose ici,
        une fois, pour tous les ecrans a la fois — briefing, observation,
        trace, controle. */
-    var perso=_HAB.piloteSansCouronne||_HAB.pilote;
+    /* Elle se tient a droite : elle doit donc regarder vers la GAUCHE, du
+       cote du texte. C'est le dessin « dg » de l'habillage. */
+    var perso=(_HAB.piloteSansCouronneSens&&_HAB.piloteSansCouronneSens.dg)
+              ||_HAB.piloteSansCouronne||_HAB.pilote;
     if(perso){
       var im=document.createElement('img');
       im.className='boy-perso';im.src=perso;im.alt='';im.setAttribute('aria-hidden','true');
@@ -12066,9 +12094,23 @@ function _boyScene(ca,reprise){
      bras pour le garcon. Elle jaillit, tient un instant, et s'efface. */
   function bravo(p,combien){
     var el=p&&p._bravo;if(!el)return;
-    el.textContent=(_HAB.bravo||'⭐').repeat(combien||1);
-    el.classList.add('vu');
-    N.plusTard(function(){el.classList.remove('vu');},2200);
+    el.innerHTML='';
+    var signe=_HAB.bravo||'⭐';
+    var n=Math.max(4,Math.min(5,(combien||1)+3));
+    /* Chacun part de la tete et file dans sa direction : en eventail au-dessus
+       d'elle, du plus a gauche au plus a droite, et pas tous a la meme
+       vitesse — une volee reguliere ne ressemble a rien. */
+    for(var i=0;i<n;i++){
+      var b=document.createElement('span');
+      b.className='bravo-un';b.textContent=signe;
+      var t=(n===1)?0.5:(i/(n-1));               /* 0 a 1, de gauche a droite */
+      b.style.setProperty('--vx',Math.round(-46+92*t)+'px');
+      b.style.setProperty('--vy',Math.round(-40-42*Math.sin(Math.PI*t)-14*Math.random())+'px');
+      b.style.animationDelay=(i*90)+'ms';
+      el.appendChild(b);
+      (function(x){N.plusTard(function(){x.classList.add('part');},20);})(b);
+    }
+    N.plusTard(function(){el.innerHTML='';},2600);
   }
   api.bravo=bravo;
   /* Revoir l'écran précédent : on passe à l'écran suivant, et il arrive
@@ -12175,8 +12217,22 @@ function _boyScene(ca,reprise){
       if(w>large)large=w;
     });
     if(large<4){t.style.fontSize='';return;}
-    var px=Math.max(15,Math.min(52,REF*(col*0.97)/large));
+    var px=Math.max(13,Math.min(52,REF*(col*0.96)/large));
     t.style.fontSize=px.toFixed(1)+'px';
+    /* DERNIERE VERIFICATION. La colonne peut avoir change entre la mesure et
+       la pose — la page est mise a l'echelle apres coup. Si une ligne depasse
+       encore, on reduit jusqu'a ce qu'elle rentre : un mot cache sous le
+       cadre — « bien », « n'a » — est ce que le client a vu. */
+    for(var g=0;g<6;g++){
+      var trop=0;
+      [].slice.call(lignes).forEach(function(l){
+        var w=l.getBoundingClientRect().width;
+        if(w>trop)trop=w;
+      });
+      if(trop<=col*0.98||px<=13)break;
+      px=Math.max(13,px*(col*0.96)/trop);
+      t.style.fontSize=px.toFixed(1)+'px';
+    }
   }
 
   /* Le mot mis en avant dans une phrase. Il s'appelle encore « bleu » dans
@@ -12474,7 +12530,9 @@ function _boyScene(ca,reprise){
      donc, sinon un écran mesuré trop tôt reste réduit de travers — ou pas
      réduit du tout, et le bouton passe sous le bord. */
   function ajusteBientot(){
-    N.plusTard(ajusteEcran,60);N.plusTard(ajusteEcran,400);
+    N.plusTard(function(){ajusteEcran();calibreLesTextes();},60);
+    N.plusTard(function(){ajusteEcran();calibreLesTextes();},400);
+    N.plusTard(calibreLesTextes,900);
     try{if(document.fonts&&document.fonts.ready)
       document.fonts.ready.then(function(){ajusteEcran();});}catch(e){}
   }
@@ -13276,7 +13334,9 @@ function _boyVowelCourse(ca){
   /* Le second signe d'un tanwin. Pour la damma il se pose A COTE — c'est
      ainsi qu'on l'ecrit. Pour la fatha et la kasra, deux traits, il se pose
      JUSTE AU-DESSUS du premier, presque colle. */
-  var HAUT2=HAUT-9, BAS2=BAS-9;
+  /* Le second trait se pose tout pres du premier : six points de cadre, la ou
+     neuf laissaient un blanc entre eux. */
+  var HAUT2=HAUT-6, BAS2=BAS+6;
 
   var CHAMP=(st.profile==='girl')?'championne':'champion',
       UNE=(st.profile==='girl')?'une':'un',
@@ -13322,8 +13382,8 @@ function _boyVowelCourse(ca){
               {L:[1],P:1,t:'bou',d:2200}]}),
 
     B.repete(te('ÉTAPE 3 · À TON TOUR'),
-      TB('Répète après moi :<br><b>« bou »</b>'),
-      te('Répète après moi : bou.'),
+      TB('On a là le son <b>« bou »</b>.<br>Répète après moi : <b>« bou »</b>'),
+      te('On a là le son bou. Répète après moi : bou.'),
       {calques:[LBD],scene:[{L:[0],P:1,t:'bou',d:4000}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
@@ -13362,7 +13422,9 @@ function _boyVowelCourse(ca){
       TB('Te souviens-tu<br>de lui ?'),
       te('On commence par ce symbole. Te souviens-tu de lui ?'),
       {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:3200},{F:[0],t:'ou',d:2000}]}),
+       /* Aucune transcription ici : c'est la question qu'on pose. L'afficher
+          reviendrait a donner la reponse dans le cadre. */
+       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
     B.tracer(te('ÉCRITURE · LA ḌAMMA'),D,
       TB('Repasse sur les <b>modèles</b> ✍️'),te('Repasse sur les modèles.')),
 
@@ -13370,7 +13432,7 @@ function _boyVowelCourse(ca){
       TB('Au dessus de la lettre,<br>on dit comment ?'),
       te('On passe à ce symbole. Au dessus de la lettre, on dit comment ?'),
       {flottants:[{m:mF,c:CFA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:3200},{F:[0],t:'a',d:2000}]}),
+       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
     B.tracer(te('ÉCRITURE · LA FATḤA'),F,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
@@ -13378,7 +13440,7 @@ function _boyVowelCourse(ca){
       TB('Sous la lettre,<br>on prononce ?'),
       te('Enfin, ce symbole. Sous la lettre, on prononce ?'),
       {flottants:[{m:mK,c:CKA,x:50,y:MILIEU}],
-       scene:[{F:[0],d:3200},{F:[0],t:'i',d:2000}]}),
+       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
     B.tracer(te('ÉCRITURE · LA KASRA'),K,
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
