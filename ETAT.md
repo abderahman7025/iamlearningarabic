@@ -31,13 +31,20 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v194
+## OÙ ON EN EST — 2 septembre 2026, production en v195
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v194) :**
+**Fait et en ligne (v187 → v195) :**
+
+- **Le bouton SUIVANT ne bouge plus et n'appelle qu'après la voix (v195).** Il
+  grandissait — donc se déplaçait sous le doigt — et se mettait à battre au
+  premier blanc venu. C'est sa lumière qui bat maintenant, et seulement une
+  fois TOUTE la voix de la page jouée : `quandToutEstDit` compte les scènes
+  encore en train de parler, là où `surSilence` prenait le silence entre deux
+  phrases pour la fin.
 
 - **On presente la voyelle SEULE, puis on assemble le son (v194).** Les pages
   qui expliquent un signe ne montrent plus la lettre : le trait seul, en
@@ -1098,6 +1105,13 @@ page et URL propres, indexables. Elles se rangent à côté de
   22 px de mise en page y devenait 46 px à l'écran et la phrase sortait du
   cadre. L'échelle se lit sur le cadre lui-même
   (`rect.width / clientWidth` de `.boy-wrap` ou `.boy-plein`).
+
+- **Un signe posé au ras du cadre ne peut pas s'écarter — v195.** Le second
+  trait d'un tanwīn était trop près du premier ; l'écarter ne changeait rien,
+  parce qu'il sortait alors du cadre et que `poseFlottant` le faisait rentrer,
+  droit sur le premier. C'est le PREMIER qu'il faut descendre pour laisser la
+  place au second (`HAUTD` / `BASD`). Même piège partout où deux signes se
+  superposent près d'un bord.
 
 - **Les cases du studio doivent être la phrase EXACTE — v194.** Elles avaient
   été tapées à la main, sans accents : « Repete apres moi » quand le cours dit

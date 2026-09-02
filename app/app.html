@@ -3176,7 +3176,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    se deviner. Le trait est peint deux fois, decale d'un poil, pour l'epaissir
    au-dela de ce qu'une graisse de police permet. */
 .sc-croix{position:absolute;transform:translate(-50%,-50%);
-  font-size:clamp(52px,13vh,86px);font-weight:900;color:#d92d20;
+  font-size:clamp(76px,19vh,128px);font-weight:900;color:#d92d20;
   text-shadow:2px 0 0 #d92d20,-2px 0 0 #d92d20,0 2px 0 #d92d20,0 -2px 0 #d92d20;
   opacity:0;transition:opacity .2s ease;line-height:1;z-index:4}
 .sc-croix.vu{opacity:1}
@@ -3386,11 +3386,20 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-btn.boy-retour{width:52px;flex:0 0 52px;padding:0;margin-top:0;font-size:1.7rem;font-weight:400;
   line-height:1;background:var(--sk-doux);color:var(--sk-moyen);border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
 .boy-btn.boy-retour:active{background:var(--sk-doux-actif)}
-/* Le bouton qui fait avancer respire, pour rester l'évidence de l'écran. */
-.boy-btn.bat{animation:bBat 2.2s ease-in-out infinite}
-@keyframes bBat{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+/* Le bouton qui fait avancer appelle l'oeil UNE FOIS LA PHRASE DITE. Il ne
+   grandit plus : un bouton qui change de taille se deplace sous le doigt, et
+   le client le veut fixe. C'est sa lumiere qui bat, pas sa geometrie. */
+.boy-btn.bat{animation:bBat 1.7s ease-in-out infinite}
+@keyframes bBat{
+  0%,100%{filter:brightness(1);box-shadow:0 6px 16px rgba(1,87,155,.28)}
+  50%{filter:brightness(1.16);box-shadow:0 6px 28px rgba(1,87,155,.55)}}
 @media (prefers-reduced-motion:reduce){.boy-btn.bat{animation:none}}
+/* Une ligne d'ecriture dans le nuage : sans elle, rien ne dit si le signe
+   qu'on y montre se tient au-dessus ou en dessous — et c'est la question. */
+.boy-cible::after{content:'';position:absolute;left:16%;right:16%;top:50%;
+  border-top:2px dashed rgba(var(--sk-rgb),.30);pointer-events:none}
 .boy-cible{border:3px solid rgba(var(--sk-rgb),.35);background:#fff;cursor:pointer;
+  position:relative;
   width:104px;height:104px;display:flex;align-items:center;justify-content:center;
   font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--sk-fonce);line-height:1;
   border-radius:46% 54% 52% 48%/50% 46% 54% 50%;
@@ -3398,7 +3407,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   transition:transform .18s,background .18s,border-color .18s;box-shadow:0 6px 16px rgba(1,87,155,.14)}
 .boy-cible.ok{background:rgba(38,166,154,.18);border-color:#00897b;color:#00695c;transform:scale(1.08)}
 .boy-cible.ko{background:rgba(239,83,80,.14);border-color:#e53935;color:#c62828}
-.boy-note{font-size:.82rem;color:rgba(var(--sk-rgb-f),.75);font-weight:700;margin-top:8px}
+.boy-note{font-size:.82rem;color:rgba(var(--sk-rgb-f),.75);font-weight:700;margin-top:22px}
 
 /* ============================================================
    RESPONSIVE — adapte toutes les pages à la largeur d'écran
@@ -9290,7 +9299,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v194';
+var _VERSION_REPLI='v195';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11427,14 +11436,14 @@ var _HABILLAGES={
        tournee vers la droite meme en partant vers la gauche. Ses deux
        dessins existaient pourtant : on les declare, comme pour la monture.
        `gd` = de gauche a droite, donc tournee vers la droite. */
-    pilote:'/images/fille-couronne.png?v=133',
+    pilote:'/images/fille-couronne.png?v=194',
     /* Ce qui jaillit quand l'enfant a juste : des coeurs pour elle. */
     bravo:'💗',
-    piloteSens:{gd:'/images/fille-couronne.png?v=133',
-                dg:'/images/fille-couronne-dg.png?v=133'},
-    piloteSansCouronne:'/images/fille-seule.png?v=133',
-    piloteSansCouronneSens:{gd:'/images/fille-seule.png?v=133',
-                            dg:'/images/fille-seule-dg.png?v=133'},
+    piloteSens:{gd:'/images/fille-couronne.png?v=194',
+                dg:'/images/fille-couronne-dg.png?v=194'},
+    piloteSansCouronne:'/images/fille-seule.png?v=194',
+    piloteSansCouronneSens:{gd:'/images/fille-seule.png?v=194',
+                            dg:'/images/fille-seule-dg.png?v=194'},
     pilotesEtape:null,
     /* CE QUI L'ATTEND SUR UN MONDE. Sa licorne au monde 1 : elle y arrive
        seule, en glissant sur l'arc-en-ciel, et repart avec. La couronne au
@@ -12107,6 +12116,8 @@ function _diraLeTrace(){
   return true;
 }
 
+/* Combien de scenes sont encore en train de parler. Voir `quandToutEstDit`. */
+var _sceneParle=0;
 function _boyScene(ca,reprise){
   _HAB=_habDuProfil();
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
@@ -12183,6 +12194,20 @@ function _boyScene(ca,reprise){
     N.plusTard(function(){el.innerHTML='';},2600);
   }
   api.bravo=bravo;
+  /* ── QUAND TOUTE LA VOIX DE LA PAGE A ETE JOUEE ──
+     `surSilence` seul ne suffit pas : une scene qui parle etat par etat
+     laisse un blanc de quelques dixiemes entre deux phrases, et le premier
+     de ces blancs passait pour la fin. On compte donc les scenes encore en
+     train de parler, et on n'attend le silence qu'une fois ce compte a zero. */
+  function quandToutEstDit(fn){
+    N.plusTard(function(){
+      var id=setInterval(function(){
+        if(_sceneParle>0)return;
+        clearInterval(id);N.surSilence(fn);
+      },200);
+      N.plusTard(function(){clearInterval(id);},20000);
+    },700);
+  }
   /* Revoir l'écran précédent : on passe à l'écran suivant, et il arrive
      qu'on veuille relire celui d'avant. Ajouté après le rendu de la scène,
      donc valable pour toutes — briefing, hublot, piste, tracé, contrôle. */
@@ -12210,9 +12235,11 @@ function _boyScene(ca,reprise){
       _dernierPanneau.appendChild(seul);
       return;
     }
-    /* Le bouton ne se met à battre qu'une fois la phrase dite : tant qu'on
-       parle à l'enfant, rien ne l'invite à passer. */
-    N.surSilence(function(){
+    /* Le bouton ne se met a battre qu'une fois TOUTE la voix de la page
+       jouee : tant qu'on parle a l'enfant, rien ne l'invite a passer. Une
+       scene qui parle etat par etat laisse un silence entre deux phrases —
+       on attend donc qu'elle ait fini, pas le premier blanc venu. */
+    quandToutEstDit(function(){
       try{if(principal.isConnected)principal.classList.add('bat');}catch(e){}
     });
     if(i<=0)return;
@@ -12712,6 +12739,10 @@ function _boyScene(ca,reprise){
   window.addEventListener('orientationchange',relanceAjuste);
   if(window.visualViewport)window.visualViewport.addEventListener('resize',relanceAjuste);
   function go(){
+    /* On change d'ecran : la scene qui parlait n'existe plus, son compte
+       repart de zero — sinon le bouton de la page suivante attendrait une
+       voix qui ne viendra jamais. */
+    _sceneParle=0;
     N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
@@ -12953,19 +12984,26 @@ function _boyScene(ca,reprise){
         croix.style.left=vu._cx.toFixed(2)+'%';
         croix.style.top =vu._cy.toFixed(2)+'%';
       }
+      /* ── UN ETAT PEUT PORTER SA PROPRE PAROLE ──
+         `dit` fait dire la phrase au moment ou l'etat se pose, et l'etat
+         suivant n'arrive qu'une fois qu'elle est finie. C'est ainsi que la
+         lettre parait EXACTEMENT quand la voix la nomme : une duree fixe ne
+         peut pas le garantir, la parole n'ayant pas la meme longueur d'un
+         appareil a l'autre, ni la synthese et l'enregistrement du client.
+         Le DERNIER etat parle comme les autres — on sortait avant de le
+         faire, et la moitie de la phrase restait muette. */
+      if(etapes.some(function(e){return e.dit;}))_sceneParle++;
       var n=0;
       (function joue(){
-        pose(n);
-        var e=etapes[n]||{},d=e.d||1200;n++;
-        if(n>=etapes.length)return;
-        /* ── UN ETAT PEUT PORTER SA PROPRE PAROLE ──
-           `dit` fait dire la phrase au moment ou l'etat se pose, et n'avance
-           qu'une fois qu'elle est finie. C'est ainsi que la lettre parait
-           EXACTEMENT quand la voix la nomme : une duree fixe ne peut pas le
-           garantir, la parole n'ayant pas la meme longueur d'un appareil a
-           l'autre, ni la synthese et l'enregistrement du client. */
-        if(e.dit){N.dire(e.dit);N.plusTard(function(){N.surSilence(joue);},250);}
-        else N.plusTard(joue,d);
+        var e=etapes[n]||{};
+        pose(n);n++;
+        var suite=(n<etapes.length)?joue:null;
+        if(e.dit){
+          N.dire(e.dit);
+          if(suite)N.plusTard(function(){N.surSilence(suite);},250);
+          else N.plusTard(function(){N.surSilence(function(){_sceneParle--;});},250);
+        }else if(suite)N.plusTard(suite,e.d||1200);
+        else if(etapes.some(function(x){return x.dit;}))_sceneParle--;
       })();
   }
   api.illustre=function(etape,html,fr,plan,label){
@@ -12990,11 +13028,12 @@ function _boyScene(ca,reprise){
       /* Un ecran « a ton tour » montre ce qu'on repete : sans la lettre sous
          les yeux, il ne restait que du texte. */
       if(plan)sceneIllustree(p,plan);
-      N.plusTard(function(){
-        N.surSilence(function(){
-          N.plusTard(function(){N.dire(te('Bravo !'));bravo(p,2);},1000);
-        });
-      },600);
+      /* On attend que TOUTE la voix de la page soit jouee — la scene parle
+         etat par etat — puis une seconde de blanc, le temps que l'enfant
+         repete, et alors seulement la recompense jaillit. */
+      quandToutEstDit(function(){
+        N.plusTard(function(){N.dire(te('Bravo !'));bravo(p,2);},1000);
+      });
       bouton(p,te('SUIVANT ▸'),suivant);
     };
   };
@@ -13577,7 +13616,7 @@ function _boyVowelCourse(ca){
 
   var LB='ب';
   var LBF=LB+'َ', LBK=LB+'ِ', LBD=LB+'ُ', LBS=LB+'ْ';
-  var mF='َ', mK='ِ', mD='ُ';
+  var mF='َ', mK='ِ', mD='ُ', mS='ْ';
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
      les signes se tiennent tout pres d'elle, au-dessus et en dessous. */
@@ -13590,9 +13629,14 @@ function _boyVowelCourse(ca){
   /* Le second signe d'un tanwin. Pour la damma il se pose A COTE — c'est
      ainsi qu'on l'ecrit. Pour la fatha et la kasra, deux traits, il se pose
      JUSTE AU-DESSUS du premier, presque colle. */
-  /* Le second trait se pose tout pres du premier : six points de cadre, la ou
-     neuf laissaient un blanc entre eux. */
-  var HAUT2=HAUT-6, BAS2=BAS+6;
+  /* ── DEUX TRAITS L'UN SUR L'AUTRE ──
+     Un signe seul se pose au ras du cadre (HAUT vaut 9). Deux traits n'y
+     tiennent pas : le second, pousse dehors, se faisait rentrer par
+     `poseFlottant` et retombait sur le premier — c'est pour cela qu'ecarter
+     davantage ne changeait rien. On DESCEND donc le premier pour laisser la
+     place au second, et l'ecart est alors reellement tenu. */
+  var HAUTD=20, HAUTD2=8;
+  var BASD=80,  BASD2=91;
 
   var CHAMP=(st.profile==='girl')?'championne':'champion',
       UNE=(st.profile==='girl')?'une':'un',
@@ -13633,15 +13677,15 @@ function _boyVowelCourse(ca){
          donc en grand d'un bout a l'autre — descendue sous la ligne, barree,
          puis remontee au-dessus, qui est sa place. La lettre viendra a la
          page suivante, quand on assemblera le son. */
-      /* Sans ligne d'ecriture : c'est le DEPLACEMENT qui dit « en bas » puis
-         « au dessus », et le signe garde ainsi sa taille d'un bout a l'autre.
-         Une ligne l'obligerait a se ranger d'un cote, donc a retrecir — le
-         client le veut tres gros, comme au debut. */
+      /* La ligne d'ecriture est la, comme sur les deux autres voyelles :
+         c'est par rapport a elle que « en bas » et « au dessus » veulent dire
+         quelque chose. Le signe se range alors du bon cote — voir
+         `poseFlottant`, qui le reduit du strict necessaire pour cela. */
       {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
-       scene:[{F:[0],t:'ou',d:1800},
-              {F:[0],fx:50,fy:BAS,d:1100},
-              {F:[0],fx:50,fy:BAS,X:[50,BAS],d:1500},
-              {F:[0],fx:50,fy:HAUT,d:2400}]}),
+       scene:[{F:[0],P:1,t:'ou',d:1800},
+              {F:[0],P:1,fx:50,fy:BAS,d:1100},
+              {F:[0],P:1,fx:50,fy:BAS,X:[50,BAS],d:1500},
+              {F:[0],P:1,fx:50,fy:HAUT,d:2400}]}),
 
     /* ── ON ASSEMBLE LE SON, A VOIX HAUTE ──
        La lettre parait quand la voix dit « b », la voyelle quand elle dit
@@ -13652,8 +13696,10 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB,LBD],
        scene:[{L:[0],P:1,dit:te('b')},
+              {L:[0],P:1,dit:te('plus')},
               {L:[1],P:1,dit:te('ou')},
-              {L:[1],P:1,t:'bou',dit:te('Ça fait bou. Répète après moi : bou.')}]}),
+              {L:[1],P:1,t:'bou',dit:te('Ça fait bou.')},
+              {L:[1],P:1,t:'bou',dit:te('Répète après moi : bou.')}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
@@ -13670,8 +13716,10 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB,LBF],
        scene:[{L:[0],P:1,dit:te('b')},
+              {L:[0],P:1,dit:te('plus')},
               {L:[1],P:1,dit:te('a')},
-              {L:[1],P:1,t:'ba',dit:te('Ça fait ba. Répète après moi : ba.')}]}),
+              {L:[1],P:1,t:'ba',dit:te('Ça fait ba.')},
+              {L:[1],P:1,t:'ba',dit:te('Répète après moi : ba.')}]}),
 
     B.illustre(te('ÉTAPE 5'),
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
@@ -13686,8 +13734,10 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB,LBK],
        scene:[{L:[0],P:1,dit:te('b')},
+              {L:[0],P:1,dit:te('plus')},
               {L:[1],P:1,dit:te('i')},
-              {L:[1],P:1,t:'bi',dit:te('Ça fait bi. Répète après moi : bi.')}]}),
+              {L:[1],P:1,t:'bi',dit:te('Ça fait bi.')},
+              {L:[1],P:1,t:'bi',dit:te('Répète après moi : bi.')}]}),
 
     B.brief(te('ÉCRITURE'),
       TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
@@ -13696,10 +13746,11 @@ function _boyVowelCourse(ca){
     B.illustre(te('ÉCRITURE · LA ḌAMMA'),
       TB('Te souviens-tu<br>de lui ?'),
       te('On commence par ce symbole. Te souviens-tu de lui ?'),
-      {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
-       /* Aucune transcription ici : c'est la question qu'on pose. L'afficher
-          reviendrait a donner la reponse dans le cadre. */
-       scene:[{F:[0],d:3200},{F:[0],d:2000}]}),
+      /* La ligne d'ecriture, comme pour la fatha et la kasra, et la damma
+         au-dessus d'elle — c'est sa place. Aucune transcription ici : c'est
+         la question qu'on pose, l'afficher donnerait la reponse. */
+      {flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000}]}),
     B.tracer(te('ÉCRITURE · LA ḌAMMA'),D,
       TB('Repasse sur les <b>modèles</b> ✍️'),te('Repasse sur les modèles.')),
 
@@ -13751,7 +13802,7 @@ function _boyVowelCourse(ca){
       TB('« ba » devient<br>« <b>ban</b> ».'),
       te('Ba devient ban.'),
       {calques:[LB],
-       flottants:[{m:mF,c:CFA,x:50,y:HAUT},{m:mF,c:CFA,x:50,y:HAUT2}],
+       flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
        scene:[{L:[0],P:1,F:[0],t:'ba',d:1800},
               {L:[0],P:1,F:[0,1],t:'ban',d:2400}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
@@ -13761,7 +13812,7 @@ function _boyVowelCourse(ca){
       TB('« bi » devient<br>« <b>bin</b> ».'),
       te('Bi devient bin.'),
       {calques:[LB],
-       flottants:[{m:mK,c:CKA,x:50,y:BAS},{m:mK,c:CKA,x:50,y:BAS2}],
+       flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
        scene:[{L:[0],P:1,F:[0],t:'bi',d:1800},
               {L:[0],P:1,F:[0,1],t:'bin',d:2400}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
@@ -13783,10 +13834,13 @@ function _boyVowelCourse(ca){
     B.illustre(te('LE SOUKOUN · LE PETIT ROND'),
       TB('Parfois tu trouveras ce<br>petit rond au dessus. Il n’a<br>aucune prononciation.<br>On dira toujours « <b>b</b> ».'),
       te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.'),
-      {calques:[LB,LBS],
+      /* Le petit rond bat au-dessus de la lettre, en orange, comme les trois
+         voyelles du tout debut : c'est lui qu'on presente. */
+      {calques:[LB],
+       flottants:[{m:mS,c:CFA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,d:1000},
-              {L:[1],P:1,d:1600},
-              {L:[1],P:1,t:'b',d:2200}]}),
+              {L:[0],P:1,F:[0],bat:1,d:1800},
+              {L:[0],P:1,F:[0],bat:1,t:'b',d:2400}]}),
 
     B.repete(te('LE SOUKOUN · À TON TOUR'),
       TB('Répète après moi :<br><b>« b »</b>'),
@@ -16724,7 +16778,7 @@ var ADMIN_SOUNDS = [
      le francais, et ne sait pas dire un son isole comme « b ».
      LA CLE EST LA PHRASE EXACTE, accents compris : c'est sur elle que
      l'enregistrement est retrouve. Cette liste se regenere depuis le cours
-     (outils/studio-voyelles.py) — ne pas la retaper a la main. */
+     (scratchpad/studio_voyelles.py) — ne pas la retaper a la main. */
   {ar:'Aujourd’hui : les voyelles.',label:'Aujourd’hui : les voyelles.'},
   {ar:'Pour comprendre les voyelles, on a besoin d\'une lettre.',label:'Pour comprendre les voyelles, on a besoin d…'},
   {ar:'Prenons la lettre ba. Seule, elle se dit b.',label:'Prenons la lettre ba. Seule, elle se dit b.'},
@@ -16732,14 +16786,18 @@ var ADMIN_SOUNDS = [
   {ar:'Il existe seulement trois voyelles.',label:'Il existe seulement trois voyelles.'},
   {ar:'Voici la première : elle se dit ou. Elle est toujours au dessus.',label:'Voici la première : elle se dit ou. Elle es…'},
   {ar:'b',label:'b'},
+  {ar:'plus',label:'plus'},
   {ar:'ou',label:'ou'},
-  {ar:'Ça fait bou. Répète après moi : bou.',label:'Ça fait bou. Répète après moi : bou.'},
+  {ar:'Ça fait bou.',label:'Ça fait bou.'},
+  {ar:'Répète après moi : bou.',label:'Répète après moi : bou.'},
   {ar:'Si ce trait est au dessus d\'une lettre, il se prononce a.',label:'Si ce trait est au dessus d\'une lettre, il …'},
   {ar:'a',label:'a'},
-  {ar:'Ça fait ba. Répète après moi : ba.',label:'Ça fait ba. Répète après moi : ba.'},
+  {ar:'Ça fait ba.',label:'Ça fait ba.'},
+  {ar:'Répète après moi : ba.',label:'Répète après moi : ba.'},
   {ar:'En revanche, si ce trait est en dessous d\'une lettre, il se dit i.',label:'En revanche, si ce trait est en dessous d\'u…'},
   {ar:'i',label:'i'},
-  {ar:'Ça fait bi. Répète après moi : bi.',label:'Ça fait bi. Répète après moi : bi.'},
+  {ar:'Ça fait bi.',label:'Ça fait bi.'},
+  {ar:'Répète après moi : bi.',label:'Répète après moi : bi.'},
   {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu …'},
   {ar:'Repasse sur les modèles.',label:'Repasse sur les modèles.'},
   {ar:'On passe à ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe à ce symbole. Au dessus de la lett…'},
