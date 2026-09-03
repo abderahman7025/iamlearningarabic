@@ -9299,7 +9299,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v195';
+var _VERSION_REPLI='v196';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12391,7 +12391,8 @@ function _boyScene(ca,reprise){
       var dy=0.3125+(e.bas-e.haut)/2;
       var biais=0;
       if(e.bas<0)biais=-0.20;            /* tout au-dessus de la ligne */
-      else if(e.haut<0)biais=0.20;       /* tout en dessous */
+      else if(e.haut<0)biais=0.30;       /* tout en dessous — la kasra
+                                            affleurait la ligne du nuage */
       var av=el.style.transform||'';
       el.style.transform=(av?av+' ':'')+'translateY('+(biais-dy).toFixed(3)+'em)';
     }catch(x){}
@@ -12857,9 +12858,13 @@ function _boyScene(ca,reprise){
         if(d.classList.contains('seul')&&piste.classList.contains('vu')){
           if(pc<LIGNE-6)cote=-1;else if(pc>LIGNE+6)cote=1;
         }
+        /* Il ne doit toucher NI la ligne NI le bord : on lui reserve un vrai
+           blanc des deux cotes — un vingtieme du cadre — au lieu des six
+           pixels d'avant, qui le faisaient affleurer les deux. */
+        var air=Math.max(8,H*0.05);
         if(H&&px&&cote){
           var place=H*(cote<0?LIGNE:(100-LIGNE))/100;
-          var max=(place-Math.min(6,H*0.02))/(eh*jeu);
+          var max=(place-2*air)/(eh*jeu);
           if(max>40&&max<px){px=Math.round(max);d.style.fontSize=px+'px';}
         }
         var dx=-(d._ex||0)*px, dy=-(d._ey||0)*px;
@@ -12872,10 +12877,10 @@ function _boyScene(ca,reprise){
            respectees. */
         if(H&&px){
           var demi=(eh*px/2)*jeu;
-          var marge=Math.min(6,H*0.02);
+          var marge=air;
           var bas=demi+marge, haut=H-demi-marge;
-          if(cote<0)haut=Math.min(haut,H*LIGNE/100-demi);
-          else if(cote>0)bas=Math.max(bas,H*LIGNE/100+demi);
+          if(cote<0)haut=Math.min(haut,H*LIGNE/100-demi-marge);
+          else if(cote>0)bas=Math.max(bas,H*LIGNE/100+demi+marge);
           if(haut<bas){var m=(haut+bas)/2;bas=haut=m;}
           var vise=H*pc/100, cale=Math.min(Math.max(vise,bas),haut);
           dy+=(cale-vise);
@@ -13626,6 +13631,11 @@ function _boyVowelCourse(ca){
      sous la ligne : un signe pose DESSOUS doit passer plus bas encore, d'ou
      BAS. Les deux sont exprimes en pourcentage du cadre. */
   var HAUT=9, MILIEU=50, BAS=82;
+  /* Le soukoun, lui, doit tomber OU LA POLICE LE MET — le client compare
+     cette page a la suivante, ou la syllabe est ecrite d'un bloc. A la
+     hauteur des voyelles il flottait tout en haut du cadre, loin de la
+     lettre. Releve a l'ecran : c'est ici qu'il se pose. */
+  var SOUKH=19;
   /* Le second signe d'un tanwin. Pour la damma il se pose A COTE — c'est
      ainsi qu'on l'ecrit. Pour la fatha et la kasra, deux traits, il se pose
      JUSTE AU-DESSUS du premier, presque colle. */
@@ -13635,8 +13645,10 @@ function _boyVowelCourse(ca){
      `poseFlottant` et retombait sur le premier — c'est pour cela qu'ecarter
      davantage ne changeait rien. On DESCEND donc le premier pour laisser la
      place au second, et l'ecart est alors reellement tenu. */
-  var HAUTD=20, HAUTD2=8;
-  var BASD=80,  BASD2=91;
+  /* Ecart reduit de moitie a la demande du client : les deux traits se
+     touchent presque, comme a la main. Le couple garde son milieu. */
+  var HAUTD=17,   HAUTD2=11;
+  var BASD=82.8,  BASD2=88.2;
 
   var CHAMP=(st.profile==='girl')?'championne':'champion',
       UNE=(st.profile==='girl')?'une':'un',
@@ -13682,7 +13694,9 @@ function _boyVowelCourse(ca){
          quelque chose. Le signe se range alors du bon cote — voir
          `poseFlottant`, qui le reduit du strict necessaire pour cela. */
       {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
-       scene:[{F:[0],P:1,t:'ou',d:1800},
+       /* La ligne n'arrive qu'avec le mouvement : tant que le signe est au
+          centre, il n'y a rien a situer par rapport a elle. */
+       scene:[{F:[0],t:'ou',d:1800},
               {F:[0],P:1,fx:50,fy:BAS,d:1100},
               {F:[0],P:1,fx:50,fy:BAS,X:[50,BAS],d:1500},
               {F:[0],P:1,fx:50,fy:HAUT,d:2400}]}),
@@ -13837,7 +13851,7 @@ function _boyVowelCourse(ca){
       /* Le petit rond bat au-dessus de la lettre, en orange, comme les trois
          voyelles du tout debut : c'est lui qu'on presente. */
       {calques:[LB],
-       flottants:[{m:mS,c:CFA,x:50,y:HAUT}],
+       flottants:[{m:mS,c:CFA,x:50,y:SOUKH}],
        scene:[{L:[0],P:1,d:1000},
               {L:[0],P:1,F:[0],bat:1,d:1800},
               {L:[0],P:1,F:[0],bat:1,t:'b',d:2400}]}),

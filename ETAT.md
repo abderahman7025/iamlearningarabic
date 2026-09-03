@@ -31,13 +31,23 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v195
+## OÙ ON EN EST — 2 septembre 2026, production en v196
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v195) :**
+**Fait et en ligne (v187 → v196) :**
+
+- **Un signe seul ne touche ni la ligne ni le bord (v196).** Il se calait au
+  ras des deux ; il a maintenant un vingtième du cadre de blanc de chaque
+  côté (`air` dans `poseFlottant`), et sa taille se réduit du strict
+  nécessaire pour cela.
+- **Le soukoun du « petit rond » se pose à 19 % (`SOUKH`), et non à HAUT.**
+  Les hauteurs du cours écartent le signe de la lettre pour qu'on le voie ;
+  celui-là doit tomber OÙ LA POLICE LE MET, le client comparant cette page à
+  la suivante. Le calcul ne le donne pas : l'encre d'une marque isolée ne
+  tombe pas dans le DOM là où le canevas la mesure. Relevé à l'écran.
 
 - **Le bouton SUIVANT ne bouge plus et n'appelle qu'après la voix (v195).** Il
   grandissait — donc se déplaçait sous le doigt — et se mettait à battre au
