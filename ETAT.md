@@ -31,13 +31,22 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v196
+## OÙ ON EN EST — 2 septembre 2026, production en v197
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v196) :**
+**Fait et en ligne (v187 → v197) :**
+
+- **Le plein écran revient quand on retourne sur le site (v197).** Passer à
+  une autre application en fait sortir, et AUCUN navigateur ne laisse y
+  revenir tout seul : la demande exige un geste. On retient donc qu'il était
+  voulu et on le redemande au PREMIER CONTACT du doigt après le retour —
+  immédiat en pratique. Sans rebasculer l'appareil en paysage : il peut
+  revenir téléphone en portrait. Sur ordinateur, on n'y touche pas ; sur
+  iPhone, Safari n'a tout simplement pas de plein écran (seule l'installation
+  sur l'écran d'accueil le donne).
 
 - **Un signe seul ne touche ni la ligne ni le bord (v196).** Il se calait au
   ras des deux ; il a maintenant un vingtième du cadre de blanc de chaque

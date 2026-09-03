@@ -9299,7 +9299,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v196';
+var _VERSION_REPLI='v197';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10922,11 +10922,14 @@ var _boyPleinEcran=false;
    Ouvrir un cours en est un (l'enfant a appuyé sur la lettre), mais le
    navigateur ne le rattache pas toujours à la nouvelle page — on réarme donc
    au premier contact avec le cours, ce qui suffit toujours. */
+/* On retient qu'on VOULAIT le plein ecran : voir `_rendLePleinEcran`. */
+var _voulaitPlein=false;
 function _pleinEcranPaysage(){
   try{
     var de=document.documentElement;
     var rf=de.requestFullscreen||de.webkitRequestFullscreen;
     if(!rf)return;
+    _voulaitPlein=true;
     if(document.fullscreenElement||document.webkitFullscreenElement){
       try{if(screen.orientation&&screen.orientation.lock)
         screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
@@ -10941,12 +10944,57 @@ function _pleinEcranPaysage(){
 }
 function _quitterPleinEcranPaysage(){
   try{
+    /* On n'oublie PAS qu'on le voulait : quitter le calque de trace n'est
+       pas quitter l'application, et le client veut le plein ecran a chaque
+       retour sur le site. Seul un appareil sans plein ecran n'arme rien. */
     if(!(document.fullscreenElement||document.webkitFullscreenElement))return;
     try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
     var ef=document.exitFullscreen||document.webkitExitFullscreen;
     if(ef){var q=ef.call(document);if(q&&q['catch'])q['catch'](function(){});}
   }catch(e){}
 }
+/* ── LE PLEIN ECRAN SE PERD DES QU'ON QUITTE L'APPLICATION ──
+   Passer a une autre application, ou verrouiller son telephone, fait sortir
+   du plein ecran ; en revenant, la barre du navigateur est de retour et le
+   client la retrouve a chaque fois. Aucun navigateur ne laisse y revenir
+   TOUT SEUL : la demande exige un geste de l'utilisateur, sans quoi elle est
+   refusee sans un mot.
+   On redemande donc au PREMIER CONTACT du doigt apres le retour — l'enfant
+   n'a rien a faire de plus que toucher l'ecran, et c'est immediat.
+   La distinction qui compte : si l'enfant sort lui-meme du plein ecran (Echap,
+   ou le geste du navigateur) SANS quitter la page, on ne le lui réimpose pas.
+   C'est le retour de visibilite qui fait la difference — lui seul dit qu'on
+   est parti ailleurs. */
+function _rendLePleinEcran(){
+  if(!_voulaitPlein)return;
+  /* Sur un ordinateur, le plein ecran s'impose a une fenetre que l'on
+     manipule soi-meme : on ne le reprend que sur un ecran tactile. */
+  try{if(window.matchMedia&&!window.matchMedia('(pointer:coarse)').matches)return;}catch(e){}
+  if(document.fullscreenElement||document.webkitFullscreenElement)return;
+  var rendu=function(){
+    ['pointerdown','touchend','click','keydown'].forEach(function(e){
+      document.removeEventListener(e,rendu,true);});
+    /* Le plein ecran, et LUI SEUL : on ne rebascule pas l'appareil en
+       paysage. Le client revient telephone en portrait, et se retrouverait
+       couche sans l'avoir demande. */
+    try{
+      var de=document.documentElement;
+      var rf=de.requestFullscreen||de.webkitRequestFullscreen;
+      if(!rf)return;
+      var pr=rf.call(de);
+      if(pr&&pr['catch'])pr['catch'](function(){});
+    }catch(e){}
+  };
+  ['pointerdown','touchend','click','keydown'].forEach(function(e){
+    document.addEventListener(e,rendu,true);});
+}
+document.addEventListener('visibilitychange',function(){
+  if(!document.hidden)_rendLePleinEcran();
+});
+/* Safari sur iPhone remet la page depuis son cache sans passer par
+   `visibilitychange` : `pageshow` est le seul signal. */
+window.addEventListener('pageshow',function(e){if(e.persisted)_rendLePleinEcran();});
+
 /* Réarme la demande au premier contact, une seule fois. */
 function _armePleinEcran(el){
   if(!el)return;
@@ -13196,26 +13244,11 @@ function _boyScene(ca,reprise){
           petit.reprendre();
         }
       }
-      function pleinEcranNatif(){
-        try{
-          var de=document.documentElement;
-          var rf=de.requestFullscreen||de.webkitRequestFullscreen;
-          if(!rf)return;
-          var pr=rf.call(de);
-          if(pr&&pr.then)pr.then(function(){
-            try{if(screen.orientation&&screen.orientation.lock)
-              screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
-          })['catch'](function(){});
-        }catch(e){}
-      }
-      function quitterPleinEcranNatif(){
-        try{
-          if(!(document.fullscreenElement||document.webkitFullscreenElement))return;
-          try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
-          var ef=document.exitFullscreen||document.webkitExitFullscreen;
-          if(ef){var q=ef.call(document);if(q&&q['catch'])q['catch'](function(){});}
-        }catch(e){}
-      }
+      /* Les memes fonctions que le reste de l'application : c'est ainsi que
+         le plein ecran se souvient d'avoir ete voulu, et qu'il revient quand
+         on quitte l'application puis qu'on y retourne. */
+      function pleinEcranNatif(){_pleinEcranPaysage();}
+      function quitterPleinEcranNatif(){_quitterPleinEcranPaysage();}
       /* Plus de bouton « agrandir » : le client veut le plein écran paysage
          d'office, sur tous les tracés. Le calque s'ouvre donc tout seul. */
       N.plusTard(agrandir,60);
