@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v197
+## OÙ ON EN EST — 2 septembre 2026, production en v198
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
@@ -48,10 +48,11 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
   iPhone, Safari n'a tout simplement pas de plein écran (seule l'installation
   sur l'écran d'accueil le donne).
 
-- **Un signe seul ne touche ni la ligne ni le bord (v196).** Il se calait au
-  ras des deux ; il a maintenant un vingtième du cadre de blanc de chaque
-  côté (`air` dans `poseFlottant`), et sa taille se réduit du strict
-  nécessaire pour cela.
+- **Un signe seul se pose EN HAUT de sa moitié de cadre (v196, v198).** Deux
+  blancs égaux le mettaient au milieu — le client le veut remonté. Peu d'air
+  au-dessus de son encre (4 % du cadre), beaucoup en dessous (13 %) :
+  au-dessus de la ligne il monte vers le bord, en dessous il monte vers la
+  ligne. La hauteur écrite dans la scène ne dit plus que DE QUEL CÔTÉ il va.
 - **Le soukoun du « petit rond » se pose à 19 % (`SOUKH`), et non à HAUT.**
   Les hauteurs du cours écartent le signe de la lettre pour qu'on le voie ;
   celui-là doit tomber OÙ LA POLICE LE MET, le client comparant cette page à
