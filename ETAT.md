@@ -31,13 +31,20 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v198
+## OÙ ON EN EST — 2 septembre 2026, production en v199
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v197) :**
+**Fait et en ligne (v187 → v199) :**
+
+- **Le secret des tanwīns se montre avant de se dire (v199).** La page « LE
+  SECRET · OUN » faisait deux choses à la fois. Elle ne fait plus qu'annoncer
+  le secret, et le fait comme l'étape 2 le faisait pour les voyelles simples :
+  les TROIS signes doublés clignotent sur la lettre. « bou devient boun » a sa
+  propre page, bâtie exactement comme « an » et « in ». Et la page BRAVO reçoit
+  les confettis de l'habillage.
 
 - **Le plein écran revient quand on retourne sur le site (v197).** Passer à
   une autre application en fait sortir, et AUCUN navigateur ne laisse y
