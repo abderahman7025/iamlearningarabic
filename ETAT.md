@@ -31,13 +31,23 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v199
+## OÙ ON EN EST — 2 septembre 2026, production en v200
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v199) :**
+**Fait et en ligne (v187 → v200) :**
+
+- **L'ALBUM DE COLLECTION (v200).** Une vignette par monde terminé, les autres
+  en silhouette, et les cinq trophées en dessous. Page `renderAlbum`, entrée
+  « Mon album » au menu enfant. La règle qui la gouverne : une récompense
+  MARQUE un progrès, elle ne PAIE jamais le temps passé — rien ne s'obtient en
+  jouant plus longtemps. Les douze étapes sont sorties de la carte
+  (`_ilesDefs()`) pour que l'album lise la même liste.
+  Les quatre autres leviers retenus avec le client, dans l'ordre : la
+  RÉVISION ESPACÉE (le plus utile, pas fait), une séance qui a une fin, un
+  récap hebdomadaire pour le parent, l'erreur qui ne bloque jamais.
 
 - **Le secret des tanwīns se montre avant de se dire (v199).** La page « LE
   SECRET · OUN » faisait deux choses à la fois. Elle ne fait plus qu'annoncer

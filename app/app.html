@@ -3374,7 +3374,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-jauge .rail{flex:1;height:10px;border-radius:6px;background:rgba(var(--sk-rgb),.16);overflow:hidden}
 .boy-jauge .feu{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--sk-jauge),var(--sk-moyen));transition:width .45s}
 .boy-jauge .fusee{font-size:1.35rem;animation:bFusee 2.2s ease-in-out infinite}
-.boy-btn{display:block;width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
+.boy-btn{position:relative;display:block;width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;
   font-family:Outfit,sans-serif;font-size:1.02rem;font-weight:900;letter-spacing:.06em;color:#fff;
   background:linear-gradient(135deg,var(--sk-clair),var(--sk-fonce));box-shadow:0 6px 16px rgba(var(--sk-rgb-f),.35);
   margin-top:20px;transition:transform .15s,opacity .3s}
@@ -3386,14 +3386,23 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-btn.boy-retour{width:52px;flex:0 0 52px;padding:0;margin-top:0;font-size:1.7rem;font-weight:400;
   line-height:1;background:var(--sk-doux);color:var(--sk-moyen);border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
 .boy-btn.boy-retour:active{background:var(--sk-doux-actif)}
-/* Le bouton qui fait avancer appelle l'oeil UNE FOIS LA PHRASE DITE. Il ne
-   grandit plus : un bouton qui change de taille se deplace sous le doigt, et
-   le client le veut fixe. C'est sa lumiere qui bat, pas sa geometrie. */
-.boy-btn.bat{animation:bBat 1.7s ease-in-out infinite}
+/* ── LE BOUTON APPELLE, UNE FOIS TOUTE LA PHRASE DITE ──
+   Il ne grandit pas : un bouton qui change de taille se deplace sous le
+   doigt. C'est sa LUMIERE qui bat, et un halo qui s'ouvre autour de lui —
+   celui-la vit dans une couche a part, la geometrie du bouton ne bouge donc
+   pas d'un pixel. Un enfant de six ans comprend qu'il faut appuyer. */
+.boy-btn.bat{animation:bBat 1.5s ease-in-out infinite}
 @keyframes bBat{
-  0%,100%{filter:brightness(1);box-shadow:0 6px 16px rgba(1,87,155,.28)}
-  50%{filter:brightness(1.16);box-shadow:0 6px 28px rgba(1,87,155,.55)}}
-@media (prefers-reduced-motion:reduce){.boy-btn.bat{animation:none}}
+  0%,100%{filter:brightness(1);box-shadow:0 6px 16px rgba(var(--sk-rgb-f),.35)}
+  50%{filter:brightness(1.22);box-shadow:0 8px 34px rgba(var(--sk-rgb-f),.70)}}
+.boy-btn.bat::before{content:'';position:absolute;inset:-3px;border-radius:17px;
+  border:3px solid rgba(255,255,255,.9);opacity:0;pointer-events:none;
+  animation:bHalo 1.5s ease-out infinite}
+@keyframes bHalo{
+  0%{transform:scale(.99);opacity:.85}
+  65%{transform:scale(1.055);opacity:0}
+  100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.boy-btn.bat,.boy-btn.bat::before{animation:none}}
 /* Une ligne d'ecriture dans le nuage : sans elle, rien ne dit si le signe
    qu'on y montre se tient au-dessus ou en dessous — et c'est la question. */
 .boy-cible::after{content:'';position:absolute;left:16%;right:16%;top:50%;
@@ -3408,6 +3417,96 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-cible.ok{background:rgba(38,166,154,.18);border-color:#00897b;color:#00695c;transform:scale(1.08)}
 .boy-cible.ko{background:rgba(239,83,80,.14);border-color:#e53935;color:#c62828}
 .boy-note{font-size:.82rem;color:rgba(var(--sk-rgb-f),.75);font-weight:700;margin-top:22px}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   L'ALBUM DE COLLECTION
+   Les couleurs viennent de l'habillage (`--al-*`, posées au rendu) : la même
+   page sert la fille et le garçon, sans une couleur en dur.
+   ══════════════════════════════════════════════════════════════════ */
+.alb{max-width:760px;margin:0 auto;padding:0 4px 40px}
+.alb-tete{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.78));
+  border:2px solid rgba(var(--al-rgb),.28);border-radius:22px;padding:16px 18px;margin-bottom:18px}
+.alb-titre{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.alb-titre h2{margin:0;font-size:1.25rem;font-weight:900;color:var(--al-fonce)}
+.alb-compte{font-size:1.05rem;font-weight:900;color:var(--al-vif);font-variant-numeric:tabular-nums}
+.alb-jauge{height:10px;border-radius:10px;background:rgba(var(--al-rgb),.16);overflow:hidden;margin-top:12px}
+.alb-jauge i{display:block;height:100%;border-radius:10px;width:0;
+  background:linear-gradient(90deg,var(--al-vif),var(--al-clair));
+  transition:width .9s cubic-bezier(.34,1.4,.64,1)}
+.alb-sstitre{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(var(--al-rgbF),.62);margin:22px 2px 10px}
+
+/* La grille des vignettes : deux par ligne sur un téléphone, quatre au large. */
+.alb-grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:12px}
+.alb-case{position:relative;border-radius:18px;padding:10px 8px 12px;text-align:center;
+  background:#fff;border:2px solid rgba(var(--al-rgb),.22);
+  box-shadow:0 4px 14px rgba(var(--al-rgbF),.10);overflow:hidden;
+  transition:transform .18s ease}
+.alb-case.gagnee{cursor:pointer}
+.alb-case.gagnee:active{transform:scale(.97)}
+.alb-case img{width:100%;height:88px;object-fit:contain;display:block;margin:0 auto 6px}
+.alb-nom{font-size:.76rem;font-weight:800;color:var(--al-fonce);line-height:1.25;
+  min-height:2.5em;display:flex;align-items:center;justify-content:center}
+.alb-lettres{font-family:'Scheherazade New',serif;font-size:1.15rem;color:var(--al-vif);
+  line-height:1;margin-top:4px;direction:rtl}
+.alb-date{font-size:.62rem;color:rgba(var(--al-rgbF),.55);margin-top:5px;font-weight:700}
+
+/* À CONQUÉRIR : l'image reste là, en silhouette. On voit qu'il y a quelque
+   chose, pas quoi — c'est cela qui donne envie d'aller le chercher. */
+/* Le fond reste opaque : le decor anime de la page passait au travers des
+   cases et l'album ressemblait a une bouillie. */
+.alb-case.fermee{background:rgba(255,255,255,.78);border-style:dashed}
+.alb-case.fermee img{filter:grayscale(1) contrast(.55) brightness(1.12);opacity:.42}
+.alb-case.fermee .alb-nom{color:rgba(var(--al-rgbF),.42)}
+.alb-cadenas{position:absolute;top:8px;right:8px;font-size:1rem;opacity:.5}
+
+/* La vignette qu'on découvre : un ruban, et elle se pose en tournant. */
+.alb-neuf{position:absolute;top:9px;left:-30px;transform:rotate(-38deg);
+  background:linear-gradient(135deg,#ffd54f,#ffb300);color:#5d4037;
+  font-size:.56rem;font-weight:900;letter-spacing:.1em;padding:3px 34px;
+  box-shadow:0 2px 6px rgba(0,0,0,.18)}
+@keyframes albPose{
+  0%{opacity:0;transform:scale(.6) rotate(-14deg)}
+  60%{opacity:1;transform:scale(1.06) rotate(3deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}}
+.alb-case.pose{animation:albPose .6s cubic-bezier(.34,1.5,.64,1) both}
+/* Un reflet passe sur les vignettes acquises : de loin, on voit tout de
+   suite lesquelles sont à soi. */
+.alb-case.gagnee::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);
+  transform:translateX(-120%)}
+.alb-case.gagnee.brille::after{transition:transform .9s ease;transform:translateX(120%)}
+
+/* LES TROPHÉES : une rangée de médailles, éteintes tant qu'on ne les a pas. */
+.alb-trophees{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.alb-tro{border-radius:16px;padding:12px 6px;text-align:center;background:#fff;
+  border:2px solid rgba(var(--al-rgb),.20);box-shadow:0 3px 10px rgba(var(--al-rgbF),.08)}
+.alb-tro .e{font-size:1.9rem;line-height:1;display:block}
+.alb-tro .l{font-size:.66rem;font-weight:800;color:var(--al-fonce);margin-top:6px;line-height:1.2}
+.alb-tro.eteint{background:rgba(255,255,255,.78);border-style:dashed}
+.alb-tro.eteint .e{filter:grayscale(1);opacity:.45}
+.alb-tro.eteint .l{color:rgba(var(--al-rgbF),.40)}
+
+/* LA VIGNETTE EN GRAND, quand l'enfant en touche une. */
+.alb-loupe{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;
+  justify-content:center;padding:24px;background:rgba(var(--al-rgbF),.55);
+  opacity:0;transition:opacity .25s ease}
+.alb-loupe.vu{opacity:1}
+.alb-loupe-carte{background:#fff;border-radius:26px;padding:22px 20px 20px;max-width:340px;
+  width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.28);
+  transform:scale(.86);transition:transform .3s cubic-bezier(.34,1.5,.64,1)}
+.alb-loupe.vu .alb-loupe-carte{transform:scale(1)}
+.alb-loupe-carte img{width:100%;max-height:190px;object-fit:contain;display:block;margin:0 auto 10px}
+.alb-loupe-carte h3{margin:0;font-size:1.15rem;font-weight:900;color:var(--al-fonce)}
+.alb-loupe-carte .ar{font-family:'Scheherazade New',serif;font-size:1.9rem;color:var(--al-vif);
+  margin-top:8px;direction:rtl;line-height:1}
+.alb-loupe-carte .d{font-size:.74rem;color:rgba(var(--al-rgbF),.6);margin-top:8px;font-weight:700}
+.alb-fermer{margin-top:16px;width:100%;padding:13px;border:none;border-radius:14px;
+  font-size:1rem;font-weight:900;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--al-vif),var(--al-fonce))}
+@media (prefers-reduced-motion:reduce){
+  .alb-case.pose{animation:none}.alb-case.gagnee.brille::after{transition:none}}
 
 /* ============================================================
    RESPONSIVE — adapte toutes les pages à la largeur d'écran
@@ -5469,6 +5568,8 @@ function buildMenu(){
     {id:'sessions', icon:'📚', cls:pc, title:t('sessions'),     desc:t('sessions_desc')},
     {id:'exercises',icon:'✏️', cls:pc, title:t('exercises'),    desc:t('exercises_desc')},
     ...(st.profile==='girl'||st.profile==='boy'?[{id:'minigames',icon:'🎮', cls:pc, title:t('minigames'), desc:t('minigames_desc')}]:[]),
+    /* L'album ne s'ouvre qu'aux enfants : c'est leur collection. */
+    ...(st.profile==='girl'||st.profile==='boy'?[{id:'album',icon:'🏅', cls:pc, title:te('Mon album'), desc:te('Ce que tu as gagné')}]:[]),
     ...(st.profile!=='girl'&&st.profile!=='boy'?[{id:'bonus',icon:'⭐',cls:pc,title:t('bonus'),desc:t('bonus_desc')}]:[]),
   ];
   // Contact uniquement pour adulte
@@ -5492,7 +5593,8 @@ function buildMenu(){
       exercises:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M4 16.5l10-10 3 3-10 10H4v-3z" fill="#fbbf24" opacity=".35"/><path d="M4 16.5l10-10 3 3-10 10H4v-3z" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 6.5l3 3" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M12 20h8" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round"/></svg>',
       contact:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="5" width="20" height="14" rx="2.5" fill="#6366f1" opacity=".18"/><rect x="2" y="5" width="20" height="14" rx="2.5" stroke="#6366f1" stroke-width="1.8"/><path d="M2 8l10 7 10-7" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/></svg>',
       bonus:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><path d="M12 3l2.09 6.26L20 9.27l-4.91 4.37 1.18 6.36L12 16.77l-4.27 3.23 1.18-6.36L4 9.27l5.91.99L12 3z" fill="#fbbf24" opacity=".35"/><path d="M12 3l2.09 6.26L20 9.27l-4.91 4.37 1.18 6.36L12 16.77l-4.27 3.23 1.18-6.36L4 9.27l5.91.99L12 3z" stroke="#f59e0b" stroke-width="1.8" stroke-linejoin="round"/></svg>',
-      minigames:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="7" width="20" height="12" rx="4" fill="#8b5cf6" opacity=".2"/><rect x="2" y="7" width="20" height="12" rx="4" stroke="#8b5cf6" stroke-width="1.8"/><path d="M8 13h4M10 11v4" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="11.5" r="1.2" fill="#fbbf24"/><circle cx="14.5" cy="14" r="1.2" fill="#34d399"/></svg>'
+      minigames:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="2" y="7" width="20" height="12" rx="4" fill="#8b5cf6" opacity=".2"/><rect x="2" y="7" width="20" height="12" rx="4" stroke="#8b5cf6" stroke-width="1.8"/><path d="M8 13h4M10 11v4" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round"/><circle cx="16" cy="11.5" r="1.2" fill="#fbbf24"/><circle cx="14.5" cy="14" r="1.2" fill="#34d399"/></svg>',
+      album:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="3" y="3" width="18" height="18" rx="3" fill="#fbbf24" opacity=".2"/><rect x="3" y="3" width="18" height="18" rx="3" stroke="#f59e0b" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="2" fill="#f472b6"/><circle cx="15.5" cy="8.5" r="2" fill="#34d399"/><circle cx="8.5" cy="15.5" r="2" fill="#38bdf8"/><circle cx="15.5" cy="15.5" r="2" fill="#a78bfa"/></svg>'
     }:{
       intro:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><circle cx="12" cy="12" r="10" stroke="'+ic+'" stroke-width="1.8" fill="none"/><circle cx="12" cy="8.5" r="1.2" fill="'+ic+'"/><rect x="11.1" y="11" width="1.8" height="6" rx=".9" fill="'+ic+'"/></svg>',
       sessions:'<svg viewBox="0 0 24 24" fill="none" width="32" height="32"><rect x="4" y="3" width="12" height="16" rx="2" stroke="'+ic+'" stroke-width="1.8" fill="none"/><path d="M8 7h8M8 11h8M8 15h5" stroke="'+ic+'" stroke-width="1.5" stroke-linecap="round"/><path d="M14 3v4h4" stroke="'+ic+'" stroke-width="1.5" stroke-linejoin="round"/></svg>',
@@ -5646,7 +5748,7 @@ function navToPage(page){
   var _ca=document.getElementById('ca');if(_ca){_ca.scrollTop=0;_ca.style.paddingTop='64px';}
   document.getElementById('tb-back').style.display='flex';
   document.getElementById('back-lbl').textContent=t('back_menu');
-  document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:t('minigames')}[page]||'';
+  document.getElementById('tb-title').textContent={intro:t('intro'),sessions:t('sessions'),exercises:t('exercises'),contact:t('contact_title'),progress:t('progress'),settings:t('settings'),bonus:t('bonus'),minigames:t('minigames'),album:te('Mon album')}[page]||'';
   st.backHistory=[{target:'menu'}];
   _navPush(page); /* navigation navigateur */
   renderPage(page,true);
@@ -5666,6 +5768,7 @@ function renderPage(page,fwd){
   else if(page==='contact')renderContact(ca);
   else if(page==='bonus')renderBonus(ca);
   else if(page==='minigames')renderMiniGames(ca);
+  else if(page==='album')renderAlbum(ca);
   else if(page==='progress')renderProgress(ca);
   else if(page==='settings')renderSettings(ca);
 }
@@ -7859,6 +7962,211 @@ function _toutOuvert(){
   }catch(e){return false;}
 }
 
+
+/* ══════════════════════════════════════════════════════════════════
+   L'ALBUM DE COLLECTION
+   Une récompense qui dure deux secondes n'en est pas une : les badges
+   s'affichaient en surimpression puis disparaissaient à jamais. L'album est
+   l'endroit où l'enfant RETOURNE voir ce qu'il a gagné.
+   Ce qui s'y gagne se mérite : une vignette s'obtient en TERMINANT un monde,
+   jamais en jouant plus longtemps — une récompense qui paie le temps passé
+   remplace l'envie d'apprendre au lieu de la nourrir.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Le jour où une vignette a été gagnée : la progression, elle, ne garde
+   aucune date. On la note au premier passage dans l'album. */
+function _albDate(i,gagnee){
+  var cle='album_monde_'+_getProfile()+'_'+i;
+  try{
+    var v=localStorage.getItem(cle);
+    if(gagnee&&!v){v=new Date().toISOString().slice(0,10);localStorage.setItem(cle,v);}
+    return gagnee?v:null;
+  }catch(e){return null;}
+}
+/* Les vignettes que l'enfant n'a pas encore VUES dans l'album : elles
+   arrivent avec un ruban et se posent en tournant, une seule fois. */
+function _albNeuve(i,gagnee){
+  var cle='album_vu_'+_getProfile()+'_'+i;
+  try{
+    if(!gagnee)return false;
+    if(localStorage.getItem(cle))return false;
+    localStorage.setItem(cle,'1');
+    return true;
+  }catch(e){return false;}
+}
+/* Un monde est acquis quand toutes ses leçons sont réussies : la règle de la
+   carte, reprise telle quelle pour qu'un monde fini là-bas soit une vignette
+   ici. */
+function _albMondesGagnes(){
+  return _ilesDefs().map(function(isle){
+    return isle.sids.every(function(sid){
+      var a=(st.accuracy||{})[sid];
+      return a&&a.t>0&&a.c/a.t>=0.8;
+    });
+  });
+}
+/* « 2026-09-02 » ne se lit pas a huit ans : on ecrit le jour et le mois. */
+function _albJour(iso){
+  try{
+    var d=new Date(iso+'T12:00:00');
+    return d.toLocaleDateString(st.lang||'fr',{day:'numeric',month:'long'});
+  }catch(e){return iso;}
+}
+
+function renderAlbum(ca){
+  _HAB=_habDuProfil();
+  ca.innerHTML='';
+  var A=document.createElement('div');
+  A.className='alb';
+  /* Les seules couleurs que porte un habillage : le fonce, le moyen, et le
+     vif donne en composantes. L'album n'en invente aucune. */
+  A.style.cssText='--al-fonce:'+_HAB.fonce+';--al-vif:'+_HAB.moyen
+    +';--al-clair:rgb('+_HAB.rgb+');--al-rgb:'+_HAB.rgb+';--al-rgbF:'+_HAB.rgbF;
+
+  var gagnes=_albMondesGagnes();
+  var n=gagnes.filter(Boolean).length, total=gagnes.length;
+
+  /* ── L'en-tête : où il en est, d'un coup d'œil ── */
+  var tete=document.createElement('div');tete.className='alb-tete';
+  var ttl=document.createElement('div');ttl.className='alb-titre';
+  ttl.innerHTML='<h2>🏅 '+te('Mon album')+'</h2>'
+    +'<span class="alb-compte">'+n+' / '+total+'</span>';
+  var jauge=document.createElement('div');jauge.className='alb-jauge';
+  var barre=document.createElement('i');jauge.appendChild(barre);
+  tete.appendChild(ttl);tete.appendChild(jauge);
+  A.appendChild(tete);
+  setTimeout(function(){barre.style.width=Math.round(n/total*100)+'%';},90);
+
+  /* ── La collection ── */
+  var st1=document.createElement('div');st1.className='alb-sstitre';
+  st1.textContent=te('Ma collection');A.appendChild(st1);
+
+  var grille=document.createElement('div');grille.className='alb-grille';
+  var noms=_HAB.etapes||[];
+  var poses=0;
+  _ilesDefs().forEach(function(isle,i){
+    var eu=gagnes[i];
+    var c=document.createElement('div');
+    c.className='alb-case '+(eu?'gagnee':'fermee');
+    var img=document.createElement('img');
+    img.src=(_HAB.images&&_HAB.images[i])||'';
+    img.alt='';img.setAttribute('aria-hidden','true');
+    c.appendChild(img);
+    var nom=document.createElement('div');nom.className='alb-nom';
+    nom.textContent=eu?(noms[i]||isle.label):'? ? ?';
+    c.appendChild(nom);
+    if(eu){
+      var ar=document.createElement('div');ar.className='alb-lettres';
+      ar.textContent=isle.ar;c.appendChild(ar);
+      var d=_albDate(i,true);
+      if(d){
+        var dd=document.createElement('div');dd.className='alb-date';
+        dd.textContent=_albJour(d);c.appendChild(dd);
+      }
+      if(_albNeuve(i,true)){
+        var rub=document.createElement('div');rub.className='alb-neuf';
+        rub.textContent=te('NOUVEAU');c.appendChild(rub);
+        (function(el,k){setTimeout(function(){el.classList.add('pose');},120+k*90);})(c,poses++);
+      }
+      (function(k,nm,arr,dt){
+        c.onclick=function(){_albLoupe(k,nm,arr,dt);};
+      })(i,noms[i]||isle.label,isle.ar,d);
+      (function(el,k){setTimeout(function(){el.classList.add('brille');},300+k*120);})(c,i);
+    }else{
+      var cad=document.createElement('div');cad.className='alb-cadenas';
+      cad.textContent='🔒';c.appendChild(cad);
+    }
+    grille.appendChild(c);
+  });
+  A.appendChild(grille);
+
+  /* ── Les trophées ── */
+  var st2=document.createElement('div');st2.className='alb-sstitre';
+  st2.textContent=te('Mes trophées');A.appendChild(st2);
+  var tro=document.createElement('div');tro.className='alb-trophees';
+  var lang=st.lang||'fr';
+  ['first_letter','lesson_5','lesson_10','perfect','streak_3'].forEach(function(id){
+    var b=CHILD_BADGES[id];if(!b)return;
+    var eu=hasChildBadge(id);
+    var e=document.createElement('div');
+    e.className='alb-tro'+(eu?'':' eteint');
+    e.innerHTML='<span class="e">'+b.emoji+'</span>'
+      +'<span class="l">'+((b.label[lang]||b.label.fr))+'</span>';
+    tro.appendChild(e);
+  });
+  A.appendChild(tro);
+  ca.appendChild(A);
+}
+/* La vignette en grand, quand l'enfant la touche. */
+function _albLoupe(i,nom,ar,date){
+  var o=document.createElement('div');o.className='alb-loupe';
+  var A=document.querySelector('.alb');
+  if(A)o.setAttribute('style',A.getAttribute('style')||'');
+  var c=document.createElement('div');c.className='alb-loupe-carte';
+  var img=document.createElement('img');
+  img.src=(_HAB.images&&_HAB.images[i])||'';img.alt='';
+  c.appendChild(img);
+  var h=document.createElement('h3');h.textContent=nom;c.appendChild(h);
+  var a=document.createElement('div');a.className='ar';a.textContent=ar;c.appendChild(a);
+  if(date){var d=document.createElement('div');d.className='d';
+    d.textContent=te('Gagné le')+' '+_albJour(date);c.appendChild(d);}
+  var b=document.createElement('button');b.className='alb-fermer';
+  b.textContent=te('Fermer');
+  c.appendChild(b);o.appendChild(c);document.body.appendChild(o);
+  requestAnimationFrame(function(){o.classList.add('vu');});
+  function fin(){o.classList.remove('vu');
+    setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o);},260);}
+  b.onclick=fin;
+  o.onclick=function(e){if(e.target===o)fin();};
+}
+
+/* ── LES DOUZE ETAPES, UNE FOIS POUR TOUTES ──
+   Elles etaient declarees DANS la carte : l'album, qui montre la meme
+   collection, ne pouvait pas les lire. C'est une fonction, et non une
+   constante, parce que les libelles sont traduits au moment ou on les
+   construit — la langue peut changer entre deux affichages. */
+function _ilesDefs(){
+  var _L=st.lang;
+  return [
+    {key:'sea',    icon:'💧', theme:'sea',
+     label:{'fr':'La Source de l\'Humanité','en':'The Source of Humanity','es':'La Fuente de la Humanidad','de':'Die Quelle der Menschheit','nl':'De Bron van de Mensheid','it':'La Fonte dell\'Umanità','pt':'A Fonte da Humanidade','ru':'Источник Человечества','tr':'İnsanlığın Kaynağı','zh':'人类之源','id':'Sumber Kemanusiaan','ur':'انسانیت کا سرچشمہ','hi':'मानवता का स्रोत'}[_L]||'La Source de l\'Humanité',
+     ar:'َ · ُ · ِ', sids:[0]},
+    {key:'beach',  icon:'🚢', theme:'beach',
+     label:{'fr':'L\'Arche de Nouh','en':'Noah\'s Ark','es':'El Arca de Noé','de':'Die Arche Noas','nl':'De Ark van Noach','it':'L\'Arca di Noè','pt':'A Arca de Noé','ru':'Ковчег Нуха','tr':'Nuh\'un Gemisi','zh':'诺亚方舟','id':'Bahtera Nuh','ur':'نوح کی کشتی','hi':'नूह की नाव'}[_L]||'L\'Arche de Nouh',
+     ar:'ا · و · ي', sids:[1]},
+    {key:'forest', icon:'🕋', theme:'forest',
+     label:{'fr':'La Maison Sacrée','en':'The Sacred House','es':'La Casa Sagrada','de':'Das Heilige Haus','nl':'Het Heilige Huis','it':'La Casa Sacra','pt':'A Casa Sagrada','ru':'Священный Дом','tr':'Kutsal Ev','zh':'圣殿','id':'Rumah Suci','ur':'بیتُ اللہ','hi':'पवित्र घर'}[_L]||'La Maison Sacrée',
+     ar:'بَا · بُو · بِي', sids:[2]},
+    {key:'desert', icon:'💦', theme:'desert',
+     label:{'fr':'Le Puits de Zamzam','en':'The Well of Zamzam','es':'El Pozo de Zamzam','de':'Der Brunnen von Zamzam','nl':'De Put van Zamzam','it':'Il Pozzo di Zamzam','pt':'O Poço de Zamzam','ru':'Колодец Замзам','tr':'Zemzem Kuyusu','zh':'渗渗泉','id':'Sumur Zamzam','ur':'زمزم کا کنواں','hi':'ज़मज़म का कुआँ'}[_L]||'Le Puits de Zamzam',
+     ar:'ب · ت · ث', sids:[3]},
+    {key:'palace', icon:'🌵', theme:'palace',
+     label:{'fr':'La Terre de la Patience','en':'The Land of Patience','es':'La Tierra de la Paciencia','de':'Das Land der Geduld','nl':'Het Land van Geduld','it':'La Terra della Pazienza','pt':'A Terra da Paciência','ru':'Земля Терпения','tr':'Sabır Diyarı','zh':'忍耐之地','id':'Tanah Kesabaran','ur':'صبر کی سرزمین','hi':'धैर्य की भूमि'}[_L]||'La Terre de la Patience',
+     ar:'ج · ح · خ', sids:[4]},
+    {key:'sea',    icon:'⛰️', theme:'sea',
+     label:{'fr':'Le Mont Sinaï','en':'Mount Sinai','es':'El Monte Sinaí','de':'Der Berg Sinai','nl':'De Berg Sinaï','it':'Il Monte Sinai','pt':'O Monte Sinai','ru':'Гора Синай','tr':'Sina Dağı','zh':'西奈山','id':'Gunung Sinai','ur':'کوہ سینا','hi':'सिनाई पर्वत'}[_L]||'Le Mont Sinaï',
+     ar:'د · ذ · ر · ز', sids:[5]},
+    {key:'beach',  icon:'🌸', theme:'beach',
+     label:{'fr':'Le Paysage des Rêves','en':'The Dreamscape','es':'El Paisaje de los Sueños','de':'Die Traumlandschaft','nl':'Het Droomlandschap','it':'Il Paesaggio dei Sogni','pt':'A Paisagem dos Sonhos','ru':'Пейзаж Мечтаний','tr':'Rüyaların Manzarası','zh':'梦幻风景','id':'Pemandangan Mimpi','ur':'خوابوں کا منظر','hi':'सपनों का दृश्य'}[_L]||'Le Paysage des Rêves',
+     ar:'س · ش', sids:[6]},
+    {key:'forest', icon:'🏔️', theme:'forest',
+     label:{'fr':'La Montagne de Dawoud','en':'The Mountain of Dawud','es':'La Montaña de Dawud','de':'Der Berg Dawuds','nl':'De Berg van Dawud','it':'La Montagna di Dawud','pt':'A Montanha de Dawud','ru':'Гора Дауда','tr':'Davud\'un Dağı','zh':'达乌德之山','id':'Gunung Dawud','ur':'داؤد کا پہاڑ','hi':'दाऊद का पर्वत'}[_L]||'La Montagne de Dawoud',
+     ar:'ص · ض · ط · ظ', sids:[7]},
+    {key:'desert', icon:'👑', theme:'desert',
+     label:{'fr':'Le Royaume de Saba','en':'The Kingdom of Sheba','es':'El Reino de Saba','de':'Das Königreich Saba','nl':'Het Koninkrijk Saba','it':'Il Regno di Saba','pt':'O Reino de Sabá','ru':'Царство Сабы','tr':'Sebe Krallığı','zh':'示巴王国','id':'Kerajaan Saba','ur':'سبا کی سلطنت','hi':'सबा का राज्य'}[_L]||'Le Royaume de Saba',
+     ar:'ع · غ', sids:[8]},
+    {key:'palace', icon:'🕌', theme:'palace',
+     label:{'fr':'La Mosquée d\'Al-Aqsa','en':'Al-Aqsa Mosque','es':'La Mezquita de Al-Aqsa','de':'Die Al-Aqsa-Moschee','nl':'De Al-Aqsa Moskee','it':'La Moschea di Al-Aqsa','pt':'A Mesquita de Al-Aqsa','ru':'Мечеть Аль-Акса','tr':'Mescid-i Aksa','zh':'阿克萨清真寺','id':'Masjid Al-Aqsa','ur':'مسجد اقصیٰ','hi':'अल-अक्सा मस्जिद'}[_L]||'La Mosquée d\'Al-Aqsa',
+     ar:'ف · ق · ك', sids:[9]},
+    {key:'sea',    icon:'🐋', theme:'sea',
+     label:{'fr':'Le Ventre de la Baleine','en':'The Belly of the Whale','es':'El Vientre de la Ballena','de':'Der Bauch des Wals','nl':'De Buik van de Walvis','it':'Il Ventre della Balena','pt':'O Ventre da Baleia','ru':'Чрево Кита','tr':'Balinanın Karnı','zh':'鲸腹之中','id':'Perut Ikan Paus','ur':'مچھلی کا پیٹ','hi':'व्हेल का पेट'}[_L]||'Le Ventre de la Baleine',
+     ar:'ل · م · ن', sids:[10]},
+    {key:'beach',  icon:'🌴', theme:'beach',
+     label:{'fr':'La Cité de Médine','en':'The City of Medina','es':'La Ciudad de Medina','de':'Die Stadt Medina','nl':'De Stad Medina','it':'La Città di Medina','pt':'A Cidade de Medina','ru':'Город Медина','tr':'Medine Şehri','zh':'麦地那圣城','id':'Kota Madinah','ur':'مدینے کا شہر','hi':'मदीना शहर'}[_L]||'La Cité de Médine',
+     ar:'ه · ء', sids:[11]},
+  ];
+}
+
 function renderSessionsMap(ca){
   _HAB=_habDuProfil();
   _migreProgressionFille();
@@ -7904,44 +8212,7 @@ function renderSessionsMap(ca){
      univers ici. Les libellés, eux, ne bougent pas — ce sont les mêmes
      lieux, les mêmes adresses et le même cours des deux côtés. */
   var islandImgs=_HAB.images;
-var islandDefs=[
-    {key:'sea',    icon:'💧', theme:'sea',
-     label:{'fr':'La Source de l\'Humanité','en':'The Source of Humanity','es':'La Fuente de la Humanidad','de':'Die Quelle der Menschheit','nl':'De Bron van de Mensheid','it':'La Fonte dell\'Umanità','pt':'A Fonte da Humanidade','ru':'Источник Человечества','tr':'İnsanlığın Kaynağı','zh':'人类之源','id':'Sumber Kemanusiaan','ur':'انسانیت کا سرچشمہ','hi':'मानवता का स्रोत'}[_L]||'La Source de l\'Humanité',
-     ar:'َ · ُ · ِ', sids:[0]},
-    {key:'beach',  icon:'🚢', theme:'beach',
-     label:{'fr':'L\'Arche de Nouh','en':'Noah\'s Ark','es':'El Arca de Noé','de':'Die Arche Noas','nl':'De Ark van Noach','it':'L\'Arca di Noè','pt':'A Arca de Noé','ru':'Ковчег Нуха','tr':'Nuh\'un Gemisi','zh':'诺亚方舟','id':'Bahtera Nuh','ur':'نوح کی کشتی','hi':'नूह की नाव'}[_L]||'L\'Arche de Nouh',
-     ar:'ا · و · ي', sids:[1]},
-    {key:'forest', icon:'🕋', theme:'forest',
-     label:{'fr':'La Maison Sacrée','en':'The Sacred House','es':'La Casa Sagrada','de':'Das Heilige Haus','nl':'Het Heilige Huis','it':'La Casa Sacra','pt':'A Casa Sagrada','ru':'Священный Дом','tr':'Kutsal Ev','zh':'圣殿','id':'Rumah Suci','ur':'بیتُ اللہ','hi':'पवित्र घर'}[_L]||'La Maison Sacrée',
-     ar:'بَا · بُو · بِي', sids:[2]},
-    {key:'desert', icon:'💦', theme:'desert',
-     label:{'fr':'Le Puits de Zamzam','en':'The Well of Zamzam','es':'El Pozo de Zamzam','de':'Der Brunnen von Zamzam','nl':'De Put van Zamzam','it':'Il Pozzo di Zamzam','pt':'O Poço de Zamzam','ru':'Колодец Замзам','tr':'Zemzem Kuyusu','zh':'渗渗泉','id':'Sumur Zamzam','ur':'زمزم کا کنواں','hi':'ज़मज़म का कुआँ'}[_L]||'Le Puits de Zamzam',
-     ar:'ب · ت · ث', sids:[3]},
-    {key:'palace', icon:'🌵', theme:'palace',
-     label:{'fr':'La Terre de la Patience','en':'The Land of Patience','es':'La Tierra de la Paciencia','de':'Das Land der Geduld','nl':'Het Land van Geduld','it':'La Terra della Pazienza','pt':'A Terra da Paciência','ru':'Земля Терпения','tr':'Sabır Diyarı','zh':'忍耐之地','id':'Tanah Kesabaran','ur':'صبر کی سرزمین','hi':'धैर्य की भूमि'}[_L]||'La Terre de la Patience',
-     ar:'ج · ح · خ', sids:[4]},
-    {key:'sea',    icon:'⛰️', theme:'sea',
-     label:{'fr':'Le Mont Sinaï','en':'Mount Sinai','es':'El Monte Sinaí','de':'Der Berg Sinai','nl':'De Berg Sinaï','it':'Il Monte Sinai','pt':'O Monte Sinai','ru':'Гора Синай','tr':'Sina Dağı','zh':'西奈山','id':'Gunung Sinai','ur':'کوہ سینا','hi':'सिनाई पर्वत'}[_L]||'Le Mont Sinaï',
-     ar:'د · ذ · ر · ز', sids:[5]},
-    {key:'beach',  icon:'🌸', theme:'beach',
-     label:{'fr':'Le Paysage des Rêves','en':'The Dreamscape','es':'El Paisaje de los Sueños','de':'Die Traumlandschaft','nl':'Het Droomlandschap','it':'Il Paesaggio dei Sogni','pt':'A Paisagem dos Sonhos','ru':'Пейзаж Мечтаний','tr':'Rüyaların Manzarası','zh':'梦幻风景','id':'Pemandangan Mimpi','ur':'خوابوں کا منظر','hi':'सपनों का दृश्य'}[_L]||'Le Paysage des Rêves',
-     ar:'س · ش', sids:[6]},
-    {key:'forest', icon:'🏔️', theme:'forest',
-     label:{'fr':'La Montagne de Dawoud','en':'The Mountain of Dawud','es':'La Montaña de Dawud','de':'Der Berg Dawuds','nl':'De Berg van Dawud','it':'La Montagna di Dawud','pt':'A Montanha de Dawud','ru':'Гора Дауда','tr':'Davud\'un Dağı','zh':'达乌德之山','id':'Gunung Dawud','ur':'داؤد کا پہاڑ','hi':'दाऊद का पर्वत'}[_L]||'La Montagne de Dawoud',
-     ar:'ص · ض · ط · ظ', sids:[7]},
-    {key:'desert', icon:'👑', theme:'desert',
-     label:{'fr':'Le Royaume de Saba','en':'The Kingdom of Sheba','es':'El Reino de Saba','de':'Das Königreich Saba','nl':'Het Koninkrijk Saba','it':'Il Regno di Saba','pt':'O Reino de Sabá','ru':'Царство Сабы','tr':'Sebe Krallığı','zh':'示巴王国','id':'Kerajaan Saba','ur':'سبا کی سلطنت','hi':'सबा का राज्य'}[_L]||'Le Royaume de Saba',
-     ar:'ع · غ', sids:[8]},
-    {key:'palace', icon:'🕌', theme:'palace',
-     label:{'fr':'La Mosquée d\'Al-Aqsa','en':'Al-Aqsa Mosque','es':'La Mezquita de Al-Aqsa','de':'Die Al-Aqsa-Moschee','nl':'De Al-Aqsa Moskee','it':'La Moschea di Al-Aqsa','pt':'A Mesquita de Al-Aqsa','ru':'Мечеть Аль-Акса','tr':'Mescid-i Aksa','zh':'阿克萨清真寺','id':'Masjid Al-Aqsa','ur':'مسجد اقصیٰ','hi':'अल-अक्सा मस्जिद'}[_L]||'La Mosquée d\'Al-Aqsa',
-     ar:'ف · ق · ك', sids:[9]},
-    {key:'sea',    icon:'🐋', theme:'sea',
-     label:{'fr':'Le Ventre de la Baleine','en':'The Belly of the Whale','es':'El Vientre de la Ballena','de':'Der Bauch des Wals','nl':'De Buik van de Walvis','it':'Il Ventre della Balena','pt':'O Ventre da Baleia','ru':'Чрево Кита','tr':'Balinanın Karnı','zh':'鲸腹之中','id':'Perut Ikan Paus','ur':'مچھلی کا پیٹ','hi':'व्हेल का पेट'}[_L]||'Le Ventre de la Baleine',
-     ar:'ل · م · ن', sids:[10]},
-    {key:'beach',  icon:'🌴', theme:'beach',
-     label:{'fr':'La Cité de Médine','en':'The City of Medina','es':'La Ciudad de Medina','de':'Die Stadt Medina','nl':'De Stad Medina','it':'La Città di Medina','pt':'A Cidade de Medina','ru':'Город Медина','tr':'Medine Şehri','zh':'麦地那圣城','id':'Kota Madinah','ur':'مدینے کا شہر','hi':'मदीना शहर'}[_L]||'La Cité de Médine',
-     ar:'ه · ء', sids:[11]},
-  ];
+var islandDefs=_ilesDefs();
 
   // Mini-jeux entre les îles
   var mgDefs=[
@@ -9299,7 +9570,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v199';
+var _VERSION_REPLI='v200';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
