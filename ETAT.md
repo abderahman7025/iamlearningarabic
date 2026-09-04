@@ -31,13 +31,23 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v200
+## OÙ ON EN EST — 2 septembre 2026, production en v201
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v200) :**
+**Fait et en ligne (v187 → v201) :**
+
+- **LA RÉVISION ESPACÉE (v201).** L'application ne retenait qu'un score PAR
+  LEÇON : on savait qu'un enfant avait eu huit sur dix, jamais QUEL signe lui
+  avait échappé. Elle retient désormais, signe par signe, sa boîte et le jour où
+  il l'a vu — cinq boîtes de Leitner à 1, 2, 4, 8 et 16 jours (`_noteSigne`,
+  `_revDus`). Le nom parlé du signe est retenu avec lui : aucune table à tenir,
+  un cours futur apporte ses signes et leurs noms tout seul.
+  La séance (`renderRevision`) fait huit signes au plus et se joue avec le
+  moteur des cours. Elle ne s'impose pas : une carte dorée l'annonce EN TÊTE de
+  la carte des mondes, dès trois signes à revoir. Choix du client.
 
 - **L'ALBUM DE COLLECTION (v200).** Une vignette par monde terminé, les autres
   en silhouette, et les cinq trophées en dessous. Page `renderAlbum`, entrée

@@ -3424,6 +3424,24 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Les couleurs viennent de l'habillage (`--al-*`, posées au rendu) : la même
    page sert la fille et le garçon, sans une couleur en dur.
    ══════════════════════════════════════════════════════════════════ */
+
+/* LA CARTE DE RÉVISION, en tête de la carte des mondes. Elle a sa couleur —
+   l'or — pour ne pas se confondre avec un monde : ce n'est pas un lieu où
+   l'on va, c'est un rendez-vous avec ce qu'on a déjà vu. */
+.rev-carte{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  border:2px solid rgba(255,193,7,.55);border-radius:22px;padding:14px 16px;
+  background:linear-gradient(135deg,rgba(255,248,225,.96),rgba(255,236,179,.92));
+  box-shadow:0 6px 20px rgba(191,138,0,.22);cursor:pointer;margin-bottom:14px;
+  font-family:inherit;transition:transform .15s ease}
+.rev-carte:active{transform:scale(.985)}
+.rev-carte .ic{font-size:2.1rem;line-height:1;flex:none}
+.rev-carte .tx{flex:1 1 auto;min-width:0}
+.rev-carte .t1{font-size:1.02rem;font-weight:900;color:#7a5200;line-height:1.2}
+.rev-carte .t2{font-size:.78rem;font-weight:700;color:rgba(122,82,0,.72);margin-top:3px}
+.rev-carte .fl{font-size:1.5rem;color:#bf8a00;flex:none}
+.rev-signes{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.rev-signes span{font-family:'Scheherazade New',serif;font-size:1.25rem;line-height:1;
+  color:#7a5200;background:rgba(255,255,255,.75);border-radius:8px;padding:2px 8px}
 .alb{max-width:760px;margin:0 auto;padding:0 4px 40px}
 .alb-tete{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(255,255,255,.78));
   border:2px solid rgba(var(--al-rgb),.28);border-radius:22px;padding:16px 18px;margin-bottom:18px}
@@ -8120,6 +8138,67 @@ function _albLoupe(i,nom,ar,date){
   o.onclick=function(e){if(e.target===o)fin();};
 }
 
+
+/* ══════════════════════════════════════════════════════════════════
+   LA SÉANCE DE RÉVISION
+   Courte — huit signes au plus — et jouée avec le moteur des cours : mêmes
+   nuages, même voix, même bouton. Ce n'est pas un écran à part, c'est la
+   leçon d'hier qui revient.
+   Les questions sortent de ce que l'enfant a le moins bien su : la mémoire
+   des signes les range de la boîte la plus fragile à la plus solide.
+   ══════════════════════════════════════════════════════════════════ */
+var _REV_MINI=3;    /* en dessous, la séance ne vaut pas la peine d'être ouverte */
+var _REV_MAXI=8;    /* au dessus, elle devient une corvée */
+
+/* Ce qu'on peut REDEMANDER : un signe dont on sait comment il se dit. Les
+   autres restent en mémoire, ils reviendront par leur leçon. */
+function _revJouables(){
+  var m=_revLis(),out=[];
+  _revDus().forEach(function(d){
+    var e=m[d.s]||{};
+    if(e.n)out.push({g:d.s,n:e.n,b:d.b});
+  });
+  return out;
+}
+/* Deux voisins pour faire un choix. On les prend parmi les signes DÉJÀ VUS —
+   proposer une lettre jamais rencontrée ne teste rien et décourage. */
+function _revVoisins(cible,combien){
+  var m=_revLis(),tous=Object.keys(m).filter(function(g){
+    return g!==cible&&m[g]&&m[g].n;});
+  tous.sort(function(){return Math.random()-.5;});
+  return tous.slice(0,combien);
+}
+
+function renderRevision(ca){
+  var jouables=_revJouables().slice(0,_REV_MAXI);
+  if(!jouables.length){renderSessionsMap(ca);return;}
+  var B=_boyScene(ca);
+  var m=_revLis();
+  var scenes=[
+    B.brief(te('RÉVISION'),
+      TB('<b>'+jouables.length+'</b> signes à revoir !'),
+      te('On revoit ce que tu as déjà appris.'),_HAB.partir)
+  ];
+  jouables.forEach(function(j){
+    var voisins=_revVoisins(j.g,2);
+    /* Moins de deux voisins connus : on complète avec les autres signes de la
+       séance, jamais avec de l'inconnu. */
+    if(voisins.length<2)jouables.forEach(function(k){
+      if(k.g!==j.g&&voisins.indexOf(k.g)<0&&voisins.length<2)voisins.push(k.g);});
+    var options=[[j.g,j.n]].concat(voisins.map(function(g){return [g,(m[g]&&m[g].n)||g];}));
+    if(options.length<2)return;
+    scenes.push(B.controle(te('RÉVISION'),
+      TB('Où est le son <b>« '+j.n+' »</b> ?'),
+      te('Où est le son')+' '+j.n+' ?',
+      options,j.g));
+  });
+  /* `mission` porte deja son propre titre — l'ecran de fin des cours. */
+  scenes.push(B.mission(TB('Tu te souviens<br><b>bien</b> !'),
+    te('Tu te souviens bien !'),
+    function(){renderSessionsMap(ca);},_HAB.carte));
+  B.run(scenes);
+}
+
 /* ── LES DOUZE ETAPES, UNE FOIS POUR TOUTES ──
    Elles etaient declarees DANS la carte : l'album, qui montre la meme
    collection, ne pouvait pas les lire. C'est une fonction, et non une
@@ -8273,6 +8352,25 @@ var islandDefs=_ilesDefs();
   gpWrap.appendChild(gpBar);
   wrap.appendChild(gpWrap);
   setTimeout(function(){gpFill.style.width=progPct+'%';},80);
+
+  /* ── LA RÉVISION, EN TÊTE ──
+     Elle ne s'impose pas : elle s'annonce, à l'endroit que l'enfant regarde
+     en premier. Un enfant qu'on force se braque — mais il faut qu'il la voie.
+     Sous trois signes à revoir, la séance ne vaut pas d'être ouverte. */
+  var _dus=_revJouables();
+  if(_dus.length>=_REV_MINI){
+    var rv=document.createElement('button');
+    rv.className='rev-carte';rv.type='button';
+    var apercu=_dus.slice(0,4).map(function(d){
+      return '<span>'+_sansCercle(d.g)+'</span>';}).join('');
+    rv.innerHTML='<div class="ic">🧠</div><div class="tx">'
+      +'<div class="t1">'+te('Petite révision')+'</div>'
+      +'<div class="t2">'+_dus.length+' '+te('signes à revoir')+'</div>'
+      +'<div class="rev-signes">'+apercu+'</div></div>'
+      +'<div class="fl">›</div>';
+    rv.onclick=function(){renderRevision(ca);};
+    wrap.appendChild(rv);
+  }
 
   // ── Parcours des îles ──
   var globeDiv=document.createElement('div');
@@ -9570,7 +9668,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v200';
+var _VERSION_REPLI='v201';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12418,6 +12516,75 @@ function _voixEnfant(){return _VOIX[st.lang]||'fr-FR';}
 
    Ce carnet ne sert qu'a l'affichage. Le deblocage des iles continue de lire
    `st.accuracy`, ou l'ile finie vaut 1/1 quoi qu'il arrive. */
+
+/* ══════════════════════════════════════════════════════════════════
+   LA MÉMOIRE DES SIGNES
+   L'application ne retenait qu'un score PAR LEÇON : on savait qu'un enfant
+   avait eu huit sur dix au monde 3, jamais QUEL signe lui avait échappé.
+   Une révision ne peut pas viser juste sans cela.
+   On note donc, signe par signe, dans quelle boîte il se trouve et le jour où
+   il l'a vu. Cinq boîtes, à un, deux, quatre, huit et seize jours — les
+   boîtes à fiches de Leitner : un signe réussi monte d'une boîte et se fait
+   attendre plus longtemps, un signe raté redescend à la première et revient
+   dès le lendemain.
+   ══════════════════════════════════════════════════════════════════ */
+var _REV_JOURS=[1,2,4,8,16];
+
+function _revCle(){return 'rev_'+_getProfile();}
+function _revLis(){
+  try{return JSON.parse(localStorage.getItem(_revCle())||'{}')||{};}
+  catch(e){return {};}
+}
+function _revEcris(m){
+  try{localStorage.setItem(_revCle(),JSON.stringify(m));}catch(e){}
+}
+function _revAujourdhui(){return new Date().toISOString().slice(0,10);}
+/* On compte en JOURS DE CALENDRIER, pas en heures : « hier » doit compter
+   pour un jour, qu'il ait joue le matin ou le soir. A l'heure pres, un enfant
+   qui revient a la meme heure moins cinq minutes ne verrait rien venir. */
+function _revJoursDepuis(iso){
+  if(!iso)return 999;
+  try{
+    var a=new Date(iso+'T00:00:00').getTime();
+    var b=new Date(_revAujourdhui()+'T00:00:00').getTime();
+    return Math.round((b-a)/86400000);
+  }catch(e){return 999;}
+}
+
+/* Le résultat d'UNE question, sur UN signe. Appelé au premier essai
+   seulement : c'est la première réponse qui dit ce que l'enfant sait, les
+   suivantes ne sont plus que du tâtonnement. */
+/* `nom` est la façon dont l'exercice vient de le FAIRE DIRE : on la retient
+   avec lui. C'est ce qui permet à la révision de reposer la question sans
+   qu'aucune table n'ait à exister — un cours futur apportera ses signes et
+   leurs noms tout seul. */
+function _noteSigne(signe,bon,nom){
+  var s=_sansCercle(String(signe==null?'':signe));
+  if(!s)return;
+  var m=_revLis(), e=m[s]||{b:1,v:''};
+  if(nom)e.n=String(nom);
+  /* Réussi : il monte d'une boîte et se fera attendre. Raté : il repart de la
+     première et revient demain. C'est tout l'algorithme. */
+  e.b=bon?Math.min(_REV_JOURS.length,(e.b||1)+1):1;
+  e.v=_revAujourdhui();
+  if(!bon)e.r=(e.r||0)+1;          /* combien de fois il a resiste */
+  m[s]=e;_revEcris(m);
+}
+
+/* Ce qui est À REVOIR aujourd'hui, du plus fragile au plus ancien. */
+function _revDus(){
+  var m=_revLis(),out=[];
+  Object.keys(m).forEach(function(s){
+    var e=m[s]||{};
+    var attente=_REV_JOURS[Math.min(_REV_JOURS.length-1,(e.b||1)-1)];
+    var depuis=_revJoursDepuis(e.v);
+    if(depuis>=attente)out.push({s:s,b:e.b||1,depuis:depuis,rates:e.r||0});
+  });
+  /* Les moins bien sus d'abord, et à boîte égale les plus anciens. */
+  out.sort(function(a,b){return (a.b-b.b)||(b.depuis-a.depuis);});
+  return out;
+}
+
 function _noteExo(bon){
   var ses=(typeof _boySession!=='undefined')?_boySession:null;
   if(!ses||ses.id===undefined||ses.id===null)return;
@@ -13573,7 +13740,7 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           /* Le tout premier clic decide de la note. */
-          if(premier){premier=false;_noteExo(o.g===cible);}
+          if(premier){premier=false;_noteExo(o.g===cible);_noteSigne(cible,o.g===cible,sonCible);}
           N.stop();N.dire(o.s);
           if(o.g===cible){repondu=true;b.classList.add('ok');
             if(typeof playBravo==='function')playBravo();
@@ -13789,7 +13956,9 @@ function _boyScene(ca,reprise){
         c.onclick=function(){
           if(c.classList.contains('ok')||c.classList.contains('ko'))return;
           /* Le tout premier clic de la grille decide de la note. */
-          if(_premierTri){_premierTri=false;_noteExo(cibles.indexOf(o.g)>=0);}
+          if(_premierTri){_premierTri=false;
+            var _bon=cibles.indexOf(o.g)>=0;
+            _noteExo(_bon);cibles.forEach(function(c){_noteSigne(c,_bon);});}
           N.stop();N.dire(o.s);
           if(cibles.indexOf(o.g)>=0){
             c.classList.add('ok');
@@ -13842,7 +14011,7 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           /* Le tout premier clic decide de la note. */
-          if(premier){premier=false;_noteExo(o.g===cible);}
+          if(premier){premier=false;_noteExo(o.g===cible);_noteSigne(cible,o.g===cible,sonCible);}
           N.stop();
           if(o.g===cible){repondu=true;b.classList.add('ok');
             N.dire(o.s);
@@ -13908,7 +14077,7 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(repondu||b.classList.contains('ko'))return;
           /* Le tout premier clic decide de la note. */
-          if(premier){premier=false;_noteExo(o.g===cible);}
+          if(premier){premier=false;_noteExo(o.g===cible);_noteSigne(cible,o.g===cible,sonCible);}
           N.stop();
           if(o.g===cible){
             repondu=true;b.classList.add('ok');
