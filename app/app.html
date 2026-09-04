@@ -9299,7 +9299,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v198';
+var _VERSION_REPLI='v199';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12815,9 +12815,15 @@ function _boyScene(ca,reprise){
   /* ── Fabriques de scènes ── */
 
   /* Briefing : du texte seul */
-  api.brief=function(etape,html,fr,label){
+  api.brief=function(etape,html,fr,label,fete){
     return function(){
+      /* Une page de felicitations merite la fete : les memes confettis que
+         l'ecran de fin, aux couleurs de l'habillage, et une volee de coeurs
+         au-dessus du personnage. */
+      if(fete&&typeof launchConfetti==='function')
+        try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
       var p=panneau(etape);titre(p,html,fr);
+      if(fete)N.plusTard(function(){bravo(p,3);},400);
       bouton(p,label||te('SUIVANT ▸'),suivant);
     };
   };
@@ -13838,7 +13844,7 @@ function _boyVowelCourse(ca){
 
     B.brief(te('BRAVO'),
       TB('Tu es '+UNE+' <b>'+CHAMP+'</b> !'),
-      te('Tu es '+UNE+' '+CHAMP+' !')),
+      te('Tu es '+UNE+' '+CHAMP+' !'),null,true),
 
     B.illustre(te('LE SECRET'),
       TB('Comme tu connais très bien<br>les 3 voyelles, je vais te<br>dévoiler un <b>secret</b> :'),
@@ -13846,10 +13852,27 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        scene:[{L:[0],P:1,d:1200},{L:[0],P:1,d:2200}]}),
 
-    /* La damma se double A COTE. Le premier signe ne bouge pas. */
+    /* ── LE SECRET : LES TROIS SIGNES DOUBLES, QUI CLIGNOTENT ──
+       Exactement l'ecran de l'ETAPE 2, mais avec les signes doubles : c'est
+       la meme decouverte, un cran plus loin. On ne dit RIEN ici de « bou
+       devient boun » — cela se montre a la page suivante, une voyelle a la
+       fois. La damma se double A COTE, la fatha et la kasra l'une sur
+       l'autre. */
     B.illustre(te('LE SECRET · « OUN »'),
       TB('On peut avoir <b>deux fois</b><br>le même symbole<br>sur une même lettre.'),
-      te('On peut avoir deux fois le même symbole sur une même lettre. Bou devient boun.'),
+      te('On peut avoir deux fois le même symbole sur une même lettre.'),
+      {calques:[LB],
+       flottants:[{m:mD,c:CDA,x:37,y:HAUT},{m:mD,c:CDA,x:44,y:HAUT},
+                  {m:mF,c:CFA,x:62,y:HAUTD},{m:mF,c:CFA,x:62,y:HAUTD2},
+                  {m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
+       scene:[{L:[0],P:1,d:800},
+              {L:[0],P:1,F:[0,1,2,3,4,5],bat:1,d:3400}]}),
+
+    /* Puis chaque voyelle a son tour, comme « an » et « in » : la syllabe
+       simple, puis le second signe qui se pose. */
+    B.illustre(te('DOUBLEMENT · « OUN »'),
+      TB('« bou » devient<br>« <b>boun</b> ».'),
+      te('Bou devient boun.'),
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
        scene:[{L:[0],P:1,F:[0],t:'bou',d:1800},
@@ -13892,8 +13915,8 @@ function _boyVowelCourse(ca){
 
     /* Quatre lignes, comme le client les a ecrites — mais ecrites en grand. */
     B.illustre(te('LE SOUKOUN · LE PETIT ROND'),
-      TB('Parfois tu trouveras ce<br>petit rond au dessus. Il n’a<br>aucune prononciation.<br>On dira toujours « <b>b</b> ».'),
-      te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.'),
+      TB('Parfois tu trouveras ce<br>petit rond au dessus. Il n’a<br>aucune prononciation.<br>On dira juste « <b>b</b> ».'),
+      te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.'),
       /* Le petit rond bat au-dessus de la lettre, en orange, comme les trois
          voyelles du tout debut : c'est lui qu'on presente. */
       {calques:[LB],
@@ -16867,7 +16890,8 @@ var ADMIN_SOUNDS = [
   {ar:'Où est le son i ?',label:'Où est le son i ?'},
   {ar:'Où est le son ou ?',label:'Où est le son ou ?'},
   {ar:'Comme tu connais très bien les trois voyelles, je vais te dévoiler un secret.',label:'Comme tu connais très bien les trois voyell…'},
-  {ar:'On peut avoir deux fois le même symbole sur une même lettre. Bou devient boun.',label:'On peut avoir deux fois le même symbole sur…'},
+  {ar:'On peut avoir deux fois le même symbole sur une même lettre.',label:'On peut avoir deux fois le même symbole sur…'},
+  {ar:'Bou devient boun.',label:'Bou devient boun.'},
   {ar:'À toi d\'écrire.',label:'À toi d\'écrire.'},
   {ar:'Ba devient ban.',label:'Ba devient ban.'},
   {ar:'Bi devient bin.',label:'Bi devient bin.'},
@@ -16875,7 +16899,7 @@ var ADMIN_SOUNDS = [
   {ar:'Où est le son oun ?',label:'Où est le son oun ?'},
   {ar:'Où est le son in ?',label:'Où est le son in ?'},
   {ar:'Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.',label:'Pour finir, tu te rappelles de la lettre ba…'},
-  {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira toujours b.',label:'Parfois tu trouveras ce petit rond au dessu…'},
+  {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.',label:'Parfois tu trouveras ce petit rond au dessu…'},
   {ar:'Répète après moi : b.',label:'Répète après moi : b.'},
   {ar:'Trace le soukoun.',label:'Trace le soukoun.'},
   {ar:'Tu maîtrises les voyelles !',label:'Tu maîtrises les voyelles !'},
