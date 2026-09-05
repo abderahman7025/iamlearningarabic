@@ -3405,7 +3405,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media (prefers-reduced-motion:reduce){.boy-btn.bat,.boy-btn.bat::before{animation:none}}
 /* Une ligne d'ecriture dans le nuage : sans elle, rien ne dit si le signe
    qu'on y montre se tient au-dessus ou en dessous — et c'est la question. */
-.boy-cible::after{content:'';position:absolute;left:16%;right:16%;top:50%;
+/* Sa hauteur ne peut pas etre fixe : sous une LETTRE elle passe la ou la
+   lettre repose, sous un SIGNE SEUL elle doit separer ceux du dessus de ceux
+   du dessous. C'est `poseCible` qui la place — il est le seul a savoir ce que
+   le nuage contient. */
+.cible-ligne{position:absolute;left:16%;right:16%;
   border-top:2px dashed rgba(var(--sk-rgb),.30);pointer-events:none}
 .boy-cible{border:3px solid rgba(var(--sk-rgb),.35);background:#fff;cursor:pointer;
   position:relative;
@@ -9668,7 +9672,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v201';
+var _VERSION_REPLI='v202';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9891,6 +9895,28 @@ function _descenteGlyphe(texte,px){
    simples cote a cote, presque jointifs. L'adulte, qui lit du vrai texte,
    garde le caractere normal. */
 var _TANWIN_DOUBLE={'ً':'َ','ٌ':'ُ','ٍ':'ِ'};
+/* ── OU TOMBE LA JOINTURE DANS UN MOT ──
+   Le mot s'ecrit CENTRE dans le cadre, et l'arabe part de la droite : la
+   jointure qui suit une lettre se trouve donc, depuis le bord droit du mot, a
+   la largeur de tout ce qui la precede. On mesure les deux largeurs a une
+   taille quelconque et on raisonne en `em` — le calque etant ecrit a la
+   moitie de la largeur du cadre, un `em` vaut cinquante pour cent de celui-ci.
+   Sert a poser la croix rouge exactement sur la liaison fautive. */
+var _JOINTURE={};
+function _xJointure(avant,mot){
+  var cle=avant+'|'+mot;
+  if(_JOINTURE[cle]!==undefined)return _JOINTURE[cle];
+  var x=50;
+  try{
+    var T=200,cv=document.createElement('canvas'),c=cv.getContext('2d');
+    c.font=T+"px 'Scheherazade New',serif";
+    var W=c.measureText(mot).width/T;
+    var L=c.measureText(avant+'\u200d').width/T;
+    x=50+(W/2-L)*50;
+    if(!(x>4&&x<96))x=50;
+  }catch(e){}
+  _JOINTURE[cle]=x;return x;
+}
 function _dessineSurLigne(cx,texte,x,baseY,px){
   var t=String(texte);
   var simple=null,i,c;
@@ -12884,6 +12910,12 @@ function _boyScene(ca,reprise){
       el.style.transform=(av?av+' ':'')+'translateY('+(biais-dy).toFixed(3)+'em)';
     }catch(x){}
   }
+  /* La ligne d'ecriture du nuage, posee sous ce qu'il contient. */
+  function ligneDuNuage(el,forme){
+    var i=document.createElement('i');i.className='cible-ligne';
+    i.style.top=(_signeSeul(forme)?57:63)+'%';
+    el.appendChild(i);
+  }
   function poseCible(el,forme){
     var t=String(forme),simple=null,base='',i,c;
     for(i=0;i<t.length;i++){
@@ -12897,6 +12929,7 @@ function _boyScene(ca,reprise){
       seul.textContent=_sansCercle(forme);
       centreEncre(seul,forme);
       el.appendChild(seul);
+      ligneDuNuage(el,forme);
       return;
     }
     base=_sansCercle(base);
@@ -12916,6 +12949,7 @@ function _boyScene(ca,reprise){
     pile.appendChild(b);
     centreEncre(pile,forme);
     el.appendChild(pile);
+    ligneDuNuage(el,forme);
   }
 
   /* Le mot mis en avant dans une phrase. Il s'appelle encore « bleu » dans
@@ -14539,8 +14573,8 @@ function _boyLetterCourse(ca,idx,premiere){
         TBF('Voici {lettre}.<br>Elle s\'écrit <b>toujours</b> ainsi.',{lettre:b(L.name)}),
         te('Cette lettre n\'a aucun son. On prononce juste sa voyelle.'))
     : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
-        TBF('Voici {lettre}.<br><b>Isolée</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
-        teF('Voici la lettre {lettre}. Isolée, elle s\'écrit ainsi.',{lettre:L.name})));
+        TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
+        teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name})));
   /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
      là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
      française se trompe. « khè » au lieu de « kha ». */
@@ -14558,14 +14592,35 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(B.brief(te('ÉTAPE · ACCROCHAGE'),TB('Sans support, elle ne s\'attache<br><b>JAMAIS</b>,<br>ni avant, ni après 🚫'),
       te('Sans support, elle ne s\'attache jamais, ni avant, ni après.')));
   }else if(!attache){
-    sc.push(B.brief(te('ÉTAPE · ACCROCHAGE'),TB('Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫'),
-      te('Cette lettre ne s\'accroche jamais à la lettre suivante.')));
+    /* ── ON MONTRE LA FAUTE ──
+       Le mot bien ecrit et le mot ou notre lettre s'accroche a la suivante se
+       ressemblent au trait pres : c'est ce trait qu'il faut voir barre. Ils
+       alternent trois fois, puis la bonne ecriture reste — ce que le client a
+       dicte sur l'alif, « باب », et qui vaut pour les six lettres concernees.
+       Le mot est bati avec le BA, connu depuis le cours des voyelles : ba,
+       notre lettre, ba. Pour l'alif cela donne « باب », son mot. */
+    var _voisin='ب';
+    var _juste=_voisin+A+_voisin;
+    var _faux =_voisin+A+'\u200d'+_voisin;   /* liant sans chasse : la faute */
+    var _xj=_xJointure(_voisin+A,_juste);
+    var _bat=[];
+    for(var _k=0;_k<3;_k++){
+      _bat.push({L:[0],P:1,X:[_xj,52],d:850});
+      _bat.push({L:[1],P:1,d:850});
+    }
+    _bat.push({L:[1],P:1,d:2600});
+    sc.push(B.illustre(te('ÉTAPE · ACCROCHAGE'),
+      TB('Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫'),
+      te('Cette lettre ne s\'accroche jamais à la lettre suivante.'),
+      {calques:[_faux,_juste],scene:_bat}));
   }
   /* Les 4 formes : observation PUIS tracé, sans exception */
-  var NOMS=[te('ISOLÉE'),te('DÉBUT'),te('MILIEU'),te('FIN')];
+  /* « Seule » et non « isolée » : le mot du client. Un enfant de six ans
+     sait ce qu'est etre seul ; « isole » est un mot d'adulte. */
+  var NOMS=[te('SEULE'),te('DÉBUT'),te('MILIEU'),te('FIN')];
   /* Les memes noms en minuscules : un toLowerCase() sur le mot traduit
      donnerait « Isolee » -> « isolee » sans point en turc. On traduit les deux. */
-  var NOMSMIN=[te('isolée'),te('début'),te('milieu'),te('fin')];
+  var NOMSMIN=[te('seule'),te('début'),te('milieu'),te('fin')];
   /* Le tā marbūṭa n'a que deux formes, et sa forme attachée est forcément
      celle de la fin : on dit « attachée », c'est ce que l'enfant voit. */
   var OU=[te('toute seule'),te('au début du mot'),te('au milieu du mot'),
@@ -14591,14 +14646,44 @@ function _boyLetterCourse(ca,idx,premiere){
     /* L'isolée vient d'être montrée à l'identification : on ne la remontre
        pas, on la fait tracer directement. */
     if(n!==0){
-      sc.push(B.obs(teF('FORME{rep} · {forme}',{rep:rep,forme:NOMS[n]}),f.form,S,
-        TBF('{place},<br>elle s\'écrit <b>ainsi</b>.',{place:_maj(OU[n])}),
-        teF('{place}, elle s\'écrit ainsi.',{place:OU[n]})));
+      /* ── CE QU'ON DIT DE CHAQUE FORME ──
+         « Elle s'ecrit ainsi » ne disait rien : l'enfant voit bien qu'elle
+         s'ecrit ainsi. On lui dit COMMENT on la fabrique a partir de ce qu'il
+         connait deja — et cela depend de la lettre :
+           · une lettre qui ne s'attache pas garde sa forme seule partout, on
+             ne fait qu'ajouter le trait de liaison devant ;
+           · une lettre qui s'attache a une forme de debut a elle, et c'est
+             elle qu'on reprend au milieu.
+         Le client a dicte ces phrases sur l'alif ; elles valent pour les huit
+         lettres qui ne s'attachent pas, et se transposent pour les autres. */
+      var _dit;
+      if(n===1){
+        _dit=attache
+          ? {h:TBF('{place},<br>elle s\'écrit <b>ainsi</b>.',{place:_maj(OU[n])}),
+             f:teF('{place}, elle s\'écrit ainsi.',{place:OU[n]})}
+          : {h:TB('Au début du mot,<br>elle s\'écrit exactement<br>comme lorsqu\'elle est <b>seule</b>.'),
+             f:te('Au début du mot, elle s\'écrit exactement comme lorsqu\'elle est seule.')};
+      }else if(n===2){
+        _dit=attache
+          ? {h:TB('Au milieu du mot,<br>on trace un <b>trait horizontal</b>,<br>puis on ajoute la forme <b>début</b>.'),
+             f:te('Au milieu du mot, on trace un trait horizontal, puis on ajoute la forme début.')}
+          : {h:TB('Au milieu du mot,<br>on trace un <b>trait horizontal</b>,<br>puis on ajoute la forme <b>seule</b>.'),
+             f:te('Au milieu du mot, on trace un trait horizontal, puis on ajoute la forme seule.')};
+      }else{
+        _dit={h:TB('À la fin du mot,<br>elle s\'écrit exactement comme<br>en <b>milieu de mot</b>. On trace un trait<br>horizontal, puis on ajoute la forme <b>seule</b>.'),
+              f:te('À la fin du mot, elle s\'écrit exactement comme en milieu de mot. On trace un trait horizontal, puis on ajoute la forme seule.')};
+        if(finDeMot)_dit={h:TBF('{place},<br>elle s\'écrit <b>ainsi</b>.',{place:_maj(OU[n])}),
+                          f:teF('{place}, elle s\'écrit ainsi.',{place:OU[n]})};
+      }
+      sc.push(B.obs(teF('FORME{rep} · {forme}',{rep:rep,forme:NOMS[n]}),f.form,S,_dit.h,_dit.f));
     }
     sc.push(formeUnique
       ? B.tracer(te('FORME · TRACÉ'),f.form,TB('Trace la <b>lettre</b> ✍️'),te('Trace la lettre.'))
       : B.tracer(teF('FORME{rep} · TRACÉ',{rep:rep}),f.form,
-          teF('Trace la forme<br>{forme} ✍️',{forme:b(nomForme(n))}),teF('Trace la forme {forme}.',{forme:nomForme(n)})));
+          teF('Trace la forme<br>{forme} ✍️',{forme:b(nomForme(n))}),
+          /* On ne decrit pas le geste lettre par lettre — le modele s'ecrit
+             tout seul sous ses yeux, il suffit de l'y renvoyer. */
+          teF('Trace la forme {forme}, en suivant le modèle.',{forme:nomForme(n)})));
   });
   /* « Deux formes à retenir » disait ce que le tableau montre juste après :
      l'écran est retiré. Et la règle générale ne se rappelle qu'une fois, à
@@ -14619,9 +14704,9 @@ function _boyLetterCourse(ca,idx,premiere){
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
   }
   if(premiereLettre&&!sansDeduction){
-    sc.push(B.brief(te('ÉTAPE · LA CLÉ'),
-      TBF('C\'est pourquoi il faut<br>connaître par cœur<br>{isolee} et {debut} :<br>les deux autres se <b>déduisent</b> ! 🔑',{isolee:B.iso(NOMSMIN[0]),debut:B.deb(NOMSMIN[1])}),
-      te('C\'est pourquoi il est très important de connaître parfaitement l\'écriture de chaque lettre isolée et en début de mot. Tu pourras alors déduire les deux autres formes.')));
+    /* La page « il faut connaitre par coeur seule et debut » est retiree a la
+       demande du client : le recapitulatif qui precede le montre deja, et un
+       enfant n'a pas besoin qu'on lui dise ce qu'il vient de voir. */
     sc.push(B.brief(te('ÉTAPE · PORTÉE'),TB('Cette règle vaut pour<br><b>toutes les lettres</b>,<br>sauf <b>3</b> que l\'on verra<br>plus tard ! ⚠️'),
       te('Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.')));
   }
@@ -14652,6 +14737,16 @@ function _boyLetterCourse(ca,idx,premiere){
   /* La lettre sur la piste, avec ses voyelles */
   sc.push(B.brief(te('ÉTAPE · SUR LA PISTE'),TB('Maintenant,<br>ses <b>voyelles</b>.'),
     te('Voyons maintenant la lettre avec ses voyelles.')));
+  /* ── LES LETTRES QUI N'ONT PAS DE SON ──
+     L'alif et la hamzah ne se prononcent pas : ce qu'on entend est leur
+     voyelle, et rien d'autre. Il faut le dire AVANT de montrer la premiere,
+     sinon l'enfant croit entendre la lettre. */
+  var _muette=(A==='ا'||A==='ء');
+  if(_muette){
+    sc.push(B.brief(te('ÉTAPE · SANS SON'),
+      TBF('La lettre {lettre} n\'a<br><b>aucune prononciation</b>.<br>On ne dit que sa <b>voyelle</b>.',{lettre:b(L.name)}),
+      teF('La lettre {lettre} n\'a aucune prononciation. On ne dit que sa voyelle.',{lettre:L.name})));
+  }
   [['َ','a',te('au-dessus')],['ِ','i',te('en-dessous')],['ُ','ou',te('au-dessus')]].forEach(function(v,n){
     sc.push(B.obs(teF('VOYELLE {n}/3',{n:n+1}),A+v[0],A+v[0],
       /* On ne nomme plus la position du signe — « Signe au-dessus », « Signe
@@ -14686,9 +14781,12 @@ function _boyLetterCourse(ca,idx,premiere){
   var tanwListe=function(signe){return tanwFormes.map(function(n){return _avecSigne(formes[n].form,signe);});};
   var tanwNoms=tanwFormes.map(function(n){return NOMS[n].toLowerCase();});
   var tanwCombien=tanwFormes.length>1?teF('ses {n} formes de fin de mot',{n:tanwFormes.length}):te('cette forme');
-  [['ً','an'],['ٍ','in'],['ٌ','oun']].forEach(function(v,n){
-    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],teF('Doublé :<br>ça fait {son} 👃',{son:q(v[1])}),
-      teF('Doublé, ça fait {son}',{son:(lat+v[1]).toLowerCase()}),null,true));
+  /* On ne dit plus « double » : on NOMME le signe qui est double. L'enfant
+     vient d'apprendre les trois voyelles, il les reconnait. */
+  [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
+    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
+      teF('Avec deux {signe} :<br>ça fait {son} 👃',{signe:b(v[2]),son:q(v[1])}),
+      teF('Avec deux {signe}, ça fait {son}',{signe:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
@@ -14698,12 +14796,14 @@ function _boyLetterCourse(ca,idx,premiere){
   if(!finDeMot){
     /* L'alif et la hamzah n'ont pas de son propre : avec un soukoun, on ne
        prononce rien du tout. */
-    var muette=(A==='ا'||A==='ء');
+    var muette=_muette;
     sc.push(B.obs(te('ÉTAPE · SOUKOUN'),A+'ْ',A+'ْ',
-      muette?(TB('Petit rond :<br>on ne <b>prononce rien</b> ⭕'))
-            :(TB('Petit rond :<br>on ne dit que<br>le <b>son de la lettre</b> ⭕')),
-      muette?te('Petit rond : on ne prononce rien.')
-            :te('Petit rond : on ne prononce que le son de la lettre.')));
+      /* On DIT le son, au lieu de parler « du son de la lettre » : l'enfant
+         entend alors ce qu'il doit produire. */
+      muette?(TB('Avec le soukoun,<br>on ne <b>prononce rien</b> ⭕'))
+            :(TBF('Avec le soukoun, on ne prononce<br>que le son de la lettre : {son} ⭕',{son:q('')})),
+      muette?te('Avec le soukoun, on ne prononce rien.')
+            :teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',{son:latMin})));
     /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
        fait donc tracer sur les formes début et milieu, les seules où il
        apparaît. */
@@ -14790,7 +14890,10 @@ function _boyLetterCourse(ca,idx,premiere){
     /* Un compagnon DEJA VU, qui s'attache des deux cotes. Faute de mieux —
        les toutes premieres lecons — la lettre du jour se sert d'elle-meme :
        le mot ne montre alors qu'elle, ce qui reste juste et connu. */
-    var _cmp=_compagnonConnu(idx,A,true)||A;
+    /* Faute de compagnon deja vu, on prend le BA : le client le rappelle,
+       l'enfant l'a rencontre dans le cours des voyelles. La lettre du jour
+       ne se servait d'elle-meme, ce qui donnait « اا » — un mot invente. */
+    var _cmp=_compagnonConnu(idx,A,true)||'ب';
     var _opts=[],_vus={};
     aMontrer.forEach(function(n){
       var f=formes[n].form;
@@ -14799,13 +14902,18 @@ function _boyLetterCourse(ca,idx,premiere){
     /* UNE QUESTION PAR PLACE. La règle porte sur les trois places du mot :
        n'en tirer qu'une au sort en laissait deux jamais demandées. Elles sont
        mélangées pour que l'ordre ne devienne pas une réponse en soi. */
+    /* ── LE MOT GRANDIT AVEC LA PLACE DEMANDEE ──
+       Le client a dicte les trois mots sur l'alif : « اب » quand on cherche
+       la lettre au debut, « باب » au milieu, « بابا » a la fin. Le schema se
+       lit lettre X, compagnon C : X C, puis C X C, puis C X C X. Il vaut pour
+       n'importe quelle lettre, et le mot montre alors la lettre AILLEURS que
+       dans le trou — l'enfant a un appui, au lieu d'une suite de compagnons.
+       Quelle forme va dans le trou : debut si elle ouvre le mot et qu'elle
+       s'attache, seule sinon ; milieu au milieu, fin a la fin. */
     var _questions=_places.map(function(_g){
-      var _cases=[_cmp,_cmp,_cmp];_cases[_g]=A;
-      /* Quelle forme va dans le trou : début si elle ouvre le mot et qu'elle
-         s'attache, isolée sinon ; milieu au milieu, fin à la fin. */
-      return {dr:_cases.slice(0,_g).join('')+(_g>0?_TATWEEL:''),
-              ga:((_g<2&&attache)?_TATWEEL:'')+_cases.slice(_g+1).join(''),
-              iF:(_g===0)?(attache?1:0):((_g===1)?(attache?2:3):3)};
+      if(_g===0)return {dr:'',ga:(attache?_TATWEEL:'')+_cmp,iF:attache?1:0};
+      if(_g===1)return {dr:_cmp+_TATWEEL,ga:(attache?_TATWEEL:'')+_cmp,iF:attache?2:3};
+      return {dr:_cmp+A+_cmp+_TATWEEL,ga:'',iF:3};
     });
     /* ── LA FORME ISOLÉE, EN PLEIN MOT ──
        Six lettres ne s'accrochent pas a la suivante : ا د ذ ر ز و. Celle qui
@@ -14839,8 +14947,13 @@ function _boyLetterCourse(ca,idx,premiere){
     if(!_dedans[f]){_dedans[f]=1;_cibles.push(f);}
   });
   if(_cibles.length>=2){
+    /* DOUZE CASES, TOUJOURS. Trois lettres de leurre ne suffisent pas quand
+       elles ne s'attachent pas — elles n'ont que deux formes distinctes — et
+       la grille tombait a onze. On en demande assez pour remplir, et on
+       s'arrete a douze. */
     var _grille=_cibles.slice();
-    _leurresLettre(L,idx,3).forEach(function(x){
+    _leurresLettre(L,idx,8).forEach(function(x){
+      if(_grille.length>=12)return;
       var xa=_AF[x.ar]||{i:x.ar,m:x.ar,f:x.ar};
       _childForms(x,xa).forEach(function(fo){
         if(_grille.length<12&&!_dedans[fo.form]){_dedans[fo.form]=1;_grille.push(fo.form);}

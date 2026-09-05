@@ -31,13 +31,22 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v201
+## OÙ ON EN EST — 2 septembre 2026, production en v202
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v201) :**
+**Fait et en ligne (v187 → v202) :**
+
+- **LE COURS DES LETTRES, RELU AVEC LE CLIENT (v202).** « Isolée » devient
+  « seule » ; chaque forme dit COMMENT on la fabrique au lieu de « elle
+  s'écrit ainsi » ; le tanwīn se nomme « avec deux fatḥa » ; le soukoun dit le
+  son de la lettre ; les lettres sans son l'annoncent avant leurs voyelles.
+  L'écran d'accrochage MONTRE la faute : le mot avec la liaison fautive,
+  barrée d'une croix rouge, alterne trois fois avec le mot juste. La fausse
+  liaison se fabrique avec le liant sans chasse U+200D, glissé après la
+  lettre : il force la SUIVANTE à prendre sa forme jointe. Aucun dessin.
 
 - **LA RÉVISION ESPACÉE (v201).** L'application ne retenait qu'un score PAR
   LEÇON : on savait qu'un enfant avait eu huit sur dix, jamais QUEL signe lui
