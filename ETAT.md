@@ -31,13 +31,21 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v202
+## OÙ ON EN EST — 2 septembre 2026, production en v203
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v202) :**
+**Fait et en ligne (v187 → v203) :**
+
+- **La lettre était écrite TROIS fois sous un tanwīn (v203).** Pour doubler le
+  signe on dessinait « lettre + signe » deux fois, décalé, plus la lettre
+  seule : le client voyait « deux alif superposés ». On prépare maintenant un
+  calque où il ne reste QUE l'encre du signe — obtenue en effaçant celle de la
+  lettre au même endroit (`_encreDuSigne`) — et c'est lui qu'on pose deux fois.
+  Et la ligne d'écriture des nuages se MESURE lettre par lettre : le nūn plonge
+  sous la ligne, le bā l'effleure, l'alif se dresse au-dessus.
 
 - **LE COURS DES LETTRES, RELU AVEC LE CLIENT (v202).** « Isolée » devient
   « seule » ; chaque forme dit COMMENT on la fabrique au lieu de « elle

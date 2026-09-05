@@ -9672,7 +9672,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v202';
+var _VERSION_REPLI='v203';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9917,6 +9917,40 @@ function _xJointure(avant,mot){
   }catch(e){}
   _JOINTURE[cle]=x;return x;
 }
+/* ── L'ENCRE D'UN SIGNE, SANS SA LETTRE ──
+   Un signe arabe ne se dessine pas seul comme il se dessine sur sa lettre :
+   la police le replace. Pour doubler un tanwin il faut donc partir de
+   « lettre + signe » — mais alors la LETTRE se dessine elle aussi, et deux
+   poses la reecrivaient deux fois de plus. On dessine donc les deux, puis on
+   EFFACE l'encre de la lettre seule, exactement au meme endroit : il ne reste
+   que le signe, a la place que la police lui a donnee.
+   Le resultat est garde en cache : ce calque coute cher et ne change pas. */
+var _CALQUE_SIGNE={};
+function _encreDuSigne(porte,simple,px,couleur){
+  var cle=porte+'|'+simple+'|'+Math.round(px)+'|'+couleur;
+  if(_CALQUE_SIGNE[cle])return _CALQUE_SIGNE[cle];
+  var r=null;
+  try{
+    var W=Math.ceil(px*3),H=Math.ceil(px*3.4);
+    var ox=Math.round(W/2), oy=Math.round(H*0.68);
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    var c=cv.getContext('2d');
+    c.font=px+"px 'Scheherazade New',serif";
+    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle=couleur;
+    c.fillText(porte+simple,ox,oy);
+    if(porte){
+      /* On efface la lettre — et un poil plus large, sinon son contour
+         adouci laisse un lisere autour du trou. */
+      c.globalCompositeOperation='destination-out';
+      c.lineWidth=Math.max(1,px*0.012);c.strokeStyle='#000';
+      c.fillText(porte,ox,oy);
+      c.strokeText(porte,ox,oy);
+      c.globalCompositeOperation='source-over';
+    }
+    r={cv:cv,ox:ox,oy:oy};
+  }catch(e){}
+  _CALQUE_SIGNE[cle]=r;return r;
+}
 function _dessineSurLigne(cx,texte,x,baseY,px){
   var t=String(texte);
   var simple=null,i,c;
@@ -9934,22 +9968,27 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
        AU-DESSUS de l'autre, presque collees. */
     var base=t.split('').filter(function(ch){return !_TANWIN_DOUBLE[ch];}).join('');
     var porte=base||'';
+    /* LA LETTRE, UNE SEULE FOIS. */
     if(base)cx.fillText(base,x,baseY+_descenteGlyphe(base,px));
     var y0=baseY+_descenteGlyphe(porte+simple,px);
+    var _sg=_encreDuSigne(porte,simple,px,cx.fillStyle);
+    function _pose(dx,dy){
+      if(_sg)cx.drawImage(_sg.cv,Math.round(x-_sg.ox+dx),Math.round(y0-_sg.oy+dy));
+      else cx.fillText(porte+simple,x+dx,y0+dy);
+    }
     if(simple==='\u064f'){                       /* damma : cote a cote */
       /* 0,10 de part et d'autre : les deux damma se touchent presque, et
          c'est ainsi que le client les veut. */
       var ec=px*0.10;
-      cx.fillText(porte+simple,x-ec,y0);
-      cx.fillText(porte+simple,x+ec,y0);
+      _pose(-ec,0);_pose(ec,0);
     }else{                                       /* traits : l'un sur l'autre */
       /* Les deux traits presque colles : a 0,17 ils laissaient un blanc entre
          eux, alors que le cadre illustre les montre jointifs. L'encre d'un
          trait fait 0,16 em de haut ; 0,105 les rapproche sans les fondre. */
       var dessus=px*0.105;                       /* fatha au-dessus */
       var dessous=px*0.105;                      /* kasra en dessous */
-      cx.fillText(porte+simple,x,y0);
-      cx.fillText(porte+simple,x,y0+(simple==='\u0650'?dessous:-dessus));
+      _pose(0,0);
+      _pose(0,(simple==='\u0650'?dessous:-dessus));
     }
     return;
   }
@@ -12910,11 +12949,34 @@ function _boyScene(ca,reprise){
       el.style.transform=(av?av+' ':'')+'translateY('+(biais-dy).toFixed(3)+'em)';
     }catch(x){}
   }
-  /* La ligne d'ecriture du nuage, posee sous ce qu'il contient. */
+  /* ── LA LIGNE D'ECRITURE DU NUAGE ──
+     Elle ne peut pas etre a hauteur fixe : chaque lettre repose autrement. Le
+     nun plonge sous la ligne, le ba l'effleure, l'alif se dresse au-dessus.
+     On MESURE donc son encre autour de sa ligne de base, et comme le nuage
+     centre cette encre, on en deduit ou la ligne passe.
+     Un SIGNE SEUL fait exception : sa ligne de base est si loin de son encre
+     qu'elle tomberait hors du nuage. Pour lui, la ligne separe simplement
+     ceux qui montent de ceux qui descendent. */
   function ligneDuNuage(el,forme){
     var i=document.createElement('i');i.className='cible-ligne';
-    i.style.top=(_signeSeul(forme)?57:63)+'%';
+    i.style.top='57%';
     el.appendChild(i);
+    if(_signeSeul(forme))return;
+    /* Le nuage n'a pas toujours de hauteur au moment ou on le remplit — la
+       page est encore en train d'arriver. On represente donc quelques fois,
+       jusqu'a ce qu'il y ait quelque chose a mesurer. */
+    var _essais=0;
+    (function pose(){
+      var H=el.clientHeight||0,px=parseFloat(getComputedStyle(el).fontSize)||0;
+      if(!H||!px){if(++_essais<6)setTimeout(pose,120);return;}
+      try{
+        var e=_encreAutourLigne(_sansCercle(forme));
+        /* L'encre est centree dans le nuage ; son centre se trouve a
+           (bas - haut)/2 SOUS la ligne de base. */
+        var pc=50-((e.bas-e.haut)/2)*px/H*100;
+        i.style.top=Math.max(28,Math.min(80,pc)).toFixed(1)+'%';
+      }catch(x){}
+    })();
   }
   function poseCible(el,forme){
     var t=String(forme),simple=null,base='',i,c;
