@@ -3432,6 +3432,28 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* LA CARTE DE RÉVISION, en tête de la carte des mondes. Elle a sa couleur —
    l'or — pour ne pas se confondre avec un monde : ce n'est pas un lieu où
    l'on va, c'est un rendez-vous avec ce qu'on a déjà vu. */
+
+/* ── LE RÉCAPITULATIF : QUATRE MOTS, DEUX PAR LIGNE ──
+   L'arabe se lit de droite à gauche : la grille aussi. La première case du
+   DOM tombe donc EN HAUT À DROITE, et c'est là que va le mot où la lettre est
+   seule — celui dont tout le reste se déduit. */
+.rec-grille{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;
+  direction:rtl;margin:6px auto 4px;max-width:640px}
+.rec-case{background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:18px;
+  padding:12px 8px 8px;text-align:center;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10)}
+.rec-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
+  font-size:clamp(30px,7.5vh,58px);line-height:1.5;color:var(--sk-fonce);
+  min-height:1.6em;display:flex;align-items:center;justify-content:center}
+.rec-lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(var(--sk-rgb-f),.62);margin-top:2px}
+/* Le morceau qui manque, puis qui vient : il grandit à sa place au lieu de
+   surgir, et le mot ne saute pas. */
+.rec-trou{display:inline-block;min-width:.75em;opacity:0;
+  transition:opacity .35s ease}
+.rec-trou.vu{opacity:1}
+.rec-case.vise{border-color:rgba(var(--sk-rgb),.85);
+  box-shadow:0 6px 22px rgba(var(--sk-rgb-f),.28)}
+@media (prefers-reduced-motion:reduce){.rec-trou{transition:none}}
 .rev-carte{display:flex;align-items:center;gap:14px;width:100%;text-align:left;
   border:2px solid rgba(255,193,7,.55);border-radius:22px;padding:14px 16px;
   background:linear-gradient(135deg,rgba(255,248,225,.96),rgba(255,236,179,.92));
@@ -9672,7 +9694,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v203';
+var _VERSION_REPLI='v204';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13854,6 +13876,74 @@ function _boyScene(ca,reprise){
      ISOLÉE en orange, DÉBUT en violet ; la case MILIEU reprend le violet
      du début et la case FIN reprend l'orange de l'isolée, précédés du
      trait de liaison en gris : l'enfant voit d'où vient chaque forme. */
+  /* ── LE RÉCAPITULATIF ──
+     Quatre mots, deux par ligne. La lettre manque dans celui du milieu et
+     dans celui de la fin ; la voix explique d'où elles viennent, et elles se
+     posent au fur et à mesure. Voir le commentaire du fichier d'installation
+     pour le detail — l'essentiel est que « milieu = trait + début » et
+     « fin = trait + seule » sont vrais AU CARACTERE PRES dans les formes que
+     donne `_childForms` : on ne fait que les reveler dans cet ordre. */
+  api.recap=function(etape,html,fr,formes,liant,bloqueur){
+    return function(){
+      var p=panneau(etape);titre(p,html,false);
+      var _t=p.querySelector('.boy-titre');if(_t)_t.classList.add('dedu');
+      var T=_TATWEEL;
+      var g=document.createElement('div');g.className='rec-grille';
+      /* Chaque mot est fait de morceaux separes : c'est ce qui permet de
+         retirer la lettre sans toucher au reste du mot. */
+      function mot(av,ap,lbl){
+        var c=document.createElement('div');c.className='rec-case';
+        var m=document.createElement('div');m.className='rec-mot';
+        var a=document.createElement('span');a.textContent=av||'';
+        var t=document.createElement('span');t.className='rec-trou';
+        var b=document.createElement('span');b.textContent=ap||'';
+        m.appendChild(a);m.appendChild(t);m.appendChild(b);
+        var l=document.createElement('div');l.className='rec-lbl';l.textContent=lbl;
+        c.appendChild(m);c.appendChild(l);g.appendChild(c);
+        return {case:c,trou:t};
+      }
+      /* L'ordre du DOM, en grille RTL : haut-droite, haut-gauche, puis
+         bas-droite, bas-gauche. Le client les veut seule, debut, fin, milieu
+         dans cet ordre-la. */
+      var mSeule =mot(bloqueur,'',      te('seule'));
+      var mDebut =mot('',T+liant,       te('début'));
+      var mFin   =mot(liant+T,'',       te('fin'));
+      var mMilieu=mot(liant+T,T+liant,  te('milieu'));
+      p.appendChild(g);
+      /* Les deux mots du haut sont ecrits d'emblee : ce sont les deux formes
+         qu'il faut connaitre. */
+      mSeule.trou.textContent=formes[0];mSeule.trou.classList.add('vu');
+      mDebut.trou.textContent=formes[1];mDebut.trou.classList.add('vu');
+      bouton(p,te('SUIVANT ▸'),suivant);
+
+      /* ── LA VOIX MENE L'ANIMATION ──
+         Quatre temps, chacun attendu : on ne pose la forme qu'au moment ou on
+         la nomme, et le trait qu'au moment ou on le dit. */
+      _sceneParle++;
+      var temps=[
+        {c:mMilieu,f:formes[1],vise:mDebut,
+         d:te('La forme du milieu, c\'est la forme du début')},
+        {c:mMilieu,f:formes[2],vise:null,
+         d:te('avec un trait devant.')},
+        {c:mFin,f:formes[0],vise:mSeule,
+         d:te('La forme de la fin, c\'est la forme seule')},
+        {c:mFin,f:formes[3],vise:null,
+         d:te('avec un trait devant.')}
+      ];
+      var n=0;
+      (function joue(){
+        if(n>=temps.length){_sceneParle--;return;}
+        var e=temps[n++];
+        [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
+          x.classList.remove('vise');});
+        if(e.vise)e.vise.case.classList.add('vise');
+        e.c.trou.textContent=e.f;
+        e.c.trou.classList.add('vu');
+        N.dire(e.d);
+        N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,260);});},250);
+      })();
+    };
+  };
   api.tableau=function(etape,html,fr,formes){
     return function(){
       /* La phrase n'est pas dite d'un bloc : elle est découpée, et chaque
@@ -14760,10 +14850,15 @@ function _boyLetterCourse(ca,idx,premiere){
        premier, en face de sa rangée, et « Milieu = début + — » en dessous,
        en face de la sienne. La phrase dite suit le même ordre, sans quoi la
        voix nommerait une ligne pendant que l'autre s'anime. */
-    sc.push(B.tableau(te('ÉTAPE · DÉDUCTION'),
+    /* Le compagnon qui S'ATTACHE, pour les mots ou la lettre est suivie, et
+       celui qui NE S'ATTACHE PAS, pour le mot ou elle reste seule. On evite
+       la lettre du jour : un mot fait d'elle deux fois n'apprend rien. */
+    var _lie=(A==='ب')?'ت':'ب';
+    var _bloc=(A==='د')?'ر':'د';
+    sc.push(B.recap(te('ÉTAPE · RÉCAPITULATIF'),
       TBF('{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',{fin:B.iso(_maj(NOMSMIN[3])),isolee:B.iso(NOMSMIN[0]),milieu:B.deb(_maj(NOMSMIN[2])),debut:B.deb(NOMSMIN[1])}),
-      te('La forme de la fin, c\'est l\'isolée avec un trait devant. La forme du milieu, c\'est celle du début avec un trait devant.'),
-      [formes[0].form,formes[1].form,formes[2].form,formes[3].form]));
+      false,
+      [formes[0].form,formes[1].form,formes[2].form,formes[3].form],_lie,_bloc));
   }
   if(premiereLettre&&!sansDeduction){
     /* La page « il faut connaitre par coeur seule et debut » est retiree a la

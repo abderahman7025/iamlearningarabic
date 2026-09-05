@@ -31,13 +31,21 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v203
+## OÙ ON EN EST — 2 septembre 2026, production en v204
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v203) :**
+**Fait et en ligne (v187 → v204) :**
+
+- **LE RÉCAPITULATIF remplace la déduction (v204).** Quatre MOTS au lieu de
+  quatre formes nues : seule en haut à droite, début en haut à gauche, milieu
+  en bas à gauche, fin en bas à droite. La lettre manque dans les deux du bas ;
+  la voix dit d'où elle vient et la forme se pose, puis le trait. Rien n'est
+  dessiné : les formes de `_childForms` PORTENT déjà leur trait de liaison, si
+  bien que « milieu = trait + début » et « fin = trait + seule » sont vrais au
+  caractère près — l'animation ne fait que les révéler dans cet ordre.
 
 - **La lettre était écrite TROIS fois sous un tanwīn (v203).** Pour doubler le
   signe on dessinait « lettre + signe » deux fois, décalé, plus la lettre
