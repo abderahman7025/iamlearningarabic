@@ -31,13 +31,36 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 6 septembre 2026, production en v205
+## OÙ ON EN EST — 6 septembre 2026, production en v206
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v205) :**
+**Fait et en ligne (v187 → v206) :**
+
+- **CE QUI SE PASSE AU BOUT D'UNE QUESTION, ET AU BOUT D'UNE LEÇON (v206).**
+
+  - **Une question ne se saute pas.** Son bouton « Suite › » est là, comme
+    sur tous les écrans qui attendent, mais il reste ÉTEINT tant que la bonne
+    réponse n'est pas donnée : c'est elle qui fait avancer. Les quatre sortes
+    de questions le disent par `data-verrou`, et rallument le bouton par
+    `p._debloque`. Deux d'entre elles — « écoute et choisis » et « le mot à
+    trou » — ne portaient pas encore `data-attend` : elles s'enchaînaient
+    toutes seules sans qu'on ait répondu.
+
+  - **LE MOT À TROU NE RÉPONDAIT À RIEN — défaut ancien.** `_noteSigne` y
+    était appelé avec un `sonCible` qui n'existait dans aucune portée : le
+    premier appui levait une `ReferenceError`, et l'exercice ne réagissait ni
+    au juste ni au faux. Le nom parlé de la cible se lit désormais dans ses
+    options, comme dans les trois autres questions.
+
+  - **L'écran de fin s'enchaîne vers SA sortie.** Il ramène l'enfant à la
+    liste des lettres du monde entamé, et à la carte quand le monde vient
+    d'être fini — c'est ce que portaient déjà ses boutons ; ils sont
+    maintenant appuyés tout seuls. `data-fin` dit à la barre du bas de
+    cliquer le bouton de l'écran au lieu de passer à l'écran suivant
+    (`_avance`).
 
 - **NEUF POINTS RELUS AVEC LE CLIENT (v205).**
 

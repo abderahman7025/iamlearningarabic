@@ -9707,7 +9707,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v205';
+var _VERSION_REPLI='v206';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12898,18 +12898,25 @@ function _boyScene(ca,reprise){
      Les ecrans qui ATTENDENT quelque chose de l'enfant ne s'enchainent
      pas : une question, un canvas ou il ecrit, l'ecran de fin qui quitte la
      lecon. Ils le disent par `data-attend`, et n'ont que retour et suite. */
-  var _apres=null,_pretAEnchainer=false;
+  /* `_avance` dit OU l'on va tout seul. C'est l'ecran suivant, sauf sur
+     l'ecran de fin : celui-la a sa propre destination — la liste des lettres
+     du monde entame, ou la carte si le monde vient d'etre fini — et elle est
+     portee par son bouton. */
+  var _apres=null,_pretAEnchainer=false,_avance=null;
   function arreteEnchainement(){if(_apres){clearTimeout(_apres);_apres=null;}}
   function lanceEnchainement(){
     arreteEnchainement();
     /* Un souffle apres la derniere parole : passer a l'instant meme donne
        l'impression que la page a ete coupee. */
-    _apres=setTimeout(function(){_apres=null;suivant();},1100);
+    var ou=_avance||suivant;
+    _apres=setTimeout(function(){_apres=null;ou();},1100);
   }
   function ajouteRetour(){
     if(!_dernierPanneau)return;
     var p=_dernierPanneau;
     var attend=!!p.getAttribute('data-attend');
+    /* L'ecran de fin s'enchaine, mais vers SA destination. */
+    var fin=!!p.getAttribute('data-fin');
     /* Le bouton d'avancement de la scene : les scenes le posent elles-memes.
        Une question n'en avait aucun — c'est la bonne reponse qui faisait
        avancer ; le client en veut un ici aussi. */
@@ -12917,6 +12924,19 @@ function _boyScene(ca,reprise){
       .filter(function(b){return b.className.indexOf('sec')<0;});
     var principal=boutons[boutons.length-1];
     if(!principal&&attend)principal=bouton(p,te('Suite ›'),suivant);
+    /* ── UNE QUESTION NE SE SAUTE PAS ──
+       Le bouton est la, comme sur tous les ecrans qui attendent, mais il
+       reste eteint tant que la bonne reponse n'a pas ete donnee : c'est elle
+       qui fait avancer, et le client ne veut pas qu'on passe sans repondre.
+       La scene rallume le bouton par `p._debloque`. */
+    if(principal&&p.getAttribute('data-verrou')){
+      var _pr=principal;
+      _pr.disabled=true;_pr.style.opacity='.45';
+      p._debloque=function(){_pr.disabled=false;_pr.style.opacity='1';};
+    }
+    if(fin&&principal)_avance=function(){
+      if(principal.isConnected)principal.click();
+    };
     var rangee=document.createElement('div');
     rangee.style.cssText='display:flex;align-items:stretch;gap:8px;margin-top:18px';
     if(principal)p.insertBefore(rangee,principal);else p.appendChild(rangee);
@@ -13485,7 +13505,7 @@ function _boyScene(ca,reprise){
        repart de zero — sinon le bouton de la page suivante attendrait une
        voix qui ne viendra jamais. */
     _sceneParle=0;
-    arreteEnchainement();_pretAEnchainer=false;N.reveille();
+    arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
     N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
@@ -13986,8 +14006,10 @@ function _boyScene(ca,reprise){
   /* Contrôle : QCM sur des cibles */
   api.controle=function(etape,html,fr,options,cible){
     return function(){
-      /* Une question attend une reponse : elle ne s'enchaine pas. */
-      var p=panneau(etape);p.setAttribute('data-attend','1');titre(p,html,fr);
+      /* Une question attend une reponse : elle ne s'enchaine pas, et son
+         bouton reste eteint tant qu'elle n'a pas ete resolue. */
+      var p=panneau(etape);p.setAttribute('data-attend','1');
+      p.setAttribute('data-verrou','1');titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var t=opts.filter(function(o){return o.g===cible;})[0];
       var sonCible=t?t.s:cible;
@@ -14014,6 +14036,7 @@ function _boyScene(ca,reprise){
           if(premier){premier=false;_noteExo(o.g===cible);_noteSigne(cible,o.g===cible,sonCible);}
           N.stop();N.dire(o.s);
           if(o.g===cible){repondu=true;b.classList.add('ok');
+            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,850);}
           else{b.classList.add('ko');if(typeof playError==='function')playError();}
@@ -14339,8 +14362,11 @@ function _boyScene(ca,reprise){
   api.mission=function(html,fr,onRetour,label){
     return function(){
       if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
-      /* L'ecran de fin QUITTE la lecon : il ne s'enchaine pas tout seul. */
-      var p=panneau(_HAB.accompli);p.setAttribute('data-attend','1');
+      /* L'ecran de fin s'enchaine comme les autres, mais vers SA sortie :
+         la liste des lettres du monde entame, ou la carte quand le monde
+         vient d'etre fini. C'est le bouton qui la porte — `data-fin` dit a la
+         barre du bas d'appuyer dessus au lieu de passer a l'ecran suivant. */
+      var p=panneau(_HAB.accompli);p.setAttribute('data-fin','1');
       p.classList.add('boy-fete');
       /* ── L'ECRAN DE FIN ──
          Deux montures encadrent le texte, l'une regardant l'autre : la
@@ -14374,7 +14400,8 @@ function _boyScene(ca,reprise){
      ici toutes les trouver avant de passer à la suite. */
   api.controleMulti=function(etape,html,fr,options,cibles){
     return function(){
-      var p=panneau(etape);p.setAttribute('data-attend','1');titre(p,html,fr);
+      var p=panneau(etape);p.setAttribute('data-attend','1');
+      p.setAttribute('data-verrou','1');titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var reste=cibles.slice(),_premierTri=true;
       var r=document.createElement('div');
@@ -14397,6 +14424,7 @@ function _boyScene(ca,reprise){
             reste=reste.filter(function(x){return x!==o.g;});
             if(typeof playBravo==='function')playBravo();
             if(!reste.length){
+              if(p._debloque)p._debloque();
               if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
               N.plusTard(suivant,900);
             }
@@ -14420,7 +14448,8 @@ function _boyScene(ca,reprise){
      or la synthese vocale suffit ici et se manque facilement. */
   api.ecoute=function(etape,html,fr,options,cible,son){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);
+      var p=panneau(etape);p.setAttribute('data-attend','1');
+      p.setAttribute('data-verrou','1');titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var t=opts.filter(function(o){return o.g===cible;})[0];
       var sonCible=son||(t?t.s:cible);
@@ -14447,6 +14476,7 @@ function _boyScene(ca,reprise){
           N.stop();
           if(o.g===cible){repondu=true;b.classList.add('ok');
             N.dire(o.s);
+            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,850);}
           else{b.classList.add('ko');if(typeof playError==='function')playError();}
@@ -14470,7 +14500,8 @@ function _boyScene(ca,reprise){
      lire. */
   api.trou=function(etape,html,fr,droite,gauche,options,cible){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);
+      var p=panneau(etape);p.setAttribute('data-attend','1');
+      p.setAttribute('data-verrou','1');titre(p,html,fr);
       /* Marques pour la regle de paysage court : ce sont ces trois pieces —
          le mot, la note et les cibles — qui poussaient le cadre sous le bord
          de l'ecran sur un telephone couche. */
@@ -14496,6 +14527,12 @@ function _boyScene(ca,reprise){
       if(gauche)bout(gauche);
       p.appendChild(mot);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
+      /* Le nom parle de la cible — celui que la revision espacee retient avec
+         elle. Il manquait ici : `sonCible` n'etait declare nulle part, et le
+         premier appui levait une ReferenceError. La question ne repondait
+         alors a rien du tout, ni juste ni faux. */
+      var _cib=opts.filter(function(o){return o.g===cible;})[0];
+      var sonCible=_cib?_cib.s:cible;
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;direction:rtl';
       var repondu=false,premier=true;
@@ -14517,6 +14554,7 @@ function _boyScene(ca,reprise){
                refermer, ce qu'une simple pastille verte ne montre pas. */
             creux.style.border='3px solid rgba('+_HAB.rgbF+',.9)';
             creux.textContent=_sansCercle(o.g);
+            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,1100);
           }else{b.classList.add('ko');if(typeof playError==='function')playError();}
