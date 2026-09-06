@@ -31,13 +31,53 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 6 septembre 2026, production en v207
+## OÙ ON EN EST — 6 septembre 2026, production en v208
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v207) :**
+**Fait et en ligne (v187 → v208) :**
+
+- **LA DEUXIÈME PASSE DU CLIENT (v208).**
+
+  - **La barre du bas, au cordeau.** Retour TOUT À GAUCHE, même seul. Tous
+    les boutons d'une page ont la même largeur — le plus large donne le
+    gabarit (`egaliseLaRangee`) — et la même épaisseur : les deux petits
+    reçoivent le même rembourrage vertical que le principal. **Le battement
+    du bouton est retiré** : il invitait à passer, or la page passe seule.
+
+  - **Le récapitulatif écrit deux fois plus gros.** Le mot se met à l'échelle
+    de SA case (`remplitLeMot`) : on additionne ses morceaux — `scrollWidth`
+    d'une boîte flex rend la largeur de la boîte et le rapport valait 1 — et
+    l'on converge en quelques essais, une seule fois par écran, puis
+    `ajusteEcran` refait tenir la page. Une passe de plus quand la police
+    arabe arrive : mesurée sur la police de repli, la largeur d'un mot n'a
+    rien à voir, et le récapitulatif restait tout petit au premier
+    chargement.
+
+  - **Le blanc de la fausse liaison, pour de bon.** Le resserrement était
+    calculé à la CONSTRUCTION du cours, quand la police arabe n'est pas
+    toujours là : la mesure valait alors celle d'une police de repli. Il se
+    pose maintenant AU RENDU et se refait quand la police arrive
+    (`_poseSerrage`, `data-serre`), avec un cheveu de marge pour l'arrondi au
+    pixel.
+
+  - **« À retenir » des voyelles se MONTRE.** Les trois signes sur une ligne
+    d'écriture — fatḥa à droite, kasra au milieu, ḍamma à gauche — et chacun
+    grossit quand la voix le nomme. Le point du doublement ajoute le second
+    signe, là où on l'écrit vraiment, sur « a … devient … an ». Un point de
+    résumé peut donc porter une vue et une petite séquence (`vue`, `temps`).
+    L'encre d'un signe seul est mesurée et ramenée sur son ancrage : la kasra
+    tombait sous la carte.
+
+  - **La licorne ne serpente plus.** L'onde de `volDroit` est celle de la
+    fusée : son dernier quart passait sous le monde puis faisait remonter la
+    fille juste avant de se poser. Amplitude nulle quand le vol n'est pas
+    « aligné ».
+
+  **À enregistrer au studio, en plus** : « devient », « an », « in »,
+  « oun ».
 
 - **LA RELECTURE DU CLIENT, POINT PAR POINT (v207).**
 

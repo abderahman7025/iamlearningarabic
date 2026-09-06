@@ -3390,7 +3390,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Pause et Retour portent desormais leur NOM, et non plus une fleche seule :
    la largeur fixe de 52 px les coupait l'un sur l'autre. Ils prennent la
    place de leur texte et restent discrets — c'est « Suite » qui mene. */
-.boy-btn.boy-nav{flex:0 0 auto;width:auto;min-width:112px;padding:0 12px;margin-top:0;
+.boy-btn.boy-nav{flex:0 0 auto;width:auto;min-width:112px;padding:14px 12px;margin-top:0;
   border-radius:9px;
   font-size:.92rem;font-weight:800;letter-spacing:.03em;line-height:1.1;
   white-space:nowrap;background:var(--sk-doux);color:var(--sk-moyen);
@@ -3457,7 +3457,28 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   transition:opacity .35s ease,transform .35s ease}
 .res-point.vu{opacity:1;transform:none}
 .res-point i{font-style:normal;flex:none;font-size:1.25rem;line-height:1.1}
+.res-point .res-tx{flex:1 1 auto;min-width:0}
 @media (prefers-reduced-motion:reduce){.res-point{transition:none}}
+
+/* ── LES TROIS VOYELLES SUR LEUR LIGNE D'ÉCRITURE ──
+   Dans « à retenir » : la fatḥa à droite, la kasra au milieu, la ḍamma à
+   gauche — le sens de lecture. Chacune grossit quand la voix la dit, puis
+   reprend sa taille. Le second signe du doublement attend, caché, juste à
+   côté du premier — au-dessus pour la fatḥa, en dessous pour la kasra, à
+   côté pour la ḍamma : c'est ainsi qu'on les écrit. */
+.res-piste{position:relative;flex:0 0 auto;width:172px;height:88px}
+.res-piste .sol{position:absolute;left:2px;right:2px;top:50%;
+  border-top:3px dashed rgba(var(--sk-rgb-f),.42)}
+.res-piste .sg{position:absolute;transform:translate(-50%,-50%);
+  font-family:'Scheherazade New',serif;font-size:38px;line-height:1;
+  color:var(--sk-vif);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
+.res-piste .sg.gros{transform:translate(-50%,-50%) scale(1.9)}
+.res-piste .sg.cache{opacity:0}
+/* L'ENCRE, PAS LA BOITE : une kasra seule est posée très bas dans sa boîte
+   de texte. La couche intérieure la remonte sur son point d'ancrage. */
+.res-piste .sg b{display:inline-block;font-weight:400}
+@media (prefers-reduced-motion:reduce){.res-piste .sg{transition:none}}
 
 /* ── LE RÉCAPITULATIF : QUATRE MOTS, DEUX PAR LIGNE ──
    L'arabe se lit de droite à gauche : la grille aussi. La première case du
@@ -3470,8 +3491,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* L'ARABE EST CE QU'ON REGARDE : il prend toute la place que la case lui
    laisse. C'est la demande du client — le mot etait bien trop petit. */
 .rec-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
-  font-size:clamp(38px,13vh,94px);line-height:1.4;color:var(--sk-fonce);
-  min-height:1.5em;display:flex;align-items:center;justify-content:center}
+  font-size:clamp(38px,13vh,94px);line-height:1.35;color:var(--sk-fonce);
+  min-height:1.4em;display:flex;align-items:center;justify-content:center}
 .rec-lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(var(--sk-rgb-f),.62);margin-top:2px}
 /* Le morceau qui manque, puis qui vient : il grandit à sa place au lieu de
@@ -7189,9 +7210,14 @@ function _volCarte(o){
        « dessus » dans ce cas. */
     var nx=vy/dist, ny=-vx/dist;
     if(ny>0){nx=-nx;ny=-ny;}
-    /* Une amplitude proportionnee au trajet : la meme largeur d'onde sur un
-       saut court et sur la traversee de la carte ne se lirait pas pareil. */
-    var amp=Math.min(60,dist*0.10);
+    /* ── L'ONDE EST CELLE DE LA FUSEE, ET D'ELLE SEULE ──
+       Une amplitude proportionnee au trajet : la meme largeur d'onde sur un
+       saut court et sur la traversee de la carte ne se lirait pas pareil.
+       Mais la licorne ne serpente pas : son dernier quart d'onde passait
+       SOUS le monde puis la faisait remonter juste avant de se poser — le
+       client n'en veut pas, c'est propre a la fusee. Elle arrive donc tout
+       droit. */
+    var amp=o.aligne?Math.min(60,dist*0.10):0;
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
        ou il l'a laissee, sinon la fusee se remettrait droite entre les deux.
        Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
@@ -9734,7 +9760,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v207';
+var _VERSION_REPLI='v208';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10034,6 +10060,25 @@ function _xJointure(avant,mot){
    juste au-dessus de la ligne d'ecriture — sinon la queue du ra, qui plonge
    dessous, comblerait le trou qu'on cherche. */
 var _CREUX_LIAISON={};
+/* ── LE RESSERREMENT SE POSE AU RENDU ──
+   Mesure a la construction du cours, la valeur pouvait etre celle d'une
+   police de REPLI : la vraie n'est pas toujours chargee a cet instant, et le
+   blanc revenait. On marque donc la balise (`data-serre="avant|apres"`) et
+   on pose la marge au moment ou le calque parait — puis de nouveau quand la
+   police arrive. Un cheveu de plus que la mesure : a l'ecran, l'arrondi au
+   pixel laissait encore un fil blanc. */
+function _poseSerrage(hote){
+  if(!hote)return;
+  function pose(){
+    [].slice.call(hote.querySelectorAll('[data-serre]')).forEach(function(el){
+      var d=String(el.getAttribute('data-serre')||'').split('|');
+      if(d.length!==2)return;
+      el.style.marginRight=(-(_creuxLiaison(d[0],d[1])+0.012)).toFixed(4)+'em';
+    });
+  }
+  pose();
+  try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(pose);}catch(e){}
+}
 function _creuxLiaison(avant,apres){
   var cle=avant+'|'+apres;
   if(_CREUX_LIAISON[cle]!==undefined)return _CREUX_LIAISON[cle];
@@ -13006,10 +13051,13 @@ function _boyScene(ca,reprise){
     if(fin&&principal)_avance=function(){
       if(principal.isConnected)principal.click();
     };
-    /* Les boutons sont CENTRES, et dans cet ordre : retour tout a gauche,
-       pause a sa droite, suite en dernier. */
-    var rangee=document.createElement('div');
-    rangee.style.cssText='display:flex;align-items:stretch;justify-content:center;'
+    /* ── L'ORDRE ET LE GABARIT ──
+       Retour TOUT A GAUCHE, toujours — meme quand il est le seul bouton de
+       la page. Pause a sa droite, Suite en dernier. Et tous les boutons
+       d'une meme page ont la MEME largeur : on prend le plus large et on
+       l'impose aux autres (`egaliseLaRangee`). */
+    var rangee=document.createElement('div');rangee.className='boy-barre';
+    rangee.style.cssText='display:flex;align-items:stretch;justify-content:flex-start;'
       +'gap:8px;margin-top:18px';
     if(principal)p.insertBefore(rangee,principal);else p.appendChild(rangee);
     function petit(txt,aria,fn){
@@ -13035,17 +13083,20 @@ function _boyScene(ca,reprise){
       });
     }
     if(principal){
-      principal.style.flex='1';principal.style.marginTop='0';
+      principal.style.marginTop='0';
       rangee.appendChild(principal);
     }
     if(!rangee.children.length){p.removeChild(rangee);return;}
+    egaliseLaRangee(rangee);
     /* Le bouton ne se met a battre — et la page ne passe — qu'une fois TOUTE
        la voix jouee : tant qu'on parle a l'enfant, rien ne bouge. Une scene
        qui parle etat par etat laisse un silence entre deux phrases, on
        attend donc qu'elle ait fini, pas le premier blanc venu. */
+    /* Plus de battement sur le bouton : il servait a dire a l'enfant qu'il
+       pouvait passer. La page passe maintenant d'elle-meme, l'invitation n'a
+       plus d'objet. */
     quandToutEstDit(function(){
       if(!p.isConnected)return;
-      try{if(principal&&principal.isConnected)principal.classList.add('bat');}catch(e){}
       if(attend)return;
       _pretAEnchainer=true;
       if(!N.enPause())lanceEnchainement();
@@ -13612,11 +13663,76 @@ function _boyScene(ca,reprise){
        tard, quand la police arabe est arrivee et que tout s'est pose. */
     calibreLesTextes();
     ajusteEcran();ajusteBientot();
-    N.plusTard(calibreLesTextes,120);N.plusTard(calibreLesTextes,500);
+    /* Quatre passes, pas deux : la mise a l'echelle de l'ecran
+       (`ajusteEcran`) change la largeur reelle des cases APRES les premieres,
+       et le mot du recapitulatif se calait alors sur une case qui n'existait
+       plus. Chaque passe repart de la taille courante et converge. */
+    function recale(){if(!wrap.isConnected)return;calibreLesTextes();ajusteEcran();}
+    N.plusTard(recale,120);N.plusTard(recale,500);
+    N.plusTard(recale,900);N.plusTard(recale,1600);
+    /* Et une fois la POLICE ARABE arrivee : mesuree sur la police de repli,
+       la largeur d'un mot n'a rien a voir, et le recapitulatif restait ecrit
+       tout petit au premier chargement. */
+    try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(recale);}catch(e){}
     if(_repriseSuivie)repriseScene(i);
+  }
+  /* ── TOUS LES BOUTONS D'UNE PAGE, DE LA MEME LARGEUR ──
+     Le plus large donne le gabarit. A l'etroit — un telephone en portrait —
+     ils se partagent la largeur au lieu de deborder. */
+  function egaliseLaRangee(r){
+    if(!r||!r.isConnected)return;
+    var bs=[].slice.call(r.children);
+    if(!bs.length)return;
+    bs.forEach(function(b){b.style.flex='0 0 auto';b.style.width='auto';});
+    var max=0;
+    bs.forEach(function(b){var w=b.offsetWidth;if(w>max)max=w;});
+    if(!max)return;
+    var dispo=r.clientWidth||0, ecart=8*(bs.length-1);
+    if(dispo>60&&max*bs.length+ecart>dispo)max=Math.floor((dispo-ecart)/bs.length);
+    bs.forEach(function(b){b.style.flex='0 0 '+max+'px';b.style.width=max+'px';});
   }
   function calibreLesTextes(){
     [].slice.call(wrap.querySelectorAll('.boy-titre')).forEach(remplitLaLargeur);
+    [].slice.call(wrap.querySelectorAll('.rec-mot')).forEach(remplitLeMot);
+    [].slice.call(wrap.querySelectorAll('.boy-barre')).forEach(egaliseLaRangee);
+  }
+  /* ── LE MOT DU RECAPITULATIF, AUSSI GROS QUE SA CASE LE PERMET ──
+     Le client le veut le plus grand possible : on part de ce que la feuille
+     de style donne et on met a l'echelle de la place reelle, plafonne par la
+     hauteur de l'ecran — quatre cases doivent tenir. */
+  function remplitLeMot(m){
+    if(!m||!m.isConnected)return;
+    /* UNE SEULE FOIS PAR ECRAN. La mise a l'echelle du cadre
+       (`ajusteEcran`) retrecit la largeur CSS du bloc d'autant qu'elle
+       grossit : remesurer apres elle ferait retrecir le mot a chaque passe,
+       sans fin. On cale sur la mise en page NATURELLE, et l'echelle fait le
+       reste. */
+    if(m.getAttribute('data-cale'))return;
+    /* Ecran replie, onglet en arriere-plan : toutes les mesures valent zero,
+       et une mise a l'echelle faite la-dessus resterait fausse une fois la
+       page revenue. On ne touche a rien. */
+    var H=(window.visualViewport&&window.visualViewport.height)||window.innerHeight||0;
+    if(H<200)return;
+    var dispo=(m.clientWidth||0)-8;
+    if(dispo<40)return;
+    var haut=H*0.26;
+    /* ── LA LARGEUR DU MOT, PAS CELLE DE SA CASE ──
+       `scrollWidth` d'une boite flex rend la largeur de la BOITE des que le
+       contenu y tient : le rapport valait 1 et le mot ne pouvait plus que
+       retrecir. On additionne donc les morceaux du mot — eux suivent
+       vraiment la police. Et l'on CONVERGE ici meme, en quelques essais :
+       une seule passe partait de trop loin quand la police arabe venait
+       juste d'arriver. */
+    for(var i=0;i<5;i++){
+      var px=parseFloat(getComputedStyle(m).fontSize)||60;
+      var large=0;
+      [].slice.call(m.children).forEach(function(x){large+=x.offsetWidth;});
+      if(large<4)return;
+      var vise=Math.max(28,Math.min(190,haut,px*dispo/large));
+      if(Math.abs(vise-px)/px<=0.02)break;
+      m.style.fontSize=Math.round(vise)+'px';
+    }
+    m.setAttribute('data-cale','1');
   }
   function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
   function precedent(){if(i<=0)return;i--;go();}
@@ -13806,7 +13922,8 @@ function _boyScene(ca,reprise){
            d'accrochage : il faut y resserrer deux lettres que la police
            laisse s'ecarter, et cela demande une balise. On la reconnait a
            son chevron — aucun mot arabe n'en contient. */
-        if(String(t).indexOf('<')>=0)c.innerHTML=t;else c.textContent=t;
+        if(String(t).indexOf('<')>=0){c.innerHTML=t;_poseSerrage(c);}
+        else c.textContent=t;
         sc.appendChild(c);return c;});
 
       var flot=(plan.flottants||[]).map(function(f){
@@ -14337,8 +14454,12 @@ function _boyScene(ca,reprise){
         var d=document.createElement('div');d.className='res-point';
         var pu=document.createElement('i');pu.textContent=_HAB.veh||'•';
         pu.setAttribute('aria-hidden','true');
-        var tx=document.createElement('span');tx.innerHTML=o.h;
-        d.appendChild(pu);d.appendChild(tx);l.appendChild(d);
+        var tx=document.createElement('span');tx.className='res-tx';tx.innerHTML=o.h;
+        d.appendChild(pu);d.appendChild(tx);
+        /* Un point peut MONTRER au lieu de dire : la vue se construit ici,
+           a chaque rendu, pour que le retour en arriere la retrouve neuve. */
+        if(o.vue){o.__el=o.vue();d.appendChild(o.__el);}
+        l.appendChild(d);
         return d;
       });
       p.appendChild(l);
@@ -14347,10 +14468,27 @@ function _boyScene(ca,reprise){
       var n=0;
       (function joue(){
         if(n>=lignes.length){_sceneParle--;return;}
-        var k=n++;
+        var k=n++,o=points[k];
         lignes[k].classList.add('vu');
-        N.dire(points[k].f);
-        N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,300);});},250);
+        function suite(){
+          N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,300);});},250);
+        }
+        /* Un point qui MONTRE parle en plusieurs temps : chaque geste part
+           avec le mot qui le nomme, et le suivant attend le silence. */
+        if(o.temps&&o.temps.length){
+          var m=0;
+          (function pas(){
+            if(m>=o.temps.length){suite();return;}
+            var e=o.temps[m++];
+            if(e.fait)e.fait(o.__el);
+            if(e.dit){
+              N.dire(e.dit);
+              N.plusTard(function(){N.surSilence(function(){N.plusTard(pas,180);});},250);
+            }else N.plusTard(pas,e.d||500);
+          })();
+        }else{
+          N.dire(o.f);suite();
+        }
       })();
     };
   };
@@ -14712,6 +14850,48 @@ function _boyScene(ca,reprise){
    ligne d'écriture (ici la piste), le nom est secondaire, le doublement
    ajoute le son [n], le soukoun ne laisse que le son de la lettre. */
 function _boyVowelCourse(ca){
+  /* ── LES TROIS VOYELLES SUR LEUR LIGNE, POUR « À RETENIR » ──
+     Le client : « une ligne d'ecriture, avec a droite la fatha, au milieu la
+     kasra et a gauche la damma ». Chacune grossit quand la voix la nomme.
+     `double` prepare en plus le second signe de chaque tanwin, cache, la ou
+     on l'ecrit vraiment : la fatha au-dessus de la premiere, la kasra en
+     dessous, la damma a cote. */
+  function pisteVoyelles(double){
+    var d=document.createElement('div');d.className='res-piste';
+    d.setAttribute('aria-hidden','true');
+    var sol=document.createElement('i');sol.className='sol';d.appendChild(sol);
+    function pose(m,x,y,cache){
+      var sp=document.createElement('span');
+      sp.className='sg'+(cache?' cache':'');
+      sp.style.left=x+'%';sp.style.top=y+'%';
+      var b=document.createElement('b');
+      b.textContent=m;
+      /* Un signe seul ne tombe pas au milieu de sa boite : la police pose la
+         kasra tres bas, la damma tres haut. On MESURE son encre et on la
+         ramene sur le point voulu, sans quoi la kasra sortait de la carte. */
+      try{
+        var e=_encreAutourLigne(m);
+        b.style.transform='translateY('+(-(0.3125+(e.bas-e.haut)/2)).toFixed(3)+'em)';
+      }catch(x2){}
+      sp.appendChild(b);
+      d.appendChild(sp);return sp;
+    }
+    d._sg=[
+      {un:pose('َ',80,28), deux:double?pose('َ',80,6,true):null},
+      {un:pose('ِ',50,72), deux:double?pose('ِ',50,94,true):null},
+      {un:pose('ُ',22,28), deux:double?pose('ُ',12,28,true):null}
+    ];
+    return d;
+  }
+  function grossit(sp){
+    if(!sp)return;
+    sp.classList.add('gros');
+    B.plusTard(function(){sp.classList.remove('gros');},1100);
+  }
+  function parait(sp){
+    if(!sp)return;
+    sp.classList.remove('cache');grossit(sp);
+  }
   var B=_boyScene(ca,{cours:'voyelles',session:_boySession&&_boySession.id}),b=B.bleu;
   var F=_vw('َ'),K=_vw('ِ'),D=_vw('ُ');
   var TF=_vw('ً'),TK=_vw('ٍ'),TD=_vw('ٌ');
@@ -14990,10 +15170,27 @@ function _boyVowelCourse(ca){
       TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
 
     B.resume([
-      {h:TB('Il y a <b>3 voyelles</b> :<br>« a », « i », « ou ».'),
-       f:te('Il y a trois voyelles : a, i, ou.')},
+      {h:TB('Il y a <b>3 voyelles</b> :'),
+       vue:function(){return pisteVoyelles(false);},
+       temps:[
+         {dit:te('Il existe seulement trois voyelles.')},
+         {dit:te('a'), fait:function(el){grossit(el._sg[0].un);}},
+         {dit:te('i'), fait:function(el){grossit(el._sg[1].un);}},
+         {dit:te('ou'),fait:function(el){grossit(el._sg[2].un);}}
+       ]},
       {h:TB('Deux fois le <b>même signe</b> :<br>on ajoute le son « n ».'),
-       f:te('Deux fois le même signe : on ajoute le son n.')},
+       vue:function(){return pisteVoyelles(true);},
+       temps:[
+         {dit:te('a'),      fait:function(el){grossit(el._sg[0].un);}},
+         {dit:te('devient')},
+         {dit:te('an'),     fait:function(el){parait(el._sg[0].deux);}},
+         {dit:te('i'),      fait:function(el){grossit(el._sg[1].un);}},
+         {dit:te('devient')},
+         {dit:te('in'),     fait:function(el){parait(el._sg[1].deux);}},
+         {dit:te('ou'),     fait:function(el){grossit(el._sg[2].un);}},
+         {dit:te('devient')},
+         {dit:te('oun'),    fait:function(el){parait(el._sg[2].deux);}}
+       ]},
       {h:TB('Le <b>soukoun</b> :<br>on ne dit que la lettre.'),
        f:te('Le soukoun : on ne dit que la lettre.')}
     ]),
@@ -15202,11 +15399,10 @@ function _boyLetterCourse(ca,idx,premiere){
        notre lettre, ba. Pour l'alif cela donne « باب », son mot. */
     var _voisin='ب';
     var _juste=_voisin+A+_voisin;
-    /* LA FAUTE : le liant sans chasse donne a la suivante sa forme jointe,
-       et le resserrement mesure fait que le trait touche vraiment la lettre
-       d'avant comme celle d'apres. */
-    var _serre=_creuxLiaison(_voisin+A,'\u200d'+_voisin);
-    var _faux =_voisin+A+'<span style="margin-right:-'+_serre.toFixed(4)+'em">'
+    /* LA FAUTE : le liant sans chasse donne a la suivante sa forme jointe, et
+       le resserrement — mesure AU RENDU, voir `_poseSerrage` — fait que le
+       trait touche vraiment la lettre d'avant comme celle d'apres. */
+    var _faux =_voisin+A+'<span data-serre="'+_voisin+A+'|\u200d'+_voisin+'">'
               +'\u200d'+_voisin+'</span>';
     var _xj=_xJointure(_voisin+A,_juste);
     var _bat=[];
@@ -18051,6 +18247,10 @@ var ADMIN_SOUNDS = [
   {ar:'Avec une deuxième voyelle, ça donne boun.',label:'Avec une deuxième voyelle, ça donne bo…'},
   {ar:'Avec une deuxième voyelle, ça donne ban.',label:'Avec une deuxième voyelle, ça donne ba…'},
   {ar:'Avec une deuxième voyelle, ça donne bin.',label:'Avec une deuxième voyelle, ça donne bi…'},
+  {ar:'devient',label:'devient'},
+  {ar:'an',label:'an'},
+  {ar:'in',label:'in'},
+  {ar:'oun',label:'oun'},
   {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu …'},
   {ar:'Repasse sur les modèles.',label:'Repasse sur les modèles.'},
   {ar:'On passe à ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe à ce symbole. Au dessus de la lett…'},
