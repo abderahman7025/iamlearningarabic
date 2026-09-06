@@ -31,13 +31,79 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 2 septembre 2026, production en v204
+## OÙ ON EN EST — 6 septembre 2026, production en v205
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v204) :**
+**Fait et en ligne (v187 → v205) :**
+
+- **NEUF POINTS RELUS AVEC LE CLIENT (v205).**
+
+  - **Les pages s'enchaînent seules.** L'enfant n'appuie plus pour avancer :
+    la page passe d'elle-même une fois TOUTE sa voix jouée. Trois boutons en
+    bas — **❙❙ Pause**, **‹ Retour**, **Suite ›**. Le triangle est réservé à
+    la reprise (**▶ Reprendre**) : le client ne veut pas qu'on le confonde
+    avec « jouer ». Les écrans qui ATTENDENT quelque chose de l'enfant ne
+    s'enchaînent pas et n'ont pas de pause : les questions, les canevas de
+    tracé, l'écran de fin. Ils le disent par `data-attend`. La pause suspend
+    pour de bon — la voix en cours, la file, l'attente du silence qui fait
+    avancer une scène, et les gestes différés, rejoués à la reprise.
+    **Une question a désormais un bouton « Suite ›» : on peut la passer sans
+    répondre.** C'est ce que le client demande.
+
+  - **LE RÉCAPITULATIF SE JOUE (v205).** Plus de titre : la pastille, les
+    quatre cases, les boutons. Les mots du haut sont écrits ; ceux du bas
+    arrivent sans la lettre, la place gardée. La voix dit « au milieu, la
+    lettre est la même qu'au début » et la lettre du haut prend sa couleur,
+    puis une COPIE d'elle-même vole jusqu'à sa place en bas, puis « avec un
+    trait horizontal » et le trait paraît en gris. Idem pour la fin, à partir
+    de seule. Orange pour la seule et ce qui en dérive, violet pour le début,
+    gris pour le trait. Toujours aucun dessin : `deuxCalques` découpe le même
+    glyphe en deux, corps et trait. Pas de récapitulatif pour ع غ ء ة.
+
+  - **Chaque forme dit seulement « elle s'écrit comme cela ».** Les
+    explications de tracé — « on trace un trait horizontal, puis on ajoute la
+    forme début » — sont retirées : trop compliquées pour un enfant. Le lien
+    entre milieu et début, entre fin et seule, n'est pas perdu : c'est le
+    récapitulatif qui le MONTRE. Décision prise avec le client après lui
+    avoir donné l'avis demandé.
+
+  - **La lettre n'est plus écrite deux fois, ni trois, sous un tanwīn.**
+    v203 avait bien préparé un calque où il ne reste que l'encre du signe,
+    mais l'effacement se faisait avec l'encre de l'appelant : sur un canevas
+    de tracé, un gris à 30 %, qui n'enlevait que 30 % de la lettre. Les 70 %
+    restants repartaient avec le calque, posé deux fois. `destination-out`
+    efface désormais en OPAQUE, toujours.
+
+  - **La ligne d'écriture quitte les nuages.** Elle ne reste qu'au cours des
+    voyelles — où la question porte justement sur elle — et dans un nuage qui
+    ne contient qu'un signe.
+
+  - **La fausse liaison touche vraiment les deux lettres.** Le liant sans
+    chasse donne bien sa forme jointe à la suivante, mais ne rapproche
+    personne : il restait un blanc de 0,05 em sur l'alif, 0,11 sur le wāw,
+    0,17 sur le rā — et une liaison qui ne touche pas ne montre aucune faute.
+    On MESURE ce blanc (`_creuxLiaison`) et on resserre d'autant. Seule la
+    croix est en couleur.
+
+  - **« À toi de tracer » se dit sur le PREMIER canevas de chaque leçon**, et
+    plus rien ensuite : l'enfant sait qu'il doit tracer. C'était un compteur
+    de deux, gardé sur l'appareil ; c'est maintenant l'écran lui-même qu'on
+    retient (`_ecranDuTrace`), pour que le retour en arrière retrouve la même
+    page.
+
+  - **Le doublement se répète, comme les voyelles simples** : « ba devient
+    ban. Répète après moi : ban. » Les trois pages passent de `illustre` à
+    `repete`, la voix porte la scène état par état.
+
+  - **La révision n'écrit plus sa réponse.** Elle demandait « Où est le son
+    بَ ? » — il n'y avait qu'à le retrouver des yeux. Elle demande « Où est
+    ce son ? » et le FAIT ENTENDRE, avec le bouton pour le rejouer.
+
+  **À enregistrer au studio** : « À toi de tracer. », « Répète après moi :
+  ban. », « … boun. », « … bin. » — ajoutées à `ADMIN_SOUNDS`.
 
 - **LE RÉCAPITULATIF remplace la déduction (v204).** Quatre MOTS au lieu de
   quatre formes nues : seule en haut à droite, début en haut à gauche, milieu

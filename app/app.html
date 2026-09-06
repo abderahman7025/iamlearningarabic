@@ -3386,6 +3386,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-btn.boy-retour{width:52px;flex:0 0 52px;padding:0;margin-top:0;font-size:1.7rem;font-weight:400;
   line-height:1;background:var(--sk-doux);color:var(--sk-moyen);border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
 .boy-btn.boy-retour:active{background:var(--sk-doux-actif)}
+/* ── LES DEUX BOUTONS DE LA BARRE DU BAS ──
+   Pause et Retour portent desormais leur NOM, et non plus une fleche seule :
+   la largeur fixe de 52 px les coupait l'un sur l'autre. Ils prennent la
+   place de leur texte et restent discrets — c'est « Suite » qui mene. */
+.boy-btn.boy-nav{flex:0 0 auto;width:auto;padding:0 14px;margin-top:0;
+  font-size:.92rem;font-weight:800;letter-spacing:.03em;line-height:1.1;
+  white-space:nowrap;background:var(--sk-doux);color:var(--sk-moyen);
+  border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
+.boy-btn.boy-nav:active{background:var(--sk-doux-actif)}
 /* ── LE BOUTON APPELLE, UNE FOIS TOUTE LA PHRASE DITE ──
    Il ne grandit pas : un bouton qui change de taille se deplace sous le
    doigt. C'est sa LUMIERE qui bat, et un halo qui s'ouvre autour de lui —
@@ -8213,9 +8222,13 @@ function renderRevision(ca){
       if(k.g!==j.g&&voisins.indexOf(k.g)<0&&voisins.length<2)voisins.push(k.g);});
     var options=[[j.g,j.n]].concat(voisins.map(function(g){return [g,(m[g]&&m[g].n)||g];}));
     if(options.length<2)return;
+    /* La question ECRIVAIT sa reponse : « Ou est le son بَ ? » — il n'y avait
+       plus qu'a la retrouver des yeux dans les nuages. On ne l'ecrit plus, on
+       la FAIT ENTENDRE : `controle` joue le son de la cible en arrivant et
+       pose le bouton pour le rejouer. */
     scenes.push(B.controle(te('RÉVISION'),
-      TB('Où est le son <b>« '+j.n+' »</b> ?'),
-      te('Où est le son')+' '+j.n+' ?',
+      TB('Où est <b>ce son</b> ?'),
+      te('Où est ce son ?'),
       options,j.g));
   });
   /* `mission` porte deja son propre titre — l'ecran de fin des cours. */
@@ -9694,7 +9707,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v204';
+var _VERSION_REPLI='v205';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9788,9 +9801,16 @@ var _CL_JUMELLES={
    est la seule qui reste. */
 function _boyNarration(){
   var q=[],busy=false,tmr=null,timers=[];
+  /* ── LA PAUSE ──
+     Le bouton du bas suspend TOUT ce qui se joue tout seul : la voix en
+     train d'etre dite, la file de celles qui suivent, l'attente du silence
+     qui fait avancer une scene, et les gestes differes. Ceux-la sont mis de
+     cote et rejoues a la reprise, dans l'ordre — sans quoi une animation
+     reprendrait a un endroit qu'elle n'a jamais atteint. */
+  var enPause=false,differes=[];
   function estim(t){return Math.min(9000,900+t.length*95);}
   function pump(){
-    if(busy||!q.length)return;
+    if(busy||!q.length||enPause)return;
     busy=true;
     var txt=q.shift(),maxMs=estim(txt);
     try{speakText(txt,_voixEnfant(),null);}catch(e){}
@@ -9798,6 +9818,9 @@ function _boyNarration(){
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
       var parle=(ss&&(ss.speaking||ss.pending))||(a&&!a.ended&&!a.paused);
+      /* En pause, le temps ne court pas : sans cela le garde-fou de duree
+         finirait par declarer la phrase dite alors qu'elle est suspendue. */
+      if(enPause){t0=Date.now();quiet=0;return;}
       quiet=parle?0:quiet+1;
       if((quiet>=3&&Date.now()-t0>500)||Date.now()-t0>maxMs){
         clearInterval(tmr);tmr=null;busy=false;setTimeout(pump,100);
@@ -9821,18 +9844,42 @@ function _boyNarration(){
     stop:function(){q=[];busy=false;if(tmr){clearInterval(tmr);tmr=null;}
       try{stopSpeech();}catch(e){}
       try{if(window._kidAudio){window._kidAudio.pause();window._kidAudio=null;}}catch(e){}},
-    plusTard:function(fn,ms){var id=setTimeout(fn,ms);timers.push(id);return id;},
+    /* En pause, le geste attend son tour au lieu de se jouer dans le vide. */
+    plusTard:function(fn,ms){
+      var id=setTimeout(function(){
+        if(enPause){differes.push(fn);return;}
+        fn();
+      },ms);
+      timers.push(id);return id;},
+    pause:function(){
+      enPause=true;
+      try{if(window.speechSynthesis)window.speechSynthesis.pause();}catch(e){}
+      try{if(window._kidAudio)window._kidAudio.pause();}catch(e){}
+    },
+    reprend:function(){
+      if(!enPause)return;
+      enPause=false;
+      try{if(window.speechSynthesis)window.speechSynthesis.resume();}catch(e){}
+      try{if(window._kidAudio&&window._kidAudio.paused)window._kidAudio.play();}catch(e){}
+      var d=differes;differes=[];
+      d.forEach(function(fn){try{fn();}catch(e){}});
+      pump();
+    },
+    /* On change d'ecran : la pause n'a plus d'objet, et ce qui attendait
+       appartenait a l'ecran qu'on quitte. */
+    reveille:function(){enPause=false;differes=[];},
+    enPause:function(){return enPause;},
     /* Appelle fn quand plus rien n'est dit : sert à n'animer le bouton
        « suivant » qu'une fois la phrase terminée, pour ne pas inviter
        l'enfant à passer pendant qu'on lui parle. */
     surSilence:function(fn){
       var id=setInterval(function(){
-        if(busy||q.length)return;
+        if(busy||q.length||enPause)return;
         clearInterval(id);fn();
       },200);
       timers.push(id);return id;
     },
-    videTimers:function(){timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];}
+    videTimers:function(){timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];differes=[];}
   };
 }
 
@@ -9939,6 +9986,49 @@ function _xJointure(avant,mot){
   }catch(e){}
   _JOINTURE[cle]=x;return x;
 }
+/* ── LE BLANC QUE LAISSE UNE FAUSSE LIAISON ──────────────────────────────
+   L'ecran d'accrochage montre la faute : la lettre accrochee a la suivante,
+   barree d'une croix. Le liant sans chasse U+200D force bien la lettre
+   SUIVANTE a prendre sa forme jointe, mais il ne rapproche personne — entre
+   l'alif et le trait de liaison du ba il restait un blanc : 0,05 em sur
+   l'alif, 0,11 sur le waw, 0,17 sur le ra. Le client a raison, une liaison
+   qui ne touche pas ne montre aucune faute.
+   On MESURE donc ce blanc, une fois par paire, et on resserre d'autant.
+   Toujours aucun dessin : c'est la police qui ecrit, on ne fait que la
+   serrer. La mesure se prend dans la bande ou vit le trait de liaison —
+   juste au-dessus de la ligne d'ecriture — sinon la queue du ra, qui plonge
+   dessous, comblerait le trou qu'on cherche. */
+var _CREUX_LIAISON={};
+function _creuxLiaison(avant,apres){
+  var cle=avant+'|'+apres;
+  if(_CREUX_LIAISON[cle]!==undefined)return _CREUX_LIAISON[cle];
+  var px=200,em=0;
+  try{
+    var W=Math.ceil(px*6),H=Math.ceil(px*3);
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    var c=cv.getContext('2d');
+    c.font=px+"px 'Scheherazade New',serif";
+    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle='#000';
+    var base=Math.round(H*0.62);
+    c.fillText(avant+apres,W/2,base);
+    var y0=base-Math.round(px*0.22),y1=base+Math.round(px*0.04);
+    var d=c.getImageData(0,0,W,H).data,plein=[],x,y,n;
+    for(x=0;x<W;x++){
+      n=0;for(y=y0;y<=y1;y++)if(d[((y*W+x)*4)+3]>40){n=1;break;}
+      plein.push(n);
+    }
+    var g=plein.indexOf(1),dr=plein.lastIndexOf(1),pire=0,cour=0;
+    for(x=g;x<=dr;x++){
+      if(!plein[x])cour++;
+      else{if(cour>pire)pire=cour;cour=0;}
+    }
+    em=pire/px;
+  }catch(e){}
+  /* Tant que la vraie police n'est pas la, on rend la mesure sans la garder. */
+  var prete=!document.fonts||document.fonts.check(px+"px 'Scheherazade New'");
+  if(prete)_CREUX_LIAISON[cle]=em;
+  return em;
+}
 /* ── L'ENCRE D'UN SIGNE, SANS SA LETTRE ──
    Un signe arabe ne se dessine pas seul comme il se dessine sur sa lettre :
    la police le replace. Pour doubler un tanwin il faut donc partir de
@@ -9962,12 +10052,22 @@ function _encreDuSigne(porte,simple,px,couleur){
     c.fillText(porte+simple,ox,oy);
     if(porte){
       /* On efface la lettre — et un poil plus large, sinon son contour
-         adouci laisse un lisere autour du trou. */
+         adouci laisse un lisere autour du trou.
+         ── L'EFFACEMENT SE FAIT EN OPAQUE, TOUJOURS ──
+         `destination-out` ne retire que ce que la source APPORTE d'opacite :
+         efface avec l'encre du modele de trace, qui est grise a 30 %, il
+         n'enlevait que 30 % de la lettre. Les 70 % restants repartaient avec
+         le calque du signe, pose deux fois — la lettre paraissait ecrite
+         deux fois, voire trois, ce que le client voit sur les tanwins. Les
+         scenes illustrees, elles, peignent en opaque : le defaut ne se
+         voyait que sur les canevas. */
       c.globalCompositeOperation='destination-out';
-      c.lineWidth=Math.max(1,px*0.012);c.strokeStyle='#000';
+      c.lineWidth=Math.max(1,px*0.012);
+      c.strokeStyle='#000';c.fillStyle='#000';
       c.fillText(porte,ox,oy);
       c.strokeText(porte,ox,oy);
       c.globalCompositeOperation='source-over';
+      c.fillStyle=couleur;
     }
     r={cv:cv,ox:ox,oy:oy};
   }catch(e){}
@@ -12340,6 +12440,7 @@ var _TE={
 'Maintenant,<br>ses <b>voyelles</b>.':{en:'Now<br>its <b>vowels</b>.',es:'Ahora,<br>sus <b>vocales</b>.',de:'Jetzt<br>seine <b>Vokale</b>.',nl:'Nu<br>zijn <b>klinkers</b>.',it:'Ora,<br>le sue <b>vocali</b>.',pt:'Agora,<br>as suas <b>vogais</b>.',ru:'Теперь<br>её <b>огласовки</b>.',tr:'Şimdi<br><b>harekeleri</b>.',zh:'现在看<br>它的<b>元音</b>。',id:'Sekarang<br><b>harakatnya</b>.',ur:'اب<br>اس کی <b>حرکات</b>۔',hi:'अब<br>इसके <b>स्वर</b>।'},
 'Voyons maintenant la lettre avec ses voyelles.':{en:'Now let\'s see the letter with its vowels.',es:'Veamos ahora la letra con sus vocales.',de:'Sehen wir uns den Buchstaben nun mit seinen Vokalen an.',nl:'Nu bekijken we de letter met zijn klinkers.',it:'Vediamo ora la lettera con le sue vocali.',pt:'Vejamos agora a letra com as suas vogais.',ru:'Теперь посмотрим букву с её огласовками.',tr:'Şimdi harfi harekeleriyle görelim.',zh:'现在来看带元音的这个字母。',id:'Sekarang kita lihat huruf ini dengan harakatnya.',ur:'اب اس حرف کو اس کی حرکات کے ساتھ دیکھتے ہیں۔',hi:'अब इस अक्षर को उसके स्वरों के साथ देखते हैं।'},
 'Où est ce son ?':{en:'Where is this sound?',es:'¿Dónde está este sonido?',de:'Wo ist dieser Laut?',nl:'Waar is deze klank?',it:'Dov\'è questo suono?',pt:'Onde está este som?',ru:'Где этот звук?',tr:'Bu ses nerede?',zh:'这个音在哪里？',id:'Mana bunyi ini?',ur:'یہ آواز کہاں ہے؟',hi:'यह ध्वनि कहाँ है?'},
+'Où est <b>ce son</b> ?':{en:'Where is <b>this sound</b>?',es:'¿Dónde está <b>este sonido</b>?',de:'Wo ist <b>dieser Laut</b>?',nl:'Waar is <b>deze klank</b>?',it:'Dov\'è <b>questo suono</b>?',pt:'Onde está <b>este som</b>?',ru:'Где <b>этот звук</b>?',tr:'<b>Bu ses</b> nerede?',zh:'<b>这个音</b>在哪里？',id:'Mana <b>bunyi ini</b>?',ur:'<b>یہ آواز</b> کہاں ہے؟',hi:'<b>यह ध्वनि</b> कहाँ है?'},
 'ÉTAPE · SOUKOUN':{en:'STEP · SUKŪN',es:'PASO · SUKŪN',de:'SCHRITT · SUKŪN',nl:'STAP · SUKŪN',it:'TAPPA · SUKŪN',pt:'ETAPA · SUKŪN',ru:'ШАГ · СУКУН',tr:'ADIM · SÜKÛN',zh:'步骤 · 静符',id:'LANGKAH · SUKUN',ur:'مرحلہ · جزم',hi:'चरण · सुकून'},
 'Petit rond :<br>on ne <b>prononce rien</b> ⭕':{en:'Little circle:<br>you say <b>nothing</b> ⭕',es:'Circulito:<br>no se <b>pronuncia nada</b> ⭕',de:'Kleiner Kreis:<br>man spricht <b>nichts</b> ⭕',nl:'Rondje:<br>je zegt <b>niets</b> ⭕',it:'Cerchietto:<br>non si <b>pronuncia nulla</b> ⭕',pt:'Circulozinho:<br>não se <b>diz nada</b> ⭕',ru:'Кружок:<br><b>ничего</b> не произносится ⭕',tr:'Küçük daire:<br><b>hiçbir şey</b> okunmaz ⭕',zh:'小圆圈：<br><b>什么都不读</b> ⭕',id:'Bulatan kecil:<br><b>tidak dibaca apa-apa</b> ⭕',ur:'چھوٹا دائرہ:<br><b>کچھ نہیں</b> پڑھا جاتا ⭕',hi:'छोटा गोला:<br><b>कुछ नहीं</b> बोला जाता ⭕'},
 'Petit rond :<br>on ne dit que<br>le <b>son de la lettre</b> ⭕':{en:'Little circle:<br>you say only<br>the <b>letter\'s sound</b> ⭕',es:'Circulito:<br>solo se dice<br>el <b>sonido de la letra</b> ⭕',de:'Kleiner Kreis:<br>man spricht nur<br>den <b>Buchstabenlaut</b> ⭕',nl:'Rondje:<br>je zegt alleen<br>de <b>klank van de letter</b> ⭕',it:'Cerchietto:<br>si dice solo<br>il <b>suono della lettera</b> ⭕',pt:'Circulozinho:<br>diz-se apenas<br>o <b>som da letra</b> ⭕',ru:'Кружок:<br>произносится только<br><b>звук буквы</b> ⭕',tr:'Küçük daire:<br>sadece <b>harfin sesi</b><br>okunur ⭕',zh:'小圆圈：<br>只读<b>字母本身的音</b> ⭕',id:'Bulatan kecil:<br>hanya <b>bunyi hurufnya</b><br>yang dibaca ⭕',ur:'چھوٹا دائرہ:<br>صرف <b>حرف کی آواز</b><br>پڑھی جاتی ہے ⭕',hi:'छोटा गोला:<br>केवल <b>अक्षर की ध्वनि</b><br>बोली जाती है ⭕'},
@@ -12358,7 +12459,11 @@ var _TE={
 '▸ MENU PRINCIPAL':{en:'▸ MAIN MENU',es:'▸ MENÚ PRINCIPAL',de:'▸ HAUPTMENÜ',nl:'▸ HOOFDMENU',it:'▸ MENU PRINCIPALE',pt:'▸ MENU PRINCIPAL',ru:'▸ ГЛАВНОЕ МЕНЮ',tr:'▸ ANA MENÜ',zh:'▸ 主菜单',id:'▸ MENU UTAMA',ur:'▸ مرکزی مینو',hi:'▸ मुख्य मेन्यू'},
 'Bravo ! Tu maîtrises cette lettre. Continue comme ça !':{en:'Well done! You have mastered this letter. Keep it up!',es:'¡Bravo! Ya dominas esta letra. ¡Sigue así!',de:'Bravo! Du beherrschst diesen Buchstaben. Weiter so!',nl:'Goed zo! Je beheerst deze letter. Ga zo door!',it:'Bravo! Hai imparato questa lettera. Continua così!',pt:'Boa! Já dominas esta letra. Continua assim!',ru:'Молодец! Ты освоил эту букву. Так держать!',tr:'Aferin! Bu harfi öğrendin. Böyle devam!',zh:'太棒了！你掌握了这个字母。继续保持！',id:'Hebat! Kamu menguasai huruf ini. Pertahankan!',ur:'شاباش! تم نے یہ حرف سیکھ لیا۔ ایسے ہی جاری رکھو!',hi:'शाबाश! तुमने यह अक्षर सीख लिया। ऐसे ही आगे बढ़ो!'},
 '▸ LETTRE SUIVANTE':{en:'▸ NEXT LETTER',es:'▸ LETRA SIGUIENTE',de:'▸ NÄCHSTER BUCHSTABE',nl:'▸ VOLGENDE LETTER',it:'▸ LETTERA SUCCESSIVA',pt:'▸ LETRA SEGUINTE',ru:'▸ СЛЕДУЮЩАЯ БУКВА',tr:'▸ SONRAKİ HARF',zh:'▸ 下一个字母',id:'▸ HURUF BERIKUTNYA',ur:'▸ اگلا حرف',hi:'▸ अगला अक्षर'},
-'SUIVANT ▸':{en:'NEXT ▸',es:'SIGUIENTE ▸',de:'WEITER ▸',nl:'VOLGENDE ▸',it:'AVANTI ▸',pt:'SEGUINTE ▸',ru:'ДАЛЬШЕ ▸',tr:'İLERİ ▸',zh:'下一步 ▸',id:'LANJUT ▸',ur:'آگے ▸',hi:'आगे ▸'},
+'Suite ›':{en:'Next ›',es:'Siguiente ›',de:'Weiter ›',nl:'Volgende ›',it:'Avanti ›',pt:'Seguinte ›',ru:'Дальше ›',tr:'İleri ›',zh:'下一步 ›',id:'Lanjut ›',ur:'آگے ›',hi:'आगे ›'},
+'❙❙ Pause':{en:'❙❙ Pause',es:'❙❙ Pausa',de:'❙❙ Pause',nl:'❙❙ Pauze',it:'❙❙ Pausa',pt:'❙❙ Pausa',ru:'❙❙ Пауза',tr:'❙❙ Duraklat',zh:'❙❙ 暂停',id:'❙❙ Jeda',ur:'❙❙ وقفہ',hi:'❙❙ रोकें'},
+'▶ Reprendre':{en:'▶ Resume',es:'▶ Reanudar',de:'▶ Fortsetzen',nl:'▶ Hervatten',it:'▶ Riprendi',pt:'▶ Retomar',ru:'▶ Продолжить',tr:'▶ Devam',zh:'▶ 继续',id:'▶ Lanjutkan',ur:'▶ جاری رکھیں',hi:'▶ जारी रखें'},
+'Mettre en pause':{en:'Pause',es:'Pausar',de:'Pausieren',nl:'Pauzeren',it:'Metti in pausa',pt:'Pausar',ru:'Поставить на паузу',tr:'Duraklat',zh:'暂停',id:'Jeda',ur:'وقفہ کریں',hi:'रोकें'},
+'‹ Retour':{en:'‹ Back',es:'‹ Atrás',de:'‹ Zurück',nl:'‹ Terug',it:'‹ Indietro',pt:'‹ Voltar',ru:'‹ Назад',tr:'‹ Geri',zh:'‹ 返回',id:'‹ Kembali',ur:'‹ واپس',hi:'‹ वापस'},
 '🔊 RÉÉCOUTER':{en:'🔊 LISTEN AGAIN',es:'🔊 ESCUCHAR OTRA VEZ',de:'🔊 NOCHMAL HÖREN',nl:'🔊 NOG EENS LUISTEREN',it:'🔊 RIASCOLTA',pt:'🔊 OUVIR OUTRA VEZ',ru:'🔊 ПОСЛУШАТЬ СНОВА',tr:'🔊 TEKRAR DİNLE',zh:'🔊 再听一次',id:'🔊 DENGAR LAGI',ur:'🔊 دوبارہ سنو',hi:'🔊 फिर सुनो'},
 '✅ Terminé !':{en:'✅ Done!',es:'✅ ¡Terminado!',de:'✅ Fertig!',nl:'✅ Klaar!',it:'✅ Finito!',pt:'✅ Concluído!',ru:'✅ Готово!',tr:'✅ Bitti!',zh:'✅ 完成！',id:'✅ Selesai!',ur:'✅ مکمل!',hi:'✅ पूरा हुआ!'},
 'MISSION':{en:'MISSION',es:'MISIÓN',de:'MISSION',nl:'MISSIE',it:'MISSIONE',pt:'MISSÃO',ru:'МИССИЯ',tr:'GÖREV',zh:'任务',id:'MISI',ur:'مہم',hi:'मिशन'},
@@ -12434,8 +12539,11 @@ var _TE={
 'On ne dit pas {faux}, mais {juste}, car c\'est une lettre grave.':{en:'You don\'t say {faux}, but {juste}, because this letter is deep.',es:'No se dice {faux}, sino {juste}, porque es una letra grave.',de:'Man sagt nicht {faux}, sondern {juste}, denn das ist ein dunkler Buchstabe.',nl:'Je zegt niet {faux}, maar {juste}, want dit is een zware letter.',it:'Non si dice {faux}, ma {juste}, perché è una lettera grave.',pt:'Não se diz {faux}, mas {juste}, porque é uma letra grave.',ru:'Говорят не {faux}, а {juste}, ведь это твёрдая буква.',tr:'{faux} değil, {juste} denir, çünkü bu kalın bir harftir.',zh:'不读 {faux}，而读 {juste}，因为这是重音字母。',id:'Bukan {faux}, tapi {juste}, karena ini huruf tebal.',ur:'{faux} نہیں بلکہ {juste} کہا جاتا ہے، کیونکہ یہ پُرحرف ہے۔',hi:'{faux} नहीं बल्कि {juste} बोला जाता है, क्योंकि यह भारी अक्षर है।'},
 '{place},<br>elle s\'écrit <b>ainsi</b>.':{en:'{place},<br>it is written <b>like this</b>.',es:'{place},<br>se escribe <b>así</b>.',de:'{place}<br>schreibt man ihn <b>so</b>.',nl:'{place}<br>schrijf je hem <b>zo</b>.',it:'{place},<br>si scrive <b>così</b>.',pt:'{place},<br>escreve-se <b>assim</b>.',ru:'{place}<br>она пишется <b>так</b>.',tr:'{place},<br><b>böyle</b> yazılır.',zh:'{place}，<br>就<b>这样</b>写。',id:'{place},<br>ditulis <b>begini</b>.',ur:'{place}،<br><b>ایسے</b> لکھا جاتا ہے۔',hi:'{place},<br><b>ऐसे</b> लिखा जाता है।'},
 '{place}, elle s\'écrit ainsi.':{en:'{place}, it is written like this.',es:'{place}, se escribe así.',de:'{place} schreibt man ihn so.',nl:'{place} schrijf je hem zo.',it:'{place}, si scrive così.',pt:'{place}, escreve-se assim.',ru:'{place} она пишется так.',tr:'{place}, böyle yazılır.',zh:'{place}，就这样写。',id:'{place}, ditulis begini.',ur:'{place}، ایسے لکھا جاتا ہے۔',hi:'{place}, ऐसे लिखा जाता है।'},
+'{place},<br>elle s\'écrit <b>comme cela</b>.':{en:'{place},<br>it is written <b>like this</b>.',es:'{place},<br>se escribe <b>así</b>.',de:'{place}<br>schreibt man ihn <b>so</b>.',nl:'{place}<br>schrijf je hem <b>zo</b>.',it:'{place},<br>si scrive <b>così</b>.',pt:'{place},<br>escreve-se <b>assim</b>.',ru:'{place}<br>она пишется <b>так</b>.',tr:'{place},<br><b>böyle</b> yazılır.',zh:'{place}，<br>就<b>这样</b>写。',id:'{place},<br>ditulis <b>begini</b>.',ur:'{place}،<br><b>ایسے</b> لکھا جاتا ہے۔',hi:'{place},<br><b>ऐसे</b> लिखा जाता है।'},
+'{place}, elle s\'écrit comme cela.':{en:'{place}, it is written like this.',es:'{place}, se escribe así.',de:'{place} schreibt man ihn so.',nl:'{place} schrijf je hem zo.',it:'{place}, si scrive così.',pt:'{place}, escreve-se assim.',ru:'{place} она пишется так.',tr:'{place}, böyle yazılır.',zh:'{place}，就这样写。',id:'{place}, ditulis begini.',ur:'{place}، ایسے لکھا جاتا ہے۔',hi:'{place}, ऐसे लिखा जाता है।'},
 'FORME{rep} · TRACÉ':{en:'FORM{rep} · WRITING',es:'FORMA{rep} · TRAZO',de:'FORM{rep} · SCHREIBEN',nl:'VORM{rep} · SCHRIJVEN',it:'FORMA{rep} · TRACCIATO',pt:'FORMA{rep} · TRAÇADO',ru:'ФОРМА{rep} · ПИСЬМО',tr:'BİÇİM{rep} · YAZMA',zh:'字形{rep} · 书写',id:'BENTUK{rep} · MENULIS',ur:'شکل{rep} · لکھائی',hi:'रूप{rep} · लेखन'},
 'Trace la forme<br>{forme} ✍️':{en:'Write the<br>{forme} form ✍️',es:'Traza la forma<br>{forme} ✍️',de:'Schreibe die Form<br>{forme} ✍️',nl:'Schrijf de vorm<br>{forme} ✍️',it:'Traccia la forma<br>{forme} ✍️',pt:'Traça a forma<br>{forme} ✍️',ru:'Напиши форму<br>{forme} ✍️',tr:'{forme}<br>biçimini yaz ✍️',zh:'写出<br>{forme}字形 ✍️',id:'Tulis bentuk<br>{forme} ✍️',ur:'{forme}<br>شکل لکھو ✍️',hi:'{forme}<br>रूप लिखो ✍️'},
+'À toi de tracer.':{en:'Your turn to write.',es:'Te toca trazar.',de:'Jetzt schreibst du.',nl:'Nu jij: schrijven.',it:'Tocca a te tracciare.',pt:'Agora és tu: traça.',ru:'Теперь пиши ты.',tr:'Sıra sende: yaz.',zh:'轮到你写了。',id:'Giliranmu menulis.',ur:'اب تمہاری باری، لکھو۔',hi:'अब तुम्हारी बारी, लिखो।'},
 'Trace la forme {forme}.':{en:'Write the {forme} form.',es:'Traza la forma {forme}.',de:'Schreibe die Form {forme}.',nl:'Schrijf de vorm {forme}.',it:'Traccia la forma {forme}.',pt:'Traça a forma {forme}.',ru:'Напиши форму {forme}.',tr:'{forme} biçimini yaz.',zh:'写出{forme}字形。',id:'Tulis bentuk {forme}.',ur:'{forme} شکل لکھو۔',hi:'{forme} रूप लिखो।'},
 '{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>':{en:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',es:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',de:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',nl:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',it:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',pt:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',ru:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',tr:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',zh:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',id:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',ur:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',hi:'{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>'},
 'C\'est pourquoi il faut<br>connaître par cœur<br>{isolee} et {debut} :<br>les deux autres se <b>déduisent</b> ! 🔑':{en:'That is why you must know<br>{isolee} and {debut}<br>by heart:<br>the other two <b>follow</b>! 🔑',es:'Por eso hay que saber<br>de memoria {isolee} y {debut}:<br>¡las otras dos se <b>deducen</b>! 🔑',de:'Darum musst du {isolee}<br>und {debut} auswendig können:<br>die anderen beiden<br><b>ergeben sich</b>! 🔑',nl:'Daarom moet je {isolee}<br>en {debut} uit je hoofd kennen:<br>de andere twee <b>volgen</b>! 🔑',it:'Ecco perché devi sapere<br>a memoria {isolee} e {debut}:<br>le altre due si <b>deducono</b>! 🔑',pt:'Por isso é preciso saber de cor<br>{isolee} e {debut}:<br>as outras duas <b>deduzem-se</b>! 🔑',ru:'Поэтому надо знать наизусть<br>{isolee} и {debut}:<br>две другие <b>выводятся</b>! 🔑',tr:'Bu yüzden {isolee} ve {debut}<br>biçimlerini ezbere bilmelisin:<br>diğer ikisi <b>bunlardan çıkar</b>! 🔑',zh:'所以要牢记<br>{isolee} 和 {debut}：<br>另外两种就能<b>推出来</b>！🔑',id:'Karena itu harus hafal<br>{isolee} dan {debut}:<br>dua bentuk lain bisa <b>disimpulkan</b>! 🔑',ur:'اسی لیے {isolee} اور {debut}<br>یاد ہونی چاہئیں:<br>باقی دو <b>خود بن جاتی</b> ہیں! 🔑',hi:'इसलिए {isolee} और {debut}<br>याद होने चाहिए:<br>बाकी दो <b>निकल आते</b> हैं! 🔑'},
@@ -12681,14 +12789,6 @@ function _noteExo(bon){
   try{localStorage.setItem(cle,JSON.stringify(n));}catch(e){}
 }
 
-function _diraLeTrace(){
-  var n=0;
-  try{n=parseInt(localStorage.getItem('boy_traces_dits')||'0',10)||0;}catch(e){}
-  if(n>=2)return false;
-  try{localStorage.setItem('boy_traces_dits',String(n+1));}catch(e){}
-  return true;
-}
-
 /* Combien de scenes sont encore en train de parler. Voir `quandToutEstDit`. */
 var _sceneParle=0;
 function _boyScene(ca,reprise){
@@ -12707,6 +12807,12 @@ function _boyScene(ca,reprise){
   var api={wrap:wrap,dire:N.dire,plusTard:N.plusTard,aEnreg:N.aEnreg};
 
   var i=0,scenes=[],fini=function(){renderSessionsMap(ca);};
+  /* ── LA CONSIGNE DU TRACE ──
+     « Joue "A toi de tracer" sur le PREMIER canvas de chaque lecon, puis plus
+     rien : l'enfant sait qu'il doit tracer. » On retient l'ECRAN ou le
+     premier trace est tombe — et non un simple compteur : l'enfant qui
+     revient en arriere puis repasse dessus doit retrouver la meme page. */
+  var _ecranDuTrace=-1;
 
   function jauge(){
     var j=document.createElement('div');j.className='boy-jauge';
@@ -12781,54 +12887,76 @@ function _boyScene(ca,reprise){
       N.plusTard(function(){clearInterval(id);},20000);
     },700);
   }
-  /* Revoir l'écran précédent : on passe à l'écran suivant, et il arrive
-     qu'on veuille relire celui d'avant. Ajouté après le rendu de la scène,
-     donc valable pour toutes — briefing, hublot, piste, tracé, contrôle. */
+  /* ── LA BARRE DU BAS, ET LES PAGES QUI S'ENCHAINENT SEULES ──────────
+     Le client ne veut plus que l'enfant appuie pour avancer : une page passe
+     d'elle-meme des que TOUTE sa voix a ete jouee. Trois boutons
+     l'accompagnent — PAUSE, qui suspend la voix et l'enchainement ; RETOUR,
+     pour revoir l'ecran d'avant ; SUITE, pour ne pas attendre. Le triangle
+     de lecture est reserve a la REPRISE : le bouton d'avancement porte un
+     chevron, sans quoi les deux se confondaient.
+
+     Les ecrans qui ATTENDENT quelque chose de l'enfant ne s'enchainent
+     pas : une question, un canvas ou il ecrit, l'ecran de fin qui quitte la
+     lecon. Ils le disent par `data-attend`, et n'ont que retour et suite. */
+  var _apres=null,_pretAEnchainer=false;
+  function arreteEnchainement(){if(_apres){clearTimeout(_apres);_apres=null;}}
+  function lanceEnchainement(){
+    arreteEnchainement();
+    /* Un souffle apres la derniere parole : passer a l'instant meme donne
+       l'impression que la page a ete coupee. */
+    _apres=setTimeout(function(){_apres=null;suivant();},1100);
+  }
   function ajouteRetour(){
     if(!_dernierPanneau)return;
-    /* Le bouton d'avancement de la scène : on le met sur une rangée, avec le
-       retour en arrière à sa gauche. Une flèche fine et discrète — c'est un
-       recours, pas la marche à suivre — et le bouton principal pulse pour
-       rester l'évidence. */
-    var boutons=[].slice.call(_dernierPanneau.querySelectorAll('.boy-btn'))
+    var p=_dernierPanneau;
+    var attend=!!p.getAttribute('data-attend');
+    /* Le bouton d'avancement de la scene : les scenes le posent elles-memes.
+       Une question n'en avait aucun — c'est la bonne reponse qui faisait
+       avancer ; le client en veut un ici aussi. */
+    var boutons=[].slice.call(p.querySelectorAll('.boy-btn'))
       .filter(function(b){return b.className.indexOf('sec')<0;});
     var principal=boutons[boutons.length-1];
-    /* Les écrans de contrôle n'ont pas de bouton d'avancement — c'est la
-       bonne réponse qui fait avancer. L'enfant y a droit au retour quand
-       même : on lui pose la flèche seule. */
-    if(!principal){
-      if(i<=0)return;
-      var seul=document.createElement('button');
-      seul.className='boy-btn sec boy-retour';
-      seul.style.cssText+=';display:block;margin:16px auto 0';
-      seul.setAttribute('aria-label','Revoir l\'écran précédent');
-      seul.title='Revoir l\'écran précédent';
-      seul.textContent='‹';
-      seul.onclick=function(){N.stop();precedent();};
-      _dernierPanneau.appendChild(seul);
-      return;
-    }
-    /* Le bouton ne se met a battre qu'une fois TOUTE la voix de la page
-       jouee : tant qu'on parle a l'enfant, rien ne l'invite a passer. Une
-       scene qui parle etat par etat laisse un silence entre deux phrases —
-       on attend donc qu'elle ait fini, pas le premier blanc venu. */
-    quandToutEstDit(function(){
-      try{if(principal.isConnected)principal.classList.add('bat');}catch(e){}
-    });
-    if(i<=0)return;
+    if(!principal&&attend)principal=bouton(p,te('Suite ›'),suivant);
     var rangee=document.createElement('div');
     rangee.style.cssText='display:flex;align-items:stretch;gap:8px;margin-top:18px';
-    _dernierPanneau.insertBefore(rangee,principal);
-    var r=document.createElement('button');
-    r.className='boy-btn sec boy-retour';
-    r.setAttribute('aria-label','Revoir l\'écran précédent');
-    r.title='Revoir l\'écran précédent';
-    r.textContent='‹';
-    r.onclick=function(){N.stop();precedent();};
-    rangee.appendChild(r);
-    principal.style.flex='1';
-    principal.style.marginTop='0';
-    rangee.appendChild(principal);
+    if(principal)p.insertBefore(rangee,principal);else p.appendChild(rangee);
+    function petit(txt,aria,fn){
+      var b=document.createElement('button');
+      b.className='boy-btn sec boy-nav';
+      b.setAttribute('aria-label',aria);b.title=aria;
+      b.textContent=txt;b.onclick=fn;
+      rangee.appendChild(b);return b;
+    }
+    /* PAUSE — seulement la ou quelque chose se joue tout seul. */
+    if(!attend){
+      var pb=petit(te('❙❙ Pause'),te('Mettre en pause'),function(){
+        if(N.enPause()){
+          N.reprend();pb.textContent=te('❙❙ Pause');
+          if(_pretAEnchainer)lanceEnchainement();
+        }else{
+          arreteEnchainement();N.pause();pb.textContent=te('▶ Reprendre');
+        }
+      });
+    }
+    /* RETOUR — un recours, pas la marche a suivre. */
+    if(i>0)petit(te('‹ Retour'),te('Revoir l\'écran précédent'),function(){
+      arreteEnchainement();N.stop();precedent();});
+    if(principal){
+      principal.style.flex='1';principal.style.marginTop='0';
+      rangee.appendChild(principal);
+    }
+    if(!rangee.children.length){p.removeChild(rangee);return;}
+    /* Le bouton ne se met a battre — et la page ne passe — qu'une fois TOUTE
+       la voix jouee : tant qu'on parle a l'enfant, rien ne bouge. Une scene
+       qui parle etat par etat laisse un silence entre deux phrases, on
+       attend donc qu'elle ait fini, pas le premier blanc venu. */
+    quandToutEstDit(function(){
+      if(!p.isConnected)return;
+      try{if(principal&&principal.isConnected)principal.classList.add('bat');}catch(e){}
+      if(attend)return;
+      _pretAEnchainer=true;
+      if(!N.enPause())lanceEnchainement();
+    });
   }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';
@@ -12980,10 +13108,18 @@ function _boyScene(ca,reprise){
      qu'elle tomberait hors du nuage. Pour lui, la ligne separe simplement
      ceux qui montent de ceux qui descendent. */
   function ligneDuNuage(el,forme){
+    /* ── OU LA LIGNE RESTE, ET OU ELLE S'EN VA ──
+       Le client n'en veut plus sur les nuages : sous une lettre, elle
+       n'apprend rien, elle encombre. Elle ne reste qu'aux deux endroits ou
+       la question PORTE sur elle : le cours des voyelles, et tout nuage qui
+       ne contient qu'un signe — la, savoir s'il est au-dessus ou en dessous
+       est toute la reponse. */
+    var seul=_signeSeul(forme);
+    if(!seul&&!(reprise&&reprise.cours==='voyelles'))return;
     var i=document.createElement('i');i.className='cible-ligne';
     i.style.top='57%';
     el.appendChild(i);
-    if(_signeSeul(forme))return;
+    if(seul)return;
     /* Le nuage n'a pas toujours de hauteur au moment ou on le remplit — la
        page est encore en train d'arriver. On represente donc quelques fois,
        jusqu'a ce qu'il y ait quelque chose a mesurer. */
@@ -13349,6 +13485,7 @@ function _boyScene(ca,reprise){
        repart de zero — sinon le bouton de la page suivante attendrait une
        voix qui ne viendra jamais. */
     _sceneParle=0;
+    arreteEnchainement();_pretAEnchainer=false;N.reveille();
     N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
@@ -13380,7 +13517,7 @@ function _boyScene(ca,reprise){
         try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
       var p=panneau(etape);titre(p,html,fr);
       if(fete)N.plusTard(function(){bravo(p,3);},400);
-      bouton(p,label||te('SUIVANT ▸'),suivant);
+      bouton(p,label||te('Suite ›'),suivant);
     };
   };
   /* ── UN ECRAN QUI MONTRE ────────────────────────────────────────────
@@ -13546,7 +13683,12 @@ function _boyScene(ca,reprise){
 
       var calques=(plan.calques||[]).map(function(t){
         var c=document.createElement('div');c.className='sc-calque';
-        c.textContent=t;sc.appendChild(c);return c;});
+        /* Un calque est du TEXTE. L'exception est le mot fautif de l'ecran
+           d'accrochage : il faut y resserrer deux lettres que la police
+           laisse s'ecarter, et cela demande une balise. On la reconnait a
+           son chevron — aucun mot arabe n'en contient. */
+        if(String(t).indexOf('<')>=0)c.innerHTML=t;else c.textContent=t;
+        sc.appendChild(c);return c;});
 
       var flot=(plan.flottants||[]).map(function(f){
         var d=document.createElement('div');d.className='sc-flot';
@@ -13638,7 +13780,7 @@ function _boyScene(ca,reprise){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       sceneIllustree(p,plan);
-      bouton(p,label||te('SUIVANT ▸'),suivant);
+      bouton(p,label||te('Suite ›'),suivant);
     };
   };
 
@@ -13662,7 +13804,7 @@ function _boyScene(ca,reprise){
       quandToutEstDit(function(){
         N.plusTard(function(){N.dire(te('Bravo !'));bravo(p,2);},1000);
       });
-      bouton(p,te('SUIVANT ▸'),suivant);
+      bouton(p,te('Suite ›'),suivant);
     };
   };
 
@@ -13670,22 +13812,27 @@ function _boyScene(ca,reprise){
   api.obs=function(etape,glyph,son,html,fr,note,ligne,socle,accent){
     return function(){
       var p=panneau(etape);titre(p,html,fr);hublot(p,glyph,son,note,ligne,socle,accent);
-      bouton(p,te('SUIVANT ▸'),suivant);
+      bouton(p,te('Suite ›'),suivant);
     };
   };
   /* Piste : texte + signes au-dessus / en-dessous de la ligne */
   api.surPiste=function(etape,html,fr,haut,bas){
     return function(){
       var p=panneau(etape);titre(p,html,fr);piste(p,haut,bas);
-      bouton(p,te('SUIVANT ▸'),suivant);
+      bouton(p,te('Suite ›'),suivant);
     };
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
   api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases,deTete){
     return function(){
-      /* La consigne parlee ne sert que les deux premieres fois — voir
-         `_diraLeTrace`. Le texte, lui, reste toujours affiche. */
-      var p=panneau(etape);titre(p,html,_diraLeTrace()?fr:false);
+      /* Un canvas attend que l'enfant ecrive : il ne s'enchaine pas. */
+      /* La consigne parlee ne sert QU'UNE FOIS par lecon, sur le premier
+         canvas — voir `_ecranDuTrace`. Et ce n'est plus la phrase de la page
+         qui est dite (« Trace la forme debut, en suivant le modele »), mais
+         la seule que le client veut entendre. Le texte, lui, reste affiche. */
+      if(_ecranDuTrace<0)_ecranDuTrace=i;
+      var p=panneau(etape);p.setAttribute('data-attend','1');
+      titre(p,html,(i===_ecranDuTrace)?te('À toi de tracer.'):false);
       var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
          page, au lieu d'un seul essai. */
@@ -13790,13 +13937,18 @@ function _boyScene(ca,reprise){
                appareil : le passage à la suite reste offert. */
             var r=document.createElement('button');r.className='boy-btn sec';
             r.style.cssText+=';width:auto;padding:9px 12px;font-size:.85rem;margin:14px 0 0';
-            r.textContent=te('SUIVANT ▸');r.onclick=function(){fermer(false);suivant();};
+            r.textContent=te('Suite ›');r.onclick=function(){fermer(false);suivant();};
             corps.appendChild(r);
             return;
           }
           courant=_blocEcriture(corps,opts({dispoW:d.l-16,dispoH:d.h-reserve}));
           courant.reprendreEncre(precedent||petit);
-          veilleuse(courant.bouton(te('SUIVANT ▸'),function(){
+          /* `precedent` designe ici le bloc d'ecriture qu'on vient de
+             quitter : le retour en arriere passe par l'api de la scene. */
+          if(i>0)courant.bouton(te('‹ Retour'),function(){
+            fermer(false);N.stop();api.precedent();
+          });
+          veilleuse(courant.bouton(te('Suite ›'),function(){
             /* On garde le plein écran d'un tracé à l'autre : le redemander
                sans un appui de doigt serait refusé par le navigateur. */
             fermer(false);suivant();
@@ -13827,14 +13979,15 @@ function _boyScene(ca,reprise){
       /* Plus de bouton « agrandir » : le client veut le plein écran paysage
          d'office, sur tous les tracés. Le calque s'ouvre donc tout seul. */
       N.plusTard(agrandir,60);
-      var btn=veilleuse(bouton(p,te('SUIVANT ▸'),suivant));
+      var btn=veilleuse(bouton(p,te('Suite ›'),suivant));
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
   };
   /* Contrôle : QCM sur des cibles */
   api.controle=function(etape,html,fr,options,cible){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);
+      /* Une question attend une reponse : elle ne s'enchaine pas. */
+      var p=panneau(etape);p.setAttribute('data-attend','1');titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var t=opts.filter(function(o){return o.g===cible;})[0];
       var sonCible=t?t.s:cible;
@@ -13872,21 +14025,63 @@ function _boyScene(ca,reprise){
       n.textContent=_HAB.noteCible;p.appendChild(n);
     };
   };
-  /* Tableau des 4 positions.
-     ISOLÉE en orange, DÉBUT en violet ; la case MILIEU reprend le violet
-     du début et la case FIN reprend l'orange de l'isolée, précédés du
-     trait de liaison en gris : l'enfant voit d'où vient chaque forme. */
   /* ── LE RÉCAPITULATIF ──
-     Quatre mots, deux par ligne. La lettre manque dans celui du milieu et
-     dans celui de la fin ; la voix explique d'où elles viennent, et elles se
-     posent au fur et à mesure. Voir le commentaire du fichier d'installation
-     pour le detail — l'essentiel est que « milieu = trait + début » et
-     « fin = trait + seule » sont vrais AU CARACTERE PRES dans les formes que
-     donne `_childForms` : on ne fait que les reveler dans cet ordre. */
-  api.recap=function(etape,html,fr,formes,liant,bloqueur){
+     Quatre mots, deux par ligne, et RIEN D'AUTRE a l'ecran : la pastille de
+     l'etape, les quatre cases, les boutons. Les deux lignes « Fin = seule +
+     — / Milieu = debut + — » sont retirees : la regle ne s'ecrit plus, elle
+     se JOUE.
+
+     Les mots du haut — seule et debut — sont ecrits d'emblee. Ceux du bas
+     arrivent sans la lettre etudiee, la place gardee. Puis, au rythme de la
+     voix : la lettre du haut prend sa couleur, une COPIE d'elle-meme vole
+     jusqu'a sa place dans le mot du bas, et le trait de liaison parait en
+     gris quand la voix le nomme.
+
+     Rien n'est dessine. « Milieu = trait + debut » et « fin = trait + seule »
+     sont vrais AU CARACTERE PRES dans les formes que donne `_childForms` :
+     la forme du milieu est celle du debut avec un tatweel devant. On ne fait
+     donc que DECOUPER le meme glyphe en deux calques et les reveler dans cet
+     ordre. */
+  /* Une forme attachee, en deux calques : le corps de la lettre d'un cote,
+     son trait de liaison de l'autre. Deux exemplaires du MEME glyphe,
+     decoupes — couper la chaine en deux morceaux casserait la liaison arabe
+     et le trait redeviendrait un tiret tout droit. */
+  function deuxCalques(g,couleurCorps,couleurTrait,lh){
+    g=String(g);lh=lh||1.5;
+    var cf=_cleForme(g);
+    if(cf&&_MASQUE_FORME[cf]){
+      /* Le jim remonte a 45 degres apres son trait, le kaf croise sa propre
+         diagonale : une coupe droite ne sait pas les separer, on les decoupe
+         par la FORME. */
+      var mq=_formeCoupeeMasque(g,couleurCorps,couleurTrait,lh);
+      if(mq){
+        mq.hote.style.cssText+=';vertical-align:baseline';
+        return {hote:mq.hote,corps:mq.hote.children[1],trait:mq.trait};
+      }
+    }
+    /* Coupe en L : le trait n'est pris qu'AU-DESSUS de la ligne d'ecriture,
+       sinon le point du ba et ceux du ya partiraient avec lui. */
+    var part=_partLiaison(g);
+    var _c=(100-part).toFixed(1)+'%';
+    var _b='calc(100% - '+_basLigne(lh).toFixed(3)+'em)';
+    var pile=document.createElement('span');
+    pile.style.cssText='position:relative;display:inline-block';
+    var sCorps=document.createElement('span');
+    sCorps.style.cssText='display:inline-block;color:'+couleurCorps
+      +';clip-path:polygon(-60% -60%, '+_c+' -60%, '+_c+' '+_b
+        +', 160% '+_b+', 160% 160%, -60% 160%)';
+    sCorps.textContent=g;
+    var sLien=document.createElement('span');
+    sLien.setAttribute('aria-hidden','true');
+    sLien.style.cssText='position:absolute;left:0;top:0;color:'+couleurTrait
+      +';clip-path:polygon('+_c+' -60%, 160% -60%, 160% '+_b+', '+_c+' '+_b+')';
+    sLien.textContent=g;
+    pile.appendChild(sCorps);pile.appendChild(sLien);
+    return {hote:pile,corps:sCorps,trait:sLien};
+  }
+  api.recap=function(etape,formes,liant,bloqueur){
     return function(){
-      var p=panneau(etape);titre(p,html,false);
-      var _t=p.querySelector('.boy-titre');if(_t)_t.classList.add('dedu');
+      var p=panneau(etape);
       var T=_TATWEEL;
       var g=document.createElement('div');g.className='rec-grille';
       /* Chaque mot est fait de morceaux separes : c'est ce qui permet de
@@ -13914,33 +14109,83 @@ function _boyScene(ca,reprise){
          qu'il faut connaitre. */
       mSeule.trou.textContent=formes[0];mSeule.trou.classList.add('vu');
       mDebut.trou.textContent=formes[1];mDebut.trou.classList.add('vu');
-      bouton(p,te('SUIVANT ▸'),suivant);
+      /* Les deux du bas : la place est gardee — le mot ne sautera pas quand
+         la lettre arrivera — mais les deux calques sont invisibles. */
+      var cMil=deuxCalques(formes[2],DEB,LIEN);
+      var cFin=deuxCalques(formes[3],ISO,LIEN);
+      mMilieu.trou.appendChild(cMil.hote);mMilieu.trou.classList.add('vu');
+      mFin.trou.appendChild(cFin.hote);mFin.trou.classList.add('vu');
+      [cMil.corps,cMil.trait,cFin.corps,cFin.trait].forEach(function(el){
+        el.style.opacity='0';
+        el.style.transition='opacity .35s ease';
+      });
+      function paraitre(el){el.style.opacity='1';}
+      bouton(p,te('Suite ›'),suivant);
+
+      /* ── LA LETTRE VOLE D'UNE CASE A L'AUTRE ──
+         Une COPIE part de la case du haut : l'originale reste ecrite. Le vol
+         se fait en position fixe, au-dessus de tout, pour traverser la grille
+         sans se faire couper par une case.
+         Le panneau est mis a l'echelle (voir `ajusteEcran`) : la copie est
+         donc grossie du meme rapport — mesure entre la largeur affichee et la
+         largeur de mise en page — sans quoi elle arriverait a une autre
+         taille que la lettre qu'elle remplace. */
+      function vole(depuis,vers,couleur,fini){
+        var a=depuis.getBoundingClientRect(),b=vers.getBoundingClientRect();
+        if(!a.width||!b.width){fini();return;}
+        var k=depuis.offsetWidth?(a.width/depuis.offsetWidth):1;
+        if(!(k>0.05&&k<20))k=1;
+        var _st=getComputedStyle(depuis);
+        var c=document.createElement('div');
+        c.textContent=depuis.textContent||'';
+        c.setAttribute('aria-hidden','true');
+        c.style.cssText='position:fixed;z-index:9500;pointer-events:none;'
+          +'white-space:nowrap;'
+          +'font-family:'+_st.fontFamily+';font-size:'+_st.fontSize+';'
+          +'line-height:'+_st.lineHeight+';color:'+couleur+';'
+          +'left:'+a.left+'px;top:'+a.top+'px;transform-origin:0 0;'
+          +'transform:scale('+k.toFixed(4)+');'
+          +'transition:transform 1000ms cubic-bezier(.45,.05,.3,1)';
+        document.body.appendChild(c);
+        var dx=(b.left-a.left).toFixed(1),dy=(b.top-a.top).toFixed(1);
+        N.plusTard(function(){
+          c.style.transform='translate('+dx+'px,'+dy+'px) scale('+k.toFixed(4)+')';
+        },40);
+        N.plusTard(function(){
+          try{c.parentNode.removeChild(c);}catch(e){}
+          fini();
+        },1120);
+      }
 
       /* ── LA VOIX MENE L'ANIMATION ──
-         Quatre temps, chacun attendu : on ne pose la forme qu'au moment ou on
-         la nomme, et le trait qu'au moment ou on le dit. */
+         Six temps, chacun attendu. On ne colore la lettre qu'au moment ou la
+         voix la nomme, on ne pose le trait qu'au moment ou elle le dit, et le
+         vol se joue dans le silence qui suit la phrase. */
       _sceneParle++;
       var temps=[
-        {c:mMilieu,f:formes[1],vise:mDebut,
-         d:te('La forme du milieu, c\'est la forme du début')},
-        {c:mMilieu,f:formes[2],vise:null,
-         d:te('avec un trait devant.')},
-        {c:mFin,f:formes[0],vise:mSeule,
-         d:te('La forme de la fin, c\'est la forme seule')},
-        {c:mFin,f:formes[3],vise:null,
-         d:te('avec un trait devant.')}
+        {dit:te('Au milieu, la lettre est la même qu\'au début'),
+         act:function(k){mDebut.trou.style.color=DEB;k();}},
+        {act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
+           paraitre(cMil.corps);k();});}},
+        {dit:te('avec un trait horizontal.'),
+         act:function(k){paraitre(cMil.trait);k();}},
+        {dit:te('À la fin, la lettre est la même que quand elle est seule'),
+         act:function(k){mSeule.trou.style.color=ISO;k();}},
+        {act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
+           paraitre(cFin.corps);k();});}},
+        {dit:te('avec un trait horizontal.'),
+         act:function(k){paraitre(cFin.trait);k();}}
       ];
       var n=0;
       (function joue(){
         if(n>=temps.length){_sceneParle--;return;}
         var e=temps[n++];
-        [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
-          x.classList.remove('vise');});
-        if(e.vise)e.vise.case.classList.add('vise');
-        e.c.trou.textContent=e.f;
-        e.c.trou.classList.add('vu');
-        N.dire(e.d);
-        N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,260);});},250);
+        function apres(){
+          if(e.dit)N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,260);});},250);
+          else N.plusTard(joue,200);
+        }
+        if(e.dit)N.dire(e.dit);
+        e.act(apres);
       })();
     };
   };
@@ -14042,7 +14287,7 @@ function _boyScene(ca,reprise){
         t.appendChild(c);
       });
       p.appendChild(t);
-      var btn=bouton(p,te('SUIVANT ▸'),suivant);
+      var btn=bouton(p,te('Suite ›'),suivant);
       /* ── Le tableau se remplit en parlant ──
          Chaque morceau de phrase est dit, et son geste part en même temps ;
          on attend le silence avant le morceau suivant. Une case déjà pleine
@@ -14094,7 +14339,8 @@ function _boyScene(ca,reprise){
   api.mission=function(html,fr,onRetour,label){
     return function(){
       if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
-      var p=panneau(_HAB.accompli);
+      /* L'ecran de fin QUITTE la lecon : il ne s'enchaine pas tout seul. */
+      var p=panneau(_HAB.accompli);p.setAttribute('data-attend','1');
       p.classList.add('boy-fete');
       /* ── L'ECRAN DE FIN ──
          Deux montures encadrent le texte, l'une regardant l'autre : la
@@ -14128,7 +14374,7 @@ function _boyScene(ca,reprise){
      ici toutes les trouver avant de passer à la suite. */
   api.controleMulti=function(etape,html,fr,options,cibles){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);
+      var p=panneau(etape);p.setAttribute('data-attend','1');titre(p,html,fr);
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var reste=cibles.slice(),_premierTri=true;
       var r=document.createElement('div');
@@ -14495,35 +14741,37 @@ function _boyVowelCourse(ca){
               {L:[0],P:1,F:[0,1,2,3,4,5],bat:1,d:3400}]}),
 
     /* Puis chaque voyelle a son tour, comme « an » et « in » : la syllabe
-       simple, puis le second signe qui se pose. */
-    B.illustre(te('DOUBLEMENT · « OUN »'),
-      TB('« bou » devient<br>« <b>boun</b> ».'),
-      te('Bou devient boun.'),
+       simple, puis le second signe qui se pose. Et, comme sur les voyelles
+       simples, l'enfant REPETE : la page attend qu'il ait parle avant de
+       feliciter (`B.repete`), et la voix porte la scene etat par etat. */
+    B.repete(te('DOUBLEMENT · « OUN »'),
+      TB('« bou » devient<br>« <b>boun</b> ».<br>Répète après moi : <b>« boun »</b>'),
+      false,
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
-       scene:[{L:[0],P:1,F:[0],t:'bou',d:1800},
-              {L:[0],P:1,F:[0,1],t:'boun',d:2400}]}),
+       scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Bou devient boun.')},
+              {L:[0],P:1,F:[0,1],t:'boun',dit:te('Répète après moi : boun.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     /* Deux traits : le second se pose JUSTE AU-DESSUS du premier. */
-    B.illustre(te('DOUBLEMENT · « AN »'),
-      TB('« ba » devient<br>« <b>ban</b> ».'),
-      te('Ba devient ban.'),
+    B.repete(te('DOUBLEMENT · « AN »'),
+      TB('« ba » devient<br>« <b>ban</b> ».<br>Répète après moi : <b>« ban »</b>'),
+      false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
-       scene:[{L:[0],P:1,F:[0],t:'ba',d:1800},
-              {L:[0],P:1,F:[0,1],t:'ban',d:2400}]}),
+       scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ba devient ban.')},
+              {L:[0],P:1,F:[0,1],t:'ban',dit:te('Répète après moi : ban.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
-    B.illustre(te('DOUBLEMENT · « IN »'),
-      TB('« bi » devient<br>« <b>bin</b> ».'),
-      te('Bi devient bin.'),
+    B.repete(te('DOUBLEMENT · « IN »'),
+      TB('« bi » devient<br>« <b>bin</b> ».<br>Répète après moi : <b>« bin »</b>'),
+      false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
-       scene:[{L:[0],P:1,F:[0],t:'bi',d:1800},
-              {L:[0],P:1,F:[0,1],t:'bin',d:2400}]}),
+       scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Bi devient bin.')},
+              {L:[0],P:1,F:[0,1],t:'bin',dit:te('Répète après moi : bin.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
@@ -14687,7 +14935,7 @@ function _boyLetterCourse(ca,idx,premiere){
   var _ileFaite=null;
 
   sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,teF('Nouvelle lettre :<br>{lettre} 🎯',{lettre:b(L.name)}),
-    teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),premiere?_HAB.partir:te('SUIVANT ▸')));
+    teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),premiere?_HAB.partir:te('Suite ›')));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
@@ -14753,7 +15001,12 @@ function _boyLetterCourse(ca,idx,premiere){
        notre lettre, ba. Pour l'alif cela donne « باب », son mot. */
     var _voisin='ب';
     var _juste=_voisin+A+_voisin;
-    var _faux =_voisin+A+'\u200d'+_voisin;   /* liant sans chasse : la faute */
+    /* LA FAUTE : le liant sans chasse donne a la suivante sa forme jointe,
+       et le resserrement mesure fait que le trait touche vraiment la lettre
+       d'avant comme celle d'apres. */
+    var _serre=_creuxLiaison(_voisin+A,'\u200d'+_voisin);
+    var _faux =_voisin+A+'<span style="margin-right:-'+_serre.toFixed(4)+'em">'
+              +'\u200d'+_voisin+'</span>';
     var _xj=_xJointure(_voisin+A,_juste);
     var _bat=[];
     for(var _k=0;_k<3;_k++){
@@ -14799,34 +15052,14 @@ function _boyLetterCourse(ca,idx,premiere){
        pas, on la fait tracer directement. */
     if(n!==0){
       /* ── CE QU'ON DIT DE CHAQUE FORME ──
-         « Elle s'ecrit ainsi » ne disait rien : l'enfant voit bien qu'elle
-         s'ecrit ainsi. On lui dit COMMENT on la fabrique a partir de ce qu'il
-         connait deja — et cela depend de la lettre :
-           · une lettre qui ne s'attache pas garde sa forme seule partout, on
-             ne fait qu'ajouter le trait de liaison devant ;
-           · une lettre qui s'attache a une forme de debut a elle, et c'est
-             elle qu'on reprend au milieu.
-         Le client a dicte ces phrases sur l'alif ; elles valent pour les huit
-         lettres qui ne s'attachent pas, et se transposent pour les autres. */
-      var _dit;
-      if(n===1){
-        _dit=attache
-          ? {h:TBF('{place},<br>elle s\'écrit <b>ainsi</b>.',{place:_maj(OU[n])}),
-             f:teF('{place}, elle s\'écrit ainsi.',{place:OU[n]})}
-          : {h:TB('Au début du mot,<br>elle s\'écrit exactement<br>comme lorsqu\'elle est <b>seule</b>.'),
-             f:te('Au début du mot, elle s\'écrit exactement comme lorsqu\'elle est seule.')};
-      }else if(n===2){
-        _dit=attache
-          ? {h:TB('Au milieu du mot,<br>on trace un <b>trait horizontal</b>,<br>puis on ajoute la forme <b>début</b>.'),
-             f:te('Au milieu du mot, on trace un trait horizontal, puis on ajoute la forme début.')}
-          : {h:TB('Au milieu du mot,<br>on trace un <b>trait horizontal</b>,<br>puis on ajoute la forme <b>seule</b>.'),
-             f:te('Au milieu du mot, on trace un trait horizontal, puis on ajoute la forme seule.')};
-      }else{
-        _dit={h:TB('À la fin du mot,<br>elle s\'écrit exactement comme<br>en <b>milieu de mot</b>. On trace un trait<br>horizontal, puis on ajoute la forme <b>seule</b>.'),
-              f:te('À la fin du mot, elle s\'écrit exactement comme en milieu de mot. On trace un trait horizontal, puis on ajoute la forme seule.')};
-        if(finDeMot)_dit={h:TBF('{place},<br>elle s\'écrit <b>ainsi</b>.',{place:_maj(OU[n])}),
-                          f:teF('{place}, elle s\'écrit ainsi.',{place:OU[n]})};
-      }
+         UNE SEULE PHRASE, la meme aux quatre places : « elle s'ecrit comme
+         cela ». Les explications de trace — « on trace un trait horizontal,
+         puis on ajoute la forme debut » — sont retirees : trop compliquees
+         pour un enfant, dit le client. Le lien entre le milieu et le debut,
+         entre la fin et la forme seule, n'est pas perdu pour autant : c'est
+         LE RECAPITULATIF qui le fait, et il le MONTRE au lieu de le dire. */
+      var _dit={h:TBF('{place},<br>elle s\'écrit <b>comme cela</b>.',{place:_maj(OU[n])}),
+                f:teF('{place}, elle s\'écrit comme cela.',{place:OU[n]})};
       sc.push(B.obs(teF('FORME{rep} · {forme}',{rep:rep,forme:NOMS[n]}),f.form,S,_dit.h,_dit.f));
     }
     sc.push(formeUnique
@@ -14856,8 +15089,6 @@ function _boyLetterCourse(ca,idx,premiere){
     var _lie=(A==='ب')?'ت':'ب';
     var _bloc=(A==='د')?'ر':'د';
     sc.push(B.recap(te('ÉTAPE · RÉCAPITULATIF'),
-      TBF('{fin} = {isolee} + <b>—</b><br>{milieu} = {debut} + <b>—</b>',{fin:B.iso(_maj(NOMSMIN[3])),isolee:B.iso(NOMSMIN[0]),milieu:B.deb(_maj(NOMSMIN[2])),debut:B.deb(NOMSMIN[1])}),
-      false,
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form],_lie,_bloc));
   }
   if(premiereLettre&&!sansDeduction){
@@ -15019,7 +15250,7 @@ function _boyLetterCourse(ca,idx,premiere){
        que le cours avait ete fait. L'appel est sans effet s'il se repete :
        la lettre n'est ajoutee qu'une fois. */
     try{_ileFaite=_boyLettreFinie(_boySession,idx);}catch(e){}
-    api.bouton(p,te('SUIVANT ▸'),api.suivant);
+    api.bouton(p,te('Suite ›'),api.suivant);
   });
   /* ── ÉCOUTE ET CHOISIS ──
      Le son, et rien d'autre. Tous les autres contrôles donnent la réponse à
@@ -17591,6 +17822,10 @@ var ADMIN_SOUNDS = [
   {ar:'i',label:'i'},
   {ar:'Ça fait bi.',label:'Ça fait bi.'},
   {ar:'Répète après moi : bi.',label:'Répète après moi : bi.'},
+  {ar:'Répète après moi : boun.',label:'Répète après moi : boun.'},
+  {ar:'Répète après moi : ban.',label:'Répète après moi : ban.'},
+  {ar:'Répète après moi : bin.',label:'Répète après moi : bin.'},
+  {ar:'À toi de tracer.',label:'À toi de tracer.'},
   {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu …'},
   {ar:'Repasse sur les modèles.',label:'Repasse sur les modèles.'},
   {ar:'On passe à ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe à ce symbole. Au dessus de la lett…'},
