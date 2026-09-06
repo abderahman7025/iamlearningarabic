@@ -3390,7 +3390,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Pause et Retour portent desormais leur NOM, et non plus une fleche seule :
    la largeur fixe de 52 px les coupait l'un sur l'autre. Ils prennent la
    place de leur texte et restent discrets — c'est « Suite » qui mene. */
-.boy-btn.boy-nav{flex:0 0 auto;width:auto;padding:0 14px;margin-top:0;
+.boy-btn.boy-nav{flex:0 0 auto;width:auto;min-width:112px;padding:0 12px;margin-top:0;
+  border-radius:9px;
   font-size:.92rem;font-weight:800;letter-spacing:.03em;line-height:1.1;
   white-space:nowrap;background:var(--sk-doux);color:var(--sk-moyen);
   border:2px solid rgba(var(--sk-rgb),.35);box-shadow:none}
@@ -3442,22 +3443,42 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    l'or — pour ne pas se confondre avec un monde : ce n'est pas un lieu où
    l'on va, c'est un rendez-vous avec ce qu'on a déjà vu. */
 
+/* ── LA PAGE « À RETENIR » ──
+   Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
+   par un, au moment où la voix les dit : une liste posée d'un bloc ne se lit
+   pas, elle se saute. */
+.res-liste{max-width:660px;margin:8px auto 2px;display:flex;flex-direction:column;gap:10px}
+.res-point{display:flex;align-items:center;gap:12px;text-align:left;
+  background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:16px;
+  padding:11px 15px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
+  font-family:Outfit,sans-serif;font-size:1.02rem;font-weight:800;
+  color:var(--sk-fonce);line-height:1.35;
+  opacity:0;transform:translateY(10px);
+  transition:opacity .35s ease,transform .35s ease}
+.res-point.vu{opacity:1;transform:none}
+.res-point i{font-style:normal;flex:none;font-size:1.25rem;line-height:1.1}
+@media (prefers-reduced-motion:reduce){.res-point{transition:none}}
+
 /* ── LE RÉCAPITULATIF : QUATRE MOTS, DEUX PAR LIGNE ──
    L'arabe se lit de droite à gauche : la grille aussi. La première case du
    DOM tombe donc EN HAUT À DROITE, et c'est là que va le mot où la lettre est
    seule — celui dont tout le reste se déduit. */
-.rec-grille{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;
-  direction:rtl;margin:6px auto 4px;max-width:640px}
+.rec-grille{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;
+  direction:rtl;margin:6px auto 4px;max-width:880px}
 .rec-case{background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:18px;
   padding:12px 8px 8px;text-align:center;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10)}
+/* L'ARABE EST CE QU'ON REGARDE : il prend toute la place que la case lui
+   laisse. C'est la demande du client — le mot etait bien trop petit. */
 .rec-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
-  font-size:clamp(30px,7.5vh,58px);line-height:1.5;color:var(--sk-fonce);
-  min-height:1.6em;display:flex;align-items:center;justify-content:center}
+  font-size:clamp(38px,13vh,94px);line-height:1.4;color:var(--sk-fonce);
+  min-height:1.5em;display:flex;align-items:center;justify-content:center}
 .rec-lbl{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(var(--sk-rgb-f),.62);margin-top:2px}
 /* Le morceau qui manque, puis qui vient : il grandit à sa place au lieu de
-   surgir, et le mot ne saute pas. */
-.rec-trou{display:inline-block;min-width:.75em;opacity:0;
+   surgir, et le mot ne saute pas. AUCUNE largeur minimale : elle ouvrait un
+   blanc entre le trait de liaison gris et la lettre qui le precede — la
+   place est deja gardee, au caractere pres, par le calque invisible. */
+.rec-trou{display:inline-block;opacity:0;
   transition:opacity .35s ease}
 .rec-trou.vu{opacity:1}
 .rec-case.vise{border-color:rgba(var(--sk-rgb),.85);
@@ -8232,6 +8253,12 @@ function renderRevision(ca){
       options,j.g));
   });
   /* `mission` porte deja son propre titre — l'ecran de fin des cours. */
+  scenes.push(B.resume([
+    {h:TB('Un signe revu <b>plusieurs fois</b><br>ne s\'oublie plus.'),
+     f:te('Un signe revu plusieurs fois ne s\'oublie plus.')},
+    {h:TB('On les <b>reverra</b><br>dans quelques jours.'),
+     f:te('On les reverra dans quelques jours.')}
+  ]));
   scenes.push(B.mission(TB('Tu te souviens<br><b>bien</b> !'),
     te('Tu te souviens bien !'),
     function(){renderSessionsMap(ca);},_HAB.carte));
@@ -9707,7 +9734,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v206';
+var _VERSION_REPLI='v207';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9964,6 +9991,14 @@ function _descenteGlyphe(texte,px){
    simples cote a cote, presque jointifs. L'adulte, qui lit du vrai texte,
    garde le caractere normal. */
 var _TANWIN_DOUBLE={'ً':'َ','ٌ':'ُ','ٍ':'ِ'};
+/* Le caractere unique du tanwin est une LIGATURE compressee : l'enfant n'y
+   lit pas le doublement. Partout ou il en voit un, on lui montre donc DEUX
+   signes. Cette fonction dit simplement s'il y en a un a doubler. */
+function _aTanwin(t){
+  var x=String(t==null?'':t),i;
+  for(i=0;i<x.length;i++)if(_TANWIN_DOUBLE[x.charAt(i)])return true;
+  return false;
+}
 /* ── OU TOMBE LA JOINTURE DANS UN MOT ──
    Le mot s'ecrit CENTRE dans le cadre, et l'arabe part de la droite : la
    jointure qui suit une lettre se trouve donc, depuis le bord droit du mot, a
@@ -11667,6 +11702,24 @@ function _blocEcriture(hote,o){
     if(_b>0.01)_max=Math.min(_max,(CH-baseY-_mg)/_b);
     PX=Math.max(48,Math.round(Math.min(PX,_max)));
     baseDessin=baseY+Math.round(_ecart*PX);
+  }else{
+    /* ── LE MODELE DOIT TENIR DANS LE CADRE ──
+       Deux signes empiles — un tanwin — montent bien plus haut qu'un seul, et
+       sur un alif, qui se dresse deja, le modele sortait par le haut du
+       cadre. On mesure donc l'encre de CHAQUE forme a tracer, autour de sa
+       ligne d'ecriture, et on reduit la police juste assez pour que la plus
+       haute et la plus basse tiennent, marge comprise. Aucune forme ne
+       grossit : on ne fait que borner. */
+    var _mgT=Math.round(10*k),_hT=0,_bT=0;
+    liste.forEach(function(g){
+      var e=_encreAutourLigne(g);
+      if(e.haut>_hT)_hT=e.haut;
+      if(e.bas>_bT)_bT=e.bas;
+    });
+    var _maxT=PX;
+    if(_hT>0.01)_maxT=Math.min(_maxT,(baseY-_mgT)/_hT);
+    if(_bT>0.01)_maxT=Math.min(_maxT,(CH-baseY-_mgT)/_bT);
+    PX=Math.max(40,Math.round(Math.min(PX,_maxT)));
   }
   var pas=CW/nb;
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
@@ -12439,6 +12492,19 @@ var _TE={
 'ÉTAPE · SUR LA PISTE':{en:'STEP · ON THE LINE',es:'PASO · EN LA PISTA',de:'SCHRITT · AUF DER LINIE',nl:'STAP · OP DE LIJN',it:'TAPPA · SULLA PISTA',pt:'ETAPA · NA PISTA',ru:'ШАГ · НА ДОРОЖКЕ',tr:'ADIM · PİSTTE',zh:'步骤 · 在跑道上',id:'LANGKAH · DI LINTASAN',ur:'مرحلہ · لائن پر',hi:'चरण · पटरी पर'},
 'Maintenant,<br>ses <b>voyelles</b>.':{en:'Now<br>its <b>vowels</b>.',es:'Ahora,<br>sus <b>vocales</b>.',de:'Jetzt<br>seine <b>Vokale</b>.',nl:'Nu<br>zijn <b>klinkers</b>.',it:'Ora,<br>le sue <b>vocali</b>.',pt:'Agora,<br>as suas <b>vogais</b>.',ru:'Теперь<br>её <b>огласовки</b>.',tr:'Şimdi<br><b>harekeleri</b>.',zh:'现在看<br>它的<b>元音</b>。',id:'Sekarang<br><b>harakatnya</b>.',ur:'اب<br>اس کی <b>حرکات</b>۔',hi:'अब<br>इसके <b>स्वर</b>।'},
 'Voyons maintenant la lettre avec ses voyelles.':{en:'Now let\'s see the letter with its vowels.',es:'Veamos ahora la letra con sus vocales.',de:'Sehen wir uns den Buchstaben nun mit seinen Vokalen an.',nl:'Nu bekijken we de letter met zijn klinkers.',it:'Vediamo ora la lettera con le sue vocali.',pt:'Vejamos agora a letra com as suas vogais.',ru:'Теперь посмотрим букву с её огласовками.',tr:'Şimdi harfi harekeleriyle görelim.',zh:'现在来看带元音的这个字母。',id:'Sekarang kita lihat huruf ini dengan harakatnya.',ur:'اب اس حرف کو اس کی حرکات کے ساتھ دیکھتے ہیں۔',hi:'अब इस अक्षर को उसके स्वरों के साथ देखते हैं।'},
+'À RETENIR':{en:'REMEMBER',es:'PARA RECORDAR',de:'ZUM MERKEN',nl:'ONTHOUDEN',it:'DA RICORDARE',pt:'A RETER',ru:'ЗАПОМНИ',tr:'AKLINDA TUT',zh:'要记住',id:'DIINGAT',ur:'یاد رکھو',hi:'याद रखो'},
+'<b>Seule</b> et <b>début</b> :<br>les deux formes à connaître.':{en:'<b>Alone</b> and <b>start</b>:<br>the two forms to know.',es:'<b>Sola</b> y <b>inicio</b>:<br>las dos formas que hay que saber.',de:'<b>Allein</b> und <b>Anfang</b>:<br>die zwei Formen, die man kennen muss.',nl:'<b>Alleen</b> en <b>begin</b>:<br>de twee vormen die je kent.',it:'<b>Da sola</b> e <b>inizio</b>:<br>le due forme da sapere.',pt:'<b>Sozinha</b> e <b>início</b>:<br>as duas formas a saber.',ru:'<b>Отдельно</b> и <b>начало</b>:<br>две формы, которые надо знать.',tr:'<b>Tek</b> ve <b>baş</b>:<br>bilinmesi gereken iki biçim.',zh:'<b>单独</b>和<b>词首</b>：<br>要记住的两个形状。',id:'<b>Sendiri</b> dan <b>awal</b>:<br>dua bentuk yang harus tahu.',ur:'<b>اکیلی</b> اور <b>شروع</b>:<br>یہی دو شکلیں یاد رکھنی ہیں۔',hi:'<b>अकेले</b> और <b>शुरू</b>:<br>ये दो रूप याद रखने हैं।'},
+'Seule et début : les deux formes à connaître.':{en:'Alone and start: the two forms to know.',es:'Sola e inicio: las dos formas que hay que saber.',de:'Allein und Anfang: die zwei Formen, die man kennen muss.',nl:'Alleen en begin: de twee vormen die je kent.',it:'Da sola e inizio: le due forme da sapere.',pt:'Sozinha e início: as duas formas a saber.',ru:'Отдельно и начало: две формы, которые надо знать.',tr:'Tek ve baş: bilinmesi gereken iki biçim.',zh:'单独和词首：要记住的两个形状。',id:'Sendiri dan awal: dua bentuk yang harus tahu.',ur:'اکیلی اور شروع: یہی دو شکلیں یاد رکھنی ہیں۔',hi:'अकेले और शुरू: ये दो रूप याद रखने हैं।'},
+'Au <b>milieu</b> :<br>la forme du début, avec un trait.':{en:'In the <b>middle</b>:<br>the start form, plus a stroke.',es:'En <b>medio</b>:<br>la forma de inicio, con un trazo.',de:'In der <b>Mitte</b>:<br>die Anfangsform, mit einem Strich.',nl:'In het <b>midden</b>:<br>de beginvorm, met een streepje.',it:'In <b>mezzo</b>:<br>la forma iniziale, con un tratto.',pt:'No <b>meio</b>:<br>a forma de início, com um traço.',ru:'В <b>середине</b>:<br>форма начала, плюс чёрточка.',tr:'<b>Ortada</b>:<br>baş biçimi, bir çizgiyle.',zh:'在<b>词中</b>：<br>词首的形状，加一横。',id:'Di <b>tengah</b>:<br>bentuk awal, dengan satu garis.',ur:'<b>درمیان</b> میں:<br>شروع والی شکل، ایک لکیر کے ساتھ۔',hi:'<b>बीच</b> में:<br>शुरू वाला रूप, एक लकीर के साथ।'},
+'Au milieu : la forme du début, avec un trait.':{en:'In the middle: the start form, plus a stroke.',es:'En medio: la forma de inicio, con un trazo.',de:'In der Mitte: die Anfangsform, mit einem Strich.',nl:'In het midden: de beginvorm, met een streepje.',it:'In mezzo: la forma iniziale, con un tratto.',pt:'No meio: a forma de início, com um traço.',ru:'В середине: форма начала, плюс чёрточка.',tr:'Ortada: baş biçimi, bir çizgiyle.',zh:'在词中：词首的形状，加一横。',id:'Di tengah: bentuk awal, dengan satu garis.',ur:'درمیان میں: شروع والی شکل، ایک لکیر کے ساتھ۔',hi:'बीच में: शुरू वाला रूप, एक लकीर के साथ।'},
+'À la <b>fin</b> :<br>la forme seule, avec un trait.':{en:'At the <b>end</b>:<br>the alone form, plus a stroke.',es:'Al <b>final</b>:<br>la forma sola, con un trazo.',de:'Am <b>Ende</b>:<br>die Alleinform, mit einem Strich.',nl:'Aan het <b>eind</b>:<br>de alleenvorm, met een streepje.',it:'Alla <b>fine</b>:<br>la forma da sola, con un tratto.',pt:'No <b>fim</b>:<br>a forma sozinha, com um traço.',ru:'В <b>конце</b>:<br>отдельная форма, плюс чёрточка.',tr:'<b>Sonda</b>:<br>tek biçimi, bir çizgiyle.',zh:'在<b>词尾</b>：<br>单独的形状，加一横。',id:'Di <b>akhir</b>:<br>bentuk sendiri, dengan satu garis.',ur:'<b>آخر</b> میں:<br>اکیلی شکل، ایک لکیر کے ساتھ۔',hi:'<b>अंत</b> में:<br>अकेला रूप, एक लकीर के साथ।'},
+'À la fin : la forme seule, avec un trait.':{en:'At the end: the alone form, plus a stroke.',es:'Al final: la forma sola, con un trazo.',de:'Am Ende: die Alleinform, mit einem Strich.',nl:'Aan het eind: de alleenvorm, met een streepje.',it:'Alla fine: la forma da sola, con un tratto.',pt:'No fim: a forma sozinha, com um traço.',ru:'В конце: отдельная форма, плюс чёрточка.',tr:'Sonda: tek biçimi, bir çizgiyle.',zh:'在词尾：单独的形状，加一横。',id:'Di akhir: bentuk sendiri, dengan satu garis.',ur:'آخر میں: اکیلی شکل، ایک لکیر کے ساتھ۔',hi:'अंत में: अकेला रूप, एक लकीर के साथ।'},
+'Cette lettre a <b>4 formes</b><br>à apprendre.':{en:'This letter has <b>4 forms</b><br>to learn.',es:'Esta letra tiene <b>4 formas</b><br>que aprender.',de:'Dieser Buchstabe hat <b>4 Formen</b><br>zum Lernen.',nl:'Deze letter heeft <b>4 vormen</b><br>om te leren.',it:'Questa lettera ha <b>4 forme</b><br>da imparare.',pt:'Esta letra tem <b>4 formas</b><br>para aprender.',ru:'У этой буквы <b>4 формы</b>,<br>их надо выучить.',tr:'Bu harfin öğrenilecek<br><b>4 biçimi</b> var.',zh:'这个字母有<b>4 个形状</b><br>要学。',id:'Huruf ini punya <b>4 bentuk</b><br>untuk dipelajari.',ur:'اس حرف کی <b>4 شکلیں</b><br>سیکھنی ہیں۔',hi:'इस अक्षर के <b>4 रूप</b><br>सीखने हैं।'},
+'Cette lettre a quatre formes à apprendre.':{en:'This letter has four forms to learn.',es:'Esta letra tiene cuatro formas que aprender.',de:'Dieser Buchstabe hat vier Formen zum Lernen.',nl:'Deze letter heeft vier vormen om te leren.',it:'Questa lettera ha quattro forme da imparare.',pt:'Esta letra tem quatro formas para aprender.',ru:'У этой буквы четыре формы, их надо выучить.',tr:'Bu harfin öğrenilecek dört biçimi var.',zh:'这个字母有四个形状要学。',id:'Huruf ini punya empat bentuk untuk dipelajari.',ur:'اس حرف کی چار شکلیں سیکھنی ہیں۔',hi:'इस अक्षर के चार रूप सीखने हैं।'},
+'Elle est <b>toujours</b><br>à la fin du mot.':{en:'It is <b>always</b><br>at the end of a word.',es:'Está <b>siempre</b><br>al final de la palabra.',de:'Er steht <b>immer</b><br>am Wortende.',nl:'Hij staat <b>altijd</b><br>aan het eind van het woord.',it:'Sta <b>sempre</b><br>alla fine della parola.',pt:'Está <b>sempre</b><br>no fim da palavra.',ru:'Она <b>всегда</b><br>в конце слова.',tr:'<b>Her zaman</b><br>kelimenin sonundadır.',zh:'它<b>总是</b>在<br>词尾。',id:'Selalu <b>di akhir</b><br>kata.',ur:'یہ <b>ہمیشہ</b><br>لفظ کے آخر میں ہوتا ہے۔',hi:'यह <b>हमेशा</b><br>शब्द के अंत में होता है।'},
+'Elle est toujours à la fin du mot.':{en:'It is always at the end of a word.',es:'Está siempre al final de la palabra.',de:'Er steht immer am Wortende.',nl:'Hij staat altijd aan het eind van het woord.',it:'Sta sempre alla fine della parola.',pt:'Está sempre no fim da palavra.',ru:'Она всегда в конце слова.',tr:'Her zaman kelimenin sonundadır.',zh:'它总是在词尾。',id:'Selalu di akhir kata.',ur:'یہ ہمیشہ لفظ کے آخر میں ہوتا ہے۔',hi:'यह हमेशा शब्द के अंत में होता है।'},
+'Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.':{en:'It <b>never</b> joins,<br>before or after.',es:'<b>Nunca</b> se une,<br>ni antes ni después.',de:'Er verbindet sich <b>nie</b>,<br>weder davor noch danach.',nl:'Hij verbindt <b>nooit</b>,<br>niet ervoor, niet erna.',it:'Non si lega <b>mai</b>,<br>né prima né dopo.',pt:'<b>Nunca</b> se liga,<br>nem antes nem depois.',ru:'Она <b>никогда</b> не соединяется,<br>ни до, ни после.',tr:'<b>Asla</b> bitişmez,<br>ne önce ne sonra.',zh:'它<b>从不</b>连写，<br>前后都不。',id:'<b>Tidak pernah</b> disambung,<br>sebelum atau sesudah.',ur:'یہ <b>کبھی</b> نہیں جڑتا،<br>نہ پہلے، نہ بعد۔',hi:'यह <b>कभी</b> नहीं जुड़ता,<br>न पहले, न बाद में।'},
+'Elle ne s\'attache jamais, ni avant, ni après.':{en:'It never joins, before or after.',es:'Nunca se une, ni antes ni después.',de:'Er verbindet sich nie, weder davor noch danach.',nl:'Hij verbindt nooit, niet ervoor, niet erna.',it:'Non si lega mai, né prima né dopo.',pt:'Nunca se liga, nem antes nem depois.',ru:'Она никогда не соединяется, ни до, ни после.',tr:'Asla bitişmez, ne önce ne sonra.',zh:'它从不连写，前后都不。',id:'Tidak pernah disambung, sebelum atau sesudah.',ur:'یہ کبھی نہیں جڑتا، نہ پہلے، نہ بعد۔',hi:'यह कभी नहीं जुड़ता, न पहले, न बाद में।'},
 'Où est ce son ?':{en:'Where is this sound?',es:'¿Dónde está este sonido?',de:'Wo ist dieser Laut?',nl:'Waar is deze klank?',it:'Dov\'è questo suono?',pt:'Onde está este som?',ru:'Где этот звук?',tr:'Bu ses nerede?',zh:'这个音在哪里？',id:'Mana bunyi ini?',ur:'یہ آواز کہاں ہے؟',hi:'यह ध्वनि कहाँ है?'},
 'Où est <b>ce son</b> ?':{en:'Where is <b>this sound</b>?',es:'¿Dónde está <b>este sonido</b>?',de:'Wo ist <b>dieser Laut</b>?',nl:'Waar is <b>deze klank</b>?',it:'Dov\'è <b>questo suono</b>?',pt:'Onde está <b>este som</b>?',ru:'Где <b>этот звук</b>?',tr:'<b>Bu ses</b> nerede?',zh:'<b>这个音</b>在哪里？',id:'Mana <b>bunyi ini</b>?',ur:'<b>یہ آواز</b> کہاں ہے؟',hi:'<b>यह ध्वनि</b> कहाँ है?'},
 'ÉTAPE · SOUKOUN':{en:'STEP · SUKŪN',es:'PASO · SUKŪN',de:'SCHRITT · SUKŪN',nl:'STAP · SUKŪN',it:'TAPPA · SUKŪN',pt:'ETAPA · SUKŪN',ru:'ШАГ · СУКУН',tr:'ADIM · SÜKÛN',zh:'步骤 · 静符',id:'LANGKAH · SUKUN',ur:'مرحلہ · جزم',hi:'चरण · सुकून'},
@@ -12558,7 +12624,7 @@ var _TE={
 'Où est {son} ?':{en:'Where is {son}?',es:'¿Dónde está {son}?',de:'Wo ist {son}?',nl:'Waar is {son}?',it:'Dov\'è {son}?',pt:'Onde está {son}?',ru:'Где {son}?',tr:'{son} nerede?',zh:'{son} 在哪里？',id:'Mana {son}?',ur:'{son} کہاں ہے؟',hi:'{son} कहाँ है?'},
 'ses {n} formes de fin de mot':{en:'its {n} word-final forms',es:'sus {n} formas de final de palabra',de:'seine {n} Endformen',nl:'zijn {n} eindvormen',it:'le sue {n} forme di fine parola',pt:'as suas {n} formas de fim de palavra',ru:'его {n} конечные формы',tr:'{n} kelime sonu biçimi',zh:'它的 {n} 种词尾字形',id:'{n} bentuk akhir katanya',ur:'اس کی {n} آخری شکلیں',hi:'इसके {n} अंतिम रूप'},
 'cette forme':{en:'in this form',es:'en esta forma',de:'in dieser Form',nl:'in deze vorm',it:'in questa forma',pt:'nesta forma',ru:'в этой форме',tr:'bu biçimde',zh:'用这个字形',id:'dalam bentuk ini',ur:'اس شکل میں',hi:'इस रूप में'},
-'Doublé :<br>ça fait {son} 👃':{en:'Doubled:<br>it says {son} 👃',es:'Duplicado:<br>suena {son} 👃',de:'Verdoppelt:<br>das klingt wie {son} 👃',nl:'Verdubbeld:<br>dat klinkt als {son} 👃',it:'Raddoppiato:<br>suona {son} 👃',pt:'Duplicado:<br>soa {son} 👃',ru:'Удвоено:<br>звучит {son} 👃',tr:'İkilenince:<br>sesi {son} 👃',zh:'写两次：<br>读作 {son} 👃',id:'Digandakan:<br>bunyinya {son} 👃',ur:'دوہری:<br>آواز {son} 👃',hi:'दोगुना:<br>ध्वनि {son} 👃'},
+'Doublé :<br>ça fait {son}':{en:'Doubled:<br>it says {son}',es:'Duplicado:<br>suena {son}',de:'Verdoppelt:<br>das klingt wie {son}',nl:'Verdubbeld:<br>dat klinkt als {son}',it:'Raddoppiato:<br>suona {son}',pt:'Duplicado:<br>soa {son}',ru:'Удвоено:<br>звучит {son}',tr:'İkilenince:<br>sesi {son}',zh:'写两次：<br>读作 {son}',id:'Digandakan:<br>bunyinya {son}',ur:'دوہری:<br>آواز {son}',hi:'दोगुना:<br>ध्वनि {son}'},
 'Doublé, ça fait {son}':{en:'Doubled, it says {son}',es:'Duplicado, suena {son}',de:'Verdoppelt klingt es wie {son}',nl:'Verdubbeld klinkt het als {son}',it:'Raddoppiato, suona {son}',pt:'Duplicado, soa {son}',ru:'Удвоено — звучит {son}',tr:'İkilenince sesi {son}',zh:'写两次，读作 {son}',id:'Digandakan, bunyinya {son}',ur:'دوہری ہو تو آواز {son}',hi:'दोगुना होने पर ध्वनि {son}'},
 'TANWĪN {n}/3 · TRACÉ':{en:'TANWĪN {n}/3 · WRITING',es:'TANWĪN {n}/3 · TRAZO',de:'TANWĪN {n}/3 · SCHREIBEN',nl:'TANWĪN {n}/3 · SCHRIJVEN',it:'TANWĪN {n}/3 · TRACCIATO',pt:'TANWĪN {n}/3 · TRAÇADO',ru:'ТАНВИН {n}/3 · ПИСЬМО',tr:'TENVİN {n}/3 · YAZMA',zh:'双元音 {n}/3 · 书写',id:'TANWIN {n}/3 · MENULIS',ur:'تنوین {n}/۳ · لکھائی',hi:'तनवीन {n}/3 · लेखन'},
 'Trace ce tanwîn dans {ou}.':{en:'Write this tanwīn in {ou}.',es:'Traza este tanwīn en {ou}.',de:'Schreibe dieses Tanwīn in {ou}.',nl:'Schrijf deze tanwīn in {ou}.',it:'Traccia questo tanwīn in {ou}.',pt:'Traça este tanwīn em {ou}.',ru:'Напиши этот танвин в {ou}.',tr:'Bu tenvini {ou} yaz.',zh:'在{ou}写出这个双元音。',id:'Tulis tanwin ini dalam {ou}.',ur:'یہ تنوین {ou} لکھو۔',hi:'यह तनवीन {ou} लिखो।'},
@@ -12634,7 +12700,7 @@ var _TE={
 'Elles ont un <b>nom</b>,<br>mais retiens le <b>SON</b> !':{en:'They have a <b>name</b>,<br>but remember the <b>SOUND</b>!',es:'Tienen un <b>nombre</b>,<br>¡pero recuerda el <b>SONIDO</b>!',de:'Sie haben einen <b>Namen</b>,<br>aber merk dir den <b>KLANG</b>!',nl:'Ze hebben een <b>naam</b>,<br>maar onthoud de <b>KLANK</b>!',it:'Hanno un <b>nome</b>,<br>ma ricorda il <b>SUONO</b>!',pt:'Têm um <b>nome</b>,<br>mas lembra-te do <b>SOM</b>!',ru:'У них есть <b>название</b>,<br>но запомни <b>ЗВУК</b>!',tr:'Bir <b>adı</b> var,<br>ama <b>SESİ</b> aklında tut!',zh:'它们有<b>名字</b>，<br>但要记住<b>读音</b>！',id:'Ada <b>namanya</b>,<br>tapi ingat <b>BUNYINYA</b>!',ur:'ان کا ایک <b>نام</b> ہے،<br>مگر <b>آواز</b> یاد رکھو!',hi:'इनका एक <b>नाम</b> है,<br>पर <b>ध्वनि</b> याद रखो!'},
 'Elles ont un nom, mais le plus important est de retenir leur son, pas leur nom.':{en:'They have names, but what matters most is remembering their sound, not their name.',es:'Tienen nombre, pero lo más importante es recordar su sonido, no su nombre.',de:'Sie haben Namen, aber am wichtigsten ist ihr Klang, nicht ihr Name.',nl:'Ze hebben namen, maar het belangrijkste is hun klank, niet hun naam.',it:'Hanno un nome, ma la cosa più importante è ricordare il suono, non il nome.',pt:'Têm nome, mas o mais importante é lembrar o som, não o nome.',ru:'У них есть названия, но важнее запомнить звук, а не название.',tr:'Adları var, ama önemli olan seslerini hatırlamak, adlarını değil.',zh:'它们有名字，但最重要的是记住读音，而不是名字。',id:'Ada namanya, tetapi yang penting mengingat bunyinya, bukan namanya.',ur:'ان کے نام ہیں، مگر اہم بات آواز یاد رکھنا ہے، نام نہیں۔',hi:'इनके नाम हैं, पर ज़रूरी है ध्वनि याद रखना, नाम नहीं।'},
 'ÉTAPE 10 · DOUBLEMENT':{en:'STEP 10 · DOUBLING',es:'PASO 10 · DUPLICACIÓN',de:'SCHRITT 10 · VERDOPPELUNG',nl:'STAP 10 · VERDUBBELING',it:'TAPPA 10 · RADDOPPIO',pt:'ETAPA 10 · DUPLICAÇÃO',ru:'ШАГ 10 · УДВОЕНИЕ',tr:'ADIM 10 · İKİLEME',zh:'第 10 步 · 双写',id:'LANGKAH 10 · PENGGANDAAN',ur:'مرحلہ ۱۰ · دوہرا',hi:'चरण 10 · दोहराव'},
-'Si on <b>double</b> une voyelle,<br>on ajoute le son <b>« n »</b> 👃':{en:'If you <b>double</b> a vowel,<br>you add an <b>“n”</b> sound 👃',es:'Si <b>duplicas</b> una vocal,<br>se añade el sonido <b>«n»</b> 👃',de:'Wenn man einen Vokal <b>verdoppelt</b>,<br>kommt ein <b>„n“</b> dazu 👃',nl:'Als je een klinker <b>verdubbelt</b>,<br>komt er een <b>“n”</b> bij 👃',it:'Se <b>raddoppi</b> una vocale,<br>si aggiunge il suono <b>«n»</b> 👃',pt:'Se <b>duplicares</b> uma vogal,<br>junta-se o som <b>«n»</b> 👃',ru:'Если огласовку <b>удвоить</b>,<br>добавляется звук <b>«н»</b> 👃',tr:'Sesliyi <b>ikilersen</b>,<br><b>“n”</b> sesi eklenir 👃',zh:'元音<b>写两次</b>，<br>就加上 <b>“n”</b> 音 👃',id:'Kalau vokal <b>digandakan</b>,<br>ada tambahan bunyi <b>“n”</b> 👃',ur:'حرکت <b>دوہری</b> ہو تو<br><b>«ن»</b> کی آواز آتی ہے 👃',hi:'स्वर <b>दोगुना</b> हो तो<br><b>“न”</b> ध्वनि जुड़ती है 👃'},
+'Si on <b>double</b> une voyelle,<br>on ajoute le son <b>« n »</b>':{en:'If you <b>double</b> a vowel,<br>you add an <b>“n”</b> sound',es:'Si <b>duplicas</b> una vocal,<br>se añade el sonido <b>«n»</b>',de:'Wenn man einen Vokal <b>verdoppelt</b>,<br>kommt ein <b>„n“</b> dazu',nl:'Als je een klinker <b>verdubbelt</b>,<br>komt er een <b>“n”</b> bij',it:'Se <b>raddoppi</b> una vocale,<br>si aggiunge il suono <b>«n»</b>',pt:'Se <b>duplicares</b> uma vogal,<br>junta-se o som <b>«n»</b>',ru:'Если огласовку <b>удвоить</b>,<br>добавляется звук <b>«н»</b>',tr:'Sesliyi <b>ikilersen</b>,<br><b>“n”</b> sesi eklenir',zh:'元音<b>写两次</b>，<br>就加上 <b>“n”</b> 音',id:'Kalau vokal <b>digandakan</b>,<br>ada tambahan bunyi <b>“n”</b>',ur:'حرکت <b>دوہری</b> ہو تو<br><b>«ن»</b> کی آواز آتی ہے',hi:'स्वर <b>दोगुना</b> हो तो<br><b>“न”</b> ध्वनि जुड़ती है'},
 'Si on double une voyelle, on ajoute le son « n »':{en:'If you double a vowel, you add an “n” sound.',es:'Si duplicas una vocal, se añade el sonido «n».',de:'Wenn man einen Vokal verdoppelt, kommt ein „n“ dazu.',nl:'Als je een klinker verdubbelt, komt er een “n” bij.',it:'Se raddoppi una vocale, si aggiunge il suono «n».',pt:'Se duplicares uma vogal, junta-se o som «n».',ru:'Если огласовку удвоить, добавляется звук «н».',tr:'Sesliyi ikilersen “n” sesi eklenir.',zh:'元音写两次，就加上“n”音。',id:'Kalau vokal digandakan, ada tambahan bunyi “n”.',ur:'حرکت دوہری ہو تو «ن» کی آواز آتی ہے۔',hi:'स्वर दोगुना हो तो “न” ध्वनि जुड़ती है।'},
 'ÉTAPE 12 · TANWĪN':{en:'STEP 12 · TANWĪN',es:'PASO 12 · TANWĪN',de:'SCHRITT 12 · TANWĪN',nl:'STAP 12 · TANWĪN',it:'TAPPA 12 · TANWĪN',pt:'ETAPA 12 · TANWĪN',ru:'ШАГ 12 · ТАНВИН',tr:'ADIM 12 · TENVİN',zh:'第 12 步 · 双元音',id:'LANGKAH 12 · TANWIN',ur:'مرحلہ ۱۲ · تنوین',hi:'चरण 12 · तनवीन'},
 'Deux traits au-dessus :<br><b>« a »</b> devient <b>« an »</b>':{en:'Two dashes above:<br><b>“a”</b> becomes <b>“an”</b>',es:'Dos rayitas encima:<br><b>«a»</b> pasa a <b>«an»</b>',de:'Zwei Striche darüber:<br>aus <b>„a“</b> wird <b>„an“</b>',nl:'Twee streepjes erboven:<br><b>“a”</b> wordt <b>“an”</b>',it:'Due trattini sopra:<br><b>«a»</b> diventa <b>«an»</b>',pt:'Dois traços acima:<br><b>«a»</b> passa a <b>«an»</b>',ru:'Две чёрточки сверху:<br><b>«а»</b> становится <b>«ан»</b>',tr:'Üstte iki çizgi:<br><b>“a”</b> olur <b>“an”</b>',zh:'上面两横：<br><b>“a”</b> 变成 <b>“an”</b>',id:'Dua garis di atas:<br><b>“a”</b> jadi <b>“an”</b>',ur:'اوپر دو لکیریں:<br><b>«اَ»</b> بنے <b>«اَن»</b>',hi:'ऊपर दो रेखाएँ:<br><b>“अ”</b> बने <b>“अन”</b>'},
@@ -12791,6 +12857,10 @@ function _noteExo(bon){
 
 /* Combien de scenes sont encore en train de parler. Voir `quandToutEstDit`. */
 var _sceneParle=0;
+/* Et combien attendent encore leur recompense. On les compte a part : la
+   page « repete apres moi » doit savoir que SA phrase est finie pour lancer
+   le bravo, sans que cette attente-la se compte elle-meme. */
+var _sceneFete=0;
 function _boyScene(ca,reprise){
   _HAB=_habDuProfil();
   if(reprise)repriseNoter({type:'cours',cours:reprise.cours,arg:reprise.arg,premiere:reprise.premiere,session:reprise.session});
@@ -12878,15 +12948,18 @@ function _boyScene(ca,reprise){
      laisse un blanc de quelques dixiemes entre deux phrases, et le premier
      de ces blancs passait pour la fin. On compte donc les scenes encore en
      train de parler, et on n'attend le silence qu'une fois ce compte a zero. */
-  function quandToutEstDit(fn){
+  function attendSilence(fn,avecFete){
     N.plusTard(function(){
       var id=setInterval(function(){
-        if(_sceneParle>0)return;
+        if(_sceneParle>0||(avecFete&&_sceneFete>0))return;
         clearInterval(id);N.surSilence(fn);
       },200);
       N.plusTard(function(){clearInterval(id);},20000);
     },700);
   }
+  /* La page a fini de parler ET de feliciter : c'est alors, et pas avant,
+     qu'elle peut passer. */
+  function quandToutEstDit(fn){attendSilence(fn,true);}
   /* ── LA BARRE DU BAS, ET LES PAGES QUI S'ENCHAINENT SEULES ──────────
      Le client ne veut plus que l'enfant appuie pour avancer : une page passe
      d'elle-meme des que TOUTE sa voix a ete jouee. Trois boutons
@@ -12923,22 +12996,21 @@ function _boyScene(ca,reprise){
     var boutons=[].slice.call(p.querySelectorAll('.boy-btn'))
       .filter(function(b){return b.className.indexOf('sec')<0;});
     var principal=boutons[boutons.length-1];
-    if(!principal&&attend)principal=bouton(p,te('Suite ›'),suivant);
-    /* ── UNE QUESTION NE SE SAUTE PAS ──
-       Le bouton est la, comme sur tous les ecrans qui attendent, mais il
-       reste eteint tant que la bonne reponse n'a pas ete donnee : c'est elle
-       qui fait avancer, et le client ne veut pas qu'on passe sans repondre.
-       La scene rallume le bouton par `p._debloque`. */
-    if(principal&&p.getAttribute('data-verrou')){
-      var _pr=principal;
-      _pr.disabled=true;_pr.style.opacity='.45';
-      p._debloque=function(){_pr.disabled=false;_pr.style.opacity='1';};
-    }
+    /* ── UNE QUESTION N'A PAS DE BOUTON D'AVANCEMENT ──
+       C'est la bonne reponse qui fait passer, et elle seule : le client ne
+       veut pas qu'on puisse sauter une question. `data-verrou` dit qu'aucun
+       « Suite » ne doit etre pose ici. Les autres ecrans qui attendent — les
+       canevas de trace — gardent le leur. */
+    var verrou=!!p.getAttribute('data-verrou');
+    if(!principal&&attend&&!verrou)principal=bouton(p,te('Suite ›'),suivant);
     if(fin&&principal)_avance=function(){
       if(principal.isConnected)principal.click();
     };
+    /* Les boutons sont CENTRES, et dans cet ordre : retour tout a gauche,
+       pause a sa droite, suite en dernier. */
     var rangee=document.createElement('div');
-    rangee.style.cssText='display:flex;align-items:stretch;gap:8px;margin-top:18px';
+    rangee.style.cssText='display:flex;align-items:stretch;justify-content:center;'
+      +'gap:8px;margin-top:18px';
     if(principal)p.insertBefore(rangee,principal);else p.appendChild(rangee);
     function petit(txt,aria,fn){
       var b=document.createElement('button');
@@ -12947,6 +13019,10 @@ function _boyScene(ca,reprise){
       b.textContent=txt;b.onclick=fn;
       rangee.appendChild(b);return b;
     }
+    /* RETOUR — tout a gauche, toujours. C'est un recours, pas la marche a
+       suivre. */
+    if(i>0)petit(te('‹ Retour'),te('Revoir l\'écran précédent'),function(){
+      arreteEnchainement();N.stop();precedent();});
     /* PAUSE — seulement la ou quelque chose se joue tout seul. */
     if(!attend){
       var pb=petit(te('❙❙ Pause'),te('Mettre en pause'),function(){
@@ -12958,9 +13034,6 @@ function _boyScene(ca,reprise){
         }
       });
     }
-    /* RETOUR — un recours, pas la marche a suivre. */
-    if(i>0)petit(te('‹ Retour'),te('Revoir l\'écran précédent'),function(){
-      arreteEnchainement();N.stop();precedent();});
     if(principal){
       principal.style.flex='1';principal.style.marginTop='0';
       rangee.appendChild(principal);
@@ -13251,6 +13324,32 @@ function _boyScene(ca,reprise){
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
       h.appendChild(cvH);
       h.onclick=function(){N.stop();N.dire(son||glyph);};
+    }else if(_aTanwin(glyph)){
+      /* ── DEUX SIGNES, PAS UNE LIGATURE ──
+         Poser deux fois le texte doublerait la LETTRE avec le signe ; seul
+         `_dessineSurLigne` sait ne reposer que l'encre du signe (voir
+         `_encreDuSigne`). On passe donc par un canevas, comme pour la
+         syllabe a deux couleurs — et la ligne d'ecriture s'y dessine aussi,
+         celle du CSS tomberait deux pixels a cote. */
+      h.classList.remove('ligne');
+      var cvT=document.createElement('canvas');cvT.width=320;cvT.height=320;
+      cvT.style.cssText='width:150px;height:150px;position:relative;z-index:1';
+      var cxT=cvT.getContext('2d');
+      var peintT=function(){
+        cxT.clearRect(0,0,320,320);
+        var bY=200;
+        cxT.save();cxT.strokeStyle='rgba('+_HAB.rgbF+',.42)';cxT.lineWidth=5;
+        cxT.setLineDash([14,10]);
+        cxT.beginPath();cxT.moveTo(46,bY);cxT.lineTo(274,bY);cxT.stroke();cxT.restore();
+        cxT.font="150px 'Scheherazade New',serif";
+        cxT.textBaseline='alphabetic';cxT.textAlign='center';
+        cxT.fillStyle=_HAB.fonce;
+        _dessineSurLigne(cxT,_sansCercle(glyph),160,bY,150);
+      };
+      peintT();
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peintT);}catch(e){}
+      h.appendChild(cvT);
+      h.onclick=function(){N.stop();N.dire(son||glyph);};
     }else{
       h.innerHTML='<span>'+_sansCercle(glyph)+'</span>';
       /* Un mot entier écrit à la taille d'une lettre débordait du hublot et
@@ -13504,7 +13603,7 @@ function _boyScene(ca,reprise){
     /* On change d'ecran : la scene qui parlait n'existe plus, son compte
        repart de zero — sinon le bouton de la page suivante attendrait une
        voix qui ne viendra jamais. */
-    _sceneParle=0;
+    _sceneParle=0;_sceneFete=0;
     arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
     N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
@@ -13820,10 +13919,16 @@ function _boyScene(ca,reprise){
       if(plan)sceneIllustree(p,plan);
       /* On attend que TOUTE la voix de la page soit jouee — la scene parle
          etat par etat — puis une seconde de blanc, le temps que l'enfant
-         repete, et alors seulement la recompense jaillit. */
-      quandToutEstDit(function(){
-        N.plusTard(function(){N.dire(te('Bravo !'));bravo(p,2);},1000);
-      });
+         repete, et alors seulement la recompense jaillit. Et la page ne passe
+         pas avant elle : `_sceneFete` la retient jusqu'a ce que le bravo soit
+         dit. */
+      _sceneFete++;
+      attendSilence(function(){
+        N.plusTard(function(){
+          N.dire(te('Bravo !'));bravo(p,2);
+          N.plusTard(function(){N.surSilence(function(){_sceneFete--;});},250);
+        },1000);
+      },false);
       bouton(p,te('Suite ›'),suivant);
     };
   };
@@ -14036,7 +14141,6 @@ function _boyScene(ca,reprise){
           if(premier){premier=false;_noteExo(o.g===cible);_noteSigne(cible,o.g===cible,sonCible);}
           N.stop();N.dire(o.s);
           if(o.g===cible){repondu=true;b.classList.add('ok');
-            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,850);}
           else{b.classList.add('ko');if(typeof playError==='function')playError();}
@@ -14123,10 +14227,18 @@ function _boyScene(ca,reprise){
       /* L'ordre du DOM, en grille RTL : haut-droite, haut-gauche, puis
          bas-droite, bas-gauche. Le client les veut seule, debut, fin, milieu
          dans cet ordre-la. */
+      /* ── CE QUI SUIT LA LETTRE ──
+         Une lettre qui ne s'attache pas a la suivante — l'alif, le dal, le
+         ra… — ne lui donne AUCUN trait de liaison : ecrire « ا » suivi d'un
+         « ـب » serait une faute, celle-la meme que l'ecran d'accrochage fait
+         barrer d'une croix. On le lit dans ses formes : sa forme de debut est
+         alors la meme que sa forme seule. */
+      var attacheApres=(formes[1]!==formes[0]);
+      var apres=attacheApres?(T+liant):liant;
       var mSeule =mot(bloqueur,'',      te('seule'));
-      var mDebut =mot('',T+liant,       te('début'));
+      var mDebut =mot('',apres,         te('début'));
       var mFin   =mot(liant+T,'',       te('fin'));
-      var mMilieu=mot(liant+T,T+liant,  te('milieu'));
+      var mMilieu=mot(liant+T,apres,    te('milieu'));
       p.appendChild(g);
       /* Les deux mots du haut sont ecrits d'emblee : ce sont les deux formes
          qu'il faut connaitre. */
@@ -14209,6 +14321,36 @@ function _boyScene(ca,reprise){
         }
         if(e.dit)N.dire(e.dit);
         e.act(apres);
+      })();
+    };
+  };
+  /* ── CE QU'IL FAUT RETENIR ──
+     Le client la veut AVANT chaque page de felicitations : on ne felicite pas
+     sans avoir redit ce qui compte. Les points paraissent un a un, chacun au
+     moment ou la voix le dit — c'est la seule facon qu'une liste se lise.
+     Chaque point est {h: ce qui s'ecrit, f: ce qui se dit}. */
+  api.resume=function(points){
+    return function(){
+      var p=panneau(te('À RETENIR'));
+      var l=document.createElement('div');l.className='res-liste';
+      var lignes=points.map(function(o){
+        var d=document.createElement('div');d.className='res-point';
+        var pu=document.createElement('i');pu.textContent=_HAB.veh||'•';
+        pu.setAttribute('aria-hidden','true');
+        var tx=document.createElement('span');tx.innerHTML=o.h;
+        d.appendChild(pu);d.appendChild(tx);l.appendChild(d);
+        return d;
+      });
+      p.appendChild(l);
+      bouton(p,te('Suite ›'),suivant);
+      _sceneParle++;
+      var n=0;
+      (function joue(){
+        if(n>=lignes.length){_sceneParle--;return;}
+        var k=n++;
+        lignes[k].classList.add('vu');
+        N.dire(points[k].f);
+        N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,300);});},250);
       })();
     };
   };
@@ -14424,8 +14566,7 @@ function _boyScene(ca,reprise){
             reste=reste.filter(function(x){return x!==o.g;});
             if(typeof playBravo==='function')playBravo();
             if(!reste.length){
-              if(p._debloque)p._debloque();
-              if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+                if(typeof launchConfetti==='function')try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
               N.plusTard(suivant,900);
             }
           }else{
@@ -14476,7 +14617,6 @@ function _boyScene(ca,reprise){
           N.stop();
           if(o.g===cible){repondu=true;b.classList.add('ok');
             N.dire(o.s);
-            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,850);}
           else{b.classList.add('ko');if(typeof playError==='function')playError();}
@@ -14554,7 +14694,6 @@ function _boyScene(ca,reprise){
                refermer, ce qu'une simple pastille verte ne montre pas. */
             creux.style.border='3px solid rgba('+_HAB.rgbF+',.9)';
             creux.textContent=_sansCercle(o.g);
-            if(p._debloque)p._debloque();
             if(typeof playBravo==='function')playBravo();
             N.plusTard(suivant,1100);
           }else{b.classList.add('ko');if(typeof playError==='function')playError();}
@@ -14668,7 +14807,7 @@ function _boyVowelCourse(ca){
        « ou » : c'est l'addition elle-meme qu'on montre. Rien n'est dit par
        le titre — toute la parole est portee par la scene, dans l'ordre. */
     B.repete(te('ÉTAPE 3 · À TON TOUR'),
-      TB('<b>« b »</b> + <b>« ou »</b>, ça fait <b>« bou »</b>.<br>Répète après moi : <b>« bou »</b>'),
+      TB('<b>« b »</b> + <b>« ou »</b>, ça fait <b>« bou »</b>.'),
       false,
       {calques:[LB,LBD],
        scene:[{L:[0],P:1,dit:te('b')},
@@ -14688,7 +14827,7 @@ function _boyVowelCourse(ca){
        scene:[{F:[0],P:1,d:2600},{F:[0],P:1,d:2600}]}),
 
     B.repete(te('ÉTAPE 4 · À TON TOUR'),
-      TB('<b>« b »</b> + <b>« a »</b>, ça fait <b>« ba »</b>.<br>Répète après moi : <b>« ba »</b>'),
+      TB('<b>« b »</b> + <b>« a »</b>, ça fait <b>« ba »</b>.'),
       false,
       {calques:[LB,LBF],
        scene:[{L:[0],P:1,dit:te('b')},
@@ -14706,7 +14845,7 @@ function _boyVowelCourse(ca){
        scene:[{F:[0],P:1,d:2600},{F:[0],P:1,d:2600}]}),
 
     B.repete(te('ÉTAPE 5 · À TON TOUR'),
-      TB('<b>« b »</b> + <b>« i »</b>, ça fait <b>« bi »</b>.<br>Répète après moi : <b>« bi »</b>'),
+      TB('<b>« b »</b> + <b>« i »</b>, ça fait <b>« bi »</b>.'),
       false,
       {calques:[LB,LBK],
        scene:[{L:[0],P:1,dit:te('b')},
@@ -14783,32 +14922,35 @@ function _boyVowelCourse(ca){
        simples, l'enfant REPETE : la page attend qu'il ait parle avant de
        feliciter (`B.repete`), et la voix porte la scene etat par etat. */
     B.repete(te('DOUBLEMENT · « OUN »'),
-      TB('« bou » devient<br>« <b>boun</b> ».<br>Répète après moi : <b>« boun »</b>'),
+      TB('Ici on a « <b>bou</b> ».<br>Avec une <b>deuxième voyelle</b>,<br>ça donne « <b>boun</b> ».'),
       false,
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
-       scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Bou devient boun.')},
+       scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Ici on a bou.')},
+              {L:[0],P:1,F:[0,1],t:'boun',dit:te('Avec une deuxième voyelle, ça donne boun.')},
               {L:[0],P:1,F:[0,1],t:'boun',dit:te('Répète après moi : boun.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     /* Deux traits : le second se pose JUSTE AU-DESSUS du premier. */
     B.repete(te('DOUBLEMENT · « AN »'),
-      TB('« ba » devient<br>« <b>ban</b> ».<br>Répète après moi : <b>« ban »</b>'),
+      TB('Ici on a « <b>ba</b> ».<br>Avec une <b>deuxième voyelle</b>,<br>ça donne « <b>ban</b> ».'),
       false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
-       scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ba devient ban.')},
+       scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ici on a ba.')},
+              {L:[0],P:1,F:[0,1],t:'ban',dit:te('Avec une deuxième voyelle, ça donne ban.')},
               {L:[0],P:1,F:[0,1],t:'ban',dit:te('Répète après moi : ban.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     B.repete(te('DOUBLEMENT · « IN »'),
-      TB('« bi » devient<br>« <b>bin</b> ».<br>Répète après moi : <b>« bin »</b>'),
+      TB('Ici on a « <b>bi</b> ».<br>Avec une <b>deuxième voyelle</b>,<br>ça donne « <b>bin</b> ».'),
       false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
-       scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Bi devient bin.')},
+       scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Ici on a bi.')},
+              {L:[0],P:1,F:[0,1],t:'bin',dit:te('Avec une deuxième voyelle, ça donne bin.')},
               {L:[0],P:1,F:[0,1],t:'bin',dit:te('Répète après moi : bin.')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
@@ -14837,13 +14979,24 @@ function _boyVowelCourse(ca){
               {L:[0],P:1,F:[0],bat:1,d:1800},
               {L:[0],P:1,F:[0],bat:1,t:'b',d:2400}]}),
 
+    /* « Repete apres moi » ne s'ECRIT plus : il se dit, et lui seul. La page
+       montre ce qu'on a sous les yeux. */
     B.repete(te('LE SOUKOUN · À TON TOUR'),
-      TB('Répète après moi :<br><b>« b »</b>'),
+      TB('Ici on a <b>« b »</b>.'),
       te('Répète après moi : b.'),
       {calques:[LBS],scene:[{L:[0],P:1,t:'b',d:4000}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
       TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
+
+    B.resume([
+      {h:TB('Il y a <b>3 voyelles</b> :<br>« a », « i », « ou ».'),
+       f:te('Il y a trois voyelles : a, i, ou.')},
+      {h:TB('Deux fois le <b>même signe</b> :<br>on ajoute le son « n ».'),
+       f:te('Deux fois le même signe : on ajoute le son n.')},
+      {h:TB('Le <b>soukoun</b> :<br>on ne dit que la lettre.'),
+       f:te('Le soukoun : on ne dit que la lettre.')}
+    ]),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
       B.mission(TB('Tu <b>maîtrises</b><br>les voyelles !'),
@@ -14937,6 +15090,16 @@ function _boyProlongCourse(ca){
     B.tracer(te('ÉTAPE 13 · TRACÉ'),'جَدّ',TB('Trace <b>جَدّ</b> ✍️'),'Trace jadd.',2),
     B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br class="dur">Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
       te('Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.')),
+    B.resume([
+      {h:TBF('Le {a} prolonge le « a »,<br>le {ou} le « ou »,<br>le {i} le « i ».',
+             {a:pa('ا'),ou:pou('و'),i:pi('ي')}),
+       f:te('Le alif prolonge le a, le waw le ou, le ya le i.')},
+      {h:TB('Ils ne prolongent que s\'ils<br>n\'ont <b>aucune voyelle</b>.'),
+       f:te('Ils ne prolongent que s\'ils n\'ont aucune voyelle.')},
+      {h:TB('La <b>chaddah</b> :<br>on insiste sur la lettre.'),
+       f:te('La chaddah : on insiste sur la lettre.')}
+    ]),
+
     function(api){_boyValideSession(_boySession&&_boySession.id);
       B.mission(TB('Prolongations <b>maîtrisées</b> !<br>🎖️'),
         teF('{mission} accomplie ! Tu maîtrises les prolongations.',{mission:_HAB.missionMin}))(api);}
@@ -15211,7 +15374,7 @@ function _boyLetterCourse(ca,idx,premiere){
      vient d'apprendre les trois voyelles, il les reconnait. */
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
-      teF('Avec deux {signe} :<br>ça fait {son} 👃',{signe:b(v[2]),son:q(v[1])}),
+      teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])}),
       teF('Avec deux {signe}, ça fait {son}',{signe:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
@@ -15401,6 +15564,24 @@ function _boyLetterCourse(ca,idx,premiere){
     teF('De tête, maintenant !<br>{lettre} dans {ou} ✍️',{lettre:b(L.name),ou:b(combien)}),
     teF('De tête, maintenant : écris cette lettre dans {ou}.',{ou:combien}),
     null,nomsMontres,true));
+  /* ── CE QU'IL FAUT RETENIR DE CETTE LETTRE ──
+     La regle des formes, celle que le recapitulatif a montree — sauf pour les
+     quatre lettres qui n'y obeissent pas : chacune a son propre point. */
+  sc.push(B.resume(sansDeduction
+    ? [ (A==='ة')
+        ? {h:TB('Elle est <b>toujours</b><br>à la fin du mot.'),
+           f:te('Elle est toujours à la fin du mot.')}
+        : (A==='ء')
+        ? {h:TB('Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.'),
+           f:te('Elle ne s\'attache jamais, ni avant, ni après.')}
+        : {h:TB('Cette lettre a <b>4 formes</b><br>à apprendre.'),
+           f:te('Cette lettre a quatre formes à apprendre.')} ]
+    : [ {h:TB('<b>Seule</b> et <b>début</b> :<br>les deux formes à connaître.'),
+         f:te('Seule et début : les deux formes à connaître.')},
+        {h:TB('Au <b>milieu</b> :<br>la forme du début, avec un trait.'),
+         f:te('Au milieu : la forme du début, avec un trait.')},
+        {h:TB('À la <b>fin</b> :<br>la forme seule, avec un trait.'),
+         f:te('À la fin : la forme seule, avec un trait.')} ]));
   sc.push(function(api){
     /* Le resultat vient de l'ecran du mot, ou la lettre a ete enregistree.
        Rappeler la fonction ici repondrait « tu la revises » a un enfant qui
@@ -17864,6 +18045,12 @@ var ADMIN_SOUNDS = [
   {ar:'Répète après moi : ban.',label:'Répète après moi : ban.'},
   {ar:'Répète après moi : bin.',label:'Répète après moi : bin.'},
   {ar:'À toi de tracer.',label:'À toi de tracer.'},
+  {ar:'Ici on a bou.',label:'Ici on a bou.'},
+  {ar:'Ici on a ba.',label:'Ici on a ba.'},
+  {ar:'Ici on a bi.',label:'Ici on a bi.'},
+  {ar:'Avec une deuxième voyelle, ça donne boun.',label:'Avec une deuxième voyelle, ça donne bo…'},
+  {ar:'Avec une deuxième voyelle, ça donne ban.',label:'Avec une deuxième voyelle, ça donne ba…'},
+  {ar:'Avec une deuxième voyelle, ça donne bin.',label:'Avec une deuxième voyelle, ça donne bi…'},
   {ar:'On commence par ce symbole. Te souviens-tu de lui ?',label:'On commence par ce symbole. Te souviens-tu …'},
   {ar:'Repasse sur les modèles.',label:'Repasse sur les modèles.'},
   {ar:'On passe à ce symbole. Au dessus de la lettre, on dit comment ?',label:'On passe à ce symbole. Au dessus de la lett…'},

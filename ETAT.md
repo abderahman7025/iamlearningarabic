@@ -31,13 +31,60 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 6 septembre 2026, production en v206
+## OÙ ON EN EST — 6 septembre 2026, production en v207
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v206) :**
+**Fait et en ligne (v187 → v207) :**
+
+- **LA RELECTURE DU CLIENT, POINT PAR POINT (v207).**
+
+  - **La barre du bas, dans son ordre.** Retour tout à gauche, Pause à sa
+    droite, Suite en dernier ; les boutons sont centrés, les deux petits ont
+    la même largeur et des coins moins arrondis (`.boy-nav`).
+
+  - **Une question n'a plus de bouton du tout** — sauf le retour. C'est la
+    bonne réponse qui fait passer, et rien d'autre : le client ne veut pas
+    qu'on puisse en sauter une. (Le bouton éteint de v206 n'était pas ce
+    qu'il voulait.)
+
+  - **Le récapitulatif : l'arabe est ce qu'on regarde.** Le mot passe à
+    `clamp(38px,13vh,94px)`, la grille s'élargit. Et **une lettre qui ne
+    s'attache pas n'entraîne plus la suivante** : après un alif on écrivait
+    « ـب », c'est-à-dire la faute même que l'écran d'accrochage fait barrer.
+    Sa forme de début étant identique à sa forme seule, la règle se lit dans
+    les formes. Enfin la largeur minimale du trou est retirée : elle ouvrait
+    un blanc entre le trait de liaison gris et la lettre à sa droite —
+    mesuré, le blanc est maintenant nul.
+
+  - **Le tanwīn se montre en DEUX signes dans le hublot aussi.** Il y restait
+    la ligature compressée. Poser deux fois le texte doublerait la lettre
+    avec le signe ; c'est `_dessineSurLigne` qui sait n'en reposer que
+    l'encre. Le hublot passe donc par un canevas quand le glyphe porte un
+    tanwīn (`_aTanwin`). Et **le nez 👃 est retiré** de tous les textes.
+
+  - **Le modèle de tracé tient dans son cadre.** Deux signes empilés montent
+    bien plus haut qu'un seul, et sur un alif le modèle sortait par le haut.
+    On mesure l'encre de chaque forme autour de sa ligne et on borne la
+    police. Aucune forme ne grossit : on ne fait que réduire.
+
+  - **« Répète après moi » se dit, ne s'écrit plus.** Nulle part. Les pages
+    de doublement disent maintenant, dans les mots du client : « Ici on a
+    "ba". Avec une deuxième voyelle, ça donne "ban". » Et **la page attend le
+    « Bravo »** avant de passer : `_sceneFete` retient l'enchaînement jusqu'à
+    ce que la récompense soit dite.
+
+  - **Une page « À RETENIR » avant chaque écran de félicitations.** Les points
+    essentiels, un par ligne, chacun paraissant au moment où la voix le dit
+    (`api.resume`). Une pour les voyelles, une pour les prolongations, une
+    par lettre — et la lettre qui ne suit pas la règle (ع غ ء ة) a son propre
+    point. **Textes à relire avec le client** : ils sont repris de ses
+    propres phrases de cours, mais c'est lui qui les arrête.
+
+  **À enregistrer au studio, en plus** : « Ici on a bou / ba / bi. » et
+  « Avec une deuxième voyelle, ça donne boun / ban / bin. »
 
 - **CE QUI SE PASSE AU BOUT D'UNE QUESTION, ET AU BOUT D'UNE LEÇON (v206).**
 
