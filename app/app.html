@@ -9791,7 +9791,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v209';
+var _VERSION_REPLI='v210';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10086,6 +10086,87 @@ function _xJointure(avant,mot){
     if(!(x>4&&x<96))x=50;
   }catch(e){}
   _JOINTURE[cle]=x;return x;
+}
+/* ── LES MOTS DU CLIENT, UN PAR FORME ────────────────────────────────────
+   Pour chaque lettre, dans l'ordre : le mot ou elle est SEULE, celui ou elle
+   est au DEBUT, celui ou elle est au MILIEU, celui ou elle est a la FIN.
+   Dictes par le client, mot pour mot — ne rien reformuler.
+
+   Une lettre peut se trouver PLUSIEURS fois dans le meme mot, et pas
+   toujours a la place qu'on decrit : « لذيذ » sert au milieu ET a la fin.
+   C'est `_placeDansMot` qui choisit la bonne occurrence. */
+var _MOTS_FORMES={
+ 'ا':['زاد','ابن','كتاب','سمعنا'],
+ 'ب':['كتاب','بيت','تبت','ريب'],
+ 'ت':['بات','تبت','كتاب','بيت'],
+ 'ث':['تراث','ثوب','جثة','بحث'],
+ 'ج':['سراج','جنة','مجد','ثلج'],
+ 'ح':['فراح','حديث','بحث','صفح'],
+ 'خ':['صراخ','خالد','فخر','نفخ'],
+ 'د':['ازداد','دخل','حديث','يد'],
+ 'ذ':['اذلال','ذوق','لذيذ','لذيذ'],
+ 'ر':['أراد','رشيد','تراث','فخر'],
+ 'ز':['فوز','زاد','يزيد','عزيز'],
+ 'س':['نحاس','سراج','نساء','شمس'],
+ 'ش':['قماش','شمس','يمشي','جيش'],
+ 'ص':['فرص','صلاة','حصة','فحص'],
+ 'ض':['فرض','ضرب','يضرب','فرض'],
+ 'ط':['صراط','طهور','بطرا','فقط'],
+ 'ظ':['حفاظ','ظلم','يظلم','حظ'],
+ 'ع':['صراع','عين','ثعلب','دفع'],
+ 'غ':['زاغ','غصن','لغو','يزيغ'],
+ 'ف':['طرف','فخر','نفخ','لطيف'],
+ 'ق':['ذوق','قرآن','فقر','فلق'],
+ 'ك':['يدك','كتب','مكة','ملك'],
+ 'ل':['مال','ليمون','فلق','إسماعيل'],
+ 'م':['آدم','محمد','قماش','ظلم'],
+ 'ن':['قرآن','نفس','جنة','ابن'],
+ 'ه':['أفواه','همس','لهو','فواكه'],
+ 'و':['ذوق','وردة','فوز','عفو'],
+ 'ي':['رأي','يدك','جيش','رمي'],
+};
+/* Les lettres qui ne s'attachent PAS a la suivante. C'est tout ce qu'il faut
+   savoir pour retrouver la forme d'une lettre dans un mot : elle est jointe A
+   DROITE si celle d'avant s'attache, et jointe A GAUCHE si elle-meme
+   s'attache et qu'une lettre la suit. */
+var _SANS_LIEN_APRES='اأإآدذرزوؤءةى';
+function _estMarqueArabe(c){
+  return /[\u064B-\u0655\u0670\u0640\u200C\u200D\u06D6-\u06ED]/.test(c);
+}
+/* Le mot coupe en trois : ce qui precede la lettre, la lettre, et ce qui la
+   suit. Les morceaux gardent un liant sans chasse au bord de la coupe, pour
+   que chacun garde EXACTEMENT la forme qu'il avait dans le mot entier —
+   sans lui, la lettre d'avant reprendrait sa forme de fin de mot. */
+function _placeDansMot(mot,lettre,forme){
+  var t=String(mot||'');
+  if(!t)return null;
+  var pos=[],i;
+  for(i=0;i<t.length;i++)if(!_estMarqueArabe(t.charAt(i)))pos.push(i);
+  var L=pos.length,cand=[];
+  for(i=0;i<L;i++)if(t.charAt(pos[i])===lettre)cand.push(i);
+  if(!cand.length)return null;
+  function liee(k){return k>0&&_SANS_LIEN_APRES.indexOf(t.charAt(pos[k-1]))<0;}
+  function lie(k){return k<L-1&&_SANS_LIEN_APRES.indexOf(t.charAt(pos[k]))<0;}
+  var choix=-1,j;
+  if(forme===0){                       /* seule : celle qui ne touche personne */
+    for(j=0;j<cand.length;j++)if(!liee(cand[j])&&!lie(cand[j])){choix=cand[j];break;}
+  }else if(forme===1){                 /* debut : la premiere lettre du mot */
+    for(j=0;j<cand.length;j++)if(cand[j]===0){choix=cand[j];break;}
+  }else if(forme===3){                 /* fin : la derniere lettre du mot */
+    for(j=cand.length-1;j>=0;j--)if(cand[j]===L-1){choix=cand[j];break;}
+  }else{                               /* milieu : ni la premiere ni la derniere */
+    for(j=0;j<cand.length;j++)if(cand[j]>0&&cand[j]<L-1){choix=cand[j];break;}
+  }
+  if(choix<0)choix=cand[0];
+  var Z='\u200d';
+  var d=pos[choix],f=d+1;
+  /* Les signes portes par la lettre restent avec elle. */
+  while(f<t.length&&_estMarqueArabe(t.charAt(f))&&t.charAt(f)!==Z)f++;
+  var av=t.slice(0,d),ap=t.slice(f);
+  var jA=liee(choix),jB=lie(choix);
+  return {avant:av?(av+(jA?Z:'')):'',
+          lettre:(jA?Z:'')+t.slice(d,f)+(jB?Z:''),
+          apres:ap?((jB?Z:'')+ap):''};
 }
 /* ── LE BLANC QUE LAISSE UNE FAUSSE LIAISON ──────────────────────────────
    L'ecran d'accrochage montre la faute : la lettre accrochee a la suivante,
@@ -14426,7 +14507,7 @@ function _boyScene(ca,reprise){
      rapetissant pendant que le hublot s'efface.
      Les morceaux du mot sont ceux du recapitulatif : le compagnon qui
      s'attache de part et d'autre, selon la place qu'on montre. */
-  api.forme=function(etape,glyph,son,html,fr,avant,apres){
+  api.forme=function(etape,glyph,son,html,fr,avant,apres,trou){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       var h=hublot(p,glyph,son);
@@ -14435,8 +14516,9 @@ function _boyScene(ca,reprise){
       var t=document.createElement('span');t.className='rec-trou';
       var b=document.createElement('span');b.textContent=apres||'';
       /* La place est gardee des le depart : le mot ne sautera pas quand la
-         lettre arrivera. */
-      t.textContent=glyph;
+         lettre arrivera. C'est la lettre TELLE QU'ELLE EST DANS LE MOT — avec
+         ses liants — et non la forme nue du hublot. */
+      t.textContent=trou||glyph;
       m.appendChild(a);m.appendChild(t);m.appendChild(b);
       p.appendChild(m);
       bouton(p,te('Suite ›'),suivant);
@@ -15488,13 +15570,21 @@ function _boyLetterCourse(ca,idx,premiere){
   }
   /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
      déjà : les deux sont réunis. Et la hamza n'a pas de son propre. */
+  /* La lettre SEULE a son mot elle aussi : c'est ici qu'on la montre, et
+     c'est donc ici qu'elle va prendre sa place. */
+  var _pSeule=_placeDansMot((_MOTS_FORMES[A]||[])[0],A,0);
   sc.push(formeUnique
     ? B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,null,
         TBF('Voici {lettre}.<br>Elle s\'écrit <b>toujours</b> ainsi.',{lettre:b(L.name)}),
         te('Cette lettre n\'a aucun son. On prononce juste sa voyelle.'))
-    : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
-        TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
-        teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name})));
+    : (_pSeule
+      ? B.forme(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
+          TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
+          teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}),
+          _pSeule.avant,_pSeule.apres,_pSeule.lettre)
+      : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
+          TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
+          teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}))));
   /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
      là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
      française se trompe. « khè » au lieu de « kha ». */
@@ -15586,14 +15676,20 @@ function _boyLetterCourse(ca,idx,premiere){
       var _dit={h:TBF('{place},<br>elle s\'écrit <b>comme cela</b>.',{place:_maj(OU[n])}),
                 f:teF('{place}, elle s\'écrit comme cela.',{place:OU[n]})};
       /* ── LE MOT OU CETTE FORME VIT ──
-         Ce qui precede la lettre et ce qui la suit, selon la place montree.
-         Une lettre qui ne s'attache pas n'entraine pas la suivante : apres
-         elle, le compagnon s'ecrit detache. */
-      var _apres=attache?(_TATWEEL+_lie):_lie;
-      var _av=(n===2||n===3)?(_lie+_TATWEEL):'';
-      var _ap=(n===1||n===2)?_apres:'';
+         Le mot dicte par le client, coupe a la bonne occurrence de la lettre.
+         A defaut — le ta marbuta n'en a pas recu — on retombe sur le mot
+         fabrique du recapitulatif : la lettre entre ses compagnons. */
+      var _p=_placeDansMot((_MOTS_FORMES[A]||[])[n],A,n);
+      var _av,_ap,_tr;
+      if(_p){_av=_p.avant;_ap=_p.apres;_tr=_p.lettre;}
+      else{
+        var _apres=attache?(_TATWEEL+_lie):_lie;
+        _av=(n===2||n===3)?(_lie+_TATWEEL):'';
+        _ap=(n===1||n===2)?_apres:'';
+        _tr=f.form;
+      }
       sc.push(B.forme(teF('FORME{rep} · {forme}',{rep:rep,forme:NOMS[n]}),
-        f.form,S,_dit.h,_dit.f,_av,_ap));
+        f.form,S,_dit.h,_dit.f,_av,_ap,_tr));
     }
     sc.push(formeUnique
       ? B.tracer(te('FORME · TRACÉ'),f.form,TB('Trace la <b>lettre</b> ✍️'),te('Trace la lettre.'))

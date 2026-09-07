@@ -31,13 +31,35 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 7 septembre 2026, production en v209
+## OÙ ON EN EST — 8 septembre 2026, production en v210
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v209) :**
+**Fait et en ligne (v187 → v210) :**
+
+- **LES MOTS DU CLIENT, UN PAR FORME (v210).** Vingt-huit lettres, quatre
+  mots chacune — seule, début, milieu, fin — dictés par le client et rangés
+  dans `_MOTS_FORMES`. Le mot de la forme SEULE se montre sur l'écran
+  d'identification, les trois autres sur leur page de forme.
+
+  **La bonne occurrence, pas la première venue.** Une lettre peut se trouver
+  plusieurs fois dans le même mot, et pas toujours à la place qu'on décrit :
+  « لذيذ » sert au milieu ET à la fin, « فرض » sert pour seule ET pour fin.
+  `_placeDansMot` choisit donc selon ce qu'on montre : pour SEULE, celle qui
+  ne touche personne ; pour DÉBUT, la première lettre du mot ; pour FIN, la
+  dernière ; pour MILIEU, une qui n'est ni l'une ni l'autre. Tout se déduit
+  d'une seule liste, `_SANS_LIEN_APRES` — les lettres qui ne s'attachent pas
+  à la suivante.
+
+  **Le mot coupé reste le même mot.** Les trois morceaux portent un liant
+  sans chasse au bord de la coupe : chacun garde EXACTEMENT la forme qu'il
+  avait dans le mot entier. Vérifié à la mesure sur huit mots : la largeur du
+  mot coupé est au pixel près celle du mot entier, sans le moindre blanc.
+
+  **Le ta marbūṭa n'a pas reçu de mot** — il retombe sur le mot fabriqué du
+  récapitulatif. À demander au client.
 
 - **LA TROISIÈME PASSE DU CLIENT (v209).**
 
