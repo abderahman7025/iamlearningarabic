@@ -31,13 +31,50 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 6 septembre 2026, production en v208
+## OÙ ON EN EST — 7 septembre 2026, production en v209
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v208) :**
+**Fait et en ligne (v187 → v209) :**
+
+- **LA TROISIÈME PASSE DU CLIENT (v209).**
+
+  - **La forme se voit, puis prend sa place dans un mot.** Nouvelle scène
+    `api.forme` : l'écran d'observation ne change pas — le hublot, la phrase
+    — puis, une fois la phrase dite, un mot arabe paraît avec un TROU à la
+    place de la lettre, le hublot s'efface et une copie de la lettre y vole
+    en rapetissant. Les morceaux du mot sont ceux du récapitulatif : le
+    compagnon qui s'attache de part et d'autre selon la place montrée, et
+    aucun trait de liaison après une lettre qui ne s'attache pas. `vole` est
+    sorti du récapitulatif pour servir aux deux.
+
+  - **Les boutons sont centrés** — la rangée entière, retour toujours en tête
+    — **et plus larges** : 158 px au minimum. Sur les canevas, le retour se
+    pose EN TÊTE de la rangée, avant « effacer ».
+
+  - **La pause ne coupe plus un son en deux.** On coupait la parole et on la
+    reprenait au milieu : le client l'entendait hachée. La phrase en cours
+    est maintenant remise en tête de file et **rejouée depuis son début**.
+
+  - **La licorne garde sa vague.** J'avais eu tort de la retirer : ce que le
+    client ne veut pas, c'est le dernier quart d'onde — elle passait sous le
+    monde, remontait, redescendait s'y poser. L'onde s'éteint donc sur le
+    dernier quart du trajet ; la fusée garde la sienne entière.
+
+  - **Le récapitulatif : la case dont parle la voix grossit**, et le nom des
+    formes passe de 0,72 à 1,02 rem.
+
+  - **« À retenir » : les voyelles plus grosses (56 px), chacune grandit du
+    bon côté** — celle du dessus vers le haut, celle du dessous vers le bas,
+    si bien que la kasra ne traverse plus la ligne. Les deux signes d'un
+    tanwīn sont serrés aux mesures du reste de l'application (0,105 em pour
+    les traits, 0,10 de part et d'autre pour les ḍamma) et grandissent
+    ensemble. Et la lettre qui ne s'attache pas le dit dans son résumé.
+
+  - **Le mot à trou : les réponses sur deux lignes de deux** (une grille de
+    deux colonnes).
 
 - **LA DEUXIÈME PASSE DU CLIENT (v208).**
 
