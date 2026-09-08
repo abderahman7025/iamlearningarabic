@@ -31,13 +31,13 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v211
+## OÙ ON EN EST — 8 septembre 2026, production en v212
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v211) :**
+**Fait et en ligne (v187 → v212) :**
 
 - **LA QUATRIÈME PASSE DU CLIENT (v211).**
 
@@ -97,8 +97,9 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
   avait dans le mot entier. Vérifié à la mesure sur huit mots : la largeur du
   mot coupé est au pixel près celle du mot entier, sans le moindre blanc.
 
-  **Le ta marbūṭa n'a pas reçu de mot** — il retombe sur le mot fabriqué du
-  récapitulatif. À demander au client.
+  **Le ta marbūṭa a ses deux mots (v212)** : صلاة quand il est seul — après
+  un alif, qui ne s'attache pas — et حصة quand il est attaché. Il n'a ni
+  début ni milieu, son cours ne montre que ces deux formes.
 
 - **LA TROISIÈME PASSE DU CLIENT (v209).**
 

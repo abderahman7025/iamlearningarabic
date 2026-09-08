@@ -9809,7 +9809,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v211';
+var _VERSION_REPLI='v212';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10151,6 +10151,9 @@ var _MOTS_FORMES={
  'ه':['أفواه','همس','لهو','فواكه'],
  'و':['ذوق','وردة','فوز','عفو'],
  'ي':['رأي','يدك','جيش','رمي'],
+ /* Le ta marbuta ne vit qu'a la fin d'un mot : il n'a ni debut ni milieu, et
+    son cours ne montre que ces deux formes-la. */
+ 'ة':['صلاة','','','حصة'],
 };
 /* Les lettres qui ne s'attachent PAS a la suivante. C'est tout ce qu'il faut
    savoir pour retrouver la forme d'une lettre dans un mot : elle est jointe A
