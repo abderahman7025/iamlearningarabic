@@ -47,10 +47,10 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     HORIZONTALEMENT seulement, le point fixe de la réduction étant posé sur
     sa ligne de base. Le mot est centré dans le hublot et sa ligne de base
     calée sur celle de la lettre, c'est-à-dire sur la ligne d'écriture
-    (, 1,07 em). Le déplacement se fait en FLIP : la lettre est
+    (`poseLeMot`, 1,07 em). Le déplacement se fait en FLIP : la lettre est
     d'abord mise à sa place réelle, puis ramenée d'où elle vient — la
     position d'arrivée est celle de la mise en page, jamais une mesure.
-    Et  imposait 4,6 rem à TOUS les spans du hublot, les
+    Et `.boy-hublot span` imposait 4,6 rem à TOUS les spans du hublot, les
     morceaux du mot compris : les réduire ne servait à rien.
 
   - **La vague est aux deux, l'atterrissage non.** La fusée monte plus haut
@@ -60,7 +60,7 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
   - **« À retenir » : ce qui bloquait.** La police avait bien grandi, mais
     chaque case faisait 184 px de haut — texte sur deux lignes — et
-     ramenait toute la page à l'échelle : la taille apparente
+    `ajusteEcran` ramenait toute la page à l'échelle : la taille apparente
     ne bougeait pas. Un point = une ligne, des cases plus larges (940 px), et
     la page tient : elle est alors agrandie.
 
