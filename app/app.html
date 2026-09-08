@@ -3447,13 +3447,23 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Le hublot ne s'en va pas : le mot paraît sur sa ligne d'écriture, la place
    de la lettre restée vide, et la lettre y glisse. Le trou garde sa largeur
    dès le départ, sinon le mot sauterait à l'arrivée. */
-.boy-hublot .hub-mot{position:absolute;left:10px;right:10px;top:50%;
-  transform:translateY(-50%);text-align:center;white-space:nowrap;direction:rtl;
-  font-family:'Scheherazade New',serif;line-height:1.5;color:var(--sk-fonce);
+/* Le mot est CENTRÉ dans le hublot et posé sur sa ligne d'écriture — c'est
+   `poseLeMot` qui calcule ce `top`. Il paraît dans un ton plus pâle que la
+   lettre : on voit d'un coup d'œil ce qui l'attend et ce qui est déjà là. */
+.boy-hublot .hub-mot{position:absolute;left:0;right:0;top:0;
+  text-align:center;white-space:nowrap;direction:rtl;
+  font-family:'Scheherazade New',serif;line-height:1.5;
+  color:rgba(var(--sk-rgb-f),.42);
   opacity:0;transition:opacity .45s ease;z-index:1;pointer-events:none}
 .boy-hublot .hub-mot.vu{opacity:1}
+/* ── LES MORCEAUX DU MOT SUIVENT LE MOT ──
+   `.boy-hublot span` impose 4,6 rem à TOUT span du hublot : les trois
+   morceaux du mot le prenaient aussi, et le réduire ne servait à rien —
+   ni sa taille ni sa ligne de base n'étaient celles qu'on croyait. */
+.boy-hublot .hub-mot span{font-size:inherit;line-height:inherit;
+  font-family:inherit;padding:0}
 .boy-hublot .hub-mot .rec-trou{opacity:1;visibility:hidden}
-.boy-hublot .hub-mot .rec-trou.vu{visibility:visible}
+.boy-hublot .hub-mot .rec-trou.vu{visibility:visible;color:var(--sk-fonce)}
 .boy-hublot span{transition:opacity .3s ease}
 @media (prefers-reduced-motion:reduce){.boy-hublot .hub-mot{transition:none}}
 
@@ -3461,10 +3471,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
    par un, au moment où la voix les dit : une liste posée d'un bloc ne se lit
    pas, elle se saute. */
-.res-liste{max-width:660px;margin:8px auto 2px;display:flex;flex-direction:column;gap:10px}
+.res-liste{max-width:min(96%,940px);margin:8px auto 2px;display:flex;
+  flex-direction:column;gap:9px}
 .res-point{display:flex;align-items:center;gap:12px;text-align:left;
   background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:16px;
-  padding:11px 15px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
+  padding:9px 16px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
   font-family:Outfit,sans-serif;font-size:1.22rem;font-weight:800;
   color:var(--sk-fonce);line-height:1.35;
   opacity:0;transform:translateY(10px);
@@ -3480,11 +3491,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    reprend sa taille. Le second signe du doublement attend, caché, juste à
    côté du premier — au-dessus pour la fatḥa, en dessous pour la kasra, à
    côté pour la ḍamma : c'est ainsi qu'on les écrit. */
-.res-piste{position:relative;flex:0 0 auto;width:214px;height:118px}
+.res-piste{position:relative;flex:0 0 auto;width:196px;height:92px}
 .res-piste .sol{position:absolute;left:2px;right:2px;top:50%;
   border-top:3px dashed rgba(var(--sk-rgb-f),.42)}
 .res-piste .sg{position:absolute;transform:translate(-50%,-50%);
-  font-family:'Scheherazade New',serif;font-size:66px;line-height:1;
+  font-family:'Scheherazade New',serif;font-size:58px;line-height:1;
   color:var(--sk-vif);
   transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
 /* UN SIGNE GRANDIT DU BON COTE : celui du dessus vers le haut, celui du
@@ -7244,14 +7255,17 @@ function _volCarte(o){
        poser. On eteint donc l'onde sur le dernier quart du trajet : elle
        serpente comme avant et arrive droit. La fusee, elle, garde sa vague
        entiere — c'est elle qui l'a demandee. */
+    /* ── LA VAGUE EST A ELLES DEUX, L'ATTERRISSAGE NON ──
+       Le client : la FUSEE monte plus haut que la planete puis redescend
+       s'y poser — c'est son atterrissage a elle. La LICORNE, non : elle fait
+       sa vague, et elle arrive DIRECTEMENT sur la surface du monde. On garde
+       donc l'onde entiere pour les deux, et on ne l'eteint, chez la licorne,
+       que sur le tout dernier dixieme : de quoi arriver droit sur le monde
+       sans rien retirer a la vague. */
     var plateALaFin=!o.aligne;
     function ondeIci(e){
       var a=amp;
-      /* TOUTE LA SECONDE MOITIE EST DROITE. Eteindre le dernier quart ne
-         suffisait pas : le creux de l'onde restait, et la licorne descendait
-         puis remontait au-dessus du monde. Elle monte donc sur la premiere
-         moitie, puis descend TOUT DROIT sur le monde et s'y pose. */
-      if(plateALaFin)a*=(e>0.5?Math.max(0,(1-e)/0.5):1);
+      if(plateALaFin&&e>0.9)a*=Math.max(0,(1-e)/0.1);
       return ecartOnde(e,a);
     }
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
@@ -8050,10 +8064,11 @@ function _volCarte(o){
       var p=versSommet(_bezier(t,item.seg),n===file.length-1,e);
       /* ── L'ARRIVEE EST DROITE ──
          Sur le dernier saut, la courbe se fond dans la ligne qui mene au
-         point de pose : plus de montee ni de redescente au-dessus du monde,
-         la licorne arrive et se pose. */
-      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.6){
-        var _w=(e-0.6)/0.4;
+         point de pose : la licorne arrive sur la surface du monde, sans
+         monter au-dessus pour y redescendre — cela, c'est l'atterrissage de
+         la fusee. Le tout dernier dixieme suffit. */
+      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.9){
+        var _w=(e-0.9)/0.1;
         p={x:p.x+(butFinal.x-p.x)*_w, y:p.y+(butFinal.y-p.y)*_w};
       }
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
@@ -8329,9 +8344,9 @@ function renderRevision(ca){
   });
   /* `mission` porte deja son propre titre — l'ecran de fin des cours. */
   scenes.push(B.resume([
-    {h:TB('Un signe revu <b>plusieurs fois</b><br>ne s\'oublie plus.'),
+    {h:TB('Un signe revu <b>plusieurs fois</b> ne s\'oublie plus.'),
      f:te('Un signe revu plusieurs fois ne s\'oublie plus.')},
-    {h:TB('On les <b>reverra</b><br>dans quelques jours.'),
+    {h:TB('On les <b>reverra</b> dans quelques jours.'),
      f:te('On les reverra dans quelques jours.')}
   ]));
   scenes.push(B.mission(TB('Tu te souviens<br><b>bien</b> !'),
@@ -9809,7 +9824,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v212';
+var _VERSION_REPLI='v213';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10224,10 +10239,12 @@ function _poseSerrage(hote){
     [].slice.call(hote.querySelectorAll('[data-serre]')).forEach(function(el){
       var d=String(el.getAttribute('data-serre')||'').split('|');
       if(d.length!==2)return;
-      /* Un cheveu de plus que la mesure : a l'ecran, l'arrondi au pixel
-         laissait encore un fil blanc. On mord franchement — une liaison
-         fautive doit TOUCHER. */
-      el.style.marginRight=(-(_creuxLiaison(d[0],d[1])+0.03)).toFixed(4)+'em';
+      /* ── ON NE FAIT PAS QUE TOUCHER, ON SE SUPERPOSE ──
+         Le client veut que le trait fautif RECOUVRE celui qui arrive de
+         l'autre cote de l'alif : une liaison qui affleure ne se voit pas
+         comme une faute. On mord donc de 0,12 em au-dela du blanc mesure —
+         un bon tiers de tatweel. */
+      el.style.marginRight=(-(_creuxLiaison(d[0],d[1])+0.12)).toFixed(4)+'em';
     });
   }
   pose();
@@ -12672,7 +12689,7 @@ var _TE={
 'ÉTAPE · ACCROCHAGE':{en:'STEP · JOINING',es:'PASO · ENLACE',de:'SCHRITT · VERBINDEN',nl:'STAP · VERBINDEN',it:'TAPPA · LEGATURA',pt:'ETAPA · LIGAÇÃO',ru:'ШАГ · СОЕДИНЕНИЕ',tr:'ADIM · BİTİŞME',zh:'步骤 · 连写',id:'LANGKAH · PENYAMBUNGAN',ur:'مرحلہ · جوڑ',hi:'चरण · जोड़'},
 'Sans support, elle ne s\'attache<br><b>JAMAIS</b>,<br>ni avant, ni après 🚫':{en:'With no seat, it <b>NEVER</b><br>joins up,<br>before or after 🚫',es:'Sin soporte, <b>NUNCA</b><br>se enlaza,<br>ni antes ni después 🚫',de:'Ohne Träger verbindet er sich<br><b>NIE</b>,<br>weder davor noch danach 🚫',nl:'Zonder drager verbindt hij<br><b>NOOIT</b>,<br>niet ervoor, niet erna 🚫',it:'Senza supporto non si lega<br><b>MAI</b>,<br>né prima né dopo 🚫',pt:'Sem suporte, <b>NUNCA</b><br>se liga,<br>nem antes nem depois 🚫',ru:'Без опоры она <b>НИКОГДА</b><br>не соединяется —<br>ни до, ни после 🚫',tr:'Kürsüsüz <b>ASLA</b><br>bitişmez,<br>ne önden ne arkadan 🚫',zh:'没有座位时，它<b>从不</b><br>连写，<br>前后都不连 🚫',id:'Tanpa dudukan, <b>TIDAK PERNAH</b><br>disambung,<br>baik sebelum maupun sesudah 🚫',ur:'بغیر کرسی کے یہ <b>کبھی</b><br>نہیں جڑتا،<br>نہ پہلے نہ بعد میں 🚫',hi:'बिना आधार यह <b>कभी</b><br>नहीं जुड़ता,<br>न पहले न बाद में 🚫'},
 'Sans support, elle ne s\'attache jamais, ni avant, ni après.':{en:'With no seat, it never joins up, before or after.',es:'Sin soporte, nunca se enlaza, ni antes ni después.',de:'Ohne Träger verbindet er sich nie, weder davor noch danach.',nl:'Zonder drager verbindt hij nooit, niet ervoor en niet erna.',it:'Senza supporto non si lega mai, né prima né dopo.',pt:'Sem suporte, nunca se liga, nem antes nem depois.',ru:'Без опоры она никогда не соединяется — ни до, ни после.',tr:'Kürsüsüz asla bitişmez, ne önden ne arkadan.',zh:'没有座位时，它从不连写，前后都不连。',id:'Tanpa dudukan, tidak pernah disambung, baik sebelum maupun sesudah.',ur:'بغیر کرسی کے یہ کبھی نہیں جڑتا، نہ پہلے نہ بعد میں۔',hi:'बिना आधार यह कभी नहीं जुड़ता, न पहले न बाद में।'},
-'Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫':{en:'It <b>NEVER</b> joins<br>the next letter 🚫',es:'<b>NUNCA</b> se enlaza<br>con la letra siguiente 🚫',de:'Er verbindet sich <b>NIE</b><br>mit dem nächsten Buchstaben 🚫',nl:'Hij verbindt <b>NOOIT</b><br>met de volgende letter 🚫',it:'Non si lega <b>MAI</b><br>alla lettera successiva 🚫',pt:'<b>NUNCA</b> se liga<br>à letra seguinte 🚫',ru:'Она <b>НИКОГДА</b> не соединяется<br>со следующей буквой 🚫',tr:'Sonraki harfe <b>ASLA</b><br>bitişmez 🚫',zh:'它<b>从不</b>与<br>后面的字母连写 🚫',id:'<b>TIDAK PERNAH</b> disambung<br>ke huruf berikutnya 🚫',ur:'یہ اگلے حرف سے<br><b>کبھی</b> نہیں جڑتا 🚫',hi:'यह अगले अक्षर से<br><b>कभी</b> नहीं जुड़ता 🚫'},
+'Elle ne s\'accroche <b>JAMAIS</b> à la lettre suivante 🚫':{en:'It <b>NEVER</b> joins<br>the next letter 🚫',es:'<b>NUNCA</b> se enlaza<br>con la letra siguiente 🚫',de:'Er verbindet sich <b>NIE</b><br>mit dem nächsten Buchstaben 🚫',nl:'Hij verbindt <b>NOOIT</b><br>met de volgende letter 🚫',it:'Non si lega <b>MAI</b><br>alla lettera successiva 🚫',pt:'<b>NUNCA</b> se liga<br>à letra seguinte 🚫',ru:'Она <b>НИКОГДА</b> не соединяется<br>со следующей буквой 🚫',tr:'Sonraki harfe <b>ASLA</b><br>bitişmez 🚫',zh:'它<b>从不</b>与<br>后面的字母连写 🚫',id:'<b>TIDAK PERNAH</b> disambung<br>ke huruf berikutnya 🚫',ur:'یہ اگلے حرف سے<br><b>کبھی</b> نہیں جڑتا 🚫',hi:'यह अगले अक्षर से<br><b>कभी</b> नहीं जुड़ता 🚫'},
 'Cette lettre ne s\'accroche jamais à la lettre suivante.':{en:'This letter never joins the next letter.',es:'Esta letra nunca se enlaza con la siguiente.',de:'Dieser Buchstabe verbindet sich nie mit dem nächsten.',nl:'Deze letter verbindt nooit met de volgende letter.',it:'Questa lettera non si lega mai alla successiva.',pt:'Esta letra nunca se liga à letra seguinte.',ru:'Эта буква никогда не соединяется со следующей.',tr:'Bu harf sonraki harfe asla bitişmez.',zh:'这个字母从不与后面的字母连写。',id:'Huruf ini tidak pernah disambung ke huruf berikutnya.',ur:'یہ حرف اگلے حرف سے کبھی نہیں جڑتا۔',hi:'यह अक्षर अगले अक्षर से कभी नहीं जुड़ता।'},
 'au début du mot':{en:'at the start of a word',es:'al principio de la palabra',de:'am Wortanfang',nl:'aan het begin van het woord',it:'all\'inizio della parola',pt:'no início da palavra',ru:'в начале слова',tr:'kelimenin başında',zh:'在词首',id:'di awal kata',ur:'لفظ کے شروع میں',hi:'शब्द के शुरू में'},
 'au milieu du mot':{en:'in the middle of a word',es:'en medio de la palabra',de:'in der Wortmitte',nl:'midden in het woord',it:'in mezzo alla parola',pt:'no meio da palavra',ru:'в середине слова',tr:'kelimenin ortasında',zh:'在词中',id:'di tengah kata',ur:'لفظ کے درمیان',hi:'शब्द के बीच में'},
@@ -12695,15 +12712,15 @@ var _TE={
 'Maintenant,<br>ses <b>voyelles</b>.':{en:'Now<br>its <b>vowels</b>.',es:'Ahora,<br>sus <b>vocales</b>.',de:'Jetzt<br>seine <b>Vokale</b>.',nl:'Nu<br>zijn <b>klinkers</b>.',it:'Ora,<br>le sue <b>vocali</b>.',pt:'Agora,<br>as suas <b>vogais</b>.',ru:'Теперь<br>её <b>огласовки</b>.',tr:'Şimdi<br><b>harekeleri</b>.',zh:'现在看<br>它的<b>元音</b>。',id:'Sekarang<br><b>harakatnya</b>.',ur:'اب<br>اس کی <b>حرکات</b>۔',hi:'अब<br>इसके <b>स्वर</b>।'},
 'Voyons maintenant la lettre avec ses voyelles.':{en:'Now let\'s see the letter with its vowels.',es:'Veamos ahora la letra con sus vocales.',de:'Sehen wir uns den Buchstaben nun mit seinen Vokalen an.',nl:'Nu bekijken we de letter met zijn klinkers.',it:'Vediamo ora la lettera con le sue vocali.',pt:'Vejamos agora a letra com as suas vogais.',ru:'Теперь посмотрим букву с её огласовками.',tr:'Şimdi harfi harekeleriyle görelim.',zh:'现在来看带元音的这个字母。',id:'Sekarang kita lihat huruf ini dengan harakatnya.',ur:'اب اس حرف کو اس کی حرکات کے ساتھ دیکھتے ہیں۔',hi:'अब इस अक्षर को उसके स्वरों के साथ देखते हैं।'},
 'À RETENIR':{en:'REMEMBER',es:'PARA RECORDAR',de:'ZUM MERKEN',nl:'ONTHOUDEN',it:'DA RICORDARE',pt:'A RETER',ru:'ЗАПОМНИ',tr:'AKLINDA TUT',zh:'要记住',id:'DIINGAT',ur:'یاد رکھو',hi:'याद रखो'},
-'<b>Seule</b> et <b>début</b> :<br>les deux formes à connaître.':{en:'<b>Alone</b> and <b>start</b>:<br>the two forms to know.',es:'<b>Sola</b> y <b>inicio</b>:<br>las dos formas que hay que saber.',de:'<b>Allein</b> und <b>Anfang</b>:<br>die zwei Formen, die man kennen muss.',nl:'<b>Alleen</b> en <b>begin</b>:<br>de twee vormen die je kent.',it:'<b>Da sola</b> e <b>inizio</b>:<br>le due forme da sapere.',pt:'<b>Sozinha</b> e <b>início</b>:<br>as duas formas a saber.',ru:'<b>Отдельно</b> и <b>начало</b>:<br>две формы, которые надо знать.',tr:'<b>Tek</b> ve <b>baş</b>:<br>bilinmesi gereken iki biçim.',zh:'<b>单独</b>和<b>词首</b>：<br>要记住的两个形状。',id:'<b>Sendiri</b> dan <b>awal</b>:<br>dua bentuk yang harus tahu.',ur:'<b>اکیلی</b> اور <b>شروع</b>:<br>یہی دو شکلیں یاد رکھنی ہیں۔',hi:'<b>अकेले</b> और <b>शुरू</b>:<br>ये दो रूप याद रखने हैं।'},
+'<b>Seule</b> et <b>début</b> : les deux formes à connaître.':{en:'<b>Alone</b> and <b>start</b>: the two forms to know.',es:'<b>Sola</b> y <b>inicio</b>: las dos formas que hay que saber.',de:'<b>Allein</b> und <b>Anfang</b>: die zwei Formen, die man kennen muss.',nl:'<b>Alleen</b> en <b>begin</b>: de twee vormen die je kent.',it:'<b>Da sola</b> e <b>inizio</b>: le due forme da sapere.',pt:'<b>Sozinha</b> e <b>início</b>: as duas formas a saber.',ru:'<b>Отдельно</b> и <b>начало</b>: две формы, которые надо знать.',tr:'<b>Tek</b> ve <b>baş</b>: bilinmesi gereken iki biçim.',zh:'<b>单独</b>和<b>词首</b>： 要记住的两个形状。',id:'<b>Sendiri</b> dan <b>awal</b>: dua bentuk yang harus tahu.',ur:'<b>اکیلی</b> اور <b>شروع</b>: یہی دو شکلیں یاد رکھنی ہیں۔',hi:'<b>अकेले</b> और <b>शुरू</b>: ये दो रूप याद रखने हैं।'},
 'Seule et début : les deux formes à connaître.':{en:'Alone and start: the two forms to know.',es:'Sola e inicio: las dos formas que hay que saber.',de:'Allein und Anfang: die zwei Formen, die man kennen muss.',nl:'Alleen en begin: de twee vormen die je kent.',it:'Da sola e inizio: le due forme da sapere.',pt:'Sozinha e início: as duas formas a saber.',ru:'Отдельно и начало: две формы, которые надо знать.',tr:'Tek ve baş: bilinmesi gereken iki biçim.',zh:'单独和词首：要记住的两个形状。',id:'Sendiri dan awal: dua bentuk yang harus tahu.',ur:'اکیلی اور شروع: یہی دو شکلیں یاد رکھنی ہیں۔',hi:'अकेले और शुरू: ये दो रूप याद रखने हैं।'},
-'Au <b>milieu</b> :<br>la forme du début, avec un trait.':{en:'In the <b>middle</b>:<br>the start form, plus a stroke.',es:'En <b>medio</b>:<br>la forma de inicio, con un trazo.',de:'In der <b>Mitte</b>:<br>die Anfangsform, mit einem Strich.',nl:'In het <b>midden</b>:<br>de beginvorm, met een streepje.',it:'In <b>mezzo</b>:<br>la forma iniziale, con un tratto.',pt:'No <b>meio</b>:<br>a forma de início, com um traço.',ru:'В <b>середине</b>:<br>форма начала, плюс чёрточка.',tr:'<b>Ortada</b>:<br>baş biçimi, bir çizgiyle.',zh:'在<b>词中</b>：<br>词首的形状，加一横。',id:'Di <b>tengah</b>:<br>bentuk awal, dengan satu garis.',ur:'<b>درمیان</b> میں:<br>شروع والی شکل، ایک لکیر کے ساتھ۔',hi:'<b>बीच</b> में:<br>शुरू वाला रूप, एक लकीर के साथ।'},
+'Au <b>milieu</b> : la forme du début, avec un trait.':{en:'In the <b>middle</b>: the start form, plus a stroke.',es:'En <b>medio</b>: la forma de inicio, con un trazo.',de:'In der <b>Mitte</b>: die Anfangsform, mit einem Strich.',nl:'In het <b>midden</b>: de beginvorm, met een streepje.',it:'In <b>mezzo</b>: la forma iniziale, con un tratto.',pt:'No <b>meio</b>: a forma de início, com um traço.',ru:'В <b>середине</b>: форма начала, плюс чёрточка.',tr:'<b>Ortada</b>: baş biçimi, bir çizgiyle.',zh:'在<b>词中</b>： 词首的形状，加一横。',id:'Di <b>tengah</b>: bentuk awal, dengan satu garis.',ur:'<b>درمیان</b> میں: شروع والی شکل، ایک لکیر کے ساتھ۔',hi:'<b>बीच</b> में: शुरू वाला रूप, एक लकीर के साथ।'},
 'Au milieu : la forme du début, avec un trait.':{en:'In the middle: the start form, plus a stroke.',es:'En medio: la forma de inicio, con un trazo.',de:'In der Mitte: die Anfangsform, mit einem Strich.',nl:'In het midden: de beginvorm, met een streepje.',it:'In mezzo: la forma iniziale, con un tratto.',pt:'No meio: a forma de início, com um traço.',ru:'В середине: форма начала, плюс чёрточка.',tr:'Ortada: baş biçimi, bir çizgiyle.',zh:'在词中：词首的形状，加一横。',id:'Di tengah: bentuk awal, dengan satu garis.',ur:'درمیان میں: شروع والی شکل، ایک لکیر کے ساتھ۔',hi:'बीच में: शुरू वाला रूप, एक लकीर के साथ।'},
-'À la <b>fin</b> :<br>la forme seule, avec un trait.':{en:'At the <b>end</b>:<br>the alone form, plus a stroke.',es:'Al <b>final</b>:<br>la forma sola, con un trazo.',de:'Am <b>Ende</b>:<br>die Alleinform, mit einem Strich.',nl:'Aan het <b>eind</b>:<br>de alleenvorm, met een streepje.',it:'Alla <b>fine</b>:<br>la forma da sola, con un tratto.',pt:'No <b>fim</b>:<br>a forma sozinha, com um traço.',ru:'В <b>конце</b>:<br>отдельная форма, плюс чёрточка.',tr:'<b>Sonda</b>:<br>tek biçimi, bir çizgiyle.',zh:'在<b>词尾</b>：<br>单独的形状，加一横。',id:'Di <b>akhir</b>:<br>bentuk sendiri, dengan satu garis.',ur:'<b>آخر</b> میں:<br>اکیلی شکل، ایک لکیر کے ساتھ۔',hi:'<b>अंत</b> में:<br>अकेला रूप, एक लकीर के साथ।'},
+'À la <b>fin</b> : la forme seule, avec un trait.':{en:'At the <b>end</b>: the alone form, plus a stroke.',es:'Al <b>final</b>: la forma sola, con un trazo.',de:'Am <b>Ende</b>: die Alleinform, mit einem Strich.',nl:'Aan het <b>eind</b>: de alleenvorm, met een streepje.',it:'Alla <b>fine</b>: la forma da sola, con un tratto.',pt:'No <b>fim</b>: a forma sozinha, com um traço.',ru:'В <b>конце</b>: отдельная форма, плюс чёрточка.',tr:'<b>Sonda</b>: tek biçimi, bir çizgiyle.',zh:'在<b>词尾</b>： 单独的形状，加一横。',id:'Di <b>akhir</b>: bentuk sendiri, dengan satu garis.',ur:'<b>آخر</b> میں: اکیلی شکل، ایک لکیر کے ساتھ۔',hi:'<b>अंत</b> में: अकेला रूप, एक लकीर के साथ।'},
 'À la fin : la forme seule, avec un trait.':{en:'At the end: the alone form, plus a stroke.',es:'Al final: la forma sola, con un trazo.',de:'Am Ende: die Alleinform, mit einem Strich.',nl:'Aan het eind: de alleenvorm, met een streepje.',it:'Alla fine: la forma da sola, con un tratto.',pt:'No fim: a forma sozinha, com um traço.',ru:'В конце: отдельная форма, плюс чёрточка.',tr:'Sonda: tek biçimi, bir çizgiyle.',zh:'在词尾：单独的形状，加一横。',id:'Di akhir: bentuk sendiri, dengan satu garis.',ur:'آخر میں: اکیلی شکل، ایک لکیر کے ساتھ۔',hi:'अंत में: अकेला रूप, एक लकीर के साथ।'},
-'Cette lettre a <b>4 formes</b><br>à apprendre.':{en:'This letter has <b>4 forms</b><br>to learn.',es:'Esta letra tiene <b>4 formas</b><br>que aprender.',de:'Dieser Buchstabe hat <b>4 Formen</b><br>zum Lernen.',nl:'Deze letter heeft <b>4 vormen</b><br>om te leren.',it:'Questa lettera ha <b>4 forme</b><br>da imparare.',pt:'Esta letra tem <b>4 formas</b><br>para aprender.',ru:'У этой буквы <b>4 формы</b>,<br>их надо выучить.',tr:'Bu harfin öğrenilecek<br><b>4 biçimi</b> var.',zh:'这个字母有<b>4 个形状</b><br>要学。',id:'Huruf ini punya <b>4 bentuk</b><br>untuk dipelajari.',ur:'اس حرف کی <b>4 شکلیں</b><br>سیکھنی ہیں۔',hi:'इस अक्षर के <b>4 रूप</b><br>सीखने हैं।'},
+'Cette lettre a <b>4 formes</b> à apprendre.':{en:'This letter has <b>4 forms</b> to learn.',es:'Esta letra tiene <b>4 formas</b> que aprender.',de:'Dieser Buchstabe hat <b>4 Formen</b> zum Lernen.',nl:'Deze letter heeft <b>4 vormen</b> om te leren.',it:'Questa lettera ha <b>4 forme</b> da imparare.',pt:'Esta letra tem <b>4 formas</b> para aprender.',ru:'У этой буквы <b>4 формы</b>, их надо выучить.',tr:'Bu harfin öğrenilecek <b>4 biçimi</b> var.',zh:'这个字母有<b>4 个形状</b> 要学。',id:'Huruf ini punya <b>4 bentuk</b> untuk dipelajari.',ur:'اس حرف کی <b>4 شکلیں</b> سیکھنی ہیں۔',hi:'इस अक्षर के <b>4 रूप</b> सीखने हैं।'},
 'Cette lettre a quatre formes à apprendre.':{en:'This letter has four forms to learn.',es:'Esta letra tiene cuatro formas que aprender.',de:'Dieser Buchstabe hat vier Formen zum Lernen.',nl:'Deze letter heeft vier vormen om te leren.',it:'Questa lettera ha quattro forme da imparare.',pt:'Esta letra tem quatro formas para aprender.',ru:'У этой буквы четыре формы, их надо выучить.',tr:'Bu harfin öğrenilecek dört biçimi var.',zh:'这个字母有四个形状要学。',id:'Huruf ini punya empat bentuk untuk dipelajari.',ur:'اس حرف کی چار شکلیں سیکھنی ہیں۔',hi:'इस अक्षर के चार रूप सीखने हैं।'},
-'Elle est <b>toujours</b><br>à la fin du mot.':{en:'It is <b>always</b><br>at the end of a word.',es:'Está <b>siempre</b><br>al final de la palabra.',de:'Er steht <b>immer</b><br>am Wortende.',nl:'Hij staat <b>altijd</b><br>aan het eind van het woord.',it:'Sta <b>sempre</b><br>alla fine della parola.',pt:'Está <b>sempre</b><br>no fim da palavra.',ru:'Она <b>всегда</b><br>в конце слова.',tr:'<b>Her zaman</b><br>kelimenin sonundadır.',zh:'它<b>总是</b>在<br>词尾。',id:'Selalu <b>di akhir</b><br>kata.',ur:'یہ <b>ہمیشہ</b><br>لفظ کے آخر میں ہوتا ہے۔',hi:'यह <b>हमेशा</b><br>शब्द के अंत में होता है।'},
+'Elle est <b>toujours</b> à la fin du mot.':{en:'It is <b>always</b> at the end of a word.',es:'Está <b>siempre</b> al final de la palabra.',de:'Er steht <b>immer</b> am Wortende.',nl:'Hij staat <b>altijd</b> aan het eind van het woord.',it:'Sta <b>sempre</b> alla fine della parola.',pt:'Está <b>sempre</b> no fim da palavra.',ru:'Она <b>всегда</b> в конце слова.',tr:'<b>Her zaman</b> kelimenin sonundadır.',zh:'它<b>总是</b>在 词尾。',id:'Selalu <b>di akhir</b> kata.',ur:'یہ <b>ہمیشہ</b> لفظ کے آخر میں ہوتا ہے۔',hi:'यह <b>हमेशा</b> शब्द के अंत में होता है।'},
 'Elle est toujours à la fin du mot.':{en:'It is always at the end of a word.',es:'Está siempre al final de la palabra.',de:'Er steht immer am Wortende.',nl:'Hij staat altijd aan het eind van het woord.',it:'Sta sempre alla fine della parola.',pt:'Está sempre no fim da palavra.',ru:'Она всегда в конце слова.',tr:'Her zaman kelimenin sonundadır.',zh:'它总是在词尾。',id:'Selalu di akhir kata.',ur:'یہ ہمیشہ لفظ کے آخر میں ہوتا ہے۔',hi:'यह हमेशा शब्द के अंत में होता है।'},
 'Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.':{en:'It <b>never</b> joins,<br>before or after.',es:'<b>Nunca</b> se une,<br>ni antes ni después.',de:'Er verbindet sich <b>nie</b>,<br>weder davor noch danach.',nl:'Hij verbindt <b>nooit</b>,<br>niet ervoor, niet erna.',it:'Non si lega <b>mai</b>,<br>né prima né dopo.',pt:'<b>Nunca</b> se liga,<br>nem antes nem depois.',ru:'Она <b>никогда</b> не соединяется,<br>ни до, ни после.',tr:'<b>Asla</b> bitişmez,<br>ne önce ne sonra.',zh:'它<b>从不</b>连写，<br>前后都不。',id:'<b>Tidak pernah</b> disambung,<br>sebelum atau sesudah.',ur:'یہ <b>کبھی</b> نہیں جڑتا،<br>نہ پہلے، نہ بعد۔',hi:'यह <b>कभी</b> नहीं जुड़ता,<br>न पहले, न बाद में।'},
 'Elle ne s\'attache jamais, ni avant, ni après.':{en:'It never joins, before or after.',es:'Nunca se une, ni antes ni después.',de:'Er verbindet sich nie, weder davor noch danach.',nl:'Hij verbindt nooit, niet ervoor, niet erna.',it:'Non si lega mai, né prima né dopo.',pt:'Nunca se liga, nem antes nem depois.',ru:'Она никогда не соединяется, ни до, ни после.',tr:'Asla bitişmez, ne önce ne sonra.',zh:'它从不连写，前后都不。',id:'Tidak pernah disambung, sebelum atau sesudah.',ur:'یہ کبھی نہیں جڑتا، نہ پہلے، نہ بعد۔',hi:'यह कभी नहीं जुड़ता, न पहले, न बाद में।'},
@@ -13215,8 +13232,11 @@ function _boyScene(ca,reprise){
        (`egaliseLaRangee`), avec un minimum genereux — le client les trouvait
        trop etroits quand ils etaient seuls. */
     var rangee=document.createElement('div');rangee.className='boy-barre';
+    /* `flex-wrap` est le garde-fou : si la place manque vraiment — un long
+       libelle comme « RETOUR A LA BASE » sur un telephone — ils passent a la
+       ligne au lieu de sortir du cadre. */
     rangee.style.cssText='display:flex;align-items:stretch;justify-content:center;'
-      +'gap:8px;margin-top:18px';
+      +'flex-wrap:wrap;gap:8px;margin-top:18px;max-width:100%';
     if(principal)p.insertBefore(rangee,principal);else p.appendChild(rangee);
     function petit(txt,aria,fn){
       var b=document.createElement('button');
@@ -13853,6 +13873,13 @@ function _boyScene(ca,reprise){
       var st_=getComputedStyle(pere);
       dispo=(pere.clientWidth||0)
             -(parseFloat(st_.paddingLeft)||0)-(parseFloat(st_.paddingRight)||0);
+    }
+    /* Et jamais plus large que le cadre lui-meme : le panneau est mis a
+       l'echelle apres coup, sa largeur CSS retrecit d'autant, et une rangee
+       calee sur l'ancienne debordait. */
+    if(wrap&&wrap.clientWidth){
+      var mw=wrap.clientWidth-24;
+      if(!dispo||mw<dispo)dispo=mw;
     }
     /* Tant que la page n'est pas posee, on ne sait pas de quelle place on
        dispose : on ne touche a rien, une passe plus tard s'en chargera.
@@ -14578,44 +14605,79 @@ function _boyScene(ca,reprise){
          qu'on lui donne d'emblee. */
       function ajusteMot(){
         if(!m.isConnected)return;
-        var max=h.clientWidth-34;if(max<40)return;
+        var max=h.clientWidth-30;if(max<40)return;
         var px=Math.round((parseFloat(getComputedStyle(h).fontSize)||16)*2.6),garde=0;
         m.style.fontSize=px+'px';
         while(m.scrollWidth>max&&px>14&&garde++<60){px-=2;m.style.fontSize=px+'px';}
       }
-      ajusteMot();
-      N.plusTard(ajusteMot,140);
-      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajusteMot);}catch(e){}
+      /* ── LE MOT SE POSE SUR LA LIGNE D'ECRITURE ──
+         Pas au milieu du hublot : sur la LIGNE, celle ou repose deja la
+         lettre. On mesure donc la ligne de base de la lettre — a 1,07 em du
+         haut de sa boite, interligne compris — et on cale celle du mot
+         dessus. La lettre n'aura ainsi rien a monter ni a descendre : elle ne
+         se deplacera que sur la largeur, comme le veut le client. */
+      var LIGNE=1.07;
+      function ligneDeBase(el){
+        var r=el.getBoundingClientRect(),rh=h.getBoundingClientRect();
+        var ech=el.offsetWidth?(r.width/el.offsetWidth):1;
+        if(!(ech>0.05&&ech<20))ech=1;
+        var bord=parseFloat(getComputedStyle(h).borderTopWidth)||0;
+        var F=parseFloat(getComputedStyle(el).fontSize)||16;
+        return {y:(r.top-rh.top)/ech-bord+LIGNE*F, ech:ech, F:F};
+      }
+      function poseLeMot(){
+        if(!m.isConnected||!lettre.isConnected)return;
+        ajusteMot();
+        var bl=ligneDeBase(lettre);
+        var Fw=parseFloat(getComputedStyle(m).fontSize)||30;
+        m.style.top=(bl.y-LIGNE*Fw).toFixed(1)+'px';
+      }
+      poseLeMot();
+      N.plusTard(poseLeMot,140);N.plusTard(poseLeMot,520);
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(poseLeMot);}catch(e){}
       /* La page ne passe pas avant que la lettre ne soit posee dans le mot :
          `_sceneFete` la retient, sans retenir l'attente du silence qui
          declenche le glissement. */
       _sceneFete++;
       attendSilence(function(){
         if(!p.isConnected){_sceneFete--;return;}
-        ajusteMot();
+        /* Le reste du mot parait, dans un ton plus pale — la lettre, restee
+           au centre et en grand, le recouvre un instant : c'est voulu. */
+        poseLeMot();
         m.classList.add('vu');
         N.plusTard(function(){
           if(!p.isConnected){_sceneFete--;return;}
-          /* De la ou elle est, a la place qui l'attend. Les ecarts se
-             mesurent a l'ecran puis se ramenent dans le repere de la lettre :
-             le panneau est mis a l'echelle, et un deplacement en pixels
-             d'ecran y serait trop grand. */
-          var ra=lettre.getBoundingClientRect(),rb=t.getBoundingClientRect();
-          var ech=lettre.offsetWidth?(ra.width/lettre.offsetWidth):1;
+          /* ── ELLE NE SE DEPLACE QUE SUR LA LARGEUR ──
+             On la met D'ABORD a sa place dans le mot, on regarde d'ou elle
+             vient, et on la fait revenir de la. La position d'arrivee est
+             alors celle de la mise en page, jamais une mesure : rien ne peut
+             la faire tomber a cote, meme si l'ecran se remet a l'echelle en
+             cours de route.
+             Sa ligne de base ne bouge pas — le point fixe de la reduction est
+             SUR cette ligne — et il ne reste qu'un glissement horizontal. */
+          var avant=lettre.getBoundingClientRect();
+          lettre.textContent=trou||glyph;
+          lettre.style.fontSize='inherit';
+          lettre.style.lineHeight='inherit';
+          lettre.style.padding='0';
+          lettre.style.color='var(--sk-fonce)';
+          t.textContent='';t.appendChild(lettre);t.classList.add('vu');
+          var apres=lettre.getBoundingClientRect();
+          var ech=lettre.offsetWidth?(apres.width/lettre.offsetWidth):1;
           if(!(ech>0.05&&ech<20))ech=1;
-          var k=(ra.width&&rb.width)?(rb.width/ra.width):1;
+          var k=(apres.width&&avant.width)?(avant.width/apres.width):1;
           if(!(k>0.05&&k<20))k=1;
-          var dx=((rb.left+rb.width/2)-(ra.left+ra.width/2))/ech;
-          var dy=((rb.top+rb.height/2)-(ra.top+ra.height/2))/ech;
-          lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
-          lettre.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)'
-            +' scale('+k.toFixed(4)+')';
+          var dx=((avant.left+avant.width/2)-(apres.left+apres.width/2))/ech;
+          var Fap=parseFloat(getComputedStyle(lettre).fontSize)||30;
+          lettre.style.transformOrigin='50% '+(LIGNE*Fap).toFixed(1)+'px';
+          lettre.style.transition='none';
+          lettre.style.transform='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
           N.plusTard(function(){
-            t.classList.add('vu');
-            lettre.style.opacity='0';
-            _sceneFete--;
-          },1040);
-        },560);
+            lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
+            lettre.style.transform='none';
+          },40);
+          N.plusTard(function(){_sceneFete--;},1120);
+        },700);
       },false);
     };
   };
@@ -15478,7 +15540,7 @@ function _boyVowelCourse(ca){
          {dit:te('i'), fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('ou'),fait:function(el){grossit(el._sg[2].un);}}
        ]},
-      {h:TB('Deux fois le <b>même signe</b> :<br>on ajoute le son « n ».'),
+      {h:TB('Deux fois le <b>même signe</b> : on ajoute le son « n ».'),
        vue:function(){return pisteVoyelles(true);},
        temps:[
          {dit:te('a'),      fait:function(el){grossit(el._sg[0].un);}},
@@ -15491,7 +15553,7 @@ function _boyVowelCourse(ca){
          {dit:te('devient')},
          {dit:te('oun'),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
        ]},
-      {h:TB('Le <b>soukoun</b> :<br>on ne dit que la lettre.'),
+      {h:TB('Le <b>soukoun</b> : on ne dit que la lettre.'),
        vue:function(){return pisteUnSigne('ْ',true);},
        temps:[
          {dit:te('Le soukoun : on ne dit que la lettre.'),
@@ -15592,12 +15654,12 @@ function _boyProlongCourse(ca){
     B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br class="dur">Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
       te('Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.')),
     B.resume([
-      {h:TBF('Le {a} prolonge le « a »,<br>le {ou} le « ou »,<br>le {i} le « i ».',
+      {h:TBF('Le {a} prolonge le « a », le {ou} le « ou », le {i} le « i ».',
              {a:pa('ا'),ou:pou('و'),i:pi('ي')}),
        f:te('Le alif prolonge le a, le waw le ou, le ya le i.')},
-      {h:TB('Ils ne prolongent que s\'ils<br>n\'ont <b>aucune voyelle</b>.'),
+      {h:TB('Ils ne prolongent que s\'ils n\'ont <b>aucune voyelle</b>.'),
        f:te('Ils ne prolongent que s\'ils n\'ont aucune voyelle.')},
-      {h:TB('La <b>chaddah</b> :<br>on insiste sur la lettre.'),
+      {h:TB('La <b>chaddah</b> : on insiste sur la lettre.'),
        f:te('La chaddah : on insiste sur la lettre.')}
     ]),
 
@@ -15728,7 +15790,7 @@ function _boyLetterCourse(ca,idx,premiere){
     }
     _bat.push({L:[1],P:1,d:2600});
     sc.push(B.illustre(te('ÉTAPE · ACCROCHAGE'),
-      TB('Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫'),
+      TB('Elle ne s\'accroche <b>JAMAIS</b> à la lettre suivante 🚫'),
       te('Cette lettre ne s\'accroche jamais à la lettre suivante.'),
       {calques:[_faux,_juste],scene:_bat}));
   }
@@ -16096,23 +16158,23 @@ function _boyLetterCourse(ca,idx,premiere){
      quatre lettres qui n'y obeissent pas : chacune a son propre point. */
   sc.push(B.resume(sansDeduction
     ? [ (A==='ة')
-        ? {h:TB('Elle est <b>toujours</b><br>à la fin du mot.'),
+        ? {h:TB('Elle est <b>toujours</b> à la fin du mot.'),
            f:te('Elle est toujours à la fin du mot.')}
         : (A==='ء')
         ? {h:TB('Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.'),
            f:te('Elle ne s\'attache jamais, ni avant, ni après.')}
-        : {h:TB('Cette lettre a <b>4 formes</b><br>à apprendre.'),
+        : {h:TB('Cette lettre a <b>4 formes</b> à apprendre.'),
            f:te('Cette lettre a quatre formes à apprendre.')} ]
-    : [ {h:TB('<b>Seule</b> et <b>début</b> :<br>les deux formes à connaître.'),
+    : [ {h:TB('<b>Seule</b> et <b>début</b> : les deux formes à connaître.'),
          f:te('Seule et début : les deux formes à connaître.')},
-        {h:TB('Au <b>milieu</b> :<br>la forme du début, avec un trait.'),
+        {h:TB('Au <b>milieu</b> : la forme du début, avec un trait.'),
          f:te('Au milieu : la forme du début, avec un trait.')},
-        {h:TB('À la <b>fin</b> :<br>la forme seule, avec un trait.'),
+        {h:TB('À la <b>fin</b> : la forme seule, avec un trait.'),
          f:te('À la fin : la forme seule, avec un trait.')}
       ].concat(attache?[]:[
         /* Une lettre qui ne s'attache pas doit l'emporter avec elle : c'est
            ce qui la distingue, et le client le veut ecrit ici. */
-        {h:TB('Elle ne s\'accroche <b>JAMAIS</b><br>à la lettre suivante 🚫'),
+        {h:TB('Elle ne s\'accroche <b>JAMAIS</b> à la lettre suivante 🚫'),
          f:te('Cette lettre ne s\'accroche jamais à la lettre suivante.')}
       ])));
   sc.push(function(api){

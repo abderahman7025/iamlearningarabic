@@ -31,13 +31,45 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v212
+## OÙ ON EN EST — 8 septembre 2026, production en v213
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v212) :**
+**Fait et en ligne (v187 → v213) :**
+
+- **LA CINQUIÈME PASSE DU CLIENT (v213).**
+
+  - **Le hublot : la lettre ne bouge que sur la largeur.** Elle reste au
+    centre, en grand ; le reste du mot paraît autour d'elle dans un ton plus
+    pâle, quitte à ce qu'elle le recouvre ; puis elle glisse à sa place —
+    HORIZONTALEMENT seulement, le point fixe de la réduction étant posé sur
+    sa ligne de base. Le mot est centré dans le hublot et sa ligne de base
+    calée sur celle de la lettre, c'est-à-dire sur la ligne d'écriture
+    (, 1,07 em). Le déplacement se fait en FLIP : la lettre est
+    d'abord mise à sa place réelle, puis ramenée d'où elle vient — la
+    position d'arrivée est celle de la mise en page, jamais une mesure.
+    Et  imposait 4,6 rem à TOUS les spans du hublot, les
+    morceaux du mot compris : les réduire ne servait à rien.
+
+  - **La vague est aux deux, l'atterrissage non.** La fusée monte plus haut
+    que la planète puis redescend s'y poser — c'est son atterrissage. La
+    licorne, non : onde entière, éteinte sur le seul dernier dixième, et elle
+    arrive droit sur la surface du monde.
+
+  - **« À retenir » : ce qui bloquait.** La police avait bien grandi, mais
+    chaque case faisait 184 px de haut — texte sur deux lignes — et
+     ramenait toute la page à l'échelle : la taille apparente
+    ne bougeait pas. Un point = une ligne, des cases plus larges (940 px), et
+    la page tient : elle est alors agrandie.
+
+  - **La fausse liaison se SUPERPOSE** au trait qui arrive de l'autre côté de
+    l'alif : 0,12 em au-delà du blanc mesuré. Vérifié — plus aucun trou dans
+    la bande de liaison.
+
+  - **Les boutons ne peuvent plus déborder** : la place est bornée par le
+    cadre lui-même, et la rangée passe à la ligne plutôt que de sortir.
 
 - **LA QUATRIÈME PASSE DU CLIENT (v211).**
 
