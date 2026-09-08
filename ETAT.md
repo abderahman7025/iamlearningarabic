@@ -31,13 +31,52 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v210
+## OÙ ON EN EST — 8 septembre 2026, production en v211
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v210) :**
+**Fait et en ligne (v187 → v211) :**
+
+- **LA QUATRIÈME PASSE DU CLIENT (v211).**
+
+  - **La forme se pose DANS le hublot.** Le hublot ne disparaît plus : la
+    lettre y est d'abord seule et grande, puis le mot paraît sur sa ligne
+    d'écriture — la place de la lettre restée vide — et la lettre y glisse en
+    rapetissant. Le mot est mis à la taille du hublot comme le fait déjà
+    `hublot` pour un mot qu'on lui donne d'emblée.
+
+  - **La licorne se pose directement.** Éteindre le dernier quart d'onde ne
+    suffisait pas, le creux restait : toute la SECONDE MOITIÉ est maintenant
+    droite. Elle monte sur la première moitié, puis descend tout droit sur le
+    monde. La courbe de Bézier (carte en portrait) se fond de même dans la
+    ligne d'arrivée sur son dernier saut.
+
+  - **La révision fait enfin entendre son son.** Deux causes : `controle` ne
+    joue que s'il existe un enregistrement — on passe à `ecoute`, qui joue
+    toujours et pose le bouton pour rejouer ; et `dire` se TAIT sur la lettre
+    de base du cours des voyelles quand elle n'est pas enregistrée. D'où
+    `direToujours`, pour les écrans où il n'y a QUE le son à entendre.
+
+  - **Une page de moins pour le soukoun.** « À ton tour » ne montrait rien de
+    plus : c'est la page du petit rond qui demande maintenant de répéter et
+    qui félicite.
+
+  - **Les boutons ne débordent plus.** La place se mesure sur le bloc qui les
+    porte, pas sur la rangée elle-même — mesurée là, elle valait ce qu'ils
+    occupaient déjà. Et tant que la page n'est pas posée, on ne les élargit
+    pas à l'aveugle.
+
+  - **La fausse liaison touche l'alif.** Le liant sans chasse ne dessine
+    rien : c'est un vrai tatweel qui allonge le trait, et le resserrement
+    mesuré mord de 0,03 em de plus.
+
+  - **Le récapitulatif : début grossit juste après milieu, seule juste après
+    fin.**
+
+  - **« À retenir » : textes plus gros** (1,22 rem, signes à 66 px) **et le
+    soukoun a sa ligne d'écriture**, avec la même animation que les voyelles.
 
 - **LES MOTS DU CLIENT, UN PAR FORME (v210).** Vingt-huit lettres, quatre
   mots chacune — seule, début, milieu, fin — dictés par le client et rangés

@@ -3443,16 +3443,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    l'or — pour ne pas se confondre avec un monde : ce n'est pas un lieu où
    l'on va, c'est un rendez-vous avec ce qu'on a déjà vu. */
 
-/* ── LE MOT OÙ LA LETTRE PREND SA PLACE ──
-   Sous le hublot, sur les pages de forme : il paraît une fois la phrase
-   dite, et la lettre y vole. Le trou garde sa largeur dès le départ, sinon
-   le mot sauterait à l'arrivée. */
-.forme-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
-  font-size:clamp(34px,9vh,64px);line-height:1.35;color:var(--sk-fonce);
-  min-height:1.35em;display:flex;align-items:center;justify-content:center;
-  margin:2px auto 0;opacity:0;transition:opacity .45s ease}
-.forme-mot.vu{opacity:1}
-@media (prefers-reduced-motion:reduce){.forme-mot{transition:none}}
+/* ── LE MOT DANS LE HUBLOT ──
+   Le hublot ne s'en va pas : le mot paraît sur sa ligne d'écriture, la place
+   de la lettre restée vide, et la lettre y glisse. Le trou garde sa largeur
+   dès le départ, sinon le mot sauterait à l'arrivée. */
+.boy-hublot .hub-mot{position:absolute;left:10px;right:10px;top:50%;
+  transform:translateY(-50%);text-align:center;white-space:nowrap;direction:rtl;
+  font-family:'Scheherazade New',serif;line-height:1.5;color:var(--sk-fonce);
+  opacity:0;transition:opacity .45s ease;z-index:1;pointer-events:none}
+.boy-hublot .hub-mot.vu{opacity:1}
+.boy-hublot .hub-mot .rec-trou{opacity:1;visibility:hidden}
+.boy-hublot .hub-mot .rec-trou.vu{visibility:visible}
+.boy-hublot span{transition:opacity .3s ease}
+@media (prefers-reduced-motion:reduce){.boy-hublot .hub-mot{transition:none}}
 
 /* ── LA PAGE « À RETENIR » ──
    Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
@@ -3462,7 +3465,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .res-point{display:flex;align-items:center;gap:12px;text-align:left;
   background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:16px;
   padding:11px 15px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
-  font-family:Outfit,sans-serif;font-size:1.02rem;font-weight:800;
+  font-family:Outfit,sans-serif;font-size:1.22rem;font-weight:800;
   color:var(--sk-fonce);line-height:1.35;
   opacity:0;transform:translateY(10px);
   transition:opacity .35s ease,transform .35s ease}
@@ -3477,11 +3480,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    reprend sa taille. Le second signe du doublement attend, caché, juste à
    côté du premier — au-dessus pour la fatḥa, en dessous pour la kasra, à
    côté pour la ḍamma : c'est ainsi qu'on les écrit. */
-.res-piste{position:relative;flex:0 0 auto;width:200px;height:108px}
+.res-piste{position:relative;flex:0 0 auto;width:214px;height:118px}
 .res-piste .sol{position:absolute;left:2px;right:2px;top:50%;
   border-top:3px dashed rgba(var(--sk-rgb-f),.42)}
 .res-piste .sg{position:absolute;transform:translate(-50%,-50%);
-  font-family:'Scheherazade New',serif;font-size:56px;line-height:1;
+  font-family:'Scheherazade New',serif;font-size:66px;line-height:1;
   color:var(--sk-vif);
   transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
 /* UN SIGNE GRANDIT DU BON COTE : celui du dessus vers le haut, celui du
@@ -7244,7 +7247,11 @@ function _volCarte(o){
     var plateALaFin=!o.aligne;
     function ondeIci(e){
       var a=amp;
-      if(plateALaFin&&e>0.75)a*=Math.max(0,(1-e)/0.25);
+      /* TOUTE LA SECONDE MOITIE EST DROITE. Eteindre le dernier quart ne
+         suffisait pas : le creux de l'onde restait, et la licorne descendait
+         puis remontait au-dessus du monde. Elle monte donc sur la premiere
+         moitie, puis descend TOUT DROIT sur le monde et s'y pose. */
+      if(plateALaFin)a*=(e>0.5?Math.max(0,(1-e)/0.5):1);
       return ecartOnde(e,a);
     }
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
@@ -8041,6 +8048,14 @@ function _volCarte(o){
       var e=elan(u,n===0,(n===file.length-1)&&!contournera);
       var t=item.sens>0?e:1-e;
       var p=versSommet(_bezier(t,item.seg),n===file.length-1,e);
+      /* ── L'ARRIVEE EST DROITE ──
+         Sur le dernier saut, la courbe se fond dans la ligne qui mene au
+         point de pose : plus de montee ni de redescente au-dessus du monde,
+         la licorne arrive et se pose. */
+      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.6){
+        var _w=(e-0.6)/0.4;
+        p={x:p.x+(butFinal.x-p.x)*_w, y:p.y+(butFinal.y-p.y)*_w};
+      }
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
       /* On se penche en décollant, on se redresse en se posant. Sans ce
          redressement, le personnage arrivait sur l'étape encore couché à
@@ -8304,10 +8319,13 @@ function renderRevision(ca){
        plus qu'a la retrouver des yeux dans les nuages. On ne l'ecrit plus, on
        la FAIT ENTENDRE : `controle` joue le son de la cible en arrivant et
        pose le bouton pour le rejouer. */
-    scenes.push(B.controle(te('RÉVISION'),
+    /* `ecoute` et non `controle` : celui-la ne joue le son que s'il en
+       existe un ENREGISTREMENT, et la revision restait muette. `ecoute` le
+       fait entendre toujours, et pose le bouton pour le rejouer. */
+    scenes.push(B.ecoute(te('RÉVISION'),
       TB('Où est <b>ce son</b> ?'),
       te('Où est ce son ?'),
-      options,j.g));
+      options,j.g,j.n));
   });
   /* `mission` porte deja son propre titre — l'ecran de fin des cours. */
   scenes.push(B.resume([
@@ -9791,7 +9809,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v210';
+var _VERSION_REPLI='v211';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9924,6 +9942,15 @@ function _boyNarration(){
   }
   return {
     aEnreg:aEnreg,
+    /* ── LE SON, COUTE QUE COUTE ──
+       `dire` se tait sur la lettre de base du cours des voyelles quand elle
+       n'est pas enregistree : la synthese la prononce mal, et la-bas c'est
+       voulu. Mais sur un ecran ou il n'y a QUE le son a entendre — « ou est
+       ce son ? » — se taire, c'est ne rien demander du tout. */
+    direToujours:function(t){
+      t=sansGuillemets(sansEmoji(t));if(!t)return;
+      q.push(t);pump();
+    },
     dire:function(t){
       t=sansGuillemets(sansEmoji(t));if(!t)return;
       if(typeof _VOW_BASE!=='undefined'&&t.indexOf(_VOW_BASE)>=0&&!aEnreg(t))return;
@@ -10194,7 +10221,10 @@ function _poseSerrage(hote){
     [].slice.call(hote.querySelectorAll('[data-serre]')).forEach(function(el){
       var d=String(el.getAttribute('data-serre')||'').split('|');
       if(d.length!==2)return;
-      el.style.marginRight=(-(_creuxLiaison(d[0],d[1])+0.012)).toFixed(4)+'em';
+      /* Un cheveu de plus que la mesure : a l'ecran, l'arrondi au pixel
+         laissait encore un fil blanc. On mord franchement — une liaison
+         fautive doit TOUCHER. */
+      el.style.marginRight=(-(_creuxLiaison(d[0],d[1])+0.03)).toFixed(4)+'em';
     });
   }
   pose();
@@ -13812,11 +13842,26 @@ function _boyScene(ca,reprise){
     var max=0;
     bs.forEach(function(b){var w=b.offsetWidth;if(w>max)max=w;});
     if(!max)return;
-    /* Jamais etriques : le client veut des boutons larges, meme quand leur
-       mot est court. */
+    /* LA PLACE REELLE, celle du bloc qui les porte : mesuree sur la rangee
+       elle-meme, elle valait ce que les boutons occupaient deja, et les deux
+       des bords sortaient du cadre. */
+    var pere=r.parentNode, dispo=0;
+    if(pere){
+      var st_=getComputedStyle(pere);
+      dispo=(pere.clientWidth||0)
+            -(parseFloat(st_.paddingLeft)||0)-(parseFloat(st_.paddingRight)||0);
+    }
+    /* Tant que la page n'est pas posee, on ne sait pas de quelle place on
+       dispose : on ne touche a rien, une passe plus tard s'en chargera.
+       Elargir a l'aveugle, c'est ce qui faisait deborder les deux boutons
+       des bords. */
+    if(dispo<=60)return;
+    var ecart=8*(bs.length-1);
+    /* Jamais etriques — le client les veut larges — mais jamais debordants
+       non plus : la place disponible passe avant. */
     if(max<158)max=158;
-    var dispo=r.clientWidth||0, ecart=8*(bs.length-1);
-    if(dispo>60&&max*bs.length+ecart>dispo)max=Math.floor((dispo-ecart)/bs.length);
+    if(max*bs.length+ecart>dispo)max=Math.floor((dispo-ecart)/bs.length);
+    if(max<44)max=44;
     bs.forEach(function(b){b.style.flex='0 0 '+max+'px';b.style.width=max+'px';});
   }
   function calibreLesTextes(){
@@ -14510,33 +14555,64 @@ function _boyScene(ca,reprise){
   api.forme=function(etape,glyph,son,html,fr,avant,apres,trou){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
+      /* LE HUBLOT NE S'EN VA PAS. Tout se joue dedans : la lettre y est
+         d'abord seule et grande, puis le MOT parait sur la ligne d'ecriture
+         — sa place a elle restee vide — et la lettre glisse s'y poser. */
       var h=hublot(p,glyph,son);
-      var m=document.createElement('div');m.className='forme-mot';
+      var lettre=h.querySelector('span');
+      var m=document.createElement('span');m.className='hub-mot';
       var a=document.createElement('span');a.textContent=avant||'';
       var t=document.createElement('span');t.className='rec-trou';
       var b=document.createElement('span');b.textContent=apres||'';
-      /* La place est gardee des le depart : le mot ne sautera pas quand la
-         lettre arrivera. C'est la lettre TELLE QU'ELLE EST DANS LE MOT — avec
-         ses liants — et non la forme nue du hublot. */
+      /* La lettre TELLE QU'ELLE EST DANS LE MOT — avec ses liants — et non la
+         forme nue du hublot : c'est elle qui garde la place. */
       t.textContent=trou||glyph;
       m.appendChild(a);m.appendChild(t);m.appendChild(b);
-      p.appendChild(m);
+      h.appendChild(m);
       bouton(p,te('Suite ›'),suivant);
+      /* Le mot doit TENIR dans le hublot : on part de la taille voulue et on
+         reduit jusqu'a ce qu'il rentre, comme le fait le hublot pour un mot
+         qu'on lui donne d'emblee. */
+      function ajusteMot(){
+        if(!m.isConnected)return;
+        var max=h.clientWidth-34;if(max<40)return;
+        var px=Math.round((parseFloat(getComputedStyle(h).fontSize)||16)*2.6),garde=0;
+        m.style.fontSize=px+'px';
+        while(m.scrollWidth>max&&px>14&&garde++<60){px-=2;m.style.fontSize=px+'px';}
+      }
+      ajusteMot();
+      N.plusTard(ajusteMot,140);
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajusteMot);}catch(e){}
       /* La page ne passe pas avant que la lettre ne soit posee dans le mot :
          `_sceneFete` la retient, sans retenir l'attente du silence qui
-         declenche le vol. */
+         declenche le glissement. */
       _sceneFete++;
       attendSilence(function(){
         if(!p.isConnected){_sceneFete--;return;}
+        ajusteMot();
         m.classList.add('vu');
         N.plusTard(function(){
-          var src=h.querySelector('span')||h;
-          h.style.transition='transform .9s cubic-bezier(.45,.05,.3,1),opacity .9s ease';
-          h.style.transform='scale(.55)';h.style.opacity='0';
-          vole(src,t,getComputedStyle(m).color,function(){
-            t.classList.add('vu');_sceneFete--;
-          },true);
-        },520);
+          if(!p.isConnected){_sceneFete--;return;}
+          /* De la ou elle est, a la place qui l'attend. Les ecarts se
+             mesurent a l'ecran puis se ramenent dans le repere de la lettre :
+             le panneau est mis a l'echelle, et un deplacement en pixels
+             d'ecran y serait trop grand. */
+          var ra=lettre.getBoundingClientRect(),rb=t.getBoundingClientRect();
+          var ech=lettre.offsetWidth?(ra.width/lettre.offsetWidth):1;
+          if(!(ech>0.05&&ech<20))ech=1;
+          var k=(ra.width&&rb.width)?(rb.width/ra.width):1;
+          if(!(k>0.05&&k<20))k=1;
+          var dx=((rb.left+rb.width/2)-(ra.left+ra.width/2))/ech;
+          var dy=((rb.top+rb.height/2)-(ra.top+ra.height/2))/ech;
+          lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
+          lettre.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px)'
+            +' scale('+k.toFixed(4)+')';
+          N.plusTard(function(){
+            t.classList.add('vu');
+            lettre.style.opacity='0';
+            _sceneFete--;
+          },1040);
+        },560);
       },false);
     };
   };
@@ -14599,13 +14675,13 @@ function _boyScene(ca,reprise){
       var temps=[
         {vise:mMilieu,dit:te('Au milieu, la lettre est la même qu\'au début'),
          act:function(k){mDebut.trou.style.color=DEB;k();}},
-        {vise:mMilieu,act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
+        {vise:mDebut,act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
            paraitre(cMil.corps);k();});}},
         {vise:mMilieu,dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cMil.trait);k();}},
         {vise:mFin,dit:te('À la fin, la lettre est la même que quand elle est seule'),
          act:function(k){mSeule.trou.style.color=ISO;k();}},
-        {vise:mFin,act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
+        {vise:mSeule,act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
            paraitre(cFin.corps);k();});}},
         {vise:mFin,dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cFin.trait);k();}}
@@ -14922,11 +14998,11 @@ function _boyScene(ca,reprise){
       var opts=options.map(function(o){return (typeof o==='string')?{g:o,s:o}:{g:o[0],s:o[1]};});
       var t=opts.filter(function(o){return o.g===cible;})[0];
       var sonCible=son||(t?t.s:cible);
-      N.plusTard(function(){N.dire(sonCible);},700);
+      N.plusTard(function(){N.direToujours(sonCible);},700);
       var rj=document.createElement('button');rj.className='boy-btn sec';
       rj.style.cssText+=';padding:10px;font-size:1.2rem;margin-top:6px';
       rj.textContent=te('🔊 RÉÉCOUTER');
-      rj.onclick=function(){N.stop();N.dire(sonCible);};
+      rj.onclick=function(){N.stop();N.direToujours(sonCible);};
       p.appendChild(rj);
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
@@ -15082,6 +15158,24 @@ function _boyVowelCourse(ca){
       {un:pose('ُ',22,30,true,false,double?-0.10:0,0),
        deux:double?pose('ُ',22,30,true,true,0.10,0):null}
     ];
+    return d;
+  }
+  /* La meme ligne d'ecriture, avec un seul signe au milieu : celle du
+     soukoun. Il se montre et grossit comme les voyelles — le client veut la
+     meme animation. */
+  function pisteUnSigne(m,dessus){
+    var d=document.createElement('div');d.className='res-piste';
+    d.setAttribute('aria-hidden','true');
+    var sol=document.createElement('i');sol.className='sol';d.appendChild(sol);
+    var sp=document.createElement('span');
+    sp.className='sg '+(dessus?'haut':'bas');
+    sp.style.left='50%';sp.style.top=(dessus?30:70)+'%';
+    var b=document.createElement('b');b.textContent=m;
+    var cy=0;
+    try{var e=_encreAutourLigne(m);cy=-(0.3125+(e.bas-e.haut)/2);}catch(x2){}
+    b.style.transform='translate(0em,'+cy.toFixed(3)+'em)';
+    sp.appendChild(b);d.appendChild(sp);
+    d._sg=[{un:sp,deux:null}];
     return d;
   }
   function grossit(sp){
@@ -15352,23 +15446,22 @@ function _boyVowelCourse(ca){
        scene:[{P:1,d:800},{L:[0],P:1,d:1300},{L:[0],P:1,t:'b',d:2000}]}),
 
     /* Quatre lignes, comme le client les a ecrites — mais ecrites en grand. */
-    B.illustre(te('LE SOUKOUN · LE PETIT ROND'),
+    /* ── UNE SEULE PAGE POUR LE SOUKOUN ──
+       La page « à ton tour » qui suivait ne montrait rien de plus : le
+       client l'a fait retirer. C'est celle-ci qui demande maintenant de
+       répéter, et qui félicite — `repete` attend le blanc, le temps que
+       l'enfant parle, puis lance le bravo. */
+    B.repete(te('LE SOUKOUN · LE PETIT ROND'),
       TB('Parfois tu trouveras ce<br>petit rond au dessus. Il n’a<br>aucune prononciation.<br>On dira juste « <b>b</b> ».'),
-      te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.'),
+      false,
       /* Le petit rond bat au-dessus de la lettre, en orange, comme les trois
          voyelles du tout debut : c'est lui qu'on presente. */
       {calques:[LB],
        flottants:[{m:mS,c:CFA,x:50,y:SOUKH}],
        scene:[{L:[0],P:1,d:1000},
-              {L:[0],P:1,F:[0],bat:1,d:1800},
-              {L:[0],P:1,F:[0],bat:1,t:'b',d:2400}]}),
-
-    /* « Repete apres moi » ne s'ECRIT plus : il se dit, et lui seul. La page
-       montre ce qu'on a sous les yeux. */
-    B.repete(te('LE SOUKOUN · À TON TOUR'),
-      TB('Ici on a <b>« b »</b>.'),
-      te('Répète après moi : b.'),
-      {calques:[LBS],scene:[{L:[0],P:1,t:'b',d:4000}]}),
+              {L:[0],P:1,F:[0],bat:1,
+               dit:te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.')},
+              {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('Répète après moi : b.')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
       TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
@@ -15396,7 +15489,11 @@ function _boyVowelCourse(ca){
          {dit:te('oun'),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
        ]},
       {h:TB('Le <b>soukoun</b> :<br>on ne dit que la lettre.'),
-       f:te('Le soukoun : on ne dit que la lettre.')}
+       vue:function(){return pisteUnSigne('ْ',true);},
+       temps:[
+         {dit:te('Le soukoun : on ne dit que la lettre.'),
+          fait:function(el){grossit(el._sg[0].un);}}
+       ]}
     ]),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
@@ -15614,8 +15711,12 @@ function _boyLetterCourse(ca,idx,premiere){
     /* LA FAUTE : le liant sans chasse donne a la suivante sa forme jointe, et
        le resserrement — mesure AU RENDU, voir `_poseSerrage` — fait que le
        trait touche vraiment la lettre d'avant comme celle d'apres. */
-    var _faux =_voisin+A+'<span data-serre="'+_voisin+A+'|\u200d'+_voisin+'">'
-              +'\u200d'+_voisin+'</span>';
+    /* Le liant sans chasse ne DESSINE rien : il ne fait que donner sa forme
+       jointe a la suivante, et il restait un vide. On met donc un vrai trait
+       — le tatweel — qui allonge la liaison vers la droite, et le
+       resserrement mesure la fait toucher l'alif. */
+    var _faux =_voisin+A+'<span data-serre="'+_voisin+A+'|'+_TATWEEL+_voisin+'">'
+              +_TATWEEL+_voisin+'</span>';
     var _xj=_xJointure(_voisin+A,_juste);
     var _bat=[];
     for(var _k=0;_k<3;_k++){
