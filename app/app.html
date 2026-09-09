@@ -3453,7 +3453,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* Le mot est CENTRÉ dans le hublot et posé sur sa ligne d'écriture — c'est
    `poseLeMot` qui calcule ce `top`. Il paraît dans un ton plus pâle que la
    lettre : on voit d'un coup d'œil ce qui l'attend et ce qui est déjà là. */
+/* CENTRÉ DANS LE CERCLE. Une boîte qui n'est ni bloc ni de largeur donnée
+   se contente de la largeur de son texte : elle se posait alors à gauche,
+   et le mot tombait à côté du centre. */
 .boy-hublot .hub-mot{position:absolute;left:0;right:0;top:0;
+  display:block;width:auto;box-sizing:border-box;
   text-align:center;white-space:nowrap;direction:rtl;
   font-family:'Scheherazade New',serif;line-height:1.5;
   color:rgba(var(--sk-rgb-f),.42);
@@ -7201,6 +7205,8 @@ function _volCarte(o){
   }
   function enVol(){
     if(!eq.aVaisseau)return;
+    /* Elle repart : elle se remet a flotter. */
+    if(eq.image)eq.image.style.animation='';
     vaisseauHabite(true);
     eq.vaisseau.style.opacity='1';
     leveLa(0);
@@ -7261,19 +7267,11 @@ function _volCarte(o){
        poser. On eteint donc l'onde sur le dernier quart du trajet : elle
        serpente comme avant et arrive droit. La fusee, elle, garde sa vague
        entiere — c'est elle qui l'a demandee. */
-    /* ── UNE SEULE BOSSE POUR LA LICORNE ──
-       La fusee decrit une onde ENTIERE : une bosse au-dessus de la ligne,
-       puis un creux en dessous, et elle remonte se poser — c'est son
-       atterrissage, le client y tient.
-       La licorne, non. Ce creux etait le va-et-vient dont il ne veut pas :
-       elle passait sous le monde et remontait dessus. Elle ne fait donc plus
-       qu'une DEMI-onde — elle s'eleve, redescend, et le mouvement s'arrete
-       ou elle se pose. La courbe est monotone sur toute la seconde moitie :
-       des qu'elle atteint sa place, c'est fini. */
-    var demiOnde=!o.aligne;
-    function ondeIci(e){
-      return demiOnde?(amp*Math.sin(Math.PI*e)):ecartOnde(e,amp);
-    }
+    /* ── L'ONDE ENTIERE, POUR LES DEUX ──
+       Bosse au-dessus de la ligne, puis creux en dessous : c'est la
+       trajectoire que le client a dessinee, et il la veut telle quelle. Ce
+       qu'il ne veut pas se passe APRES, a l'arrivee — voir `poserPilote`. */
+    function ondeIci(e){return ecartOnde(e,amp);}
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
        ou il l'a laissee, sinon la fusee se remettrait droite entre les deux.
        Et elle ne se redresse pas a l'arrivee, la boucle s'en charge. */
@@ -7476,8 +7474,16 @@ function _volCarte(o){
     if(!eq.aVaisseau){if(fini)fini();return;}
     if(eq.flamme)eq.flamme.style.display='none';
     habillePilote();
-    leveLa(0.34);
-    eq.pilote.style.transform='translateY(-34%) scale(.72)';
+    /* ── LA MONTEE-DESCENTE EST CELLE DE LA FUSEE ──
+       Elle tient au-dessus de la planete, coupe le feu, puis se pose : c'est
+       son atterrissage, et le client y tient. La LICORNE, non — c'est
+       exactement le va-et-vient dont il ne veut pas. Elle arrive, elle
+       s'arrete, et la fille descend. */
+    var tientEnVol=!!o.aligne;
+    leveLa(tientEnVol?0.34:0);
+    /* Et elle cesse de flotter : le mouvement s'arrete ou elle se pose. */
+    if(!tientEnVol&&eq.image)eq.image.style.animation='none';
+    eq.pilote.style.transform='translateY('+(tientEnVol?-34:0)+'%) scale(.72)';
     setTimeout(function(){
       leveLa(0);                               /* elle se pose */
       setTimeout(function(){
@@ -7492,7 +7498,7 @@ function _volCarte(o){
           porteLumiere(1,fini);
         },620);
       },780);
-    },700);
+    },tientEnVol?700:0);
   }
   /* `part` : de 0 à 1, la part d'inclinaison qu'on applique. Elle vaut 0 au
      décollage et à l'atterrissage — le personnage y est droit — et 1 en
@@ -8068,12 +8074,11 @@ function _volCarte(o){
       var e=elan(u,n===0,(n===file.length-1)&&!contournera);
       var t=item.sens>0?e:1-e;
       var p=versSommet(_bezier(t,item.seg),n===file.length-1,e);
-      /* ── L'ARRIVEE EST DROITE ──
-         Sur le dernier saut, la courbe se fond dans la ligne qui mene au
-         point de pose : la licorne arrive sur la surface du monde et s'y
-         arrete, sans le depasser pour y revenir. */
-      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.5){
-        var _w=(e-0.5)/0.5;
+      /* Sur le dernier saut, la courbe se fond dans la ligne qui mene au
+         point de pose : on arrive sur le monde, on ne le depasse pas pour y
+         revenir. */
+      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.85){
+        var _w=(e-0.85)/0.15;
         p={x:p.x+(butFinal.x-p.x)*_w, y:p.y+(butFinal.y-p.y)*_w};
       }
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
@@ -9829,7 +9834,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v216';
+var _VERSION_REPLI='v217';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14594,7 +14599,11 @@ function _boyScene(ca,reprise){
       /* LE HUBLOT NE S'EN VA PAS. Tout se joue dedans : la lettre y est
          d'abord seule et grande, puis le MOT parait sur la ligne d'ecriture
          — sa place a elle restee vide — et la lettre glisse s'y poser. */
-      var h=hublot(p,glyph,son);
+      /* PAS DE NOTE SOUS LA BULLE. La page de reference — « VOYELLE 1/3 »
+         — n'en a pas, et cette note prend 113 px : le panneau etait plus
+         haut, la mise a l'echelle le reduisait d'autant, et le hublot
+         paraissait plus petit que celui de la reference. Mesure. */
+      var h=hublot(p,glyph,son,null);
       var lettre=h.querySelector('span');
       /* ── LE HUBLOT NE CHANGE PAS ──
          Le modele est celui d'une lettre qui porte sa voyelle — « VOYELLE

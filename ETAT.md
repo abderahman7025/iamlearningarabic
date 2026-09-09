@@ -31,13 +31,33 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v216
+## OÙ ON EN EST — 8 septembre 2026, production en v217
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v216) :**
+**Fait et en ligne (v187 → v217) :**
+
+- **LA NEUVIÈME PASSE DU CLIENT (v217).**
+
+  - **La montée-descente était l’ATTERRISSAGE, pas la trajectoire.** Le vol
+    n’y était pour rien : c’est  qui, à l’arrivée, soulevait la
+    monture de 34 % puis la reposait — le geste de la fusée qui tient
+    au-dessus de sa planète, appliqué aussi à la licorne. Elle ne le fait
+    plus : elle arrive, elle s’arrête, elle cesse de flotter
+    ( coupé), et la fille descend. L’onde ENTIÈRE — bosse et
+    creux — est rendue aux deux : c’est la trajectoire que le client a
+    dessinée.
+
+  - **Le hublot d’une page de forme n’a plus de note sous la bulle.** Cette
+    note prenait 113 px : le panneau était plus haut que celui de la page de
+    référence, la mise à l’échelle le réduisait d’autant, et le hublot
+    paraissait plus petit. Mesuré : les deux panneaux font maintenant 532 px,
+    au pixel près, et les deux hublots la même taille.
+
+  - **Le mot est centré dans le cercle** : sa boîte se contentait de la
+    largeur du texte au lieu de prendre celle du hublot.
 
 - **LA HUITIÈME PASSE DU CLIENT (v216).**
 
