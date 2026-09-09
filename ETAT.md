@@ -42,11 +42,11 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 - **LA NEUVIÈME PASSE DU CLIENT (v217).**
 
   - **La montée-descente était l’ATTERRISSAGE, pas la trajectoire.** Le vol
-    n’y était pour rien : c’est  qui, à l’arrivée, soulevait la
+    n’y était pour rien : c’est `poserPilote` qui, à l’arrivée, soulevait la
     monture de 34 % puis la reposait — le geste de la fusée qui tient
     au-dessus de sa planète, appliqué aussi à la licorne. Elle ne le fait
     plus : elle arrive, elle s’arrête, elle cesse de flotter
-    ( coupé), et la fille descend. L’onde ENTIÈRE — bosse et
+    (`volFlotte` coupé), et la fille descend. L’onde ENTIÈRE — bosse et
     creux — est rendue aux deux : c’est la trajectoire que le client a
     dessinée.
 
