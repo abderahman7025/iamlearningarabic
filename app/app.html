@@ -3456,12 +3456,14 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* CENTRÉ DANS LE CERCLE. Une boîte qui n'est ni bloc ni de largeur donnée
    se contente de la largeur de son texte : elle se posait alors à gauche,
    et le mot tombait à côté du centre. */
+.boy-hublot.ligne .hub-mot,
 .boy-hublot .hub-mot{position:absolute;left:0;right:0;top:0;
   display:block;width:auto;box-sizing:border-box;
   text-align:center;white-space:nowrap;direction:rtl;
   font-family:'Scheherazade New',serif;line-height:1.5;
   color:rgba(var(--sk-rgb-f),.42);
   opacity:0;transition:opacity .45s ease;z-index:1;pointer-events:none}
+.boy-hublot.ligne .hub-mot.vu,
 .boy-hublot .hub-mot.vu{opacity:1}
 /* ── LES MORCEAUX DU MOT SUIVENT LE MOT ──
    `.boy-hublot span` impose 4,6 rem à TOUT span du hublot : les trois
@@ -9834,7 +9836,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v217';
+var _VERSION_REPLI='v218';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

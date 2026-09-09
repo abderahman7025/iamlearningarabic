@@ -31,13 +31,22 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v217
+## OÙ ON EN EST — 8 septembre 2026, production en v218
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v217) :**
+**Fait et en ligne (v187 → v218) :**
+
+- **LE MOT DU HUBLOT N'ETAIT PAS EN POSITION ABSOLUE (v218).** Une regle plus
+  specifique — celle qui donne sa couche a la lettre du hublot — le remettait
+  dans le flux. Il devenait donc un second element de la rangee : la lettre
+  etait poussee A GAUCHE du cercle, et le mot se posait a cote d'elle au lieu
+  de la ligne d'ecriture. C'est la cause des deux defauts que le client
+  signalait depuis plusieurs versions. Mesure apres correction : la lettre
+  centree a 0 px, le mot centre a 0 px, et les deux lignes de base a 101 px —
+  la meme.
 
 - **LA NEUVIÈME PASSE DU CLIENT (v217).**
 
