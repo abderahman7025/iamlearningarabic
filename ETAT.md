@@ -31,13 +31,21 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v218
+## OÙ ON EN EST — 8 septembre 2026, production en v219
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v218) :**
+**Fait et en ligne (v187 → v219) :**
+
+- **LE MOT DU HUBLOT A LA TAILLE DE LA LETTRE (v219).** Il partait d une
+  taille fixe et restait minuscule a cote d elle. Il part maintenant de la
+  taille de la LETTRE et ne se reduit que si le cercle ne le contient pas.
+  Piege au passage : sa boite va d un bord a l autre du hublot, donc
+  `scrollWidth` valait toujours la meme chose et le mot se reduisait jusqu au
+  plancher — on additionne les morceaux du mot. Mesure : lettre 74 px, mot
+  74 px, memes lignes de base, centre a 0 px.
 
 - **LE MOT DU HUBLOT N'ETAIT PAS EN POSITION ABSOLUE (v218).** Une regle plus
   specifique — celle qui donne sa couche a la lettre du hublot — le remettait

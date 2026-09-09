@@ -9836,7 +9836,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v218';
+var _VERSION_REPLI='v219';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14628,11 +14628,24 @@ function _boyScene(ca,reprise){
          reduit jusqu'a ce qu'il rentre, comme le fait le hublot pour un mot
          qu'on lui donne d'emblee. */
       function ajusteMot(){
-        if(!m.isConnected)return;
-        var max=h.clientWidth-30;if(max<40)return;
-        var px=Math.round((parseFloat(getComputedStyle(h).fontSize)||16)*2.6),garde=0;
+        if(!m.isConnected||!lettre.isConnected)return;
+        var max=h.clientWidth-24;if(max<40)return;
+        /* ── LE MOT AUSSI GRAND QUE LA LETTRE LE PERMET ──
+           On part de la taille de la LETTRE — c'est elle la reference du
+           hublot — et on ne reduit que ce qu'il faut pour que le mot tienne
+           dans le cercle. Partir d'une taille fixe le laissait minuscule a
+           cote d'elle. */
+        var px=Math.round(parseFloat(getComputedStyle(lettre).fontSize)||60),garde=0;
         m.style.fontSize=px+'px';
-        while(m.scrollWidth>max&&px>14&&garde++<60){px-=2;m.style.fontSize=px+'px';}
+        /* LA LARGEUR DU MOT, PAS CELLE DE SA BOITE : celle-ci va d'un bord a
+           l'autre du hublot, `scrollWidth` valait donc toujours la meme
+           et le mot se reduisait jusqu'au plancher. */
+        function largeurMot(){
+          var w=0;
+          [].slice.call(m.children).forEach(function(x){w+=x.offsetWidth;});
+          return w;
+        }
+        while(largeurMot()>max&&px>14&&garde++<160){px-=1;m.style.fontSize=px+'px';}
       }
       /* ── LE MOT SE POSE SUR LA LIGNE D'ECRITURE ──
          Pas au milieu du hublot : sur la LIGNE, celle ou repose deja la
