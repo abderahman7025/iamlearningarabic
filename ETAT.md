@@ -31,13 +31,20 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v219
+## OÙ ON EN EST — 8 septembre 2026, production en v220
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v219) :**
+**Fait et en ligne (v187 → v220) :**
+
+- **LA LETTRE GLISSE POUR DE BON, ET LE MOT EST GRIS (v220).** Elle sautait a
+  sa place : la lettre vient d etre deplacee dans le DOM, et un element
+  fraichement insere n a pas d etat AVANT — une transition CSS n y demarre
+  pas. On anime donc par l API des animations, qui porte ses deux etats avec
+  elle. Et le reste du mot est GRIS, la couleur de ce qui n est pas la lettre
+  du jour : on la distingue d un coup d oeil au milieu de son mot.
 
 - **LE MOT DU HUBLOT A LA TAILLE DE LA LETTRE (v219).** Il partait d une
   taille fixe et restait minuscule a cote d elle. Il part maintenant de la

@@ -3461,7 +3461,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   display:block;width:auto;box-sizing:border-box;
   text-align:center;white-space:nowrap;direction:rtl;
   font-family:'Scheherazade New',serif;line-height:1.5;
-  color:rgba(var(--sk-rgb-f),.42);
+  /* LE RESTE DU MOT EN GRIS : c'est la couleur de ce qui n'est pas la
+     lettre du jour, ici comme dans le recapitulatif. On la distingue alors
+     d'un coup d'oeil au milieu de son mot. */
+  color:#90a4ae;
   opacity:0;transition:opacity .45s ease;z-index:1;pointer-events:none}
 .boy-hublot.ligne .hub-mot.vu,
 .boy-hublot .hub-mot.vu{opacity:1}
@@ -9836,7 +9839,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v219';
+var _VERSION_REPLI='v220';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14724,14 +14727,41 @@ function _boyScene(ca,reprise){
           var dx=((avant.left+avant.width/2)-(apres.left+apres.width/2))/ech;
           /* Le point fixe est SUR la ligne de base : la lettre ne monte ni ne
              descend, elle ne fait que glisser sur la largeur en rapetissant. */
-          lettre.style.transformOrigin='50% '+baseDansBoite(lettre).toFixed(1)+'px';
+          var _orig='50% '+baseDansBoite(lettre).toFixed(1)+'px';
+          var _dep='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
+          lettre.style.transformOrigin=_orig;
+          /* ── ELLE GLISSE, ELLE NE SAUTE PAS ──
+             On anime par l'API des animations plutot que par une transition :
+             la lettre vient d'etre deplacee dans le DOM, et un element
+             fraichement insere n'a pas d'etat AVANT — une transition n'y
+             demarre pas, la lettre se contentait de reapparaitre a sa place.
+             L'animation, elle, porte ses deux etats avec elle. */
+          if(lettre.animate){
+            lettre.style.transition='';lettre.style.transform='';
+            try{
+              lettre.animate([{transform:_dep,transformOrigin:_orig},
+                              {transform:'none',transformOrigin:_orig}],
+                             {duration:1000,easing:'cubic-bezier(.45,.05,.3,1)'});
+            }catch(_a){}
+          }else{
           lettre.style.transition='none';
-          lettre.style.transform='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
+          lettre.style.transform=_dep;
           /* On force le calcul de la mise en page : sans cela le navigateur
              fond les deux etats en un seul et la lettre saute sans glisser. */
           void lettre.offsetWidth;
-          lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
-          lettre.style.transform='none';
+          /* DEUX IMAGES D'ECART, pas un simple recalcul : la lettre vient
+             d'etre deplacee dans le DOM, et un element fraichement insere
+             n'a pas d'etat AVANT — le navigateur fondait alors les deux
+             etats en un seul et elle sautait a sa place au lieu d'y
+             glisser. */
+          requestAnimationFrame(function(){
+            requestAnimationFrame(function(){
+              if(!lettre.isConnected)return;
+              lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
+              lettre.style.transform='none';
+            });
+          });
+          }
           N.plusTard(function(){_sceneFete--;},1120);
         },700);
       },false);
