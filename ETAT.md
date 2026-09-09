@@ -31,13 +31,22 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v220
+## OÙ ON EN EST — 8 septembre 2026, production en v221
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v220) :**
+**Fait et en ligne (v187 → v221) :**
+
+- **LE FONDU DU MOT ET LE GLISSEMENT DE LA LETTRE, ENSEMBLE (v221).** Ils
+  partent au meme instant et finissent ensemble : 900 ms tous les deux. Le
+  fondu ne porte que sur les COTES du mot — s il portait sur toute la boite,
+  la lettre disparaitrait pour revenir.
+  Et la couleur : elle ne prenait pas, parce que la regle du hublot forcait
+  celle de la lettre a TOUS ses spans, les morceaux du mot compris. Le mot
+  herite maintenant de sa propre couleur : VIOLET chez la fille, VERT chez le
+  garcon. Mesure : cotes du mot violet, lettre rose fonce.
 
 - **LA LETTRE GLISSE POUR DE BON, ET LE MOT EST GRIS (v220).** Elle sautait a
   sa place : la lettre vient d etre deplacee dans le DOM, et un element

@@ -3464,8 +3464,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   /* LE RESTE DU MOT EN GRIS : c'est la couleur de ce qui n'est pas la
      lettre du jour, ici comme dans le recapitulatif. On la distingue alors
      d'un coup d'oeil au milieu de son mot. */
-  color:#90a4ae;
-  opacity:0;transition:opacity .45s ease;z-index:1;pointer-events:none}
+  z-index:1;pointer-events:none}
+/* LE FONDU NE PORTE QUE SUR LES COTES DU MOT. La lettre, elle, est deja la
+   et doit le rester : si le fondu portait sur toute la boite, elle
+   disparaitrait pour revenir. */
+.boy-hublot .hub-mot>span{opacity:0;transition:opacity .9s ease}
+.boy-hublot .hub-mot.vu>span{opacity:1}
+/* LA COULEUR DU MOT S'HERITE : `.boy-hublot span` la forcait au ton de la
+   lettre, et le mot restait de la meme couleur qu'elle. */
+.boy-hublot .hub-mot span{color:inherit}
 .boy-hublot.ligne .hub-mot.vu,
 .boy-hublot .hub-mot.vu{opacity:1}
 /* ── LES MORCEAUX DU MOT SUIVENT LE MOT ──
@@ -3474,7 +3481,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    ni sa taille ni sa ligne de base n'étaient celles qu'on croyait. */
 .boy-hublot .hub-mot span{font-size:inherit;line-height:inherit;
   font-family:inherit;padding:0}
-.boy-hublot .hub-mot .rec-trou{opacity:1;visibility:hidden}
+.boy-hublot .hub-mot .rec-trou,
+.boy-hublot .hub-mot.vu .rec-trou{opacity:1;visibility:hidden;transition:none}
 .boy-hublot .hub-mot .rec-trou.vu{visibility:visible;color:var(--sk-fonce)}
 .boy-hublot span{transition:opacity .3s ease}
 @media (prefers-reduced-motion:reduce){.boy-hublot .hub-mot{transition:none}}
@@ -9839,7 +9847,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v220';
+var _VERSION_REPLI='v221';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14618,6 +14626,10 @@ function _boyScene(ca,reprise){
          Le mot, lui, vient se poser A LA MEME HAUTEUR que la lettre — meme
          ligne de base — pour qu'elle n'ait qu'a glisser sur la largeur. */
       var m=document.createElement('span');m.className='hub-mot';
+      /* Le mot porte SA couleur, tres differente de celle de la lettre :
+         violet chez la fille, vert chez le garcon. C'est ce qui permet de
+         reconnaitre la lettre du jour au milieu de son mot. */
+      m.style.color=(st.profile==='girl')?'#8e24aa':'#2e7d32';
       var a=document.createElement('span');a.textContent=avant||'';
       var t=document.createElement('span');t.className='rec-trou';
       var b=document.createElement('span');b.textContent=apres||'';
@@ -14691,11 +14703,13 @@ function _boyScene(ca,reprise){
       _sceneFete++;
       attendSilence(function(){
         if(!p.isConnected){_sceneFete--;return;}
-        /* Le reste du mot parait, dans un ton plus pale — la lettre, restee
-           au centre et en grand, le recouvre un instant : c'est voulu. */
-        poseLeMot();
-        m.classList.add('vu');
-        N.plusTard(function(){
+        /* ── LES DEUX ENSEMBLE ──
+           Le reste du mot parait en fondu, et la lettre glisse PENDANT ce
+           fondu : elles partent au meme instant et finissent au meme instant.
+           C'est ce que le client demande. Le fondu ne porte que sur les cotes
+           du mot — jamais sur la lettre, qui doit rester pleine tout du
+           long. */
+        (function(){
           if(!p.isConnected){_sceneFete--;return;}
           /* ── ELLE NE SE DEPLACE QUE SUR LA LARGEUR ──
              On la met D'ABORD a sa place dans le mot, on regarde d'ou elle
@@ -14741,7 +14755,7 @@ function _boyScene(ca,reprise){
             try{
               lettre.animate([{transform:_dep,transformOrigin:_orig},
                               {transform:'none',transformOrigin:_orig}],
-                             {duration:1000,easing:'cubic-bezier(.45,.05,.3,1)'});
+                             {duration:900,easing:'cubic-bezier(.35,.05,.25,1)'});
             }catch(_a){}
           }else{
           lettre.style.transition='none';
@@ -14757,13 +14771,14 @@ function _boyScene(ca,reprise){
           requestAnimationFrame(function(){
             requestAnimationFrame(function(){
               if(!lettre.isConnected)return;
-              lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
+              lettre.style.transition='transform 900ms cubic-bezier(.35,.05,.25,1)';
               lettre.style.transform='none';
             });
           });
           }
-          N.plusTard(function(){_sceneFete--;},1120);
-        },700);
+          m.classList.add('vu');
+          N.plusTard(function(){_sceneFete--;},1000);
+        })();
       },false);
     };
   };
