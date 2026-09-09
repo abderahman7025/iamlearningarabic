@@ -31,13 +31,39 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v213
+## OÙ ON EN EST — 8 septembre 2026, production en v214
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v213) :**
+**Fait et en ligne (v187 → v214) :**
+
+- **LA SIXIÈME PASSE DU CLIENT (v214).**
+
+  - **La lettre est CENTRÉE dans le hublot.** Centrer sa boîte ne la centrait
+    pas : l'alif n'a d'encre qu'au-dessus de la ligne, le bâ en dessous, le
+    wâw autour. On mesure son encre et on la ramène au milieu du cercle —
+    mesuré : le bâ était 16 px trop bas, il est à 3 px près. **La ligne
+    d'écriture suit la lettre** (variable `--hub-ligne`) au lieu des 62 % fixes, et
+    le mot vient s'y aligner : la lettre ne fait plus alors qu'un glissement
+    horizontal, point fixe posé sur sa ligne de base. Un recalcul forcé de la
+    mise en page entre les deux états — sans lui le navigateur les fondait en
+    un seul et la lettre sautait sans glisser.
+
+  - **La lettre du jour est en couleur** dans le mot de l'écran d'accrochage,
+    le juste comme le fautif.
+
+  - **Le récapitulatif : début et seule grossissent dès qu'on les nomme.**
+    `vise` accepte plusieurs cases : la phrase les nomme toutes les deux.
+
+  - **« je vais te dévoiler un secret » devient « on peut passer à la
+    suite ».** À réenregistrer.
+
+  - **« À retenir » : des rangées plus courtes.** C'est la hauteur de la piste
+    qui commandait celle de la page, et la page trop haute était ramenée à
+    l'échelle : les signes gardent leur taille, la piste passe de 92 à 66 px
+    et déborde un peu de sa boîte. Textes à 1,28 rem.
 
 - **LA CINQUIÈME PASSE DU CLIENT (v213).**
 

@@ -3355,7 +3355,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* La ligne d'écriture, à l'intérieur du hublot : elle s'arrête avant les
    parois, sinon elle déborderait du cercle. */
 .boy-hublot.apesanteur{margin-bottom:52px}
-.boy-hublot.ligne::before{content:'';position:absolute;left:26px;right:26px;top:62%;
+/* La ligne d'écriture est réglable : sur les pages de forme, elle se pose
+   là où la lettre repose vraiment (voir `poseLeMot`). Ailleurs, 62 %. */
+.boy-hublot.ligne::before{content:'';position:absolute;left:26px;right:26px;
+  top:var(--hub-ligne,62%);
   border-top:3px dashed rgba(var(--sk-rgb-f),.42);z-index:0}
 .boy-hublot.ligne span{position:relative;z-index:1}
 /* Piste d'atterrissage : la ligne d'écriture du cours adulte, en piste */
@@ -3471,12 +3474,12 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
    par un, au moment où la voix les dit : une liste posée d'un bloc ne se lit
    pas, elle se saute. */
-.res-liste{max-width:min(96%,940px);margin:8px auto 2px;display:flex;
-  flex-direction:column;gap:9px}
+.res-liste{max-width:min(96%,940px);margin:6px auto 2px;display:flex;
+  flex-direction:column;gap:8px}
 .res-point{display:flex;align-items:center;gap:12px;text-align:left;
   background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:16px;
-  padding:9px 16px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
-  font-family:Outfit,sans-serif;font-size:1.22rem;font-weight:800;
+  padding:7px 16px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
+  font-family:Outfit,sans-serif;font-size:1.28rem;font-weight:800;
   color:var(--sk-fonce);line-height:1.35;
   opacity:0;transform:translateY(10px);
   transition:opacity .35s ease,transform .35s ease}
@@ -3491,7 +3494,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    reprend sa taille. Le second signe du doublement attend, caché, juste à
    côté du premier — au-dessus pour la fatḥa, en dessous pour la kasra, à
    côté pour la ḍamma : c'est ainsi qu'on les écrit. */
-.res-piste{position:relative;flex:0 0 auto;width:196px;height:92px}
+/* La hauteur de la rangee est celle de cette piste : plus elle est basse,
+   moins la page est haute, et plus `ajusteEcran` peut l'agrandir. Les signes,
+   eux, gardent leur taille — ils debordent un peu de la boite, sans gene. */
+.res-piste{position:relative;flex:0 0 auto;width:186px;height:66px}
 .res-piste .sol{position:absolute;left:2px;right:2px;top:50%;
   border-top:3px dashed rgba(var(--sk-rgb-f),.42)}
 .res-piste .sg{position:absolute;transform:translate(-50%,-50%);
@@ -9824,7 +9830,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v213';
+var _VERSION_REPLI='v214';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14590,6 +14596,18 @@ function _boyScene(ca,reprise){
          — sa place a elle restee vide — et la lettre glisse s'y poser. */
       var h=hublot(p,glyph,son);
       var lettre=h.querySelector('span');
+      /* ── LA LETTRE AU CENTRE DU HUBLOT ──
+         Centrer sa BOITE ne la centre pas : l'alif n'a d'encre qu'au-dessus
+         de la ligne, le ba en dessous, le waw autour. On mesure donc son
+         encre et on la ramene au milieu du cercle — c'est ainsi que la
+         lettre avec sa voyelle parait centree, et le client la prend pour
+         modele. La ligne d'ecriture suit : elle se pose la ou la lettre
+         repose vraiment, et le mot viendra s'y aligner. */
+      var _enc=null;try{_enc=_encreAutourLigne(_sansCercle(glyph));}catch(_x){}
+      if(_enc){
+        lettre.style.position='relative';
+        lettre.style.top=(-(0.3125+(_enc.bas-_enc.haut)/2)).toFixed(3)+'em';
+      }
       var m=document.createElement('span');m.className='hub-mot';
       var a=document.createElement('span');a.textContent=avant||'';
       var t=document.createElement('span');t.className='rec-trou';
@@ -14629,6 +14647,10 @@ function _boyScene(ca,reprise){
         if(!m.isConnected||!lettre.isConnected)return;
         ajusteMot();
         var bl=ligneDeBase(lettre);
+        /* LA LIGNE D'ECRITURE PASSE SOUS LA LETTRE, pas a 62 % du cercle :
+           la lettre ayant ete centree sur son encre, sa ligne de base a
+           bouge, et le pointille doit la suivre. */
+        h.style.setProperty('--hub-ligne',bl.y.toFixed(1)+'px');
         var Fw=parseFloat(getComputedStyle(m).fontSize)||30;
         m.style.top=(bl.y-LIGNE*Fw).toFixed(1)+'px';
       }
@@ -14655,27 +14677,35 @@ function _boyScene(ca,reprise){
              cours de route.
              Sa ligne de base ne bouge pas — le point fixe de la reduction est
              SUR cette ligne — et il ne reste qu'un glissement horizontal. */
+          poseLeMot();
+          var Fav=parseFloat(getComputedStyle(lettre).fontSize)||60;
           var avant=lettre.getBoundingClientRect();
           lettre.textContent=trou||glyph;
           lettre.style.fontSize='inherit';
           lettre.style.lineHeight='inherit';
           lettre.style.padding='0';
+          lettre.style.position='static';lettre.style.top='';
           lettre.style.color='var(--sk-fonce)';
           t.textContent='';t.appendChild(lettre);t.classList.add('vu');
           var apres=lettre.getBoundingClientRect();
           var ech=lettre.offsetWidth?(apres.width/lettre.offsetWidth):1;
           if(!(ech>0.05&&ech<20))ech=1;
-          var k=(apres.width&&avant.width)?(avant.width/apres.width):1;
+          var Fap=parseFloat(getComputedStyle(lettre).fontSize)||30;
+          /* Le rapport des TAILLES, et non des largeurs : la lettre ecrite
+             dans le mot porte ses liants, sa boite n'est pas celle du hublot. */
+          var k=(Fap>0)?(Fav/Fap):1;
           if(!(k>0.05&&k<20))k=1;
           var dx=((avant.left+avant.width/2)-(apres.left+apres.width/2))/ech;
-          var Fap=parseFloat(getComputedStyle(lettre).fontSize)||30;
+          /* Le point fixe est SUR la ligne de base : la lettre ne monte ni ne
+             descend, elle ne fait que glisser sur la largeur en rapetissant. */
           lettre.style.transformOrigin='50% '+(LIGNE*Fap).toFixed(1)+'px';
           lettre.style.transition='none';
           lettre.style.transform='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
-          N.plusTard(function(){
-            lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
-            lettre.style.transform='none';
-          },40);
+          /* On force le calcul de la mise en page : sans cela le navigateur
+             fond les deux etats en un seul et la lettre saute sans glisser. */
+          void lettre.offsetWidth;
+          lettre.style.transition='transform 1000ms cubic-bezier(.45,.05,.3,1)';
+          lettre.style.transform='none';
           N.plusTard(function(){_sceneFete--;},1120);
         },700);
       },false);
@@ -14737,18 +14767,21 @@ function _boyScene(ca,reprise){
          voix la nomme, on ne pose le trait qu'au moment ou elle le dit, et le
          vol se joue dans le silence qui suit la phrase. */
       _sceneParle++;
+      /* `vise` peut nommer PLUSIEURS cases : la phrase les nomme toutes les
+         deux — « au milieu … qu'au debut » — et le client veut que chacune
+         grossisse des qu'on prononce son nom, sans attendre son tour. */
       var temps=[
-        {vise:mMilieu,dit:te('Au milieu, la lettre est la même qu\'au début'),
+        {vise:[mMilieu,mDebut],dit:te('Au milieu, la lettre est la même qu\'au début'),
          act:function(k){mDebut.trou.style.color=DEB;k();}},
-        {vise:mDebut,act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
+        {vise:[mDebut,mMilieu],act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
            paraitre(cMil.corps);k();});}},
-        {vise:mMilieu,dit:te('avec un trait horizontal.'),
+        {vise:[mMilieu],dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cMil.trait);k();}},
-        {vise:mFin,dit:te('À la fin, la lettre est la même que quand elle est seule'),
+        {vise:[mFin,mSeule],dit:te('À la fin, la lettre est la même que quand elle est seule'),
          act:function(k){mSeule.trou.style.color=ISO;k();}},
-        {vise:mSeule,act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
+        {vise:[mSeule,mFin],act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
            paraitre(cFin.corps);k();});}},
-        {vise:mFin,dit:te('avec un trait horizontal.'),
+        {vise:[mFin],dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cFin.trait);k();}}
       ];
       var n=0;
@@ -14762,7 +14795,7 @@ function _boyScene(ca,reprise){
         /* LA CASE DONT ON PARLE GROSSIT : c'est elle qu'on regarde. */
         [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
           x.classList.remove('vise');});
-        if(e.vise)e.vise.case.classList.add('vise');
+        (e.vise||[]).forEach(function(x){x.case.classList.add('vise');});
         function apres(){
           if(e.dit)N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,260);});},250);
           else N.plusTard(joue,200);
@@ -15439,8 +15472,8 @@ function _boyVowelCourse(ca){
       te('Tu es '+UNE+' '+CHAMP+' !'),null,true),
 
     B.illustre(te('LE SECRET'),
-      TB('Comme tu connais très bien<br>les 3 voyelles, je vais te<br>dévoiler un <b>secret</b> :'),
-      te('Comme tu connais très bien les trois voyelles, je vais te dévoiler un secret.'),
+      TB('Comme tu connais très bien<br>les 3 voyelles,<br>on peut <b>passer à la suite</b> :'),
+      te('Comme tu connais très bien les trois voyelles, on peut passer à la suite.'),
       {calques:[LB],
        scene:[{L:[0],P:1,d:1200},{L:[0],P:1,d:2200}]}),
 
@@ -15772,15 +15805,21 @@ function _boyLetterCourse(ca,idx,premiere){
        Le mot est bati avec le BA, connu depuis le cours des voyelles : ba,
        notre lettre, ba. Pour l'alif cela donne « باب », son mot. */
     var _voisin='ب';
-    var _juste=_voisin+A+_voisin;
-    /* LA FAUTE : le liant sans chasse donne a la suivante sa forme jointe, et
-       le resserrement — mesure AU RENDU, voir `_poseSerrage` — fait que le
-       trait touche vraiment la lettre d'avant comme celle d'apres. */
-    /* Le liant sans chasse ne DESSINE rien : il ne fait que donner sa forme
-       jointe a la suivante, et il restait un vide. On met donc un vrai trait
-       — le tatweel — qui allonge la liaison vers la droite, et le
-       resserrement mesure la fait toucher l'alif. */
-    var _faux =_voisin+A+'<span data-serre="'+_voisin+A+'|'+_TATWEEL+_voisin+'">'
+    /* ── LA LETTRE DU JOUR SE DISTINGUE DANS LE MOT ──
+       Le client la veut d'une autre couleur : c'est d'elle qu'on parle, et
+       c'est son accrochage qu'on montre. Le mot est coupe en trois avec le
+       liant sans chasse, comme partout ailleurs, pour que chaque morceau
+       garde exactement la forme qu'il a dans le mot entier. */
+    var _pAcc=_placeDansMot(_voisin+A+_voisin,A,2)
+              ||{avant:_voisin,lettre:A,apres:_voisin};
+    var _lettreEnCouleur='<span style="color:var(--sk-vif)">'+_pAcc.lettre+'</span>';
+    var _juste=_pAcc.avant+_lettreEnCouleur+_pAcc.apres;
+    /* LA FAUTE : le liant sans chasse ne DESSINE rien, il ne fait que donner
+       sa forme jointe a la suivante — il restait un vide. On met donc un vrai
+       trait, le tatweel, et le resserrement mesure AU RENDU (`_poseSerrage`)
+       le fait se superposer au trait qui arrive de l'autre cote. */
+    var _faux =_pAcc.avant+_lettreEnCouleur
+              +'<span data-serre="'+_voisin+A+'|'+_TATWEEL+_voisin+'">'
               +_TATWEEL+_voisin+'</span>';
     var _xj=_xJointure(_voisin+A,_juste);
     var _bat=[];
@@ -18658,7 +18697,7 @@ var ADMIN_SOUNDS = [
   {ar:'Où est le son a ?',label:'Où est le son a ?'},
   {ar:'Où est le son i ?',label:'Où est le son i ?'},
   {ar:'Où est le son ou ?',label:'Où est le son ou ?'},
-  {ar:'Comme tu connais très bien les trois voyelles, je vais te dévoiler un secret.',label:'Comme tu connais très bien les trois voyell…'},
+  {ar:'Comme tu connais très bien les trois voyelles, on peut passer à la suite.',label:'Comme tu connais très bien les trois voyell…'},
   {ar:'On peut avoir deux fois le même symbole sur une même lettre.',label:'On peut avoir deux fois le même symbole sur…'},
   {ar:'Bou devient boun.',label:'Bou devient boun.'},
   {ar:'À toi d\'écrire.',label:'À toi d\'écrire.'},
