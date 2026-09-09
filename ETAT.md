@@ -31,13 +31,39 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v214
+## OÙ ON EN EST — 8 septembre 2026, production en v215
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v214) :**
+**Fait et en ligne (v187 → v215) :**
+
+- **LA SEPTIÈME PASSE DU CLIENT (v215).**
+
+  - **La lettre REMPLIT sa bulle, et son encre y est centrée.** Le modèle du
+    client est le hublot d’une lettre qui porte sa voyelle : elle y est
+    grande. Une lettre nue, elle, flottait. On mesure donc son encre — hauteur
+    ET largeur, sur le rendu réel de la police — et on la grossit jusqu’à ce
+    qu’elle occupe 56 % du cercle. Mesuré ensuite : toutes à 5 px du centre,
+    l’alif à 56 % du hublot, le bâ à 50 %. Son interligne passe à 1 pour que
+    sa boîte ne déborde pas du cercle, et la ligne de base se calcule
+    désormais sur l’interligne RÉEL de chaque boîte.
+
+  - **La kasra descend** dans « à retenir » : à 70 % elle effleurait la ligne
+    d’écriture, la seconde la touchait. À 82 %.
+
+  - **Le premier bouton d’un cours dit « C’est parti ! »**, tous les autres
+    « Suite › ». Les libellés ENVOL et DÉCOLLAGE sont retirés.
+
+  - **Le récapitulatif : chaque case grossit sur SON nom.** La phrase est dite
+    en deux morceaux — « au milieu, la lettre est la même », puis « qu’au
+    début » — pour que le mot commande, et non la phrase.
+
+  **À enregistrer au studio** : « Au milieu, la lettre est la même »,
+  « qu’au début. », « À la fin, la lettre est la même », « que quand elle est
+  seule. », « C’est parti ! », « Comme tu connais très bien les trois
+  voyelles, on peut passer à la suite. »
 
 - **LA SIXIÈME PASSE DU CLIENT (v214).**
 

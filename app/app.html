@@ -8326,7 +8326,7 @@ function renderRevision(ca){
   var scenes=[
     B.brief(te('RÉVISION'),
       TB('<b>'+jouables.length+'</b> signes à revoir !'),
-      te('On revoit ce que tu as déjà appris.'),_HAB.partir)
+      te('On revoit ce que tu as déjà appris.'),te('C\'est parti !'))
   ];
   jouables.forEach(function(j){
     var voisins=_revVoisins(j.g,2);
@@ -9830,7 +9830,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v214';
+var _VERSION_REPLI='v215';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12730,6 +12730,7 @@ var _TE={
 'Elle est toujours à la fin du mot.':{en:'It is always at the end of a word.',es:'Está siempre al final de la palabra.',de:'Er steht immer am Wortende.',nl:'Hij staat altijd aan het eind van het woord.',it:'Sta sempre alla fine della parola.',pt:'Está sempre no fim da palavra.',ru:'Она всегда в конце слова.',tr:'Her zaman kelimenin sonundadır.',zh:'它总是在词尾。',id:'Selalu di akhir kata.',ur:'یہ ہمیشہ لفظ کے آخر میں ہوتا ہے۔',hi:'यह हमेशा शब्द के अंत में होता है।'},
 'Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.':{en:'It <b>never</b> joins,<br>before or after.',es:'<b>Nunca</b> se une,<br>ni antes ni después.',de:'Er verbindet sich <b>nie</b>,<br>weder davor noch danach.',nl:'Hij verbindt <b>nooit</b>,<br>niet ervoor, niet erna.',it:'Non si lega <b>mai</b>,<br>né prima né dopo.',pt:'<b>Nunca</b> se liga,<br>nem antes nem depois.',ru:'Она <b>никогда</b> не соединяется,<br>ни до, ни после.',tr:'<b>Asla</b> bitişmez,<br>ne önce ne sonra.',zh:'它<b>从不</b>连写，<br>前后都不。',id:'<b>Tidak pernah</b> disambung,<br>sebelum atau sesudah.',ur:'یہ <b>کبھی</b> نہیں جڑتا،<br>نہ پہلے، نہ بعد۔',hi:'यह <b>कभी</b> नहीं जुड़ता,<br>न पहले, न बाद में।'},
 'Elle ne s\'attache jamais, ni avant, ni après.':{en:'It never joins, before or after.',es:'Nunca se une, ni antes ni después.',de:'Er verbindet sich nie, weder davor noch danach.',nl:'Hij verbindt nooit, niet ervoor, niet erna.',it:'Non si lega mai, né prima né dopo.',pt:'Nunca se liga, nem antes nem depois.',ru:'Она никогда не соединяется, ни до, ни после.',tr:'Asla bitişmez, ne önce ne sonra.',zh:'它从不连写，前后都不。',id:'Tidak pernah disambung, sebelum atau sesudah.',ur:'یہ کبھی نہیں جڑتا، نہ پہلے، نہ بعد۔',hi:'यह कभी नहीं जुड़ता, न पहले, न बाद में।'},
+'C\'est parti !':{en:'Let\'s go!',es:'¡Vamos!',de:'Los geht\'s!',nl:'We gaan!',it:'Si parte!',pt:'Vamos!',ru:'Поехали!',tr:'Hadi başlayalım!',zh:'出发！',id:'Ayo mulai!',ur:'چلو شروع کریں!',hi:'चलो शुरू करें!'},
 'Où est ce son ?':{en:'Where is this sound?',es:'¿Dónde está este sonido?',de:'Wo ist dieser Laut?',nl:'Waar is deze klank?',it:'Dov\'è questo suono?',pt:'Onde está este som?',ru:'Где этот звук?',tr:'Bu ses nerede?',zh:'这个音在哪里？',id:'Mana bunyi ini?',ur:'یہ آواز کہاں ہے؟',hi:'यह ध्वनि कहाँ है?'},
 'Où est <b>ce son</b> ?':{en:'Where is <b>this sound</b>?',es:'¿Dónde está <b>este sonido</b>?',de:'Wo ist <b>dieser Laut</b>?',nl:'Waar is <b>deze klank</b>?',it:'Dov\'è <b>questo suono</b>?',pt:'Onde está <b>este som</b>?',ru:'Где <b>этот звук</b>?',tr:'<b>Bu ses</b> nerede?',zh:'<b>这个音</b>在哪里？',id:'Mana <b>bunyi ini</b>?',ur:'<b>یہ آواز</b> کہاں ہے؟',hi:'<b>यह ध्वनि</b> कहाँ है?'},
 'ÉTAPE · SOUKOUN':{en:'STEP · SUKŪN',es:'PASO · SUKŪN',de:'SCHRITT · SUKŪN',nl:'STAP · SUKŪN',it:'TAPPA · SUKŪN',pt:'ETAPA · SUKŪN',ru:'ШАГ · СУКУН',tr:'ADIM · SÜKÛN',zh:'步骤 · 静符',id:'LANGKAH · SUKUN',ur:'مرحلہ · جزم',hi:'चरण · सुकून'},
@@ -14608,6 +14609,36 @@ function _boyScene(ca,reprise){
         lettre.style.position='relative';
         lettre.style.top=(-(0.3125+(_enc.bas-_enc.haut)/2)).toFixed(3)+'em';
       }
+      /* ── ET ELLE REMPLIT SA BULLE ──
+         Une lettre seule est petite : l'alif n'est qu'un trait, et il flottait
+         dans un cercle que la meme lettre, portant sa voyelle, remplit bien —
+         c'est celle-la que le client donne pour modele. On grossit donc chaque
+         lettre jusqu'a ce que son ENCRE occupe la meme part du hublot, en
+         hauteur comme en largeur. Rien n'est devine : les deux mesures
+         viennent du rendu reel de la police. */
+      function remplitLaBulle(){
+        if(!_enc||!lettre.isConnected)return;
+        var H=h.clientHeight,W=h.clientWidth;
+        if(H<60||W<60)return;
+        var hEm=(_enc.haut||0)+(_enc.bas||0);
+        if(hEm<0.05)hEm=0.05;
+        var lEm=0.6;
+        try{
+          var mes=_encreForme(_sansCercle(glyph));
+          if(mes&&mes.droite>mes.gauche)lEm=(mes.droite-mes.gauche)/_TL_TAILLE;
+        }catch(_y){}
+        if(lEm<0.05)lEm=0.05;
+        /* La boite ne doit pas deborder du cercle : avec un interligne de 1
+           elle vaut la taille de police, et l'encre peut alors occuper plus
+           de la moitie du hublot sans rien faire sortir. */
+        lettre.style.lineHeight='1';
+        var px=Math.min(0.56*H/hEm,(W-46)/lEm,0.94*H,190);
+        px=Math.max(34,Math.round(px));
+        lettre.style.fontSize=px+'px';
+      }
+      remplitLaBulle();
+      N.plusTard(remplitLaBulle,120);
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(remplitLaBulle);}catch(_z){}
       var m=document.createElement('span');m.className='hub-mot';
       var a=document.createElement('span');a.textContent=avant||'';
       var t=document.createElement('span');t.className='rec-trou';
@@ -14634,25 +14665,35 @@ function _boyScene(ca,reprise){
          haut de sa boite, interligne compris — et on cale celle du mot
          dessus. La lettre n'aura ainsi rien a monter ni a descendre : elle ne
          se deplacera que sur la largeur, comme le veut le client. */
-      var LIGNE=1.07;
+      /* ── OU TOMBE LA LIGNE DE BASE D'UNE BOITE DE TEXTE ──
+         A `interligne/2 + 0,32 em` du haut de la boite : la police mesure
+         1,34 em au-dessus de la ligne et 0,70 en dessous, le demi-plomb se
+         partage. L'interligne se LIT sur l'element — la lettre du hublot et
+         le mot n'ont pas le meme. */
+      function baseDansBoite(el){
+        var st=getComputedStyle(el);
+        var F=parseFloat(st.fontSize)||16;
+        var lh=parseFloat(st.lineHeight);
+        if(!(lh>0))lh=1.5*F;
+        return lh/2+0.32*F;
+      }
       function ligneDeBase(el){
         var r=el.getBoundingClientRect(),rh=h.getBoundingClientRect();
         var ech=el.offsetWidth?(r.width/el.offsetWidth):1;
         if(!(ech>0.05&&ech<20))ech=1;
         var bord=parseFloat(getComputedStyle(h).borderTopWidth)||0;
         var F=parseFloat(getComputedStyle(el).fontSize)||16;
-        return {y:(r.top-rh.top)/ech-bord+LIGNE*F, ech:ech, F:F};
+        return {y:(r.top-rh.top)/ech-bord+baseDansBoite(el), ech:ech, F:F};
       }
       function poseLeMot(){
         if(!m.isConnected||!lettre.isConnected)return;
-        ajusteMot();
+        remplitLaBulle();ajusteMot();
         var bl=ligneDeBase(lettre);
         /* LA LIGNE D'ECRITURE PASSE SOUS LA LETTRE, pas a 62 % du cercle :
            la lettre ayant ete centree sur son encre, sa ligne de base a
            bouge, et le pointille doit la suivre. */
         h.style.setProperty('--hub-ligne',bl.y.toFixed(1)+'px');
-        var Fw=parseFloat(getComputedStyle(m).fontSize)||30;
-        m.style.top=(bl.y-LIGNE*Fw).toFixed(1)+'px';
+        m.style.top=(bl.y-baseDansBoite(m)).toFixed(1)+'px';
       }
       poseLeMot();
       N.plusTard(poseLeMot,140);N.plusTard(poseLeMot,520);
@@ -14683,6 +14724,7 @@ function _boyScene(ca,reprise){
           lettre.textContent=trou||glyph;
           lettre.style.fontSize='inherit';
           lettre.style.lineHeight='inherit';
+          lettre.style.transformOrigin='';
           lettre.style.padding='0';
           lettre.style.position='static';lettre.style.top='';
           lettre.style.color='var(--sk-fonce)';
@@ -14698,7 +14740,7 @@ function _boyScene(ca,reprise){
           var dx=((avant.left+avant.width/2)-(apres.left+apres.width/2))/ech;
           /* Le point fixe est SUR la ligne de base : la lettre ne monte ni ne
              descend, elle ne fait que glisser sur la largeur en rapetissant. */
-          lettre.style.transformOrigin='50% '+(LIGNE*Fap).toFixed(1)+'px';
+          lettre.style.transformOrigin='50% '+baseDansBoite(lettre).toFixed(1)+'px';
           lettre.style.transition='none';
           lettre.style.transform='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
           /* On force le calcul de la mise en page : sans cela le navigateur
@@ -14767,17 +14809,24 @@ function _boyScene(ca,reprise){
          voix la nomme, on ne pose le trait qu'au moment ou elle le dit, et le
          vol se joue dans le silence qui suit la phrase. */
       _sceneParle++;
-      /* `vise` peut nommer PLUSIEURS cases : la phrase les nomme toutes les
-         deux — « au milieu … qu'au debut » — et le client veut que chacune
-         grossisse des qu'on prononce son nom, sans attendre son tour. */
+      /* ── CHAQUE CASE GROSSIT QUAND LA VOIX DIT SON NOM ──
+         La phrase est donc DITE EN DEUX MORCEAUX : « au milieu, la lettre est
+         la même », puis « qu'au début ». Grossir les deux cases ensemble au
+         debut de la phrase ne convient pas au client — c'est le mot qui doit
+         commander, pas la phrase. `vise` peut nommer plusieurs cases quand
+         elles sont toutes deux en jeu, comme pendant le vol. */
       var temps=[
-        {vise:[mMilieu,mDebut],dit:te('Au milieu, la lettre est la même qu\'au début'),
+        {vise:[mMilieu],dit:te('Au milieu, la lettre est la même'),
+         act:function(k){k();}},
+        {vise:[mMilieu,mDebut],dit:te('qu\'au début.'),
          act:function(k){mDebut.trou.style.color=DEB;k();}},
         {vise:[mDebut,mMilieu],act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
            paraitre(cMil.corps);k();});}},
         {vise:[mMilieu],dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cMil.trait);k();}},
-        {vise:[mFin,mSeule],dit:te('À la fin, la lettre est la même que quand elle est seule'),
+        {vise:[mFin],dit:te('À la fin, la lettre est la même'),
+         act:function(k){k();}},
+        {vise:[mFin,mSeule],dit:te('que quand elle est seule.'),
          act:function(k){mSeule.trou.style.color=ISO;k();}},
         {vise:[mSeule,mFin],act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
            paraitre(cFin.corps);k();});}},
@@ -15251,8 +15300,10 @@ function _boyVowelCourse(ca){
     d._sg=[
       {un:pose('َ',78,30,true,false,0,double?0:0),
        deux:double?pose('َ',78,30,true,true,0,-0.105):null},
-      {un:pose('ِ',50,70,false,false,0,0),
-       deux:double?pose('ِ',50,70,false,true,0,0.105):null},
+      /* Plus bas qu'avant : a 70 % la kasra effleurait la ligne, et la
+         seconde la touchait franchement. */
+      {un:pose('ِ',50,82,false,false,0,0),
+       deux:double?pose('ِ',50,82,false,true,0,0.105):null},
       {un:pose('ُ',22,30,true,false,double?-0.10:0,0),
        deux:double?pose('ُ',22,30,true,true,0.10,0):null}
     ];
@@ -15267,7 +15318,7 @@ function _boyVowelCourse(ca){
     var sol=document.createElement('i');sol.className='sol';d.appendChild(sol);
     var sp=document.createElement('span');
     sp.className='sg '+(dessus?'haut':'bas');
-    sp.style.left='50%';sp.style.top=(dessus?30:70)+'%';
+    sp.style.left='50%';sp.style.top=(dessus?30:82)+'%';
     var b=document.createElement('b');b.textContent=m;
     var cy=0;
     try{var e=_encreAutourLigne(m);cy=-(0.3125+(e.bas-e.haut)/2);}catch(x2){}
@@ -15334,7 +15385,7 @@ function _boyVowelCourse(ca){
   B.run([
     B.brief(_HAB.mission+' 1 · '+_HAB.depart,
       TB('Aujourd’hui :<br>les <b>voyelles</b>'),
-      te('Aujourd’hui : les voyelles.'),_HAB.partir),
+      te('Aujourd’hui : les voyelles.'),te('C\'est parti !')),
 
     B.brief(te('ÉTAPE 1'),
       TB('Pour comprendre les voyelles,<br>on a besoin d’une <b>lettre</b>.'),
@@ -15432,7 +15483,7 @@ function _boyVowelCourse(ca){
 
     B.brief(te('ÉCRITURE'),
       TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
-      te('Maintenant, on va les écrire ! Tu es '+PRET+' ?'),_HAB.partir),
+      te('Maintenant, on va les écrire ! Tu es '+PRET+' ?'),te('Suite ›')),
 
     B.illustre(te('ÉCRITURE · LA ḌAMMA'),
       TB('Te souviens-tu<br>de lui ?'),
@@ -15621,7 +15672,7 @@ function _boyProlongCourse(ca){
   function gros(s){return '<span style="font-size:1.9em;line-height:.7;vertical-align:-.15em">'+s+'</span>';}
   B.run([
     B.brief(_HAB.mission+' · '+_HAB.depart,TB('Aujourd\'hui :<br>les <b>prolongations</b> 📡'),
-      teF('{mission} du jour : les prolongations.',{mission:_HAB.missionMin}),_HAB.partir),
+      teF('{mission} du jour : les prolongations.',{mission:_HAB.missionMin}),te('C\'est parti !')),
     B.brief(te('ÉTAPE 1 · PRINCIPE'),TB('En arabe, la <b>durée</b><br>d\'une voyelle compte.'),
       te('En arabe, le temps passé sur une voyelle est très important.')),
     B.obs(te('ÉTAPE 2 · COURT'),'بَ','بَ',TB('Ici c\'est <b>court</b> :<br><b>\u00ab ba \u00bb</b> ⏱️'),te('Ici c\'est court.')),
@@ -15732,7 +15783,7 @@ function _boyLetterCourse(ca,idx,premiere){
   var _ileFaite=null;
 
   sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,teF('Nouvelle lettre :<br>{lettre} 🎯',{lettre:b(L.name)}),
-    teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),premiere?_HAB.partir:te('Suite ›')));
+    teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),te('C\'est parti !')));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
