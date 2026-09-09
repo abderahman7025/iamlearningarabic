@@ -31,13 +31,34 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v215
+## OÙ ON EN EST — 8 septembre 2026, production en v216
 
 Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
 règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
 place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 
-**Fait et en ligne (v187 → v215) :**
+**Fait et en ligne (v187 → v216) :**
+
+- **LA HUITIÈME PASSE DU CLIENT (v216).**
+
+  - **La licorne ne fait plus qu’une DEMI-onde.** La fusée décrit une onde
+    entière — une bosse, puis un creux, et elle remonte se poser : c’est son
+    atterrissage, le client y tient. Ce creux était le va-et-vient dont il ne
+    voulait pas chez la licorne : elle passait sous le monde et remontait
+    dessus. Elle s’élève, redescend, et le mouvement s’arrête où elle se
+    pose — la courbe est monotone sur toute la seconde moitié.
+
+  - **LE HUBLOT NE CHANGE PLUS.** Le modèle est celui d’une lettre qui porte
+    sa voyelle (« VOYELLE 1/3 » du cours de l’alif) : le client le donne pour
+    parfait. Mes recentrages sur l’encre et mes agrandissements sont retirés —
+    mesuré, l’identification de l’alif rend maintenant exactement comme sa
+    page de voyelle : 74 px, ligne de base à 101, ligne d’écriture à 62 %. Le
+    MOT vient se poser à la même hauteur — même ligne de base — et la lettre
+    n’a plus qu’à glisser sur la largeur.
+
+  - **Le récapitulatif garde UNE SEULE phrase.** La couper en deux y mettait
+    un silence ; la seconde case s’allume maintenant EN COURS de phrase, à
+    62 % du temps de parole estimé — là où son nom est prononcé.
 
 - **LA SEPTIÈME PASSE DU CLIENT (v215).**
 

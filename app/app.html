@@ -7261,18 +7261,18 @@ function _volCarte(o){
        poser. On eteint donc l'onde sur le dernier quart du trajet : elle
        serpente comme avant et arrive droit. La fusee, elle, garde sa vague
        entiere — c'est elle qui l'a demandee. */
-    /* ── LA VAGUE EST A ELLES DEUX, L'ATTERRISSAGE NON ──
-       Le client : la FUSEE monte plus haut que la planete puis redescend
-       s'y poser — c'est son atterrissage a elle. La LICORNE, non : elle fait
-       sa vague, et elle arrive DIRECTEMENT sur la surface du monde. On garde
-       donc l'onde entiere pour les deux, et on ne l'eteint, chez la licorne,
-       que sur le tout dernier dixieme : de quoi arriver droit sur le monde
-       sans rien retirer a la vague. */
-    var plateALaFin=!o.aligne;
+    /* ── UNE SEULE BOSSE POUR LA LICORNE ──
+       La fusee decrit une onde ENTIERE : une bosse au-dessus de la ligne,
+       puis un creux en dessous, et elle remonte se poser — c'est son
+       atterrissage, le client y tient.
+       La licorne, non. Ce creux etait le va-et-vient dont il ne veut pas :
+       elle passait sous le monde et remontait dessus. Elle ne fait donc plus
+       qu'une DEMI-onde — elle s'eleve, redescend, et le mouvement s'arrete
+       ou elle se pose. La courbe est monotone sur toute la seconde moitie :
+       des qu'elle atteint sa place, c'est fini. */
+    var demiOnde=!o.aligne;
     function ondeIci(e){
-      var a=amp;
-      if(plateALaFin&&e>0.9)a*=Math.max(0,(1-e)/0.1);
-      return ecartOnde(e,a);
+      return demiOnde?(amp*Math.sin(Math.PI*e)):ecartOnde(e,amp);
     }
     /* En descendant, la ligne CONTINUE l'arc de sortie : elle reprend le cap
        ou il l'a laissee, sinon la fusee se remettrait droite entre les deux.
@@ -8070,11 +8070,10 @@ function _volCarte(o){
       var p=versSommet(_bezier(t,item.seg),n===file.length-1,e);
       /* ── L'ARRIVEE EST DROITE ──
          Sur le dernier saut, la courbe se fond dans la ligne qui mene au
-         point de pose : la licorne arrive sur la surface du monde, sans
-         monter au-dessus pour y redescendre — cela, c'est l'atterrissage de
-         la fusee. Le tout dernier dixieme suffit. */
-      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.9){
-        var _w=(e-0.9)/0.1;
+         point de pose : la licorne arrive sur la surface du monde et s'y
+         arrete, sans le depasser pour y revenir. */
+      if(!o.aligne&&butFinal&&n===file.length-1&&e>0.5){
+        var _w=(e-0.5)/0.5;
         p={x:p.x+(butFinal.x-p.x)*_w, y:p.y+(butFinal.y-p.y)*_w};
       }
       var deg=_penteBezier(t,item.seg)+(item.sens>0?0:180);
@@ -9830,7 +9829,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v215';
+var _VERSION_REPLI='v216';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14597,48 +14596,13 @@ function _boyScene(ca,reprise){
          — sa place a elle restee vide — et la lettre glisse s'y poser. */
       var h=hublot(p,glyph,son);
       var lettre=h.querySelector('span');
-      /* ── LA LETTRE AU CENTRE DU HUBLOT ──
-         Centrer sa BOITE ne la centre pas : l'alif n'a d'encre qu'au-dessus
-         de la ligne, le ba en dessous, le waw autour. On mesure donc son
-         encre et on la ramene au milieu du cercle — c'est ainsi que la
-         lettre avec sa voyelle parait centree, et le client la prend pour
-         modele. La ligne d'ecriture suit : elle se pose la ou la lettre
-         repose vraiment, et le mot viendra s'y aligner. */
-      var _enc=null;try{_enc=_encreAutourLigne(_sansCercle(glyph));}catch(_x){}
-      if(_enc){
-        lettre.style.position='relative';
-        lettre.style.top=(-(0.3125+(_enc.bas-_enc.haut)/2)).toFixed(3)+'em';
-      }
-      /* ── ET ELLE REMPLIT SA BULLE ──
-         Une lettre seule est petite : l'alif n'est qu'un trait, et il flottait
-         dans un cercle que la meme lettre, portant sa voyelle, remplit bien —
-         c'est celle-la que le client donne pour modele. On grossit donc chaque
-         lettre jusqu'a ce que son ENCRE occupe la meme part du hublot, en
-         hauteur comme en largeur. Rien n'est devine : les deux mesures
-         viennent du rendu reel de la police. */
-      function remplitLaBulle(){
-        if(!_enc||!lettre.isConnected)return;
-        var H=h.clientHeight,W=h.clientWidth;
-        if(H<60||W<60)return;
-        var hEm=(_enc.haut||0)+(_enc.bas||0);
-        if(hEm<0.05)hEm=0.05;
-        var lEm=0.6;
-        try{
-          var mes=_encreForme(_sansCercle(glyph));
-          if(mes&&mes.droite>mes.gauche)lEm=(mes.droite-mes.gauche)/_TL_TAILLE;
-        }catch(_y){}
-        if(lEm<0.05)lEm=0.05;
-        /* La boite ne doit pas deborder du cercle : avec un interligne de 1
-           elle vaut la taille de police, et l'encre peut alors occuper plus
-           de la moitie du hublot sans rien faire sortir. */
-        lettre.style.lineHeight='1';
-        var px=Math.min(0.56*H/hEm,(W-46)/lEm,0.94*H,190);
-        px=Math.max(34,Math.round(px));
-        lettre.style.fontSize=px+'px';
-      }
-      remplitLaBulle();
-      N.plusTard(remplitLaBulle,120);
-      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(remplitLaBulle);}catch(_z){}
+      /* ── LE HUBLOT NE CHANGE PAS ──
+         Le modele est celui d'une lettre qui porte sa voyelle — « VOYELLE
+         1/3 » du cours de l'alif : le client le donne pour parfait. On n'y
+         touche donc a rien : ni la taille, ni la place, ni la ligne
+         d'ecriture. Mes recentrages et mes agrandissements sont retires.
+         Le mot, lui, vient se poser A LA MEME HAUTEUR que la lettre — meme
+         ligne de base — pour qu'elle n'ait qu'a glisser sur la largeur. */
       var m=document.createElement('span');m.className='hub-mot';
       var a=document.createElement('span');a.textContent=avant||'';
       var t=document.createElement('span');t.className='rec-trou';
@@ -14687,12 +14651,8 @@ function _boyScene(ca,reprise){
       }
       function poseLeMot(){
         if(!m.isConnected||!lettre.isConnected)return;
-        remplitLaBulle();ajusteMot();
+        ajusteMot();
         var bl=ligneDeBase(lettre);
-        /* LA LIGNE D'ECRITURE PASSE SOUS LA LETTRE, pas a 62 % du cercle :
-           la lettre ayant ete centree sur son encre, sa ligne de base a
-           bouge, et le pointille doit la suivre. */
-        h.style.setProperty('--hub-ligne',bl.y.toFixed(1)+'px');
         m.style.top=(bl.y-baseDansBoite(m)).toFixed(1)+'px';
       }
       poseLeMot();
@@ -14720,13 +14680,13 @@ function _boyScene(ca,reprise){
              SUR cette ligne — et il ne reste qu'un glissement horizontal. */
           poseLeMot();
           var Fav=parseFloat(getComputedStyle(lettre).fontSize)||60;
+          var LHav=parseFloat(getComputedStyle(lettre).lineHeight)||1.5*Fav;
           var avant=lettre.getBoundingClientRect();
           lettre.textContent=trou||glyph;
           lettre.style.fontSize='inherit';
           lettre.style.lineHeight='inherit';
           lettre.style.transformOrigin='';
           lettre.style.padding='0';
-          lettre.style.position='static';lettre.style.top='';
           lettre.style.color='var(--sk-fonce)';
           t.textContent='';t.appendChild(lettre);t.classList.add('vu');
           var apres=lettre.getBoundingClientRect();
@@ -14810,24 +14770,23 @@ function _boyScene(ca,reprise){
          vol se joue dans le silence qui suit la phrase. */
       _sceneParle++;
       /* ── CHAQUE CASE GROSSIT QUAND LA VOIX DIT SON NOM ──
-         La phrase est donc DITE EN DEUX MORCEAUX : « au milieu, la lettre est
-         la même », puis « qu'au début ». Grossir les deux cases ensemble au
-         debut de la phrase ne convient pas au client — c'est le mot qui doit
-         commander, pas la phrase. `vise` peut nommer plusieurs cases quand
-         elles sont toutes deux en jeu, comme pendant le vol. */
+         La phrase reste ENTIERE : la couper en deux y mettait un silence, et
+         le client veut une voix fluide. C'est la seconde case qui s'allume
+         EN COURS DE PHRASE — `puis.apres` dit a quelle part du temps de
+         parole, la duree etant estimee comme la narration l'estime. */
       var temps=[
-        {vise:[mMilieu],dit:te('Au milieu, la lettre est la même'),
+        {vise:[mMilieu],dit:te('Au milieu, la lettre est la même qu\'au début'),
+         puis:{apres:0.62,vise:[mMilieu,mDebut],
+               fait:function(){mDebut.trou.style.color=DEB;}},
          act:function(k){k();}},
-        {vise:[mMilieu,mDebut],dit:te('qu\'au début.'),
-         act:function(k){mDebut.trou.style.color=DEB;k();}},
         {vise:[mDebut,mMilieu],act:function(k){vole(mDebut.trou,cMil.hote,DEB,function(){
            paraitre(cMil.corps);k();});}},
         {vise:[mMilieu],dit:te('avec un trait horizontal.'),
          act:function(k){paraitre(cMil.trait);k();}},
-        {vise:[mFin],dit:te('À la fin, la lettre est la même'),
+        {vise:[mFin],dit:te('À la fin, la lettre est la même que quand elle est seule'),
+         puis:{apres:0.66,vise:[mFin,mSeule],
+               fait:function(){mSeule.trou.style.color=ISO;}},
          act:function(k){k();}},
-        {vise:[mFin,mSeule],dit:te('que quand elle est seule.'),
-         act:function(k){mSeule.trou.style.color=ISO;k();}},
         {vise:[mSeule,mFin],act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
            paraitre(cFin.corps);k();});}},
         {vise:[mFin],dit:te('avec un trait horizontal.'),
@@ -14845,6 +14804,17 @@ function _boyScene(ca,reprise){
         [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
           x.classList.remove('vise');});
         (e.vise||[]).forEach(function(x){x.case.classList.add('vise');});
+        /* La seconde case s'allume au milieu de la phrase, la ou son nom est
+           prononce : meme estimation de duree que la narration. */
+        if(e.puis){
+          var _d=Math.min(9000,900+String(e.dit||'').length*95);
+          N.plusTard(function(){
+            [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
+              x.classList.remove('vise');});
+            (e.puis.vise||[]).forEach(function(x){x.case.classList.add('vise');});
+            if(e.puis.fait)e.puis.fait();
+          },Math.round(_d*e.puis.apres));
+        }
         function apres(){
           if(e.dit)N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,260);});},250);
           else N.plusTard(joue,200);
