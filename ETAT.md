@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v227
+## OÙ ON EN EST — 13 septembre 2026, production en v228
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,71 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v227), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v228), du plus récent au plus ancien :**
+
+- **LA VOIX, ET DOUZE AUTRES REMARQUES (v228).** Sa relecture du 13 septembre.
+  La plus dure d'abord : « j'ai dit qu'il ne devait pas avoir de texte écrit,
+  MAIS PAS DE VOIX ! C'est quoi cette appli sans communication avec
+  l'enfant ! » Les manches étaient muettes hors du son de la lettre.
+
+  - **CHAQUE MANCHE PARLE, avec ses phrases à lui** : « Voici la lettre… /
+    répète… / bravo ! », « Dans un mot elle se prononce… répète… bravo ! »,
+    « Avec un trait en haut, ça fait quoi ? », « Éclate les bulles avec la
+    lettre… », « Relie les deux mêmes lettres ! », « Retrouve les paires ! ».
+    **La lettre est TOUJOURS dite par son propre enregistrement** : la phrase
+    est coupée en deux et son son glissé au milieu (`phraseAvecLettre`) — la
+    synthèse ne saurait pas dire « bā ». Les vingt-deux phrases sont dans
+    `ADMIN_SOUNDS`, sans nom de lettre dedans : elles resservent à toutes.
+
+  - **Chaque bonne réponse est une fête** : un mot en très grand par-dessus
+    l'écran — bravo, youpi, ouiii, super, génial, waouh, à tour de rôle — des
+    confettis, et la voix qui le dit. « Chaque bonne réponse ne doit pas être
+    quelque chose de normal. »
+
+  - **LES BULLES NE RÉPÈTENT PLUS LA LETTRE** à chaque éclatement : « ba ba
+    ba, ça casse les oreilles ». La consigne est dite une fois au départ.
+
+  - **On TRACE le trait entre les deux lettres**, on n'appuie plus sur les
+    deux : le doigt part d'une case de gauche, un trait le suit, et il faut
+    le lâcher sur sa jumelle.
+
+  - **Le haut-parleur est petit et posé de côté**, et les trois réponses
+    tiennent le milieu de la scène.
+
+  - **Les paires : huit cartes, huit couleurs**, toutes vives — bleu foncé,
+    jaune flashy, rouge, vert, magenta, orange, cyan, rose.
+
+  - **Les points ET LA VOYELLE ont leurs étoiles** dans le tracé : « quand il
+    faut repasser sur les lettres, il faut devoir repasser sur les voyelles
+    s'il y en a ». Mesuré : بَ donne 1 point + 1 voyelle, وُ donne 1 voyelle.
+
+  - **L'écran du choix de la lettre** est refait en rectangles colorés —
+    l'emoji du mot en grand, la lettre en très grand — au lieu des cartes
+    des 6-11 ans, « trop petites ».
+
+  - **Les voyelles passent APRÈS alif, waw et ya**, et le cours des voyelles
+    se fait sur le **WAW** : ce sont des lettres qu'il vient de tracer.
+
+  - **Plus de menu principal chez les 3-5** : la carte des cours s'ouvre
+    directement, et le « retour » de la barre du haut y est masqué.
+
+  - **On change d'interface sans quitter** : un bouton dans la barre du haut
+    (`changerInterface`) ramène à l'écran du choix. Il fallait se déconnecter
+    et se reconnecter.
+
+  - **La mascotte du coin s'en va** chez les petits, et la grille prend toute
+    la largeur : sur une tablette de 1024, quatre vignettes par rangée au
+    lieu de trois, 921 px de grille sur 1014 disponibles.
+
+  - **La rubrique « on joue » est retirée** de la carte : les jeux ne sont
+    plus à côté des cours, ce sont les manches. Les trois fonctions
+    autonomes qui la servaient ont été supprimées avec elle.
+
+  - **Les âges deviennent 3-5 ans et 6-11 ans** (sa correction).
+
+  - **Une étape fermée n'ouvre plus la suivante**, même quand son score dit
+    qu'elle est faite : sans cela une étape déverrouillée au milieu de la
+    chaîne rouvrait tout ce qui la suivait.
 
 - **SA RELECTURE DES MANCHES (v227).** Cinq remarques sur la v226, toutes
   faites :
