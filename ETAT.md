@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v226
+## OÙ ON EN EST — 12 septembre 2026, production en v227
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,50 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v226), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v227), du plus récent au plus ancien :**
+
+- **SA RELECTURE DES MANCHES (v227).** Cinq remarques sur la v226, toutes
+  faites :
+
+  - **L'ALIF ÉTAIT COMPTÉ FAUX DANS SON PROPRE MOT.** Le mot de l'alif est
+    « أَسَد » : sa première lettre porte un hamza, et `أ` n'est pas `ا` au sens
+    du signe. L'enfant touchait le bon alif et s'entendait dire non.
+    `_memeLettre` ramène les quatre alifs à un seul avant de comparer — c'est
+    la seule famille où le cas se pose dans ce cours.
+
+  - **TROIS MOTS, ET TROIS PLACES.** « La lettre sur laquelle cliquer est
+    toujours la première, c'est nul. » `motsPour` prend les mots de SA liste
+    (`_MOTS_FORMES`, où la lettre occupe justement les quatre places) et en
+    choisit un où elle OUVRE, un où elle est AU MILIEU, un où elle FERME.
+    Mesuré : alif → أَسَد (1/3), زاد (2/3), سمعنا (5/5) ; bā → بَقَرَة (1/4),
+    تبت (2/3), كتاب (4/4). Toute occurrence est acceptée, il n'y a pas de piège.
+
+  - **LES POINTS ONT LEURS ÉTOILES, ET ELLES COMPTENT.** Ils ne sont pas dans
+    le geste, qui ne décrit que le corps : on les retrouve par `_revelateur`,
+    qui sait déjà séparer l'encre du corps de celle des points, et on prend
+    le centre de chaque TACHE (composante connexe — grouper par distance
+    fondait les points du thā en un seul). Ils viennent après le corps, comme
+    la main les pose. **Attention** : dans Scheherazade New, les deux points
+    du tā sont dessinés d'un seul tenant — une étoile pour la paire, et c'est
+    juste : c'est ce que l'enfant voit.
+
+  - **DE LA COULEUR.** « Tout est fade pour un enfant qui veut plein de belles
+    couleurs. » Chaque manche porte SA teinte dans `--mc` — les six du monde
+    des animaux — et chaque objet d'une manche prend la sienne à son tour :
+    les six lettres qui dérivent, les bulles, les cartes du memory, les
+    bulles de voyelle. La lettre du tracé est en couleur AVEC SON CONTOUR dès
+    le premier passage, et le trait du doigt est un arc-en-ciel. Plus un seul
+    écran ne ressemble au précédent.
+
+  - **PLUS LONG, PLUS DE RÉPÉTITION.** Huit manches au lieu de six — ÉCOUTE
+    BIEN et LES PAIRES s'ajoutent — et chacune compte plus de tours : cinq
+    prises au lieu de trois, huit bulles au lieu de cinq, trois mots au lieu
+    d'un, six voyelles au lieu de trois, et **le tracé se refait deux fois**
+    (les étoiles se rallument, la lettre reste). Une jauge dit ce qu'il reste,
+    sans un mot. Le cours des voyelles passe lui aussi à dix manches.
+
+  Le parcours 7-12 reste intact : 27 écrans de formes / tanwīn / soukoun /
+  allongement, vérifié après cette passe.
 
 - **LA LEÇON DES 3-5 ANS EST DEVENUE UN JEU (v226).** Le client, après la
   v225 : « tu n'as rien compris à ma requête ! Je ne veux pas les cours + des
