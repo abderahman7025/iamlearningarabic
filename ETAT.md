@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v225
+## OÙ ON EN EST — 12 septembre 2026, production en v226
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,76 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v225), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v226), du plus récent au plus ancien :**
+
+- **LA LEÇON DES 3-5 ANS EST DEVENUE UN JEU (v226).** Le client, après la
+  v225 : « tu n'as rien compris à ma requête ! Je ne veux pas les cours + des
+  jeux ! Je veux que les cours EUX-MÊMES soient des jeux. » La v225 avait
+  raccourci le cours et ajouté trois jeux à côté — ce n'était pas ça.
+  **Les âges deviennent aussi 3-5 ans et 7-12 ans.**
+
+  Il n'y a donc plus, chez les petits, un seul écran qui montre et explique.
+  La leçon d'une lettre est une suite de MANCHES, et l'on ne passe pas parce
+  que la voix s'est tue mais **parce qu'on a gagné** : le bouton reste éteint
+  jusque-là, puis la page part d'elle-même après un souffle — un enfant de
+  trois ans n'appuie pas toujours. Les six manches sont celles qu'il a
+  validées le 12 septembre :
+
+  | # | manche | ce qu'on y fait |
+  |---|---|---|
+  | 1 | LA LETTRE | elle respire, on la touche, elle bondit et dit son nom |
+  | 2 | ATTRAPE-LA | cinq lettres dérivent, on entend la nôtre, on la touche — trois prises |
+  | 3 | SUIS LES ÉTOILES | un chemin d'étoiles à suivre au doigt, dans l'ordre |
+  | 4 | LES BULLES | elles montent, on perce celles qui portent la lettre — cinq |
+  | 5 | LE MOT | la lettre cachée dans le mot de l'animal |
+  | 6 | LES VOYELLES | on entend une syllabe, on touche la bonne bulle |
+  | — | BRAVO | l'animal saute, il rejoint l'album |
+
+  - **LES ÉTOILES SUIVENT LE VRAI GESTE.** Elles ne sont pas semées à la
+    main : `_trajectoire` garde les points du geste dicté par le client, et
+    `_cheminPlat` les met bout à bout — on échantillonne neuf points le long
+    de cette longueur. L'enfant ne peut pas prendre la troisième avant la
+    deuxième : c'est ce qui donne le SENS de l'écriture. Aucun geste connu
+    pour une forme ? La manche est gagnée d'entrée et il repasse librement.
+
+  - **La lettre remplit le cadre.** Une taille écrite en dur la laissait
+    perdue au milieu d'un grand blanc : l'encre occupe une petite part de sa
+    boîte, et cette part change d'une lettre à l'autre. `encreQuiRemplit` la
+    mesure à une taille connue et en déduit la police ET l'ancre. Et le
+    canevas devient presque carré sur une colonne étroite : son RAPPORT
+    décide de sa hauteur à l'écran, et un rapport large donnait une bande de
+    240 × 130 px sur un téléphone.
+
+  - **PIÈGE : le mot coupé en cases à toucher se détachait.** Chaque lettre
+    du mot est une balise à part — il faut pouvoir la toucher — et couper une
+    chaîne arabe casse la liaison : بَقَرَة devenait « بَ قَ رَ ة ». Chaque
+    morceau porte donc un LIANT SANS CHASSE du côté de la coupe, et seulement
+    là où le voisin s'attache vraiment (`_SANS_LIEN_APRES`). Aucun
+    rembourrage non plus : il écartait les morceaux — mesuré, 10 px de trop
+    sur quatre lettres. Après : mot coupé 88 px, mot entier 88 px.
+
+  - **La récompense se laisse regarder** : `data-attend` coupe
+    l'enchaînement (ailleurs il part dès que la voix se tait, et l'animal
+    disparaissait en une seconde et demie), et on repart tout seul au bout de
+    six secondes.
+
+  - **Les voyelles ont leur version jouée** aussi (`_boyVowelJeu`) :
+    rencontre et tracé de بَ, بِ, بُ, puis attrape et la manche des voyelles.
+
+  - **Le branchement tient en une ligne** dans `_boyLetterCourse` et
+    `_boyVowelCourse` : `if(st.age==='petit')return _boy…Jeu(…)`. Tout le
+    découpage conditionnel de la v225 a donc été RETIRÉ de ces deux
+    fonctions — il était devenu inatteignable, et deux chemins « petit » dans
+    le même corps ne se relisent pas.
+
+  Le parcours 7-12 est intact, vérifié après le retrait : 47 écrans par
+  lettre dont 27 de formes / tanwīn / soukoun / allongement, et le cours des
+  voyelles a retrouvé son doublement et son soukoun.
+
+  **Ce qui reste ouvert** : l'écran du choix de la lettre (`_boyLetterPicker`)
+  serre ses cartes à 89 px de mise en page quand la page est agrandie — les
+  contenus s'y chevauchent. Défaut PRÉEXISTANT, identique chez les 7-12,
+  signalé et non corrigé ici.
 
 - **LE MONDE DES ANIMAUX, DEUXIÈME PASSE (v225).** Le client, après avoir vu
   la v224 : « pour le contenu des cours de 3-5 ans, tu n'as rien changé. Il y
