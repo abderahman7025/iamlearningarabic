@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v223
+## OÙ ON EN EST — 12 septembre 2026, production en v224
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,69 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v223), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v224), du plus récent au plus ancien :**
+
+- **LE MONDE DES ANIMAUX — UNE SECONDE INTERFACE ENFANT (v224).**
+  Le client veut deux parcours : après garçon/fille, on choisit **3-7 ans**
+  ou **8-12 ans**. Les 8-12 gardent le voyage tel quel, à l'écran près. Les
+  3-7 reçoivent le monde des animaux. Ses trois choix, dictés le
+  12 septembre : **le même programme, en plus lent** ; **une grille de
+  vignettes colorées** plutôt qu'un chemin ; **des dessins en SVG**, à
+  remplacer par ses photos s'ils ne lui plaisent pas.
+
+  - **`st.age`**, 'petit' ou 'grand', gardé dans `arab_age`. **'grand' par
+    défaut** : un compte ouvert avant ce choix ne voit aucune différence.
+    L'écran `s-age` s'intercale entre le profil et le menu (`/interface/age`)
+    et ne se montre qu'aux enfants — l'adulte va droit au menu, et une
+    adresse qui désigne déjà un écran ne se fait pas couper la route.
+
+  - **Un CALQUE, pas un troisième univers.** `_habDuProfil` recopie
+    l'habillage du garçon ou de la fille et pose `_HABILLAGES.animaux`
+    par-dessus. Celui-ci ne porte que le parcours — noms d'étapes, images,
+    couleurs, titre de la carte, fond. La monture de fin de mission, les
+    couleurs des canevas, les notes sous les bulles restent celles de la
+    fusée ou de la licorne, et restent justes. **Ne pas refaire un moteur de
+    plus** : c'est la leçon écrite en tête de `_HABILLAGES`.
+
+  - **La carte : `renderTuilesAnimaux`.** Douze vignettes carrées, chacune de
+    SA couleur — le client ne veut pas d'un thème d'une seule teinte. Le
+    verrouillage est celui du voyage, et le cours ouvert derrière est le
+    même. Le détour se prend en tête de `renderSessionsMap`, une fois, et
+    non aux douze endroits qui rappellent la carte.
+
+  - **Les douze animaux : `node outils/animaux.js`** → `public/images/
+    animal-*.svg`. Même façon de faire que `outils/planetes.js` : un
+    squelette commun — les mêmes yeux pour tous, ce qui donne l'air de
+    famille — et chacun n'écrit que ce qui le distingue. **Les couleurs sont
+    écrites AUX DEUX ENDROITS** (le script et `_HABILLAGES.animaux`) et
+    doivent bouger ensemble. Pour de vraies illustrations : déposer
+    `animal-<nom>.png` et changer l'extension dans l'habillage.
+
+  - **Un fond de prairie** (`fond-prairie`) pour les deux profils : les
+    vignettes sont claires, l'espace du garçon les éteignait. Et le calque
+    d'ambiance — licornes, fusées — est coupé dans ce monde-là.
+
+  - **PIÈGE : l'écran de l'âge se faisait manger par le ciel du profil.**
+    Celui-ci vient d'être allumé, il vit HORS de l'écran et au-dessus : un
+    fond opaque ne suffit pas. Une classe `choix-age` sur le body l'éteint —
+    avec DEUX classes dans le sélecteur, parce que `body.profile-girl
+    #girl-bg-anim` l'allume déjà en `!important` plus bas dans la feuille, et
+    qu'à spécificité égale c'est la dernière écrite qui l'emporte.
+
+  - **Des séances plus courtes.** Le programme ne change pas ; toutes les
+    huit à douze scènes, une **halte** demande à l'enfant s'il veut
+    continuer. Elle tombe sur un DÉBUT DE CHAPITRE — `api.brief` marque ses
+    scènes d'un `_chapitre`, seule chose qu'on sache dire d'une scène de
+    l'extérieur, ses fabriques rendant des fermetures — et jamais entre une
+    leçon et le tracé qui la suit ; passé douze écrans sans chapitre, on
+    coupe là où l'on est. Mesuré : trois haltes sur les voyelles (11, 22, 35)
+    et trois sur une lettre (12, 25, 38), aucune chez les 8-12. S'il
+    s'arrête, la reprise le ramène à l'écran exact.
+
+  **Ce qui reste ouvert sur ce chantier** : les vignettes reprennent les
+  lettres de chaque étape mais gardent le découpage des douze îles ; les
+  mini-jeux et la révision n'ont pas encore leur vignette ; et les dessins
+  attendent son avis.
 
 - **LA ONZIÈME PASSE DU CLIENT (v223).**
 

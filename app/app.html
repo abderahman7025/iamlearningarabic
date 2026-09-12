@@ -329,6 +329,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 
 /* ── WELCOME ── */
 #s-welcome{align-items:center;justify-content:center;gap:0;padding:30px 24px}
+/* L'ecran de la question porte SON PROPRE FOND. Le ciel du profil vient
+   d'etre allume — les licornes roses de la fille, l'espace du garcon — et il
+   passe derriere cet ecran-ci : deux roses l'un sur l'autre ne se lisent pas,
+   le titre et les deux cartes y disparaissaient. Un fond opaque coupe court,
+   quel que soit ce qui est allume dessous. */
+/* Le calque d'ambiance vit HORS de l'ecran, et au-dessus : un fond opaque ne
+   suffit pas a le cacher. Une classe sur le body l'eteint le temps de la
+   question. DEUX classes sur le body, et non une : `body.profile-girl
+   #girl-bg-anim` l'allume deja en `!important`, plus bas dans la feuille —
+   a specificite egale c'est la derniere ecrite qui l'emporte, et ce n'est
+   pas celle-ci. */
+body.choix-age.profile-girl #girl-bg-anim,
+body.choix-age.profile-boy #boy-bg-anim{display:none !important}
+#s-age{align-items:center;justify-content:center;gap:0;padding:30px 24px;
+  z-index:40;
+  background:radial-gradient(ellipse 90% 60% at 50% -8%,rgba(245,200,66,.10) 0%,transparent 70%),#0a0718}
+/* Sur ce fond-la, l'encre est claire : le profil vient de repeindre `--gold`
+   en rose ou en bleu, et les libelles heritaient d'un ton qui s'y perdait. */
+#s-age .prof-name{color:#f3f1fb}
+#s-age .prof-desc,#s-age .w-sub{color:rgba(243,241,251,.66)}
+.prof-card.age-petit:hover{border-color:rgba(87,200,77,.45);box-shadow:0 16px 48px rgba(87,200,77,.2)}
+.prof-card.age-grand:hover{border-color:rgba(56,189,248,.4);box-shadow:0 16px 48px rgba(56,189,248,.2)}
 .w-ar{
   font-family:'Scheherazade New',serif;font-size:2.6rem;
   background:linear-gradient(135deg,var(--gold),var(--gold2),#fff8dc);
@@ -3501,6 +3523,57 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
    par un, au moment où la voix les dit : une liste posée d'un bloc ne se lit
    pas, elle se saute. */
+/* ── LE CIEL DU MONDE DES ANIMAUX ──
+   Deux classes sur le body, comme `fond-espace` : `body.profile-boy` pose
+   deja son fond en `!important`, il faut peser autant et venir apres. */
+body.profile-boy.fond-prairie,#root.profile-boy.fond-prairie,
+body.profile-girl.fond-prairie,#root.profile-girl.fond-prairie{
+  background:linear-gradient(178deg,#bfe8ff 0%,#e6f6ff 34%,#f3fbe9 68%,#d8f0c2 100%) !important;
+}
+/* Les voiles sombres du garcon eteindraient la prairie. */
+body.fond-prairie #root.profile-boy::before,
+body.fond-prairie #root.profile-boy::after{background:none !important;opacity:0 !important}
+/* Sur un fond clair, les titres reprennent l'encre foncee. */
+body.fond-prairie #root .sess-map-title,
+body.fond-prairie #root .sess-gp-lbl,
+body.fond-prairie #root #tb-title{
+  color:#20242e !important;-webkit-text-fill-color:#20242e !important;text-shadow:none !important;
+}
+body.age-petit #boy-bg-anim,body.age-petit #girl-bg-anim{display:none !important}
+
+/* ── LES VIGNETTES DU MONDE DES ANIMAUX (3-7 ans) ──
+   Chaque etape porte SA couleur, posee en ligne dans `--tc` : le fond en est
+   un voile, la bordure la teinte pleine. Deux par rangee sur un telephone,
+   davantage des que la place est la. */
+.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));
+  gap:14px;padding:0 2px 24px}
+.tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 26%,#ffffff) 0%,
+    color-mix(in srgb,var(--tc) 12%,#ffffff) 100%);
+  border:3px solid var(--tc);
+  box-shadow:0 8px 22px color-mix(in srgb,var(--tc) 32%,transparent);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s}
+.tuile:active{transform:scale(.95)}
+.tuile:hover{transform:translateY(-4px);
+  box-shadow:0 14px 30px color-mix(in srgb,var(--tc) 44%,transparent)}
+.tuile-img{width:84%;max-width:118px;display:block;pointer-events:none}
+.tuile-nom{font-family:Outfit,sans-serif;font-weight:900;font-size:.96rem;
+  color:#20242e;text-align:center;line-height:1.15}
+.tuile-ar{font-family:'Scheherazade New',serif;font-size:1.15rem;
+  color:color-mix(in srgb,var(--tc) 78%,#000000);direction:rtl;text-align:center;line-height:1.5}
+.tuile-etat{position:absolute;top:8px;right:10px;font-size:1.05rem;line-height:1}
+.tuile.fermee{filter:grayscale(.9);opacity:.62;cursor:default}
+.tuile.fermee .tuile-nom,.tuile.fermee .tuile-ar{color:#4a5160}
+.tuile.fermee:hover{transform:none}
+.tuile.finie{border-style:solid}
+.tuile-jauge{height:14px;border-radius:99px;background:rgba(32,36,46,.12);overflow:hidden}
+.tuile-jauge>i{display:block;height:100%;border-radius:99px;
+  background:linear-gradient(90deg,#57C84D,#F2C230,#EC6EA8)}
+/* Le titre de la carte et la jauge se lisent sur le fond sombre du garcon
+   comme sur le fond clair de la fille. */
+body.fond-espace .tuile-nom{color:#20242e}
+
 .res-liste{max-width:min(96%,940px);margin:6px auto 2px;display:flex;
   flex-direction:column;gap:8px}
 .res-point{display:flex;align-items:center;gap:12px;text-align:left;
@@ -4131,6 +4204,28 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
     <div class="prof-card adult" onclick="chooseProfile('adult')">
       <div class="prof-emoji"><img src="/images/app-a3959e9ce994.png" style="width:52px;height:52px;border-radius:50%;object-fit:cover"></div>
       <div class="prof-info"><div class="prof-name" id="pb-adult"></div><div class="prof-desc" id="pd-adult"></div></div>
+      <div class="prof-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHOIX DE L'AGE — apres garcon/fille, avant le menu.
+     Deux parcours pour le meme cours : le voyage pour les grands, le monde
+     des animaux pour les petits. -->
+<div id="s-age" class="scr">
+  <div class="w-ar">كَمْ عُمْرُك؟<br><span style="font-size:1.4rem">Quel âge as-tu ?</span></div>
+  <div class="w-sub" id="w-sub-age">Choisis ton parcours</div>
+  <div class="prof-cards">
+    <div class="prof-card age-petit" onclick="chooseAge('petit')">
+      <div class="prof-emoji">🦁</div>
+      <div class="prof-info"><div class="prof-name">3 – 7 ans</div>
+        <div class="prof-desc">Le monde des animaux</div></div>
+      <div class="prof-arrow">›</div>
+    </div>
+    <div class="prof-card age-grand" onclick="chooseAge('grand')">
+      <div class="prof-emoji" id="age-grand-emoji">🚀</div>
+      <div class="prof-info"><div class="prof-name">8 – 12 ans</div>
+        <div class="prof-desc" id="age-grand-desc">Le voyage dans l’espace</div></div>
       <div class="prof-arrow">›</div>
     </div>
   </div>
@@ -5033,7 +5128,15 @@ const LS=[
 ];
 const ALL_S=[SV,SA,SP,...LS];
 const ALL_LETTERS=LS.flatMap(s=>s.letters);
-const st={lang:'fr',profile:'adult',soundOn:true,scores:{},user:null,curLesson:null,quiz:null,backHistory:[],_curPage:null};
+/* `age` : 'grand' (8-12 ans, le voyage — fusee ou licorne) ou 'petit'
+   (3-7 ans, le monde des animaux). Le COURS est le meme des deux cotes ;
+   seuls le parcours et l'habillage changent. 'grand' par defaut : c'est ce
+   qu'ont deja les comptes ouverts avant ce choix, rien ne bouge pour eux. */
+const st={lang:'fr',profile:'adult',age:'grand',soundOn:true,scores:{},user:null,curLesson:null,quiz:null,backHistory:[],_curPage:null};
+try{
+  var _savedAge=localStorage.getItem('arab_age');
+  if(_savedAge==='petit'||_savedAge==='grand')st.age=_savedAge;
+}catch(e){}
 try{
   var _savedLang=localStorage.getItem('arab_lang');
   if(_savedLang){
@@ -5059,6 +5162,11 @@ var _intendedUrl=null; /* URL demandée avant connexion */
 function _appliqueThemeEnfant(){
   try{
     document.body.classList.toggle('kid-boy', st && st.profile==='boy');
+    /* Le monde des animaux eteint les decors du voyage — la fusee qui
+       traverse le fond du garcon, le ciel a licornes de la fille : ils
+       appartiennent a l'autre parcours. */
+    document.body.classList.toggle('age-petit', !!(st && st.age==='petit'
+      && (st.profile==='boy'||st.profile==='girl')));
   }catch(e){}
 }
 
@@ -5128,7 +5236,7 @@ var _ISLE_SLUGS={
 };
 function _screenToUrl(id){
   var p=_getProfile();
-  var fixed={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/interface','s-audio-admin':'/admin/audio'};
+  var fixed={'s-buy':'/','s-login':'/connexion','s-register':'/inscription','s-welcome':'/interface','s-age':'/interface/age','s-audio-admin':'/admin/audio'};
   if(fixed[id])return fixed[id];
   var perProfile={
     's-menu':'/'+p+'/accueil',
@@ -5145,6 +5253,7 @@ function _urlToScreen(path){
   if(path==='/'||path==='')return 's-buy';
   if(path==='/connexion')return 's-login';
   if(path==='/inscription')return 's-register';
+  if(path==='/interface/age')return 's-age';
   if(path==='/interface')return 's-welcome';
   if(/\/(fille|garcon|adulte)\/accueil/.test(path))return 's-menu';
   if(/\/(fille|garcon|adulte)\/lecon/.test(path))return 's-main';
@@ -5705,6 +5814,25 @@ function chooseProfile(p){
   if(boyBg)  boyBg.style.display=(p==='boy'?'block':'none');
   if(p==='girl'||p==='boy') setTimeout(initChildBgAnim, 200);
   document.getElementById('m-avatar').textContent=st.user?st.user.name[0].toUpperCase():'A';
+  /* ── L'AGE SE DEMANDE APRES LE GARCON OU LA FILLE ──
+     Un enfant choisit sa monture, puis son parcours. L'adulte n'a pas de
+     parcours, il va droit au menu ; et une adresse qui designe deja un ecran
+     (`_skipProfileNav`, pose par la reprise) ne doit pas se faire couper la
+     route par une question — l'age est alors celui qu'on avait garde. */
+  if((p==='girl'||p==='boy')&&!window._skipProfileNav){
+    var _mag=document.getElementById('age-grand-emoji');
+    if(_mag)_mag.textContent=(p==='girl')?'🦄':'🚀';
+    var _mad=document.getElementById('age-grand-desc');
+    if(_mad)_mad.textContent=(p==='girl')?'Le voyage des licornes':'Le voyage dans l\u2019espace';
+    /* Le ciel du profil est deja allume — les licornes de la fille, l'espace
+       du garcon. Pose derriere cet ecran-ci, il en mange le texte : deux
+       roses l'un sur l'autre ne se lisent pas. On l'eteint le temps de la
+       question, `chooseAge` le rallumera s'il y a lieu. */
+    document.body.classList.add('choix-age');
+    showS('s-age',true);
+    updateStreak();renderGlobalProgress();setupPushNotifications();
+    return;
+  }
   /* Le garcon garde son espace jusque sur le menu. */
   _fondEnfant(_fondMenuEnfant());
   buildMenu();showS('s-menu',true,true);
@@ -5721,6 +5849,34 @@ function chooseProfile(p){
   history.replaceState({_appState:'root'}, '', location.pathname);
 }
 
+
+/* ── LE PARCOURS, CHOISI PAR L'AGE ──
+   'petit' — 3-7 ans — ouvre le monde des animaux : une grille de vignettes
+   colorees (`renderTuilesAnimaux`) au lieu du chemin qui serpente. 'grand'
+   garde le voyage tel qu'il est. Le COURS ne change pas : ce sont les memes
+   lecons, le meme moteur de scenes, les memes ecrans. */
+function chooseAge(a){
+  st.age=(a==='petit')?'petit':'grand';
+  try{localStorage.setItem('arab_age',st.age);}catch(e){}
+  document.body.classList.remove('choix-age');
+  _appliqueThemeEnfant();
+  _HAB=_habDuProfil();
+  /* Le ciel du voyage revient pour les grands ; le monde des animaux, lui,
+     a son propre fond de prairie et n'en veut pas. */
+  var _gb=document.getElementById('girl-bg-anim');
+  var _bb=document.getElementById('boy-bg-anim');
+  var _voyage=(st.age==='grand');
+  if(_gb)_gb.style.display=(_voyage&&st.profile==='girl')?'block':'none';
+  if(_bb)_bb.style.display=(_voyage&&st.profile==='boy')?'block':'none';
+  _fondEnfant(_fondMenuEnfant());
+  buildMenu();showS('s-menu',true,true);
+  var profileUrl=(st.profile==='girl')?'/fille/accueil':'/garcon/accueil';
+  window.history.pushState({screen:'s-menu',profile:st.profile},'',profileUrl);
+  window._mhLastScroll=0;
+  var _mh=document.querySelector('.menu-header');
+  if(_mh){_mh.style.top='0';_mh.style.opacity='1';_mh.style.pointerEvents='';}
+  history.replaceState({_appState:'root'},'',location.pathname);
+}
 
 function buildMenu(){
   const nav=document.getElementById('menu-nav');if(!nav)return;nav.innerHTML='';
@@ -8435,7 +8591,96 @@ function _ilesDefs(){
   ];
 }
 
+/* ── LA CARTE DES 3-7 ANS : UNE GRILLE DE VIGNETTES ──
+   Pas de chemin qui serpente, pas de monture qui vole : douze cartes
+   carrees, une par etape, chacune de SA couleur — le client ne veut pas
+   d'un theme d'une seule teinte. Tout tient a l'ecran d'un coup, et
+   l'enfant touche celle qu'il veut parmi celles qui sont ouvertes.
+   Le verrouillage est exactement celui du voyage : une etape s'ouvre quand
+   la precedente est finie. Le cours qui s'ouvre derriere est le meme. */
+function renderTuilesAnimaux(ca){
+  _HAB=_habDuProfil();
+  _migreProgressionFille();
+  _fondEnfant(true);
+  _decorMonde(ca,false);
+  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='64px';
+  st._curPage='sessions-map';
+  var _stb=document.getElementById('topbar');
+  if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
+  try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');
+      Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
+  try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');
+      if(!st.accuracy)st.accuracy=_av;}catch(e){if(!st.accuracy)st.accuracy={};}
+
+  var wrap=document.createElement('div');
+  wrap.className='sess-map-wrap';
+  var titre=document.createElement('div');
+  titre.className='sess-map-title';titre.textContent=_HAB.titreCarte;
+  wrap.appendChild(titre);
+
+  /* La barre de progression : la meme mesure que le voyage — une session
+     comptee des qu'elle a 80. */
+  var faites=ALL_S.filter(function(x){return (st.scores[x.id]||0)>=80;}).length;
+  var pct=Math.round(faites/ALL_S.length*100);
+  var gp=document.createElement('div');
+  gp.style.cssText='margin:0 4px 16px';
+  gp.innerHTML='<div class="sess-gp-lbl" style="display:flex;justify-content:space-between;'
+    +'font-size:.8rem;font-weight:800;margin-bottom:6px">'
+    +'<span>'+te('Progression')+'</span><span>'+faites+'/'+ALL_S.length+'</span></div>'
+    +'<div class="tuile-jauge"><i style="width:'+pct+'%"></i></div>';
+  wrap.appendChild(gp);
+
+  var defs=_ilesDefs();
+  var noms=_HAB.etapes||[],imgs=_HAB.images||[],cols=_HAB.couleurs||[];
+  var grille=document.createElement('div');
+  grille.className='tuiles';
+  var precedenteFinie=true;
+
+  defs.forEach(function(isle,i){
+    isle.sids.forEach(function(sid){_ICONE_MONDE[sid]=isle.icon;});
+    var sessions=isle.sids.map(function(sid){
+      return ALL_S.filter(function(x){return x.id===sid;})[0]||null;}).filter(Boolean);
+    var faite=sessions.filter(function(x){return (st.scores[x.id]||0)>=80;}).length;
+    var finie=(faite===sessions.length);
+    var fermee=!precedenteFinie&&!_toutOuvert();
+    var coul=cols[i]||'#7FA9D4';
+
+    var t=document.createElement('div');
+    t.className='tuile'+(fermee?' fermee':'')+(finie?' finie':'');
+    t.style.setProperty('--tc',coul);
+    var im=document.createElement('img');
+    im.className='tuile-img';im.src=imgs[i]||'';im.alt='';
+    im.setAttribute('aria-hidden','true');
+    var nm=document.createElement('div');
+    nm.className='tuile-nom';nm.textContent=noms[i]||isle.label;
+    var ar=document.createElement('div');
+    ar.className='tuile-ar';ar.textContent=isle.ar;
+    var et=document.createElement('div');
+    et.className='tuile-etat';
+    et.textContent=fermee?'🔒':(finie?'✅':'▶');
+    t.appendChild(et);t.appendChild(im);t.appendChild(nm);t.appendChild(ar);
+
+    if(!fermee)t.onclick=(function(ss,ii,lbl){return function(){
+      _lessonPushed=false;_currentIsleSlug=_slugEtape(ii,lbl);
+      try{localStorage.setItem('arab_ile',String(ii));}catch(e){}
+      var s0=ss[0];_boySession=s0;
+      if(s0.type==='vowels'){_boyVowelCourse(ca);return;}
+      if(s0.type==='prolong'){_boyProlongCourse(ca);return;}
+      _boyLetterPicker(ca,s0);
+    };})(sessions,i,noms[i]||isle.label);
+
+    grille.appendChild(t);
+    precedenteFinie=finie;
+  });
+  wrap.appendChild(grille);
+  ca.appendChild(wrap);
+}
+
 function renderSessionsMap(ca){
+  /* Les 3-7 ans n'ont pas de chemin qui serpente : le detour se prend ICI,
+     une fois, plutot qu'aux douze endroits qui rappellent la carte. */
+  if(st&&st.age==='petit'&&(st.profile==='boy'||st.profile==='girl'))
+    return renderTuilesAnimaux(ca);
   _HAB=_habDuProfil();
   _migreProgressionFille();
   _fondEnfant(true);
@@ -9857,7 +10102,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v223';
+var _VERSION_REPLI='v224';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12227,6 +12472,42 @@ function _blocEcriture(hote,o){
    `bulle`   le cadre rond où la lettre se montre
    `carte`   le retour vers la carte du parcours */
 var _HABILLAGES={
+  /* ── LE MONDE DES ANIMAUX — 3 A 7 ANS ──
+     Pas un univers a part entiere : un CALQUE pose sur celui du garcon ou de
+     la fille (voir `_habDuProfil`). Il ne porte que ce qui touche au
+     parcours. Le client ne veut pas d'un theme d'une seule teinte : chaque
+     etape a SA couleur, et c'est elle qui peint sa vignette.
+     Les douze dessins sortent de `node outils/animaux.js` — les couleurs
+     sont ecrites aux deux endroits et doivent bouger ensemble. Pour de
+     vraies illustrations, deposer `public/images/animal-<nom>.png` et changer
+     l'extension ci-dessous : rien d'autre a toucher. */
+  animaux:{
+    cle:'animaux',veh:'🐾',
+    mission:'MISSION',missionMin:'Mission',depart:'ON COMMENCE',
+    accompli:'BRAVO !',retour:'▸ RETOUR AUX ANIMAUX',
+    lieu:'animal',monLieu:'▸ MON ANIMAL',carte:'▸ LES ANIMAUX',
+    titreCarte:'🐾 Le monde des animaux',
+    etapes:['Le Lion','L\u2019Éléphant','La Girafe','Le Panda','Le Renard','La Grenouille',
+            'Le Hibou','Le Poisson','L\u2019Abeille','Le Pingouin','La Tortue','Le Papillon'],
+    slugs:['lion','elephant','girafe','panda','renard','grenouille',
+           'hibou','poisson','abeille','pingouin','tortue','papillon'],
+    images:['/images/animal-lion.svg','/images/animal-elephant.svg',
+            '/images/animal-girafe.svg','/images/animal-panda.svg',
+            '/images/animal-renard.svg','/images/animal-grenouille.svg',
+            '/images/animal-hibou.svg','/images/animal-poisson.svg',
+            '/images/animal-abeille.svg','/images/animal-pingouin.svg',
+            '/images/animal-tortue.svg','/images/animal-papillon.svg'],
+    couleurs:['#F5A524','#7FA9D4','#F2C230','#4C5566','#EF7042','#57C84D',
+              '#9B7EDE','#2FC4D6','#F5C518','#3C4A5A','#7CB342','#EC6EA8'],
+    /* Un ciel de jour au-dessus d'une prairie, pour les deux profils : les
+       vignettes sont claires et vives, l'espace du garcon les eteignait. */
+    fond:'fond-prairie',
+    fondPlein:'linear-gradient(158deg,#ffffff 0%,#eaf7e4 100%)',
+    /* Rien a poser sur les vignettes : ni monture qui vole, ni sommet ou se
+       tenir. Ces trois-la sont mis a blanc pour que le code du voyage, s'il
+       est appele par megarde, ne cherche pas un decor qui n'existe pas. */
+    scenesMonde:null,montureEtape:0,couronneEtape:0
+  },
   garcon:{
     cle:'garcon',classe:'',veh:'🚀',
     mission:'MISSION',missionMin:'Mission',depart:'BRIEFING',partir:'▶ DÉCOLLAGE',
@@ -12565,7 +12846,21 @@ function _habTraduit(h){
   return c;
 }
 function _habDuProfil(){
-  return _habTraduit((st&&st.profile==='girl')?_HABILLAGES.licorne:_HABILLAGES.garcon);
+  var base=(st&&st.profile==='girl')?_HABILLAGES.licorne:_HABILLAGES.garcon;
+  /* ── LES 3-7 ANS : LE MEME HABILLAGE, REPEINT ──
+     On ne fabrique pas un troisieme univers complet — la fusee et la licorne
+     servent toujours, l'enfant a choisi l'une des deux au premier ecran. On
+     ne remplace que ce qui regarde le PARCOURS : les noms d'etapes, les
+     images, les couleurs, le titre de la carte. Tout le reste — la monture
+     de fin de mission, les couleurs des canevas, les notes sous les bulles —
+     est celui de la fusee ou de la licorne, et reste juste. */
+  if(st&&st.age==='petit'){
+    var h={},k;
+    for(k in base)h[k]=base[k];
+    for(k in _HABILLAGES.animaux)h[k]=_HABILLAGES.animaux[k];
+    return _habTraduit(h);
+  }
+  return _habTraduit(base);
 }
 
 /* Le decor du monde ou l'on se trouve, derriere le cours. `_currentIsleSlug`
@@ -14077,13 +14372,39 @@ function _boyScene(ca,reprise){
   function precedent(){if(i<=0)return;i--;go();}
   api.precedent=precedent;
   api.suivant=suivant;
-  api.run=function(list,f){scenes=_aplati(list);if(f)fini=f;i=_repriseDebut(scenes.length);go();};
+  /* Une halte tous les PAS_SEANCE ecrans, posee au chapitre suivant. On n'en
+     met pas dans les trois derniers ecrans : couper juste avant les
+     felicitations n'aurait aucun sens. */
+  var PAS_SEANCE=8, PAS_MAX=12;
+  function _poseLesHaltes(liste){
+    if(!(st&&st.age==='petit'))return liste;
+    var out=[],depuis=0;
+    liste.forEach(function(sc,n){
+      /* On vise un debut de chapitre. Mais certains passages n'en ont aucun
+         sur quinze ecrans d'affilee — le doublement des voyelles, par
+         exemple : la halte se poserait alors bien trop tard. Passe PAS_MAX,
+         on coupe la ou l'on est. */
+      var loin=(depuis>=PAS_MAX);
+      var bon=(depuis>=PAS_SEANCE&&sc&&sc._chapitre);
+      if((bon||loin)&&n>0&&n<liste.length-3){
+        out.push(api.halte());depuis=0;
+      }
+      out.push(sc);depuis++;
+    });
+    return out;
+  }
+  api.run=function(list,f){scenes=_poseLesHaltes(_aplati(list));if(f)fini=f;i=_repriseDebut(scenes.length);go();};
 
   /* ── Fabriques de scènes ── */
 
   /* Briefing : du texte seul */
   api.brief=function(etape,html,fr,label,fete){
-    return function(){
+    /* ── UN ECRAN DE TEXTE SEUL OUVRE UN CHAPITRE ──
+       C'est la seule chose qu'on sache dire d'une scene de l'exterieur : ses
+       fabriques rendent des fermetures, on ne peut pas les interroger. Les
+       haltes des 3-7 ans (voir `_poseLesHaltes`) tombent sur cette marque —
+       jamais entre une lecon et le trace qui la suit. */
+    var f=function(){
       /* Une page de felicitations merite la fete : les memes confettis que
          l'ecran de fin, aux couleurs de l'habillage, et une volee de coeurs
          au-dessus du personnage. */
@@ -14092,6 +14413,27 @@ function _boyScene(ca,reprise){
       var p=panneau(etape);titre(p,html,fr);
       if(fete)N.plusTard(function(){bravo(p,3);},400);
       bouton(p,label||te('Suite ›'),suivant);
+    };
+    f._chapitre=true;
+    return f;
+  };
+  /* ── LA HALTE DES 3-7 ANS ──
+     Le programme est le meme que celui des grands — le client y tient — mais
+     quarante ecrans d'affilee sont trop pour un enfant de quatre ans. Toutes
+     les dix scenes environ, on lui demande s'il veut continuer. S'il
+     s'arrete, la reprise le ramene exactement ici : `repriseScene` note le
+     rang de l'ecran a chaque page. */
+  api.halte=function(){
+    return function(){
+      var p=panneau(te('PETITE PAUSE'));
+      /* Elle ATTEND : pas d'enchainement tout seul, c'est l'enfant qui
+         decide. Et pas de verrou — les deux boutons sont a lui. */
+      p.setAttribute('data-attend','1');
+      titre(p,TB('Bravo ! 🎉<br>Tu veux <b>continuer</b> ?'),
+        te('Bravo ! Tu as bien travaillé. Tu veux continuer ?'));
+      bouton(p,te('▸ Je continue'),suivant);
+      bouton(p,te('▸ J\'arrête pour aujourd\'hui'),function(){
+        N.stop();renderSessionsMap(ca);},true);
     };
   };
   /* ── UN ECRAN QUI MONTRE ────────────────────────────────────────────
