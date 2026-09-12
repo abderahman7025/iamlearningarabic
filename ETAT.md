@@ -31,13 +31,13 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v222
+## OÙ ON EN EST — 12 septembre 2026, production en v223
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
 Parti de la leçon des voyelles, il a gagné les trente leçons de lettres.
 
-Depuis v205, dix passes de relecture avec lui, écran par écran. Elles sont
+Depuis v205, onze passes de relecture avec lui, écran par écran. Elles sont
 détaillées plus bas dans l'ordre inverse (la plus récente d'abord) ; voici
 d'abord ce qui reste ouvert.
 
@@ -58,7 +58,6 @@ qui les dit en attendant, et elle les dit mal.
 | doublement, voyelles | « Répète après moi : boun / ban / bin. » |
 | « à retenir » des voyelles | « devient » · « an » · « in » · « oun » |
 | avant le secret des tanwīns | « Comme tu connais très bien les trois voyelles, on peut passer à la suite. » |
-| page du soukoun | « On dira juste b. » |
 | début de chaque « à retenir » | « Ce qu'il faut retenir. » |
 | « à retenir » des voyelles | « Lorsque l'on double une voyelle, on ajoute le son n. » |
 | « à retenir » des voyelles | « Lorsqu'il y a un soukoun sur une lettre, on ne prononce que le son de la lettre. » |
@@ -66,13 +65,8 @@ qui les dit en attendant, et elle les dit mal.
 La phrase « Comme tu connais très bien… » REMPLACE « … je vais te dévoiler
 un secret. », dont l'enregistrement ne sert plus.
 
-**« On dira juste b. » est un cas à part.** La phrase du soukoun garde sa
-CLÉ ENTIÈRE — « Parfois tu trouveras ce petit rond au dessus. Il n'a aucune
-prononciation. On dira juste b. » — parce que son enregistrement existe
-déjà. Mais il s'arrête à « aucune prononciation » : le client ne s'entendait
-jamais dire la fin. Le dernier morceau est donc devenu un TEMPS À PART, avec
-sa propre clé. Si l'enregistrement d'origine dit finalement la phrase en
-entier, il n'y a qu'à retirer ce temps-là de la scène du soukoun.
+**La phrase du soukoun était COUPÉE, pas incomplète** — corrigé en v223,
+voir plus bas. Son enregistrement la dit en entier.
 
 **Les textes de la page « À RETENIR » sont à relire avec lui.** Ils sont
 repris de ses propres phrases de cours, jamais inventés, mais c'est lui qui
@@ -91,7 +85,56 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v222), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v223), du plus récent au plus ancien :**
+
+- **LA ONZIÈME PASSE DU CLIENT (v223).**
+
+  - **UNE PAGE QUI PARLE LONGTEMPS N'ÉTAIT PLUS JAMAIS RENDUE.** Le garde-fou
+    d'`attendSilence` valait vingt secondes et il ABANDONNAIT : l'attente
+    était coupée sans que la suite soit jamais appelée. La page « à retenir »
+    des voyelles parle près de quarante secondes — elle ne passait donc pas
+    d'elle-même, et son bouton restait éteint. Le délai passe à deux minutes
+    et, surtout, on ne renonce plus : on passe outre et on attend le silence.
+    Mesuré : bouton ouvert à 39,0 s, page passée à 40,1 s.
+
+  - **Le bouton d'avancement s'ouvre aussi QUAND TOUT EST DIT**, et plus
+    seulement à la pause. C'est ce que le client demande pour les pages qui
+    ne s'enchaînent pas d'elles-mêmes.
+
+  - **LA PHRASE DU SOUKOUN ÉTAIT COUPÉE PAR LE GARDE-FOU DE DURÉE.** `pump`
+    estimait la durée sur la LONGUEUR DU TEXTE, plafonnée à 9 s ; dite par le
+    client, la phrase les dépasse, et « on dira juste b » n'était jamais
+    entendu — la page passait dessus. Dès qu'un enregistrement joue, c'est SA
+    durée qui commande. Le temps séparé ajouté en v222 est retiré : il la
+    faisait dire deux fois. Mesuré avec un enregistrement de 12 s : la phrase
+    suivante part à 14,2 s au lieu de 10,3 s.
+
+  - **Les pages « allongement » nomment la lettre.** « Avec cette lettre, le
+    son s'étire » ne veut rien dire — il s'étire avec les trois. La voix dit
+    maintenant « avec l'alif, on obtient baaa », comme le font déjà les pages
+    de voyelle et de tanwīn. Le TEXTE ne bouge pas, à la demande du client.
+
+  - **Le mot à trou, en paysage : les quatre propositions sur UNE rangée**, et
+    le mot descendu. Elles se partagent la largeur de la colonne au lieu de
+    garder leurs 104 px — à quatre, elles en sortiraient. Mesuré sur 1024 ×
+    700 : une seule rangée, colonne de 353 px.
+
+  - **UN POINT D'« À RETENIR » TIENT SUR UNE LIGNE.** La page est mise à
+    l'échelle pour remplir la hauteur, et sa largeur de MISE EN PAGE se
+    resserre d'autant : « Pour cette lettre, il faut apprendre les 4 formes »
+    débordait d'un mot et laissait la moitié de la rangée vide. Les coupures
+    écrites dans le texte sont retirées de ces points-là, et la police se
+    réduit juste assez — 20,5 px à 19,9 px sur cet exemple. On repasse après
+    chaque mise à l'échelle, en repartant de la valeur de feuille de style :
+    le réglage ne s'empile pas.
+
+  - **Le mot du hublot se pose SUR la ligne d'écriture.** Réduit pour tenir
+    dans le cercle, il gardait le MILIEU du hublot : sa ligne de base
+    remontait au-dessus du pointillé et il flottait — « ʿuṣfūr » était trop
+    haut. On la mesure avec un repère de hauteur nulle (le bas d'un
+    `inline-block` vide est posé dessus) et on le descend de l'écart. Mesuré :
+    écart 0,0 px. Une LETTRE seule ne bouge pas, sa place est réglée depuis
+    longtemps.
 
 - **LA DIXIÈME PASSE DU CLIENT (v222).**
 

@@ -3231,6 +3231,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-2col .boy-col-g{min-width:0}
 .boy-2col .boy-titre{max-width:none;margin:0;font-size:1.95rem;line-height:1.6}
 .boy-2col .boy-hublot{margin:0 auto}
+/* ── LE MOT A TROU, EN PAYSAGE ──
+   La colonne de droite tient les QUATRE propositions sur une seule rangee —
+   le client les veut ainsi. Elles se partagent la largeur au lieu de garder
+   leurs 104 px, sans quoi elles sortiraient de la colonne. Et le mot
+   descend : colle en haut, il paraissait pose de travers. */
+.boy-2col .trou-cibles{grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:8px!important;width:100%}
+.boy-2col .trou-cibles .boy-cible{width:100%;height:auto;aspect-ratio:1;
+  max-width:104px;font-size:clamp(1.1rem,4.4vh,2.6rem)}
+.boy-2col .trou-mot{margin-top:clamp(6px,5vh,42px)!important}
 /* La page de déduction : ses deux lignes doivent tomber en face des deux
    rangées du tableau, on les écarte donc autant que lui. */
 .boy-2col .boy-titre.dedu{line-height:2.9;font-size:1.7rem}
@@ -9847,7 +9857,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v222';
+var _VERSION_REPLI='v223';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -9962,6 +9972,16 @@ function _boyNarration(){
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
       var parle=(ss&&(ss.speaking||ss.pending))||(a&&!a.ended&&!a.paused);
+      /* ── UN ENREGISTREMENT DURE CE QU'IL DURE ──
+         `estim` devine la duree sur la LONGUEUR DU TEXTE, et plafonne a 9 s :
+         la phrase du soukoun, dite par le client, passe les 9 s, et le
+         garde-fou la declarait finie avant son dernier mot — on n'entendait
+         jamais « on dira juste b », la page passait dessus. Des qu'un
+         enregistrement joue, c'est SA duree qui commande. */
+      if(a&&isFinite(a.duration)&&a.duration>0){
+        var _m=a.duration*1000+900;
+        if(_m>maxMs)maxMs=_m;
+      }
       /* En pause, le temps ne court pas : sans cela le garde-fou de duree
          finirait par declarer la phrase dite alors qu'elle est suspendue. */
       if(enPause){t0=Date.now();quiet=0;return;}
@@ -13199,11 +13219,20 @@ function _boyScene(ca,reprise){
      train de parler, et on n'attend le silence qu'une fois ce compte a zero. */
   function attendSilence(fn,avecFete){
     N.plusTard(function(){
+      var t0=Date.now();
       var id=setInterval(function(){
-        if(_sceneParle>0||(avecFete&&_sceneFete>0))return;
+        if(_sceneParle>0||(avecFete&&_sceneFete>0)){
+          /* GARDE-FOU : une scene qui oublie de rendre la main. Il valait
+             vingt secondes, et il ABANDONNAIT — l attente etait simplement
+             coupee, sans jamais appeler la suite. La page << a retenir >>,
+             parle plus de trente secondes, restait donc plantee : elle ne
+             passait pas d elle-meme et son bouton restait eteint. Le delai
+             est large, et surtout on ne renonce plus : on passe outre et on
+             attend le silence. */
+          if(Date.now()-t0<120000)return;
+        }
         clearInterval(id);N.surSilence(fn);
       },200);
-      N.plusTard(function(){clearInterval(id);},20000);
     },700);
   }
   /* La page a fini de parler ET de feliciter : c'est alors, et pas avant,
@@ -13330,6 +13359,11 @@ function _boyScene(ca,reprise){
        plus d'objet. */
     quandToutEstDit(function(){
       if(!p.isConnected)return;
+      /* ── LA VOIX A FINI : LE BOUTON S'OUVRE ──
+         Il ne s'ouvrait qu'a la pause. Sur une page qui parle longtemps sans
+         passer d'elle-meme — « a retenir » — l'enfant restait devant un
+         bouton eteint alors qu'il n'y avait plus rien a entendre. */
+      ouvreSuite(true);
       if(attend)return;
       _pretAEnchainer=true;
       if(!N.enPause())lanceEnchainement();
@@ -13672,9 +13706,42 @@ function _boyScene(ca,reprise){
       };
       /* `requestAnimationFrame` ne bat pas dans un onglet cache : on repasse
          par l'horloge, la seule qui tourne a coup sur. */
-      requestAnimationFrame(ajuste);
-      N.plusTard(ajuste,80);N.plusTard(ajuste,420);
-      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajuste);}catch(e){}
+      /* ── LE MOT SE POSE SUR LA LIGNE D'ECRITURE ──
+         Reduit pour tenir dans le cercle, le mot garde le MILIEU du hublot :
+         sa ligne de base remonte alors bien au-dessus du pointille, et il
+         flotte — le client l'a vu sur « ʿuṣfūr ». On mesure sa ligne de base
+         avec un repere de hauteur nulle (le bas d'un `inline-block` vide est
+         POSE dessus) et on le descend de l'ecart. La mesure se fait en
+         pixels de mise en page, le cadre etant mis a l'echelle.
+         Une LETTRE seule ne bouge pas : sa place est reglee depuis
+         longtemps, et le client la donne pour bonne. */
+      var _estMot=_sansCercle(glyph).replace(_MARQUES,'').length>1;
+      var _repere=null;
+      function poseSurLaLigne(){
+        if(!_estMot||!h.isConnected)return;
+        var H=h.clientHeight;if(!H)return;
+        if(!_repere){
+          _repere=document.createElement('i');
+          _repere.setAttribute('aria-hidden','true');
+          _repere.style.cssText='display:inline-block;width:0;height:0;overflow:hidden';
+          sp.appendChild(_repere);
+        }
+        sp.style.position='relative';sp.style.top='0px';
+        var rh=h.getBoundingClientRect(),rr=_repere.getBoundingClientRect();
+        var ech=h.offsetWidth?(rh.width/h.offsetWidth):1;
+        if(!(ech>0.05&&ech<20))ech=1;
+        var bord=parseFloat(getComputedStyle(h).borderTopWidth)||0;
+        var base=(rr.bottom-rh.top)/ech-bord;      /* ligne de base du mot */
+        var _v=parseFloat(getComputedStyle(h).getPropertyValue('--hub-ligne'));
+        var ligne=H*((_v>0?_v:62)/100);
+        sp.style.top=(ligne-base).toFixed(1)+'px';
+      }
+      function ajustePuisPose(){ajuste();poseSurLaLigne();}
+      /* `requestAnimationFrame` ne bat pas dans un onglet cache : on repasse
+         par l'horloge, la seule qui tourne a coup sur. */
+      requestAnimationFrame(ajustePuisPose);
+      N.plusTard(ajustePuisPose,80);N.plusTard(ajustePuisPose,420);
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajustePuisPose);}catch(e){}
       h.onclick=function(){N.stop();N.dire(son||glyph);};
     }
     p.appendChild(h);
@@ -14959,7 +15026,13 @@ function _boyScene(ca,reprise){
         var d=document.createElement('div');d.className='res-point';
         var pu=document.createElement('i');pu.textContent=_HAB.veh||'•';
         pu.setAttribute('aria-hidden','true');
-        var tx=document.createElement('span');tx.className='res-tx';tx.innerHTML=o.h;
+        var tx=document.createElement('span');tx.className='res-tx';
+        /* ── UN POINT = UNE LIGNE ──
+           Les coupures ecrites dans le texte servent aux pages de cours, ou
+           la phrase est posee ligne par ligne. Ici la rangee est large : une
+           coupure y laissait la moitie de la place vide a droite. On les
+           retire et on laisse le texte occuper sa ligne. */
+        tx.innerHTML=String(o.h).replace(/<br\s*\/?>/gi,' ');
         d.appendChild(pu);d.appendChild(tx);
         /* Un point peut MONTRER au lieu de dire : la vue se construit ici,
            a chaque rendu, pour que le retour en arriere la retrouve neuve. */
@@ -14969,6 +15042,36 @@ function _boyScene(ca,reprise){
       });
       p.appendChild(l);
       bouton(p,te('Suite ›'),suivant);
+      /* ── UN POINT TIENT SUR UNE LIGNE ──
+         La page est mise a l'echelle pour remplir la hauteur, et sa largeur
+         de MISE EN PAGE se resserre d'autant : une phrase qui tenait deborde
+         alors d'un mot, et la moitie de la rangee reste vide a droite — c'est
+         ce que le client a vu sur « Pour cette lettre, il faut apprendre les
+         4 formes ». On reduit la police du point, juste assez pour qu'il
+         tienne d'un trait. On repasse apres chaque mise a l'echelle, la
+         largeur ayant pu changer : la police repart de sa valeur de feuille
+         de style a chaque fois, le reglage ne s'empile donc pas. */
+      function tientSurUneLigne(){
+        if(!p.isConnected)return;
+        lignes.forEach(function(d){
+          var tx=d.querySelector('.res-tx');if(!tx)return;
+          tx.style.fontSize='';
+          var px=parseFloat(getComputedStyle(tx).fontSize)||20,garde=0;
+          function uneLigne(){
+            var lh=parseFloat(getComputedStyle(tx).lineHeight)||(px*1.35);
+            return tx.offsetHeight<=lh*1.4;
+          }
+          while(!uneLigne()&&px>11&&garde++<40){
+            px-=0.6;tx.style.fontSize=px.toFixed(2)+'px';
+          }
+        });
+      }
+      N.plusTard(tientSurUneLigne,120);
+      N.plusTard(tientSurUneLigne,460);
+      N.plusTard(tientSurUneLigne,980);
+      try{if(document.fonts&&document.fonts.ready)
+        document.fonts.ready.then(tientSurUneLigne);}catch(e){}
+      window.addEventListener('resize',tientSurUneLigne);
       _sceneParle++;
       var n=0;
       /* ── LA PAGE S'ANNONCE ──
@@ -15325,6 +15428,9 @@ function _boyScene(ca,reprise){
          client. Une grille de deux colonnes s'en charge, quel que soit le
          nombre de propositions. */
       var r=document.createElement('div');
+      /* La classe sert au paysage : la colonne de droite est assez large
+         pour les quatre d'un seul tenant (voir la feuille de style). */
+      r.className='trou-cibles';
       r.style.cssText='display:grid;grid-template-columns:repeat(2,auto);gap:10px;'
         +'justify-content:center;margin-top:8px;direction:rtl';
       var repondu=false,premier=true;
@@ -15712,15 +15818,13 @@ function _boyVowelCourse(ca){
          voyelles du tout debut : c'est lui qu'on presente. */
       {calques:[LB],
        flottants:[{m:mS,c:CFA,x:50,y:SOUKH}],
-       /* ── « ON DIRA JUSTE B » EST UN TEMPS A PART ──
-          L'enregistrement du client s'arrete a « aucune prononciation » : la
-          fin de la phrase ecrite n'etait jamais dite. On garde sa phrase
-          telle quelle — sa cle porte son enregistrement — et le dernier
-          morceau devient un temps a lui, avec sa propre cle a enregistrer. */
+       /* L'enregistrement du client dit la phrase ENTIERE. Elle etait
+          coupee avant « on dira juste b » par le garde-fou de duree de
+          `pump` — voir la, la duree reelle de l'enregistrement commande
+          maintenant. Rien a decouper ici. */
        scene:[{L:[0],P:1,d:1000},
               {L:[0],P:1,F:[0],bat:1,
                dit:te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.')},
-              {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('On dira juste b.')},
               {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('Répète après moi : b.')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
@@ -16200,8 +16304,16 @@ function _boyLetterCourse(ca,idx,premiere){
   }
   if(avecProlong&&!finDeMot){
     [['َا','aaa','ا'],['ُو','ouou','و'],['ِي','iii','ي']].forEach(function(v,n){
+      /* ── ON NOMME LA LETTRE, ET LE SON QU'ELLE DONNE ──
+         « Avec cette lettre, le son s'etire » ne dit rien : le son s'etire
+         avec les trois, et l'enfant ne sait pas de laquelle on parle. La
+         voix nomme donc la lettre de prolongation et donne la syllabe, comme
+         le font deja les pages de voyelle et de tanwin. Le TEXTE ne bouge
+         pas — c'est la demande du client. */
       sc.push(B.obs(teF('ALLONGEMENT {n}/3',{n:n+1}),A+v[0],A+v[0],teF('Avec {lettre} :<br>ça fait {son} 🎵',{lettre:b(v[2]),son:q(v[1])}),
-        te('Avec cette lettre, le son s\'étire.')));
+        teF('Avec {lettre}, on obtient {son}',
+            {lettre:[te('l\'alif'),te('le waw'),te('le ya')][n],
+             son:(lat+v[1]).toLowerCase()})));
       if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
       /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au
@@ -16370,7 +16482,7 @@ function _boyLetterCourse(ca,idx,premiere){
            f:te('Elle ne s\'attache jamais, ni avant, ni après.')}
         /* La phrase du client, mot pour mot — la meme qu'a la page
            « exception » de ces lettres-la. */
-        : {h:TB('Pour cette lettre, il faut<br>apprendre les <b>4 formes</b>.'),
+        : {h:TB('Pour cette lettre, il faut apprendre les <b>4 formes</b>.'),
            f:te('Pour cette lettre, il faut apprendre les quatre formes.')} ]
     : [ {h:TB('<b>Seule</b> et <b>début</b> : les deux formes à connaître.'),
          f:te('Seule et début : les deux formes à connaître.')},
@@ -18876,7 +18988,6 @@ var ADMIN_SOUNDS = [
   {ar:'Où est le son in ?',label:'Où est le son in ?'},
   {ar:'Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.',label:'Pour finir, tu te rappelles de la lettre ba…'},
   {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.',label:'Parfois tu trouveras ce petit rond au dessu…'},
-  {ar:'On dira juste b.',label:'On dira juste b.'},
   {ar:'Répète après moi : b.',label:'Répète après moi : b.'},
   {ar:'Trace le soukoun.',label:'Trace le soukoun.'},
   /* ── LA PAGE « A RETENIR » ──
