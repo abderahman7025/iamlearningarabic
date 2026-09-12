@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v224
+## OÙ ON EN EST — 12 septembre 2026, production en v225
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,53 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v224), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v225), du plus récent au plus ancien :**
+
+- **LE MONDE DES ANIMAUX, DEUXIÈME PASSE (v225).** Le client, après avoir vu
+  la v224 : « pour le contenu des cours de 3-5 ans, tu n'as rien changé. Il y
+  a toujours les textes, les mêmes cours. » Il avait raison — la v224 n'avait
+  touché qu'au rythme et à l'habillage. Trois décisions de sa part, le
+  12 septembre :
+
+  - **Les âges deviennent 3-5 ans et 7-12 ans** (les six ans ne sont nommés
+    nulle part : c'est ce qu'il a demandé).
+
+  - **Plus de phrase écrite sur les écrans des 3-5.** Un enfant de trois ans
+    ne lit pas, et la phrase prenait la moitié de la page — l'image, tout ce
+    qu'il comprend, s'en trouvait réduite d'autant. `_texteMuetSiImage`
+    retire le titre partout où il y a quelque chose à REGARDER, et le laisse
+    sur les écrans de texte seul (briefing, félicitations, halte), sans quoi
+    il n'y aurait rien du tout. **Le tri se fait APRÈS le montage de la
+    scène** : avant, on ne sait pas ce qu'elle contient. La voix, elle, ne
+    change pas d'un mot. Mesuré : le hublot passe de 174 à 240 px.
+
+  - **Le cours des 3-5 s'arrête aux LETTRES.** « Une fois qu'ils ont appris
+    les lettres, ils pourront passer à l'étape suivante. » Partent : les
+    formes début/milieu/fin, le récapitulatif, le mot à trou, le tri, les
+    tanwīn, le soukoun, les prolongations — l'étape des prolongations sort
+    même de la grille (11 vignettes au lieu de 12, les animaux suivent le
+    RANG et non l'île). Restent : la lettre, son son, ses trois voyelles, son
+    tracé, son mot. **Une seule ligne fait l'essentiel** : `aMontrer=[0]`, et
+    tout ce qui dérive des autres formes tombe de soi — les pages de forme,
+    le mot à trou (plus de place à demander) et le tri (il lui faut deux
+    cibles). Mesuré : la leçon d'une lettre passe de 46 à 20 écrans, celle
+    des voyelles de 39 à 24.
+
+  - **Trois jeux**, sous les animaux, jouables sans savoir lire :
+    **Les paires** (un memory de la MÊME lettre — pas de la lettre contre sa
+    translittération, qu'un enfant de trois ans ne sait pas lire),
+    **Relie les pareilles** (deux colonnes, un trait de couleur), et
+    **Écoute et touche** (le son seul, trois bulles). Ils ne tirent que dans
+    les lettres DÉJÀ RENCONTRÉES (`_lettresConnues`) : proposer une lettre
+    jamais vue ne ferait pas jouer, cela ferait deviner.
+
+  - **Une halte ne coupe plus une paire.** `api.tracer` marque ses scènes
+    d'un `_colle` : on ne s'arrête jamais juste avant un tracé, la leçon
+    qui vient de le préparer et lui font un bloc.
+
+  Le parcours 7-12 est intact, vérifié : 13 îles, 46 écrans par lettre, les
+  20 écrans de formes/tanwīn/soukoun/allongement toujours là, et le texte
+  écrit toujours à sa place.
 
 - **LE MONDE DES ANIMAUX — UNE SECONDE INTERFACE ENFANT (v224).**
   Le client veut deux parcours : après garçon/fille, on choisit **3-7 ans**

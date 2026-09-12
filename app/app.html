@@ -3519,6 +3519,84 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-hublot span{transition:opacity .3s ease}
 @media (prefers-reduced-motion:reduce){.boy-hublot .hub-mot{transition:none}}
 
+
+/* ── LES JEUX DU MONDE DES ANIMAUX (3-5 ans) ──
+   Tout est gros et rond : un doigt d'enfant de trois ans ne vise pas. Aucune
+   consigne écrite — la couleur et le mouvement disent ce qu'il faut faire. */
+.jeu-retour{display:block;margin:18px auto 26px;padding:12px 26px;border-radius:99px;
+  border:3px solid rgba(var(--sk-rgb),.45);background:#fff;color:var(--sk-fonce);
+  font-family:Outfit,sans-serif;font-weight:900;font-size:1rem;cursor:pointer}
+.jeu-retour:active{transform:scale(.95)}
+
+/* Le memory. Une carte se retourne pour de bon : deux faces sur la même
+   boîte, et c'est la boîte qui pivote — un simple changement de texte ne
+   donnerait pas le geste de retourner une carte. */
+.jeu-grille{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  max-width:520px;margin:0 auto;padding:0 2px}
+.jeu-carte{position:relative;aspect-ratio:.82;cursor:pointer;
+  transform-style:preserve-3d;transition:transform .42s cubic-bezier(.34,1.4,.64,1)}
+.jeu-carte.vue,.jeu-carte.prise{transform:rotateY(180deg)}
+.jeu-carte>div{position:absolute;inset:0;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.jc-dos{background:linear-gradient(150deg,#7FA9D4,#4C5566);color:#fff;font-size:2rem;
+  border:3px solid #3C4A5A;box-shadow:0 6px 16px rgba(60,74,90,.3)}
+.jc-face{background:#fff;border:3px solid #F5A524;transform:rotateY(180deg);
+  font-family:'Scheherazade New',serif;font-size:2.8rem;color:#20242e;
+  box-shadow:0 6px 16px rgba(245,165,36,.3)}
+.jeu-carte.prise .jc-face{border-color:#57C84D;background:#f1fbef}
+
+/* Relier : deux colonnes, et les traits par-dessus. */
+.jeu-relier{position:relative;display:flex;justify-content:space-between;
+  gap:60px;max-width:460px;margin:0 auto;padding:0 4px}
+.jr-traits{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.jr-col{display:flex;flex-direction:column;gap:16px;flex:0 0 auto}
+.jr-case{width:78px;height:78px;border-radius:24px;background:#fff;
+  border:3px solid rgba(var(--sk-rgb),.4);display:flex;align-items:center;justify-content:center;
+  font-family:'Scheherazade New',serif;font-size:2.4rem;color:#20242e;cursor:pointer;
+  box-shadow:0 5px 14px rgba(var(--sk-rgb-f),.14);transition:transform .18s,border-color .18s}
+.jr-case.vise{border-color:#F5A524;transform:scale(1.1)}
+.jr-case.prise{border-color:#57C84D;background:#f1fbef;cursor:default}
+.jr-case.rate{border-color:#e53935;animation:jrSecoue .38s}
+@keyframes jrSecoue{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}
+  75%{transform:translateX(7px)}}
+
+/* Écoute et touche. */
+.jeu-hp{display:block;margin:0 auto 22px;width:104px;height:104px;border-radius:50%;
+  border:4px solid rgba(var(--sk-rgb),.45);background:#fff;font-size:2.6rem;cursor:pointer;
+  box-shadow:0 8px 22px rgba(var(--sk-rgb-f),.18)}
+.jeu-hp:active{transform:scale(.94)}
+.jeu-rangee{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.jeu-bulle{width:92px;height:92px;border-radius:46% 54% 52% 48%/50% 46% 54% 50%;
+  background:#fff;border:3px solid rgba(var(--sk-rgb),.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Scheherazade New',serif;font-size:2.6rem;color:#20242e;cursor:pointer;
+  box-shadow:0 6px 16px rgba(var(--sk-rgb-f),.14);transition:transform .18s}
+.jeu-bulle:active{transform:scale(.94)}
+.jeu-bulle.juste{border-color:#57C84D;background:#f1fbef;transform:scale(1.1)}
+.jeu-bulle.rate{border-color:#e53935;animation:jrSecoue .38s}
+.jeu-jauge{height:14px;border-radius:99px;background:rgba(32,36,46,.12);
+  overflow:hidden;max-width:420px;margin:0 auto 22px}
+.jeu-jauge>i{display:block;height:100%;border-radius:99px;width:0;
+  background:linear-gradient(90deg,#57C84D,#F2C230,#EC6EA8);transition:width .4s}
+
+/* La fête de fin. */
+.jeu-fete{text-align:center;margin-top:26px}
+.jeu-fete-em{font-size:3.4rem;line-height:1}
+.jeu-fete-tx{font-family:Outfit,sans-serif;font-weight:900;font-size:1.8rem;
+  color:var(--sk-fonce);margin:4px 0 16px}
+.jeu-rejouer{padding:14px 32px;border-radius:99px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#57C84D,#2FC4D6);color:#fff;
+  font-family:Outfit,sans-serif;font-weight:900;font-size:1.1rem;
+  box-shadow:0 8px 22px rgba(87,200,77,.35)}
+.jeu-rejouer:active{transform:scale(.95)}
+@media (max-width:420px){
+  .jeu-grille{gap:9px}
+  .jr-case{width:66px;height:66px;font-size:2rem}
+  .jeu-relier{gap:32px}
+  .jeu-bulle{width:80px;height:80px;font-size:2.2rem}
+}
+
 /* ── LA PAGE « À RETENIR » ──
    Juste avant les félicitations, ce qu'il faut garder. Les points arrivent un
    par un, au moment où la voix les dit : une liste posée d'un bloc ne se lit
@@ -3541,7 +3619,7 @@ body.fond-prairie #root #tb-title{
 }
 body.age-petit #boy-bg-anim,body.age-petit #girl-bg-anim{display:none !important}
 
-/* ── LES VIGNETTES DU MONDE DES ANIMAUX (3-7 ans) ──
+/* ── LES VIGNETTES DU MONDE DES ANIMAUX (3-5 ans) ──
    Chaque etape porte SA couleur, posee en ligne dans `--tc` : le fond en est
    un voile, la bordure la teinte pleine. Deux par rangee sur un telephone,
    davantage des que la place est la. */
@@ -4218,13 +4296,13 @@ body.fond-espace .tuile-nom{color:#20242e}
   <div class="prof-cards">
     <div class="prof-card age-petit" onclick="chooseAge('petit')">
       <div class="prof-emoji">🦁</div>
-      <div class="prof-info"><div class="prof-name">3 – 7 ans</div>
+      <div class="prof-info"><div class="prof-name">3 – 5 ans</div>
         <div class="prof-desc">Le monde des animaux</div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card age-grand" onclick="chooseAge('grand')">
       <div class="prof-emoji" id="age-grand-emoji">🚀</div>
-      <div class="prof-info"><div class="prof-name">8 – 12 ans</div>
+      <div class="prof-info"><div class="prof-name">7 – 12 ans</div>
         <div class="prof-desc" id="age-grand-desc">Le voyage dans l’espace</div></div>
       <div class="prof-arrow">›</div>
     </div>
@@ -5128,8 +5206,8 @@ const LS=[
 ];
 const ALL_S=[SV,SA,SP,...LS];
 const ALL_LETTERS=LS.flatMap(s=>s.letters);
-/* `age` : 'grand' (8-12 ans, le voyage — fusee ou licorne) ou 'petit'
-   (3-7 ans, le monde des animaux). Le COURS est le meme des deux cotes ;
+/* `age` : 'grand' (7-12 ans, le voyage — fusee ou licorne) ou 'petit'
+   (3-5 ans, le monde des animaux). Le COURS est le meme des deux cotes ;
    seuls le parcours et l'habillage changent. 'grand' par defaut : c'est ce
    qu'ont deja les comptes ouverts avant ce choix, rien ne bouge pour eux. */
 const st={lang:'fr',profile:'adult',age:'grand',soundOn:true,scores:{},user:null,curLesson:null,quiz:null,backHistory:[],_curPage:null};
@@ -5851,7 +5929,7 @@ function chooseProfile(p){
 
 
 /* ── LE PARCOURS, CHOISI PAR L'AGE ──
-   'petit' — 3-7 ans — ouvre le monde des animaux : une grille de vignettes
+   'petit' — 3-5 ans — ouvre le monde des animaux : une grille de vignettes
    colorees (`renderTuilesAnimaux`) au lieu du chemin qui serpente. 'grand'
    garde le voyage tel qu'il est. Le COURS ne change pas : ce sont les memes
    lecons, le meme moteur de scenes, les memes ecrans. */
@@ -8591,7 +8669,7 @@ function _ilesDefs(){
   ];
 }
 
-/* ── LA CARTE DES 3-7 ANS : UNE GRILLE DE VIGNETTES ──
+/* ── LA CARTE DES 3-5 ANS : UNE GRILLE DE VIGNETTES ──
    Pas de chemin qui serpente, pas de monture qui vole : douze cartes
    carrees, une par etape, chacune de SA couleur — le client ne veut pas
    d'un theme d'une seule teinte. Tout tient a l'ecran d'un coup, et
@@ -8631,6 +8709,14 @@ function renderTuilesAnimaux(ca){
   wrap.appendChild(gp);
 
   var defs=_ilesDefs();
+  /* Les prolongations sortent du parcours des 3-5 ans : elles viendront a
+     l'etape suivante, quand l'enfant saura ses lettres. L'etape retiree, les
+     animaux se decalent — ils suivent le RANG dans la grille, pas l'ile. */
+  defs=defs.filter(function(isle){
+    return !isle.sids.some(function(sid){
+      var x=ALL_S.filter(function(y){return y.id===sid;})[0];
+      return x&&x.type==='prolong';});
+  });
   var noms=_HAB.etapes||[],imgs=_HAB.images||[],cols=_HAB.couleurs||[];
   var grille=document.createElement('div');
   grille.className='tuiles';
@@ -8673,11 +8759,282 @@ function renderTuilesAnimaux(ca){
     precedenteFinie=finie;
   });
   wrap.appendChild(grille);
+
+  /* ── ON JOUE ──
+     « Ils doivent apprendre en s'amusant. » Les trois jeux sont sous les
+     animaux, dans une vignette a eux : l'enfant y va quand il veut, sans
+     avoir a finir quoi que ce soit. */
+  var jt=document.createElement('div');
+  jt.className='sess-map-title';jt.style.marginTop='10px';
+  jt.textContent='🎲 '+te('On joue !');
+  wrap.appendChild(jt);
+  var gj=document.createElement('div');gj.className='tuiles';
+  [['paires','#F5A524','/images/animal-lion.svg',te('Les paires')],
+   ['relier','#57C84D','/images/animal-grenouille.svg',te('Relie les pareilles')],
+   ['ecoute','#9B7EDE','/images/animal-hibou.svg',te('Écoute et touche')]
+  ].forEach(function(j){
+    var t=document.createElement('div');t.className='tuile';
+    t.style.setProperty('--tc',j[1]);
+    var im=document.createElement('img');im.className='tuile-img';im.src=j[2];im.alt='';
+    var nm=document.createElement('div');nm.className='tuile-nom';nm.textContent=j[3];
+    t.appendChild(im);t.appendChild(nm);
+    t.onclick=function(){
+      if(j[0]==='paires')_jeuPaires(ca);
+      else if(j[0]==='relier')_jeuRelier(ca);
+      else _jeuEcoute(ca);
+    };
+    gj.appendChild(t);
+  });
+  wrap.appendChild(gj);
   ca.appendChild(wrap);
 }
 
+
+/* ══════════════════════════════════════════════════════════════════
+   LES JEUX DU MONDE DES ANIMAUX — 3 à 5 ans
+   « Ils doivent apprendre en s'amusant » : trois jeux, tous jouables
+   sans savoir lire. Pas une consigne écrite, pas un mot de français à
+   comprendre — une image, un son, et le doigt.
+
+   Ils ne travaillent que sur les lettres DÉJÀ RENCONTRÉES : proposer
+   une lettre jamais vue ne ferait pas jouer, cela ferait deviner.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Les lettres que l'enfant a déjà travaillées, dans l'ordre du parcours.
+   Au tout début il n'y en a aucune : on prend les six premières, sinon il
+   n'y aurait pas de jeu du tout le premier jour. */
+function _lettresConnues(){
+  var vues=[],dedans={};
+  ALL_S.forEach(function(s){
+    if(!s.letters)return;
+    var f=[];try{f=JSON.parse(localStorage.getItem('boy_lettres_'+s.id)||'[]');}catch(e){}
+    f.forEach(function(i){
+      var L=CHILD_LETTERS[i];
+      if(L&&!dedans[L.ar]){dedans[L.ar]=1;vues.push(L);}
+    });
+  });
+  if(vues.length<4)vues=CHILD_LETTERS.slice(0,6);
+  return vues;
+}
+function _melangeTab(t){return t.slice().sort(function(){return Math.random()-0.5;});}
+/* Le son d'une lettre : l'enregistrement du client s'il existe, la synthèse
+   sinon — c'est `speakText` qui choisit. */
+function _ditLettre(L){try{stopSpeech();}catch(e){}
+  try{speakText(L.ar,_voixEnfant(),null);}catch(e){}}
+
+/* Le cadre commun des trois jeux : le fond de la prairie, un titre en
+   images, et le bouton du retour. Rien d'autre — l'écran doit rester nu. */
+function _cadreJeu(ca,emoji,titre,retour){
+  ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='64px';
+  st._curPage='jeux-animaux';
+  _HAB=_habDuProfil();_fondEnfant(true);_decorMonde(ca,false);
+  var stb=document.getElementById('topbar');
+  if(stb){stb.style.maxHeight='200px';stb.style.opacity='1';stb.style.transform='translateY(0)';stb.style.pointerEvents='';}
+  var w=document.createElement('div');w.className='sess-map-wrap';
+  var t=document.createElement('div');t.className='sess-map-title';
+  t.textContent=emoji+' '+titre;w.appendChild(t);
+  var corps=document.createElement('div');w.appendChild(corps);
+  var b=document.createElement('button');
+  b.className='jeu-retour';b.textContent=te('‹ Retour');
+  b.onclick=retour||function(){renderJeuxAnimaux(ca);};
+  w.appendChild(b);
+  ca.appendChild(w);
+  return corps;
+}
+
+/* ── LE CHOIX DU JEU ─────────────────────────────────────────────── */
+function renderJeuxAnimaux(ca){
+  var corps=_cadreJeu(ca,'🎲',te('On joue !'),function(){renderSessionsMap(ca);});
+  var jeux=[
+    {cle:'paires', coul:'#F5A524', img:'/images/animal-lion.svg',    nom:te('Les paires')},
+    {cle:'relier', coul:'#57C84D', img:'/images/animal-grenouille.svg',nom:te('Relie les pareilles')},
+    {cle:'ecoute', coul:'#9B7EDE', img:'/images/animal-hibou.svg',   nom:te('Écoute et touche')}
+  ];
+  var g=document.createElement('div');g.className='tuiles';
+  jeux.forEach(function(j){
+    var t=document.createElement('div');t.className='tuile';
+    t.style.setProperty('--tc',j.coul);
+    var im=document.createElement('img');im.className='tuile-img';im.src=j.img;im.alt='';
+    var nm=document.createElement('div');nm.className='tuile-nom';nm.textContent=j.nom;
+    t.appendChild(im);t.appendChild(nm);
+    t.onclick=function(){
+      if(j.cle==='paires')_jeuPaires(ca);
+      else if(j.cle==='relier')_jeuRelier(ca);
+      else _jeuEcoute(ca);
+    };
+    g.appendChild(t);
+  });
+  corps.appendChild(g);
+}
+
+/* La fête de fin, la même pour les trois : des confettis, un mot, et on
+   recommence ou on s'en va. */
+function _finDeJeu(ca,corps,rejouer){
+  if(typeof launchConfetti==='function')
+    try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+  try{speakText(te('Bravo !'),_voixEnfant(),null);}catch(e){}
+  var f=document.createElement('div');f.className='jeu-fete';
+  f.innerHTML='<div class="jeu-fete-em">🎉</div><div class="jeu-fete-tx">'+te('Bravo !')+'</div>';
+  var b=document.createElement('button');b.className='jeu-rejouer';
+  b.textContent=te('↺ Encore !');b.onclick=rejouer;
+  f.appendChild(b);
+  corps.appendChild(f);
+}
+
+/* ── 1. LES PAIRES ────────────────────────────────────────────────
+   Un memory de HUIT cartes : quatre lettres, chacune deux fois. On ne
+   compare pas une lettre à sa translittération — un enfant de trois ans ne
+   lit pas l'alphabet latin : il retrouve la MÊME lettre, et il l'entend
+   nommée chaque fois qu'il la retourne. */
+function _jeuPaires(ca){
+  var corps=_cadreJeu(ca,'🃏',te('Les paires'));
+  var choix=_melangeTab(_lettresConnues()).slice(0,4);
+  var cartes=_melangeTab(choix.concat(choix));
+  var g=document.createElement('div');g.className='jeu-grille';
+  var ouvertes=[],trouvees=0,bloque=false;
+  cartes.forEach(function(L){
+    var c=document.createElement('div');c.className='jeu-carte';
+    c.innerHTML='<div class="jc-dos">🐾</div><div class="jc-face">'+L.ar+'</div>';
+    c.onclick=function(){
+      if(bloque||c.classList.contains('vue')||c.classList.contains('prise'))return;
+      c.classList.add('vue');_ditLettre(L);
+      ouvertes.push({el:c,L:L});
+      if(ouvertes.length<2)return;
+      bloque=true;
+      var a=ouvertes[0],b=ouvertes[1];ouvertes=[];
+      if(a.L.ar===b.L.ar){
+        setTimeout(function(){
+          a.el.classList.add('prise');b.el.classList.add('prise');
+          bloque=false;trouvees++;
+          if(typeof playBravo==='function')playBravo();
+          if(trouvees===choix.length)_finDeJeu(ca,corps,function(){_jeuPaires(ca);});
+        },420);
+      }else{
+        setTimeout(function(){
+          a.el.classList.remove('vue');b.el.classList.remove('vue');bloque=false;
+        },900);
+      }
+    };
+    g.appendChild(c);
+  });
+  corps.appendChild(g);
+}
+
+/* ── 2. RELIE LES PAREILLES ───────────────────────────────────────
+   Quatre lettres à gauche, les mêmes à droite dans un autre ordre. On
+   touche l'une, puis l'autre : un trait de couleur les relie. Le trait est
+   dessiné dans un SVG posé PAR-DESSUS la grille, aux coordonnées mesurées —
+   les deux colonnes bougent avec la largeur de l'écran, une position écrite
+   en dur tomberait à côté dès qu'on tourne l'appareil. */
+function _jeuRelier(ca){
+  var corps=_cadreJeu(ca,'🔗',te('Relie les pareilles'));
+  var choix=_melangeTab(_lettresConnues()).slice(0,4);
+  var gauche=_melangeTab(choix),droite=_melangeTab(choix);
+  var COUL=['#F5A524','#57C84D','#9B7EDE','#2FC4D6'];
+  var boite=document.createElement('div');boite.className='jeu-relier';
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','jr-traits');boite.appendChild(svg);
+  var cg=document.createElement('div');cg.className='jr-col';
+  var cd=document.createElement('div');cd.className='jr-col';
+  boite.appendChild(cg);boite.appendChild(cd);
+  var sel=null,faites=0;
+  function pastille(L,col){
+    var d=document.createElement('div');d.className='jr-case';d.textContent=L.ar;
+    d._L=L;col.appendChild(d);return d;
+  }
+  var elg=gauche.map(function(L){return pastille(L,cg);});
+  var eld=droite.map(function(L){return pastille(L,cd);});
+  function trait(a,b,coul){
+    var rb=boite.getBoundingClientRect();
+    var ech=boite.offsetWidth?(rb.width/boite.offsetWidth):1;
+    if(!(ech>0.05&&ech<20))ech=1;
+    function pt(el,cote){
+      var r=el.getBoundingClientRect();
+      return {x:((cote==='d'?r.right:r.left)-rb.left)/ech,
+              y:(r.top+r.height/2-rb.top)/ech};
+    }
+    var p1=pt(a,'d'),p2=pt(b,'g');
+    var l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',p1.x);l.setAttribute('y1',p1.y);
+    l.setAttribute('x2',p2.x);l.setAttribute('y2',p2.y);
+    l.setAttribute('stroke',coul);l.setAttribute('stroke-width','9');
+    l.setAttribute('stroke-linecap','round');
+    svg.appendChild(l);
+  }
+  elg.forEach(function(d){
+    d.onclick=function(){
+      if(d.classList.contains('prise'))return;
+      elg.forEach(function(x){x.classList.remove('vise');});
+      d.classList.add('vise');sel=d;_ditLettre(d._L);
+    };
+  });
+  eld.forEach(function(d){
+    d.onclick=function(){
+      if(d.classList.contains('prise')||!sel)return;
+      if(d._L.ar===sel._L.ar){
+        var c=COUL[faites%COUL.length];
+        sel.classList.remove('vise');
+        sel.classList.add('prise');d.classList.add('prise');
+        trait(sel,d,c);sel=null;faites++;
+        if(typeof playBravo==='function')playBravo();
+        if(faites===choix.length)_finDeJeu(ca,corps,function(){_jeuRelier(ca);});
+      }else{
+        d.classList.add('rate');
+        if(typeof playError==='function')playError();
+        setTimeout(function(){d.classList.remove('rate');},420);
+      }
+    };
+  });
+  corps.appendChild(boite);
+}
+
+/* ── 3. ÉCOUTE ET TOUCHE ──────────────────────────────────────────
+   Le son, et rien d'autre : trois lettres à l'écran, on entend l'une des
+   trois. C'est le seul exercice où la réponse ne se voit nulle part. Six
+   manches, et le haut-parleur rejoue autant de fois qu'il faut. */
+function _jeuEcoute(ca){
+  var corps=_cadreJeu(ca,'👂',te('Écoute et touche'));
+  var toutes=_lettresConnues();
+  var manches=Math.min(6,toutes.length);
+  var suite=_melangeTab(toutes).slice(0,manches);
+  var n=0;
+  var jauge=document.createElement('div');jauge.className='jeu-jauge';
+  jauge.innerHTML='<i></i>';corps.appendChild(jauge);
+  var zone=document.createElement('div');corps.appendChild(zone);
+  function manche(){
+    if(n>=suite.length){zone.innerHTML='';_finDeJeu(ca,corps,function(){_jeuEcoute(ca);});return;}
+    jauge.firstChild.style.width=Math.round(n/suite.length*100)+'%';
+    var cible=suite[n];
+    var leurres=_melangeTab(toutes.filter(function(x){return x.ar!==cible.ar;})).slice(0,2);
+    var props=_melangeTab([cible].concat(leurres));
+    zone.innerHTML='';
+    var hp=document.createElement('button');hp.className='jeu-hp';hp.textContent='🔊';
+    hp.onclick=function(){_ditLettre(cible);};
+    zone.appendChild(hp);
+    var g=document.createElement('div');g.className='jeu-rangee';
+    props.forEach(function(L){
+      var d=document.createElement('div');d.className='jeu-bulle';d.textContent=L.ar;
+      d.onclick=function(){
+        if(L.ar===cible.ar){
+          d.classList.add('juste');
+          if(typeof playBravo==='function')playBravo();
+          n++;setTimeout(manche,700);
+        }else{
+          d.classList.add('rate');
+          if(typeof playError==='function')playError();
+          setTimeout(function(){d.classList.remove('rate');},420);
+        }
+      };
+      g.appendChild(d);
+    });
+    zone.appendChild(g);
+    setTimeout(function(){_ditLettre(cible);},500);
+  }
+  manche();
+}
+
 function renderSessionsMap(ca){
-  /* Les 3-7 ans n'ont pas de chemin qui serpente : le detour se prend ICI,
+  /* Les 3-5 ans n'ont pas de chemin qui serpente : le detour se prend ICI,
      une fois, plutot qu'aux douze endroits qui rappellent la carte. */
   if(st&&st.age==='petit'&&(st.profile==='boy'||st.profile==='girl'))
     return renderTuilesAnimaux(ca);
@@ -10102,7 +10459,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v224';
+var _VERSION_REPLI='v225';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -12847,7 +13204,7 @@ function _habTraduit(h){
 }
 function _habDuProfil(){
   var base=(st&&st.profile==='girl')?_HABILLAGES.licorne:_HABILLAGES.garcon;
-  /* ── LES 3-7 ANS : LE MEME HABILLAGE, REPEINT ──
+  /* ── LES 3-5 ANS : LE MEME HABILLAGE, REPEINT ──
      On ne fabrique pas un troisieme univers complet — la fusee et la licorne
      servent toujours, l'enfant a choisi l'une des deux au premier ecran. On
      ne remplace que ce qui regarde le PARCOURS : les noms d'etapes, les
@@ -13557,6 +13914,23 @@ function _boyScene(ca,reprise){
     var ou=_avance||suivant;
     _apres=setTimeout(function(){_apres=null;ou();},1100);
   }
+  /* ── LES 3-5 ANS NE LISENT PAS ──
+     Le client : « il y a toujours les textes ». Un enfant de trois ans ne lit
+     pas la phrase ecrite, et elle prend la moitie de la page : l'image — tout
+     ce qu'il comprend — s'en trouve reduite d'autant, et le cadre entier est
+     ramene a l'echelle pour la faire tenir. On la RETIRE donc partout ou il y
+     a quelque chose a REGARDER. La voix ne change pas d'un mot : elle dit
+     exactement ce qu'elle disait.
+     Les ecrans de TEXTE SEUL la gardent — briefing, felicitations, halte : sans
+     elle il n'y aurait rien du tout a l'ecran. C'est pourquoi le tri se fait
+     ICI, une fois la scene montee : avant, on ne sait pas ce qu'elle contient. */
+  function _texteMuetSiImage(){
+    if(!(st&&st.age==='petit'))return;
+    var p=wrap.querySelector('.boy-panel');if(!p)return;
+    var t=p.querySelector('.boy-titre');if(!t)return;
+    if(!p.querySelector('.boy-scene,.boy-hublot,canvas,.rec-grille,.boy-cible,.boy-piste,.trou-mot'))return;
+    t.parentNode.removeChild(t);
+  }
   function ajouteRetour(){
     if(!_dernierPanneau)return;
     var p=_dernierPanneau;
@@ -14265,7 +14639,8 @@ function _boyScene(ca,reprise){
        voix qui ne viendra jamais. */
     _sceneParle=0;_sceneFete=0;
     arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
-    N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);ajouteRetour();
+    N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);
+    _texteMuetSiImage();ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
        la largeur de sa colonne qui la commande. On la reprend un peu plus
@@ -14386,6 +14761,9 @@ function _boyScene(ca,reprise){
          on coupe la ou l'on est. */
       var loin=(depuis>=PAS_MAX);
       var bon=(depuis>=PAS_SEANCE&&sc&&sc._chapitre);
+      /* Un trace se colle a la lecon qui vient de le preparer : on ne coupe
+         jamais juste devant. */
+      if(sc&&sc._colle){out.push(sc);depuis++;return;}
       if((bon||loin)&&n>0&&n<liste.length-3){
         out.push(api.halte());depuis=0;
       }
@@ -14402,7 +14780,7 @@ function _boyScene(ca,reprise){
     /* ── UN ECRAN DE TEXTE SEUL OUVRE UN CHAPITRE ──
        C'est la seule chose qu'on sache dire d'une scene de l'exterieur : ses
        fabriques rendent des fermetures, on ne peut pas les interroger. Les
-       haltes des 3-7 ans (voir `_poseLesHaltes`) tombent sur cette marque —
+       haltes des 3-5 ans (voir `_poseLesHaltes`) tombent sur cette marque —
        jamais entre une lecon et le trace qui la suit. */
     var f=function(){
       /* Une page de felicitations merite la fete : les memes confettis que
@@ -14417,7 +14795,7 @@ function _boyScene(ca,reprise){
     f._chapitre=true;
     return f;
   };
-  /* ── LA HALTE DES 3-7 ANS ──
+  /* ── LA HALTE DES 3-5 ANS ──
      Le programme est le meme que celui des grands — le client y tient — mais
      quarante ecrans d'affilee sont trop pour un enfant de quatre ans. Toutes
      les dix scenes environ, on lui demande s'il veut continuer. S'il
@@ -14747,7 +15125,10 @@ function _boyScene(ca,reprise){
   };
   /* Tracé : l'enfant écrit. Obligatoire pour chaque forme. */
   api.tracer=function(etape,glyph,html,fr,repetitions,nomsCases,deTete){
-    return function(){
+    /* ── UN TRACE NE SE DETACHE PAS DE SA LECON ──
+       On vient de montrer la forme, on demande de l'ecrire : une halte entre
+       les deux couperait la paire en son milieu (voir `_poseLesHaltes`). */
+    var f=function(){
       /* Un canvas attend que l'enfant ecrive : il ne s'enchaine pas. */
       /* La consigne parlee ne sert QU'UNE FOIS par lecon, sur le premier
          canvas — voir `_ecranDuTrace`. Et ce n'est plus la phrase de la page
@@ -14910,6 +15291,8 @@ function _boyScene(ca,reprise){
       var btn=veilleuse(bouton(p,te('Suite ›'),suivant));
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
+    f._colle=true;
+    return f;
   };
   /* Contrôle : QCM sur des cibles */
   api.controle=function(etape,html,fr,options,cible){
@@ -15884,6 +16267,9 @@ function _boyVowelCourse(ca){
     deux.classList.remove('cache');
     grossit(deux);grossit(un);
   }
+  /* Chez les 3-5 ans, le cours s'arrete aux TROIS VOYELLES : le doublement
+     (les tanwin) et le soukoun sont reportes a l'etape suivante. */
+  var petit=!!(st&&st.age==='petit');
   var B=_boyScene(ca,{cours:'voyelles',session:_boySession&&_boySession.id}),b=B.bleu;
   var F=_vw('َ'),K=_vw('ِ'),D=_vw('ُ');
   var TF=_vw('ً'),TK=_vw('ٍ'),TD=_vw('ٌ');
@@ -16075,6 +16461,9 @@ function _boyVowelCourse(ca){
       TB('Tu es '+UNE+' <b>'+CHAMP+'</b> !'),
       te('Tu es '+UNE+' '+CHAMP+' !'),null,true),
 
+    /* Tout ce qui suit — le doublement et le soukoun — saute chez les
+       petits : ils s'arretent aux trois voyelles. */
+    (petit?[]:[
     B.illustre(te('LE SECRET'),
       TB('Comme tu connais très bien<br>les 3 voyelles,<br>on peut <b>passer à la suite</b> :'),
       te('Comme tu connais très bien les trois voyelles, on peut passer à la suite.'),
@@ -16170,7 +16559,8 @@ function _boyVowelCourse(ca){
               {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('Répète après moi : b.')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
-      TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
+      TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.'))
+    ]),
 
     B.resume([
       {h:TB('Il y a <b>3 voyelles</b> :'),
@@ -16180,7 +16570,7 @@ function _boyVowelCourse(ca){
          {dit:te('a'), fait:function(el){grossit(el._sg[0].un);}},
          {dit:te('i'), fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('ou'),fait:function(el){grossit(el._sg[2].un);}}
-       ]},
+       ]}].concat(petit?[]:[
       /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
          Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
          doit faire une vraie phrase avant de derouler « a devient an ». */
@@ -16204,7 +16594,7 @@ function _boyVowelCourse(ca){
          {dit:te('Lorsqu\'il y a un soukoun sur une lettre, on ne prononce que le son de la lettre.'),
           fait:function(el){grossit(el._sg[0].un);}}
        ]}
-    ]),
+    ])),
 
     function(api){_boyValideSession(_boySession&&_boySession.id);
       B.mission(TB('Tu <b>maîtrises</b><br>les voyelles !'),
@@ -16335,6 +16725,13 @@ function _boyLetterCourse(ca,idx,premiere){
   /* ع et غ sont les exceptions annoncées : leurs formes ne se déduisent pas,
      le tableau de déduction n'a donc rien à y faire. */
   var sansDeduction=finDeMot||formeUnique||L.ar==='ع'||L.ar==='غ';
+  /* ── LE PARCOURS DES 3-5 ANS S'ARRETE AUX LETTRES ──
+     « On commence comme ca avec les petits enfants, et une fois qu'ils ont
+     appris les lettres, ils pourront passer a l'etape suivante. » Restent
+     donc : la lettre, son son, ses trois voyelles, son mot. Partent : les
+     formes debut/milieu/fin et tout ce qui en decoule (recapitulatif, mot a
+     trou, tri), les tanwin, le soukoun, les prolongations. */
+  var petit=!!(st&&st.age==='petit');
   var B=_boyScene(ca,{cours:'lettre',arg:idx,premiere:premiere,session:_boySession&&_boySession.id}),b=B.bleu;
   function q(s){return b('« '+(lat+s).toLowerCase()+' »');}
   var A=L.ar,S=A+'ْ';
@@ -16400,7 +16797,9 @@ function _boyLetterCourse(ca,idx,premiere){
       teF('On ne dit pas {faux}, mais {juste}, car c\'est une lettre grave.',{faux:son,juste:juste}));
   }
   var latMin=(lat||'').toLowerCase();
-  if(finDeMot){
+  /* L'accrochage est une regle de FORME : elle ne concerne pas les petits. */
+  if(petit){/* rien */}
+  else if(finDeMot){
     /* Le tā marbūṭa n'a pas d'histoire d'accrochage à raconter : ce qui
        compte pour lui, c'est sa place. */
     sc.push(B.brief(te('ÉTAPE · PLACE'),TB('Elle se trouvera <b>toujours</b><br>à la fin du mot 🔚'),
@@ -16465,6 +16864,10 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Le tā marbūṭa ne s'écrit qu'en fin de mot, la hamza ne s'écrit que d'une
      seule façon : on ne montre que les formes qui existent vraiment. */
   var aMontrer=formeUnique?[0]:(finDeMot?[0,3]:[0,1,2,3]);
+  /* UNE SEULE FORME chez les petits, et tout ce qui derive des autres tombe
+     de lui-meme : les pages de forme, le mot a trou (il n'a plus de place a
+     demander) et le tri (il lui faut deux cibles). */
+  if(petit)aMontrer=[0];
   var total=aMontrer.length;
   /* Les tracés à plusieurs cases ne montrent que ces formes-là, et portent
      leurs vrais noms : « isolée » et « fin » pour le tā marbūṭa, pas
@@ -16523,7 +16926,7 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Le tiret n'est pas écrit tel quel dans le titre : posé seul il ressemble
      à un trait droit, alors que c'est le trait de liaison arabe. C'est
      l'animation du tableau qui le montre, collé à la lettre. */
-  if(!sansDeduction){
+  if(!sansDeduction&&!petit){
     /* Les deux lignes suivent l'ordre des RANGÉES du tableau : isolée et fin
        en haut, début et milieu en bas. « Fin = isolée + — » se lit donc en
        premier, en face de sa rangée, et « Milieu = début + — » en dessous,
@@ -16532,7 +16935,7 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(B.recap(te('ÉTAPE · RÉCAPITULATIF'),
       [formes[0].form,formes[1].form,formes[2].form,formes[3].form],_lie,_bloc));
   }
-  if(premiereLettre&&!sansDeduction){
+  if(premiereLettre&&!sansDeduction&&!petit){
     /* La page « il faut connaitre par coeur seule et debut » est retiree a la
        demande du client : le recapitulatif qui precede le montre deja, et un
        enfant n'a pas besoin qu'on lui dise ce qu'il vient de voir. */
@@ -16542,11 +16945,11 @@ function _boyLetterCourse(ca,idx,premiere){
   /* On ne nomme pas les trois exceptions ici : les citer à un enfant qui ne
      les a pas encore vues n'apprend rien et charge l'écran. Chacune se
      présente d'elle-même le jour où elle arrive (voir juste en dessous). */
-  if(A==='ع'||A==='غ'){
+  if((A==='ع'||A==='غ')&&!petit){
     sc.push(B.brief(te('ÉTAPE · EXCEPTION'),TB('Pour cette lettre,<br>il faut apprendre<br>les <b>4 formes</b> ! ⚠️'),
       te('Pour cette lettre, il faut apprendre les quatre formes.')));
   }
-  if(A==='ء'){
+  if(A==='ء'&&!petit){
     ['أ','ؤ','ئ'].forEach(function(g,n){
       sc.push(B.obs('SUPPORT '+(n+1)+'/3',g,g+'َ',teF('Parfois, tu verras<br>la hamzah sur le {lettre} 🪑',{lettre:b(['ا','و','ي'][n])}),
         teF('Parfois, tu verras la hamzah sur le {lettre}.',{lettre:['alif','waw','ya'][n]})));
@@ -16603,7 +17006,8 @@ function _boyLetterCourse(ca,idx,premiere){
       sc.push(B.controle(teF('CONTRÔLE {n}',{n:n+1}),teF('Où est {son} ?',{son:q(o[2])}),te('Où est ce son ?'),
         [[cible('َ'),A+'َ'],[cible('ِ'),A+'ِ'],[cible('ُ'),A+'ُ']],cible(o[1])));
     });
-  /* Tanwīn */
+  /* Tanwīn — pas chez les petits : les trois voyelles simples suffisent. */
+  if(!petit){
   /* Le tanwīn ne se pose QUE sur la dernière lettre d'un mot : on ne fait
      donc tracer que l'isolée et la forme attachée de fin. */
   var tanwFormes=aMontrer.filter(function(n){return n===0||n===3;});
@@ -16621,8 +17025,10 @@ function _boyLetterCourse(ca,idx,premiere){
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
       teF('Trace ce tanwîn dans {ou}.',{ou:tanwCombien}),null,tanwNoms));
   });
-  /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas. */
-  if(!finDeMot){
+  }
+  /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas — ni chez les
+     petits, qui n'en sont pas la. */
+  if(!finDeMot&&!petit){
     /* L'alif et la hamzah n'ont pas de son propre : avec un soukoun, on ne
        prononce rien du tout. */
     var muette=_muette;
@@ -16644,7 +17050,7 @@ function _boyLetterCourse(ca,idx,premiere){
         null,['début','milieu']));
     }
   }
-  if(avecProlong&&!finDeMot){
+  if(avecProlong&&!finDeMot&&!petit){
     [['َا','aaa','ا'],['ُو','ouou','و'],['ِي','iii','ي']].forEach(function(v,n){
       /* ── ON NOMME LA LETTRE, ET LE SON QU'ELLE DONNE ──
          « Avec cette lettre, le son s'etire » ne dit rien : le son s'etire
@@ -16815,7 +17221,9 @@ function _boyLetterCourse(ca,idx,premiere){
   /* ── CE QU'IL FAUT RETENIR DE CETTE LETTRE ──
      La regle des formes, celle que le recapitulatif a montree — sauf pour les
      quatre lettres qui n'y obeissent pas : chacune a son propre point. */
-  sc.push(B.resume(sansDeduction
+  /* Les points a retenir parlent tous des FORMES : chez les petits, il n'y a
+     rien a redire, et une page de texte pur ne leur apprendrait rien. */
+  if(!petit)sc.push(B.resume(sansDeduction
     ? [ (A==='ة')
         ? {h:TB('Elle est <b>toujours</b> à la fin du mot.'),
            f:te('Elle est toujours à la fin du mot.')}
