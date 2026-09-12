@@ -31,13 +31,55 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 8 septembre 2026, production en v221
+## OÙ ON EN EST — 12 septembre 2026, production en v221
 
-Le chantier du moment : **illustrer les leçons enfants**. Le client : « chaque
-règle, chaque chose doit être illustrée » — une image AVEC le texte, pas à la
-place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
+Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
+chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
+Parti de la leçon des voyelles, il a gagné les trente leçons de lettres.
 
-**Fait et en ligne (v187 → v221) :**
+Depuis v205, neuf passes de relecture avec lui, écran par écran. Elles sont
+détaillées plus bas dans l'ordre inverse (la plus récente d'abord) ; voici
+d'abord ce qui reste ouvert.
+
+---
+
+### CE QUI L'ATTEND, LUI
+
+**Quinze phrases à enregistrer au studio.** Elles sont toutes dans
+`ADMIN_SOUNDS` — donc déjà présentes dans le studio de
+l'application — mais sans enregistrement : c'est la synthèse du navigateur
+qui les dit en attendant, et elle les dit mal.
+
+| Où | Phrase |
+|---|---|
+| tracé, 1er canevas de chaque leçon | « À toi de tracer. » |
+| doublement, voyelles | « Ici on a bou. » · « Ici on a ba. » · « Ici on a bi. » |
+| doublement, voyelles | « Avec une deuxième voyelle, ça donne boun / ban / bin. » |
+| doublement, voyelles | « Répète après moi : boun / ban / bin. » |
+| « à retenir » des voyelles | « devient » · « an » · « in » · « oun » |
+| avant le secret des tanwīns | « Comme tu connais très bien les trois voyelles, on peut passer à la suite. » |
+
+Cette dernière REMPLACE « … je vais te dévoiler un secret. », dont
+l'enregistrement ne sert plus.
+
+**Les textes de la page « À RETENIR » sont à relire avec lui.** Ils sont
+repris de ses propres phrases de cours, jamais inventés, mais c'est lui qui
+les arrête. Trois points pour les voyelles, trois pour les prolongations,
+trois par lettre (un seul pour ع غ ء ة).
+
+### CE QUI RESTE À FAIRE, CÔTÉ CODE
+
+- ses avis clients à mettre en page ;
+- les balises GTM, à lui expliquer une par une ; le jour où il déplace la
+  conversion Ads dans GTM, vider `CONVERSION` dans `/tag.js` **le même jour** ;
+- deux défauts d'accolades PRÉEXISTANTS dans la feuille de style (une `}` en
+  trop, un bloc non fermé) : signalés, pas corrigés à l'aveugle. Une `}`
+  orpheline fait jeter au navigateur la règle SUIVANTE — c'est ce qui avait
+  rendu `.boy-perso` sans style pendant deux versions.
+
+---
+
+**Fait et en ligne (v187 → v221), du plus récent au plus ancien :**
 
 - **LE FONDU DU MOT ET LE GLISSEMENT DE LA LETTRE, ENSEMBLE (v221).** Ils
   partent au meme instant et finissent ensemble : 900 ms tous les deux. Le
@@ -134,10 +176,6 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     en deux morceaux — « au milieu, la lettre est la même », puis « qu’au
     début » — pour que le mot commande, et non la phrase.
 
-  **À enregistrer au studio** : « Au milieu, la lettre est la même »,
-  « qu’au début. », « À la fin, la lettre est la même », « que quand elle est
-  seule. », « C’est parti ! », « Comme tu connais très bien les trois
-  voyelles, on peut passer à la suite. »
 
 - **LA SIXIÈME PASSE DU CLIENT (v214).**
 
@@ -158,7 +196,7 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     `vise` accepte plusieurs cases : la phrase les nomme toutes les deux.
 
   - **« je vais te dévoiler un secret » devient « on peut passer à la
-    suite ».** À réenregistrer.
+    suite ».** À réenregistrer — voir la liste en tête.
 
   - **« À retenir » : des rangées plus courtes.** C'est la hauteur de la piste
     qui commandait celle de la page, et la page trop haute était ramenée à
@@ -333,8 +371,6 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     fille juste avant de se poser. Amplitude nulle quand le vol n'est pas
     « aligné ».
 
-  **À enregistrer au studio, en plus** : « devient », « an », « in »,
-  « oun ».
 
 - **LA RELECTURE DU CLIENT, POINT PAR POINT (v207).**
 
@@ -380,8 +416,6 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     point. **Textes à relire avec le client** : ils sont repris de ses
     propres phrases de cours, mais c'est lui qui les arrête.
 
-  **À enregistrer au studio, en plus** : « Ici on a bou / ba / bi. » et
-  « Avec une deuxième voyelle, ça donne boun / ban / bin. »
 
 - **CE QUI SE PASSE AU BOUT D'UNE QUESTION, ET AU BOUT D'UNE LEÇON (v206).**
 
@@ -469,8 +503,6 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
     بَ ? » — il n'y avait qu'à le retrouver des yeux. Elle demande « Où est
     ce son ? » et le FAIT ENTENDRE, avec le bouton pour le rejouer.
 
-  **À enregistrer au studio** : « À toi de tracer. », « Répète après moi :
-  ban. », « … boun. », « … bin. » — ajoutées à `ADMIN_SOUNDS`.
 
 - **LE RÉCAPITULATIF remplace la déduction (v204).** Quatre MOTS au lieu de
   quatre formes nues : seule en haut à droite, début en haut à gauche, milieu
@@ -580,21 +612,12 @@ place. Commencé par **la leçon des voyelles**, qui sert de patron aux autres.
 - Le micro du studio (v186a/b) : c'est `api/_security.js` qui pose
   `Permissions-Policy`, PAS `vercel.json` — ce fichier-là gagne toujours.
 
-**Le seul chantier ouvert reste LES VOIX.** `ADMIN_SOUNDS` compte 428 entrées
-(370 sons arabes + 34 phrases françaises du cours illustré). Le studio est
-dans l'application, les fichiers vont sur Supabase (`AUDIO_URLS`). Le client
-les enregistre lui-même.
+**LES VOIX restent le chantier de fond.** `ADMIN_SOUNDS` compte 430 entrées.
+Le studio est dans l'application, les fichiers vont sur Supabase
+(`AUDIO_URLS`). Le client les enregistre lui-même — la liste de ce qui manque
+est en tête de ce fichier.
 
-**À faire après :**
-- ses avis clients à mettre en page ;
-- les balises GTM, à lui expliquer une par une ; le jour où il déplace la
-  conversion Ads dans GTM, vider `CONVERSION` dans `/tag.js` **le même jour** ;
-- deux défauts d'accolades PRÉEXISTANTS dans la feuille de style (une `}` en
-  trop, un bloc non fermé) : signalés, pas corrigés à l'aveugle. Une `}`
-  orpheline fait jeter au navigateur la règle SUIVANTE — c'est ce qui avait
-  rendu `.boy-perso` sans style pendant deux versions.
-
-**Trois habitudes prises avec lui, à garder :**
+**Quatre habitudes prises avec lui, à garder :**
 - Avant un gros chantier, annoncer le plan et attendre son avis. Les
   corrections bornées, non : celles-là se font d'un trait.
 - Quand il donne un texte, le prendre TEL QUEL. « Arrête de faire à ta
@@ -602,6 +625,13 @@ les enregistre lui-même.
 - Pour un réglage à l'œil, lui envoyer une planche d'images plutôt que de
   deviner. Et n'y mettre QUE ce qu'il a demandé : les témoins « inchangés »
   l'ont agacé, une phrase suffit à dire qu'on n'y a pas touché.
+- **MESURER DANS LA PAGE, ne pas raisonner sur le code.** Le navigateur
+  intégré ne rend pas les images de façon fiable : ce qui a fait gagner
+  chaque manche, ce sont des mesures prises dans le DOM — hauteur d'un
+  panneau, ligne de base d'une boîte, encre d'un glyphe sur un canevas — et
+  la comparaison avec l'écran que le client donne pour modèle. Trois défauts
+  de suite venaient d'une règle CSS plus spécifique qu'on ne voyait pas :
+  vérifier la valeur CALCULÉE, jamais celle qu'on vient d'écrire.
 
 ---
 
