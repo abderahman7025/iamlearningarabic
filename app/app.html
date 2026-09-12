@@ -9847,7 +9847,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v221';
+var _VERSION_REPLI='v222';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11870,7 +11870,13 @@ function _blocEcriture(hote,o){
   /* Un signe seul se repasse mal quand il est petit : le doigt d'un enfant
      couvre le modele. On l'ecrit donc bien plus grand que les lettres, qui,
      elles, ont un corps. */
-  var PX0=o.signeSeul?176:({1:150,2:126,3:104}[nb]||80);
+  /* 260 et non 176 : le client trouvait les modeles du cours des voyelles
+     trop petits pour un doigt d'enfant. La HAUTEUR du cadre ne bouge pas —
+     l'agrandir rendrait la page trop haute et `ajusteEcran` la ramenerait a
+     l'echelle, si bien que la taille apparente ne changerait pas. C'est la
+     borne de tenue, juste en dessous, qui redescend le signe le jour ou il
+     ne rentre pas. */
+  var PX0=o.signeSeul?260:({1:150,2:126,3:104}[nb]||80);
   var k=(o.dispoW||CW0)/CW0;
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
@@ -13247,7 +13253,10 @@ function _boyScene(ca,reprise){
     var verrou=!!p.getAttribute('data-verrou');
     if(!principal&&attend&&!verrou)principal=bouton(p,te('Suite ›'),suivant);
     if(fin&&principal)_avance=function(){
-      if(principal.isConnected)principal.click();
+      /* Le bouton est eteint tant qu'on n'a pas mis en pause (voir plus
+         bas) ; l'ecran de fin, lui, s'enchaine PAR ce bouton — on le
+         rouvre juste le temps de l'appui, sinon l'enfant reste bloque. */
+      if(principal.isConnected){principal.disabled=false;principal.click();}
     };
     /* ── L'ORDRE ET LE GABARIT ──
        La rangee est CENTREE dans la page ; a l'interieur, retour d'abord,
@@ -13274,6 +13283,9 @@ function _boyScene(ca,reprise){
     if(i>0)petit(te('‹ Retour'),te('Revoir l\'écran précédent'),function(){
       arreteEnchainement();N.stop();precedent();});
     /* PAUSE — seulement la ou quelque chose se joue tout seul. */
+    /* Elle commande aussi le bouton d'avancement : voir `ouvreSuite`, pose
+       plus bas, une fois le bouton principal range dans la rangee. */
+    var ouvreSuite=function(){};
     if(!attend){
       var pb=petit(te('❙❙ Pause'),te('Mettre en pause'),function(){
         if(N.enPause()){
@@ -13282,6 +13294,7 @@ function _boyScene(ca,reprise){
         }else{
           arreteEnchainement();N.pause();pb.textContent=te('▶ Reprendre');
         }
+        ouvreSuite(N.enPause());
       });
     }
     if(principal){
@@ -13290,6 +13303,24 @@ function _boyScene(ca,reprise){
     }
     if(!rangee.children.length){p.removeChild(rangee);return;}
     egaliseLaRangee(rangee);
+    /* ── SUITE NE S'OUVRE QU'EN PAUSE ──
+       Le client ne veut pas qu'un enfant saute une page pendant qu'on lui
+       parle : tant que la voix court, le bouton d'avancement est ETEINT. Il
+       s'allume au moment ou l'enfant met en pause, et s'eteint de nouveau
+       quand il reprend. Les ecrans qui ATTENDENT quelque chose de lui — une
+       question, un canevas — n'ont pas de pause : leur bouton reste ouvert,
+       sans quoi il n'y aurait plus aucun moyen d'en sortir. */
+    /* L'ecran de fin est hors du compte : son bouton n'est pas un « suite »,
+       c'est une destination — la carte, la lettre suivante — et il s'appuie
+       tout seul au bout de quelques secondes. L'eteindre n'y protegerait
+       rien et donnerait une page bloquee. */
+    if(principal&&!attend&&!fin){
+      ouvreSuite=function(o){
+        principal.disabled=!o;
+        principal.style.opacity=o?'1':'.45';
+      };
+      ouvreSuite(N.enPause());
+    }
     /* Le bouton ne se met a battre — et la page ne passe — qu'une fois TOUTE
        la voix jouee : tant qu'on parle a l'enfant, rien ne bouge. Une scene
        qui parle etat par etat laisse un silence entre deux phrases, on
@@ -13622,13 +13653,27 @@ function _boyScene(ca,reprise){
       if(/^[جحخ]$/.test(_sansCercle(glyph).replace(_MARQUES,'')))
         sp.style.cssText+=';position:relative;top:.11em';
       var ajuste=function(){
+        /* ── ON NE MELANGE PAS LES DEUX MESURES ──
+           `ajusteEcran` pose un `scale` sur tout le cadre. Un
+           `getBoundingClientRect` rend alors des pixels D'ECRAN, tandis que
+           `clientWidth` rend ceux de la MISE EN PAGE : des que la page etait
+           reduite, la comparaison des deux repondait « ca tient » et le mot
+           sortait du cercle — c'est ce que le client voyait sur « ʿouSfour ».
+           On ne compare plus que des mesures de mise en page.
+           Et le span est FIGE : dans une boite en flex il se faisait raboter
+           a la largeur du hublot, si bien que sa largeur mesuree ne disait
+           plus rien de ce qui etait ecrit. */
         var max=h.clientWidth-40;if(max<40)return;
+        sp.style.flex='0 0 auto';
         var px=parseFloat(getComputedStyle(sp).fontSize)||74,garde=0;
-        while(sp.getBoundingClientRect().width>max&&px>20&&garde++<40){
+        while(sp.offsetWidth>max&&px>20&&garde++<60){
           px-=3;sp.style.fontSize=px+'px';
         }
       };
+      /* `requestAnimationFrame` ne bat pas dans un onglet cache : on repasse
+         par l'horloge, la seule qui tourne a coup sur. */
       requestAnimationFrame(ajuste);
+      N.plusTard(ajuste,80);N.plusTard(ajuste,420);
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajuste);}catch(e){}
       h.onclick=function(){N.stop();N.dire(son||glyph);};
     }
@@ -14859,13 +14904,21 @@ function _boyScene(ca,reprise){
         {vise:[mSeule,mFin],act:function(k){vole(mSeule.trou,cFin.hote,ISO,function(){
            paraitre(cFin.corps);k();});}},
         {vise:[mFin],dit:te('avec un trait horizontal.'),
-         act:function(k){paraitre(cFin.trait);k();}}
+         act:function(k){paraitre(cFin.trait);k();}},
+        /* ── LA CONCLUSION ──
+           Les deux formes qu'il faut savoir — seule et debut — grossissent
+           ensemble pendant que la voix les designe, et elles RESTENT en
+           avant : c'est la derniere chose que l'enfant voit de la page. */
+        {vise:[mDebut,mSeule],dit:te('Donc il faut retenir ces deux formes.'),
+         act:function(k){k();}}
       ];
       var n=0;
       (function joue(){
         if(n>=temps.length){
+          /* Seule et debut gardent leur mise en avant : la voix vient de dire
+             que ce sont elles qu'il faut retenir. */
           [].slice.call(g.querySelectorAll('.rec-case.vise')).forEach(function(x){
-            x.classList.remove('vise');});
+            if(x!==mSeule.case&&x!==mDebut.case)x.classList.remove('vise');});
           _sceneParle--;return;
         }
         var e=temps[n++];
@@ -14918,7 +14971,12 @@ function _boyScene(ca,reprise){
       bouton(p,te('Suite ›'),suivant);
       _sceneParle++;
       var n=0;
-      (function joue(){
+      /* ── LA PAGE S'ANNONCE ──
+         Le client veut l'entendre nommee avant qu'on n'enonce quoi que ce
+         soit : « ce qu'il faut retenir », puis les points, un par un. */
+      N.dire(te('Ce qu\'il faut retenir.'));
+      N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,320);});},250);
+      function joue(){
         if(n>=lignes.length){_sceneParle--;return;}
         var k=n++,o=points[k];
         lignes[k].classList.add('vu');
@@ -14941,7 +14999,7 @@ function _boyScene(ca,reprise){
         }else{
           N.dire(o.f);suite();
         }
-      })();
+      }
     };
   };
   api.tableau=function(etape,html,fr,formes){
@@ -15387,7 +15445,6 @@ function _boyVowelCourse(ca){
   var CFA='#e65100', CDA='#2e7d32', CKA='#6a1b9a';
 
   var LB='ب';
-  var LBF=LB+'َ', LBK=LB+'ِ', LBD=LB+'ُ', LBS=LB+'ْ';
   var mF='َ', mK='ِ', mD='ُ', mS='ْ';
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
@@ -15475,12 +15532,19 @@ function _boyVowelCourse(ca){
     B.repete(te('ÉTAPE 3 · À TON TOUR'),
       TB('<b>« b »</b> + <b>« ou »</b>, ça fait <b>« bou »</b>.'),
       false,
-      {calques:[LB,LBD],
+      /* ── LA VOYELLE PORTE SA COULEUR ──
+         Le client la veut coloree ici comme sur « boun », « ban » et « bin ».
+         Un second calque ne le permet pas : en HTML, une marque enfermee dans
+         son propre span est repeinte a la couleur de la lettre qui la porte —
+         c'est la police qui recolle le groupe. On passe donc par un SIGNE
+         FLOTTANT, exactement comme les pages du doublement. */
+      {calques:[LB],
+       flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:te('b')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[1],P:1,dit:te('ou')},
-              {L:[1],P:1,t:'bou',dit:te('Ça fait bou.')},
-              {L:[1],P:1,t:'bou',dit:te('Répète après moi : bou.')}]}),
+              {L:[0],P:1,F:[0],dit:te('ou')},
+              {L:[0],P:1,F:[0],t:'bou',dit:te('Ça fait bou.')},
+              {L:[0],P:1,F:[0],t:'bou',dit:te('Répète après moi : bou.')}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
@@ -15495,12 +15559,13 @@ function _boyVowelCourse(ca){
     B.repete(te('ÉTAPE 4 · À TON TOUR'),
       TB('<b>« b »</b> + <b>« a »</b>, ça fait <b>« ba »</b>.'),
       false,
-      {calques:[LB,LBF],
+      {calques:[LB],
+       flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:te('b')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[1],P:1,dit:te('a')},
-              {L:[1],P:1,t:'ba',dit:te('Ça fait ba.')},
-              {L:[1],P:1,t:'ba',dit:te('Répète après moi : ba.')}]}),
+              {L:[0],P:1,F:[0],dit:te('a')},
+              {L:[0],P:1,F:[0],t:'ba',dit:te('Ça fait ba.')},
+              {L:[0],P:1,F:[0],t:'ba',dit:te('Répète après moi : ba.')}]}),
 
     B.illustre(te('ÉTAPE 5'),
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
@@ -15513,12 +15578,13 @@ function _boyVowelCourse(ca){
     B.repete(te('ÉTAPE 5 · À TON TOUR'),
       TB('<b>« b »</b> + <b>« i »</b>, ça fait <b>« bi »</b>.'),
       false,
-      {calques:[LB,LBK],
+      {calques:[LB],
+       flottants:[{m:mK,c:CKA,x:50,y:BAS}],
        scene:[{L:[0],P:1,dit:te('b')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[1],P:1,dit:te('i')},
-              {L:[1],P:1,t:'bi',dit:te('Ça fait bi.')},
-              {L:[1],P:1,t:'bi',dit:te('Répète après moi : bi.')}]}),
+              {L:[0],P:1,F:[0],dit:te('i')},
+              {L:[0],P:1,F:[0],t:'bi',dit:te('Ça fait bi.')},
+              {L:[0],P:1,F:[0],t:'bi',dit:te('Répète après moi : bi.')}]}),
 
     B.brief(te('ÉCRITURE'),
       TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
@@ -15646,9 +15712,15 @@ function _boyVowelCourse(ca){
          voyelles du tout debut : c'est lui qu'on presente. */
       {calques:[LB],
        flottants:[{m:mS,c:CFA,x:50,y:SOUKH}],
+       /* ── « ON DIRA JUSTE B » EST UN TEMPS A PART ──
+          L'enregistrement du client s'arrete a « aucune prononciation » : la
+          fin de la phrase ecrite n'etait jamais dite. On garde sa phrase
+          telle quelle — sa cle porte son enregistrement — et le dernier
+          morceau devient un temps a lui, avec sa propre cle a enregistrer. */
        scene:[{L:[0],P:1,d:1000},
               {L:[0],P:1,F:[0],bat:1,
                dit:te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.')},
+              {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('On dira juste b.')},
               {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('Répète après moi : b.')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
@@ -15663,9 +15735,13 @@ function _boyVowelCourse(ca){
          {dit:te('i'), fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('ou'),fait:function(el){grossit(el._sg[2].un);}}
        ]},
+      /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
+         Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
+         doit faire une vraie phrase avant de derouler « a devient an ». */
       {h:TB('Deux fois le <b>même signe</b> : on ajoute le son « n ».'),
        vue:function(){return pisteVoyelles(true);},
        temps:[
+         {dit:te('Lorsque l\'on double une voyelle, on ajoute le son n.')},
          {dit:te('a'),      fait:function(el){grossit(el._sg[0].un);}},
          {dit:te('devient')},
          {dit:te('an'),     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
@@ -15679,7 +15755,7 @@ function _boyVowelCourse(ca){
       {h:TB('Le <b>soukoun</b> : on ne dit que la lettre.'),
        vue:function(){return pisteUnSigne('ْ',true);},
        temps:[
-         {dit:te('Le soukoun : on ne dit que la lettre.'),
+         {dit:te('Lorsqu\'il y a un soukoun sur une lettre, on ne prononce que le son de la lettre.'),
           fait:function(el){grossit(el._sg[0].un);}}
        ]}
     ]),
@@ -16292,8 +16368,10 @@ function _boyLetterCourse(ca,idx,premiere){
         : (A==='ء')
         ? {h:TB('Elle ne s\'attache <b>jamais</b>,<br>ni avant, ni après.'),
            f:te('Elle ne s\'attache jamais, ni avant, ni après.')}
-        : {h:TB('Cette lettre a <b>4 formes</b> à apprendre.'),
-           f:te('Cette lettre a quatre formes à apprendre.')} ]
+        /* La phrase du client, mot pour mot — la meme qu'a la page
+           « exception » de ces lettres-la. */
+        : {h:TB('Pour cette lettre, il faut<br>apprendre les <b>4 formes</b>.'),
+           f:te('Pour cette lettre, il faut apprendre les quatre formes.')} ]
     : [ {h:TB('<b>Seule</b> et <b>début</b> : les deux formes à connaître.'),
          f:te('Seule et début : les deux formes à connaître.')},
         {h:TB('Au <b>milieu</b> : la forme du début, avec un trait.'),
@@ -18798,8 +18876,15 @@ var ADMIN_SOUNDS = [
   {ar:'Où est le son in ?',label:'Où est le son in ?'},
   {ar:'Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.',label:'Pour finir, tu te rappelles de la lettre ba…'},
   {ar:'Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.',label:'Parfois tu trouveras ce petit rond au dessu…'},
+  {ar:'On dira juste b.',label:'On dira juste b.'},
   {ar:'Répète après moi : b.',label:'Répète après moi : b.'},
   {ar:'Trace le soukoun.',label:'Trace le soukoun.'},
+  /* ── LA PAGE « A RETENIR » ──
+     Elle s'annonce, et chacun de ses points se dit en une phrase entiere —
+     ce que la synthese du navigateur rend mal. */
+  {ar:'Ce qu\'il faut retenir.',label:'Ce qu\'il faut retenir.'},
+  {ar:'Lorsque l\'on double une voyelle, on ajoute le son n.',label:'Lorsque l\'on double une voyelle, on ajoute…'},
+  {ar:'Lorsqu\'il y a un soukoun sur une lettre, on ne prononce que le son de la lettre.',label:'Lorsqu\'il y a un soukoun sur une lettre, on…'},
   {ar:'Tu maîtrises les voyelles !',label:'Tu maîtrises les voyelles !'},
   {ar:'Maintenant, on va les écrire ! Tu es prêt ?',label:'Maintenant, on va les écrire ! Tu es prêt ?'},
   {ar:'Maintenant, on va les écrire ! Tu es prête ?',label:'Maintenant, on va les écrire ! Tu es prête ?'},

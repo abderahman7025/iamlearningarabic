@@ -31,13 +31,13 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 12 septembre 2026, production en v221
+## OÙ ON EN EST — 12 septembre 2026, production en v222
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
 Parti de la leçon des voyelles, il a gagné les trente leçons de lettres.
 
-Depuis v205, neuf passes de relecture avec lui, écran par écran. Elles sont
+Depuis v205, dix passes de relecture avec lui, écran par écran. Elles sont
 détaillées plus bas dans l'ordre inverse (la plus récente d'abord) ; voici
 d'abord ce qui reste ouvert.
 
@@ -58,9 +58,21 @@ qui les dit en attendant, et elle les dit mal.
 | doublement, voyelles | « Répète après moi : boun / ban / bin. » |
 | « à retenir » des voyelles | « devient » · « an » · « in » · « oun » |
 | avant le secret des tanwīns | « Comme tu connais très bien les trois voyelles, on peut passer à la suite. » |
+| page du soukoun | « On dira juste b. » |
+| début de chaque « à retenir » | « Ce qu'il faut retenir. » |
+| « à retenir » des voyelles | « Lorsque l'on double une voyelle, on ajoute le son n. » |
+| « à retenir » des voyelles | « Lorsqu'il y a un soukoun sur une lettre, on ne prononce que le son de la lettre. » |
 
-Cette dernière REMPLACE « … je vais te dévoiler un secret. », dont
-l'enregistrement ne sert plus.
+La phrase « Comme tu connais très bien… » REMPLACE « … je vais te dévoiler
+un secret. », dont l'enregistrement ne sert plus.
+
+**« On dira juste b. » est un cas à part.** La phrase du soukoun garde sa
+CLÉ ENTIÈRE — « Parfois tu trouveras ce petit rond au dessus. Il n'a aucune
+prononciation. On dira juste b. » — parce que son enregistrement existe
+déjà. Mais il s'arrête à « aucune prononciation » : le client ne s'entendait
+jamais dire la fin. Le dernier morceau est donc devenu un TEMPS À PART, avec
+sa propre clé. Si l'enregistrement d'origine dit finalement la phrase en
+entier, il n'y a qu'à retirer ce temps-là de la scène du soukoun.
 
 **Les textes de la page « À RETENIR » sont à relire avec lui.** Ils sont
 repris de ses propres phrases de cours, jamais inventés, mais c'est lui qui
@@ -79,7 +91,64 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v221), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v222), du plus récent au plus ancien :**
+
+- **LA DIXIÈME PASSE DU CLIENT (v222).**
+
+  - **SUITE NE S'OUVRE QU'EN PAUSE.** Tant que la voix court, le bouton
+    d'avancement est ÉTEINT ; il s'allume au moment où l'enfant met en
+    pause, et s'éteint de nouveau quand il reprend. Deux écrans y échappent,
+    et il le faut : ceux qui ATTENDENT quelque chose de lui — une question,
+    un canevas — n'ont pas de pause, leur bouton resterait mort ; et l'écran
+    de FIN, dont le bouton n'est pas un « suite » mais une destination, et
+    que l'enchaînement appuie tout seul (`_avance` le rouvre le temps de
+    l'appui).
+
+  - **La voyelle est en couleur sur « bou », « ba » et « bi ».** Elle
+    l'était déjà sur « boun / ban / bin ». Un second calque ne pouvait pas
+    la colorer : en HTML, une marque enfermée dans son propre span est
+    REPEINTE à la couleur de la lettre qui la porte — la police recolle le
+    groupe. On passe donc par un SIGNE FLOTTANT, exactement comme les pages
+    du doublement. Mesuré : sur « bou », signe vert à (220, 183), corps
+    201,5 px — au pixel près ce que donne « DOUBLEMENT · OUN ».
+
+  - **Les modèles à repasser sont beaucoup plus gros** : un signe seul passe
+    de 176 à 260 px. La HAUTEUR du cadre ne bouge pas — l'agrandir rendrait
+    la page trop haute et `ajusteEcran` la ramènerait à l'échelle, si bien
+    que la taille apparente ne changerait pas (c'est la leçon de la v213).
+    Mesuré : l'encre d'une ḍamma passe de 49 à 73 px de haut, et les six
+    modèles du cours — ḍamma, fatḥa, kasra et leurs tanwīns — tiennent tous
+    dans le cadre, le plus large à 10 px du bord.
+
+  - **Le soukoun dit enfin « on dira juste b ».** Voir la note en tête.
+
+  - **« À retenir » s'annonce et fait des phrases.** La voix dit d'abord
+    « ce qu'il faut retenir », puis chaque point EN UNE PHRASE ENTIÈRE avant
+    de le démontrer : « lorsque l'on double une voyelle, on ajoute le son
+    n », puis a → an, i → in, ou → oun. Ce qui est ÉCRIT reste abrégé, le
+    client y tient.
+
+  - **Le récapitulatif se conclut.** Un septième temps : « donc il faut
+    retenir ces deux formes », pendant que SEULE et DÉBUT grossissent
+    ensemble — et elles restent en avant, c'est la dernière chose que
+    l'enfant voit de la page.
+
+  - **Les lettres à quatre formes.** « Cette lettre a 4 formes à apprendre »
+    devient « Pour cette lettre, il faut apprendre les 4 formes » : la
+    phrase du client, la même qu'à la page « exception » de ʿayn et ġayn.
+
+  - **LE MOT NE DÉPASSE PLUS DU HUBLOT.** On mélangeait deux mesures.
+    `ajusteEcran` pose un `scale` sur tout le cadre : `getBoundingClientRect`
+    rend alors des pixels d'ÉCRAN, `clientWidth` ceux de la MISE EN PAGE.
+    Dès que la page était réduite, comparer les deux répondait « ça tient »
+    et le mot restait à sa pleine taille. Mesuré sur « ʿuṣfūr » à l'échelle
+    0,574 : l'ancienne mesure disait 69 px pour une place de 120, et rien
+    n'était donc réduit — le mot restait à 4,6 rem, soit près de 190 px de
+    large dans un cercle de 160. On ne compare plus que des mesures de mise en
+    page, et le span est figé (`flex:0 0 auto`) — dans une boîte en flex il
+    se faisait raboter à la largeur du hublot et sa largeur ne disait plus
+    rien. Mesuré après : mot 120 px dans un hublot de 160, 15 px de marge de
+    chaque côté.
 
 - **LE FONDU DU MOT ET LE GLISSEMENT DE LA LETTRE, ENSEMBLE (v221).** Ils
   partent au meme instant et finissent ensemble : 900 ms tous les deux. Le
