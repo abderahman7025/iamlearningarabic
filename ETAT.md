@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v232
+## OÙ ON EN EST — 13 septembre 2026, production en v233
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,25 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v232), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v233), du plus récent au plus ancien :**
+
+- **ON NE POUVAIT PAS SUPPRIMER UN ENREGISTREMENT (v233).** Le bouton 🗑 ne
+  retirait que la copie gardée sur l'appareil. Le fichier restait dans le
+  bucket, donc dans `AUDIO_URLS`, donc rejoué par l'application : une prise
+  ratée ne pouvait être corrigée qu'en réenregistrant par-dessus. Et depuis
+  que la pastille dit l'état du SERVEUR (v230), la ligne repassait au vert
+  aussitôt — d'où « pourquoi je ne peux pas supprimer un audio ! ».
+
+  - **`DELETE /api/audio`** est ajouté à la fonction existante (pas de
+    treizième fonction : le forfait Vercel n'en accepte que douze). Mêmes
+    gardes que l'envoi — jeton admin, IP, limite de débit — et la clé est
+    lue dans `?ar=` COMME dans le corps : le corps d'un DELETE n'est pas
+    toujours analysé par la plateforme. `DELETE` est ajouté aux méthodes
+    CORS.
+  - **Le bouton efface les deux**, demande confirmation, et dit ce qui a
+    échoué le cas échéant. Vérifié : l'appel part bien en DELETE, la clé
+    disparaît du cloud et du stockage local, et la ligne retombe sur
+    « ⬜ Non enregistré ».
 
 - **LE STUDIO TIENT EN PORTRAIT (v232).** « Rapetisse la taille sur le
   studio, que je n'aie pas à mettre en paysage pour appuyer sur les boutons

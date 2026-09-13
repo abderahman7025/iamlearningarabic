@@ -10540,7 +10540,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v232';
+var _VERSION_REPLI='v233';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21254,14 +21254,41 @@ function adminRenderList() {
     recBtn.style.cssText = 'background:rgba(255,80,80,.2);border:1px solid rgba(255,80,80,.3);color:#ff6060;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:1rem;flex:none';
     recBtn.onclick = function() { adminStartRecord(s.ar, s.label, item, recBtn, info); };
     
+    /* ── SUPPRIMER, POUR DE BON ──
+        Le bouton ne retirait que la copie gardée sur l'appareil : le fichier
+        restait dans le cloud, donc dans `AUDIO_URLS`, donc rejoué par
+        l'application — « pourquoi je ne peux pas supprimer un audio ! ». Il
+        efface maintenant les DEUX, et dit ce qu'il a fait. */
     // Bouton supprimer si enregistré
     if (hasAudio) {
       var delBtn = document.createElement('button');
       delBtn.textContent = '🗑';
       delBtn.style.cssText = 'background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff6060;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:.9rem;flex:none';
       delBtn.onclick = function() {
-        localStorage.removeItem(key);
-        adminRenderList();
+        if (!confirm('Supprimer l\'enregistrement de « ' + s.label + ' » ?')) return;
+        try { localStorage.removeItem(key); } catch (e) {}
+        if (!monte) { adminRenderList(); return; }
+        var _d = info.querySelector('.admin-etat');
+        if (_d) { _d.textContent = '\u2715 Suppression\u2026'; _d.style.color = '#8ab4ff'; }
+        fetch(API_URL + '/api/audio?ar=' + encodeURIComponent(s.ar), {
+          method: 'DELETE',
+          headers: {'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
+          body: JSON.stringify({ ar: s.ar })
+        }).then(function (r) {
+          return r.json()['catch'](function(){return {};}).then(function(d){ return {status:r.status, data:d}; });
+        }).then(function (o) {
+          if (o.status === 200 && o.data && o.data.success) {
+            delete AUDIO_URLS[s.ar];
+          } else {
+            alert('La suppression a échoué.\n\n'
+              + ((o.data && o.data.error) || ('code ' + o.status))
+              + '\n\nLa copie locale, elle, est bien retirée.');
+          }
+          adminRenderList();
+        })['catch'](function (e) {
+          alert('La suppression a échoué : réseau — ' + ((e && e.message) || e));
+          adminRenderList();
+        });
       };
       btns.appendChild(delBtn);
     }

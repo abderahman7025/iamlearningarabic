@@ -4,8 +4,9 @@ const { applyMiddleware, isAdminRequest, isAdminIpAllowed, rateLimit, logEvent, 
 /**
  * Les enregistrements du studio, en lecture et en écriture.
  *
- *   GET  → la liste des sons disponibles (nom arabe → URL publique)
- *   POST → dépose un enregistrement (studio d'enregistrement, admin)
+ *   GET    → la liste des sons disponibles (nom arabe → URL publique)
+ *   POST   → dépose un enregistrement (studio d'enregistrement, admin)
+ *   DELETE → efface un enregistrement (studio, admin)
  *
  * Les deux moitiés étaient deux fonctions séparées (audio-get, audio-upload).
  * Le forfait Hobby de Vercel n'en accepte que douze par déploiement : elles
@@ -127,11 +128,55 @@ async function deposerUnSon(req, res, ip) {
   }
 }
 
+/**
+ * Efface un enregistrement.
+ *
+ * Il n'y en avait aucune : le bouton du studio ne retirait que la copie
+ * gardée sur l'appareil, et le fichier restait dans le bucket — donc dans
+ * `AUDIO_URLS`, donc rejoué par l'application. Impossible de corriger une
+ * prise ratée autrement qu'en la réenregistrant par-dessus.
+ */
+async function effacerUnSon(req, res, ip) {
+  if (!isAdminRequest(req)) {
+    logEvent('audio_delete_no_auth', { ip });
+    return res.status(403).json({ error: 'Accès refusé.' });
+  }
+  if (!isAdminIpAllowed(req)) {
+    logEvent('audio_delete_ip_blocked', { ip });
+    return res.status(403).json({ error: 'Accès refusé : IP non autorisée.' });
+  }
+  const { limited } = rateLimit(ip, 'audio-delete', 120, 10 * 60 * 1000);
+  if (limited) return res.status(429).json({ error: 'Trop de requêtes.' });
+
+  /* Le corps d'un DELETE n'est pas toujours analysé par la plateforme : on
+     accepte donc aussi bien `?ar=` que le corps JSON. */
+  const ar = (req.query && req.query.ar) || (req.body && req.body.ar);
+  if (!ar || typeof ar !== 'string' || ar.length > 50)
+    return res.status(400).json({ error: 'Donnée manquante.' });
+
+  try {
+    const fileName = Buffer.from(ar).toString('hex') + '.webm';
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { error } = await supabase.storage.from('audio').remove([fileName]);
+    if (error) {
+      logEvent('audio_delete_error', { ip, error: error.message });
+      return res.status(500).json({ error: 'Erreur lors de la suppression.' });
+    }
+    logEvent('audio_delete_success', { ip, ar });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[Audio] Delete error:', err.message);
+    logEvent('audio_delete_exception', { ip, error: err.message });
+    res.status(500).json({ error: 'Erreur lors de la suppression.' });
+  }
+}
+
 module.exports = async (req, res) => {
   if (applyMiddleware(req, res)) return;
 
   const ip = getClientIp(req);
   if (req.method === 'GET') return lireLesSons(req, res, ip);
   if (req.method === 'POST') return deposerUnSon(req, res, ip);
+  if (req.method === 'DELETE') return effacerUnSon(req, res, ip);
   return res.status(405).json({ error: 'Method not allowed' });
 };
