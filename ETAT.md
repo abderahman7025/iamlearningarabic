@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v233
+## OÙ ON EN EST — 13 septembre 2026, production en v234
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,33 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v233), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v234), du plus récent au plus ancien :**
+
+- **LES ENREGISTREMENTS N'ARRIVAIENT PAS À TEMPS (v234).** « J'ai enregistré
+  quelques sons, mais ils ne se jouent pas sur le site. » Ils étaient bel et
+  bien montés — **115 au relevé du 13 septembre**, tous ARABES (lettres,
+  syllabes, tanwīns) — et `speakText` sait les jouer : vérifié, l'appel prend
+  bien la branche « enregistrement » dès que la liste est là.
+
+  Le défaut était le MOMENT du chargement. `loadAudioUrls()` n'était appelé
+  que sur **`window.onload`**, qui attend TOUTES les ressources de la page,
+  le widget de discussion compris. Un enfant qui entre dans une leçon avant
+  ce moment-là trouve `AUDIO_URLS` vide, tout retombe sur la synthèse — en
+  voix ARABE, que la plupart des appareils n'ont pas installée : silence.
+
+  - **On charge dès que le script s'exécute**, sans attendre `onload` (l'appel
+    de `onload` reste, il ne coûte rien).
+  - **Trois essais espacés** si la liste revient vide ou si le réseau manque :
+    un téléphone met parfois quelques secondes à se réveiller.
+  - **`speakText` rattrape** : s'il est appelé alors que la liste est vide, il
+    la redemande — au plus une fois toutes les dix secondes — et rouvre le
+    compteur d'essais. La phrase en cours passe par la synthèse, les
+    suivantes ont la vraie voix.
+
+  **Aucune phrase FRANÇAISE n'est encore enregistrée** (0 sur 115) : les
+  consignes des manches — « Voici la lettre », « Répète ! », « Bravo ! » —
+  passent donc par la synthèse française, qui elle est disponible partout.
+  C'est le studio qui les attend.
 
 - **ON NE POUVAIT PAS SUPPRIMER UN ENREGISTREMENT (v233).** Le bouton 🗑 ne
   retirait que la copie gardée sur l'appareil. Le fichier restait dans le

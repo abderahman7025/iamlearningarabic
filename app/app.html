@@ -5575,21 +5575,51 @@ function transitionCA(fwd){stopSpeech();const ca=document.getElementById('ca');i
 // Cache des URLs audio depuis Supabase
 var AUDIO_URLS = {};
 
-function loadAudioUrls() {
+/* ── LES ENREGISTREMENTS ARRIVENT TOT, ET ON INSISTE ──
+   Le client : « j'ai enregistré quelques sons, mais ils ne se jouent pas sur
+   le site ». Ils étaient bel et bien en ligne — 115 au relevé — et
+   `speakText` sait les jouer. Le défaut était le MOMENT du chargement :
+   `loadAudioUrls` n'était appelé que sur `window.onload`, qui attend TOUTES
+   les ressources de la page, le widget de discussion compris. Un enfant qui
+   entre dans une leçon avant ce moment-là trouve `AUDIO_URLS` vide, et tout
+   retombe sur la synthèse — en voix arabe, que la plupart des appareils
+   n'ont pas : le silence.
+   On charge donc dès que le script s'exécute, on garde l'appel de
+   `window.onload`, et on réessaie tant que la liste est vide. */
+var _audioEnCours = false, _audioEssais = 0;
+function loadAudioUrls(silencieux) {
+  if (_audioEnCours) return;
+  _audioEnCours = true;
   try {
     fetch(API_URL + '/api/audio')
       .then(function(r){ return r.json(); })
-      .then(function(data){ 
-        if(data && data.urls) {
+      .then(function(data){
+        _audioEnCours = false;
+        if (data && data.urls && Object.keys(data.urls).length) {
           AUDIO_URLS = data.urls;
           console.log('[Audio] ' + Object.keys(AUDIO_URLS).length + ' sons chargés depuis Supabase');
-        } else {
-          console.log('[Audio] Aucun son reçu de l API');
+          return;
         }
+        console.log('[Audio] Aucun son reçu de l API');
+        _audioRessaie(silencieux);
       })
-      .catch(function(e){ console.log('[Audio] Erreur chargement:', e); });
-  } catch(e){ console.log('[Audio] Exception:', e); }
+      .catch(function(e){
+        _audioEnCours = false;
+        console.log('[Audio] Erreur chargement:', e);
+        _audioRessaie(silencieux);
+      });
+  } catch(e){ _audioEnCours = false; console.log('[Audio] Exception:', e); }
 }
+/* Trois essais, espacés : le réseau d'un téléphone met parfois quelques
+   secondes à se réveiller, et une leçon commencée entre-temps serait muette
+   pour toute sa durée. */
+function _audioRessaie(silencieux) {
+  if (_audioEssais >= 3) return;
+  _audioEssais++;
+  setTimeout(function(){ loadAudioUrls(silencieux); }, 2500 * _audioEssais);
+}
+/* Sans attendre `window.onload` : c'est tout l'objet du correctif. */
+loadAudioUrls(true);
 
 function speak(txt,rate){
   if(!st.soundOn)return;
@@ -6573,6 +6603,21 @@ function playError(){
 
 function speakText(txt,lang,el){
   if(!st.soundOn)return;
+  /* La liste des enregistrements n'est pas encore là : on la redemande, sans
+     attendre — la phrase en cours passera par la synthèse, les suivantes
+     auront la vraie voix. */
+  try{
+    if(typeof AUDIO_URLS!=='undefined' && !Object.keys(AUDIO_URLS).length
+       && typeof loadAudioUrls==='function'
+       && (Date.now()-(window._audioDernier||0))>10000){
+      window._audioDernier=Date.now();
+      /* Les trois essais du démarrage sont peut-être déjà consommés — un
+         téléphone sans réseau au lancement. On rouvre le compteur : c'est
+         une leçon qui demande, pas la page qui s'ouvre. */
+      _audioEssais=0;
+      loadAudioUrls(true);
+    }
+  }catch(e){}
   /* ── UN ENREGISTREMENT PASSE AVANT LA SYNTHESE ──
      La recherche d'un son enregistre etait reservee aux textes ARABES : une
      phrase francaise, meme dite par le client dans le studio, retombait
@@ -10540,7 +10585,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v233';
+var _VERSION_REPLI='v234';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
