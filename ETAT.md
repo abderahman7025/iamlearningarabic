@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v228
+## OÙ ON EN EST — 13 septembre 2026, production en v229
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,37 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v228), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v229), du plus récent au plus ancien :**
+
+- **QUATRE POINTS DE PLUS (v229).**
+
+  - **« Choisis ta lettre » : des rectangles pleine largeur.** Trois vignettes
+    carrées côte à côte étaient trop petites. Une seule colonne, et le
+    contenu se range en rangée — l'emoji du mot d'un côté, la lettre en très
+    grand de l'autre. Mesuré : 917 px sur 1014 disponibles, une par rangée.
+
+  - **« Où est le son… »** remplace « avec un trait en haut, ça fait quoi ? » :
+    l'enfant doit TOUCHER une lettre, pas répondre à voix haute. Le son suit,
+    joué par son propre enregistrement.
+
+  - **LE RETOUR EST REVENU en haut à gauche.** Il avait disparu des cours
+    depuis que la carte le masque — elle est leur racine, ils n'ont pas de
+    menu. Chaque écran dit maintenant lui-même où il ramène
+    (`_retourEnfant`) : la carte le cache, le choix de la lettre ramène à la
+    carte, un cours ramène au choix de la lettre. Vérifié de bout en bout.
+
+  - **L'ALBUM EST SOUS LA CARTE.** Un animal par étape, en silhouette avec un
+    cadenas tant que son cours n'est pas validé, en couleur et nommé une fois
+    gagné. Rien n'est stocké à part : l'état vient d'être calculé pour la
+    grille juste au-dessus, on le reprend tel quel.
+
+  **AU FAIT — LES LETTRES NE SONT PAS ENREGISTRÉES.** Relevé le 13 septembre
+  sur `https://iamlearningarabic.com/api/audio` : **un seul son en base, et
+  c'est l'alif**. Toutes les autres lettres retombent sur la synthèse du
+  navigateur en voix ARABE — que la plupart des appareils n'ont pas installée,
+  d'où le silence. Les phrases françaises des manches, elles, s'entendent :
+  la voix française existe presque partout. Rien à corriger dans le code : il
+  faut passer au studio.
 
 - **LA VOIX, ET DOUZE AUTRES REMARQUES (v228).** Sa relecture du 13 septembre.
   La plus dure d'abord : « j'ai dit qu'il ne devait pas avoir de texte écrit,

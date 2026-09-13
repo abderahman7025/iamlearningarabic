@@ -3724,12 +3724,37 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   box-shadow:0 8px 20px rgba(var(--sk-rgb-f),.16)}
 .jeu-retour:active{transform:scale(.95)}
 
-/* Les vignettes du choix de la lettre : l'emoji du mot en grand, la lettre
-   en très grand, et rien d'écrit. */
-.tuile-emo{font-size:3.1rem;line-height:1.1}
-.tuile-lettre-ar{font-family:'Scheherazade New',serif;font-size:3.4rem;
-  line-height:1.3;color:color-mix(in srgb,var(--tc) 78%,#111827)}
-.tuile-lettre{min-height:172px;justify-content:center}
+/* ── L'ALBUM, SOUS LA CARTE DES ANIMAUX ──
+   Une bande de silhouettes qui se colorent une a une. */
+.alb-bande{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));
+  gap:12px;padding:0 2px 28px}
+.alb-vig{position:relative;border-radius:22px;padding:10px 6px 8px;
+  background:rgba(255,255,255,.55);border:3px dashed rgba(32,36,46,.16);
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+.alb-vig img{width:78%;max-width:78px;display:block;
+  filter:grayscale(1) opacity(.30)}
+.alb-vig.eu{background:linear-gradient(160deg,
+    color-mix(in srgb,var(--tc) 24%,#ffffff),color-mix(in srgb,var(--tc) 10%,#ffffff));
+  border:3px solid var(--tc);
+  box-shadow:0 7px 18px color-mix(in srgb,var(--tc) 30%,transparent)}
+.alb-vig.eu img{filter:none;animation:mjSautille 3.2s ease-in-out infinite}
+.alb-vig-nom{font-family:Outfit,sans-serif;font-weight:900;font-size:.74rem;
+  color:#20242e;text-align:center;line-height:1.1}
+.alb-cadenas{position:absolute;inset:0;display:flex;align-items:center;
+  justify-content:center;font-size:1.5rem;opacity:.5}
+
+/* ── LE CHOIX DE LA LETTRE : DES RECTANGLES PLEINE LARGEUR ──
+   Le client : « les rectangles des cours doivent faire la largeur de
+   l'écran ». Une seule colonne, donc, et le contenu se range en rangée :
+   l'emoji du mot d'un côté, la lettre en très grand de l'autre. */
+.tuiles-large{grid-template-columns:1fr !important}
+.tuile-lettre{min-height:0;padding:16px 22px}
+.tuile-duo{display:flex;align-items:center;justify-content:center;
+  gap:clamp(18px,7vw,64px);width:100%}
+.tuile-emo{font-size:clamp(2.6rem,9vw,4rem);line-height:1.1}
+.tuile-lettre-ar{font-family:'Scheherazade New',serif;
+  font-size:clamp(3rem,11vw,5rem);line-height:1.3;
+  color:color-mix(in srgb,var(--tc) 78%,#111827)}
 
 /* Le bouton qui ramene au choix du profil et de l'age. */
 .tb-inter{width:34px;height:34px;border-radius:50%;display:flex;
@@ -8851,6 +8876,20 @@ function _ilesDefs(){
    l'enfant touche celle qu'il veut parmi celles qui sont ouvertes.
    Le verrouillage est exactement celui du voyage : une etape s'ouvre quand
    la precedente est finie. Le cours qui s'ouvre derriere est le meme. */
+/* ── LE RETOUR DE LA BARRE DU HAUT, CHEZ LES 3-5 ANS ──
+   Le client : « il n'y a pas de bouton retour sur les pages des cours, en
+   haut à gauche ». Il n'y en avait plus depuis que la carte le masque — elle
+   est leur racine, ils n'ont pas de menu. Chaque écran dit donc lui-même où
+   il ramène : la carte le cache, le choix de la lettre et les manches le
+   montrent, avec leur destination. */
+function _retourEnfant(vers){
+  var b=document.getElementById('tb-back');if(!b)return;
+  if(!vers){b.style.display='none';b.onclick=handleBack;return;}
+  b.style.display='flex';
+  var l=document.getElementById('back-lbl');if(l)l.textContent=te('Retour');
+  b.onclick=function(){try{stopSpeech();}catch(e){}vers();};
+}
+
 function renderTuilesAnimaux(ca){
   _HAB=_habDuProfil();
   _migreProgressionFille();
@@ -8860,8 +8899,9 @@ function renderTuilesAnimaux(ca){
   st._curPage='sessions-map';
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
-  /* Le « retour » ramenerait au menu principal, qui n'existe plus pour eux. */
-  var _tbb=document.getElementById('tb-back');if(_tbb)_tbb.style.display='none';
+  /* Le « retour » ramenerait au menu principal, qui n'existe plus pour eux :
+     il n'a de sens que PLUS BAS, dans un cours (voir `_retourEnfant`). */
+  _retourEnfant(null);
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');
       Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');
@@ -8911,6 +8951,9 @@ function renderTuilesAnimaux(ca){
   var grille=document.createElement('div');
   grille.className='tuiles';
   var precedenteFinie=true;
+  /* Ce qui nourrira l'album, juste en dessous : un animal par etape, et
+     l'etat de son cours. */
+  var collection=[];
 
   defs.forEach(function(isle,i){
     isle.sids.forEach(function(sid){_ICONE_MONDE[sid]=isle.icon;});
@@ -8946,12 +8989,43 @@ function renderTuilesAnimaux(ca){
     };})(sessions,i,noms[i]||isle.label);
 
     grille.appendChild(t);
+    collection.push({img:imgs[i]||'',nom:noms[i]||isle.label,coul:coul,finie:finie});
     /* Une etape FERMEE n'ouvre pas la suivante, meme si son score dit
        qu'elle est faite : sans cela, une etape deverrouillee au milieu de la
        chaine rouvrait tout ce qui la suit. */
     precedenteFinie=finie&&!fermee;
   });
   wrap.appendChild(grille);
+
+  /* ── L'ALBUM, SOUS LA CARTE ──
+     Demande du client : les animaux gagnes se rangent la, juste en dessous,
+     et chacun se decouvre quand SON cours est valide. Rien n'est stocke a
+     part : l'etat vient d'etre calcule pour la grille, on le reprend tel
+     quel. Un animal pas encore gagne reste une silhouette — c'est ce qui
+     donne envie du suivant. */
+  var faits=collection.filter(function(x){return x.finie;}).length;
+  var at=document.createElement('div');
+  at.className='sess-map-title';at.style.marginTop='6px';
+  at.textContent='🏅 '+te('Mon album')+'  '+faits+'/'+collection.length;
+  wrap.appendChild(at);
+  var alb=document.createElement('div');alb.className='alb-bande';
+  collection.forEach(function(o){
+    var c=document.createElement('div');
+    c.className='alb-vig'+(o.finie?' eu':'');
+    c.style.setProperty('--tc',o.coul);
+    var im=document.createElement('img');im.src=o.img;im.alt='';
+    im.setAttribute('aria-hidden','true');
+    c.appendChild(im);
+    if(!o.finie){
+      var cad=document.createElement('div');cad.className='alb-cadenas';
+      cad.textContent='🔒';c.appendChild(cad);
+    }else{
+      var nm=document.createElement('div');nm.className='alb-vig-nom';
+      nm.textContent=o.nom;c.appendChild(nm);
+    }
+    alb.appendChild(c);
+  });
+  wrap.appendChild(alb);
 
   /* La rubrique « on joue » est retiree : le client ne veut pas les cours
      D'UN COTE et les jeux DE L'AUTRE — les jeux sont maintenant DANS la
@@ -10292,6 +10366,7 @@ function _boyLettreFinie(session,idx){
    grand — et rien d'écrit qu'un enfant devrait lire. */
 function _boyLetterPickerJeu(ca,session){
   _boySession=session;
+  _retourEnfant(function(){renderSessionsMap(ca);});
   ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='64px';
   st._curPage='child';
   _HAB=_habDuProfil();_fondEnfant(true);_decorMonde(ca,false);
@@ -10305,7 +10380,7 @@ function _boyLetterPickerJeu(ca,session){
   try{faites=JSON.parse(localStorage.getItem('boy_lettres_'+session.id)||'[]');}catch(e){}
   var indices=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
                 .filter(function(i){return i>=0;});
-  var g=document.createElement('div');g.className='tuiles';
+  var g=document.createElement('div');g.className='tuiles tuiles-large';
   indices.forEach(function(idx,rang){
     var L=CHILD_LETTERS[idx];
     var fait=faites.indexOf(idx)>=0;
@@ -10319,7 +10394,12 @@ function _boyLetterPickerJeu(ca,session){
     em.textContent=L.emoji||'';
     var ar=document.createElement('div');ar.className='tuile-lettre-ar';
     ar.textContent=L.ar;
-    t.appendChild(et);t.appendChild(em);t.appendChild(ar);
+    /* Le rectangle prend toute la largeur : l'emoji du mot d'un cote, la
+       lettre en tres grand de l'autre. Trois vignettes carrees cote a cote
+       etaient trop petites — c'est ce que le client a releve. */
+    var d=document.createElement('div');d.className='tuile-duo';
+    d.appendChild(em);d.appendChild(ar);
+    t.appendChild(et);t.appendChild(d);
     if(ouverte)t.onclick=function(){
       try{stopSpeech();}catch(e){}
       _boyLetterCourse(ca,idx,rang===0);
@@ -10443,7 +10523,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v228';
+var _VERSION_REPLI='v229';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16710,9 +16790,10 @@ function _boyScene(ca,reprise){
   api.jeuVoyelles=function(A){
     return function(){
       var m=manche(te('LES VOYELLES'),'mj-voyelles',MJ_COUL[5]);
-      var V=[['َ','a','Avec un trait en haut, ça fait quoi ?'],
-             ['ِ','i','Avec un trait en bas, ça fait quoi ?'],
-             ['ُ','ou','Avec ce petit signe en haut, ça fait quoi ?']];
+      /* « Pas dire "avec un trait en haut, ça fait quoi" alors que l'enfant
+         doit cliquer sur une lettre : dire "où est le son…" » — et le son
+         est joué par son propre enregistrement, pas épelé en français. */
+      var V=[['َ','a'],['ِ','i'],['ُ','ou']];
       var suite=_melangeTab(V.concat(V));
       var n=0;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
@@ -16747,7 +16828,7 @@ function _boyScene(ca,reprise){
         });
         zone.appendChild(r);
         N.plusTard(function(){
-          N.dire(te(cible[2]));
+          N.dire(te('Où est le son'));
           N.plusTard(function(){N.direToujours(A+cible[0]);},20);
         },450);
       }
@@ -16991,6 +17072,9 @@ function _beteEtape(){
 }
 
 function _boyLetterJeu(ca,idx,premiere){
+  /* Dans un cours, le retour ramene au choix de la lettre. */
+  _retourEnfant(function(){
+    if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);});
   var L=CHILD_LETTERS[idx];
   var A=L.ar;
   var B=_boyScene(ca,{cours:'lettre',arg:idx,premiere:premiere,
@@ -17031,6 +17115,8 @@ function _boyLetterJeu(ca,idx,premiere){
    — la lettre que le client a choisie pour les présenter — on les trace, et
    on finit par les reconnaître à l'oreille. */
 function _boyVowelJeu(ca){
+  /* Le cours des voyelles n'a pas de choix de lettre : on rend la carte. */
+  _retourEnfant(function(){renderSessionsMap(ca);});
   var B=_boyScene(ca,{cours:'voyelles',session:_boySession&&_boySession.id});
   var bete=_beteEtape();
   /* Le WAW et non le bā : chez les petits, les voyelles arrivent APRES alif,
@@ -20601,9 +20687,8 @@ var ADMIN_SOUNDS = [
   {ar:'Relie les deux mêmes lettres !',label:'Relie les deux mêmes lettres !'},
   {ar:'Retrouve les paires !',label:'Retrouve les paires !'},
   {ar:'Choisis ta lettre !',label:'Choisis ta lettre !'},
-  {ar:'Avec un trait en haut, ça fait quoi ?',label:'Avec un trait en haut, ça fait quoi ?'},
-  {ar:'Avec un trait en bas, ça fait quoi ?',label:'Avec un trait en bas, ça fait quoi ?'},
-  {ar:'Avec ce petit signe en haut, ça fait quoi ?',label:'Avec ce petit signe en haut…'},
+  {ar:'Retour',label:'Retour'},
+  {ar:'Où est le son',label:'Où est le son…'},
   {ar:'Youpi !',label:'Youpi !'},
   {ar:'Ouiii !',label:'Ouiii !'},
   {ar:'Super !',label:'Super !'},
