@@ -10527,7 +10527,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v230';
+var _VERSION_REPLI='v231';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21138,6 +21138,28 @@ function adminFilter(q) {
   });
 }
 
+/* Joue l'enregistrement d'une clé, quelle que soit sa langue. La synthèse
+   n'arrive qu'en dernier recours, et on le dit. */
+function adminJoue(ar) {
+  try { stopSpeech(); } catch (e) {}
+  try { if (window._kidAudio) { window._kidAudio.pause(); window._kidAudio = null; } } catch (e) {}
+  var src = null;
+  try { src = localStorage.getItem('audio_' + ar); } catch (e) {}
+  if (!src && typeof AUDIO_URLS !== 'undefined' && AUDIO_URLS) src = AUDIO_URLS[ar];
+  if (src) {
+    var a = new Audio(src);
+    window._kidAudio = a;
+    a.play()['catch'](function (e) {
+      alert('Lecture impossible : ' + ((e && e.message) || e)
+        + '\n\nL\'enregistrement existe mais le navigateur refuse de le lire.');
+    });
+    return;
+  }
+  /* Rien d'enregistré : on le dit, au lieu de faire croire que la voix
+     entendue est la sienne. */
+  try { speak(ar, 0.75); } catch (e) {}
+}
+
 function adminRenderList() {
   var list = document.getElementById('admin-sound-list');
   if (!list) return;
@@ -21179,7 +21201,20 @@ function adminRenderList() {
     listenBtn.textContent = '▶';
     listenBtn.title = 'Écouter';
     listenBtn.style.cssText = 'background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem';
-    listenBtn.onclick = function() { speak(s.ar, 0.75); };
+    /* ── ── ── LE DEFAUT QUE LE CLIENT DECRIT ── ── ──
+       « J'appuie sur le micro, j'enregistre, je rappuie pour arrêter, et
+       quand j'appuie sur play, ça n'a pas enregistré. »
+       Le bouton appelait `speak`, et `speak` ne cherche un enregistrement
+       QUE SI LE TEXTE EST ARABE : ses deux recherches — le cloud puis le
+       stockage local — sont l'une et l'autre sous un `if (isArabic)`. Or
+       toutes les phrases du studio sont FRANÇAISES. Elles partaient donc
+       droit à la synthèse vocale, et sa voix à lui n'était jamais rejouée —
+       alors qu'elle était bel et bien enregistrée.
+       Ici on joue CE QU'IL Y A : le fichier local d'abord (c'est ce qu'il
+       vient d'enregistrer), le cloud ensuite, la synthèse en dernier. */
+    listenBtn.onclick = function() {
+      adminJoue(s.ar);
+    };
     
     // Bouton enregistrer
     var recBtn = document.createElement('button');
@@ -21221,10 +21256,23 @@ function adminStartRecord(ar, label, item, btn, info) {
     adminChunks = [];
     adminCurrentKey = 'audio_' + ar;
     
+    /* ── LE FORMAT EST CELUI DU MAGNETOPHONE, PAS UN FORMAT SUPPOSE ──
+       On écrivait « audio/webm » en dur. Un navigateur qui enregistre en
+       `audio/mp4` — c'est le cas de Safari, donc de tout iPhone — rendait
+       alors un fichier étiqueté webm mais contenant du mp4 : illisible à la
+       relecture. On reprend le type que le magnétophone annonce. */
     adminRecorder = new MediaRecorder(stream);
-    adminRecorder.ondataavailable = function(e) { adminChunks.push(e.data); };
+    adminRecorder.ondataavailable = function(e) { if (e.data && e.data.size) adminChunks.push(e.data); };
     adminRecorder.onstop = function() {
-      var blob = new Blob(adminChunks, {type:'audio/webm'});
+      var type = (adminRecorder && adminRecorder.mimeType) || 'audio/webm';
+      var blob = new Blob(adminChunks, {type: type});
+      if (!blob.size) {
+        alert('Rien n\'a été enregistré : le micro n\'a rien capté.'
+          + '\n\nVérifie que le navigateur a bien l\'autorisation du microphone.');
+        try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+        adminRenderList();
+        return;
+      }
       var reader = new FileReader();
       reader.onload = function() {
         var base64 = reader.result;
@@ -21255,8 +21303,10 @@ function adminStartRecord(ar, label, item, btn, info) {
             var m=(o.data&&o.data.error)||('code '+o.status);
             if(_dit){_dit.textContent='❌ ÉCHEC : '+m;_dit.style.color='#ff6060';}
             alert('L\'envoi a échoué pour « '+arText+' ».\n\n'+m
-              +'\n\nIl est gardé sur cet appareil : le bouton « Renvoyer tout » '
-              +'le remontera une fois le problème réglé.');
+              +'\n\nIl est gardé sur cet appareil : tu peux le réécouter avec ▶, '
+              +'et le bouton « Renvoyer tout » le remontera une fois le '
+              +'problème réglé.');
+            adminRenderList();
           }
         })
         .catch(function(e){

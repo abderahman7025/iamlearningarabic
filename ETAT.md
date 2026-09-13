@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v230
+## OÙ ON EN EST — 13 septembre 2026, production en v231
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,32 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v230), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v231), du plus récent au plus ancien :**
+
+- **LE ▶ DU STUDIO NE JOUAIT PAS L'ENREGISTREMENT (v231).** Le client, après
+  la v230 : « je n'ai pas dit qu'ils ne s'enregistraient pas sur Supabase !
+  Sur le studio directement : j'appuie sur le micro, j'enregistre, je
+  rappuie pour arrêter, et quand j'appuie sur play, ça n'a pas enregistré. »
+
+  Le bouton appelait `speak(s.ar)`. Or **`speak` ne cherche un enregistrement
+  QUE SI LE TEXTE EST ARABE** : ses deux recherches — le cloud, puis le
+  stockage local — sont l'une et l'autre sous un `if (isArabic)`. Toutes les
+  phrases du studio sont FRANÇAISES : elles partaient donc droit à la
+  synthèse vocale. Sa voix était bel et bien enregistrée ; elle n'était
+  simplement jamais rejouée. (Le grand frère `speakText`, celui que
+  l'application utilise, ne fait pas ce tri — d'où le fait que les phrases
+  enregistrées s'entendent DANS les leçons mais pas dans le studio.)
+
+  - **`adminJoue` remplace `speak` sur le bouton ▶** : le fichier local
+    d'abord — c'est ce qu'il vient d'enregistrer — le cloud ensuite, la
+    synthèse en dernier. Vérifié sur les trois cas : clé française locale,
+    clé arabe locale, clé française venue du cloud.
+  - **Le blob prend le type que le magnétophone annonce**, au lieu d'un
+    « audio/webm » écrit en dur : Safari enregistre en `audio/mp4`, et le
+    fichier étiqueté webm mais contenant du mp4 était illisible à la
+    relecture. Sur iPhone, rien ne pouvait se rejouer.
+  - **Un enregistrement vide le dit** au lieu de se ranger en silence.
+  - La liste se redessine aussi quand l'envoi échoue.
 
 - **LE STUDIO N'ENREGISTRAIT RIEN, ET DISAIT LE CONTRAIRE (v230).**
   Le client : « les audio ne s'enregistrent pas !!!! » Relevé : l'API ne
