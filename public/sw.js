@@ -1,5 +1,5 @@
-﻿// iamlearningarabic â€” Service Worker v236
-const CACHE = 'arab-v236';
+﻿// iamlearningarabic â€” Service Worker v237
+const CACHE = 'arab-v237';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();

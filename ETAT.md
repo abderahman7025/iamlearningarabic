@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v236
+## OÙ ON EN EST — 13 septembre 2026, production en v237
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,15 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v236), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v237), du plus récent au plus ancien :**
+
+- **LA BASCULE D'INTERFACE EST PARTOUT (v237).** Elle ne vivait que dans la
+  barre du haut, et cette barre n'existe qu'à l'intérieur de `s-main` : le
+  MENU PRINCIPAL, qui a son propre en-tête, ne l'avait pas — ni le studio.
+  Elle est maintenant dans les trois : la barre des pages, l'en-tête du menu
+  (`#menu-inter`) et les boutons du studio.
+  Vérifié un par un : menu principal, page de leçons, carte des animaux,
+  leçon des 3-5 en cours, studio — et le clic ramène bien à l'écran du choix.
 
 - **LA LIMITE DE DÉBIT REFUSAIT LA MOITIÉ D'UN RENVOI (v236).** « 48 en
   échec : trop de requêtes. » Soixante envois par dix minutes, et il en

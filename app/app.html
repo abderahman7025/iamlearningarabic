@@ -3773,11 +3773,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   font-size:clamp(3rem,11vw,5rem);line-height:1.3;
   color:color-mix(in srgb,var(--tc) 78%,#111827)}
 
-/* Le bouton qui ramene au choix du profil et de l'age. */
+/* Le bouton qui ramene au choix du profil et de l'age. Il est present sur
+   TOUTES les interfaces : dans la barre du haut des pages, dans l'en-tete du
+   menu principal (qui n'a pas cette barre) et dans le studio. */
 .tb-inter{width:34px;height:34px;border-radius:50%;display:flex;
   align-items:center;justify-content:center;font-size:1.15rem;cursor:pointer;
   background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.28);
   margin-right:8px;flex:none;transition:transform .2s}
+/* Sur la prairie des petits, le fond clair demande une encre foncee. */
+body.fond-prairie #menu-inter{background:rgba(32,36,46,.08);
+  border-color:rgba(32,36,46,.18)}
 .tb-inter:active{transform:scale(.9)}
 body.fond-prairie .tb-inter{background:rgba(32,36,46,.08);
   border-color:rgba(32,36,46,.18)}
@@ -4522,6 +4527,11 @@ body.fond-espace .tuile-nom{color:#20242e}
       <div style="font-size:.65rem;color:var(--txt2);letter-spacing:.15em;text-transform:uppercase" id="app-subtitle-lbl">Apprendre l'arabe</div>
     </div>
     <div style="display:flex;align-items:center;gap:12px">
+      <!-- Changer d'interface : le menu principal a son propre en-tête, la
+           barre du haut n'y apparaît pas. Le bouton doit être sur TOUTES les
+           interfaces, pas seulement dans les pages. -->
+      <div class="tb-inter" id="menu-inter" title="Changer d'interface"
+           onclick="changerInterface()">🧒</div>
       <div id="sound-dot" class="sound-dot" onclick="toggleSound()"></div>
       <div class="menu-avatar" id="m-avatar">A</div>
     </div>
@@ -10585,7 +10595,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v236';
+var _VERSION_REPLI='v237';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -20649,6 +20659,7 @@ s0.parentNode.insertBefore(s1,s0);
         <button onclick="adminExportAll()" style="background:#f5c842;color:#000;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700">⬇ Exporter tout</button>
         <button onclick="adminImportAll()" style="background:rgba(255,255,255,.1);color:#fff;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem">⬆ Importer</button>
         <button onclick="adminRenvoyerTout()" style="background:#4caf50;color:#04240f;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700">↑ Renvoyer tout</button>
+        <button onclick="changerInterface()" style="background:rgba(255,255,255,.12);color:#fff;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem">🧒 Changer d'interface</button>
         <button onclick="adminClearAll()" style="background:rgba(255,80,80,.2);color:#ff6060;border:1px solid rgba(255,80,80,.3);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem">🗑 Tout effacer</button>
       </div>
     </div>
