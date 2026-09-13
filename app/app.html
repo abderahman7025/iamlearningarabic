@@ -348,7 +348,20 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
 /* Le studio est un ecran d'adulte, dessine pour le fond sombre : depuis que
    les enfants ont leur prairie claire, il s'y delavait. Il porte donc son
    propre fond, quel que soit le profil. */
-#s-audio-admin{background:#0a0718 !important}
+/* ── LE STUDIO TIENT DANS UN TELEPHONE, EN PORTRAIT ──
+   Il fallait le tourner pour atteindre ▶ et 🎙. On borne la largeur du
+   contenu, on empêche tout débordement horizontal, et les quatre boutons du
+   haut passent à la ligne au lieu de sortir. */
+/* Le studio garde son fond sombre : la prairie des petits le delavait. Et
+   il ne deborde jamais en largeur — c'est ce qui obligeait a tourner le
+   telephone pour atteindre le micro. */
+#s-audio-admin{background:#0a0718 !important;overflow-x:hidden}
+#s-audio-admin .admin-item{max-width:100%}
+#s-audio-admin button{touch-action:manipulation}
+@media(max-width:520px){
+  #s-audio-admin{padding-left:8px !important;padding-right:8px !important}
+  #s-audio-admin>div{max-width:100% !important}
+}
 #s-age{align-items:center;justify-content:center;gap:0;padding:30px 24px;
   z-index:40;
   background:radial-gradient(ellipse 90% 60% at 50% -8%,rgba(245,200,66,.10) 0%,transparent 70%),#0a0718}
@@ -10527,7 +10540,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v231';
+var _VERSION_REPLI='v232';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21179,28 +21192,46 @@ function adminRenderList() {
     item.className = 'admin-item';
     item.dataset.label = s.label.toLowerCase();
     item.dataset.ar = s.ar;
-    item.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,'+(hasAudio?'.3':'.08')+');border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s';
+    /* ── ELLE TIENT EN PORTRAIT ──
+       Le client devait tourner son téléphone pour atteindre ▶ et 🎙. La
+       cause : le texte de la clé était posé en 2 rem dans une police à
+       empattements, et une phrase française y prenait trois lignes et toute
+       la largeur — les boutons partaient hors de l'écran. La ligne se
+       resserre, et les boutons ne se laissent jamais comprimer. */
+    item.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,'+(hasAudio?'.3':'.08')+');border-radius:14px;padding:9px 10px;margin-bottom:7px;display:flex;align-items:center;gap:9px;transition:all .2s';
     
     var arSpan = document.createElement('div');
-    arSpan.style.cssText = "font-family:'Scheherazade New',serif;font-size:2rem;color:"+(monte?'#4caf50':(local?'#ffb300':'#888'))+";min-width:48px;text-align:center;direction:rtl";
-    arSpan.textContent = s.ar;
+    /* Le gros bloc arabe n'a de sens que pour une CLÉ ARABE — une lettre,
+       une syllabe. Pour une phrase française, le libellé juste à côté dit
+       déjà tout, et ce bloc-là ne faisait que manger la largeur. */
+    var estArabe = /[\u0600-\u06FF]/.test(s.ar);
+    arSpan.style.cssText = estArabe
+      ? ("font-family:'Scheherazade New',serif;font-size:1.55rem;line-height:1.4;color:"
+         + (monte?'#4caf50':(local?'#ffb300':'#888'))
+         + ";min-width:40px;flex:none;text-align:center;direction:rtl")
+      : ('font-size:1rem;flex:none;width:20px;text-align:center;color:'
+         + (monte?'#4caf50':(local?'#ffb300':'#888')));
+    arSpan.textContent = estArabe ? s.ar : (monte?'✓':(local?'●':'○'));
     
     var etat = monte ? {t:'✅ En ligne', c:'#4caf50'}
              : local ? {t:'⚠️ Sur cet appareil seulement — pas envoyé', c:'#ffb300'}
                      : {t:'⬜ Non enregistré', c:'rgba(255,255,255,.4)'};
     var info = document.createElement('div');
-    info.style.cssText = 'flex:1';
-    info.innerHTML = '<div style="font-size:.85rem;color:#fff;font-weight:600">'+s.label+'</div>'
+    /* `min-width:0` : sans lui, un enfant en flex refuse de passer sous sa
+       largeur de contenu, et c'est la rangée entière qui déborde. */
+    info.style.cssText = 'flex:1;min-width:0';
+    info.innerHTML = '<div style="font-size:.8rem;color:#fff;font-weight:600;'
+      +'overflow-wrap:anywhere">'+s.label+'</div>'
       +'<div class="admin-etat" style="font-size:.7rem;color:'+etat.c+';margin-top:2px">'+etat.t+'</div>';
     
     var btns = document.createElement('div');
-    btns.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
+    btns.style.cssText = 'display:flex;gap:5px;flex:none;flex-shrink:0';
     
     // Bouton écouter (synthèse si pas d'enregistrement)
     var listenBtn = document.createElement('button');
     listenBtn.textContent = '▶';
     listenBtn.title = 'Écouter';
-    listenBtn.style.cssText = 'background:rgba(255,255,255,.1);border:none;color:#fff;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem';
+    listenBtn.style.cssText = 'background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:1rem;flex:none';
     /* ── ── ── LE DEFAUT QUE LE CLIENT DECRIT ── ── ──
        « J'appuie sur le micro, j'enregistre, je rappuie pour arrêter, et
        quand j'appuie sur play, ça n'a pas enregistré. »
@@ -21220,14 +21251,14 @@ function adminRenderList() {
     var recBtn = document.createElement('button');
     recBtn.textContent = '🎙';
     recBtn.title = 'Enregistrer';
-    recBtn.style.cssText = 'background:rgba(255,80,80,.2);border:1px solid rgba(255,80,80,.3);color:#ff6060;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:1rem';
+    recBtn.style.cssText = 'background:rgba(255,80,80,.2);border:1px solid rgba(255,80,80,.3);color:#ff6060;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:1rem;flex:none';
     recBtn.onclick = function() { adminStartRecord(s.ar, s.label, item, recBtn, info); };
     
     // Bouton supprimer si enregistré
     if (hasAudio) {
       var delBtn = document.createElement('button');
       delBtn.textContent = '🗑';
-      delBtn.style.cssText = 'background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff6060;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:.9rem';
+      delBtn.style.cssText = 'background:rgba(255,80,80,.1);border:1px solid rgba(255,80,80,.2);color:#ff6060;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:.9rem;flex:none';
       delBtn.onclick = function() {
         localStorage.removeItem(key);
         adminRenderList();

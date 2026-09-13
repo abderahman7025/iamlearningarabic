@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v231
+## OÙ ON EN EST — 13 septembre 2026, production en v232
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,41 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v231), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v232), du plus récent au plus ancien :**
+
+- **LE STUDIO TIENT EN PORTRAIT (v232).** « Rapetisse la taille sur le
+  studio, que je n'aie pas à mettre en paysage pour appuyer sur les boutons
+  play et enregistrer. »
+
+  La cause : le texte de la CLÉ était posé en 2 rem dans Scheherazade, à
+  côté du libellé. Pour une lettre isolée c'est juste ce qu'il faut ; pour
+  une phrase française — et elles sont 108 sur 478 — cela faisait trois
+  lignes de gros caractères à empattements, et la rangée poussait les trois
+  boutons hors de l'écran.
+
+  - **Le gros bloc arabe est réservé aux CLÉS ARABES**, et descend à
+    1,55 rem. Une clé française reçoit à sa place une simple pastille — ✓,
+    ● ou ○ selon l'état — de 20 px de large : le libellé juste à côté dit
+    déjà la phrase.
+  - **Les boutons ne se laissent plus comprimer** (`flex:none`) et passent de
+    36 à 40 px : plus gros sous le doigt, et jamais rabotés. Le libellé, lui,
+    prend `min-width:0` — sans quoi un enfant en flex refuse de descendre
+    sous la largeur de son contenu et fait déborder la rangée entière.
+  - La ligne se resserre (9 px de marge au lieu de 12) et l'écran ne déborde
+    jamais en largeur.
+
+  Mesuré sur 375 px de large, en portrait : les trois boutons vont de 206 à
+  336 px, la rangée la plus haute fait 99 px, aucun débordement horizontal.
+
+  **PIÈGE DE MESURE, à connaître.** Une première lecture donnait l'écran à
+  `left:88, width:360` alors que `offsetLeft` valait 0 — et j'ai failli
+  attribuer cela au widget de discussion. C'était l'ANIMATION D'ENTRÉE :
+  `showS` pose une classe `tx-*` dont l'animation est en `fill-mode:both`,
+  et **le volet du navigateur ne compose pas** — l'animation ne démarre
+  jamais et l'élément reste figé sur sa PREMIÈRE image,
+  `translateX(80px) scale(.96)`. Toute mesure au `getBoundingClientRect`
+  d'un écran fraîchement ouvert est donc fausse ici. Retirer la classe
+  `tx-*` avant de mesurer, ou lire `offsetLeft` / `offsetWidth`.
 
 - **LE ▶ DU STUDIO NE JOUAIT PAS L'ENREGISTREMENT (v231).** Le client, après
   la v230 : « je n'ai pas dit qu'ils ne s'enregistraient pas sur Supabase !
