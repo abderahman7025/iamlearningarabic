@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v235
+## OÙ ON EN EST — 13 septembre 2026, production en v236
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,21 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v235), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v236), du plus récent au plus ancien :**
+
+- **LA LIMITE DE DÉBIT REFUSAIT LA MOITIÉ D'UN RENVOI (v236).** « 48 en
+  échec : trop de requêtes. » Soixante envois par dix minutes, et il en
+  avait 115 à renvoyer d'un coup.
+
+  - **600 par dix minutes** au lieu de 60, pour l'envoi comme pour la
+    suppression. La liste compte près de cinq cents phrases : un « renvoyer
+    tout » est un geste normal, pas un abus. Ce reste un garde-fou contre
+    une boucle emballée, et l'accès est déjà réservé à l'admin, par jeton ET
+    par IP.
+  - **Le délai d'attente part avec la réponse** (`Retry-After` et le corps
+    JSON), et **le studio patiente au lieu d'abandonner** : il reprend LE
+    MÊME son après la pause, rien n'est perdu, et il l'affiche. Vingt pauses
+    au maximum, pour ne pas tourner en rond si le serveur refuse sans fin.
 
 - **LES 115 FICHIERS FAISAIENT QUINZE OCTETS (v235).** « Toujours pas de
   sons. » Mesuré, cette fois, sur le fichier lui-même :

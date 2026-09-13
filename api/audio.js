@@ -87,11 +87,19 @@ async function deposerUnSon(req, res, ip) {
     return res.status(403).json({ error: 'Accès refusé : IP non autorisée.' });
   }
 
-  // ── Rate limit : 60 uploads / 10 min ─────────────────────────────────────────
-  const { limited } = rateLimit(ip, 'audio-upload', 60, 10 * 60 * 1000);
+  /* ── LA LIMITE TIENT COMPTE D'UN STUDIO ENTIER ──
+     Soixante envois par dix minutes : le client, qui en avait 115 à
+     renvoyer d'un coup, s'en est vu refuser 48. La liste compte près de
+     cinq cents phrases, et un « renvoyer tout » est un geste normal. On
+     monte à 600 par dix minutes — c'est encore un garde-fou contre une
+     boucle emballée, et l'accès est déjà réservé à l'admin, par jeton ET
+     par IP. Le délai d'attente part avec la réponse : le studio sait alors
+     patienter au lieu de compter un échec. */
+  const { limited, retryAfter } = rateLimit(ip, 'audio-upload', 600, 10 * 60 * 1000);
   if (limited) {
     logEvent('audio_upload_rate_limited', { ip });
-    return res.status(429).json({ error: 'Trop de requêtes.' });
+    res.setHeader('Retry-After', retryAfter);
+    return res.status(429).json({ error: 'Trop de requêtes.', retryAfter: retryAfter });
   }
 
   const { ar, audioBase64 } = req.body || {};
@@ -163,8 +171,11 @@ async function effacerUnSon(req, res, ip) {
     logEvent('audio_delete_ip_blocked', { ip });
     return res.status(403).json({ error: 'Accès refusé : IP non autorisée.' });
   }
-  const { limited } = rateLimit(ip, 'audio-delete', 120, 10 * 60 * 1000);
-  if (limited) return res.status(429).json({ error: 'Trop de requêtes.' });
+  const { limited, retryAfter } = rateLimit(ip, 'audio-delete', 600, 10 * 60 * 1000);
+  if (limited) {
+    res.setHeader('Retry-After', retryAfter);
+    return res.status(429).json({ error: 'Trop de requêtes.', retryAfter: retryAfter });
+  }
 
   /* Le corps d'un DELETE n'est pas toujours analysé par la plateforme : on
      accepte donc aussi bien `?ar=` que le corps JSON. */

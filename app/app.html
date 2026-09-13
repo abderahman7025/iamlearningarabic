@@ -10585,7 +10585,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v235';
+var _VERSION_REPLI='v236';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21565,7 +21565,7 @@ function adminRenvoyerTout() {
   }
   if (!confirm(aFaire.length + ' enregistrement(s) sur cet appareil.\n\n'
       + 'Les (r)envoyer maintenant ? Ceux qui sont déjà en ligne seront remplacés.')) return;
-  var n = 0, ok = 0, rates = [];
+  var n = 0, ok = 0, rates = [], pauses = 0;
   var etat = document.getElementById('admin-renvoi');
   if (!etat) {
     etat = document.createElement('div');
@@ -21584,8 +21584,8 @@ function adminRenvoyerTout() {
       setTimeout(adminRenderList, 1200);
       return;
     }
-    var s2 = aFaire[n++];
-    etat.textContent = 'Envoi ' + n + '/' + aFaire.length + ' — ' + s2.label;
+    var s2 = aFaire[n];
+    etat.textContent = 'Envoi ' + (n + 1) + '/' + aFaire.length + ' — ' + s2.label;
     fetch(API_URL + '/api/audio', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
@@ -21594,10 +21594,26 @@ function adminRenvoyerTout() {
     }).then(function(r) {
       return r.json()['catch'](function(){return {};}).then(function(d){ return {status:r.status, data:d}; });
     }).then(function(o) {
+      /* ── TROP DE REQUÊTES : ON ATTEND, ON N'ABANDONNE PAS ──
+         Un renvoi complet dépassait la limite du serveur et comptait le
+         reste en échec — « 48 en échec : trop de requêtes ». On patiente le
+         temps qu'il indique, et on REPREND LE MÊME son : rien n'est perdu. */
+      if (o.status === 429) {
+        /* Un filet : si le serveur refuse sans fin, on s arrete au lieu de
+           tourner en rond toute la soiree. */
+        if (++pauses > 20) { rates.push('trop de pauses : le serveur refuse toujours'); n = aFaire.length; setTimeout(suivant, 60); return; }
+        var att = Math.min(120, Math.max(5, ((o.data && o.data.retryAfter) || 30)));
+        etat.textContent = 'Le serveur demande une pause de ' + att + ' s\u2026 (' + (n + 1)
+          + '/' + aFaire.length + ')';
+        setTimeout(suivant, att * 1000);
+        return;
+      }
+      n++;
       if (o.status === 200 && o.data && o.data.url) { ok++; AUDIO_URLS[s2.ar] = o.data.url; }
       else rates.push((o.data && o.data.error) || ('code ' + o.status));
       setTimeout(suivant, 120);
     })['catch'](function(e) {
+      n++;
       rates.push('réseau : ' + ((e && e.message) || e));
       setTimeout(suivant, 250);
     });
