@@ -100,13 +100,31 @@ async function deposerUnSon(req, res, ip) {
   if (typeof ar !== 'string' || ar.length > 50)
     return res.status(400).json({ error: 'Caractère arabe invalide.' });
 
-  // ── Limite taille fichier : 2 MB ──────────────────────────────────────────
-  const base64Data = audioBase64.replace(/^data:audio\/\w+;base64,/, '');
+  /* ── LE PREFIXE, QUEL QU'IL SOIT ──
+     L'ancienne expression n'acceptait que « data:audio/webm;base64, ». Or un
+     magnétophone annonce son codec : `MediaRecorder` rend
+     « audio/webm;codecs=opus », et `readAsDataURL` écrit alors
+     « data:audio/webm;codecs=opus;base64,… ». Le préfixe n'était plus
+     reconnu, restait collé devant, et `Buffer.from(…, 'base64')` avalait
+     tout : QUINZE OCTETS de bouillie à la place du son. Les 115
+     enregistrements montés le 13 septembre faisaient tous cette taille-là.
+     On coupe donc à la première virgule, ce qui vaut pour tout type. */
+  const base64Data = String(audioBase64).replace(/^data:[^,]*,/, '');
   if (base64Data.length > 2 * 1024 * 1024 * 1.34)
     return res.status(413).json({ error: 'Fichier trop volumineux (max 2 MB).' });
 
   try {
     const buffer = Buffer.from(base64Data, 'base64');
+    /* ── ON REFUSE CE QUI N'EST PAS UN SON ──
+       Le défaut ci-dessus est passé inaperçu des semaines parce que le
+       serveur acceptait tout. Un enregistrement, même très court, pèse des
+       milliers d'octets ; en dessous, c'est que le décodage a échoué. */
+    if (buffer.length < 500) {
+      logEvent('audio_upload_vide', { ip, ar, taille: buffer.length });
+      return res.status(400).json({
+        error: 'Enregistrement illisible (' + buffer.length + ' octets). Rien n\'a été enregistré.'
+      });
+    }
     const fileName = Buffer.from(ar).toString('hex') + '.webm';
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

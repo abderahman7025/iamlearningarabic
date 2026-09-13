@@ -10585,7 +10585,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v234';
+var _VERSION_REPLI='v235';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21378,7 +21378,12 @@ function adminStartRecord(ar, label, item, btn, info) {
       }
       var reader = new FileReader();
       reader.onload = function() {
+        /* On garde le lien complet pour le stockage local — une balise Audio
+           sait le lire tel quel — mais on n'envoie que le base64 NU : c'est
+           le préfixe, avec son « ;codecs=opus », qui a fait monter 115
+           fichiers de quinze octets. Les deux bouts sont protégés. */
         var base64 = reader.result;
+        var nu = String(base64).replace(/^data:[^,]*,/, '');
         var arText = adminCurrentKey.replace('audio_','');
         // Sauvegarder localement
         localStorage.setItem(adminCurrentKey, base64);
@@ -21392,7 +21397,7 @@ function adminStartRecord(ar, label, item, btn, info) {
         fetch(API_URL + '/api/audio', {
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
-          body: JSON.stringify({ ar: arText, audioBase64: base64 })
+          body: JSON.stringify({ ar: arText, audioBase64: nu })
         }).then(function(r){
           return r.json()['catch'](function(){return {};}).then(function(d){
             return {status:r.status, data:d};
@@ -21546,16 +21551,20 @@ function adminDoImport(input) {
    les remonte un par un et rend un compte exact — combien sont passés,
    combien ont échoué, et pourquoi. */
 function adminRenvoyerTout() {
+  /* ── TOUT, MEME CE QUI EST DEJA « EN LIGNE » ──
+     Les fichiers montés avant le 13 septembre au soir sont corrompus — le
+     préfixe des données n'était pas retiré, ils font quinze octets. Il faut
+     donc pouvoir les REMPLACER, et pas seulement combler les manques : le
+     dépôt écrase (`upsert`). On renvoie tout ce que l'appareil possède. */
   var aFaire = ADMIN_SOUNDS.filter(function(s) {
-    var l = localStorage.getItem('audio_' + s.ar);
-    var enLigne = !!(typeof AUDIO_URLS!=='undefined' && AUDIO_URLS && AUDIO_URLS[s.ar]);
-    return l && !enLigne;
+    return !!localStorage.getItem('audio_' + s.ar);
   });
   if (!aFaire.length) {
-    alert('Rien à renvoyer : tout ce qui est sur cet appareil est déjà en ligne.');
+    alert('Rien à renvoyer : aucun enregistrement sur cet appareil.');
     return;
   }
-  if (!confirm(aFaire.length + ' enregistrement(s) sont sur cet appareil sans être en ligne.\n\nLes envoyer maintenant ?')) return;
+  if (!confirm(aFaire.length + ' enregistrement(s) sur cet appareil.\n\n'
+      + 'Les (r)envoyer maintenant ? Ceux qui sont déjà en ligne seront remplacés.')) return;
   var n = 0, ok = 0, rates = [];
   var etat = document.getElementById('admin-renvoi');
   if (!etat) {
@@ -21580,7 +21589,8 @@ function adminRenvoyerTout() {
     fetch(API_URL + '/api/audio', {
       method: 'POST',
       headers: {'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
-      body: JSON.stringify({ ar: s2.ar, audioBase64: localStorage.getItem('audio_' + s2.ar) })
+      body: JSON.stringify({ ar: s2.ar,
+        audioBase64: String(localStorage.getItem('audio_' + s2.ar)||'').replace(/^data:[^,]*,/, '') })
     }).then(function(r) {
       return r.json()['catch'](function(){return {};}).then(function(d){ return {status:r.status, data:d}; });
     }).then(function(o) {

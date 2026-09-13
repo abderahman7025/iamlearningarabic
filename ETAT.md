@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v234
+## OÙ ON EN EST — 13 septembre 2026, production en v235
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,42 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v234), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v235), du plus récent au plus ancien :**
+
+- **LES 115 FICHIERS FAISAIENT QUINZE OCTETS (v235).** « Toujours pas de
+  sons. » Mesuré, cette fois, sur le fichier lui-même :
+  `curl` sur l'URL publique d'un enregistrement rend **HTTP 200, audio/webm,
+  15 octets** — et les octets sont `75ab 5a6a e762…`, pas l'en-tête d'un
+  webm (`1a45 dfa3`). Les 115 fichiers font tous cette taille.
+
+  **La cause, et c'est ma faute.** En v231 j'ai fait porter au fichier son
+  VRAI type au lieu d'un « audio/webm » écrit en dur — juste sur le principe,
+  et nécessaire pour Safari. Or `MediaRecorder` annonce
+  « audio/webm;codecs=opus », et `readAsDataURL` écrit alors
+  « data:audio/webm;codecs=opus;base64,… ». Le serveur, lui, ne retirait le
+  préfixe que par `/^data:audio\/\w+;base64,/` — le « ;codecs=opus » ne
+  correspond pas. Le préfixe restait collé, `Buffer.from(…, 'base64')`
+  avalait la chaîne entière, et rendait quinze octets. Reproduit à
+  l'identique en deux lignes de Node.
+
+  - **Le serveur coupe à la première virgule** (`/^data:[^,]*,/`), ce qui
+    vaut pour n'importe quel type et n'importe quel codec.
+  - **Le client envoie du base64 NU** : le préfixe est retiré avant l'envoi,
+    à l'enregistrement comme au renvoi. Le stockage local, lui, garde le lien
+    complet — une balise `<audio>` le lit tel quel, c'est ce qui fait
+    fonctionner le ▶ du studio.
+  - **Le serveur REFUSE ce qui n'est pas un son** : moins de 500 octets après
+    décodage, c'est 400 avec le nombre d'octets en clair. Ce garde-fou aurait
+    arrêté l'affaire le premier jour ; c'est parce que le serveur acceptait
+    tout que le défaut a tenu si longtemps.
+  - **« Renvoyer tout » reprend AUSSI ce qui est déjà en ligne** : les 115
+    fichiers corrompus doivent être remplacés, pas complétés. Le dépôt écrase
+    (`upsert`).
+
+  **Ce qu'il faut faire** : ouvrir le studio et appuyer sur « ↑ Renvoyer
+  tout ». Les enregistrements d'origine sont sur son appareil (ils y sont
+  rangés avant l'envoi) ; ils repartiront corrects. Ce que le stockage local
+  n'a pas gardé — il est borné à quelques mégaoctets — sera à refaire.
 
 - **LES ENREGISTREMENTS N'ARRIVAIENT PAS À TEMPS (v234).** « J'ai enregistré
   quelques sons, mais ils ne se jouent pas sur le site. » Ils étaient bel et
