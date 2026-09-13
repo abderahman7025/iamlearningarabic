@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v229
+## OÙ ON EN EST — 13 septembre 2026, production en v230
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,52 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v229), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v230), du plus récent au plus ancien :**
+
+- **LE STUDIO N'ENREGISTRAIT RIEN, ET DISAIT LE CONTRAIRE (v230).**
+  Le client : « les audio ne s'enregistrent pas !!!! » Relevé : l'API ne
+  contenait qu'UN SEUL son, l'alif, alors qu'il avait enregistré des dizaines
+  de phrases. Trois défauts empilés, tous du même côté :
+
+  1. **Le mot de passe n'était jamais vérifié.** `adminCheckPassword`
+     acceptait n'importe quelle saisie, ouvrait le studio, et gardait ce
+     qu'on avait tapé comme jeton. Un jeton faux part avec chaque envoi.
+  2. **Le serveur refusait, et personne ne le voyait.** `POST /api/audio`
+     répond `403 {"error":"Accès refusé."}` — vérifié au `curl` — et
+     l'application l'écrivait dans la CONSOLE.
+  3. **La pastille verte se fiait au stockage local.** L'enregistrement
+     étant gardé sur l'appareil avant l'envoi, la liste affichait
+     « ✅ Enregistré » quoi qu'il arrive, et il se rejouait très bien sur
+     SON téléphone. Rien ne pouvait le détromper.
+
+  Ce qui est fait :
+
+  - **Le mot de passe est vérifié auprès du serveur** avant d'ouvrir le
+    studio. On envoie un POST **vide** : les contrôles d'admin passent
+    d'abord, et c'est seulement après que le serveur réclame les données —
+    un **400** signifie donc « mot de passe accepté », un **403** « refusé ».
+    Rien n'est écrit dans le stockage. Le message distingue le mot de passe
+    de l'IP bloquée (`ADMIN_IPS`), les deux cas rendant 403.
+  - **Trois états, et c'est celui du SERVEUR qui compte** : « ✅ En ligne »,
+    « ⚠️ Sur cet appareil seulement — pas envoyé », « ⬜ Non enregistré ».
+  - **Un échec d'envoi s'affiche et s'annonce** : le code et le message du
+    serveur, sur la ligne du son et dans une alerte.
+  - **Bouton « ↑ Renvoyer tout »** : remonte un par un tout ce qui dort dans
+    le stockage local sans être en ligne, et rend le compte exact. **C'est
+    par là qu'il faut commencer** — ses enregistrements y sont sans doute
+    encore.
+  - **Vingt secondes d'enregistrement au lieu de cinq** : la phrase du
+    soukoun en fait plus de neuf, elle était coupée à la prise.
+  - Le studio reprend son fond sombre : la prairie des petits le délavait.
+
+  **PIÈGE, DE NOUVEAU : LES HEREDOCS DE BASH.** Ce correctif a été écrit une
+  première fois par un heredoc `python - <<'PYEOF'` : les `\'` et les `\n`
+  des chaînes JavaScript ont été mangés, et tout le bloc `<script>` du studio
+  a cessé de parser — sans que rien ne le dise, les fonctions devenant
+  simplement `undefined`. C'est écrit en tête des pièges connus ; il faut le
+  lire. **Écrire le script avec l'outil Write, et le lancer ensuite.** Et un
+  `node --check` sur le bloc `<script>` extrait donne la réponse en deux
+  secondes.
 
 - **QUATRE POINTS DE PLUS (v229).**
 

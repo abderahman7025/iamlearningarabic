@@ -345,6 +345,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
    pas celle-ci. */
 body.choix-age.profile-girl #girl-bg-anim,
 body.choix-age.profile-boy #boy-bg-anim{display:none !important}
+/* Le studio est un ecran d'adulte, dessine pour le fond sombre : depuis que
+   les enfants ont leur prairie claire, il s'y delavait. Il porte donc son
+   propre fond, quel que soit le profil. */
+#s-audio-admin{background:#0a0718 !important}
 #s-age{align-items:center;justify-content:center;gap:0;padding:30px 24px;
   z-index:40;
   background:radial-gradient(ellipse 90% 60% at 50% -8%,rgba(245,200,66,.10) 0%,transparent 70%),#0a0718}
@@ -10523,7 +10527,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v229';
+var _VERSION_REPLI='v230';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -20586,6 +20590,7 @@ s0.parentNode.insertBefore(s1,s0);
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button onclick="adminExportAll()" style="background:#f5c842;color:#000;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700">⬇ Exporter tout</button>
         <button onclick="adminImportAll()" style="background:rgba(255,255,255,.1);color:#fff;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem">⬆ Importer</button>
+        <button onclick="adminRenvoyerTout()" style="background:#4caf50;color:#04240f;border:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem;font-weight:700">↑ Renvoyer tout</button>
         <button onclick="adminClearAll()" style="background:rgba(255,80,80,.2);color:#ff6060;border:1px solid rgba(255,80,80,.3);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:.8rem">🗑 Tout effacer</button>
       </div>
     </div>
@@ -21138,9 +21143,15 @@ function adminRenderList() {
   if (!list) return;
   list.innerHTML = '';
   
+  /* ── CE QUI EST VRAIMENT EN LIGNE ──
+     La pastille verte se fiait au SEUL stockage de l'appareil : elle
+     s'allumait même quand le serveur avait refusé l'envoi. Trois états
+     maintenant, et c'est celui du SERVEUR qui compte. */
   ADMIN_SOUNDS.forEach(function(s) {
     var key = 'audio_' + s.ar;
-    var hasAudio = !!localStorage.getItem(key);
+    var local = !!localStorage.getItem(key);
+    var monte = !!(typeof AUDIO_URLS!=='undefined' && AUDIO_URLS && AUDIO_URLS[s.ar]);
+    var hasAudio = local || monte;
     
     var item = document.createElement('div');
     item.className = 'admin-item';
@@ -21149,13 +21160,16 @@ function adminRenderList() {
     item.style.cssText = 'background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,'+(hasAudio?'.3':'.08')+');border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s';
     
     var arSpan = document.createElement('div');
-    arSpan.style.cssText = "font-family:'Scheherazade New',serif;font-size:2rem;color:"+(hasAudio?'#f5c842':'#888')+";min-width:48px;text-align:center;direction:rtl";
+    arSpan.style.cssText = "font-family:'Scheherazade New',serif;font-size:2rem;color:"+(monte?'#4caf50':(local?'#ffb300':'#888'))+";min-width:48px;text-align:center;direction:rtl";
     arSpan.textContent = s.ar;
     
+    var etat = monte ? {t:'✅ En ligne', c:'#4caf50'}
+             : local ? {t:'⚠️ Sur cet appareil seulement — pas envoyé', c:'#ffb300'}
+                     : {t:'⬜ Non enregistré', c:'rgba(255,255,255,.4)'};
     var info = document.createElement('div');
     info.style.cssText = 'flex:1';
     info.innerHTML = '<div style="font-size:.85rem;color:#fff;font-weight:600">'+s.label+'</div>'
-      +'<div style="font-size:.7rem;color:'+(hasAudio?'#4caf50':'rgba(255,255,255,.4)')+';margin-top:2px">'+(hasAudio?'✅ Enregistré':'⬜ Non enregistré')+'</div>';
+      +'<div class="admin-etat" style="font-size:.7rem;color:'+etat.c+';margin-top:2px">'+etat.t+'</div>';
     
     var btns = document.createElement('div');
     btns.style.cssText = 'display:flex;gap:6px;flex-shrink:0';
@@ -21217,19 +21231,38 @@ function adminStartRecord(ar, label, item, btn, info) {
         var arText = adminCurrentKey.replace('audio_','');
         // Sauvegarder localement
         localStorage.setItem(adminCurrentKey, base64);
-        // Envoyer vers Supabase via le backend
+        /* ── L'ENVOI DOIT SE VOIR ──
+           Un 403 finissait dans la console : l'enregistrement restait sur
+           l'appareil, la liste affichait « enregistré », et rien n'était
+           jamais monté. On lit maintenant le CODE de la réponse et on le dit
+           à l'écran, en toutes lettres. */
+        var _dit=info.querySelector('.admin-etat');
+        if(_dit){_dit.textContent='↑ Envoi…';_dit.style.color='#8ab4ff';}
         fetch(API_URL + '/api/audio', {
           method:'POST',
           headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
           body: JSON.stringify({ ar: arText, audioBase64: base64 })
-        }).then(function(r){ return r.json(); })
-        .then(function(data){
-          if(data.url) AUDIO_URLS[arText] = data.url;
-          console.log('Audio uploadé:', data.url);
+        }).then(function(r){
+          return r.json()['catch'](function(){return {};}).then(function(d){
+            return {status:r.status, data:d};
+          });
         })
-        .catch(function(e){ console.log('Erreur upload:', e); });
+        .then(function(o){
+          if(o.status===200 && o.data && o.data.url){
+            AUDIO_URLS[arText]=o.data.url;
+            adminRenderList();
+          }else{
+            var m=(o.data&&o.data.error)||('code '+o.status);
+            if(_dit){_dit.textContent='❌ ÉCHEC : '+m;_dit.style.color='#ff6060';}
+            alert('L\'envoi a échoué pour « '+arText+' ».\n\n'+m
+              +'\n\nIl est gardé sur cet appareil : le bouton « Renvoyer tout » '
+              +'le remontera une fois le problème réglé.');
+          }
+        })
+        .catch(function(e){
+          if(_dit){_dit.textContent='❌ RÉSEAU : '+((e&&e.message)||e);_dit.style.color='#ff6060';}
+        });
         stream.getTracks().forEach(function(t){t.stop();});
-        adminRenderList();
       };
       reader.readAsDataURL(blob);
     };
@@ -21240,12 +21273,13 @@ function adminStartRecord(ar, label, item, btn, info) {
     item.style.borderColor = '#ff6060';
     info.querySelector('div:last-child').textContent = '🔴 Enregistrement...';
     
-    // Arrêt automatique après 5 secondes
+    /* Arrêt automatique. Cinq secondes coupaient les phrases longues — celle
+       du soukoun en fait plus de neuf. Vingt, c'est large pour toutes. */
     setTimeout(function() {
       if (adminRecorder && adminRecorder.state === 'recording') {
         adminRecorder.stop();
       }
-    }, 5000);
+    }, 20000);
     
   }).catch(function(err) {
     alert('Microphone inaccessible: ' + err.message);
@@ -21353,21 +21387,111 @@ function adminDoImport(input) {
   reader.readAsText(file);
 }
 
+/* ── RENVOYER CE QUI EST RESTE SUR L'APPAREIL ──
+   Tant que le jeton était faux, chaque enregistrement se rangeait dans le
+   stockage local et n'allait pas plus loin. Ils y sont toujours : ce bouton
+   les remonte un par un et rend un compte exact — combien sont passés,
+   combien ont échoué, et pourquoi. */
+function adminRenvoyerTout() {
+  var aFaire = ADMIN_SOUNDS.filter(function(s) {
+    var l = localStorage.getItem('audio_' + s.ar);
+    var enLigne = !!(typeof AUDIO_URLS!=='undefined' && AUDIO_URLS && AUDIO_URLS[s.ar]);
+    return l && !enLigne;
+  });
+  if (!aFaire.length) {
+    alert('Rien à renvoyer : tout ce qui est sur cet appareil est déjà en ligne.');
+    return;
+  }
+  if (!confirm(aFaire.length + ' enregistrement(s) sont sur cet appareil sans être en ligne.\n\nLes envoyer maintenant ?')) return;
+  var n = 0, ok = 0, rates = [];
+  var etat = document.getElementById('admin-renvoi');
+  if (!etat) {
+    etat = document.createElement('div');
+    etat.id = 'admin-renvoi';
+    etat.style.cssText = 'margin:10px 0;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.07);color:#fff;font-size:.8rem';
+    var l = document.getElementById('admin-sound-list');
+    if (l && l.parentNode) l.parentNode.insertBefore(etat, l);
+  }
+  function suivant() {
+    if (n >= aFaire.length) {
+      etat.innerHTML = '<b>' + ok + ' envoyé(s)</b> sur ' + aFaire.length
+        + (rates.length
+            ? ' — <span style="color:#ff6060">' + rates.length + ' en échec : ' + rates[0] + '</span>'
+            : ' ✅');
+      loadAudioUrls();
+      setTimeout(adminRenderList, 1200);
+      return;
+    }
+    var s2 = aFaire[n++];
+    etat.textContent = 'Envoi ' + n + '/' + aFaire.length + ' — ' + s2.label;
+    fetch(API_URL + '/api/audio', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
+      body: JSON.stringify({ ar: s2.ar, audioBase64: localStorage.getItem('audio_' + s2.ar) })
+    }).then(function(r) {
+      return r.json()['catch'](function(){return {};}).then(function(d){ return {status:r.status, data:d}; });
+    }).then(function(o) {
+      if (o.status === 200 && o.data && o.data.url) { ok++; AUDIO_URLS[s2.ar] = o.data.url; }
+      else rates.push((o.data && o.data.error) || ('code ' + o.status));
+      setTimeout(suivant, 120);
+    })['catch'](function(e) {
+      rates.push('réseau : ' + ((e && e.message) || e));
+      setTimeout(suivant, 250);
+    });
+  }
+  suivant();
+}
+
 function adminClearAll() {
   if (!confirm('Effacer TOUS les enregistrements ?')) return;
   ADMIN_SOUNDS.forEach(function(s) { localStorage.removeItem('audio_' + s.ar); });
   adminRenderList();
 }
 
+/* ── LE MOT DE PASSE EST VERIFIE AUPRES DU SERVEUR ──
+   Il ne l'était pas : n'importe quelle saisie ouvrait le studio, et le jeton
+   faux partait avec chaque envoi. Le serveur répondait 403, l'application
+   l'écrivait dans la console, et la liste affichait « enregistré » quand
+   même — d'où des dizaines d'enregistrements restés sur l'appareil et jamais
+   montés. C'est LA cause du « les audio ne s'enregistrent pas ».
+   On envoie donc un POST VIDE : les contrôles d'admin passent d'abord, et
+   c'est seulement après que le serveur réclame les données. Un 400 signifie
+   donc « mot de passe accepté », un 403 « refusé ». Rien n'est écrit. */
+function adminVerifieJeton(jeton){
+  return fetch(API_URL + '/api/audio', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+jeton},
+    body:'{}'
+  }).then(function(r){
+    return r.json()['catch'](function(){return {};}).then(function(d){
+      return {ok:(r.status===400), status:r.status, message:(d&&d.error)||''};
+    });
+  })['catch'](function(e){
+    return {ok:false, status:0, message:'réseau : '+((e&&e.message)||e)};
+  });
+}
 function adminCheckPassword() {
   var pwd = prompt('🔐 Mot de passe :');
-  if (pwd && pwd.length > 0) {
-    window._adminSecret = pwd; // utilisé dans Authorization header des uploads
+  if (pwd === null) return;
+  if (!pwd.length) { alert('Mot de passe vide.'); return; }
+  adminVerifieJeton(pwd).then(function(v){
+    if (!v.ok) {
+      var quoi = (v.status===403)
+        ? (/IP/.test(v.message)
+            ? 'Ton adresse IP n\'est pas dans la liste autorisée (ADMIN_IPS).'
+            : 'Mot de passe incorrect.')
+        : ('Code ' + v.status + ' — ' + v.message);
+      alert('Refusé par le serveur.\n\n' + quoi);
+      return;
+    }
+    window._adminSecret = pwd;
     showS('s-audio-admin');
+    /* On relit la liste des sons EN LIGNE : c'est elle qui dit ce qui est
+       vraiment monté, et non le stockage de l'appareil. */
+    loadAudioUrls();
     adminRenderList();
-  } else if (pwd !== null) {
-    alert('Mot de passe incorrect.');
-  }
+    setTimeout(adminRenderList, 1200);
+  });
 }
 
 // Accès secret : taper "admin" sur la page de sélection de profil
