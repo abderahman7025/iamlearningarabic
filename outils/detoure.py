@@ -123,4 +123,9 @@ def main():
     print('%d images detourees' % len(faits))
 
 
-main()
+# Appele seulement quand on LANCE ce fichier. Il etait appele a l'import, si
+# bien que `from detoure import detoure` redetourait les images de la licorne
+# au passage — elles se retrouvaient modifiees sans que personne l'ait
+# demande.
+if __name__ == '__main__':
+    main()

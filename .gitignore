@@ -7,3 +7,4 @@ node_modules/
 # à regarder soi-même une animation ou une mise en page pendant qu'on
 # travaille, elles n'ont rien à faire dans l'historique.
 outils/captures/
+__pycache__/

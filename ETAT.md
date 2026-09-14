@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 13 septembre 2026, production en v237
+## OÙ ON EN EST — 14 septembre 2026, production en v238
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -85,7 +85,65 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v237), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v238), du plus récent au plus ancien :**
+
+- **LES DESSINS DU CLIENT, LE TRACÉ QUI SE REMPLIT, ET LE SON QUI PART TOUT
+  DE SUITE (v238).** Cinq demandes d'un coup, plus un défaut trouvé en
+  chemin.
+
+  - **Les onze animaux sont les siens.** Ses dessins arrivaient dans ses
+    téléchargements sous « 1.png » à « 11.png », sur fond blanc et à près de
+    deux mégaoctets pièce. `python outils/animaux-images.py` les détoure
+    (même méthode que `detoure.py` : le fond se reconnaît à ce qu'il TOUCHE
+    LE BORD, et on n'avance que dans le clair, donc le ventre du pingouin
+    reste opaque), les réduit à 440 px de grand côté et les ramène à 255
+    teintes — **1,78 Mo à 359 Ko pour les onze**. `_HABILLAGES.animaux.images`
+    pointe dessus. Le papillon garde son SVG : son île est la prolongation,
+    que la carte des petits ne montre pas.
+  - **Le tracé n'a plus d'étoiles : LA LETTRE SE REMPLIT.** « Enlève les
+    étoiles, enlève aussi le point bleu sur les voyelles, et à la place la
+    lettre se remplit de couleur là où l'enfant repasse. » Le doigt peint sur
+    un calque à part ; ce calque sert de DÉCOUPE (`source-in`) dans laquelle
+    on verse la couleur, si bien que rien ne déborde du dessin même avec un
+    gros pinceau — et un gros pinceau, pour un doigt de trois ans, est
+    indispensable. Le calque ne s'efface qu'au changement de passe : l'enfant
+    peut lever le doigt, ce qui est rempli le reste. Les jalons du geste
+    demeurent, INVISIBLES : c'est eux qui imposent le sens de l'écriture, et
+    le point et la voyelle gardent les leurs — ils restent gris tant qu'on
+    n'est pas allé les peindre. `MJ_GUIDES` attend les dessins qu'il doit
+    fournir pour le départ de chaque lettre : une ligne à écrire, rien de
+    plus. Vérifié au banc sur ا et sur بَ.
+  - **« Écoute bien » ne rabâche plus.** « Ça fait trop de alif alif alif
+    alif. » La cible est la même aux quatre tours : on la dit UNE FOIS au
+    début, puis on encourage (trois relances déjà enregistrées), et le
+    haut-parleur reste là pour qui veut la réentendre. Mesuré : la lettre
+    n'est plus prononcée qu'une seule fois sur la manche entière.
+  - **Relier marche dans les deux sens, et pardonne.** Le départ se prend
+    dans n'importe laquelle des deux colonnes, l'arrivée est dans l'autre, et
+    le trait s'accroche au bord qui regarde d'en face. Le lâcher ne cherche
+    plus la case EXACTEMENT sous le doigt : on prend la case libre la plus
+    proche et on l'accepte à moins de `max(70 px, 0,85 × hauteur)` de son
+    rectangle. Vérifié : six lâchers décalés (jusqu'à 70 px de côté)
+    valident, dans les deux sens ; un lâcher tombé en plein sur une AUTRE
+    lettre est toujours refusé.
+  - **Le son part tout de suite.** Chaque lecture fabriquait un
+    `new Audio(url)` neuf — le navigateur repartait CHERCHER le fichier, et
+    l'enfant attendait un aller-retour complet, à chaque « Bravo ! ». Les
+    lecteurs sont maintenant gardés et rembobinés (48 au plus : les
+    enregistrements locaux sont des adresses `data:`), et `_prechargeSons`
+    fabrique ceux d'une leçon dès son ouverture. À côté : la narration
+    enchaîne en 20 ms au lieu de 100, guette toutes les 50 ms au lieu de 100,
+    et les sursis d'entrée de manche passent de 420-480 ms à 150.
+  - **TROUVÉ EN CHEMIN — les enregistrements français ne pouvaient PAS se
+    jouer.** La narration nettoie la phrase avant de la dire :
+    `sansGuillemets` colle la ponctuation au mot, « Bravo ! » devient
+    « Bravo! ». Le studio, lui, dépose le fichier sous la phrase telle
+    qu'elle est écrite, avec l'espace français. Les deux ne se rencontraient
+    jamais. C'est l'autre moitié de « j'ai enregistré quelques sons, mais ils
+    ne se jouent pas sur le site » — la première étant les quinze octets de
+    la v235. `_sonEnregistre` cherche désormais les DEUX écritures (l'espace
+    n'est restauré que devant « ! ? ; : … », jamais devant la virgule ni le
+    point). Vérifié au banc.
 
 - **LA BASCULE D'INTERFACE EST PARTOUT (v237).** Elle ne vivait que dans la
   barre du haut, et cette barre n'existe qu'à l'intérieur de `s-main` : le

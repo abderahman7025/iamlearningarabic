@@ -5631,16 +5631,91 @@ function _audioRessaie(silencieux) {
 /* Sans attendre `window.onload` : c'est tout l'objet du correctif. */
 loadAudioUrls(true);
 
+/* ── LE SON PART TOUT DE SUITE ──
+   « Il y a trop d'attente avant le jeu d'un son. » Chaque lecture
+   fabriquait un `new Audio(url)` neuf : le navigateur repartait CHERCHER LE
+   FICHIER sur le réseau, et l'enfant attendait un aller-retour complet —
+   plusieurs dixièmes de seconde, parfois plus d'une seconde sur un
+   téléphone. Or les mêmes phrases reviennent sans cesse : « Bravo ! », la
+   lettre du cours, les consignes des manches.
+   On garde donc les lecteurs déjà fabriqués et on les REMBOBINE. La
+   deuxième écoute ne coûte plus rien, et `_prechargeSons` fabrique ceux
+   d'une leçon avant qu'on en ait besoin, pour que la première non plus.
+   Le cache est borné : les enregistrements gardés sur l'appareil sont des
+   adresses `data:` de plusieurs dizaines de kilo-octets. */
+var _lecteurs={},_lecteursOrdre=[];
+var _LECTEURS_MAX=48;
+function _lecteurPour(src){
+  var a=_lecteurs[src];
+  if(a)return a;
+  a=new Audio(src);a.preload='auto';
+  try{a.load();}catch(e){}
+  _lecteurs[src]=a;_lecteursOrdre.push(src);
+  while(_lecteursOrdre.length>_LECTEURS_MAX){
+    var v=_lecteursOrdre.shift();
+    if(v!==src)delete _lecteurs[v];
+  }
+  return a;
+}
+/* ── LA CLÉ D'UN ENREGISTREMENT ──
+   La narration nettoie la phrase avant de la dire : `sansGuillemets` COLLE
+   LA PONCTUATION au mot qui la précède — « Bravo ! » devient « Bravo! ».
+   Le studio, lui, garde la phrase telle qu'elle est écrite dans
+   l'application, avec l'espace de la typographie française, et c'est sous
+   cette forme-là que le fichier est déposé. Les deux ne se rencontraient
+   jamais : le client a enregistré ses phrases et ne les a jamais entendues
+   — « j'ai enregistré quelques sons, mais ils ne se jouent pas sur le
+   site ». On cherche donc les DEUX écritures.
+   On ne restaure l'espace que devant « ! ? ; : … », qui le prennent en
+   français ; la virgule et le point, jamais. */
+function _clesSon(t){
+  var l=[t];
+  var espace=String(t).replace(/([^\s])([!?;:\u2026])/g,'$1 $2');
+  if(espace!==t)l.push(espace);
+  return l;
+}
+function _sonEnregistre(t){
+  if(!t)return null;
+  var c=_clesSon(t);
+  for(var i=0;i<c.length;i++){
+    try{if(typeof AUDIO_URLS!=='undefined'&&AUDIO_URLS&&AUDIO_URLS[c[i]])return AUDIO_URLS[c[i]];}catch(e){}
+    try{var v=localStorage.getItem('audio_'+c[i]);if(v)return v;}catch(e){}
+  }
+  return null;
+}
+function _joueSon(src){
+  var a;
+  try{a=_lecteurPour(src);}catch(e){return null;}
+  try{a.currentTime=0;}catch(e){}
+  /* La narration se sert de ce repère pour savoir qu'une voix joue. Un
+     lecteur réutilisé est encore `paused` pendant les premiers
+     millisecondes : on note l'instant du départ pour qu'elle ne prenne pas
+     ce battement pour un silence. */
+  a._lance=Date.now();
+  window._kidAudio=a;
+  try{var p=a.play();if(p&&p['catch'])p['catch'](function(){});}catch(e){}
+  return a;
+}
+/* Fabrique à l'avance les lecteurs d'une liste de phrases : au moment de
+   les dire, le fichier est déjà là. */
+function _prechargeSons(liste){
+  (liste||[]).forEach(function(t){
+    if(!t)return;
+    try{
+      var u=_sonEnregistre(t);
+      if(u)_lecteurPour(u);
+    }catch(e){}
+  });
+}
 function speak(txt,rate){
   if(!st.soundOn)return;
   var isArabic=/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(txt);
   // 1. Audio Supabase (arabe seulement)
   // window._kidAudio : permet aux cours enfant de savoir qu'un enregistrement
   // est en cours de lecture (speechSynthesis.speaking reste faux dans ce cas).
-  if(isArabic&&AUDIO_URLS[txt]){window._kidAudio=new Audio(AUDIO_URLS[txt]);window._kidAudio.play();return;}
-  // 2. Audio localStorage (arabe seulement)
   if(isArabic){
-    try{var stored=localStorage.getItem('audio_'+txt);if(stored){window._kidAudio=new Audio(stored);window._kidAudio.play();return;}}catch(e){}
+    var _e=_sonEnregistre(txt);
+    if(_e){_joueSon(_e);return;}
   }
   // 3. Synthèse vocale (fallback)
   if(isArabic) console.log('[Audio] Son non trouvé pour:', txt, '| AUDIO_URLS keys:', Object.keys(AUDIO_URLS).length);
@@ -6634,9 +6709,8 @@ function speakText(txt,lang,el){
      toujours sur la voix du navigateur — celle qui lit « tres » comme
      « tresse ». Elle vaut maintenant pour toute phrase. */
   try{
-    var _enr=(typeof AUDIO_URLS!=='undefined'&&AUDIO_URLS&&AUDIO_URLS[txt])
-             ||localStorage.getItem('audio_'+txt);
-    if(_enr){window._kidAudio=new Audio(_enr);window._kidAudio.play();return;}
+    var _enr=_sonEnregistre(txt);
+    if(_enr){_joueSon(_enr);return;}
   }catch(e){}
   var arabicChars=(txt.match(/[\u0600-\u06FF\u0750-\u077F]/g)||[]).length;
   var latinChars=(txt.match(/[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/g)||[]).length;
@@ -10595,7 +10669,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v237';
+var _VERSION_REPLI='v238';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10709,7 +10783,10 @@ function _boyNarration(){
     var t0=Date.now(),quiet=0;
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
-      var parle=(ss&&(ss.speaking||ss.pending))||(a&&!a.ended&&!a.paused);
+      /* Un lecteur qu'on vient de rembobiner est encore `paused` le temps
+         que le navigateur le relance : on le compte comme parlant. */
+      var parle=(ss&&(ss.speaking||ss.pending))
+        ||(a&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600));
       /* ── UN ENREGISTREMENT DURE CE QU'IL DURE ──
          `estim` devine la duree sur la LONGUEUR DU TEXTE, et plafonne a 9 s :
          la phrase du soukoun, dite par le client, passe les 9 s, et le
@@ -10724,14 +10801,21 @@ function _boyNarration(){
          finirait par declarer la phrase dite alors qu'elle est suspendue. */
       if(enPause){t0=Date.now();quiet=0;return;}
       quiet=parle?0:quiet+1;
-      if((quiet>=3&&Date.now()-t0>500)||Date.now()-t0>maxMs){
-        clearInterval(tmr);tmr=null;busy=false;enCours=null;setTimeout(pump,100);
+      /* On regarde deux fois plus souvent et on enchaîne aussitôt : le
+         guet valait 100 ms, il fallait trois silences d'affilée puis un
+         demi-tour de 100 ms — presque une demi-seconde de blanc entre deux
+         phrases, alors que le lecteur suivant est déjà prêt. */
+      if((quiet>=2&&Date.now()-t0>320)||Date.now()-t0>maxMs){
+        clearInterval(tmr);tmr=null;busy=false;enCours=null;setTimeout(pump,20);
       }
-    },100);
+    },50);
   }
   function sansEmoji(t){return String(t).replace(/[←-⇿⌀-○◍-➿⬀-⯿️⃣]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]/g,' ').replace(/\s+/g,' ').trim();}
   function sansGuillemets(t){return String(t).replace(/«[^»]*»/g,' ').replace(/\s+([!?…,.])/g,'$1').replace(/\s+/g,' ').trim();}
   function aEnreg(t){
+    /* Même règle que la lecture : la phrase peut être rangée avec l'espace
+       français devant sa ponctuation. */
+    try{if(typeof _sonEnregistre==='function')return !!_sonEnregistre(t);}catch(e){}
     try{if(typeof AUDIO_URLS!=='undefined'&&AUDIO_URLS&&AUDIO_URLS[t])return true;}catch(e){}
     try{if(localStorage.getItem('audio_'+t))return true;}catch(e){}
     return false;
@@ -10792,7 +10876,7 @@ function _boyNarration(){
       var id=setInterval(function(){
         if(busy||q.length||enPause)return;
         clearInterval(id);fn();
-      },200);
+      },80);
       timers.push(id);return id;
     },
     videTimers:function(){timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];differes=[];}
@@ -12970,10 +13054,11 @@ var _HABILLAGES={
      la fille (voir `_habDuProfil`). Il ne porte que ce qui touche au
      parcours. Le client ne veut pas d'un theme d'une seule teinte : chaque
      etape a SA couleur, et c'est elle qui peint sa vignette.
-     Les douze dessins sortent de `node outils/animaux.js` — les couleurs
-     sont ecrites aux deux endroits et doivent bouger ensemble. Pour de
-     vraies illustrations, deposer `public/images/animal-<nom>.png` et changer
-     l'extension ci-dessous : rien d'autre a toucher. */
+     Les onze premiers dessins sont ceux du client, detoures et allegus par
+     `python outils/animaux-images.py` (source : ses telechargements). Le
+     douzieme, le papillon, garde le SVG de `node outils/animaux.js` : son
+     ile est la prolongation, que la carte des petits ne montre pas. Les
+     couleurs restent ecrites aux deux endroits et doivent bouger ensemble. */
   animaux:{
     cle:'animaux',veh:'🐾',
     mission:'MISSION',missionMin:'Mission',depart:'ON COMMENCE',
@@ -12984,12 +13069,12 @@ var _HABILLAGES={
             'Le Hibou','Le Poisson','L\u2019Abeille','Le Pingouin','La Tortue','Le Papillon'],
     slugs:['lion','elephant','girafe','panda','renard','grenouille',
            'hibou','poisson','abeille','pingouin','tortue','papillon'],
-    images:['/images/animal-lion.svg','/images/animal-elephant.svg',
-            '/images/animal-girafe.svg','/images/animal-panda.svg',
-            '/images/animal-renard.svg','/images/animal-grenouille.svg',
-            '/images/animal-hibou.svg','/images/animal-poisson.svg',
-            '/images/animal-abeille.svg','/images/animal-pingouin.svg',
-            '/images/animal-tortue.svg','/images/animal-papillon.svg'],
+    images:['/images/animal-lion.png','/images/animal-elephant.png',
+            '/images/animal-girafe.png','/images/animal-panda.png',
+            '/images/animal-renard.png','/images/animal-grenouille.png',
+            '/images/animal-hibou.png','/images/animal-poisson.png',
+            '/images/animal-abeille.png','/images/animal-pingouin.png',
+            '/images/animal-tortue.png','/images/animal-papillon.svg'],
     couleurs:['#F5A524','#7FA9D4','#F2C230','#4C5566','#EF7042','#57C84D',
               '#9B7EDE','#2FC4D6','#F5C518','#3C4A5A','#7CB342','#EC6EA8'],
     /* Un ciel de jour au-dessus d'une prairie, pour les deux profils : les
@@ -14020,8 +14105,8 @@ function _boyScene(ca,reprise){
           if(Date.now()-t0<120000)return;
         }
         clearInterval(id);N.surSilence(fn);
-      },200);
-    },700);
+      },90);
+    },220);
   }
   /* La page a fini de parler ET de feliciter : c'est alors, et pas avant,
      qu'elle peut passer. */
@@ -16275,7 +16360,7 @@ function _boyScene(ca,reprise){
             N.dire(te('Maintenant, touche la lettre !'));
           },30);
         },20);
-      },450);
+      },150);
     };
   };
 
@@ -16319,26 +16404,27 @@ function _boyScene(ca,reprise){
         });
         if(premier)N.plusTard(function(){
           phraseAvecLettre('Attrape la lettre',son||cible,null);
-        },420);
+        },150);
       }
       tour(true);
     };
   };
 
   /* ── 3. LE DOIGT QUI DESSINE ──
-     Un chemin d'étoiles posé SUR LE VRAI GESTE de la lettre — celui que le
-     client a dicté geste par geste, et dont `_trajectoire` garde les points.
-     L'enfant les allume l'une après l'autre ; il ne peut pas prendre la
-     troisième avant la deuxième, c'est ce qui donne le SENS de l'écriture.
+     Des JALONS INVISIBLES posés SUR LE VRAI GESTE de la lettre — celui que
+     le client a dicté geste par geste, et dont `_trajectoire` garde les
+     points. Ils étaient dessinés en étoiles ; le client n'en veut plus. Ils
+     restent, mais on ne les voit pas : c'est eux qui imposent le SENS de
+     l'écriture, on ne peut pas prendre le troisième avant le deuxième.
 
-     LES POINTS ET LA VOYELLE ONT AUSSI LEURS ÉTOILES, et elles comptent :
+     LES POINTS ET LA VOYELLE ONT AUSSI LEURS JALONS, et ils comptent :
      « quand il faut repasser sur les lettres, il faut devoir repasser sur
      les voyelles s'il y en a ». Ni les uns ni l'autre ne sont dans le geste,
      qui ne décrit que le corps : on les retrouve par `_revelateur`, qui sait
      déjà séparer les trois encres, et on prend le centre de chaque tache.
      L'ordre est celui de la main : le corps, puis les points, puis la
      voyelle. */
-  function cheminEtoiles(texte,ax,ay,px,nb){
+  function jalonsDuGeste(texte,ax,ay,px,nb){
     var g=null;
     try{g=_trajectoire(texte);}catch(e){}
     if(!g)return [];
@@ -16402,9 +16488,25 @@ function _boyScene(ca,reprise){
             ax:W/2-(((g+dr)/2-X)/T)*px,
             ay:H/2-(((h+b)/2-Y)/T)*px};
   }
+  /* ── L'IMAGE QUI MÈNE LE DOIGT ──
+     Le client posera des dessins à placer AU DÉPART de l'écriture de chaque
+     lettre ; ils suivront ensuite le doigt pendant qu'il repasse. Tant que
+     cette table est vide, rien n'est dessiné et la manche marche sans. Pour
+     en poser un : déposer le fichier dans `public/images/` et l'inscrire
+     ici, la lettre en clé — par exemple  'ب':'/images/guide-ba.png'. */
+  var MJ_GUIDES={};
+  var _guidesCharges={};
+  function _guidePour(glyph){
+    var u=MJ_GUIDES[_sansCercle(glyph)]||MJ_GUIDES[glyph];
+    if(!u)return null;
+    var im=_guidesCharges[u];
+    if(!im){im=new Image();im.src=u;_guidesCharges[u]=im;}
+    return (im.complete&&im.naturalWidth)?im:null;
+  }
+
   api.jeuTrace=function(glyph,passes){
     return function(){
-      var m=manche(te('SUIS LES ÉTOILES'),'mj-trace',MJ_COUL[2]);
+      var m=manche(te('REMPLIS LA LETTRE'),'mj-trace',MJ_COUL[2]);
       var cadre=document.createElement('div');cadre.className='mj-cadre';
       var cv=document.createElement('canvas');
       cadre.appendChild(cv);m.zone.appendChild(cadre);
@@ -16418,7 +16520,7 @@ function _boyScene(ca,reprise){
       var cx=cv.getContext('2d');
       var _r=encreQuiRemplit(glyph,W,H,46);
       var PX=_r.px,AX=_r.ax,AY=_r.ay;
-      var corps=cheminEtoiles(glyph,AX,AY,PX,9);
+      var corps=jalonsDuGeste(glyph,AX,AY,PX,9);
       var eto=corps.slice();
       if(corps.length){
         var rev=null;
@@ -16430,38 +16532,80 @@ function _boyScene(ca,reprise){
       }
       var libre=!eto.length;
       var TOTAL=Math.max(1,passes||2),passe=1;
-      var n=0,trace=[],fini=false;
+      var n=0,fini=false;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.insertBefore(jauge,cadre);
+      /* ── LA LETTRE SE REMPLIT LÀ OÙ LE DOIGT PASSE ──
+         « Enlève les étoiles, enlève aussi le point bleu sur les voyelles,
+         et à la place la lettre se remplit de couleur là où l'enfant
+         repasse. » La lettre est donc posée en gris, et l'enfant la PEINT.
+         Le tracé du doigt va sur un calque à part ; ce calque sert ensuite
+         de DÉCOUPE (`source-in`) dans laquelle on verse la couleur. Rien ne
+         déborde du dessin de la lettre, même avec un gros pinceau — et un
+         gros pinceau, pour un doigt de trois ans, est indispensable.
+         Le calque n'est effacé qu'au changement de passe : l'enfant peut
+         lever le doigt et reprendre, ce qui est déjà rempli le reste. */
+      var calque=document.createElement('canvas');
+      calque.width=W;calque.height=H;
+      var kx=calque.getContext('2d');
+      var encre=document.createElement('canvas');
+      encre.width=W;encre.height=H;
+      var ex=encre.getContext('2d');
+      var PINCEAU=Math.max(22,Math.round(PX*0.30));
+      var dernier=null,tete=null;
+      function poseLettre(c,coul){
+        c.save();
+        c.font=PX+"px 'Scheherazade New',serif";
+        c.textAlign='center';c.textBaseline='alphabetic';
+        c.fillStyle=coul;
+        try{_dessineSurLigne(c,glyph,AX,AY,PX);}catch(e){}
+        c.restore();
+      }
+      function peintCalque(p){
+        kx.save();
+        kx.strokeStyle='#000';kx.fillStyle='#000';
+        kx.lineWidth=PINCEAU;kx.lineCap='round';kx.lineJoin='round';
+        if(dernier){
+          kx.beginPath();kx.moveTo(dernier[0],dernier[1]);
+          kx.lineTo(p[0],p[1]);kx.stroke();
+        }
+        kx.beginPath();kx.arc(p[0],p[1],PINCEAU/2,0,6.2832);kx.fill();
+        kx.restore();
+        dernier=p;tete=p;
+      }
+      function videCalque(){kx.clearRect(0,0,W,H);dernier=null;tete=null;}
       function peint(){
         cx.clearRect(0,0,W,H);
-        cx.save();
-        cx.font=PX+"px 'Scheherazade New',serif";
-        cx.textAlign='center';cx.textBaseline='alphabetic';
-        cx.fillStyle=fini?m.coul:'rgba(20,24,32,.16)';
-        _dessineSurLigne(cx,glyph,AX,AY,PX);
-        if(!fini){
+        poseLettre(cx,'rgba(20,24,32,.15)');
+        if(fini){
+          poseLettre(cx,m.coul);
+        }else{
+          ex.clearRect(0,0,W,H);
+          ex.drawImage(calque,0,0);
+          ex.globalCompositeOperation='source-in';
+          poseLettre(ex,m.coul);
+          ex.globalCompositeOperation='source-over';
+          cx.drawImage(encre,0,0);
+          /* Le contour reste dessiné tant que la lettre n'est pas pleine :
+             c'est lui, maintenant, qui dit où aller. */
+          cx.save();
+          cx.font=PX+"px 'Scheherazade New',serif";
+          cx.textAlign='center';cx.textBaseline='alphabetic';
           cx.lineWidth=Math.max(2,PX*0.012);cx.strokeStyle=m.coul;
-          cx.globalAlpha=.55;
+          cx.globalAlpha=.5;
           try{cx.strokeText(glyph,AX,AY+_descenteGlyphe(glyph,PX));}catch(e){}
-          cx.globalAlpha=1;
-        }
-        cx.restore();
-        for(var i=1;i<trace.length;i++){
-          cx.save();
-          cx.strokeStyle=MJ_COUL[i%MJ_COUL.length];
-          cx.lineWidth=14;cx.lineCap='round';cx.globalAlpha=.75;
-          cx.beginPath();cx.moveTo(trace[i-1][0],trace[i-1][1]);
-          cx.lineTo(trace[i][0],trace[i][1]);cx.stroke();cx.restore();
-        }
-        eto.forEach(function(e,k){
-          cx.save();
-          cx.globalAlpha=e.on?1:(k===n?1:.55);
-          cx.font=(e.on||k===n?38:27)+'px serif';
-          cx.textAlign='center';cx.textBaseline='middle';
-          cx.fillText(e.on?'⭐':(e.marque==='point'?'🔸':(e.marque==='voyelle'?'🔷':'✨')),e.x,e.y);
           cx.restore();
-        });
+          var gi=_guidePour(glyph);
+          if(gi){
+            var vise=tete||eto[n]||eto[0];
+            if(vise){
+              var gx=(vise.x!==undefined?vise.x:vise[0]);
+              var gy=(vise.y!==undefined?vise.y:vise[1]);
+              var GH=Math.max(34,PX*0.34),GW=GH*(gi.naturalWidth/gi.naturalHeight);
+              cx.drawImage(gi,gx-GW/2,gy-GH,GW,GH);
+            }
+          }
+        }
         jauge.firstChild.style.width=
           Math.round(((passe-1)+(eto.length?n/eto.length:1))/TOTAL*100)+'%';
       }
@@ -16475,19 +16619,25 @@ function _boyScene(ca,reprise){
       var doigt=false;
       function touche(ev){
         if(fini)return;
-        var p=auCanvas(ev);trace.push(p);
+        var p=auCanvas(ev);
+        peintCalque(p);
         if(!libre&&n<eto.length){
           var e=eto[n],dx=p[0]-e.x,dy=p[1]-e.y;
-          if(dx*dx+dy*dy<52*52){
+          /* Un doigt d'enfant ne vise pas : le jalon se prend de loin. */
+          if(dx*dx+dy*dy<62*62){
             e.on=true;n++;
             if(typeof playBravo==='function')playBravo();
             if(n>=eto.length){
               if(passe<TOTAL){
-                passe++;
                 youpi(m.zone,true);N.dire(te('Encore une fois !'));
+                /* La passe ne change de numero QU'AU MOMENT DU REMISE A
+                   ZERO : comptee tout de suite, la jauge sautait a 100 %
+                   pendant les huit dixiemes de la fete, puis retombait a
+                   la moitie. */
                 N.plusTard(function(){
+                  passe++;
                   eto.forEach(function(x){x.on=false;});
-                  n=0;trace=[];peint();
+                  n=0;videCalque();peint();
                 },800);
               }else{
                 fini=true;youpi(m.zone);m.gagne();
@@ -16500,14 +16650,14 @@ function _boyScene(ca,reprise){
       cv.style.touchAction='none';
       cv.addEventListener('pointerdown',function(ev){doigt=true;
         try{cv.setPointerCapture(ev.pointerId);}catch(e){}
-        trace=[];touche(ev);ev.preventDefault();});
+        dernier=null;touche(ev);ev.preventDefault();});
       cv.addEventListener('pointermove',function(ev){if(doigt)touche(ev);});
-      cv.addEventListener('pointerup',function(){doigt=false;});
-      cv.addEventListener('pointercancel',function(){doigt=false;});
+      cv.addEventListener('pointerup',function(){doigt=false;dernier=null;});
+      cv.addEventListener('pointercancel',function(){doigt=false;dernier=null;});
       N.plusTard(function(){
         phraseAvecLettre(null,glyph,null);
-        N.plusTard(function(){N.dire(te('Suis les étoiles avec ton doigt !'));},20);
-      },480);
+        N.plusTard(function(){N.dire(te('Repasse sur la lettre avec ton doigt !'));},20);
+      },150);
     };
   };
 
@@ -16555,7 +16705,7 @@ function _boyScene(ca,reprise){
       pose();
       N.plusTard(function(){
         phraseAvecLettre('Éclate les bulles avec la lettre',cible,null);
-      },420);
+      },150);
     };
   };
 
@@ -16563,6 +16713,9 @@ function _boyScene(ca,reprise){
      Le son, et rien d'autre : la réponse ne se voit nulle part. Quatre
      manches. Le haut-parleur est PLUS PETIT et posé de côté — le client le
      trouvait envahissant — et les trois réponses sont centrées en hauteur. */
+  /* Trois relances courtes, à la place de la lettre rabâchée. Elles sont
+     déjà dans la liste du studio : rien de neuf à enregistrer. */
+  var _RELANCE=['Encore une fois !','Touche la bonne lettre !','Écoute bien !'];
   api.jeuEcoute=function(cible,leurres){
     return function(){
       var m=manche(te('ÉCOUTE BIEN'),'mj-ecoute',MJ_COUL[4]);
@@ -16601,8 +16754,17 @@ function _boyScene(ca,reprise){
           N.dire(te('Écoute bien !'));
           N.plusTard(function(){N.direToujours(_sansCercle(cible));},20);
           N.plusTard(function(){N.dire(te('Touche la bonne lettre !'));},30);
-        },420);
-        else N.plusTard(function(){ditGlyphe(cible);},420);
+        },150);
+        /* ── ON NE REDIT PLUS LA LETTRE A CHAQUE TOUR ──
+           « Il faut arrêter de répéter la lettre à chaque fois que l'on
+           clique sur la bonne, ça fait trop de alif alif alif alif. » La
+           cible est la MÊME pendant les quatre tours : l'enfant l'a
+           entendue au premier, il n'a pas besoin qu'on la lui rejette
+           dans l'oreille trois fois de plus. On l'encourage, et le
+           haut-parleur reste là pour qui veut la réentendre. */
+        else N.plusTard(function(){
+          N.dire(te(_RELANCE[(n-1)%_RELANCE.length]));
+        },150);
       }
       tour(true);
     };
@@ -16712,7 +16874,7 @@ function _boyScene(ca,reprise){
               N.dire(te('Trouve la lettre dans le mot !'));
             },30);
           },20);
-        },420);
+        },150);
         else N.plusTard(function(){N.dire(te('Trouve la lettre dans le mot !'));},380);
       }
       tour();
@@ -16721,11 +16883,24 @@ function _boyScene(ca,reprise){
 
   /* ── 7. RELIE LES PAREILLES ──
      Le client : « l'enfant doit TRACER UNE LIGNE entre les deux lettres, pas
-     appuyer sur les deux. » Le doigt part d'une case de gauche, un trait le
-     suit, et il faut le lâcher sur sa jumelle à droite. Le trait est dessiné
-     dans un SVG posé par-dessus, aux coordonnées MESURÉES : les colonnes
-     bougent avec la largeur de l'écran, une position écrite en dur tomberait
-     à côté dès qu'on tourne l'appareil. */
+     appuyer sur les deux. » Le doigt part d'une case, un trait le suit, et
+     il faut le lâcher sur sa jumelle. Le trait est dessiné dans un SVG posé
+     par-dessus, aux coordonnées MESURÉES : les colonnes bougent avec la
+     largeur de l'écran, une position écrite en dur tomberait à côté dès
+     qu'on tourne l'appareil.
+
+     DEUX CORRECTIONS DU CLIENT.
+     « On doit pouvoir commencer de la lettre à droite à la lettre à gauche,
+     les deux côtés » : on partait forcément de la colonne de gauche. Le
+     départ se prend maintenant dans N'IMPORTE LAQUELLE des deux, et
+     l'arrivée est dans l'autre — le trait s'accroche au bon bord de chaque
+     case selon le sens.
+     « L'enfant n'a pas à arriver pile sur la lettre, c'est un enfant, s'il
+     arrive à peine derrière à côté ça doit valider » : on cherchait la case
+     EXACTEMENT sous le doigt (`elementFromPoint`). On prend maintenant la
+     case libre la plus proche du lâcher, et on l'accepte si le doigt est
+     tombé à moins d'une bonne marge de son rectangle — un lâcher dedans
+     vaut zéro, un lâcher juste à côté vaut quelques dizaines de pixels. */
   api.jeuRelier=function(cible,leurres){
     return function(){
       var m=manche(te('RELIE LES PAREILLES'),'mj-relier',MJ_COUL[1]);
@@ -16738,7 +16913,7 @@ function _boyScene(ca,reprise){
       var cd=document.createElement('div');cd.className='mjr-col';
       boite.appendChild(cg);boite.appendChild(cd);
       m.zone.appendChild(boite);
-      var faites=0,depart=null,vivant=null;
+      var faites=0,depart=null,departCol=null,vivant=null;
       function pastille(g,col,k){
         var d=document.createElement('div');d.className='mjr-case';
         d.textContent=_sansCercle(g);d._g=g;
@@ -16754,6 +16929,28 @@ function _boyScene(ca,reprise){
         var r=el.getBoundingClientRect();
         return {x:((cote==='d'?r.right:r.left)-rb.left)/ech,
                 y:(r.top+r.height/2-rb.top)/ech};
+      }
+      /* Le bord d'une case qui REGARDE L'AUTRE COLONNE : c'est par là que
+         le trait sort, et par là qu'il arrive de l'autre côté. */
+      function bordFace(col){return col===cg?'d':'g';}
+      /* La case visée : la plus proche du lâcher dans la colonne d'en face,
+         acceptée si le doigt est tombé à moins de `TOL` de son rectangle.
+         On mesure une distance AU RECTANGLE, pas à son centre : tomber
+         dedans vaut zéro, tomber juste au-dessous vaut l'écart réel. */
+      function viseeProche(col,x,y){
+        var best=null,bd=1e9;
+        Array.prototype.forEach.call(col.children,function(c){
+          if(c.classList.contains('prise'))return;
+          var r=c.getBoundingClientRect();
+          var dx=Math.max(r.left-x,0,x-r.right);
+          var dy=Math.max(r.top-y,0,y-r.bottom);
+          var d=Math.sqrt(dx*dx+dy*dy);
+          if(d<bd){bd=d;best=c;}
+        });
+        if(!best)return null;
+        var rb=best.getBoundingClientRect();
+        var TOL=Math.max(70,rb.height*0.85);
+        return bd<=TOL?best:null;
       }
       function versBoite(ev){
         var rb=boite.getBoundingClientRect();
@@ -16774,40 +16971,41 @@ function _boyScene(ca,reprise){
       boite.style.touchAction='none';
       boite.addEventListener('pointerdown',function(ev){
         var c=ev.target.closest?ev.target.closest('.mjr-case'):null;
-        if(!c||c.classList.contains('prise')||cd.contains(c))return;
+        if(!c||c.classList.contains('prise'))return;
+        departCol=cd.contains(c)?cd:cg;
         depart=c;c.classList.add('vise');
         ditGlyphe(c._g);
         vivant=ligne(getComputedStyle(c).getPropertyValue('--mc')||'#1E40AF');
-        place(vivant,pt(c,'d'),versBoite(ev));
+        place(vivant,pt(c,bordFace(departCol)),versBoite(ev));
         try{boite.setPointerCapture(ev.pointerId);}catch(e){}
         ev.preventDefault();
       });
       boite.addEventListener('pointermove',function(ev){
         if(!depart||!vivant)return;
-        place(vivant,pt(depart,'d'),versBoite(ev));
+        place(vivant,pt(depart,bordFace(departCol)),versBoite(ev));
       });
       boite.addEventListener('pointerup',function(ev){
         if(!depart)return;
-        var sous=document.elementFromPoint(ev.clientX,ev.clientY);
-        var c=sous&&sous.closest?sous.closest('.mjr-case'):null;
+        var face=(departCol===cg)?cd:cg;
+        var c=viseeProche(face,ev.clientX,ev.clientY);
         depart.classList.remove('vise');
-        if(c&&cd.contains(c)&&!c.classList.contains('prise')&&c._g===depart._g){
+        if(c&&c._g===depart._g){
           depart.classList.add('prise');c.classList.add('prise');
-          place(vivant,pt(depart,'d'),pt(c,'g'));
-          vivant=null;depart=null;faites++;
+          place(vivant,pt(depart,bordFace(departCol)),pt(c,bordFace(face)));
+          vivant=null;depart=null;departCol=null;faites++;
           youpi(m.zone,true);
           if(faites===choix.length){N.dire(te('Bravo !'));m.gagne();}
           return;
         }
-        if(c&&cd.contains(c)){
+        if(c){
           c.classList.add('non');
           if(typeof playError==='function')playError();
           N.plusTard(function(){c.classList.remove('non');},430);
         }
         if(vivant&&vivant.parentNode)vivant.parentNode.removeChild(vivant);
-        vivant=null;depart=null;
+        vivant=null;depart=null;departCol=null;
       });
-      N.plusTard(function(){N.dire(te('Relie les deux mêmes lettres !'));},450);
+      N.plusTard(function(){N.dire(te('Relie les deux mêmes lettres !'));},150);
     };
   };
 
@@ -16843,7 +17041,7 @@ function _boyScene(ca,reprise){
               etincelles(m.zone,b.el);youpi(m.zone,true);
               bloque=false;trouvees++;
               if(trouvees===choix.length){N.dire(te('Bravo !'));m.gagne();}
-            },420);
+            },150);
           }else{
             N.plusTard(function(){
               a.el.classList.remove('vue');b.el.classList.remove('vue');bloque=false;
@@ -16852,7 +17050,7 @@ function _boyScene(ca,reprise){
         };
         g.appendChild(c);
       });
-      N.plusTard(function(){N.dire(te('Retrouve les paires !'));},450);
+      N.plusTard(function(){N.dire(te('Retrouve les paires !'));},150);
     };
   };
 
@@ -16902,7 +17100,7 @@ function _boyScene(ca,reprise){
         N.plusTard(function(){
           N.dire(te('Où est le son'));
           N.plusTard(function(){N.direToujours(A+cible[0]);},20);
-        },450);
+        },150);
       }
       tour();
     };
@@ -16937,7 +17135,7 @@ function _boyScene(ca,reprise){
       p.appendChild(z);
       N.plusTard(function(){
         N.dire(nom?teF('Bravo ! {nom} arrive dans ton album.',{nom:nom}):te('Bravo !'));
-      },420);
+      },150);
       var b=bouton(p,label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});
       N.plusTard(function(){if(b.isConnected)b.click();},6200);
     };
@@ -17155,6 +17353,19 @@ function _boyLetterJeu(ca,idx,premiere){
      rencontrée ne se distingue pas, elle s'élimine au hasard. */
   var leurres=_leurresLettre(L,idx,6).map(function(x){return x.ar;});
   var bete=_beteEtape();
+  /* Les fichiers sont demandes MAINTENANT, pendant que l'enfant regarde la
+     premiere manche : au moment de les dire, il n'y a plus d'aller-retour a
+     attendre. Ce sont les phrases qui reviennent a chaque manche, plus la
+     lettre du cours et ses leurres. */
+  try{
+    if(typeof _prechargeSons==='function')
+      _prechargeSons([A].concat(leurres).concat(
+        ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
+         'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
+         'Repasse sur la lettre avec ton doigt !',
+         'Relie les deux mêmes lettres !','Retrouve les paires !']
+        .map(function(p){return te(p);})));
+  }catch(e){}
   /* HUIT MANCHES, et non six : « les cours sont trop courts, pas assez de
      répétition ». Chacune a aussi plus de tours qu'à la v226 — cinq prises
      au lieu de trois, huit bulles au lieu de cinq, trois mots au lieu d'un,
@@ -20751,7 +20962,7 @@ var ADMIN_SOUNDS = [
   {ar:'Répète !',label:'Répète !'},
   {ar:'Maintenant, touche la lettre !',label:'Maintenant, touche la lettre !'},
   {ar:'Attrape la lettre',label:'Attrape la lettre…'},
-  {ar:'Suis les étoiles avec ton doigt !',label:'Suis les étoiles avec ton doigt !'},
+  {ar:'Repasse sur la lettre avec ton doigt !',label:'Repasse sur la lettre avec ton doigt !'},
   {ar:'Encore une fois !',label:'Encore une fois !'},
   {ar:'Éclate les bulles avec la lettre',label:'Éclate les bulles avec la lettre…'},
   {ar:'Écoute bien !',label:'Écoute bien !'},
