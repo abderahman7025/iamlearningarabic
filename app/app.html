@@ -3582,10 +3582,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   background:linear-gradient(90deg,#F5A524,#57C84D,#2FC4D6,#9B7EDE,#EC6EA8);
   transition:width .45s cubic-bezier(.34,1.56,.64,1)}
 /* L'aire de jeu : un ciel clair teinté de la manche, jamais un blanc nu. */
+/* LE FOND DES BULLES. Il etait fait de la seule couleur de la manche —
+   « tout vert, c'est pas top ». Les bulles montent depuis le bas : le fond
+   marin s'impose de lui-meme, et un enfant le comprend sans explication.
+   Le cadre, lui, garde la couleur de la manche : c'est ce qui relie l'ecran
+   au reste de la lecon. */
 .mj-aire{position:relative;height:330px;overflow:hidden;border-radius:30px;
-  background:radial-gradient(circle at 28% 22%,#ffffff 0%,
-    color-mix(in srgb,var(--mc) 16%,#ffffff) 58%,
-    color-mix(in srgb,var(--mc) 30%,#ffffff) 100%);
+  background:#cdeefb url("/images/fond-bulles.svg") center/cover no-repeat;
   border:4px solid color-mix(in srgb,var(--mc) 55%,#ffffff);
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 26%,transparent)}
 
@@ -3833,11 +3836,19 @@ body.age-petit .sess-map-wrap{max-width:min(1180px,97%)}
 .tuile:active{transform:scale(.95)}
 .tuile:hover{transform:translateY(-4px);
   box-shadow:0 14px 30px color-mix(in srgb,var(--tc) 44%,transparent)}
-.tuile-img{width:84%;max-width:118px;display:block;pointer-events:none}
+/* Tous les dessins ont le meme cadre (470 x 440, voir outils/animaux-cadre.py)
+   et leur encre y fait la meme hauteur : quelle que soit la largeur posee ici,
+   ils s affichent donc tous a la MEME HAUTEUR, chacun avec sa largeur propre.
+   La borne monte de 118 a 152 px pour compenser le vide lateral du cadre. */
+.tuile-img{width:92%;max-width:152px;display:block;pointer-events:none}
 .tuile-nom{font-family:Outfit,sans-serif;font-weight:900;font-size:.96rem;
   color:#20242e;text-align:center;line-height:1.15}
 .tuile-ar{font-family:'Scheherazade New',serif;font-size:1.15rem;
   color:color-mix(in srgb,var(--tc) 78%,#000000);direction:rtl;text-align:center;line-height:1.5}
+/* Les dessins des mots ont tous le meme cadre (330 x 300, voir
+   outils/mots-lettres.py) : poses a une largeur commune, ils s'affichent
+   donc tous a la meme hauteur. */
+.tuile-emo-img{width:100%;max-width:104px;display:block;pointer-events:none}
 .tuile-etat{position:absolute;top:8px;right:10px;font-size:1.05rem;line-height:1}
 .tuile.fermee{filter:grayscale(.9);opacity:.62;cursor:default}
 .tuile.fermee .tuile-nom,.tuile.fermee .tuile-ar{color:#4a5160}
@@ -6023,7 +6034,7 @@ async function doLogin(){
   try{
     const res=await fetch(`${API_URL}/api/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw||'__check_pending__',device_id:getDeviceId()})});
     const data=await res.json();
-    if(data.success){st.user={email:data.email,name:data.email.split('@')[0]};localStorage.setItem('arab_token',data.token);localStorage.setItem('arab_email',data.email);if(_intendedUrl){var iu=_intendedUrl;_intendedUrl=null;window.location.href=iu;}else{showS('s-welcome',true);}}
+    if(data.success){st.user={email:data.email,name:data.email.split('@')[0]};localStorage.setItem('arab_token',data.token);localStorage.setItem('arab_email',data.email);poseLeCookie(data.token);if(_intendedUrl){var iu=_intendedUrl;_intendedUrl=null;window.location.href=iu;}else{showS('s-welcome',true);}}
     else if(data.error&&data.error.includes('non activé')){document.getElementById('reg-email').value=em;const rt=document.getElementById('reg-title');rt.textContent=t('payment_ok');rt.dataset.set='1';const rs=document.getElementById('reg-sub');rs.textContent=t('payment_sub');rs.dataset.set='1';document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);}
     else{errEl.textContent=data.error||t('login_err')||t('err_connection');}
   }catch(e){errEl.textContent=t('err_connection');}
@@ -6033,7 +6044,10 @@ function doLogout(){
   st.user=null;
   localStorage.removeItem('arab_token');localStorage.removeItem('arab_email');
   repriseOublier();
-  document.cookie='arab_token=; path=/; max-age=0; SameSite=Lax';
+  /* On efface le cookie AVEC les memes attributs qu'a la pose : un cookie
+     Secure ne se remplace proprement que par un cookie Secure. */
+  document.cookie='arab_token=; path=/; max-age=0; SameSite=Lax'
+    +(location.protocol==='https:'?'; Secure':'');
   /* le cache hors ligne contient les pages de l'application : on le vide,
      sinon elles resteraient lisibles après la déconnexion. */
   try{ if(window.caches) caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});}); }catch(e){}
@@ -6044,9 +6058,40 @@ function checkStripeReturn(){
   if(params.get('payment')==='success'){const email=params.get('email')||'';document.getElementById('reg-email').value=decodeURIComponent(email);const rt=document.getElementById('reg-title');rt.textContent=t('payment_ok');rt.dataset.set='1';const rs=document.getElementById('reg-sub');rs.textContent=t('payment_sub');rs.dataset.set='1';document.getElementById('reg-btn').textContent=t('create_account');showS('s-register',true);window.history.replaceState({},'',window.location.pathname);}
   else if(params.get('payment')==='cancel'){showS('s-buy',false);window.history.replaceState({},'',window.location.pathname);}
 }
+/* ── LE COOKIE DE SESSION ──
+   `api/app.js` ne peut lire que lui : une actualisation est une navigation
+   ordinaire, elle ne porte pas d'en-tête `Authorization`. Il n'était posé
+   que par la page publique — une connexion faite DEPUIS l'application n'en
+   posait aucun, et la première actualisation renvoyait à l'écran de
+   connexion. Il est maintenant écrit au même endroit pour tout le monde, et
+   pour un an ; le serveur le repose à chaque page servie. */
+function poseLeCookie(jeton){
+  if(!jeton)return;
+  try{
+    document.cookie='arab_token='+encodeURIComponent(jeton)
+      +'; path=/; max-age='+(365*24*60*60)+'; SameSite=Lax'
+      +(location.protocol==='https:'?'; Secure':'');
+  }catch(e){}
+}
+function jetonDuCookie(){
+  try{
+    var m=/(?:^|;\s*)arab_token=([^;]+)/.exec(document.cookie||'');
+    return m?decodeURIComponent(m[1]):null;
+  }catch(e){return null;}
+}
 async function tryAutoLogin(){
-  const token=localStorage.getItem('arab_token');
-  const email=localStorage.getItem('arab_email');
+  /* Le jeton peut manquer d'un côté et pas de l'autre — un stockage local
+     vidé, un cookie périmé. On prend celui qui reste et on répare l'autre :
+     tant qu'une des deux traces existe, la session continue. */
+  var _tok=localStorage.getItem('arab_token')||jetonDuCookie();
+  var _mel=localStorage.getItem('arab_email')||(_tok?String(_tok).split(':')[0]:null);
+  if(_tok){
+    try{localStorage.setItem('arab_token',_tok);}catch(e){}
+    if(_mel){try{localStorage.setItem('arab_email',_mel);}catch(e){}}
+    poseLeCookie(_tok);
+  }
+  const token=_tok;
+  const email=_mel;
   var path=window.location.pathname;
   var pMap={'fille':'girl','garcon':'boy','adulte':'adult','girl':'girl','boy':'boy','adult':'adult'};
   var pm=path.match(/^\/(fille|garcon|adulte|girl|boy|adult)/);
@@ -10357,6 +10402,38 @@ var CHILD_LETTERS=[
   {ar:'ة',name:'tā',    emoji:'🍎',wordAr:'تُفَّاحَة', wordLat:'tuffāHa'}
 ];
 
+/* ── LE DESSIN DU MOT DE CHAQUE LETTRE ──
+   Les emoji tenaient lieu d'illustration. Le client a fourni trente-cinq
+   dessins — « ce sont les images qu'il y a sur les cours de chaque lettre,
+   j'ai repris les memes animaux » — prepares par `python
+   outils/mots-lettres.py` (detourage par la silhouette, cadre commun de
+   330 x 300, palette de 255 teintes : 715 Ko pour les trente-cinq).
+
+   Ils servent a DEUX endroits : la vignette du choix de la lettre, et
+   surtout le TRACE, ou le dessin se pose la ou commence le geste, suit le
+   doigt, et saute au depart du morceau suivant des qu'il faut lever la
+   main.
+
+   Deux lettres peuvent partager un dessin quand elles partagent un mot de
+   la meme famille — les deux chattes, `qitta` et `hirra`. Une lettre sans
+   entree garde son emoji : rien ne casse. */
+var MOT_IMAGE={
+  'ا':'lion',      'و':'rose',      'ي':'colombe',
+  'ب':'vache',     'ت':'crocodile', 'ث':'serpent',
+  'ج':'chameau',   'ح':'cheval',    'خ':'mouton',
+  'د':'ours',      'ذ':'loup',                       /* ر : sans dessin */
+  'ز':'girafe',    'س':'poisson',   'ش':'arbre',
+  'ص':'aigle',     'ض':'grenouille','ط':'paon',      'ظ':'gazelle',
+  'ع':'oiseau',    'غ':'gorille',
+  'ف':'papillon',  'ق':'chatte',    'ك':'chien',
+  'ل':'cigogne',   'م':'banane',    'ن':'tigre',
+  'ه':'chat',      'ء':'vipere',    'ة':'pomme'
+};
+function imageDuMot(ar){
+  var n=MOT_IMAGE[ar];
+  return n?('/images/mot-'+n+'.png'):null;
+}
+
 /* Correspondance île → indices dans CHILD_LETTERS */
 var CHILD_ISLAND_LETTERS=[
   [],              // 0: SV  — voyelles (pas de lettres)
@@ -10536,8 +10613,16 @@ function _boyLetterPickerJeu(ca,session){
     t.style.setProperty('--tc',COUL[rang%COUL.length]);
     var et=document.createElement('div');et.className='tuile-etat';
     et.textContent=ouverte?(fait?'✅':'▶'):'🔒';
+    /* Le dessin du client s'il existe, l'emoji sinon. */
     var em=document.createElement('div');em.className='tuile-emo';
-    em.textContent=L.emoji||'';
+    var _img=imageDuMot(L.ar);
+    /* Meme fermee, la vignette montre son dessin : le filtre gris de
+       `.tuile.fermee` s'en charge, comme sur la carte des animaux. */
+    if(_img){
+      var _i=document.createElement('img');_i.className='tuile-emo-img';
+      _i.src=_img;_i.alt='';_i.setAttribute('aria-hidden','true');
+      em.appendChild(_i);
+    }else em.textContent=L.emoji||'';
     var ar=document.createElement('div');ar.className='tuile-lettre-ar';
     ar.textContent=L.ar;
     /* Le rectangle prend toute la largeur : l'emoji du mot d'un cote, la
@@ -10669,7 +10754,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v238';
+var _VERSION_REPLI='v239';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16489,19 +16574,42 @@ function _boyScene(ca,reprise){
             ay:H/2-(((h+b)/2-Y)/T)*px};
   }
   /* ── L'IMAGE QUI MÈNE LE DOIGT ──
-     Le client posera des dessins à placer AU DÉPART de l'écriture de chaque
-     lettre ; ils suivront ensuite le doigt pendant qu'il repasse. Tant que
-     cette table est vide, rien n'est dessiné et la manche marche sans. Pour
-     en poser un : déposer le fichier dans `public/images/` et l'inscrire
-     ici, la lettre en clé — par exemple  'ب':'/images/guide-ba.png'. */
-  var MJ_GUIDES={};
+     Le client : « le dessin doit être là où l'enfant doit commencer le
+     mouvement, et l'animal suit le doigt de l'enfant ; quand il finit une
+     partie de la lettre et qu'il faut lever le doigt, le dessin va à
+     l'endroit de la lettre suivant. »
+
+     C'est exactement ce que fait `peint` : le dessin se met SUR LE DOIGT
+     tant qu'il touche, et sur LE PROCHAIN JALON dès qu'il l'a levé — donc
+     au départ du morceau suivant, le point, la voyelle, la seconde barre.
+     Avant le premier contact, il attend au tout début du geste.
+
+     C'est le dessin du MOT de la lettre (`MOT_IMAGE`) : l'enfant retrouve
+     l'animal qu'il a vu en choisissant sa lettre. Une lettre sans dessin
+     trace sans, la manche marche pareil. */
   var _guidesCharges={};
-  function _guidePour(glyph){
-    var u=MJ_GUIDES[_sansCercle(glyph)]||MJ_GUIDES[glyph];
+  /* `quandPret` est rappele des que le fichier arrive : sans lui, le dessin
+     n'apparaissait que s'il avait DEJA ete charge ailleurs — le lion, vu sur
+     la vignette juste avant, s'affichait ; la vache, jamais. */
+  function _guidePour(glyph,quandPret){
+    /* On cherche par la LETTRE NUE : le trace porte souvent une voyelle
+       (« ba », « bou »), et la table est rangee par lettre. */
+    var u=null;
+    try{
+      var nu=String(_sansCercle(glyph)).replace(_MARQUES,'');
+      _MARQUES.lastIndex=0;
+      u=imageDuMot(nu)||imageDuMot(glyph);
+    }catch(e){}
     if(!u)return null;
     var im=_guidesCharges[u];
-    if(!im){im=new Image();im.src=u;_guidesCharges[u]=im;}
-    return (im.complete&&im.naturalWidth)?im:null;
+    if(!im){
+      im=new Image();_guidesCharges[u]=im;
+      im.onload=function(){var f=im._quand;im._quand=null;if(f)try{f();}catch(e){}};
+      im.src=u;
+    }
+    if(im.complete&&im.naturalWidth)return im;
+    if(quandPret)im._quand=quandPret;
+    return null;
   }
 
   api.jeuTrace=function(glyph,passes){
@@ -16595,14 +16703,26 @@ function _boyScene(ca,reprise){
           cx.globalAlpha=.5;
           try{cx.strokeText(glyph,AX,AY+_descenteGlyphe(glyph,PX));}catch(e){}
           cx.restore();
-          var gi=_guidePour(glyph);
+          var gi=_guidePour(glyph,peint);
           if(gi){
             var vise=tete||eto[n]||eto[0];
             if(vise){
               var gx=(vise.x!==undefined?vise.x:vise[0]);
               var gy=(vise.y!==undefined?vise.y:vise[1]);
-              var GH=Math.max(34,PX*0.34),GW=GH*(gi.naturalWidth/gi.naturalHeight);
-              cx.drawImage(gi,gx-GW/2,gy-GH,GW,GH);
+              /* Assez grand pour qu'on le suive des yeux, assez petit pour
+                 ne pas cacher la lettre : un peu plus du tiers du corps. Il
+                 est posé AU-DESSUS du point visé, la tête sur le trait, pour
+                 ne pas couvrir ce que le doigt est en train de peindre. */
+              /* Assez grand pour qu'on le suive des yeux, assez petit pour
+                 ne pas cacher la lettre. Il est pose JUSTE AU-DESSUS du
+                 point vise — a peine posé dessus — pour laisser voir
+                 l'endroit ou il faut aller, et il ne sort jamais du cadre. */
+              var GH=Math.max(44,PX*0.40),GW=GH*(gi.naturalWidth/gi.naturalHeight);
+              var gxa=Math.max(0,Math.min(W-GW,gx-GW/2));
+              var gya=Math.max(0,Math.min(H-GH,gy-GH*0.95));
+              cx.save();cx.globalAlpha=.92;
+              cx.drawImage(gi,gxa,gya,GW,GH);
+              cx.restore();
             }
           }
         }
@@ -16652,8 +16772,12 @@ function _boyScene(ca,reprise){
         try{cv.setPointerCapture(ev.pointerId);}catch(e){}
         dernier=null;touche(ev);ev.preventDefault();});
       cv.addEventListener('pointermove',function(ev){if(doigt)touche(ev);});
-      cv.addEventListener('pointerup',function(){doigt=false;dernier=null;});
-      cv.addEventListener('pointercancel',function(){doigt=false;dernier=null;});
+      /* Le doigt se leve : le dessin quitte sa derniere position et va
+         attendre AU DEPART DU MORCEAU SUIVANT — c'est `tete=null` qui le
+         renvoie au prochain jalon. */
+      function leve(){doigt=false;dernier=null;tete=null;peint();}
+      cv.addEventListener('pointerup',leve);
+      cv.addEventListener('pointercancel',leve);
       N.plusTard(function(){
         phraseAvecLettre(null,glyph,null);
         N.plusTard(function(){N.dire(te('Repasse sur la lettre avec ton doigt !'));},20);

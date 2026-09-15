@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 14 septembre 2026, production en v238
+## OÙ ON EN EST — 15 septembre 2026, production en v239
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -73,6 +73,22 @@ repris de ses propres phrases de cours, jamais inventés, mais c'est lui qui
 les arrête. Trois points pour les voyelles, trois pour les prolongations,
 trois par lettre (un seul pour ع غ ء ة).
 
+### DEUX QUESTIONS EN ATTENTE SUR LES TRENTE-CINQ DESSINS
+
+Ils couvrent vingt-neuf des trente lettres. Restent :
+
+- **ر (rawḍa, « jardin »)** n'a pas de dessin — aucun des trente-cinq n'est un
+  jardin, ni une fleur autre que la rose, déjà prise par و (warda). La lettre
+  garde son emoji 🌷 en attendant sa réponse.
+- **Six dessins ne servent pas encore** : panda, renard, hibou, éléphant,
+  tortue, et une deuxième grenouille (`mot-grenouille2.png`). Ce sont les
+  animaux des ÎLES, pas des mots de lettres. Ils sont détourés et prêts dans
+  `public/images/`, il n'y a qu'à les brancher quand il aura dit où.
+
+Les doublons voulus sont branchés : les deux chattes (`qiṭṭa` pour ق, `hirra`
+pour ه) prennent `mot-chatte.png` et `mot-chat.png`, et le crocodile de ت est
+distinct de la vipère de ء.
+
 ### CE QUI RESTE À FAIRE, CÔTÉ CODE
 
 - ses avis clients à mettre en page ;
@@ -85,7 +101,65 @@ trois par lettre (un seul pour ع غ ء ة).
 
 ---
 
-**Fait et en ligne (v187 → v238), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v239), du plus récent au plus ancien :**
+
+- **ON RESTE CONNECTÉ, LES ANIMAUX SONT À LA MÊME HAUTEUR, ET LES TRENTE-CINQ
+  DESSINS DES LETTRES (v239).**
+
+  - **La session ne se ferme plus toute seule.** « On doit toujours rester
+    connecté, sauf si on veut se déconnecter. » Deux défauts se cumulaient.
+    Le jeton durait VINGT-QUATRE HEURES et personne ne le renouvelait : passé
+    ce délai, la moindre actualisation renvoyait à la page de connexion —
+    `api/app.js` ne peut lire QUE le cookie, une navigation ordinaire ne
+    porte pas d'en-tête `Authorization`. Et la connexion faite DEPUIS
+    l'application ne posait aucun cookie : elle n'écrivait que le stockage
+    local, si bien qu'on était déconnecté dès la première actualisation.
+    Désormais : le jeton dure un an (`DUREE_SESSION`), `api/app.js` le
+    **re-signe et repose le cookie à chaque page servie** — la session
+    GLISSE, un compte qui s'en sert ne la voit jamais expirer —, le cookie
+    est posé par `poseLeCookie()` partout où l'on se connecte, et
+    `tryAutoLogin` répare celle des deux traces qui manque. Le contenu reste
+    fermé : le jeton est signé, il porte l'adresse du compte, et le serveur
+    vérifie EN PLUS à chaque ouverture que le compte est toujours payant. Se
+    déconnecter efface les deux et reste le seul moyen d'en sortir.
+  - **Les onze animaux ont la même hauteur.** Ce n'était pas une affaire de
+    fichier : la vignette est dimensionnée par sa LARGEUR
+    (`.tuile-img{width:…}`), donc à largeur égale le renard, étroit,
+    s'affichait à 144 px quand l'éléphant, large, tombait à 95. La règle est
+    maintenant : TOUS LES FICHIERS ONT LE MÊME CADRE — 470 × 440, l'encre à
+    440 px, centrée (`python outils/animaux-cadre.py`). Mesuré : les onze
+    rendent 152 × 142, au pixel près.
+  - **Le jeu des bulles a un fond.** « Tout vert, c'est pas top. » Les bulles
+    montent : le fond marin s'impose de lui-même et un enfant le lit sans
+    explication. `public/images/fond-bulles.svg` — rais de lumière, sable,
+    algues, coraux, deux poissons très pâles. Le cadre garde la couleur de la
+    manche, c'est ce qui relie l'écran au reste de la leçon.
+  - **LES TRENTE-CINQ DESSINS DES MOTS.** Préparés par `python
+    outils/mots-lettres.py`. Le détourage de `detoure.py` ne pouvait pas
+    servir : il suppose le sujet plus foncé que le fond, or l'aigle, la
+    colombe, le mouton et le cheval sont BLANCS, du même blanc que le fond —
+    le remplissage passait par la moindre brisure du contour et leur mangeait
+    la tête. On prend donc le problème par la SILHOUETTE : le sujet est ce
+    qui n'est pas clair, on ferme la forme pour recoller les brisures du
+    contour, on bouche ses trous (un trou ne rejoint pas le bord, donc c'est
+    l'intérieur du dessin, blanc compris ; un creux entre deux oreilles
+    rejoint le bord et reste transparent), et on ne garde que la tache qui
+    passe par le centre. Cadre commun 330 × 300, 255 teintes : **715 Ko pour
+    les trente-cinq**. Ils servent à deux endroits — la vignette du choix de
+    la lettre, et le tracé.
+  - **LE DESSIN MÈNE LE DOIGT.** « Le dessin doit être là où l'enfant doit
+    commencer le mouvement, et l'animal suit le doigt ; quand il finit une
+    partie de la lettre et qu'il faut lever le doigt, le dessin va à
+    l'endroit de la lettre suivant. » C'est exactement ce que fait `peint` :
+    l'animal est SUR LE DOIGT tant qu'il touche, et sur LE PROCHAIN JALON dès
+    qu'il l'a levé (`tete=null` au lever) — donc au départ du morceau
+    suivant, le point, la voyelle. Avant le premier contact, il attend au
+    tout début du geste. Vérifié sur بَ : la vache part en haut à droite,
+    suit le doigt le long du corps, saute au point quand on lève, puis à la
+    fatḥa quand le point est fait. La table `MOT_IMAGE` range par lettre
+    NUE : un tracé porte souvent une voyelle, la clé ne doit pas en tenir
+    compte. Et `_guidePour` redemande un dessin à `peint` quand le fichier
+    arrive — sans quoi seul un dessin DÉJÀ chargé ailleurs s'affichait.
 
 - **LES DESSINS DU CLIENT, LE TRACÉ QUI SE REMPLIT, ET LE SON QUI PART TOUT
   DE SUITE (v238).** Cinq demandes d'un coup, plus un défaut trouvé en

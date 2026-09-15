@@ -84,8 +84,18 @@ function clearEmailBlock(email) {
 }
 
 // ── Tokens signés avec HMAC + expiration ──────────────────────────────────────
+/* ── COMBIEN DE TEMPS DURE UNE SESSION ──
+   Vingt-quatre heures : le client se retrouvait déconnecté d'un jour sur
+   l'autre, et même à la première actualisation dès que le cookie manquait.
+   « On doit toujours rester connecté, sauf si on veut se déconnecter. »
+   Un an, donc — et surtout la session GLISSE : `api/app.js` re-signe le
+   jeton à chaque page servie, si bien qu'un compte qui s'en sert ne le voit
+   jamais expirer. Le contenu reste fermé : le jeton porte l'adresse du
+   compte, il est signé, et le serveur vérifie EN PLUS que le compte est
+   toujours payant à chaque ouverture. */
+const DUREE_SESSION = 365 * 24 * 60 * 60;
 function generateToken(email, expiresInSeconds) {
-  expiresInSeconds = expiresInSeconds || 24 * 60 * 60; // 24h par défaut
+  expiresInSeconds = expiresInSeconds || DUREE_SESSION;
   const payload = email + ':' + (Date.now() + expiresInSeconds * 1000);
   const secret = process.env.TOKEN_SECRET || 'fallback-secret';
   const signature = crypto.createHmac('sha256', secret).update(payload).digest('hex');
@@ -209,6 +219,7 @@ function isAdminIpAllowed(req) {
 }
 
 module.exports = {
+  DUREE_SESSION,
   setCors,
   setSecurityHeaders,
   rateLimit,

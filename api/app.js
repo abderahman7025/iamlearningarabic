@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
-const { applyMiddleware, verifyToken, rateLimit, getClientIp, logEvent } = require('./_security');
+const { applyMiddleware, verifyToken, generateToken, DUREE_SESSION,
+        rateLimit, getClientIp, logEvent } = require('./_security');
 
 /**
  * Sert l'application de cours UNIQUEMENT aux comptes ayant payé.
@@ -141,6 +142,23 @@ module.exports = async (req, res) => {
   if (!html) {
     console.error('[App] Fichier introuvable :', fichier);
     return res.status(500).json({ error: 'Application indisponible.' });
+  }
+
+  /* ── LA SESSION GLISSE ──
+     Le cookie vivait vingt-quatre heures et personne ne le reposait : passé
+     ce délai, la moindre actualisation renvoyait à la page de connexion. On
+     re-signe donc le jeton À CHAQUE PAGE SERVIE et on repose le cookie. Tant
+     que le compte ouvre l'application, il reste connecté ; le jour où il se
+     déconnecte, `logout` efface le cookie et le stockage local, et cela
+     reste le SEUL moyen d'en sortir. */
+  try {
+    const frais = generateToken(email);
+    res.setHeader('Set-Cookie',
+      'arab_token=' + encodeURIComponent(frais) +
+      '; Path=/; Max-Age=' + DUREE_SESSION + '; SameSite=Lax' +
+      (req.headers['x-forwarded-proto'] === 'https' ? '; Secure' : ''));
+  } catch (e) {
+    console.error('[App] Renouvellement du jeton impossible :', e.message);
   }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');

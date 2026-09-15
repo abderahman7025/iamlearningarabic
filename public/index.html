@@ -3257,9 +3257,11 @@ async function doLogin(){
       localStorage.setItem('arab_token',data.token);
       localStorage.setItem('arab_email',data.email);
       /* api/app.js lit ce cookie : une navigation ordinaire ne peut pas
-         porter d'en-tête Authorization. 24 h, comme le jeton. */
+         porter d'en-tête Authorization. UN AN, comme le jeton — et le
+         serveur le repose à chaque page servie, si bien qu'un compte qui
+         s'en sert ne se déconnecte jamais tout seul. */
       document.cookie='arab_token='+encodeURIComponent(data.token)+
-        '; path=/; max-age='+(24*60*60)+'; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
+        '; path=/; max-age='+(365*24*60*60)+'; SameSite=Lax'+(location.protocol==='https:'?'; Secure':'');
       window.location.href=_suite||'/interface';
       return;
     }

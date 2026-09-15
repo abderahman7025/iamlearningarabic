@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du jeu des bulles. Le client : « mettre un fond d'écran, car
+       là tout vert c'est pas top. » Les bulles MONTENT depuis le bas : le
+       fond du dessous s'impose de lui-même, et un enfant le lit sans qu'on
+       le lui explique. Les teintes restent claires, parce que les bulles
+       sont vives et portent la lettre à lire — le décor ne doit jamais leur
+       disputer le regard. -->
+  <defs>
+    <linearGradient id="eau" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#eaf8ff"/>
+      <stop offset="45%"  stop-color="#c3ecfb"/>
+      <stop offset="100%" stop-color="#8fd7f2"/>
+    </linearGradient>
+    <linearGradient id="sable" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#f6e3b4"/>
+      <stop offset="100%" stop-color="#e8cf92"/>
+    </linearGradient>
+    <linearGradient id="rai" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="560" fill="url(#eau)"/>
+
+  <!-- Les rais de lumière qui tombent de la surface. -->
+  <g>
+    <polygon points="120,0 200,0 90,560 -10,560" fill="url(#rai)"/>
+    <polygon points="380,0 430,0 330,560 260,560" fill="url(#rai)"/>
+    <polygon points="690,0 780,0 720,560 610,560" fill="url(#rai)"/>
+  </g>
+
+  <!-- Le sable, en deux dunes molles. -->
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="url(#sable)"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#dfc27f" opacity=".8"/>
+
+  <!-- Les algues, posées dans le sable et penchées du même côté. -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M70 470 C 40 410 96 372 62 316"  stroke="#5cb86a" stroke-width="15"/>
+    <path d="M104 476 C 84 428 124 400 106 356" stroke="#7ccb7f" stroke-width="11"/>
+    <path d="M792 476 C 826 420 770 386 806 330" stroke="#5cb86a" stroke-width="15"/>
+    <path d="M760 480 C 782 436 744 410 764 366" stroke="#7ccb7f" stroke-width="11"/>
+    <path d="M430 486 C 410 450 444 430 428 398" stroke="#6cc275" stroke-width="10"/>
+  </g>
+
+  <!-- Trois coraux ronds, pour casser la ligne du sable. -->
+  <g opacity=".9">
+    <circle cx="215" cy="486" r="26" fill="#f7a8c4"/>
+    <circle cx="243" cy="496" r="18" fill="#fbc0d5"/>
+    <circle cx="600" cy="492" r="21" fill="#f9b98a"/>
+    <circle cx="624" cy="500" r="14" fill="#fcd0ab"/>
+  </g>
+
+  <!-- Deux petits poissons, très pâles : une présence, pas un sujet. -->
+  <g opacity=".45">
+    <g transform="translate(250,250)">
+      <ellipse cx="0" cy="0" rx="26" ry="17" fill="#ffffff"/>
+      <polygon points="-24,0 -44,-14 -44,14" fill="#ffffff"/>
+      <circle cx="10" cy="-4" r="3.4" fill="#8fd7f2"/>
+    </g>
+    <g transform="translate(680,168) scale(-0.8,0.8)">
+      <ellipse cx="0" cy="0" rx="26" ry="17" fill="#ffffff"/>
+      <polygon points="-24,0 -44,-14 -44,14" fill="#ffffff"/>
+      <circle cx="10" cy="-4" r="3.4" fill="#8fd7f2"/>
+    </g>
+  </g>
+
+  <!-- Quelques bulles du décor, immobiles et discrètes : elles ne doivent
+       pas se confondre avec celles du jeu, qui portent une lettre. -->
+  <g fill="#ffffff" opacity=".3">
+    <circle cx="150" cy="330" r="9"/>
+    <circle cx="176" cy="292" r="5"/>
+    <circle cx="520" cy="392" r="11"/>
+    <circle cx="546" cy="352" r="6"/>
+    <circle cx="836" cy="252" r="8"/>
+  </g>
+</svg>

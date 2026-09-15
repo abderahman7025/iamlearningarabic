@@ -73,7 +73,7 @@ module.exports = async (req, res) => {
 
   // ── Login réussi : générer token signé + effacer blocage ────────────────────
   clearEmailBlock(cleanEmail);
-  const token = generateToken(cleanEmail, 24 * 60 * 60); // 24h expiration
+  const token = generateToken(cleanEmail); // un an, renouvele a chaque page
   logEvent('login_success', { email: cleanEmail, ip, is_admin: isAdmin });
 
   res.json({ success: true, token, email: user.email });
