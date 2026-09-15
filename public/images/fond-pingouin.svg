@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « pingouin ». C'est la banquise. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eef7ff"/><stop offset="100%" stop-color="#cfe6f6"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <g opacity=".6" fill="#ffffff"><ellipse cx="680" cy="86" rx="41" ry="23"/><ellipse cx="716" cy="93" rx="30" ry="18"/><ellipse cx="645" cy="95" rx="27" ry="16"/></g>
+  <polygon points="60,470 170,300 280,470" fill="#bcd9ee"/>
+  <polygon points="118,470 170,300 200,470" fill="#9cc4e2"/>
+  <polygon points="700,470 800,338 900,470" fill="#bcd9ee"/>
+  <polygon points="754,470 800,338 828,470" fill="#9cc4e2"/>
+  <polygon points="360,470 430,392 500,470" fill="#cbe2f2"/>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#e2eefa"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#c9dff1" opacity=".85"/>
+  <ellipse cx="420" cy="508" rx="120" ry="20" fill="#aecfea" opacity=".6"/>
+  <ellipse cx="640" cy="534" rx="90" ry="16" fill="#aecfea" opacity=".5"/>
+</svg>

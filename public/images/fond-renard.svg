@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « renard ». C'est la foret de jour. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eaf4ff"/><stop offset="100%" stop-color="#d7ead6"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="760" cy="88" r="48" fill="#fff0bd" opacity=".85"/>
+  <circle cx="760" cy="88" r="74" fill="#fff0bd" opacity=".35"/>
+  <g opacity=".55" fill="#ffffff"><ellipse cx="200" cy="92" rx="39" ry="22"/><ellipse cx="234" cy="98" rx="28" ry="17"/><ellipse cx="167" cy="100" rx="25" ry="15"/></g>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#bcd9a8"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#a8cb93" opacity=".85"/>
+  <g><rect x="78" y="438" width="24" height="48" fill="#a97f56" rx="4"/><polygon points="90,242 34,443 145,443" fill="#93c58c"/><polygon points="90,237 50,350 129,350" fill="#93c58c" opacity=".9"/></g>
+  <g><rect x="171" y="449" width="18" height="36" fill="#a97f56" rx="4"/><polygon points="180,302 138,453 221,453" fill="#93c58c"/><polygon points="180,298 150,383 209,383" fill="#93c58c" opacity=".9"/></g>
+  <g><rect x="777" y="437" width="25" height="50" fill="#a97f56" rx="4"/><polygon points="790,232 732,442 847,442" fill="#93c58c"/><polygon points="790,227 748,344 831,344" fill="#93c58c" opacity=".9"/></g>
+  <g><rect x="691" y="451" width="17" height="34" fill="#a97f56" rx="4"/><polygon points="700,312 660,454 739,454" fill="#93c58c"/><polygon points="700,308 671,388 728,388" fill="#93c58c" opacity=".9"/></g>
+  <g><rect x="393" y="458" width="13" height="26" fill="#a97f56" rx="4"/><polygon points="400,352 370,461 429,461" fill="#93c58c"/><polygon points="400,349 378,410 421,410" fill="#93c58c" opacity=".9"/></g>
+  <path d="M300 494 C 314 474 292 463 318 450" stroke="#8fc98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M560 498 C 546 481 568 472 542 462" stroke="#8fc98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>

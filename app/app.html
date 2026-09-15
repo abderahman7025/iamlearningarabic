@@ -3582,13 +3582,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   background:linear-gradient(90deg,#F5A524,#57C84D,#2FC4D6,#9B7EDE,#EC6EA8);
   transition:width .45s cubic-bezier(.34,1.56,.64,1)}
 /* L'aire de jeu : un ciel clair teinté de la manche, jamais un blanc nu. */
-/* LE FOND DES BULLES. Il etait fait de la seule couleur de la manche —
-   « tout vert, c'est pas top ». Les bulles montent depuis le bas : le fond
-   marin s'impose de lui-meme, et un enfant le comprend sans explication.
+/* LE FOND DES AIRES DE JEU. Il etait fait de la seule couleur de la manche —
+   « tout vert, c'est pas top » — puis d'un fond marin unique. Le client :
+   « regarde plutot l'animal du cours, et fais que le fond corresponde a cet
+   animal. » Chaque monde a donc le sien : la savane du lion, la bambouseraie
+   du panda, la banquise du pingouin (voir outils/fonds-animaux.py). Il
+   arrive par `--fond`, pose sur la manche.
    Le cadre, lui, garde la couleur de la manche : c'est ce qui relie l'ecran
    au reste de la lecon. */
 .mj-aire{position:relative;height:330px;overflow:hidden;border-radius:30px;
-  background:#cdeefb url("/images/fond-bulles.svg") center/cover no-repeat;
+  background:#e8f2e4 var(--fond,url("/images/fond-bulles.svg")) center/cover no-repeat;
   border:4px solid color-mix(in srgb,var(--mc) 55%,#ffffff);
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 26%,transparent)}
 
@@ -3601,10 +3604,30 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   border:10px solid var(--mc);
   box-shadow:0 14px 38px color-mix(in srgb,var(--mc) 45%,transparent);
   font-family:'Scheherazade New',serif;font-size:6.6rem;color:var(--mc);
+  /* LE CONTOUR SE REMPLIT A CHAQUE TOUCHER. « Pour qu'on sache quand il faut
+     encore toucher, et quand c'est fini. » La lettre est dessinee en creux
+     et la couleur monte par le bas, d'un tiers a chaque fois : c'est la
+     jauge, et elle est la lettre elle-meme. */
+  -webkit-text-stroke:2px var(--mc);
+  -webkit-background-clip:text;background-clip:text;
+  /* Au-dessus du niveau, la lettre reste VISIBLE mais palie : sur un alif,
+     qui n'est qu'un trait, un vide franc ne se lisait pas — on ne voyait
+     que le contour. Palie dessus, franche dessous, la limite saute aux
+     yeux. */
+  background-image:linear-gradient(to top,var(--mc) var(--plein,0%),
+    color-mix(in srgb,var(--mc) 15%,#ffffff) var(--plein,0%));
+  color:transparent;-webkit-text-fill-color:transparent;
+  transition:--plein .35s ease-out;
   line-height:1.4;animation:mjRespire 2.6s ease-in-out infinite;user-select:none;
   transition:border-color .3s,color .3s,box-shadow .3s}
+/* Declaree, la variable s'interpole : le remplissage MONTE au lieu de
+   sauter. La ou @property n'existe pas, il saute — et c'est tout. */
+@property --plein{syntax:'<percentage>';inherits:false;initial-value:0%}
 @keyframes mjRespire{0%,100%{transform:scale(1) rotate(-1.5deg)}
   50%{transform:scale(1.06) rotate(1.5deg)}}
+/* Pleine : plus de creux, la lettre est de la couleur de la manche. */
+.mj-disque.pleine{-webkit-text-fill-color:var(--mc);color:var(--mc);
+  background-image:none}
 .mj-disque.saute{animation:mjSaute .55s cubic-bezier(.34,1.56,.64,1)}
 @keyframes mjSaute{0%{transform:scale(1)}
   40%{transform:scale(1.26) translateY(-18px) rotate(6deg)}
@@ -3633,17 +3656,43 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 30%,transparent)}
 .mj-cadre canvas{display:block;width:100%;height:auto}
 
-/* 4. Les bulles */
-.mj-bulle{position:absolute;bottom:-120px;width:96px;height:96px;border-radius:50%;
+/* 4. Les ballons.
+   Un cercle, c'etait une bulle de savon ; le client veut un BALLON DE
+   BAUDRUCHE. La forme se fait a l'ovale (plus haut que large, le bas un peu
+   plus pointu), avec son noeud et sa ficelle. Et quand on le touche, il
+   ECLATE : il se gonfle d'un coup puis se froisse en rien. */
+.mj-bulle{position:absolute;bottom:-150px;width:92px;height:108px;
+  border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 36%,#fff));
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
   border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
   font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
-  animation:mjMonte 8s linear forwards;user-select:none}
-@keyframes mjMonte{0%{bottom:-120px;transform:translateX(0)}
-  50%{transform:translateX(16px)}100%{bottom:108%;transform:translateX(0)}}
-.mj-bulle.creve{animation:none;transform:scale(1.7);opacity:0;
-  transition:transform .35s,opacity .35s}
+  animation:mjMonte 8s linear forwards;user-select:none;
+  transform-origin:50% 118%}
+/* la ficelle, puis le noeud par-dessus */
+.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
+  width:2px;height:30px;margin-top:7px;margin-left:-1px;
+  background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
+.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
+  width:0;height:0;margin-left:-7px;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-top:11px solid var(--mc)}
+@keyframes mjMonte{0%{bottom:-150px;transform:translateX(0)}
+  50%{transform:translateX(16px)}100%{bottom:112%;transform:translateX(0)}}
+.mj-bulle.creve{animation:mjEclate .32s ease-out forwards;pointer-events:none}
+.mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
+@keyframes mjEclate{
+  0%  {transform:scale(1);   opacity:1}
+  30% {transform:scale(1.34);opacity:1}
+  100%{transform:scale(.2) rotate(14deg);opacity:0}}
+/* Les lambeaux du ballon, projetes a l'eclatement. */
+.mj-lambeau{position:absolute;width:16px;height:20px;pointer-events:none;
+  border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
+  background:var(--mc);animation:mjLambeau .6s ease-out forwards}
+@keyframes mjLambeau{
+  0%  {transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy)))
+        scale(.35) rotate(var(--rot,180deg));opacity:0}}
 .mj-bulle.non{border-color:#e53935;color:#e53935}
 
 /* 5 et 9. Écoute, voyelles — le haut-parleur est PETIT et de côté, les trois
@@ -3710,7 +3759,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .mjc-dos{background:linear-gradient(150deg,var(--mc),
   color-mix(in srgb,var(--mc) 62%,#111827));color:#fff;font-size:2rem;
   border:4px solid color-mix(in srgb,var(--mc) 76%,#111827);
-  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 38%,transparent)}
+  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 38%,transparent);
+  overflow:hidden}
+.mjc-dos img{width:84%;max-width:88px;display:block;pointer-events:none;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.28))}
 .mjc-face{background:#fff;border:5px solid var(--mc);transform:rotateY(180deg);
   font-family:'Scheherazade New',serif;font-size:3rem;color:var(--mc);
   box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 34%,transparent)}
@@ -3751,15 +3803,18 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .alb-vig{position:relative;border-radius:22px;padding:10px 6px 8px;
   background:rgba(255,255,255,.55);border:3px dashed rgba(32,36,46,.16);
   display:flex;flex-direction:column;align-items:center;gap:2px}
-.alb-vig img{width:78%;max-width:78px;display:block;
-  filter:grayscale(1) opacity(.30)}
+/* Meme regle que les vignettes de la carte : une boite de hauteur fixe ou
+   l'animal se centre, et deux lignes reservees au nom. */
+.alb-vig img{width:78%;max-width:78px;height:74px;object-fit:contain;
+  display:block;filter:grayscale(1) opacity(.30)}
 .alb-vig.eu{background:linear-gradient(160deg,
     color-mix(in srgb,var(--tc) 24%,#ffffff),color-mix(in srgb,var(--tc) 10%,#ffffff));
   border:3px solid var(--tc);
   box-shadow:0 7px 18px color-mix(in srgb,var(--tc) 30%,transparent)}
 .alb-vig.eu img{filter:none;animation:mjSautille 3.2s ease-in-out infinite}
 .alb-vig-nom{font-family:Outfit,sans-serif;font-weight:900;font-size:.74rem;
-  color:#20242e;text-align:center;line-height:1.1}
+  color:#20242e;text-align:center;line-height:1.1;
+  min-height:2.2em;display:flex;align-items:center;justify-content:center}
 .alb-cadenas{position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;font-size:1.5rem;opacity:.5}
 
@@ -3836,13 +3891,22 @@ body.age-petit .sess-map-wrap{max-width:min(1180px,97%)}
 .tuile:active{transform:scale(.95)}
 .tuile:hover{transform:translateY(-4px);
   box-shadow:0 14px 30px color-mix(in srgb,var(--tc) 44%,transparent)}
-/* Tous les dessins ont le meme cadre (470 x 440, voir outils/animaux-cadre.py)
-   et leur encre y fait la meme hauteur : quelle que soit la largeur posee ici,
-   ils s affichent donc tous a la MEME HAUTEUR, chacun avec sa largeur propre.
-   La borne monte de 118 a 152 px pour compenser le vide lateral du cadre. */
-.tuile-img{width:92%;max-width:152px;display:block;pointer-events:none}
+/* ── TOUT S'ALIGNE, D'UNE VIGNETTE A L'AUTRE ──
+   Les dessins ont tous le meme cadre (470 x 440, voir
+   outils/animaux-iles.py) et leur encre y fait la meme hauteur. Mais cela
+   ne suffit pas a aligner les NOMS : il a fallu leur reserver la place, a
+   eux aussi. Le client : « les textes doivent tous etre a la meme hauteur
+   dans chaque vignette et dans chaque carte de l'album ; ensuite l'animal
+   doit etre centre en hauteur sur le reste. »
+   D'ou : une boite de HAUTEUR FIXE pour le dessin, qui s'y centre
+   (`object-fit:contain`), et deux lignes reservees au nom, quel qu'il
+   soit. « La Grenouille » tient sur deux lignes, « Le Lion » sur une : sans
+   cette reserve, la lettre arabe dessous sautait d'une vignette a l'autre. */
+.tuile-img{width:92%;max-width:152px;height:142px;object-fit:contain;
+  display:block;pointer-events:none}
 .tuile-nom{font-family:Outfit,sans-serif;font-weight:900;font-size:.96rem;
-  color:#20242e;text-align:center;line-height:1.15}
+  color:#20242e;text-align:center;line-height:1.15;
+  min-height:2.3em;display:flex;align-items:center;justify-content:center}
 .tuile-ar{font-family:'Scheherazade New',serif;font-size:1.15rem;
   color:color-mix(in srgb,var(--tc) 78%,#000000);direction:rtl;text-align:center;line-height:1.5}
 /* Les dessins des mots ont tous le meme cadre (330 x 300, voir
@@ -9090,9 +9154,13 @@ function renderTuilesAnimaux(ca){
   st._curPage='sessions-map';
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
-  /* Le « retour » ramenerait au menu principal, qui n'existe plus pour eux :
-     il n'a de sens que PLUS BAS, dans un cours (voir `_retourEnfant`). */
-  _retourEnfant(null);
+  /* Le retour ne peut pas ramener au menu principal — il n'existe pas chez
+     les petits. Il ramene donc au CHOIX DU PARCOURS, l'ecran d'ou l'on
+     vient : c'est la seule chose qui soit au-dessus de cette carte. */
+  _retourEnfant(function(){
+    document.body.classList.add('choix-age');
+    showS('s-age',true);
+  });
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');
       Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');
@@ -9207,12 +9275,16 @@ function renderTuilesAnimaux(ca){
     var im=document.createElement('img');im.src=o.img;im.alt='';
     im.setAttribute('aria-hidden','true');
     c.appendChild(im);
+    /* Le nom est TOUJOURS pose, meme quand l'animal n'est pas gagne : sans
+       lui, la case serait plus courte et l'album ondulerait au fur et a
+       mesure des victoires. Pas gagne, il est simplement efface. */
+    var nm=document.createElement('div');nm.className='alb-vig-nom';
+    nm.textContent=o.nom;
+    if(!o.finie)nm.style.visibility='hidden';
+    c.appendChild(nm);
     if(!o.finie){
       var cad=document.createElement('div');cad.className='alb-cadenas';
       cad.textContent='🔒';c.appendChild(cad);
-    }else{
-      var nm=document.createElement('div');nm.className='alb-vig-nom';
-      nm.textContent=o.nom;c.appendChild(nm);
     }
     alb.appendChild(c);
   });
@@ -10607,6 +10679,13 @@ function _boyLetterPickerJeu(ca,session){
   try{faites=JSON.parse(localStorage.getItem('boy_lettres_'+session.id)||'[]');}catch(e){}
   var indices=(session.letters||[]).map(function(l){return _childIdxOf(l.ar);})
                 .filter(function(i){return i>=0;});
+  /* Les lettres de cette page sont dites dès qu'on en touche une, et la
+     leçon qui suit les redira : on va chercher leurs enregistrements tout de
+     suite, pendant que l'enfant regarde l'écran. */
+  try{
+    if(typeof _prechargeSons==='function')
+      _prechargeSons(indices.map(function(i){return CHILD_LETTERS[i].ar;}));
+  }catch(e){}
   var g=document.createElement('div');g.className='tuiles tuiles-large';
   indices.forEach(function(idx,rang){
     var L=CHILD_LETTERS[idx];
@@ -10758,7 +10837,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v240';
+var _VERSION_REPLI='v241';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -10869,6 +10948,17 @@ function _boyNarration(){
     var txt=q.shift(),maxMs=estim(txt);
     enCours=txt;
     try{speakText(txt,_voixEnfant(),null);}catch(e){}
+    /* ── LA SUIVANTE EST DEJA EN ROUTE ──
+       « On entend "où est le son", puis UNE SECONDE APRÈS le son de la
+       lettre. » Ce blanc, c'est le téléchargement du fichier : on ne le
+       demandait qu'au moment de le jouer. On va donc le chercher MAINTENANT,
+       pendant que la phrase en cours occupe l'oreille — au moment de la
+       dire, il est là. Deux phrases d'avance, parce qu'une phrase courte ne
+       laisse pas toujours le temps. */
+    try{
+      if(typeof _prechargeSons==='function'&&q.length)
+        _prechargeSons(q.slice(0,2));
+    }catch(e){}
     var t0=Date.now(),quiet=0;
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
@@ -10901,6 +10991,16 @@ function _boyNarration(){
   }
   function sansEmoji(t){return String(t).replace(/[←-⇿⌀-○◍-➿⬀-⯿️⃣]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]/g,' ').replace(/\s+/g,' ').trim();}
   function sansGuillemets(t){return String(t).replace(/«[^»]*»/g,' ').replace(/\s+([!?…,.])/g,'$1').replace(/\s+/g,' ').trim();}
+  /* ── ON VA CHERCHER LE FICHIER DES QU'ON SAIT QU'ON LE DIRA ──
+     « On entend "ou est le son", puis UNE SECONDE APRES le son de la
+     lettre. » Ce blanc etait le telechargement, demande seulement au moment
+     de jouer. Une phrase mise en file sera dite : autant la chercher tout de
+     suite, pendant que la precedente occupe l'oreille. */
+  function enFile(t){
+    q.push(t);
+    try{if(typeof _prechargeSons==='function')_prechargeSons([t]);}catch(e){}
+    pump();
+  }
   function aEnreg(t){
     /* Même règle que la lecture : la phrase peut être rangée avec l'espace
        français devant sa ponctuation. */
@@ -10918,12 +11018,12 @@ function _boyNarration(){
        ce son ? » — se taire, c'est ne rien demander du tout. */
     direToujours:function(t){
       t=sansGuillemets(sansEmoji(t));if(!t)return;
-      q.push(t);pump();
+      enFile(t);
     },
     dire:function(t){
       t=sansGuillemets(sansEmoji(t));if(!t)return;
       if(typeof _VOW_BASE!=='undefined'&&t.indexOf(_VOW_BASE)>=0&&!aEnreg(t))return;
-      q.push(t);pump();
+      enFile(t);
     },
     stop:function(){q=[];busy=false;if(tmr){clearInterval(tmr);tmr=null;}
       try{stopSpeech();}catch(e){}
@@ -16359,6 +16459,10 @@ function _boyScene(ca,reprise){
     var z=document.createElement('div');
     z.className='mj '+(classe||'');
     z.style.setProperty('--mc',coul||MJ_COUL[0]);
+    /* Le décor du monde où l'on est. Il ne sert qu'aux aires de jeu qui en
+       demandent un (`.mj-aire`), mais il est posé ici, une fois, sur la
+       manche entière : les aires n'ont pas à savoir d'où il vient. */
+    try{z.style.setProperty('--fond','url("'+_fondDuMonde()+'")');}catch(e){}
     p.appendChild(z);
     var b=bouton(p,te('Suite ›'),suivant);
     b.disabled=true;b.style.opacity='.35';
@@ -16368,6 +16472,26 @@ function _boyScene(ca,reprise){
         b.disabled=false;b.style.opacity='1';b.classList.add('mj-pret');
         N.plusTard(function(){if(b.isConnected&&!b.disabled)b.click();},2100);
       }};
+  }
+  /* Les lambeaux d'un ballon qui vient d'éclater : huit morceaux de sa
+     couleur, projetés en étoile. Les étincelles disent « bravo » ; ceux-ci
+     disent « il a crevé », et c'est autre chose. */
+  function lambeaux(zone,el,coul){
+    var rz=zone.getBoundingClientRect(),re=el.getBoundingClientRect();
+    var ech=zone.offsetWidth?(rz.width/zone.offsetWidth):1;
+    if(!(ech>0.05&&ech<20))ech=1;
+    var cx=(re.left+re.width/2-rz.left)/ech, cy=(re.top+re.height/2-rz.top)/ech;
+    for(var k=0;k<8;k++){
+      var e=document.createElement('i');e.className='mj-lambeau';
+      var a=(k/8)*Math.PI*2+Math.random()*0.5,d=42+Math.random()*44;
+      e.style.left=cx+'px';e.style.top=cy+'px';
+      e.style.setProperty('--mc',coul||'#F5A524');
+      e.style.setProperty('--dx',Math.round(Math.cos(a)*d)+'px');
+      e.style.setProperty('--dy',Math.round(Math.sin(a)*d)+'px');
+      e.style.setProperty('--rot',Math.round(-220+Math.random()*440)+'deg');
+      zone.appendChild(e);
+      (function(el2){setTimeout(function(){if(el2.parentNode)el2.parentNode.removeChild(el2);},620);})(e);
+    }
   }
   /* Une poignée d'étincelles là où l'enfant vient de toucher. */
   function etincelles(zone,el){
@@ -16431,12 +16555,21 @@ function _boyScene(ca,reprise){
       var d=document.createElement('div');d.className='mj-disque';
       d.textContent=_sansCercle(glyph);
       m.zone.appendChild(d);
-      var n=0;
+      var n=0,BUT=3;
+      d.style.setProperty('--plein','0%');
       d.onclick=function(){
+        if(n>=BUT)return;
         d.classList.remove('saute');void d.offsetWidth;d.classList.add('saute');
-        d.style.setProperty('--mc',MJ_COUL[(n+1)%MJ_COUL.length]);
         etincelles(m.zone,d);ditGlyphe(son||glyph);
-        if(++n>=3){youpi(m.zone);m.gagne();}
+        n++;
+        d.style.setProperty('--plein',Math.round(n/BUT*100)+'%');
+        if(n>=BUT){
+          /* Pleine, la lettre reprend sa couleur franche : le contour en
+             creux n'a plus rien a annoncer. */
+          d.style.webkitTextFillColor=d.style.color='';
+          d.classList.add('pleine');
+          youpi(m.zone);m.gagne();
+        }
       };
       /* La présentation, en trois temps : on la nomme, on la fait répéter,
          on félicite. Puis la consigne du jeu. */
@@ -16665,6 +16798,66 @@ function _boyScene(ca,reprise){
       var ex=encre.getContext('2d');
       var PINCEAU=Math.max(22,Math.round(PX*0.30));
       var dernier=null,tete=null;
+
+      /* ── LE DESSIN NE SORT PAS DE LA LETTRE ──
+         « Qu'on ne puisse pas bouger l'animal n'importe où, mais juste sur
+         la lettre. » On garde donc le masque de l'encre, et pour chaque
+         point du cadre l'adresse du POINT D'ENCRE LE PLUS PROCHE — deux
+         balayages en chanfrein, une fois pour toutes. Le doigt peint où il
+         veut (de toute façon la couleur ne prend que dans la lettre), mais
+         l'animal, lui, est ramené sur le trait.
+         Le même masque donne l'ÉPAISSEUR DU TRAIT : l'aire de l'encre
+         divisée par la longueur du geste. C'est elle qui fixe la taille du
+         dessin — « un peu plus grosse que l'épaisseur du trait ». */
+      var projX=null,projY=null,epaisseur=PX*0.12;
+      (function(){
+        var c2=document.createElement('canvas');c2.width=W;c2.height=H;
+        var k2=c2.getContext('2d');
+        k2.font=PX+"px 'Scheherazade New',serif";
+        k2.textAlign='center';k2.textBaseline='alphabetic';k2.fillStyle='#000';
+        try{_dessineSurLigne(k2,glyph,AX,AY,PX);}catch(e){}
+        var dd,i,N2=W*H;
+        try{dd=k2.getImageData(0,0,W,H).data;}catch(e){return;}
+        var dist=new Float32Array(N2);
+        projX=new Int16Array(N2);projY=new Int16Array(N2);
+        var aire=0;
+        for(i=0;i<N2;i++){
+          if(dd[i*4+3]>40){dist[i]=0;projX[i]=i%W;projY[i]=(i/W)|0;aire++;}
+          else{dist[i]=1e9;projX[i]=-1;projY[i]=-1;}
+        }
+        if(!aire){projX=projY=null;return;}
+        function essaie(a,b,cout){
+          if(projX[b]<0)return;
+          var v=dist[b]+cout;
+          if(v<dist[a]){dist[a]=v;projX[a]=projX[b];projY[a]=projY[b];}
+        }
+        var x,y,j;
+        for(y=0;y<H;y++)for(x=0;x<W;x++){
+          j=y*W+x;
+          if(x>0)essaie(j,j-1,1);
+          if(y>0)essaie(j,j-W,1);
+          if(x>0&&y>0)essaie(j,j-W-1,1.414);
+          if(x<W-1&&y>0)essaie(j,j-W+1,1.414);
+        }
+        for(y=H-1;y>=0;y--)for(x=W-1;x>=0;x--){
+          j=y*W+x;
+          if(x<W-1)essaie(j,j+1,1);
+          if(y<H-1)essaie(j,j+W,1);
+          if(x<W-1&&y<H-1)essaie(j,j+W+1,1.414);
+          if(x>0&&y<H-1)essaie(j,j+W-1,1.414);
+        }
+        var lg=0;
+        try{var _p=_cheminPlat(_trajectoire(glyph));if(_p&&_p.L)lg=_p.L*PX;}catch(e){}
+        if(lg>0)epaisseur=Math.max(6,Math.min(PX*0.30,aire/lg));
+      })();
+      function surLEncre(p){
+        if(!projX)return p;
+        var x=Math.max(0,Math.min(W-1,Math.round(p[0])));
+        var y=Math.max(0,Math.min(H-1,Math.round(p[1])));
+        var i=y*W+x;
+        if(projX[i]<0)return p;
+        return [projX[i],projY[i]];
+      }
       function poseLettre(c,coul){
         c.save();
         c.font=PX+"px 'Scheherazade New',serif";
@@ -16711,21 +16904,14 @@ function _boyScene(ca,reprise){
           if(gi){
             var vise=tete||eto[n]||eto[0];
             if(vise){
-              var gx=(vise.x!==undefined?vise.x:vise[0]);
-              var gy=(vise.y!==undefined?vise.y:vise[1]);
-              /* Assez grand pour qu'on le suive des yeux, assez petit pour
-                 ne pas cacher la lettre : un peu plus du tiers du corps. Il
-                 est posé AU-DESSUS du point visé, la tête sur le trait, pour
-                 ne pas couvrir ce que le doigt est en train de peindre. */
-              /* Assez grand pour qu'on le suive des yeux, assez petit pour
-                 ne pas cacher la lettre. Il est pose JUSTE AU-DESSUS du
-                 point vise — a peine posé dessus — pour laisser voir
-                 l'endroit ou il faut aller, et il ne sort jamais du cadre. */
-              var GH=Math.max(44,PX*0.40),GW=GH*(gi.naturalWidth/gi.naturalHeight);
-              var gxa=Math.max(0,Math.min(W-GW,gx-GW/2));
-              var gya=Math.max(0,Math.min(H-GH,gy-GH*0.95));
-              cx.save();cx.globalAlpha=.92;
-              cx.drawImage(gi,gxa,gya,GW,GH);
+              var gp=surLEncre(vise.x!==undefined?[vise.x,vise.y]:vise);
+              /* A PEINE PLUS GROS QUE LE TRAIT, et CENTRE dessus : c'est ce
+                 que le client demande. Un dessin qui couvrait le tiers du
+                 corps cachait la lettre au lieu de la montrer. */
+              var GH=Math.max(18,epaisseur*1.7);
+              var GW=GH*(gi.naturalWidth/gi.naturalHeight);
+              cx.save();cx.globalAlpha=.95;
+              cx.drawImage(gi,gp[0]-GW/2,gp[1]-GH/2,GW,GH);
               cx.restore();
             }
           }
@@ -16814,7 +17000,9 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(b.classList.contains('creve'))return;
           if(g===cible){
-            b.classList.add('creve');etincelles(aire,b);
+            b.classList.add('creve');
+            lambeaux(aire,b,b.style.getPropertyValue('--mc'));
+            etincelles(aire,b);
             if(typeof playBravo==='function')playBravo();
             pris++;jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
             if(pris>=BUT){vivant=false;youpi(m.zone);m.gagne();}
@@ -16844,10 +17032,15 @@ function _boyScene(ca,reprise){
   /* Trois relances courtes, à la place de la lettre rabâchée. Elles sont
      déjà dans la liste du studio : rien de neuf à enregistrer. */
   var _RELANCE=['Encore une fois !','Touche la bonne lettre !','Écoute bien !'];
-  api.jeuEcoute=function(cible,leurres){
+  /* `cible` accepte AUSSI une liste : le cours des voyelles fait tourner les
+     trois syllabes au lieu d'en marteler une seule. `tours` vaut trois par
+     defaut — « il faut toucher 3 fois la lettre seulement, actuellement
+     c'est trop » — et six pour les voyelles. */
+  api.jeuEcoute=function(cible,leurres,tours){
     return function(){
       var m=manche(te('ÉCOUTE BIEN'),'mj-ecoute',MJ_COUL[4]);
-      var BUT=4,n=0;
+      var cibles=(cible&&cible.length&&typeof cible!=='string')?cible.slice():[cible];
+      var BUT=tours||3,n=0;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
       var zone=document.createElement('div');zone.className='mj-scene';
@@ -16857,11 +17050,13 @@ function _boyScene(ca,reprise){
           N.dire(te('Bravo !'));m.gagne();return;}
         jauge.firstChild.style.width=Math.round(n/BUT*100)+'%';
         zone.innerHTML='';
+        var cible=cibles[n%cibles.length];
+        var faux=cibles.filter(function(x){return x!==cible;}).concat(leurres||[]);
         var hp=document.createElement('button');hp.className='mj-hp';hp.textContent='🔊';
         hp.onclick=function(){ditGlyphe(cible);};
         zone.appendChild(hp);
         var r=document.createElement('div');r.className='mj-rangee';
-        _melangeTab([cible].concat(_melangeTab(leurres).slice(0,2))).forEach(function(g,k){
+        _melangeTab([cible].concat(_melangeTab(faux).slice(0,2))).forEach(function(g,k){
           var d=document.createElement('div');d.className='mj-bulleV';
           d.textContent=_sansCercle(g);
           d.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
@@ -16891,6 +17086,11 @@ function _boyScene(ca,reprise){
            dans l'oreille trois fois de plus. On l'encourage, et le
            haut-parleur reste là pour qui veut la réentendre. */
         else N.plusTard(function(){
+          /* Quand la cible change d'un tour a l'autre — le cours des
+             voyelles — il FAUT la redire : c'est une autre syllabe. Quand
+             elle ne change pas, on encourage : « ca fait trop de alif alif
+             alif alif ». */
+          if(cibles.length>1){N.direToujours(_sansCercle(cible));return;}
           N.dire(te(_RELANCE[(n-1)%_RELANCE.length]));
         },150);
       }
@@ -17187,7 +17387,7 @@ function _boyScene(ca,reprise){
      translittération : un enfant de trois ans ne lit pas l'alphabet latin.
      HUIT CARTES, CHACUNE DE SA COULEUR : le client les voulait toutes
      différentes, et vives. */
-  api.jeuPaires=function(cible,leurres){
+  api.jeuPaires=function(cible,leurres,image){
     return function(){
       var m=manche(te('LES PAIRES'),'mj-paires',MJ_COUL[1]);
       var choix=[cible].concat(_melangeTab(leurres).slice(0,3));
@@ -17199,8 +17399,18 @@ function _boyScene(ca,reprise){
       cartes.forEach(function(gl,k){
         var c=document.createElement('div');c.className='mj-carte';
         c.style.setProperty('--mc',teintes[k]||MJ_VIF[k%MJ_VIF.length]);
-        c.innerHTML='<div class="mjc-dos">🐾</div><div class="mjc-face">'
-                    +_sansCercle(gl)+'</div>';
+        /* Le dos porte l'animal du mot de la lettre — le client le veut la.
+           Sans dessin, la patte fait l'affaire. */
+        var _im=image||(function(){
+          try{
+            var nu=String(_sansCercle(cible)).replace(_MARQUES,'');
+            _MARQUES.lastIndex=0;
+            return imageDuMot(nu);
+          }catch(e){return null;}
+        })();
+        c.innerHTML='<div class="mjc-dos">'
+                    +(_im?'<img src="'+_im+'" alt="" aria-hidden="true">':'🐾')
+                    +'</div><div class="mjc-face">'+_sansCercle(gl)+'</div>';
         c.onclick=function(){
           if(bloque||c.classList.contains('vue')||c.classList.contains('prise'))return;
           c.classList.add('vue');ditGlyphe(gl);
@@ -17511,7 +17721,19 @@ function _beteEtape(){
   var i=0;
   try{i=parseInt(localStorage.getItem('arab_ile'),10)||0;}catch(e){}
   var im=(_HAB.images||[])[i],nom=(_HAB.etapes||[])[i];
-  return {image:im||'',nom:nom||''};
+  /* Le `slug` sert au DÉCOR : « regarde l'animal du cours, et fais que le
+     fond corresponde à cet animal ». Les trois tables — images, noms, slugs —
+     sont rangées dans le même ordre que la carte. */
+  var sl=(_HAB.slugs||[])[i];
+  return {image:im||'',nom:nom||'',slug:sl||''};
+}
+/* Le décor d'un monde : `public/images/fond-<animal>.svg`, engendré par
+   `python outils/fonds-animaux.py`. Sans animal connu, le fond marin, qui
+   était là avant eux. */
+function _fondDuMonde(){
+  var b=null;
+  try{b=_beteEtape();}catch(e){}
+  return '/images/fond-'+((b&&b.slug)||'bulles')+'.svg';
 }
 
 function _boyLetterJeu(ca,idx,premiere){
@@ -17530,9 +17752,14 @@ function _boyLetterJeu(ca,idx,premiere){
      premiere manche : au moment de les dire, il n'y a plus d'aller-retour a
      attendre. Ce sont les phrases qui reviennent a chaque manche, plus la
      lettre du cours et ses leurres. */
+  /* La lettre NUE et la lettre AVEC SA VOYELLE sont deux enregistrements
+     differents : le trace et les voyelles disent « ba », « bi », « bou », et
+     ces cles-la manquaient au prechargement. */
+  var _avecVoyelles=[A];
+  ['\u064e','\u0650','\u064f','\u0652'].forEach(function(v){_avecVoyelles.push(A+v);});
   try{
     if(typeof _prechargeSons==='function')
-      _prechargeSons([A].concat(leurres).concat(
+      _prechargeSons(_avecVoyelles.concat(leurres).concat(
         ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
          'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
          'Repasse sur la lettre avec ton doigt !',
@@ -17584,7 +17811,10 @@ function _boyVowelJeu(ca){
     B.jeuRencontre(syl[1]),B.jeuTrace(syl[1],2),
     B.jeuRencontre(syl[2]),B.jeuTrace(syl[2],2),
     B.jeuAttrape(syl[0],[syl[1],syl[2],LB,LB+'\u0652']),
-    B.jeuEcoute(syl[1],[syl[0],syl[2],LB]),
+    /* Six tours, et la cible tourne : « pour les voyelles, laisse 6 fois ».
+       Les trois syllabes passent donc deux fois chacune, au lieu d'une seule
+       martelee six fois. */
+    B.jeuEcoute(syl,[LB,LB+'\u0652'],6),
     B.jeuRelier(syl[0],[syl[1],syl[2],LB]),
     B.jeuPaires(syl[2],[syl[0],syl[1],LB]),
     B.jeuVoyelles(LB),

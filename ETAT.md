@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 15 septembre 2026, production en v240
+## OÙ ON EN EST — 15 septembre 2026, production en v241
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,64 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v240), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v241), du plus récent au plus ancien :**
+
+- **UNE PASSE DE NEUF CORRECTIONS SUR LES MANCHES (v241).**
+
+  - **UNE IMAGE CORRIGÉE NE REVENAIT JAMAIS — le piège à retenir.** Le client
+    voyait encore le panda cassé, alors que le fichier en ligne était bon,
+    vérifié par `curl`. Le service worker vide bien son cache au changement
+    de version, mais le `fetch` qui suit passait par le CACHE HTTP DU
+    NAVIGATEUR, qui garde les images des mois : on rechargeait la vieille
+    image et on la rangeait dans le cache neuf. `cache:'reload'` sur les
+    défauts de cache règle la chose pour toutes les images à venir.
+  - **Un décor par animal.** « Regarde plutôt l'animal du cours, et fais que
+    le fond corresponde à cet animal. » Onze décors, engendrés par `python
+    outils/fonds-animaux.py` : savane (lion, éléphant, girafe), bambouseraie,
+    forêt, mare, forêt de nuit, sous l'eau, prairie fleurie, banquise, plage.
+    Deux règles priment sur le joli : **tout reste pâle** — ce qu'on doit
+    voir, ce sont les ballons vifs et leur lettre — et **le haut reste vide**,
+    puisque les ballons montent par là. Le décor arrive par `--fond`, posé
+    une fois sur la manche par `manche()`, d'après `_beteEtape().slug`.
+  - **Des ballons de baudruche, qui éclatent.** Ovale, nœud et ficelle à la
+    place du cercle ; au toucher, le ballon se gonfle d'un coup puis se
+    froisse en rien, et huit lambeaux de sa couleur partent en étoile.
+  - **Le tracé : le dessin est PETIT, CENTRÉ, et ne sort pas de la lettre.**
+    Il faisait le tiers du corps et se posait au-dessus du point visé : il
+    cachait la lettre. Sa taille vient maintenant de l'ÉPAISSEUR DU TRAIT,
+    mesurée (aire de l'encre ÷ longueur du geste), et il est centré dessus.
+    Et il est **ramené sur l'encre** : on garde, pour chaque point du cadre,
+    l'adresse du point d'encre le plus proche — deux balayages en chanfrein,
+    une fois — si bien que le doigt a beau partir n'importe où, l'animal
+    reste sur le trait. Vérifié : doigt lâché en bas à gauche du cadre,
+    l'animal reste au bout du corps du bā.
+  - **« Écoute bien » : trois tours, six pour les voyelles.** Il en faisait
+    quatre. Pour les voyelles la cible TOURNE sur les trois syllabes — deux
+    fois chacune — au lieu d'en marteler une ; quand elle change on la redit
+    (c'en est une autre), quand elle ne change pas on encourage.
+  - **La première manche a sa jauge, et c'est la lettre.** « Que le contour
+    se remplisse à force de toucher, pour qu'on sache quand c'est fini. » La
+    lettre est dessinée en creux et la couleur MONTE par le bas, d'un tiers à
+    chaque toucher (`background-clip:text`). Au-dessus du niveau elle reste
+    visible mais pâlie : sur un alif, qui n'est qu'un trait, un vide franc ne
+    se lisait pas.
+  - **Les paires portent l'animal de la lettre au dos des huit cartes.**
+  - **Le son enregistré arrivait une seconde trop tard.** « On entend "où est
+    le son", puis une seconde après le son de la lettre. » Ce blanc, c'était
+    le téléchargement, demandé seulement au moment de jouer. Une phrase MISE
+    EN FILE sera dite : on va donc chercher son fichier tout de suite
+    (`enFile`), pendant que la précédente occupe l'oreille. Le choix de la
+    lettre précharge aussi les siennes, et le préchargement d'une leçon
+    couvre désormais la lettre AVEC ses voyelles — « ba », « bi », « bou »
+    sont des enregistrements à part, et ces clés-là manquaient.
+  - **La carte des animaux a son bouton retour**, qui ramène au choix du
+    parcours — la seule chose au-dessus d'elle.
+  - **Tout s'aligne sur la carte et dans l'album.** Une boîte de hauteur fixe
+    pour le dessin, qui s'y centre, et deux lignes réservées au nom : « La
+    Grenouille » tient sur deux lignes, « Le Lion » sur une, et sans cette
+    réserve la lettre arabe dessous sautait d'une vignette à l'autre. Dans
+    l'album, le nom est toujours posé — masqué tant que l'animal n'est pas
+    gagné — sinon la bande ondulait au fur et à mesure des victoires.
 
 - **LE PANDA RÉPARÉ, LA ROSE POUR DEUX, ET RELIER AU TOUCHER (v240).**
 

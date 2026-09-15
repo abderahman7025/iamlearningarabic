@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « panda ». C'est la bambouseraie. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eef8ea"/><stop offset="100%" stop-color="#cfe9c8"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <g opacity=".5" fill="#ffffff"><ellipse cx="700" cy="84" rx="36" ry="20"/><ellipse cx="732" cy="90" rx="27" ry="16"/><ellipse cx="669" cy="92" rx="24" ry="14"/></g>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#bfdcb0"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#a9cf9c" opacity=".85"/>
+  <rect x="70" y="430" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <rect x="70" y="380" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <rect x="70" y="330" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <rect x="70" y="280" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <rect x="70" y="230" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <rect x="70" y="180" width="15" height="43" rx="6" fill="#8cc27f"/>
+  <path d="M84 234 q 34 -18 58 -6 q -30 20 -58 6 Z" fill="#8cc27f" opacity=".9"/>
+  <path d="M70 294 q -34 -20 -58 -8 q 30 22 58 8 Z" fill="#8cc27f" opacity=".9"/>
+  <rect x="130" y="432" width="15" height="41" rx="6" fill="#a3d296"/>
+  <rect x="130" y="384" width="15" height="41" rx="6" fill="#a3d296"/>
+  <rect x="130" y="336" width="15" height="41" rx="6" fill="#a3d296"/>
+  <rect x="130" y="288" width="15" height="41" rx="6" fill="#a3d296"/>
+  <rect x="130" y="240" width="15" height="41" rx="6" fill="#a3d296"/>
+  <path d="M144 283 q 34 -18 58 -6 q -30 20 -58 6 Z" fill="#a3d296" opacity=".9"/>
+  <path d="M130 331 q -34 -20 -58 -8 q 30 22 58 8 Z" fill="#a3d296" opacity=".9"/>
+  <rect x="780" y="426" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <rect x="780" y="373" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <rect x="780" y="320" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <rect x="780" y="266" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <rect x="780" y="213" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <rect x="780" y="160" width="15" height="46" rx="6" fill="#8cc27f"/>
+  <path d="M794 217 q 34 -18 58 -6 q -30 20 -58 6 Z" fill="#8cc27f" opacity=".9"/>
+  <path d="M780 281 q -34 -20 -58 -8 q 30 22 58 8 Z" fill="#8cc27f" opacity=".9"/>
+  <rect x="840" y="430" width="15" height="43" rx="6" fill="#a3d296"/>
+  <rect x="840" y="380" width="15" height="43" rx="6" fill="#a3d296"/>
+  <rect x="840" y="330" width="15" height="43" rx="6" fill="#a3d296"/>
+  <rect x="840" y="280" width="15" height="43" rx="6" fill="#a3d296"/>
+  <rect x="840" y="230" width="15" height="43" rx="6" fill="#a3d296"/>
+  <path d="M854 275 q 34 -18 58 -6 q -30 20 -58 6 Z" fill="#a3d296" opacity=".9"/>
+  <path d="M840 325 q -34 -20 -58 -8 q 30 22 58 8 Z" fill="#a3d296" opacity=".9"/>
+  <rect x="420" y="420" width="15" height="53" rx="6" fill="#b5dcaa"/>
+  <rect x="420" y="360" width="15" height="53" rx="6" fill="#b5dcaa"/>
+  <rect x="420" y="300" width="15" height="53" rx="6" fill="#b5dcaa"/>
+  <path d="M434 332 q 34 -18 58 -6 q -30 20 -58 6 Z" fill="#b5dcaa" opacity=".9"/>
+  <path d="M420 368 q -34 -20 -58 -8 q 30 22 58 8 Z" fill="#b5dcaa" opacity=".9"/>
+  <path d="M260 492 C 274 472 252 461 278 448" stroke="#93c98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M600 496 C 586 478 608 469 582 458" stroke="#93c98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>

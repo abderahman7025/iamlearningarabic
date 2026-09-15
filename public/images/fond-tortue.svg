@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « tortue ». C'est la plage : mer, sable, palmier. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eaf6ff"/><stop offset="100%" stop-color="#cdeaf7"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="770" cy="86" r="52" fill="#ffe9a8" opacity=".85"/>
+  <circle cx="770" cy="86" r="78" fill="#ffe9a8" opacity=".35"/>
+  <path d="M0 400 L900 400 L900 470 Q 680 492 450 470 T 0 468 Z" fill="#9fd8ea"/>
+  <path d="M0 430 q 60 -14 120 0 t 120 0 t 120 0" stroke="#ffffff" stroke-width="5" fill="none" opacity=".6"/>
+  <path d="M0 478 Q 150 438 300 468 T 610 460 T 900 486 L900 560 L0 560 Z" fill="#f3e0ae"/>
+  <path d="M0 516 Q 220 486 460 510 T 900 520 L900 560 L0 560 Z" fill="#e6cd8f" opacity=".85"/>
+  <path d="M118 500 q -18 -100 22 -156" stroke="#bf9463" stroke-width="15" fill="none" stroke-linecap="round"/>
+  <path d="M140 344 q -43 -22 -86 -8 q 28 16 86 8 Z" fill="#8fc98a" opacity=".92"/>
+  <path d="M140 344 q -26 -52 -52 -38 q 17 16 52 38 Z" fill="#8fc98a" opacity=".92"/>
+  <path d="M140 344 q 28 -48 56 -34 q -19 16 -56 34 Z" fill="#8fc98a" opacity=".92"/>
+  <path d="M140 344 q 44 -16 88 -2 q -30 16 -88 2 Z" fill="#8fc98a" opacity=".92"/>
+  <path d="M140 344 q 2 -60 4 -46 q -2 16 -4 46 Z" fill="#8fc98a" opacity=".92"/>
+  <ellipse cx="600" cy="520" rx="26" ry="12" fill="#f7cfa8" opacity=".8"/>
+  <ellipse cx="640" cy="534" rx="18" ry="9" fill="#f7cfa8" opacity=".7"/>
+</svg>

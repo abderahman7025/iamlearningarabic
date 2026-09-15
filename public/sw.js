@@ -1,5 +1,5 @@
-﻿// iamlearningarabic â€” Service Worker v240
-const CACHE = 'arab-v240';
+﻿// iamlearningarabic â€” Service Worker v241
+const CACHE = 'arab-v241';
 
 self.addEventListener('install', function(e) {
   self.skipWaiting();
@@ -67,7 +67,13 @@ self.addEventListener('fetch', function(e) {
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;
-      return fetch(e.request).then(function(response) {
+      // cache: 'reload' — SANS LUI, UNE IMAGE CORRIGEE NE REVIENT JAMAIS.
+      // Au changement de version, le cache du service worker est vide : on
+      // repart donc chercher le fichier. Mais un fetch ordinaire passe
+      // d'abord par le cache HTTP du navigateur, qui garde les images des
+      // mois — on rechargeait la VIEILLE image et on la remettait dans le
+      // cache neuf. Le client a vu le panda reparer revenir casse.
+      return fetch(e.request, {cache: 'reload'}).then(function(response) {
         if (!response || response.status !== 200 || response.type === 'opaque') return response;
         var clone = response.clone();
         caches.open(CACHE).then(function(c) { c.put(e.request, clone); });

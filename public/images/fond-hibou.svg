@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « hibou ». C'est la foret de nuit : lune et etoiles. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#dfe4f7"/><stop offset="100%" stop-color="#c3cbe9"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="770" cy="92" r="46" fill="#fdf6d8" opacity=".9"/>
+  <circle cx="750" cy="82" r="40" fill="#dfe4f7"/>
+  <circle cx="120" cy="80" r="3" fill="#ffffff" opacity=".8"/>
+  <circle cx="210" cy="130" r="2" fill="#ffffff" opacity=".8"/>
+  <circle cx="330" cy="70" r="3" fill="#ffffff" opacity=".8"/>
+  <circle cx="470" cy="120" r="2" fill="#ffffff" opacity=".8"/>
+  <circle cx="590" cy="64" r="3" fill="#ffffff" opacity=".8"/>
+  <circle cx="660" cy="150" r="2" fill="#ffffff" opacity=".8"/>
+  <circle cx="860" cy="170" r="3" fill="#ffffff" opacity=".8"/>
+  <circle cx="60" cy="190" r="2" fill="#ffffff" opacity=".8"/>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#9fa9cd"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#8d97bd" opacity=".85"/>
+  <g><rect x="77" y="437" width="25" height="50" fill="#6f77a0" rx="4"/><polygon points="90,232 32,442 147,442" fill="#8b95bd"/><polygon points="90,227 48,344 131,344" fill="#8b95bd" opacity=".9"/></g>
+  <g><rect x="165" y="447" width="19" height="38" fill="#6f77a0" rx="4"/><polygon points="175,292 131,451 218,451" fill="#8b95bd"/><polygon points="175,288 143,377 206,377" fill="#8b95bd" opacity=".9"/></g>
+  <g><rect x="787" y="435" width="26" height="52" fill="#6f77a0" rx="4"/><polygon points="800,222 740,440 859,440" fill="#8b95bd"/><polygon points="800,216 756,339 843,339" fill="#8b95bd" opacity=".9"/></g>
+  <g><rect x="706" y="449" width="18" height="36" fill="#6f77a0" rx="4"/><polygon points="715,302 673,453 756,453" fill="#8b95bd"/><polygon points="715,298 685,383 744,383" fill="#8b95bd" opacity=".9"/></g>
+</svg>

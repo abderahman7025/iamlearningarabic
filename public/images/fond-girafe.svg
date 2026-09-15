@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le fond du monde de l'animal « girafe ». C'est la savane, comme le lion. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fdf3d8"/><stop offset="100%" stop-color="#f6e3ad"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="770" cy="96" r="62" fill="#ffe9a8" opacity=".85"/>
+  <circle cx="770" cy="96" r="88" fill="#ffe9a8" opacity=".35"/>
+  <g opacity=".55" fill="#ffffff"><ellipse cx="180" cy="96" rx="41" ry="23"/><ellipse cx="216" cy="103" rx="30" ry="18"/><ellipse cx="145" cy="105" rx="27" ry="16"/></g>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#e9d08b"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#dcbf74" opacity=".85"/>
+  <rect x="120" y="320" width="14" height="150" fill="#b98a55" rx="5"/>
+  <ellipse cx="127" cy="320" rx="93" ry="26" fill="#a8c98a" opacity=".92"/>
+  <ellipse cx="127" cy="302" rx="63" ry="18" fill="#bcd79d" opacity=".9"/>
+  <rect x="760" y="350" width="14" height="120" fill="#b98a55" rx="5"/>
+  <ellipse cx="767" cy="350" rx="74" ry="26" fill="#a8c98a" opacity=".92"/>
+  <ellipse cx="767" cy="332" rx="50" ry="18" fill="#bcd79d" opacity=".9"/>
+  <path d="M250 486 C 264 459 242 445 268 428" stroke="#cbbd7e" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M300 492 C 286 472 308 461 282 448" stroke="#cbbd7e" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M560 488 C 574 464 552 451 578 436" stroke="#cbbd7e" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M620 494 C 606 476 628 466 602 454" stroke="#cbbd7e" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M430 500 C 444 484 422 476 448 466" stroke="#cbbd7e" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>
