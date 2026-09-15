@@ -10421,7 +10421,11 @@ var MOT_IMAGE={
   'ا':'lion',      'و':'rose',      'ي':'colombe',
   'ب':'vache',     'ت':'crocodile', 'ث':'serpent',
   'ج':'chameau',   'ح':'cheval',    'خ':'mouton',
-  'د':'ours',      'ذ':'loup',                       /* ر : sans dessin */
+  'د':'ours',      'ذ':'loup',
+  /* La rose sert DEUX fois : warda pour wāw, rawḍa pour rā. Aucun des
+     trente-cinq dessins n'est un jardin, et le client a tranche — « prends
+     la rose aussi ». */
+  'ر':'rose',
   'ز':'girafe',    'س':'poisson',   'ش':'arbre',
   'ص':'aigle',     'ض':'grenouille','ط':'paon',      'ظ':'gazelle',
   'ع':'oiseau',    'غ':'gorille',
@@ -10754,7 +10758,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v239';
+var _VERSION_REPLI='v240';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17024,7 +17028,13 @@ function _boyScene(ca,reprise){
      EXACTEMENT sous le doigt (`elementFromPoint`). On prend maintenant la
      case libre la plus proche du lâcher, et on l'accepte si le doigt est
      tombé à moins d'une bonne marge de son rectangle — un lâcher dedans
-     vaut zéro, un lâcher juste à côté vaut quelques dizaines de pixels. */
+     vaut zéro, un lâcher juste à côté vaut quelques dizaines de pixels.
+
+     ET ON PEUT AUSSI TOUCHER LES DEUX LETTRES, l'une puis l'autre : le trait
+     se trace tout seul entre elles. Tracer un trait d'un bout à l'autre de
+     l'écran demande une main sûre ; toucher deux fois, non. Les deux gestes
+     cohabitent — un appui qui ne bouge pas CHOISIT la lettre et attend la
+     seconde, un appui qui glisse tire le trait comme avant. */
   api.jeuRelier=function(cible,leurres){
     return function(){
       var m=manche(te('RELIE LES PAREILLES'),'mj-relier',MJ_COUL[1]);
@@ -17038,6 +17048,9 @@ function _boyScene(ca,reprise){
       boite.appendChild(cg);boite.appendChild(cd);
       m.zone.appendChild(boite);
       var faites=0,depart=null,departCol=null,vivant=null;
+      /* La lettre touchée qui attend sa jumelle, et le point de l'appui —
+         c'est lui qui dit si le doigt a glissé ou s'il est resté sur place. */
+      var choisie=null,choisieCol=null,ptDepart=null;
       function pastille(g,col,k){
         var d=document.createElement('div');d.className='mjr-case';
         d.textContent=_sansCercle(g);d._g=g;
@@ -17093,11 +17106,35 @@ function _boyScene(ca,reprise){
         l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
       }
       boite.style.touchAction='none';
+      /* Les deux chemins — glisser et toucher — finissent ici. */
+      function relie(a,colA,b,colB,trait){
+        a.classList.remove('vise');b.classList.remove('vise');
+        a.classList.add('prise');b.classList.add('prise');
+        var l=trait||ligne(getComputedStyle(a).getPropertyValue('--mc')||'#1E40AF');
+        place(l,pt(a,bordFace(colA)),pt(b,bordFace(colB)));
+        faites++;
+        youpi(m.zone,true);
+        if(faites===choix.length){N.dire(te('Bravo !'));m.gagne();}
+      }
+      function refuse(c){
+        c.classList.add('non');
+        if(typeof playError==='function')playError();
+        N.plusTard(function(){c.classList.remove('non');},430);
+      }
+      function oublieChoix(){
+        if(choisie)choisie.classList.remove('vise');
+        choisie=null;choisieCol=null;
+      }
+      function jetteVivant(){
+        if(vivant&&vivant.parentNode)vivant.parentNode.removeChild(vivant);
+        vivant=null;
+      }
       boite.addEventListener('pointerdown',function(ev){
         var c=ev.target.closest?ev.target.closest('.mjr-case'):null;
         if(!c||c.classList.contains('prise'))return;
         departCol=cd.contains(c)?cd:cg;
-        depart=c;c.classList.add('vise');
+        depart=c;ptDepart=[ev.clientX,ev.clientY];
+        c.classList.add('vise');
         ditGlyphe(c._g);
         vivant=ligne(getComputedStyle(c).getPropertyValue('--mc')||'#1E40AF');
         place(vivant,pt(c,bordFace(departCol)),versBoite(ev));
@@ -17110,24 +17147,36 @@ function _boyScene(ca,reprise){
       });
       boite.addEventListener('pointerup',function(ev){
         if(!depart)return;
-        var face=(departCol===cg)?cd:cg;
-        var c=viseeProche(face,ev.clientX,ev.clientY);
-        depart.classList.remove('vise');
-        if(c&&c._g===depart._g){
-          depart.classList.add('prise');c.classList.add('prise');
-          place(vivant,pt(depart,bordFace(departCol)),pt(c,bordFace(face)));
-          vivant=null;depart=null;departCol=null;faites++;
-          youpi(m.zone,true);
-          if(faites===choix.length){N.dire(te('Bravo !'));m.gagne();}
+        var d=depart,dc=departCol;
+        depart=null;departCol=null;
+        var bouge=ptDepart?Math.max(Math.abs(ev.clientX-ptDepart[0]),
+                                    Math.abs(ev.clientY-ptDepart[1])):0;
+
+        /* ── LE DOIGT N'A PAS BOUGÉ : C'EST UN APPUI ── */
+        if(bouge<12){
+          jetteVivant();
+          if(choisie===d){oublieChoix();return;}        /* on se ravise */
+          if(choisie&&choisieCol!==dc){                 /* la seconde lettre */
+            var a=choisie,ac=choisieCol;
+            oublieChoix();
+            if(a._g===d._g){relie(a,ac,d,dc);return;}
+            refuse(d);d.classList.remove('vise');
+            return;
+          }
+          /* la première, ou une autre du même côté : c'est elle qui attend */
+          oublieChoix();
+          choisie=d;choisieCol=dc;d.classList.add('vise');
           return;
         }
-        if(c){
-          c.classList.add('non');
-          if(typeof playError==='function')playError();
-          N.plusTard(function(){c.classList.remove('non');},430);
-        }
-        if(vivant&&vivant.parentNode)vivant.parentNode.removeChild(vivant);
-        vivant=null;depart=null;departCol=null;
+
+        /* ── LE DOIGT A GLISSÉ : C'EST UN TRAIT ── */
+        oublieChoix();
+        d.classList.remove('vise');
+        var face=(dc===cg)?cd:cg;
+        var c=viseeProche(face,ev.clientX,ev.clientY);
+        if(c&&c._g===d._g){var l=vivant;vivant=null;relie(d,dc,c,face,l);return;}
+        if(c)refuse(c);
+        jetteVivant();
       });
       N.plusTard(function(){N.dire(te('Relie les deux mêmes lettres !'));},150);
     };

@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 15 septembre 2026, production en v239
+## OÙ ON EN EST — 15 septembre 2026, production en v240
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -73,19 +73,19 @@ repris de ses propres phrases de cours, jamais inventés, mais c'est lui qui
 les arrête. Trois points pour les voyelles, trois pour les prolongations,
 trois par lettre (un seul pour ع غ ء ة).
 
-### DEUX QUESTIONS EN ATTENTE SUR LES TRENTE-CINQ DESSINS
+### LES TRENTE-CINQ DESSINS — RÉGLÉ
 
-Ils couvrent vingt-neuf des trente lettres. Restent :
+Les trente lettres ont leur dessin. Deux points tranchés par le client :
 
-- **ر (rawḍa, « jardin »)** n'a pas de dessin — aucun des trente-cinq n'est un
-  jardin, ni une fleur autre que la rose, déjà prise par و (warda). La lettre
-  garde son emoji 🌷 en attendant sa réponse.
-- **Six dessins ne servent pas encore** : panda, renard, hibou, éléphant,
-  tortue, et une deuxième grenouille (`mot-grenouille2.png`). Ce sont les
-  animaux des ÎLES, pas des mots de lettres. Ils sont détourés et prêts dans
-  `public/images/`, il n'y a qu'à les brancher quand il aura dit où.
+- **La rose sert deux fois** — warda pour و, rawḍa pour ر : « prends la rose
+  aussi ». Aucun des trente-cinq n'était un jardin.
+- **Six dessins ne servent nulle part et n'y sont PAS branchés** : panda,
+  renard, hibou, éléphant, tortue, et une deuxième grenouille
+  (`mot-grenouille2.png`). Ce sont les animaux des ÎLES, pas des mots de
+  lettres. « Ne les branche nulle part s'ils ne servent pas. » Ils restent
+  détourés dans `public/images/`, prêts si le besoin vient.
 
-Les doublons voulus sont branchés : les deux chattes (`qiṭṭa` pour ق, `hirra`
+Les autres doublons sont voulus : les deux chattes (`qiṭṭa` pour ق, `hirra`
 pour ه) prennent `mot-chatte.png` et `mot-chat.png`, et le crocodile de ت est
 distinct de la vipère de ء.
 
@@ -101,7 +101,34 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v239), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v240), du plus récent au plus ancien :**
+
+- **LE PANDA RÉPARÉ, LA ROSE POUR DEUX, ET RELIER AU TOUCHER (v240).**
+
+  - **LE DÉTOURAGE TIENT MAINTENANT DANS UN SEUL FICHIER :
+    `outils/detourage.py`.** `mots-lettres.py` et le nouveau
+    `animaux-iles.py` s'en servent tous les deux. Son en-tête explique la
+    méthode — par la SILHOUETTE — et pourquoi celle de `detoure.py` ne peut
+    pas servir sur ces dessins-là.
+  - **Le panda de l'île ǧīm-ḥā-ḫā avait le haut du crâne mangé**, le client
+    l'a vu. C'était l'ancienne méthode : partir du bord et n'avancer que dans
+    le clair suppose le sujet plus foncé que le fond, or le FRONT DU PANDA
+    est du même blanc que lui — le remplissage passait entre les deux
+    oreilles. Les onze animaux ont été REFAITS depuis leurs sources
+    d'origine, retrouvées dans le ZIP des téléchargements (le client avait
+    depuis retéléchargé un autre lot SOUS LES MÊMES NOMS : `animaux-iles.py`
+    prend donc sa source dans le zip, et accepte `--source`). Vérifié sur le
+    panda : le crâne est entier. 359 Ko pour les onze.
+  - **La rose sert deux fois** : warda pour و, rawḍa pour ر. Les trente
+    lettres ont désormais leur dessin — mesuré, aucune ne retombe sur son
+    emoji.
+  - **Relier accepte AUSSI le toucher.** Tracer un trait d'un bout à l'autre
+    de l'écran demande une main sûre ; toucher deux fois, non. Un appui qui
+    ne bouge pas (moins de 12 px) CHOISIT la lettre et attend sa jumelle ; un
+    appui qui glisse tire le trait comme avant. Toucher deux fois la même la
+    désélectionne. Vérifié : le premier appui arme une case, le second la
+    relie et trace le trait, une paire fausse est refusée sans rien prendre,
+    et le glisser d'un bord à l'autre — décalé de 55 px — marche toujours.
 
 - **ON RESTE CONNECTÉ, LES ANIMAUX SONT À LA MÊME HAUTEUR, ET LES TRENTE-CINQ
   DESSINS DES LETTRES (v239).**
