@@ -3597,37 +3597,31 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 
 /* 1. La rencontre */
 .mj-rencontre{min-height:290px;display:flex;align-items:center;justify-content:center}
+/* ── L'ANNEAU EST LA JAUGE ──
+   Le client : « les lettres sont dans un cercle qui a un bord epais ; c'est
+   cette epaisseur que tu dois mettre en creux, et chaque fois qu'on clique,
+   un quart du cercle se remplit. » La lettre, elle, reste pleine.
+   La bordure devient donc transparente et c'est un DEGRADE CONIQUE qui la
+   peint, jusqu'a l'angle `--anneau` : le fond du disque est peint dans la
+   boite de remplissage, l'anneau dans la boite de bordure. */
 .mj-disque{width:230px;height:230px;border-radius:50%;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 34% 26%,#fff,
-    color-mix(in srgb,var(--mc) 30%,#fff) 58%,color-mix(in srgb,var(--mc) 62%,#fff));
-  border:10px solid var(--mc);
+  background:
+    radial-gradient(circle at 34% 26%,#fff,
+      color-mix(in srgb,var(--mc) 30%,#fff) 58%,color-mix(in srgb,var(--mc) 62%,#fff))
+      padding-box,
+    conic-gradient(from -90deg,var(--mc) var(--anneau,0deg),
+      color-mix(in srgb,var(--mc) 14%,#ffffff) 0) border-box;
+  border:10px solid transparent;
   box-shadow:0 14px 38px color-mix(in srgb,var(--mc) 45%,transparent);
   font-family:'Scheherazade New',serif;font-size:6.6rem;color:var(--mc);
-  /* LE CONTOUR SE REMPLIT A CHAQUE TOUCHER. « Pour qu'on sache quand il faut
-     encore toucher, et quand c'est fini. » La lettre est dessinee en creux
-     et la couleur monte par le bas, d'un tiers a chaque fois : c'est la
-     jauge, et elle est la lettre elle-meme. */
-  -webkit-text-stroke:2px var(--mc);
-  -webkit-background-clip:text;background-clip:text;
-  /* Au-dessus du niveau, la lettre reste VISIBLE mais palie : sur un alif,
-     qui n'est qu'un trait, un vide franc ne se lisait pas — on ne voyait
-     que le contour. Palie dessus, franche dessous, la limite saute aux
-     yeux. */
-  background-image:linear-gradient(to top,var(--mc) var(--plein,0%),
-    color-mix(in srgb,var(--mc) 15%,#ffffff) var(--plein,0%));
-  color:transparent;-webkit-text-fill-color:transparent;
-  transition:--plein .35s ease-out;
   line-height:1.4;animation:mjRespire 2.6s ease-in-out infinite;user-select:none;
   transition:border-color .3s,color .3s,box-shadow .3s}
-/* Declaree, la variable s'interpole : le remplissage MONTE au lieu de
-   sauter. La ou @property n'existe pas, il saute — et c'est tout. */
-@property --plein{syntax:'<percentage>';inherits:false;initial-value:0%}
+/* Declaree, la variable s'interpole : le quart se remplit EN TOURNANT au
+   lieu de sauter. La ou @property n'existe pas, il saute — et c'est tout. */
+@property --anneau{syntax:'<angle>';inherits:false;initial-value:0deg}
 @keyframes mjRespire{0%,100%{transform:scale(1) rotate(-1.5deg)}
   50%{transform:scale(1.06) rotate(1.5deg)}}
-/* Pleine : plus de creux, la lettre est de la couleur de la manche. */
-.mj-disque.pleine{-webkit-text-fill-color:var(--mc);color:var(--mc);
-  background-image:none}
 .mj-disque.saute{animation:mjSaute .55s cubic-bezier(.34,1.56,.64,1)}
 @keyframes mjSaute{0%{transform:scale(1)}
   40%{transform:scale(1.26) translateY(-18px) rotate(6deg)}
@@ -3679,20 +3673,36 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   border-top:11px solid var(--mc)}
 @keyframes mjMonte{0%{bottom:-150px;transform:translateX(0)}
   50%{transform:translateX(16px)}100%{bottom:112%;transform:translateX(0)}}
-.mj-bulle.creve{animation:mjEclate .32s ease-out forwards;pointer-events:none}
+/* ── IL ÉCLATE, IL NE DISPARAIT PAS ──
+   Le client : « il faut un effet eclatement de tous les cotes, pas
+   disparition ». Le ballon se gonfle un instant puis s'efface TRES vite —
+   en un dixieme de seconde, trop court pour qu'on le voie retrecir — et ce
+   sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
+   eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
+   Une onde blanche part du meme point : c'est le claquement. */
+.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;pointer-events:none}
 .mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
 @keyframes mjEclate{
-  0%  {transform:scale(1);   opacity:1}
-  30% {transform:scale(1.34);opacity:1}
-  100%{transform:scale(.2) rotate(14deg);opacity:0}}
-/* Les lambeaux du ballon, projetes a l'eclatement. */
-.mj-lambeau{position:absolute;width:16px;height:20px;pointer-events:none;
+  0%  {transform:scale(1);    opacity:1}
+  55% {transform:scale(1.28); opacity:1}
+  100%{transform:scale(1.34); opacity:0}}
+/* Les lambeaux du ballon, projetes en etoile. */
+.mj-lambeau{position:absolute;width:20px;height:26px;pointer-events:none;
   border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
-  background:var(--mc);animation:mjLambeau .6s ease-out forwards}
+  background:var(--mc);animation:mjLambeau .58s cubic-bezier(.16,.8,.35,1) forwards}
 @keyframes mjLambeau{
-  0%  {transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+  0%  {transform:translate(-50%,-50%) scale(.5) rotate(0);opacity:1}
+  22% {transform:translate(calc(-50% + var(--dx) * .5),calc(-50% + var(--dy) * .5))
+        scale(1.05) rotate(calc(var(--rot,180deg) * .3));opacity:1}
   100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy)))
-        scale(.35) rotate(var(--rot,180deg));opacity:0}}
+        scale(.4) rotate(var(--rot,180deg));opacity:0}}
+/* L'onde du claquement. */
+.mj-onde{position:absolute;width:20px;height:20px;border-radius:50%;
+  pointer-events:none;border:5px solid var(--mc);
+  animation:mjOnde .42s ease-out forwards}
+@keyframes mjOnde{
+  0%  {transform:translate(-50%,-50%) scale(.6);opacity:.85;border-width:7px}
+  100%{transform:translate(-50%,-50%) scale(7);  opacity:0;  border-width:1px}}
 .mj-bulle.non{border-color:#e53935;color:#e53935}
 
 /* 5 et 9. Écoute, voyelles — le haut-parleur est PETIT et de côté, les trois
@@ -10837,7 +10847,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v241';
+var _VERSION_REPLI='v242';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16455,6 +16465,11 @@ function _boyScene(ca,reprise){
 
   function manche(etape,classe,coul){
     var p=panneau(etape);p.setAttribute('data-attend','1');
+    /* `data-verrou` dit a `ajouteRetour` de ne poser AUCUN « Suite » ici.
+       Sans lui, la barre du bas en remet un a la place de celui qu'on vient
+       de retirer : une manche gagnee passe d'elle-meme, le bouton n'etait
+       qu'un faux choix devant un enfant de trois ans. */
+    p.setAttribute('data-verrou','1');
     p.classList.add('panneau-jeu');
     var z=document.createElement('div');
     z.className='mj '+(classe||'');
@@ -16464,13 +16479,18 @@ function _boyScene(ca,reprise){
        manche entière : les aires n'ont pas à savoir d'où il vient. */
     try{z.style.setProperty('--fond','url("'+_fondDuMonde()+'")');}catch(e){}
     p.appendChild(z);
-    var b=bouton(p,te('Suite ›'),suivant);
-    b.disabled=true;b.style.opacity='.35';
-    return {p:p,zone:z,bouton:b,coul:coul||MJ_COUL[0],
+    /* ── PAS DE BOUTON « SUITE » ──
+       Le client : « enleve les boutons suivants sur toutes les pages qui
+       changent automatiquement ». Une manche gagnee passe d'elle-meme apres
+       la fete ; le bouton ne servait qu'a montrer qu'on avait gagne, et deux
+       secondes plus tard il se cliquait tout seul. C'est un faux choix pose
+       devant un enfant de trois ans. */
+    var passe=false;
+    return {p:p,zone:z,bouton:null,coul:coul||MJ_COUL[0],
       gagne:function(){
-        if(!b.disabled)return;
-        b.disabled=false;b.style.opacity='1';b.classList.add('mj-pret');
-        N.plusTard(function(){if(b.isConnected&&!b.disabled)b.click();},2100);
+        if(passe)return;
+        passe=true;
+        N.plusTard(function(){if(p.isConnected)suivant();},2100);
       }};
   }
   /* Les lambeaux d'un ballon qui vient d'éclater : huit morceaux de sa
@@ -16481,16 +16501,27 @@ function _boyScene(ca,reprise){
     var ech=zone.offsetWidth?(rz.width/zone.offsetWidth):1;
     if(!(ech>0.05&&ech<20))ech=1;
     var cx=(re.left+re.width/2-rz.left)/ech, cy=(re.top+re.height/2-rz.top)/ech;
-    for(var k=0;k<8;k++){
+    var c=coul||'#F5A524';
+    /* L'onde d'abord : elle part du centre et s'ouvre. */
+    var o=document.createElement('i');o.className='mj-onde';
+    o.style.left=cx+'px';o.style.top=cy+'px';o.style.setProperty('--mc',c);
+    zone.appendChild(o);
+    setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o);},440);
+    /* SEIZE morceaux, en etoile reguliere pour que ca parte VRAIMENT de tous
+       les cotes, avec juste assez de hasard pour que ce ne soit pas un
+       compas. */
+    for(var k=0;k<16;k++){
       var e=document.createElement('i');e.className='mj-lambeau';
-      var a=(k/8)*Math.PI*2+Math.random()*0.5,d=42+Math.random()*44;
+      var a=(k/16)*Math.PI*2+(Math.random()-0.5)*0.32;
+      var d=64+Math.random()*58;
       e.style.left=cx+'px';e.style.top=cy+'px';
-      e.style.setProperty('--mc',coul||'#F5A524');
+      e.style.setProperty('--mc',c);
       e.style.setProperty('--dx',Math.round(Math.cos(a)*d)+'px');
       e.style.setProperty('--dy',Math.round(Math.sin(a)*d)+'px');
-      e.style.setProperty('--rot',Math.round(-220+Math.random()*440)+'deg');
+      e.style.setProperty('--rot',Math.round(-300+Math.random()*600)+'deg');
+      e.style.animationDelay=(Math.random()*40).toFixed(0)+'ms';
       zone.appendChild(e);
-      (function(el2){setTimeout(function(){if(el2.parentNode)el2.parentNode.removeChild(el2);},620);})(e);
+      (function(el2){setTimeout(function(){if(el2.parentNode)el2.parentNode.removeChild(el2);},680);})(e);
     }
   }
   /* Une poignée d'étincelles là où l'enfant vient de toucher. */
@@ -16555,21 +16586,18 @@ function _boyScene(ca,reprise){
       var d=document.createElement('div');d.className='mj-disque';
       d.textContent=_sansCercle(glyph);
       m.zone.appendChild(d);
-      var n=0,BUT=3;
-      d.style.setProperty('--plein','0%');
+      /* QUATRE touchers, un quart d'anneau chacun : le tour complet dit que
+         c'est fini, et l'enfant le voit venir. */
+      var n=0,BUT=4;
+      d.style.setProperty('--anneau','0deg');
+      d.style.transition='--anneau .3s ease-out';
       d.onclick=function(){
         if(n>=BUT)return;
         d.classList.remove('saute');void d.offsetWidth;d.classList.add('saute');
         etincelles(m.zone,d);ditGlyphe(son||glyph);
         n++;
-        d.style.setProperty('--plein',Math.round(n/BUT*100)+'%');
-        if(n>=BUT){
-          /* Pleine, la lettre reprend sa couleur franche : le contour en
-             creux n'a plus rien a annoncer. */
-          d.style.webkitTextFillColor=d.style.color='';
-          d.classList.add('pleine');
-          youpi(m.zone);m.gagne();
-        }
+        d.style.setProperty('--anneau',(n/BUT*360)+'deg');
+        if(n>=BUT){youpi(m.zone);m.gagne();}
       };
       /* La présentation, en trois temps : on la nomme, on la fait répéter,
          on félicite. Puis la consigne du jeu. */
@@ -16633,56 +16661,8 @@ function _boyScene(ca,reprise){
   };
 
   /* ── 3. LE DOIGT QUI DESSINE ──
-     Des JALONS INVISIBLES posés SUR LE VRAI GESTE de la lettre — celui que
-     le client a dicté geste par geste, et dont `_trajectoire` garde les
-     points. Ils étaient dessinés en étoiles ; le client n'en veut plus. Ils
-     restent, mais on ne les voit pas : c'est eux qui imposent le SENS de
-     l'écriture, on ne peut pas prendre le troisième avant le deuxième.
-
-     LES POINTS ET LA VOYELLE ONT AUSSI LEURS JALONS, et ils comptent :
-     « quand il faut repasser sur les lettres, il faut devoir repasser sur
-     les voyelles s'il y en a ». Ni les uns ni l'autre ne sont dans le geste,
-     qui ne décrit que le corps : on les retrouve par `_revelateur`, qui sait
-     déjà séparer les trois encres, et on prend le centre de chaque tache.
-     L'ordre est celui de la main : le corps, puis les points, puis la
-     voyelle. */
-  function jalonsDuGeste(texte,ax,ay,px,nb){
-    var g=null;
-    try{g=_trajectoire(texte);}catch(e){}
-    if(!g)return [];
-    var plat=_cheminPlat(g);
-    if(!plat.seg.length||!plat.L)return [];
-    var ay2=ay+_descenteGlyphe(texte,px);
-    var out=[];
-    for(var k=0;k<nb;k++){
-      var vise=plat.L*(nb>1?(k/(nb-1)):0),s=plat.seg[0];
-      for(var j=0;j<plat.seg.length;j++){s=plat.seg[j];if(s[5]+s[4]>=vise)break;}
-      var t=s[4]?((vise-s[5])/s[4]):0;t=Math.max(0,Math.min(1,t));
-      out.push({x:ax+(s[0]+(s[2]-s[0])*t)*px,
-                y:ay2+(s[1]+(s[3]-s[1])*t)*px,on:false});
-    }
-    return out;
-  }
-  /* Un centre par tache d'encre. Grouper par distance fondait les points du
-     thā en un seul : on passe par les composantes connexes, que
-     `_tachesEncre` sait trouver. */
-  function centresDes(pixels,W,H,px,marque){
-    if(!pixels||!pixels.length)return [];
-    var masque=new Uint8Array(W*H);
-    pixels.forEach(function(i){masque[i]=1;});
-    var t=_tachesEncre(masque,W,H),acc={};
-    pixels.forEach(function(i){
-      var lb=t.lab[i];if(!lb)return;
-      var a=acc[lb]||(acc[lb]={sx:0,sy:0,n:0});
-      a.sx+=i%W;a.sy+=Math.floor(i/W);a.n++;
-    });
-    var grp=Object.keys(acc).map(function(lb){
-      var a=acc[lb];return {cx:a.sx/a.n,cy:a.sy/a.n,n:a.n};});
-    var gros=grp.filter(function(g){return g.n>=Math.max(4,px*px*0.0008);});
-    if(gros.length)grp=gros;
-    grp.sort(function(a,b){return b.cx-a.cx;});
-    return grp.map(function(g){return {x:g.cx,y:g.cy,on:false,marque:marque};});
-  }
+     La lettre est posee en gris et l'enfant la PEINT, dans l'ordre. Le detail
+     est explique dans `api.jeuTrace`, plus bas. */
   /* ── LA LETTRE REMPLIT LE CADRE ──
      Une taille écrite en dur la laissait perdue au milieu d'un grand blanc :
      l'encre d'une lettre arabe occupe une petite part de sa boîte, et cette
@@ -16765,71 +16745,106 @@ function _boyScene(ca,reprise){
       var cx=cv.getContext('2d');
       var _r=encreQuiRemplit(glyph,W,H,46);
       var PX=_r.px,AX=_r.ax,AY=_r.ay;
-      var corps=jalonsDuGeste(glyph,AX,AY,PX,9);
-      var eto=corps.slice();
-      if(corps.length){
-        var rev=null;
-        try{rev=_revelateur(glyph,AX,AY,PX,0,0,W,H,'#000');}catch(e){}
-        if(rev){
-          eto=eto.concat(centresDes(rev.points,W,H,PX,'point'))
-                 .concat(centresDes(rev.voyelle,W,H,PX,'voyelle'));
-        }
-      }
-      var libre=!eto.length;
-      var TOTAL=Math.max(1,passes||2),passe=1;
-      var n=0,fini=false;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.insertBefore(jauge,cadre);
-      /* ── LA LETTRE SE REMPLIT LÀ OÙ LE DOIGT PASSE ──
-         « Enlève les étoiles, enlève aussi le point bleu sur les voyelles,
-         et à la place la lettre se remplit de couleur là où l'enfant
-         repasse. » La lettre est donc posée en gris, et l'enfant la PEINT.
-         Le tracé du doigt va sur un calque à part ; ce calque sert ensuite
-         de DÉCOUPE (`source-in`) dans laquelle on verse la couleur. Rien ne
-         déborde du dessin de la lettre, même avec un gros pinceau — et un
-         gros pinceau, pour un doigt de trois ans, est indispensable.
-         Le calque n'est effacé qu'au changement de passe : l'enfant peut
-         lever le doigt et reprendre, ce qui est déjà rempli le reste. */
-      var calque=document.createElement('canvas');
-      calque.width=W;calque.height=H;
-      var kx=calque.getContext('2d');
-      var encre=document.createElement('canvas');
-      encre.width=W;encre.height=H;
-      var ex=encre.getContext('2d');
-      var PINCEAU=Math.max(22,Math.round(PX*0.30));
-      var dernier=null,tete=null;
 
-      /* ── LE DESSIN NE SORT PAS DE LA LETTRE ──
-         « Qu'on ne puisse pas bouger l'animal n'importe où, mais juste sur
-         la lettre. » On garde donc le masque de l'encre, et pour chaque
-         point du cadre l'adresse du POINT D'ENCRE LE PLUS PROCHE — deux
-         balayages en chanfrein, une fois pour toutes. Le doigt peint où il
-         veut (de toute façon la couleur ne prend que dans la lettre), mais
-         l'animal, lui, est ramené sur le trait.
-         Le même masque donne l'ÉPAISSEUR DU TRAIT : l'aire de l'encre
-         divisée par la longueur du geste. C'est elle qui fixe la taille du
-         dessin — « un peu plus grosse que l'épaisseur du trait ». */
-      var projX=null,projY=null,epaisseur=PX*0.12;
-      (function(){
-        var c2=document.createElement('canvas');c2.width=W;c2.height=H;
-        var k2=c2.getContext('2d');
-        k2.font=PX+"px 'Scheherazade New',serif";
-        k2.textAlign='center';k2.textBaseline='alphabetic';k2.fillStyle='#000';
-        try{_dessineSurLigne(k2,glyph,AX,AY,PX);}catch(e){}
-        var dd,i,N2=W*H;
-        try{dd=k2.getImageData(0,0,W,H).data;}catch(e){return;}
-        var dist=new Float32Array(N2);
-        projX=new Int16Array(N2);projY=new Int16Array(N2);
-        var aire=0;
+      /* ══ LA LETTRE SE REMPLIT, DANS L'ORDRE, PARTIE PAR PARTIE ══
+         Le client, en trois temps :
+           « la lettre se remplit de couleur là où l'enfant repasse » ;
+           « on ne doit pas pouvoir remplir les voyelles tant qu'on n'a pas
+             rempli les points éventuels, et ces derniers tant qu'on n'a pas
+             rempli l'entièreté de la lettre » ;
+           « à côté de la lettre, mets une autre petite tête d'animal qui
+             montre la trajectoire ».
+
+         `_revelateur` sait déjà découper l'encre en TROIS LISTES ORDONNÉES —
+         le corps au fil du geste, les points de droite à gauche, la voyelle
+         ensuite. Ce sont exactement les trois parties, et leur ordre est
+         celui de la main. On n'en ouvre qu'une à la fois.
+
+         DANS une partie, on ne peut pas non plus sauter : un pixel ne se
+         peint que si son RANG dans la liste ne dépasse pas de trop le plus
+         avancé déjà peint. C'est ce qui donne le sens de l'écriture — on ne
+         commence pas un alif par le bas. */
+      var rev=null;
+      try{rev=_revelateur(glyph,AX,AY,PX,0,0,W,H,'#000');}catch(e){}
+
+      function partieDe(nom,liste){
+        if(!liste||!liste.length)return null;
+        var rang=new Int32Array(W*H);
+        var i;
+        for(i=0;i<W*H;i++)rang[i]=-1;
+        for(i=0;i<liste.length;i++)rang[liste[i]]=i;
+        return {nom:nom,liste:liste,rang:rang,aire:liste.length,
+                couvert:0,avance:-1,proche:null,
+                /* Tolérance d'avance : on peut peindre un peu devant soi,
+                   sinon le pinceau, qui couvre une tache, se bloquerait sur
+                   son propre bord. */
+                marge:Math.max(50,Math.round(liste.length*0.18))};
+      }
+      var parties=[];
+      if(rev){
+        var p1=partieDe('corps',rev.ordre);if(p1)parties.push(p1);
+        var p2=partieDe('point',rev.points);if(p2)parties.push(p2);
+        var p3=partieDe('voyelle',rev.voyelle);if(p3)parties.push(p3);
+      }
+      /* Secours : sans découpage, toute l'encre en une seule partie, sans
+         ordre. La manche marche, elle est seulement moins exigeante. */
+      if(!parties.length){
+        var tout=[],c0=document.createElement('canvas');
+        c0.width=W;c0.height=H;
+        var k0=c0.getContext('2d');
+        k0.font=PX+"px 'Scheherazade New',serif";
+        k0.textAlign='center';k0.textBaseline='alphabetic';k0.fillStyle='#000';
+        try{_dessineSurLigne(k0,glyph,AX,AY,PX);}catch(e){}
+        try{
+          var d0=k0.getImageData(0,0,W,H).data;
+          for(var q0=0;q0<W*H;q0++)if(d0[q0*4+3]>40)tout.push(q0);
+        }catch(e){}
+        var ps=partieDe('corps',tout);
+        if(ps){ps.marge=ps.aire;parties.push(ps);}
+      }
+      var libre=!parties.length;
+
+      /* L'ÉPAISSEUR DU TRAIT : l'aire de l'encre divisée par la longueur du
+         geste. Elle règle tout — la taille de l'animal et celle du pinceau. */
+      /* L'aire du CORPS seul : la longueur mesuree est celle de son geste,
+         et compter les points et la voyelle avec lui gonflait l'epaisseur
+         d'un quart — assez pour qu'un appui sur le point, trente pixels plus
+         bas, atteigne encore le corps. */
+      var aireCorps=(parties[0]&&parties[0].aire)||0;
+      var epaisseur=PX*0.12;
+      try{
+        var _pl=_cheminPlat(_trajectoire(glyph));
+        if(_pl&&_pl.L>0&&aireCorps)
+          epaisseur=Math.max(6,Math.min(PX*0.3,aireCorps/(_pl.L*PX)));
+      }catch(e){}
+      /* L'animal est À PEINE plus gros que le trait — le client y tient. Le
+         PINCEAU, lui, est large : posé sur un bord du trait, un pinceau de la
+         largeur du trait en laissait une bande de l'autre côté, « une petite
+         partie en épaisseur qui n'est pas remplie quand on y passe ». */
+      var TAILLE=Math.max(16,epaisseur*1.3);
+      var PINCEAU=Math.max(26,epaisseur*2.6);
+      /* Au-dela, le doigt n'est plus sur la lettre et ne peint rien. Une
+         portee large laissait un appui SUR LE POINT peindre le corps, qui
+         passe trente pixels plus haut : un peu plus d'une epaisseur suffit a
+         pardonner une main qui tremble sans ramasser ce qui est ailleurs. */
+      var PORTEE=epaisseur*1.25;
+
+      /* Le point de la partie active le plus proche d'un endroit donné : deux
+         balayages en chanfrein, faits une fois par partie, à son ouverture. */
+      function carteProche(p){
+        if(p.proche)return p.proche;
+        var N2=W*H,dist=new Float32Array(N2);
+        var px2=new Int16Array(N2),py2=new Int16Array(N2),i;
         for(i=0;i<N2;i++){
-          if(dd[i*4+3]>40){dist[i]=0;projX[i]=i%W;projY[i]=(i/W)|0;aire++;}
-          else{dist[i]=1e9;projX[i]=-1;projY[i]=-1;}
+          if(p.rang[i]>=0){dist[i]=0;px2[i]=i%W;py2[i]=(i/W)|0;}
+          else{dist[i]=1e9;px2[i]=-1;py2[i]=-1;}
         }
-        if(!aire){projX=projY=null;return;}
         function essaie(a,b,cout){
-          if(projX[b]<0)return;
+          if(px2[b]<0)return;
           var v=dist[b]+cout;
-          if(v<dist[a]){dist[a]=v;projX[a]=projX[b];projY[a]=projY[b];}
+          if(v<dist[a]){dist[a]=v;px2[a]=px2[b];py2[a]=py2[b];}
         }
         var x,y,j;
         for(y=0;y<H;y++)for(x=0;x<W;x++){
@@ -16846,18 +16861,42 @@ function _boyScene(ca,reprise){
           if(x<W-1&&y<H-1)essaie(j,j+W+1,1.414);
           if(x>0&&y<H-1)essaie(j,j+W-1,1.414);
         }
-        var lg=0;
-        try{var _p=_cheminPlat(_trajectoire(glyph));if(_p&&_p.L)lg=_p.L*PX;}catch(e){}
-        if(lg>0)epaisseur=Math.max(6,Math.min(PX*0.30,aire/lg));
-      })();
-      function surLEncre(p){
-        if(!projX)return p;
-        var x=Math.max(0,Math.min(W-1,Math.round(p[0])));
-        var y=Math.max(0,Math.min(H-1,Math.round(p[1])));
-        var i=y*W+x;
-        if(projX[i]<0)return p;
-        return [projX[i],projY[i]];
+        p.proche={x:px2,y:py2};
+        return p.proche;
       }
+
+      var TOTAL=Math.max(1,passes||2),passe=1;
+      var ip=0,fini=false;
+      var peint=new Uint8Array(W*H);
+      var calque=document.createElement('canvas');
+      calque.width=W;calque.height=H;
+      var kx=calque.getContext('2d');
+      var encre=document.createElement('canvas');
+      encre.width=W;encre.height=H;
+      var ex=encre.getContext('2d');
+      var dernier=null,tete=null;
+
+      function active(){return parties[ip]||null;}
+      function surLaPartie(pt){
+        var P=active();if(!P)return null;
+        var c=carteProche(P);
+        var x=Math.max(0,Math.min(W-1,Math.round(pt[0])));
+        var y=Math.max(0,Math.min(H-1,Math.round(pt[1])));
+        var i=y*W+x;
+        if(c.x[i]<0)return null;
+        return [c.x[i],c.y[i]];
+      }
+      /* Là où l'animal doit mener : le PREMIER PIXEL PAS ENCORE PEINT de la
+         partie, dans l'ordre de la liste — donc dans l'ordre d'écriture. */
+      function prochainVide(P2){
+        var L=P2.liste;
+        for(var k=Math.max(0,P2.avance);k<L.length;k++)
+          if(!peint[L[k]])return {x:L[k]%W,y:(L[k]/W)|0,k:k};
+        for(var k2=0;k2<L.length;k2++)
+          if(!peint[L[k2]])return {x:L[k2]%W,y:(L[k2]/W)|0,k:k2};
+        return null;
+      }
+
       function poseLettre(c,coul){
         c.save();
         c.font=PX+"px 'Scheherazade New',serif";
@@ -16866,20 +16905,76 @@ function _boyScene(ca,reprise){
         try{_dessineSurLigne(c,glyph,AX,AY,PX);}catch(e){}
         c.restore();
       }
-      function peintCalque(p){
+      function tacheCalque(q){
         kx.save();
         kx.strokeStyle='#000';kx.fillStyle='#000';
         kx.lineWidth=PINCEAU;kx.lineCap='round';kx.lineJoin='round';
         if(dernier){
           kx.beginPath();kx.moveTo(dernier[0],dernier[1]);
-          kx.lineTo(p[0],p[1]);kx.stroke();
+          kx.lineTo(q[0],q[1]);kx.stroke();
         }
-        kx.beginPath();kx.arc(p[0],p[1],PINCEAU/2,0,6.2832);kx.fill();
+        kx.beginPath();kx.arc(q[0],q[1],PINCEAU/2,0,6.2832);kx.fill();
         kx.restore();
-        dernier=p;tete=p;
       }
-      function videCalque(){kx.clearRect(0,0,W,H);dernier=null;tete=null;}
-      function peint(){
+      /* Compte ce que le pinceau vient de couvrir DANS la partie active, et
+         fait avancer le rang le plus loin atteint. */
+      function compte(q){
+        var P=active();if(!P)return;
+        var r=Math.ceil(PINCEAU/2)+1,r2=(PINCEAU/2+1)*(PINCEAU/2+1);
+        var x0=Math.max(0,Math.round(q[0])-r),x1=Math.min(W-1,Math.round(q[0])+r);
+        var y0=Math.max(0,Math.round(q[1])-r),y1=Math.min(H-1,Math.round(q[1])+r);
+        for(var y=y0;y<=y1;y++)for(var x=x0;x<=x1;x++){
+          var dx=x-q[0],dy=y-q[1];
+          if(dx*dx+dy*dy>r2)continue;
+          var i=y*W+x,rg=P.rang[i];
+          if(rg<0||peint[i])continue;
+          if(rg>P.avance+P.marge)continue;      /* devant soi : pas encore */
+          peint[i]=1;P.couvert++;
+          if(rg>P.avance)P.avance=rg;
+        }
+      }
+      function videCalque(){
+        kx.clearRect(0,0,W,H);
+        peint=new Uint8Array(W*H);
+        parties.forEach(function(p){p.couvert=0;p.avance=-1;});
+        ip=0;dernier=null;tete=null;
+      }
+      /* Une partie est finie quand elle est peinte pour l'essentiel. On
+         termine alors son remplissage : le reste, c'est le bord adouci du
+         glyphe, que le doigt n'atteindra jamais tout à fait. */
+      function verifieAvance(){
+        var P=active();if(!P)return;
+        if(P.couvert<P.aire*0.82)return;
+        for(var k=0;k<P.liste.length;k++)peint[P.liste[k]]=1;
+        P.couvert=P.aire;
+        kx.save();kx.fillStyle='#000';
+        var im=kx.getImageData(0,0,W,H);
+        for(var k2=0;k2<P.liste.length;k2++){
+          var j=P.liste[k2]*4;
+          im.data[j]=0;im.data[j+1]=0;im.data[j+2]=0;im.data[j+3]=255;
+        }
+        kx.putImageData(im,0,0);kx.restore();
+        ip++;dernier=null;tete=null;
+        if(ip>=parties.length){
+          if(passe<TOTAL){
+            youpi(m.zone,true);N.dire(te('Encore une fois !'));
+            N.plusTard(function(){passe++;videCalque();peint2();},800);
+          }else{
+            fini=true;youpi(m.zone);m.gagne();
+          }
+        }
+      }
+      function progres(){
+        var f=0,t=0;
+        parties.forEach(function(p){f+=Math.min(p.couvert,p.aire);t+=p.aire;});
+        return t?f/t:1;
+      }
+
+      /* ── LA TÊTE QUI MONTRE LA TRAJECTOIRE ──
+         Une SECONDE tête, plus pâle, qui parcourt sans fin la partie ouverte
+         dans l'ordre d'écriture. Elle ne se touche pas : elle montre. */
+      var demo=0,tDemo=0;
+      function peint2(){
         cx.clearRect(0,0,W,H);
         poseLettre(cx,'rgba(20,24,32,.15)');
         if(fini){
@@ -16891,8 +16986,6 @@ function _boyScene(ca,reprise){
           poseLettre(ex,m.coul);
           ex.globalCompositeOperation='source-over';
           cx.drawImage(encre,0,0);
-          /* Le contour reste dessiné tant que la lettre n'est pas pleine :
-             c'est lui, maintenant, qui dit où aller. */
           cx.save();
           cx.font=PX+"px 'Scheherazade New',serif";
           cx.textAlign='center';cx.textBaseline='alphabetic';
@@ -16900,72 +16993,71 @@ function _boyScene(ca,reprise){
           cx.globalAlpha=.5;
           try{cx.strokeText(glyph,AX,AY+_descenteGlyphe(glyph,PX));}catch(e){}
           cx.restore();
-          var gi=_guidePour(glyph,peint);
-          if(gi){
-            var vise=tete||eto[n]||eto[0];
+
+          var gi=_guidePour(glyph,peint2);
+          var P=active();
+          if(gi&&P){
+            var GW=TAILLE*(gi.naturalWidth/gi.naturalHeight);
+            /* 1. la tête de démonstration, pâle, qui suit la trajectoire */
+            var L=P.liste,q=L[Math.min(L.length-1,Math.floor(tDemo*L.length))];
+            if(q!==undefined){
+              cx.save();cx.globalAlpha=.42;
+              cx.drawImage(gi,(q%W)-GW/2,((q/W)|0)-TAILLE/2,GW,TAILLE);
+              cx.restore();
+            }
+            /* 2. celle de l'enfant : sous son doigt, ou à l'endroit qu'il
+                  doit atteindre ensuite. */
+            var vise=tete||prochainVide(P);
             if(vise){
-              var gp=surLEncre(vise.x!==undefined?[vise.x,vise.y]:vise);
-              /* A PEINE PLUS GROS QUE LE TRAIT, et CENTRE dessus : c'est ce
-                 que le client demande. Un dessin qui couvrait le tiers du
-                 corps cachait la lettre au lieu de la montrer. */
-              var GH=Math.max(18,epaisseur*1.7);
-              var GW=GH*(gi.naturalWidth/gi.naturalHeight);
-              cx.save();cx.globalAlpha=.95;
-              cx.drawImage(gi,gp[0]-GW/2,gp[1]-GH/2,GW,GH);
+              var vx=(vise.x!==undefined?vise.x:vise[0]);
+              var vy=(vise.y!==undefined?vise.y:vise[1]);
+              cx.save();cx.globalAlpha=.97;
+              cx.drawImage(gi,vx-GW/2,vy-TAILLE/2,GW,TAILLE);
               cx.restore();
             }
           }
         }
         jauge.firstChild.style.width=
-          Math.round(((passe-1)+(eto.length?n/eto.length:1))/TOTAL*100)+'%';
+          Math.round(((passe-1)+progres())/TOTAL*100)+'%';
       }
-      peint();
-      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
+      peint2();
+      try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint2);}catch(e){}
       if(libre)m.gagne();
+      /* La démonstration tourne tant que le canevas est à l'écran. Vingt
+         images par seconde suffisent pour une tête qui glisse, et repeindre
+         la lettre soixante fois par seconde coûterait cher sur un téléphone. */
+      demo=setInterval(function(){
+        if(!cv.isConnected){clearInterval(demo);return;}
+        if(fini)return;
+        tDemo+=0.012;if(tDemo>1)tDemo=0;
+        peint2();
+      },50);
+
       function auCanvas(ev){
         var r=cv.getBoundingClientRect();
         return [(ev.clientX-r.left)/r.width*W,(ev.clientY-r.top)/r.height*H];
       }
       var doigt=false;
       function touche(ev){
-        if(fini)return;
+        if(fini||libre)return;
         var p=auCanvas(ev);
-        peintCalque(p);
-        if(!libre&&n<eto.length){
-          var e=eto[n],dx=p[0]-e.x,dy=p[1]-e.y;
-          /* Un doigt d'enfant ne vise pas : le jalon se prend de loin. */
-          if(dx*dx+dy*dy<62*62){
-            e.on=true;n++;
-            if(typeof playBravo==='function')playBravo();
-            if(n>=eto.length){
-              if(passe<TOTAL){
-                youpi(m.zone,true);N.dire(te('Encore une fois !'));
-                /* La passe ne change de numero QU'AU MOMENT DU REMISE A
-                   ZERO : comptee tout de suite, la jauge sautait a 100 %
-                   pendant les huit dixiemes de la fete, puis retombait a
-                   la moitie. */
-                N.plusTard(function(){
-                  passe++;
-                  eto.forEach(function(x){x.on=false;});
-                  n=0;videCalque();peint();
-                },800);
-              }else{
-                fini=true;youpi(m.zone);m.gagne();
-              }
-            }
-          }
-        }
-        peint();
+        var q=surLaPartie(p);
+        if(!q){tete=null;return;}
+        var dx=q[0]-p[0],dy=q[1]-p[1];
+        if(dx*dx+dy*dy>PORTEE*PORTEE){tete=null;dernier=null;return;}
+        tacheCalque(q);compte(q);
+        dernier=q;tete={x:q[0],y:q[1]};
+        verifieAvance();
+        peint2();
       }
       cv.style.touchAction='none';
       cv.addEventListener('pointerdown',function(ev){doigt=true;
         try{cv.setPointerCapture(ev.pointerId);}catch(e){}
         dernier=null;touche(ev);ev.preventDefault();});
       cv.addEventListener('pointermove',function(ev){if(doigt)touche(ev);});
-      /* Le doigt se leve : le dessin quitte sa derniere position et va
-         attendre AU DEPART DU MORCEAU SUIVANT — c'est `tete=null` qui le
-         renvoie au prochain jalon. */
-      function leve(){doigt=false;dernier=null;tete=null;peint();}
+      /* Le doigt se lève : la tête quitte sa position et va attendre au
+         début de ce qui reste à faire. */
+      function leve(){doigt=false;dernier=null;tete=null;peint2();}
       cv.addEventListener('pointerup',leve);
       cv.addEventListener('pointercancel',leve);
       N.plusTard(function(){

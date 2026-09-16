@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 15 septembre 2026, production en v241
+## OÙ ON EN EST — 16 septembre 2026, production en v242
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,60 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v241), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v242), du plus récent au plus ancien :**
+
+- **LE TRACÉ SE FAIT DANS L'ORDRE, ET LE RESTE D'UNE PASSE (v242).**
+
+  - **LE TRACÉ, REFAIT.** Trois demandes d'un coup, et elles tiennent
+    ensemble : « l'animal à peine plus gros que la largeur » ; « à côté de la
+    lettre, une autre petite tête d'animal qui montre la trajectoire » ; « on
+    ne doit pas pouvoir remplir les voyelles tant qu'on n'a pas rempli les
+    points, ni ceux-ci tant qu'on n'a pas rempli l'entièreté de la lettre ».
+
+    `_revelateur` découpait déjà l'encre en TROIS LISTES ORDONNÉES — le corps
+    au fil du geste, les points de droite à gauche, la voyelle ensuite. Ce
+    sont exactement les trois parties, et leur ordre est celui de la main :
+    **on n'en ouvre qu'une à la fois**, et une partie ne s'ouvre que lorsque
+    la précédente est peinte à 82 % (le reste, c'est le bord adouci du glyphe,
+    qu'un doigt n'atteint jamais — on le termine pour lui). DANS une partie,
+    on ne peut pas non plus sauter : un pixel ne se peint que si son RANG
+    dans la liste ne dépasse pas de trop le plus avancé déjà peint. C'est ce
+    qui donne le sens de l'écriture — on ne commence pas un alif par le bas.
+
+    Deux têtes, donc : **celle de l'enfant**, sous son doigt ou à l'endroit
+    qu'il doit atteindre (le premier pixel pas encore peint, dans l'ordre), et
+    **une seconde, pâle, qui parcourt sans fin la partie ouverte** — c'est la
+    démonstration qu'il demandait.
+
+    Les deux tailles étaient mêlées : l'animal **à peine plus gros que le
+    trait** (1,3 fois), mais le PINCEAU large (2,6 fois). Posé sur un bord du
+    trait, un pinceau de la largeur du trait en laissait une bande de l'autre
+    côté — « une petite partie en épaisseur qui n'est pas remplie quand on y
+    passe ». Et l'épaisseur se mesure sur le CORPS SEUL (aire ÷ longueur du
+    geste) : y compter les points et la voyelle la gonflait d'un quart, assez
+    pour qu'un appui sur le point atteigne encore le corps trente pixels plus
+    haut. La portée d'un doigt est d'une épaisseur et quart : ça pardonne une
+    main qui tremble sans ramasser ce qui est ailleurs.
+
+    Vérifié sur بَ : appuyer d'abord sur la fatḥa ou sur le point ne peint
+    rien ; le corps se remplit d'un bout à l'autre sans bande oubliée, les
+    deux têtes descendent alors sur le point, puis remontent sur la fatḥa.
+
+  - **L'ANNEAU EST LA JAUGE, PAS LA LETTRE.** J'avais mis la lettre en creux ;
+    ce n'était pas la demande. « Les lettres sont dans un cercle qui a un bord
+    épais ; c'est cette épaisseur que tu dois mettre en creux, et chaque fois
+    qu'on clique, un quart du cercle se remplit. » La lettre redevient pleine,
+    la bordure devient transparente, et un dégradé conique la peint jusqu'à
+    l'angle `--anneau` — quatre touchers, un quart chacun.
+  - **Le ballon éclate de tous les côtés.** Il rétrécissait, ce qui se lit
+    comme une disparition. Il s'efface maintenant en un dixième de seconde —
+    trop court pour qu'on le voie partir — et ce sont SEIZE morceaux de sa
+    couleur qui filent en étoile, avec une onde blanche pour le claquement.
+  - **Plus de bouton « Suite » chez les petits.** Une manche gagnée passe
+    d'elle-même : le bouton ne servait qu'à montrer qu'on avait gagné, et deux
+    secondes plus tard il se cliquait tout seul. C'est un faux choix devant un
+    enfant de trois ans. `manche()` ne le pose plus, et `data-verrou` empêche
+    la barre du bas d'en remettre un à sa place.
 
 - **UNE PASSE DE NEUF CORRECTIONS SUR LES MANCHES (v241).**
 
