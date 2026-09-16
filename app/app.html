@@ -3901,30 +3901,60 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
    enormement de place sur les cotes ». Le cadre commun (`sess-map-wrap`) est
    borne a 680 px pour le parcours des grands ; le monde des animaux, lui,
    s'etale, et les vignettes grossissent avec lui. */
-/* ── UNE CARTE, PAS UNE LISTE ──
-   Le client : « teste une carte des animaux au lieu de juste des vignettes
-   posees l'une apres l'autre ». Les vignettes serpentent donc : deux par
-   rangee (trois au large), une rangee sur deux a l'envers, et un CHEMIN
-   POINTILLE passe de l'une a l'autre — trace en SVG par-dessous, aux
-   positions MESUREES. Une grille qui s'adapte a la largeur ne peut pas
-   porter un chemin ecrit en dur : c'est la mesure qui decide. */
-.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-  gap:16px;padding:0 2px 24px}
-.carte-anim{position:relative}
-.carte-anim .tuiles{grid-template-columns:repeat(2,1fr);
-  gap:44px 26px;padding-bottom:34px}
-@media(min-width:760px){.carte-anim .tuiles{grid-template-columns:repeat(3,1fr)}}
-.carte-anim .tuile{z-index:1}
-.carte-chemin{position:absolute;inset:0;width:100%;height:100%;
-  pointer-events:none;z-index:0;overflow:visible}
-.carte-chemin path{fill:none;stroke:#8aa87a;stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:2 15;opacity:.75}
-.carte-chemin .socle{stroke:#ffffff;stroke-width:16;stroke-dasharray:none;
-  opacity:.55}
-.carte-chemin .patte{fill:#7d9c6e;opacity:.55}
-body.age-petit .sess-map-wrap{max-width:min(1180px,97%)}
-@media(min-width:900px){.tuiles{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
-.tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
+/* ══ LA CARTE DU MONDE DES ANIMAUX ══
+   Le client, deux fois : « teste une carte au lieu de juste des vignettes
+   posees l'une apres l'autre », puis « je ne vois AUCUNE carte ». Il avait
+   raison : un serpentin de vignettes avec un pointille entre elles restait
+   une grille.
+   C'en est une, maintenant : un PAYSAGE (`carte-animaux.svg` — collines,
+   riviere, pont, bosquets), un SENTIER qui le traverse, et les etapes posees
+   dessus en medaillons. Le repere est le meme des deux cotes, 100 x 140 ;
+   `CARTE_ETAPES` donne la place de chacune, et le sentier passe par elles. */
+.carte-monde{position:relative;width:100%;max-width:760px;margin:0 auto 18px;
+  /* 140/100 : la hauteur du repere. C'est ce qui reserve la place avant que
+     l'image arrive, donc aucun saut de mise en page. */
+  padding-bottom:140%;border-radius:28px;overflow:hidden;
+  background:#ddf0d0 url("/images/carte-animaux.svg") center/100% 100% no-repeat;
+  box-shadow:0 10px 30px rgba(60,90,50,.18)}
+.carte-sentier{position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none}
+.carte-sentier .sol{fill:none;stroke:#e8d9b4;stroke-width:6.4;
+  stroke-linecap:round;stroke-linejoin:round}
+.carte-sentier .bord{fill:none;stroke:#cdb98c;stroke-width:7.8;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.65}
+/* Une etape : un medaillon rond, son nom sous lui. */
+.carte-etape{position:absolute;transform:translate(-50%,-50%);
+  /* 21 % : assez grand pour un doigt, assez petit pour qu on voie le
+     sentier passer entre les etapes. */
+  width:21%;display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;z-index:2;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.carte-etape:active{transform:translate(-50%,-50%) scale(.94)}
+.carte-rond{position:relative;width:100%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 34% 26%,#ffffff,
+    color-mix(in srgb,var(--tc) 22%,#ffffff));
+  border:5px solid var(--tc);
+  box-shadow:0 7px 16px color-mix(in srgb,var(--tc) 40%,transparent);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.carte-rond img{width:88%;height:88%;object-fit:contain;display:block;
+  pointer-events:none}
+.carte-nom{margin-top:5px;font-family:Outfit,sans-serif;font-weight:900;
+  font-size:.78rem;line-height:1.1;text-align:center;color:#20242e;
+  background:rgba(255,255,255,.88);border-radius:10px;padding:2px 7px;
+  box-shadow:0 2px 6px rgba(60,90,50,.16);white-space:nowrap}
+.carte-ar{font-family:'Scheherazade New',serif;font-size:.86rem;
+  color:color-mix(in srgb,var(--tc) 80%,#000000);direction:rtl;line-height:1.4}
+.carte-etat{position:absolute;top:-4px;right:-4px;font-size:.95rem;
+  background:#ffffff;border-radius:50%;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.carte-etape.fermee .carte-rond img{filter:grayscale(.92);opacity:.6}
+.carte-etape.fermee{cursor:default}
+.carte-etape.fermee .carte-nom{color:#5a6070}
+@media(min-width:520px){
+  .carte-nom{font-size:.9rem}.carte-ar{font-size:1rem}
+  .carte-etat{width:26px;height:26px;font-size:1.05rem}
+}
+.tuile{position:relative;border-radius:26px;.tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
   background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 26%,#ffffff) 0%,
     color-mix(in srgb,var(--tc) 12%,#ffffff) 100%);
   border:3px solid var(--tc);
@@ -9251,10 +9281,38 @@ function renderTuilesAnimaux(ca){
     var _v=defs[0];defs[0]=defs[1];defs[1]=_v;
   }
   var noms=_HAB.etapes||[],imgs=_HAB.images||[],cols=_HAB.couleurs||[];
-  /* La carte enveloppe la grille : le chemin se pose entre les deux. */
-  var carte=document.createElement('div');carte.className='carte-anim';
-  var grille=document.createElement('div');
-  grille.className='tuiles';
+  /* ── LA CARTE ──
+     Un paysage, un sentier, et les etapes posees dessus. Les places sont
+     dans le repere 100 x 140 de `carte-animaux.svg` : les deux doivent
+     bouger ensemble. Le sentier n'est pas dans l'image — il passe PAR les
+     etapes, et lui seul sait ou elles sont. */
+  var CARTE_ETAPES=[[23,19],[52,25],[79,18],
+                    [83,50],[54,56],[24,51],
+                    [20,86],[49,92],[79,85],
+                    [80,118],[47,125]];
+  var carte=document.createElement('div');carte.className='carte-monde';
+  var sentier=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  sentier.setAttribute('class','carte-sentier');
+  sentier.setAttribute('viewBox','0 0 100 140');
+  sentier.setAttribute('preserveAspectRatio','none');
+  sentier.setAttribute('aria-hidden','true');
+  (function(){
+    /* Un trait adouci qui passe par toutes les etapes : chaque sommet est
+       arrondi par une courbe, sinon le sentier ferait des angles droits. */
+    var d='M'+CARTE_ETAPES[0][0]+' '+CARTE_ETAPES[0][1];
+    for(var k=1;k<CARTE_ETAPES.length;k++){
+      var a=CARTE_ETAPES[k-1],b=CARTE_ETAPES[k];
+      var my=(a[1]+b[1])/2;
+      d+=' C'+a[0]+' '+my+' '+b[0]+' '+my+' '+b[0]+' '+b[1];
+    }
+    var bord=document.createElementNS('http://www.w3.org/2000/svg','path');
+    bord.setAttribute('class','bord');bord.setAttribute('d',d);
+    var sol=document.createElementNS('http://www.w3.org/2000/svg','path');
+    sol.setAttribute('class','sol');sol.setAttribute('d',d);
+    sentier.appendChild(bord);sentier.appendChild(sol);
+  })();
+  carte.appendChild(sentier);
+  var grille=carte;   /* les etapes se posent directement sur la carte */
   var precedenteFinie=true;
   /* Ce qui nourrira l'album, juste en dessous : un animal par etape, et
      l'etat de son cours. */
@@ -9270,19 +9328,25 @@ function renderTuilesAnimaux(ca){
     var coul=cols[i]||'#7FA9D4';
 
     var t=document.createElement('div');
-    t.className='tuile'+(fermee?' fermee':'')+(finie?' finie':'');
+    t.className='carte-etape'+(fermee?' fermee':'')+(finie?' finie':'');
     t.style.setProperty('--tc',coul);
+    var pos=CARTE_ETAPES[i]||[50,10+i*12];
+    t.style.left=pos[0]+'%';
+    t.style.top=(pos[1]/140*100)+'%';
+    var rond=document.createElement('div');rond.className='carte-rond';
     var im=document.createElement('img');
-    im.className='tuile-img';im.src=imgs[i]||'';im.alt='';
-    im.setAttribute('aria-hidden','true');
-    var nm=document.createElement('div');
-    nm.className='tuile-nom';nm.textContent=noms[i]||isle.label;
-    var ar=document.createElement('div');
-    ar.className='tuile-ar';ar.textContent=isle.ar;
+    im.src=imgs[i]||'';im.alt='';im.setAttribute('aria-hidden','true');
+    rond.appendChild(im);
     var et=document.createElement('div');
-    et.className='tuile-etat';
-    et.textContent=fermee?'🔒':(finie?'✅':'▶');
-    t.appendChild(et);t.appendChild(im);t.appendChild(nm);t.appendChild(ar);
+    et.className='carte-etat';
+    et.textContent=fermee?'\ud83d\udd12':(finie?'\u2705':'\u25b6');
+    rond.appendChild(et);
+    var nm=document.createElement('div');
+    nm.className='carte-nom';nm.textContent=noms[i]||isle.label;
+    var ar=document.createElement('div');
+    ar.className='carte-ar';ar.textContent=isle.ar;
+    nm.appendChild(ar);
+    t.appendChild(rond);t.appendChild(nm);
 
     if(!fermee)t.onclick=(function(ss,ii,lbl){return function(){
       _lessonPushed=false;_currentIsleSlug=_slugEtape(ii,lbl);
@@ -9304,111 +9368,7 @@ function renderTuilesAnimaux(ca){
        chaine rouvrait tout ce qui la suit. */
     precedenteFinie=finie&&!fermee;
   });
-  carte.appendChild(grille);
   wrap.appendChild(carte);
-
-  /* ── LE CHEMIN QUI RELIE LES ETAPES ──
-     Trace APRES la mise en page, aux centres mesures des vignettes, et
-     refait des que la largeur change : le nombre de colonnes en depend, et
-     avec lui tout le serpentin. */
-  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('class','carte-chemin');
-  svg.setAttribute('aria-hidden','true');
-  var socle=document.createElementNS('http://www.w3.org/2000/svg','path');
-  socle.setAttribute('class','socle');
-  var trait=document.createElementNS('http://www.w3.org/2000/svg','path');
-  /* Une empreinte de patte au milieu de chaque liaison : c'est elle qui fait
-     lire une CARTE là où il n'y avait qu'une grille. Dessinée en ellipses et
-     non en emoji : une police d'emoji ne se dessine pas pareil partout, et
-     celle-ci doit rester discrète. */
-  var empreintes=document.createElementNS('http://www.w3.org/2000/svg','g');
-  svg.appendChild(socle);svg.appendChild(trait);svg.appendChild(empreintes);
-  function patte(x,y){
-    var g2=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g2.setAttribute('class','patte');
-    function rond(dx,dy,rx,ry){
-      var e=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
-      e.setAttribute('cx',(x+dx).toFixed(1));e.setAttribute('cy',(y+dy).toFixed(1));
-      e.setAttribute('rx',rx);e.setAttribute('ry',ry);
-      g2.appendChild(e);
-    }
-    rond(0,3,5.5,4.5);
-    rond(-5,-4,2.6,3.2);rond(0,-6.5,2.6,3.2);rond(5,-4,2.6,3.2);
-    return g2;
-  }
-  carte.insertBefore(svg,grille);
-
-  function colonnes(){
-    var st2=getComputedStyle(grille).gridTemplateColumns||'';
-    var n=st2.split(' ').filter(function(x){return x&&x!=='none';}).length;
-    return Math.max(1,n);
-  }
-  function serpente(){
-    var cols=colonnes();
-    var cases=[].slice.call(grille.children);
-    cases.forEach(function(t,k){
-      var lig=Math.floor(k/cols),col=k%cols;
-      /* une rangee sur deux se parcourt de droite a gauche */
-      if(lig%2===1)col=cols-1-col;
-      t.style.gridRow=(lig+1);
-      t.style.gridColumn=(col+1);
-      t.style.order='';
-    });
-    return cases;
-  }
-  function traceLeChemin(){
-    var cases=serpente();
-    if(cases.length<2){svg.style.display='none';return;}
-    svg.style.display='';
-    var rc=carte.getBoundingClientRect();
-    var ech=carte.offsetWidth?(rc.width/carte.offsetWidth):1;
-    if(!(ech>0.05&&ech<20))ech=1;
-    svg.setAttribute('viewBox','0 0 '+carte.offsetWidth+' '+carte.offsetHeight);
-    var boites=cases.map(function(t){
-      var r=t.getBoundingClientRect();
-      return {l:(r.left-rc.left)/ech, t:(r.top-rc.top)/ech,
-              r:(r.right-rc.left)/ech, b:(r.bottom-rc.top)/ech,
-              x:(r.left+r.width/2-rc.left)/ech, y:(r.top+r.height/2-rc.top)/ech};
-    });
-    /* LE CHEMIN PASSE DANS LES ALLÉES, pas sous les vignettes : entre deux
-       étapes il sort par le BORD qui regarde la suivante et entre par le
-       bord d'en face. Tracé de centre à centre, il était caché par les
-       vignettes elles-mêmes et ne se voyait que par éclats. */
-    var d='';
-    while(empreintes.firstChild)empreintes.removeChild(empreintes.firstChild);
-    for(var k=1;k<boites.length;k++){
-      var a=boites[k-1],b=boites[k],p1,p2,c1,c2;
-      if(Math.abs(a.y-b.y)<Math.abs(a.x-b.x)){       /* même rangée */
-        var vers=(b.x>a.x)?1:-1;
-        p1=[vers>0?a.r:a.l,a.y]; p2=[vers>0?b.l:b.r,b.y];
-        var mx=(p1[0]+p2[0])/2;
-        c1=[mx,p1[1]];c2=[mx,p2[1]];
-      }else{                                          /* on change de rangée */
-        p1=[a.x,a.b]; p2=[b.x,b.t];
-        var my=(p1[1]+p2[1])/2;
-        c1=[p1[0],my];c2=[p2[0],my];
-      }
-      d+=' M'+p1[0].toFixed(1)+' '+p1[1].toFixed(1)
-        +' C'+c1[0].toFixed(1)+' '+c1[1].toFixed(1)
-        +' '+c2[0].toFixed(1)+' '+c2[1].toFixed(1)
-        +' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1);
-      empreintes.appendChild(patte((p1[0]+p2[0])/2,(p1[1]+p2[1])/2));
-    }
-    socle.setAttribute('d',d);trait.setAttribute('d',d);
-  }
-  traceLeChemin();
-  /* Les dessins arrivent apres : la hauteur des vignettes change, le chemin
-     aussi. On le refait au chargement de chacun, et a chaque coup de
-     redimensionnement. */
-  [].slice.call(grille.querySelectorAll('img')).forEach(function(im2){
-    if(!im2.complete)im2.addEventListener('load',traceLeChemin);
-  });
-  if(window.ResizeObserver){
-    try{new ResizeObserver(traceLeChemin).observe(carte);}catch(e){}
-  }else{
-    window.addEventListener('resize',traceLeChemin);
-  }
-  setTimeout(traceLeChemin,180);
 
   /* ── L'ALBUM, SOUS LA CARTE ──
      Demande du client : les animaux gagnes se rangent la, juste en dessous,
@@ -11024,7 +10984,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v244';
+var _VERSION_REPLI='v245';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17031,14 +16991,60 @@ function _boyScene(ca,reprise){
           out.push({x:mx,y:my});
         }
         if(!out.length)out.push({x:W/2,y:H/2});
-        p2.centres=out;
-        return out;
+        /* ── ON LISSE, SINON LA TÊTE VIBRE ──
+           `rev.ordre` remplit le trait par balayages : d'une tranche à la
+           suivante, le centre saute d'un bord à l'autre de l'épaisseur. Vu
+           de loin la trajectoire est juste, mais la tête tremble. Une
+           moyenne glissante sur cinq tranches suffit à la calmer — et on ne
+           garde le point lissé que s'il est TOUJOURS DANS L'ENCRE, sinon on
+           reprend celui d'origine : un virage serré ne doit pas faire couper
+           le coin. */
+        var lisse=[],F=2;
+        for(k=0;k<out.length;k++){
+          var ax2=0,ay2=0,m2=0;
+          for(i=Math.max(0,k-F);i<=Math.min(out.length-1,k+F);i++){
+            ax2+=out[i].x;ay2+=out[i].y;m2++;
+          }
+          var lx=ax2/m2,ly=ay2/m2;
+          var ix=Math.round(lx),iy=Math.round(ly);
+          var dedans=(ix>=0&&iy>=0&&ix<W&&iy<H&&p2.rang[iy*W+ix]>=0);
+          lisse.push(dedans?{x:lx,y:ly}:out[k]);
+        }
+        /* ── LES LEVERS DE STYLO SE SAUTENT, ILS NE SE GLISSENT PAS ──
+           Le ṭāʾ fait sa boucle puis REPREND sa barre verticale, soixante
+           pixels plus loin ; le kāf pareil. Interpolé, le modèle traversait
+           ce vide en glissant — il sortait de la lettre et montrait un geste
+           qui n'existe pas. On repère ces coupures — un pas très au-dessus
+           de l'ordinaire — et la tête les franchit d'un coup.
+           Le seuil vient de la MÉDIANE des pas : une lettre grande et une
+           lettre petite n'ont pas la même échelle. */
+        var pas2=[],k2;
+        for(k2=1;k2<lisse.length;k2++){
+          var ex=lisse[k2].x-lisse[k2-1].x,ey=lisse[k2].y-lisse[k2-1].y;
+          pas2.push(Math.sqrt(ex*ex+ey*ey));
+        }
+        var tri=pas2.slice().sort(function(a2,b2){return a2-b2;});
+        var med=tri.length?tri[Math.floor(tri.length/2)]:0;
+        var seuil=Math.max(14,med*4);
+        for(k2=1;k2<lisse.length;k2++)
+          if(pas2[k2-1]>seuil)lisse[k2].saut=true;
+        p2.centres=lisse;
+        return lisse;
       }
-      /* Le point de la trajectoire d'une partie à l'avancement `t` (0 à 1). */
+      /* Le point de la trajectoire d'une partie à l'avancement `t` (0 à 1).
+         On INTERPOLE entre deux tranches : sans cela la tête avance par
+         bonds de quelques pixels, vingt fois par seconde — c'est exactement
+         ce que le client appelle vibrer. */
       function pointDuGeste(p2,t){
         var c=centresDeLordre(p2);
-        var k=Math.floor(Math.max(0,Math.min(0.9999,t))*c.length);
-        return c[Math.max(0,Math.min(c.length-1,k))];
+        if(c.length<2)return c[0];
+        var u=Math.max(0,Math.min(0.9999,t))*(c.length-1);
+        var k=Math.floor(u),f=u-k;
+        var a=c[k],b=c[Math.min(c.length-1,k+1)];
+        /* Un lever de stylo ne se traverse pas : on attend au bout du trait,
+           et on reparaît de l'autre côté. */
+        if(b.saut)return {x:a.x,y:a.y};
+        return {x:a.x+(b.x-a.x)*f, y:a.y+(b.y-a.y)*f};
       }
 
       /* L'aire du CORPS seul : la longueur mesuree est celle de son geste,
@@ -17233,8 +17239,10 @@ function _boyScene(ca,reprise){
           var P=active();
           if(gi&&P){
             var GW=TAILLE*(gi.naturalWidth/gi.naturalHeight);
-            /* 1. la tête de démonstration, pâle, qui suit la trajectoire */
-            var d1=pointDuGeste(P,tDemo);
+            /* 1. la tête de démonstration, pâle, qui suit la trajectoire.
+                  PAS SUR LES POINTS : un point se pose, il ne se parcourt
+                  pas, et une tête qui tourne autour n'apprend rien. */
+            var d1=(P.nom==='point')?null:pointDuGeste(P,tDemo);
             if(d1){
               cx.save();cx.globalAlpha=.42;
               cx.drawImage(gi,d1.x-GW/2,d1.y-TAILLE/2,GW,TAILLE);
@@ -17259,15 +17267,21 @@ function _boyScene(ca,reprise){
       peint2();
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint2);}catch(e){}
       if(libre)m.gagne();
-      /* La démonstration tourne tant que le canevas est à l'écran. Vingt
-         images par seconde suffisent pour une tête qui glisse, et repeindre
-         la lettre soixante fois par seconde coûterait cher sur un téléphone. */
-      demo=setInterval(function(){
-        if(!cv.isConnected){clearInterval(demo);return;}
+      /* ── LA DÉMONSTRATION AVANCE AU TEMPS, PAS AU COMPTEUR ──
+         Elle avançait d'un pas fixe à chaque réveil : si le réveil traîne —
+         et il traîne, sur un téléphone —, le pas reste le même et la tête
+         saccade. On la place donc d'après le TEMPS ÉCOULÉ, à vitesse
+         constante : un aller complet en quatre secondes, quoi qu'il arrive.
+         Et on repeint à la cadence de l'écran (`requestAnimationFrame`), pas
+         toutes les cinquante millisecondes. */
+      var _t0Demo=Date.now(),DEMO_MS=4000;
+      (function tourne(){
+        if(!cv.isConnected)return;
+        demo=requestAnimationFrame(tourne);
         if(fini)return;
-        tDemo+=0.012;if(tDemo>1)tDemo=0;
+        tDemo=((Date.now()-_t0Demo)%DEMO_MS)/DEMO_MS;
         peint2();
-      },50);
+      })();
 
       function auCanvas(ev){
         var r=cv.getBoundingClientRect();

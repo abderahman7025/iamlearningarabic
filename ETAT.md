@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 16 septembre 2026, production en v244
+## OÙ ON EN EST — 17 septembre 2026, production en v245
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,44 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v244), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v245), du plus récent au plus ancien :**
+
+- **UNE VRAIE CARTE, ET UN MODÈLE QUI GLISSE (v245).**
+
+  - **LA CARTE EST UNE CARTE.** Le client, deux fois de suite : « teste une
+    carte au lieu de vignettes posées l'une après l'autre », puis « je ne vois
+    AUCUNE carte ». Il avait raison — un serpentin de vignettes avec un
+    pointillé entre elles reste une grille. C'en est une maintenant : un
+    PAYSAGE (`python outils/carte-monde.py` → collines, rivière, petit pont,
+    bosquets, fleurs), un SENTIER de terre qui le traverse, et les onze étapes
+    posées dessus en médaillons ronds, nom sur une étiquette. Le repère est le
+    même des deux côtés — 100 × 140 — et `CARTE_ETAPES` donne la place de
+    chacune ; le sentier n'est PAS dans l'image, il passe par les étapes, et
+    seul le code sait où elles sont.
+  - **Le modèle du tracé glisse au lieu de vibrer.** Trois défauts, tous
+    mesurés :
+      1. il avançait d'un pas fixe à chaque réveil d'un `setInterval` — si le
+         réveil traîne, le pas ne change pas et la tête saccade. Elle se place
+         maintenant d'après le TEMPS ÉCOULÉ, à vitesse constante (un tour en
+         quatre secondes), repeinte à la cadence de l'écran ;
+      2. d'une tranche à l'autre le centre sautait d'un bord à l'autre de
+         l'épaisseur — une moyenne glissante sur cinq tranches le calme, et on
+         ne garde le point lissé que s'il reste DANS l'encre ;
+      3. entre deux tranches il ne bougeait pas du tout, puis d'un coup —
+         on INTERPOLE désormais entre elles.
+    Mesuré sur les trente lettres, à soixante images par seconde : **6,3 px
+    par image au maximum** sur les vingt et une lettres sans lever de stylo.
+  - **Les levers de stylo se sautent.** Le ṭāʾ fait sa boucle puis reprend sa
+    barre soixante pixels plus loin ; interpolé, le modèle traversait ce vide
+    en glissant — il sortait de la lettre et montrait un geste qui n'existe
+    pas. Ces coupures se repèrent à un pas très au-dessus de la médiane, et la
+    tête les franchit d'un coup. Points hors de l'encre : **13 sur 7 200**.
+  - **Pas de modèle sur les points.** Un point se pose, il ne se parcourt pas.
+  - **L'éclatement : rien à corriger, c'était déjà juste.** `ATTRAPE-LA` pose
+    `.mj-flotte` (rond, disparaît) et n'appelle pas `lambeaux` ; `LES BULLES`
+    pose `.mj-bulle` (ballon, éclate) et l'appelle. Vérifié ligne à ligne dans
+    le fichier déployé. Si le client voit autre chose, c'est sa copie en cache
+    — le service worker garde la page tant qu'elle n'est pas rechargée.
 
 - **LA TRAJECTOIRE, POUR DE BON, ET UNE CARTE (v244).**
 
