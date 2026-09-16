@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le decor << marais >>. C'est un marais : eau trouble, joncs, vase. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eef8f4"/><stop offset="100%" stop-color="#cfe8dd"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <g opacity=".5" fill="#ffffff"><ellipse cx="700" cy="92" rx="39" ry="22"/><ellipse cx="734" cy="98" rx="28" ry="17"/><ellipse cx="667" cy="100" rx="25" ry="15"/></g>
+  <path d="M0 430 Q 200 410 430 430 T 900 424 L900 560 L0 560 Z" fill="#a9d5c4"/>
+  <path d="M0 486 Q 240 470 520 488 T 900 482 L900 560 L0 560 Z" fill="#93c7b2" opacity=".85"/>
+  <path d="M50 470 L55 300" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="55" cy="288" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M86 470 L91 260" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="91" cy="248" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M122 470 L127 320" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="127" cy="308" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M800 470 L805 280" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="805" cy="268" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M838 470 L843 240" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="843" cy="228" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M872 470 L877 310" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="877" cy="298" rx="9" ry="26" fill="#a98b62"/>
+  <path d="M410 470 L415 340" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="415" cy="328" rx="9" ry="26" fill="#a98b62"/>
+  <ellipse cx="300" cy="500" rx="54" ry="14" fill="#7bbf9c" opacity=".55"/>
+  <ellipse cx="620" cy="516" rx="44" ry="12" fill="#7bbf9c" opacity=".5"/>
+</svg>

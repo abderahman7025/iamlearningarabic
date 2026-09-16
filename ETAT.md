@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 16 septembre 2026, production en v243
+## OÙ ON EN EST — 16 septembre 2026, production en v244
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,45 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v243), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v244), du plus récent au plus ancien :**
+
+- **LA TRAJECTOIRE, POUR DE BON, ET UNE CARTE (v244).**
+
+  - **« Attrape-la » n'a jamais eu de ballons.** J'avais mis l'éclatement sur
+    les deux manches en croyant le client confus ; il ne l'était pas. Ses
+    bulles sont RONDES et DISPARAISSENT au toucher. L'éclatement appartient à
+    la manche des bulles qui montent, et à elle seule.
+  - **LE MODÈLE : TROISIÈME ESSAI, ET LE BON.** Deux ratés notés dans le code
+    pour qu'on n'y revienne pas : la liste de pixels brute (elle sautait d'un
+    bord à l'autre du trait), puis `_cheminPlat` (le chemin dicté ne tombe pas
+    sur l'encre de toutes les formes — le modèle sortait du wāw et partait
+    n'importe où sur le yā).
+    Ce que font VRAIMENT les modèles des 6-11 ans : `_reveleJusqua` révèle la
+    lettre PIXEL PAR PIXEL dans l'ordre du geste. C'est ça, leur trajectoire.
+    On découpe donc cet ordre en CENT TRANCHES et on prend le centre de
+    chacune, ramené sur le pixel de la tranche le plus proche — il est dans
+    l'encre par construction. Mesuré sur les trente lettres : 28 n'ont AUCUN
+    point hors de l'encre, les deux autres en ont un sur cent, à un pixel du
+    bord. Les sauts qui restent (ط, ك, ن) sont de VRAIS levers de stylo.
+  - **L'anneau se remplit à l'envers des aiguilles.** Mesuré, parce que le
+    raisonnement s'y trompe : `from 0deg` place l'origine à MIDI et le
+    dégradé tourne dans le sens des aiguilles ; on peint le creux sur les
+    (360 − angle) premiers degrés, et la couleur sur ce qui reste — ce secteur
+    finit à midi et grandit vers l'arrière. (`from -90deg` mettait l'origine à
+    neuf heures : le premier quart se peignait en bas à gauche.)
+  - **Le décor suit l'animal DE LA LETTRE**, plus celui de l'île : « si c'est
+    fleur c'est un champ, si c'est oiseau c'est un ciel avec quelques
+    nuages ». `outils/fonds-animaux.py` engendre seize décors, un par
+    HABITAT et non par animal — la savane sert au lion, à la girafe et à
+    l'éléphant. `HABITAT` range les trente-cinq dessins dedans ; vérifié :
+    aucune lettre sans habitat, et le fichier de chacun répond.
+  - **UNE CARTE, pas une liste.** Les vignettes serpentent — deux par rangée,
+    trois au large, une rangée sur deux à l'envers — et un chemin pointillé
+    passe de l'une à l'autre, avec une empreinte de patte à chaque liaison. Le
+    chemin est tracé en SVG aux positions MESURÉES et refait à chaque
+    changement de largeur : une grille qui s'adapte ne peut pas porter un
+    tracé écrit en dur. Il passe dans les ALLÉES — de bord à bord — parce que
+    de centre à centre les vignettes le cachaient.
 
 - **LES DEUX JEUX DE BALLONS, ET LE MODÈLE QUI DESCEND (v243).**
 
@@ -3255,6 +3293,25 @@ page et URL propres, indexables. Elles se rangent à côté de
   `controllerchange`).
 
 ## Pièges connus
+
+### Une écriture Python qui échoue VIDE le fichier
+
+`io.open(P,'w').write(s)` TRONQUE d'abord, écrit ensuite. Si l'encodage
+échoue en cours de route — un `\ud83d` isolé venu d'un heredoc mal échappé,
+par exemple —, il ne reste RIEN : `app/app.html` s'est retrouvé à zéro octet.
+Le contenu a été repris par `git show HEAD:app/app.html`, puis les retouches
+rejouées une à une depuis les scripts du brouillon.
+
+**Tout script de retouche écrit donc dans un fichier temporaire, puis
+remplace** :
+
+```python
+open(P + '.tmp', 'w', encoding='utf-8', newline='').write(s)
+os.replace(P + '.tmp', P)
+```
+
+C'est le deuxième visage du piège des heredocs, déjà noté plus bas : le
+heredoc abîme le texte, et l'écriture directe transforme l'erreur en perte.
 
 - **Ne jamais faire décider un fait de LANGUE par une mesure de police.**
   Le côté où vit une voyelle — la kasra et son tanwīn sous la ligne, les six

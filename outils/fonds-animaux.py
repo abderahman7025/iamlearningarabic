@@ -273,18 +273,160 @@ def sousleau():
     return s
 
 
+def cielSeul():
+    """La colombe, l'aigle, l'oiseau : un ciel, quelques nuages, rien au sol.
+       C'est le seul decor sans terre — et c'est juste : on y vole."""
+    s = '  <defs>\n' + ciel('#eaf6ff', '#c9e6fa') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += soleil(790, 92, 54)
+    s += nuage(150, 120, 1.15, '#ffffff', '.75')
+    s += nuage(520, 92, 0.85, '#ffffff', '.6')
+    s += nuage(700, 210, 1.0, '#ffffff', '.55')
+    s += nuage(280, 300, 0.75, '#ffffff', '.45')
+    s += nuage(60, 430, 1.2, '#ffffff', '.5')
+    s += nuage(640, 470, 1.35, '#ffffff', '.55')
+    return s
+
+
+def pre():
+    """La vache, le cheval, le mouton : un pre vert, une barriere, des herbes."""
+    s = '  <defs>\n' + ciel('#eef8ff', '#d3eec4') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += soleil(790, 88, 50)
+    s += nuage(180, 96, 0.9, '#ffffff', '.6')
+    s += sol('#b6dca0', '#a1cd8a')
+    # la barriere, au fond a gauche
+    s += '  <g fill="#cdae83">\n'
+    for x in (40, 120, 200, 280):
+        s += '    <rect x="%d" y="404" width="12" height="80" rx="4"/>\n' % x
+    s += ('    <rect x="34" y="424" width="258" height="10" rx="5"/>\n'
+          '    <rect x="34" y="452" width="258" height="10" rx="5"/>\n  </g>\n')
+    s += herbes([(420, 496, 50, 1), (470, 502, 38, -1), (620, 494, 46, 1),
+                 (680, 500, 36, -1), (830, 492, 44, 1)], '#8cc27f')
+    return s
+
+
+def marais():
+    """Le crocodile, la cigogne : de l'eau trouble, des joncs, de la vase."""
+    s = '  <defs>\n' + ciel('#eef8f4', '#cfe8dd') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += nuage(700, 92, 0.85, '#ffffff', '.5')
+    s += ('  <path d="M0 430 Q 200 410 430 430 T 900 424 L900 560 L0 560 Z" fill="#a9d5c4"/>\n'
+          '  <path d="M0 486 Q 240 470 520 488 T 900 482 L900 560 L0 560 Z" fill="#93c7b2" opacity=".85"/>\n')
+    # les joncs, groupes sur les deux bords
+    for (x, h) in ((50, 170), (86, 210), (122, 150),
+                   (800, 190), (838, 230), (872, 160), (410, 130)):
+        s += ('  <path d="M%d 470 L%d %d" stroke="#7bbf9c" stroke-width="8" stroke-linecap="round"/>\n'
+              '  <ellipse cx="%d" cy="%d" rx="9" ry="26" fill="#a98b62"/>\n'
+              % (x, x + 5, 470 - h, x + 5, 470 - h - 12))
+    s += ('  <ellipse cx="300" cy="500" rx="54" ry="14" fill="#7bbf9c" opacity=".55"/>\n'
+          '  <ellipse cx="620" cy="516" rx="44" ry="12" fill="#7bbf9c" opacity=".5"/>\n')
+    return s
+
+
+def desert():
+    """Le chameau, le serpent, la vipere : du sable, des dunes, un cactus."""
+    s = '  <defs>\n' + ciel('#fff3dd', '#ffe1b4') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += soleil(760, 100, 66, '#ffd98a')
+    s += ('  <path d="M0 452 Q 180 392 380 448 T 900 440 L900 560 L0 560 Z" fill="#f0d59b"/>\n'
+          '  <path d="M0 500 Q 260 452 540 500 T 900 496 L900 560 L0 560 Z" fill="#e3c07c" opacity=".9"/>\n')
+    # un cactus a gauche
+    s += ('  <g fill="#8fbf7a">\n'
+          '    <rect x="86" y="352" width="30" height="132" rx="15"/>\n'
+          '    <rect x="44" y="392" width="24" height="70" rx="12"/>\n'
+          '    <rect x="44" y="392" width="62" height="22" rx="11"/>\n'
+          '    <rect x="134" y="372" width="24" height="88" rx="12"/>\n'
+          '    <rect x="100" y="372" width="58" height="22" rx="11"/>\n  </g>\n')
+    s += ('  <ellipse cx="620" cy="506" rx="46" ry="11" fill="#d9b271" opacity=".7"/>\n'
+          '  <ellipse cx="760" cy="528" rx="36" ry="9" fill="#d9b271" opacity=".6"/>\n')
+    return s
+
+
+def jardin():
+    """Le paon, les deux chattes, le chien : pelouse, haie, fleurs."""
+    s = '  <defs>\n' + ciel('#f1fbff', '#d8f0cf') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += soleil(800, 86, 48)
+    s += nuage(200, 92, 0.85, '#ffffff', '.55')
+    # la haie, au fond
+    s += '  <g fill="#9ecb8c">\n'
+    for x in range(0, 900, 74):
+        s += '    <circle cx="%d" cy="432" r="46"/>\n' % x
+    s += '  </g>\n'
+    s += sol('#bfe3ac', '#a9d596')
+    s += fleur(120, 470, '#f7a8c4')
+    s += fleur(250, 494, '#ffd08a')
+    s += fleur(660, 480, '#c3a8f0')
+    s += fleur(790, 500, '#f7a8c4')
+    s += herbes([(400, 502, 40, 1), (520, 506, 34, -1)], '#93c98a')
+    return s
+
+
+def jungle():
+    """Le gorille, le tigre, la banane : de grandes feuilles, une liane."""
+    s = '  <defs>\n' + ciel('#e9f7ea', '#c2e3bd') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += sol('#a9d19a', '#93c184')
+    # deux troncs, et des feuilles qui pendent des deux bords
+    for (x, c) in ((58, '#b08a5e'), (812, '#9d7a52')):
+        s += '  <rect x="%d" y="150" width="30" height="330" rx="12" fill="%s"/>\n' % (x, c)
+    for (x, y, sens, c) in ((96, 214, 1, '#7ebd74'), (96, 286, 1, '#93cc88'),
+                            (804, 236, -1, '#7ebd74'), (804, 312, -1, '#93cc88')):
+        s += ('  <path d="M%d %d q %d -46 %d -12 q %d 42 %d 12 Z" fill="%s" opacity=".95"/>\n'
+              % (x, y, sens * 62, sens * 116, -sens * 54, -sens * 116, c))
+    # une liane qui descend au milieu, tres pale
+    s += ('  <path d="M470 0 q 26 120 -6 208 q -30 86 10 150" stroke="#8ec784" '
+          'stroke-width="7" fill="none" opacity=".5" stroke-linecap="round"/>\n')
+    s += herbes([(300, 498, 52, 1), (360, 504, 40, -1), (600, 500, 46, 1)], '#7ebd74')
+    return s
+
+
+def verger():
+    """La pomme : des pommiers, de l'herbe, des fruits tombes."""
+    s = '  <defs>\n' + ciel('#f3fbff', '#dcf0d2') + '  </defs>\n'
+    s += '  <rect width="900" height="560" fill="url(#ciel)"/>\n'
+    s += soleil(800, 88, 48)
+    s += nuage(190, 96, 0.85, '#ffffff', '.55')
+    s += sol('#bfe3ac', '#a9d596')
+    # deux pommiers, aux deux bords
+    for (x, ec) in ((120, 1.0), (790, 0.82)):
+        s += ('  <rect x="%d" y="%d" width="%d" height="%d" fill="#b08a5e" rx="7"/>\n'
+              % (int(x - 9 * ec), int(470 - 120 * ec), int(18 * ec), int(120 * ec)))
+        s += ('  <circle cx="%d" cy="%d" r="%d" fill="#9ecb8c"/>\n'
+              '  <circle cx="%d" cy="%d" r="%d" fill="#8fc07e"/>\n'
+              '  <circle cx="%d" cy="%d" r="%d" fill="#a8d497"/>\n'
+              % (x, int(470 - 120 * ec), int(56 * ec),
+                 int(x - 40 * ec), int(470 - 96 * ec), int(40 * ec),
+                 int(x + 40 * ec), int(470 - 100 * ec), int(38 * ec)))
+        for (dx, dy) in ((-30, -14), (18, -34), (34, 6)):
+            s += ('  <circle cx="%d" cy="%d" r="%d" fill="#e8737a" opacity=".9"/>\n'
+                  % (int(x + dx * ec), int(470 - 120 * ec + dy * ec), int(9 * ec)))
+    s += ('  <circle cx="330" cy="500" r="13" fill="#e8737a" opacity=".85"/>\n'
+          '  <circle cx="372" cy="512" r="11" fill="#e8737a" opacity=".8"/>\n'
+          '  <circle cx="600" cy="506" r="12" fill="#e8737a" opacity=".8"/>\n')
+    return s
+
+
+# nom du decor -> sa fabrique, et ce qu'il montre.
+# C'est `HABITAT`, dans app.html, qui dit quel animal vit dans lequel.
 SCENES = [
-    ('lion',       savane,       'la savane : herbe seche, acacias, grand soleil'),
-    ('elephant',   savane,       'la savane, comme le lion'),
-    ('girafe',     savane,       'la savane, comme le lion'),
-    ('panda',      bambouseraie, 'la bambouseraie'),
-    ('renard',     foret,        'la foret de jour'),
-    ('grenouille', mare,         'la mare : nenuphars et roseaux'),
-    ('hibou',      nuit,         'la foret de nuit : lune et etoiles'),
-    ('poisson',    sousleau,     'sous l eau : le decor d origine'),
-    ('abeille',    prairie,      'la prairie fleurie'),
-    ('pingouin',   banquise,     'la banquise'),
-    ('tortue',     plage,        'la plage : mer, sable, palmier'),
+    ('savane',       savane,       'la savane : herbe seche, acacias, grand soleil'),
+    ('prairie',      prairie,      'la prairie fleurie'),
+    ('ciel',         cielSeul,     'un ciel avec quelques nuages, et rien au sol'),
+    ('pre',          pre,          'un pre vert, avec sa barriere'),
+    ('marais',       marais,       'un marais : eau trouble, joncs, vase'),
+    ('desert',       desert,       'le desert : dunes de sable et cactus'),
+    ('foret',        foret,        'la foret de jour'),
+    ('jardin',       jardin,       'un jardin : pelouse, haie, fleurs'),
+    ('jungle',       jungle,       'la jungle : grandes feuilles et liane'),
+    ('verger',       verger,       'un verger : pommiers et fruits tombes'),
+    ('mare',         mare,         'la mare : nenuphars et roseaux'),
+    ('sousleau',     sousleau,     'sous l eau : sable, algues, rais de lumiere'),
+    ('bambouseraie', bambouseraie, 'la bambouseraie'),
+    ('nuit',         nuit,         'la foret de nuit : lune et etoiles'),
+    ('banquise',     banquise,     'la banquise'),
+    ('plage',        plage,        'la plage : mer, sable, palmier'),
 ]
 
 
@@ -292,7 +434,7 @@ def main():
     for nom, fabrique, quoi in SCENES:
         corps = fabrique()
         svg = (ENTETE
-               + commentaire('Le fond du monde de l\'animal « %s »' % nom,
+               + commentaire('Le decor << %s >>' % nom,
                              'C\'est %s. Tout reste PALE et le haut reste vide : '
                              'les ballons montent par la, et ce sont eux qu\'on '
                              'doit voir. Genere par outils/fonds-animaux.py.' % quoi)
@@ -300,7 +442,7 @@ def main():
         chemin = os.path.join(CIBLE, 'fond-' + nom + '.svg')
         with open(chemin, 'w', encoding='utf-8', newline='') as f:
             f.write(svg)
-        print('%-22s %5d o' % ('fond-' + nom + '.svg', len(svg.encode('utf-8'))))
+        print('%-24s %5d o' % ('fond-' + nom + '.svg', len(svg.encode('utf-8'))))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le decor << ciel >>. C'est un ciel avec quelques nuages, et rien au sol. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eaf6ff"/><stop offset="100%" stop-color="#c9e6fa"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="790" cy="92" r="54" fill="#ffe9a8" opacity=".85"/>
+  <circle cx="790" cy="92" r="80" fill="#ffe9a8" opacity=".35"/>
+  <g opacity=".75" fill="#ffffff"><ellipse cx="150" cy="120" rx="52" ry="29"/><ellipse cx="196" cy="129" rx="39" ry="23"/><ellipse cx="106" cy="131" rx="34" ry="20"/></g>
+  <g opacity=".6" fill="#ffffff"><ellipse cx="520" cy="92" rx="39" ry="22"/><ellipse cx="554" cy="98" rx="28" ry="17"/><ellipse cx="487" cy="100" rx="25" ry="15"/></g>
+  <g opacity=".55" fill="#ffffff"><ellipse cx="700" cy="210" rx="46" ry="26"/><ellipse cx="740" cy="218" rx="34" ry="20"/><ellipse cx="662" cy="220" rx="30" ry="18"/></g>
+  <g opacity=".45" fill="#ffffff"><ellipse cx="280" cy="300" rx="34" ry="19"/><ellipse cx="310" cy="306" rx="25" ry="15"/><ellipse cx="251" cy="307" rx="22" ry="13"/></g>
+  <g opacity=".5" fill="#ffffff"><ellipse cx="60" cy="430" rx="55" ry="31"/><ellipse cx="108" cy="439" rx="40" ry="24"/><ellipse cx="14" cy="442" rx="36" ry="21"/></g>
+  <g opacity=".55" fill="#ffffff"><ellipse cx="640" cy="470" rx="62" ry="35"/><ellipse cx="694" cy="480" rx="45" ry="27"/><ellipse cx="588" cy="483" rx="40" ry="24"/></g>
+</svg>

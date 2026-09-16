@@ -3591,7 +3591,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Le cadre, lui, garde la couleur de la manche : c'est ce qui relie l'ecran
    au reste de la lecon. */
 .mj-aire{position:relative;height:330px;overflow:hidden;border-radius:30px;
-  background:#e8f2e4 var(--fond,url("/images/fond-bulles.svg")) center/cover no-repeat;
+  background:#e8f2e4 var(--fond,url("/images/fond-prairie.svg")) center/cover no-repeat;
   border:4px solid color-mix(in srgb,var(--mc) 55%,#ffffff);
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 26%,transparent)}
 
@@ -3610,8 +3610,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
     radial-gradient(circle at 34% 26%,#fff,
       color-mix(in srgb,var(--mc) 30%,#fff) 58%,color-mix(in srgb,var(--mc) 62%,#fff))
       padding-box,
-    conic-gradient(from -90deg,var(--mc) var(--anneau,0deg),
-      color-mix(in srgb,var(--mc) 14%,#ffffff) 0) border-box;
+    /* DANS LE SENS INVERSE DES AIGUILLES D'UNE MONTRE, comme demande.
+       MESURE, parce que le raisonnement s'y trompe : `from 0deg` place
+       l'origine a MIDI et le degrade tourne dans le sens des aiguilles. On
+       peint donc le creux sur les (360 - angle) premiers degres et la
+       couleur sur ce qui reste : ce secteur finit a midi et GRANDIT VERS
+       L'ARRIERE, c'est-a-dire a l'envers des aiguilles. (`from -90deg`
+       mettait l'origine a neuf heures et remplissait le quart d'en bas.) */
+    conic-gradient(from 0deg,
+      color-mix(in srgb,var(--mc) 14%,#ffffff) calc(360deg - var(--anneau,0deg)),
+      var(--mc) 0) border-box;
   border:10px solid transparent;
   box-shadow:0 14px 38px color-mix(in srgb,var(--mc) 45%,transparent);
   font-family:'Scheherazade New',serif;font-size:6.6rem;color:var(--mc);
@@ -3628,14 +3636,21 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   100%{transform:scale(1)}}
 
 /* 2. Attrape-la.
-   MÊMES BALLONS QUE LA MANCHE DES BULLES, et le même éclatement : le client
-   ne distingue pas les deux jeux par le nom mais par ce qu'il voit, et
-   trouvait l'éclatement « sur le mauvais ». Ils gardent chacun leur
-   mouvement — ceux-ci dérivent sur place, ceux-là montent — et c'est ce qui
-   les distingue. La forme, le nœud, la ficelle et l'éclatement sont écrits
-   une seule fois, plus bas, pour `.mj-flotte` comme pour `.mj-bulle`. */
-.mj-flotte{position:absolute;
+   DES BULLES RONDES, qui DISPARAISSENT quand on les touche. Elles n'ont
+   jamais été des ballons : « le jeu attrape-la, il ne faut rien toucher ».
+   L'éclatement appartient à l'autre manche, celle des bulles qui montent —
+   c'est là, et là seulement, qu'un ballon crève. */
+.mj-flotte{position:absolute;width:92px;height:92px;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
+  border:6px solid var(--mc);
+  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
+  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
+  user-select:none;
   animation:mjDerive 6s ease-in-out infinite alternate}
+.mj-flotte.pris{animation:none;transform:scale(1.6);opacity:0;
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
+.mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjDerive{0%{transform:translate(0,0) rotate(-6deg)}
   100%{transform:translate(18px,-24px) rotate(6deg)}}
 @keyframes mjSecoue{0%,100%{margin-left:0}25%{margin-left:-9px}75%{margin-left:9px}}
@@ -3653,19 +3668,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    BAUDRUCHE. La forme se fait a l'ovale (plus haut que large, le bas un peu
    plus pointu), avec son noeud et sa ficelle. Et quand on le touche, il
    ECLATE : il se gonfle d'un coup puis se froisse en rien. */
-.mj-flotte,.mj-bulle{width:92px;height:108px;
+.mj-bulle{position:absolute;bottom:-150px;width:92px;height:108px;
   border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
   border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
   font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
-  user-select:none;transform-origin:50% 118%}
-.mj-bulle{position:absolute;bottom:-150px;animation:mjMonte 8s linear forwards}
+  user-select:none;transform-origin:50% 118%;
+  animation:mjMonte 8s linear forwards}
 /* la ficelle, puis le noeud par-dessus */
-.mj-flotte::before,.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
+.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
   width:2px;height:30px;margin-top:7px;margin-left:-1px;
   background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
-.mj-flotte::after,.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
+.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
   width:0;height:0;margin-left:-7px;
   border-left:7px solid transparent;border-right:7px solid transparent;
   border-top:11px solid var(--mc)}
@@ -3678,11 +3693,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
    eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
    Une onde blanche part du meme point : c'est le claquement. */
-.mj-flotte.pris,.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;
-  pointer-events:none}
-.mj-flotte.pris::before,.mj-flotte.pris::after,
+.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;pointer-events:none}
 .mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
-.mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjEclate{
   0%  {transform:scale(1);    opacity:1}
   55% {transform:scale(1.28); opacity:1}
@@ -3791,7 +3803,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media (max-width:420px){
   .mj-disque{width:180px;height:180px;font-size:5.2rem}
   .mj-aire{height:280px}
-  .mj-flotte,.mj-bulle{width:78px;height:92px;font-size:2.2rem}
+  .mj-flotte{width:78px;height:78px;font-size:2.2rem}
+  .mj-bulle{width:78px;height:92px;font-size:2.2rem}
   .mj-motar{font-size:3.2rem}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
   .mj-hp{width:56px;height:56px;font-size:1.3rem}
@@ -3888,8 +3901,27 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
    enormement de place sur les cotes ». Le cadre commun (`sess-map-wrap`) est
    borne a 680 px pour le parcours des grands ; le monde des animaux, lui,
    s'etale, et les vignettes grossissent avec lui. */
+/* ── UNE CARTE, PAS UNE LISTE ──
+   Le client : « teste une carte des animaux au lieu de juste des vignettes
+   posees l'une apres l'autre ». Les vignettes serpentent donc : deux par
+   rangee (trois au large), une rangee sur deux a l'envers, et un CHEMIN
+   POINTILLE passe de l'une a l'autre — trace en SVG par-dessous, aux
+   positions MESUREES. Une grille qui s'adapte a la largeur ne peut pas
+   porter un chemin ecrit en dur : c'est la mesure qui decide. */
 .tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
   gap:16px;padding:0 2px 24px}
+.carte-anim{position:relative}
+.carte-anim .tuiles{grid-template-columns:repeat(2,1fr);
+  gap:44px 26px;padding-bottom:34px}
+@media(min-width:760px){.carte-anim .tuiles{grid-template-columns:repeat(3,1fr)}}
+.carte-anim .tuile{z-index:1}
+.carte-chemin{position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;overflow:visible}
+.carte-chemin path{fill:none;stroke:#8aa87a;stroke-width:8;stroke-linecap:round;
+  stroke-dasharray:2 15;opacity:.75}
+.carte-chemin .socle{stroke:#ffffff;stroke-width:16;stroke-dasharray:none;
+  opacity:.55}
+.carte-chemin .patte{fill:#7d9c6e;opacity:.55}
 body.age-petit .sess-map-wrap{max-width:min(1180px,97%)}
 @media(min-width:900px){.tuiles{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
 .tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
@@ -9165,6 +9197,7 @@ function renderTuilesAnimaux(ca){
   st._curPage='sessions-map';
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
+  _LETTRE_COURS=null;            /* on quitte les cours : l'île reprend la main */
   /* Le retour ne peut pas ramener au menu principal — il n'existe pas chez
      les petits. Il ramene donc au CHOIX DU PARCOURS, l'ecran d'ou l'on
      vient : c'est la seule chose qui soit au-dessus de cette carte. */
@@ -9218,6 +9251,8 @@ function renderTuilesAnimaux(ca){
     var _v=defs[0];defs[0]=defs[1];defs[1]=_v;
   }
   var noms=_HAB.etapes||[],imgs=_HAB.images||[],cols=_HAB.couleurs||[];
+  /* La carte enveloppe la grille : le chemin se pose entre les deux. */
+  var carte=document.createElement('div');carte.className='carte-anim';
   var grille=document.createElement('div');
   grille.className='tuiles';
   var precedenteFinie=true;
@@ -9260,12 +9295,120 @@ function renderTuilesAnimaux(ca){
 
     grille.appendChild(t);
     collection.push({img:imgs[i]||'',nom:noms[i]||isle.label,coul:coul,finie:finie});
+    /* Le serpentin : une rangee sur deux se lit a l'envers, comme un chemin
+       qui revient sur ses pas. Le nombre de colonnes vient de la feuille de
+       style, on le relit au moment de poser. */
+    t.dataset.rang=i;
     /* Une etape FERMEE n'ouvre pas la suivante, meme si son score dit
        qu'elle est faite : sans cela, une etape deverrouillee au milieu de la
        chaine rouvrait tout ce qui la suit. */
     precedenteFinie=finie&&!fermee;
   });
-  wrap.appendChild(grille);
+  carte.appendChild(grille);
+  wrap.appendChild(carte);
+
+  /* ── LE CHEMIN QUI RELIE LES ETAPES ──
+     Trace APRES la mise en page, aux centres mesures des vignettes, et
+     refait des que la largeur change : le nombre de colonnes en depend, et
+     avec lui tout le serpentin. */
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','carte-chemin');
+  svg.setAttribute('aria-hidden','true');
+  var socle=document.createElementNS('http://www.w3.org/2000/svg','path');
+  socle.setAttribute('class','socle');
+  var trait=document.createElementNS('http://www.w3.org/2000/svg','path');
+  /* Une empreinte de patte au milieu de chaque liaison : c'est elle qui fait
+     lire une CARTE là où il n'y avait qu'une grille. Dessinée en ellipses et
+     non en emoji : une police d'emoji ne se dessine pas pareil partout, et
+     celle-ci doit rester discrète. */
+  var empreintes=document.createElementNS('http://www.w3.org/2000/svg','g');
+  svg.appendChild(socle);svg.appendChild(trait);svg.appendChild(empreintes);
+  function patte(x,y){
+    var g2=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g2.setAttribute('class','patte');
+    function rond(dx,dy,rx,ry){
+      var e=document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      e.setAttribute('cx',(x+dx).toFixed(1));e.setAttribute('cy',(y+dy).toFixed(1));
+      e.setAttribute('rx',rx);e.setAttribute('ry',ry);
+      g2.appendChild(e);
+    }
+    rond(0,3,5.5,4.5);
+    rond(-5,-4,2.6,3.2);rond(0,-6.5,2.6,3.2);rond(5,-4,2.6,3.2);
+    return g2;
+  }
+  carte.insertBefore(svg,grille);
+
+  function colonnes(){
+    var st2=getComputedStyle(grille).gridTemplateColumns||'';
+    var n=st2.split(' ').filter(function(x){return x&&x!=='none';}).length;
+    return Math.max(1,n);
+  }
+  function serpente(){
+    var cols=colonnes();
+    var cases=[].slice.call(grille.children);
+    cases.forEach(function(t,k){
+      var lig=Math.floor(k/cols),col=k%cols;
+      /* une rangee sur deux se parcourt de droite a gauche */
+      if(lig%2===1)col=cols-1-col;
+      t.style.gridRow=(lig+1);
+      t.style.gridColumn=(col+1);
+      t.style.order='';
+    });
+    return cases;
+  }
+  function traceLeChemin(){
+    var cases=serpente();
+    if(cases.length<2){svg.style.display='none';return;}
+    svg.style.display='';
+    var rc=carte.getBoundingClientRect();
+    var ech=carte.offsetWidth?(rc.width/carte.offsetWidth):1;
+    if(!(ech>0.05&&ech<20))ech=1;
+    svg.setAttribute('viewBox','0 0 '+carte.offsetWidth+' '+carte.offsetHeight);
+    var boites=cases.map(function(t){
+      var r=t.getBoundingClientRect();
+      return {l:(r.left-rc.left)/ech, t:(r.top-rc.top)/ech,
+              r:(r.right-rc.left)/ech, b:(r.bottom-rc.top)/ech,
+              x:(r.left+r.width/2-rc.left)/ech, y:(r.top+r.height/2-rc.top)/ech};
+    });
+    /* LE CHEMIN PASSE DANS LES ALLÉES, pas sous les vignettes : entre deux
+       étapes il sort par le BORD qui regarde la suivante et entre par le
+       bord d'en face. Tracé de centre à centre, il était caché par les
+       vignettes elles-mêmes et ne se voyait que par éclats. */
+    var d='';
+    while(empreintes.firstChild)empreintes.removeChild(empreintes.firstChild);
+    for(var k=1;k<boites.length;k++){
+      var a=boites[k-1],b=boites[k],p1,p2,c1,c2;
+      if(Math.abs(a.y-b.y)<Math.abs(a.x-b.x)){       /* même rangée */
+        var vers=(b.x>a.x)?1:-1;
+        p1=[vers>0?a.r:a.l,a.y]; p2=[vers>0?b.l:b.r,b.y];
+        var mx=(p1[0]+p2[0])/2;
+        c1=[mx,p1[1]];c2=[mx,p2[1]];
+      }else{                                          /* on change de rangée */
+        p1=[a.x,a.b]; p2=[b.x,b.t];
+        var my=(p1[1]+p2[1])/2;
+        c1=[p1[0],my];c2=[p2[0],my];
+      }
+      d+=' M'+p1[0].toFixed(1)+' '+p1[1].toFixed(1)
+        +' C'+c1[0].toFixed(1)+' '+c1[1].toFixed(1)
+        +' '+c2[0].toFixed(1)+' '+c2[1].toFixed(1)
+        +' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1);
+      empreintes.appendChild(patte((p1[0]+p2[0])/2,(p1[1]+p2[1])/2));
+    }
+    socle.setAttribute('d',d);trait.setAttribute('d',d);
+  }
+  traceLeChemin();
+  /* Les dessins arrivent apres : la hauteur des vignettes change, le chemin
+     aussi. On le refait au chargement de chacun, et a chaque coup de
+     redimensionnement. */
+  [].slice.call(grille.querySelectorAll('img')).forEach(function(im2){
+    if(!im2.complete)im2.addEventListener('load',traceLeChemin);
+  });
+  if(window.ResizeObserver){
+    try{new ResizeObserver(traceLeChemin).observe(carte);}catch(e){}
+  }else{
+    window.addEventListener('resize',traceLeChemin);
+  }
+  setTimeout(traceLeChemin,180);
 
   /* ── L'ALBUM, SOUS LA CARTE ──
      Demande du client : les animaux gagnes se rangent la, juste en dessous,
@@ -10521,6 +10664,39 @@ function imageDuMot(ar){
   return n?('/images/mot-'+n+'.png'):null;
 }
 
+/* ── OÙ VIT CHAQUE ANIMAL ──
+   Le client : « le fond d'écran des jeux bulles et attrape-la doit
+   correspondre à l'animal de la lettre en question — si c'est fleur c'est un
+   champ, si c'est oiseau c'est un ciel avec quelques nuages ».
+   Les décors sont engendrés par `python outils/fonds-animaux.py`, un fichier
+   par HABITAT et non par animal : la savane sert au lion, à la girafe et à
+   l'éléphant, et il n'y a aucune raison d'en garder trois copies.
+   Les onze derniers sont ceux des ÎLES, pour les écrans qui ne savent pas de
+   quelle lettre il s'agit. */
+var HABITAT={
+  /* les mots des lettres */
+  lion:'savane',     girafe:'savane',    gazelle:'savane',
+  rose:'prairie',    papillon:'prairie',
+  colombe:'ciel',    aigle:'ciel',       oiseau:'ciel',
+  vache:'pre',       cheval:'pre',       mouton:'pre',
+  crocodile:'marais',cigogne:'marais',
+  serpent:'desert',  vipere:'desert',    chameau:'desert',
+  ours:'foret',      loup:'foret',       arbre:'foret',
+  poisson:'sousleau',
+  grenouille:'mare', grenouille2:'mare',
+  paon:'jardin',     chat:'jardin',      chatte:'jardin',   chien:'jardin',
+  gorille:'jungle',  tigre:'jungle',     banane:'jungle',
+  pomme:'verger',
+  /* les animaux des îles */
+  panda:'bambouseraie', renard:'foret',  hibou:'nuit',
+  elephant:'savane', abeille:'prairie',  pingouin:'banquise',
+  tortue:'plage'
+};
+/* La lettre du cours en train d'être joué. C'est elle qui commande le décor
+   des manches ; l'île ne sert que de secours, quand aucune lettre n'est en
+   jeu — l'écran de récompense, par exemple. */
+var _LETTRE_COURS=null;
+
 /* Correspondance île → indices dans CHILD_LETTERS */
 var CHILD_ISLAND_LETTERS=[
   [],              // 0: SV  — voyelles (pas de lettres)
@@ -10848,7 +11024,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v243';
+var _VERSION_REPLI='v244';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16639,9 +16815,7 @@ function _boyScene(ca,reprise){
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
             if(g===cible){
-              f.classList.add('pris');
-              lambeaux(aire,f,f.style.getPropertyValue('--mc'));
-              etincelles(aire,f);
+              f.classList.add('pris');etincelles(aire,f);
               youpi(m.zone,true);
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
@@ -16811,39 +16985,60 @@ function _boyScene(ca,reprise){
 
       /* L'ÉPAISSEUR DU TRAIT : l'aire de l'encre divisée par la longueur du
          geste. Elle règle tout — la taille de l'animal et celle du pinceau. */
-      /* ── LE CHEMIN, CELUI DES MODÈLES DES GRANDS ──
-         La tête de démonstration parcourait la LISTE DES PIXELS du corps.
-         Elle est rangée par ordre d'écriture, mais à rang égal les pixels
-         sont dispersés sur toute la largeur du trait : la tête sautait d'un
-         bord à l'autre au lieu de descendre — « elle bouge de tous les sens
-         bizarrement pour l'alif ».
-         On prend donc LE MÊME CHEMIN que les modèles animés des 6-11 ans :
-         `_trajectoire` donne les gestes dictés par le client, `_cheminPlat`
-         les met bout à bout en segments mesurés, et on avance dessus à la
-         longueur d'arc. C'est une ligne, et elle descend. */
-      var _chem=null;
-      try{
-        var _g0=_trajectoire(glyph);
-        if(_g0){var _p0=_cheminPlat(_g0);if(_p0&&_p0.seg&&_p0.seg.length&&_p0.L)_chem=_p0;}
-      }catch(e){}
-      var _bas=0;
-      try{_bas=_descenteGlyphe(glyph,PX);}catch(e){}
-      function pointDuChemin(t){
-        if(!_chem)return null;
-        t=Math.max(0,Math.min(1,t));
-        var vise=_chem.L*t,sg=_chem.seg[0],k;
-        for(k=0;k<_chem.seg.length;k++){sg=_chem.seg[k];if(sg[5]+sg[4]>=vise)break;}
-        var u=sg[4]?((vise-sg[5])/sg[4]):0;
-        u=Math.max(0,Math.min(1,u));
-        return {x:AX+(sg[0]+(sg[2]-sg[0])*u)*PX,
-                y:AY+_bas+(sg[1]+(sg[3]-sg[1])*u)*PX};
+      /* ══ LE CHEMIN DU MODÈLE — CELUI DES GRANDS, POUR DE BON ══
+         Les modèles animés des 6-11 ans ne suivent aucune ligne : ils
+         RÉVÈLENT LA LETTRE PIXEL PAR PIXEL, dans l'ordre du geste
+         (`_reveleJusqua` promène le rang de `rev.ordre`). C'est ça, leur
+         trajectoire, et c'est la seule qui soit juste pour toutes les
+         lettres.
+
+         Poser une tête sur le pixel de rang k, en revanche, la fait sauter
+         d'un bord à l'autre du trait : à rang voisin, les pixels sont
+         dispersés sur toute la largeur. On découpe donc l'ordre en CENT
+         TRANCHES et on prend le CENTRE de chacune. Le centre d'une tranche
+         d'encre est dans l'encre, et cent tranches sur une lettre, c'est un
+         pas de quelques pixels : la tête glisse au milieu du trait, dans
+         l'ordre exact du geste, et ne peut pas en sortir.
+
+         Deux essais ratés avant celui-ci, notés pour qu'on n'y revienne
+         pas : la liste de pixels brute (elle sautait), puis `_cheminPlat`
+         (le chemin dicté ne tombe pas sur l'encre de toutes les formes —
+         le modèle sortait du wāw et partait n'importe où sur le yā). */
+      var TRANCHES=100;
+      function centresDeLordre(p2){
+        if(p2.centres)return p2.centres;
+        var L=p2.liste,out=[],k,i,n2,sx,sy,a,b;
+        var pas=L.length/TRANCHES;
+        for(k=0;k<TRANCHES;k++){
+          a=Math.floor(k*pas);b=Math.floor((k+1)*pas);
+          if(b<=a)b=a+1;
+          if(a>=L.length)break;
+          sx=0;sy=0;n2=0;
+          for(i=a;i<b&&i<L.length;i++){sx+=L[i]%W;sy+=(L[i]/W)|0;n2++;}
+          if(!n2)continue;
+          sx/=n2;sy/=n2;
+          /* Le centre d une tranche tombe DANS l encre, sauf quand la
+             tranche enjambe un saut du geste — la boucle du ta puis sa barre
+             verticale : le milieu des deux est alors dans le vide, a trente
+             pixels de la lettre. On reprend donc le pixel de la tranche le
+             plus proche de ce centre : il est dans l encre par nature. */
+          var mx=sx,my=sy,md=1e9,dx2,dy2,d2,px2,py2;
+          for(i=a;i<b&&i<L.length;i++){
+            px2=L[i]%W;py2=(L[i]/W)|0;
+            dx2=px2-sx;dy2=py2-sy;d2=dx2*dx2+dy2*dy2;
+            if(d2<md){md=d2;mx=px2;my=py2;}
+          }
+          out.push({x:mx,y:my});
+        }
+        if(!out.length)out.push({x:W/2,y:H/2});
+        p2.centres=out;
+        return out;
       }
-      /* Le milieu d'une partie : là où la tête attend quand ce n'est pas le
-         corps — un point, une voyelle, ça ne se parcourt pas. */
-      function milieuDe(p2){
-        var sx=0,sy=0,L=p2.liste;
-        for(var k=0;k<L.length;k++){sx+=L[k]%W;sy+=(L[k]/W)|0;}
-        return L.length?{x:sx/L.length,y:sy/L.length}:null;
+      /* Le point de la trajectoire d'une partie à l'avancement `t` (0 à 1). */
+      function pointDuGeste(p2,t){
+        var c=centresDeLordre(p2);
+        var k=Math.floor(Math.max(0,Math.min(0.9999,t))*c.length);
+        return c[Math.max(0,Math.min(c.length-1,k))];
       }
 
       /* L'aire du CORPS seul : la longueur mesuree est celle de son geste,
@@ -17039,20 +17234,16 @@ function _boyScene(ca,reprise){
           if(gi&&P){
             var GW=TAILLE*(gi.naturalWidth/gi.naturalHeight);
             /* 1. la tête de démonstration, pâle, qui suit la trajectoire */
-            var d1=(ip===0&&_chem)?pointDuChemin(tDemo):milieuDe(P);
+            var d1=pointDuGeste(P,tDemo);
             if(d1){
               cx.save();cx.globalAlpha=.42;
               cx.drawImage(gi,d1.x-GW/2,d1.y-TAILLE/2,GW,TAILLE);
               cx.restore();
             }
             /* 2. celle de l'enfant : sous son doigt, ou à l'endroit qu'il
-                  doit atteindre ensuite — sur le chemin lui aussi, à la part
-                  déjà peinte, pour qu'il descende au lieu de sautiller. */
-            var vise=tete;
-            if(!vise){
-              if(ip===0&&_chem)vise=pointDuChemin(P.avance<0?0:P.avance/P.liste.length);
-              else vise=prochainVide(P)||milieuDe(P);
-            }
+                  doit atteindre ensuite — sur la même trajectoire, à la part
+                  déjà peinte, pour qu'elle glisse au lieu de sautiller. */
+            var vise=tete||pointDuGeste(P,P.avance<0?0:P.avance/P.liste.length);
             if(vise){
               var vx=(vise.x!==undefined?vise.x:vise[0]);
               var vy=(vise.y!==undefined?vise.y:vise[1]);
@@ -17864,13 +18055,14 @@ function _beteEtape(){
   var sl=(_HAB.slugs||[])[i];
   return {image:im||'',nom:nom||'',slug:sl||''};
 }
-/* Le décor d'un monde : `public/images/fond-<animal>.svg`, engendré par
-   `python outils/fonds-animaux.py`. Sans animal connu, le fond marin, qui
-   était là avant eux. */
+/* Le décor d'une manche : l'habitat de l'animal DE LA LETTRE si l'on en
+   joue une, celui de l'animal de l'île sinon. Sans rien de connu, la
+   prairie — neutre et claire. */
 function _fondDuMonde(){
-  var b=null;
-  try{b=_beteEtape();}catch(e){}
-  return '/images/fond-'+((b&&b.slug)||'bulles')+'.svg';
+  var h=null;
+  try{if(_LETTRE_COURS)h=HABITAT[MOT_IMAGE[_LETTRE_COURS]];}catch(e){}
+  if(!h){try{var b=_beteEtape();h=HABITAT[b&&b.slug];}catch(e){}}
+  return '/images/fond-'+(h||'prairie')+'.svg';
 }
 
 function _boyLetterJeu(ca,idx,premiere){
@@ -17879,6 +18071,7 @@ function _boyLetterJeu(ca,idx,premiere){
     if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);});
   var L=CHILD_LETTERS[idx];
   var A=L.ar;
+  _LETTRE_COURS=A;               /* c'est elle qui donne le décor des manches */
   var B=_boyScene(ca,{cours:'lettre',arg:idx,premiere:premiere,
                       session:_boySession&&_boySession.id});
   /* Les leurres viennent des lettres DÉJÀ VUES : une lettre jamais
@@ -17942,6 +18135,7 @@ function _boyVowelJeu(ca){
   /* Le WAW et non le bā : chez les petits, les voyelles arrivent APRES alif,
      waw et ya, et c'est une lettre qu'ils viennent de tracer. */
   var LB='و';
+  _LETTRE_COURS=LB;              /* la rose du wāw : le décor sera la prairie */
   var syl=[LB+'\u064e',LB+'\u0650',LB+'\u064f'];
   B.run([
     B.jeuRencontre(syl[0]),B.jeuTrace(syl[0],2),

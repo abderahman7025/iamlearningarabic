@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le decor << jungle >>. C'est la jungle : grandes feuilles et liane. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e9f7ea"/><stop offset="100%" stop-color="#c2e3bd"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#a9d19a"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#93c184" opacity=".85"/>
+  <rect x="58" y="150" width="30" height="330" rx="12" fill="#b08a5e"/>
+  <rect x="812" y="150" width="30" height="330" rx="12" fill="#9d7a52"/>
+  <path d="M96 214 q 62 -46 116 -12 q -54 42 -116 12 Z" fill="#7ebd74" opacity=".95"/>
+  <path d="M96 286 q 62 -46 116 -12 q -54 42 -116 12 Z" fill="#93cc88" opacity=".95"/>
+  <path d="M804 236 q -62 -46 -116 -12 q 54 42 116 12 Z" fill="#7ebd74" opacity=".95"/>
+  <path d="M804 312 q -62 -46 -116 -12 q 54 42 116 12 Z" fill="#93cc88" opacity=".95"/>
+  <path d="M470 0 q 26 120 -6 208 q -30 86 10 150" stroke="#8ec784" stroke-width="7" fill="none" opacity=".5" stroke-linecap="round"/>
+  <path d="M300 498 C 314 474 292 461 318 446" stroke="#7ebd74" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M360 504 C 346 486 368 476 342 464" stroke="#7ebd74" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M600 500 C 614 479 592 467 618 454" stroke="#7ebd74" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>

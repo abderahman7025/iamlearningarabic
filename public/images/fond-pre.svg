@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le decor << pre >>. C'est un pre vert, avec sa barriere. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eef8ff"/><stop offset="100%" stop-color="#d3eec4"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="790" cy="88" r="50" fill="#ffe9a8" opacity=".85"/>
+  <circle cx="790" cy="88" r="76" fill="#ffe9a8" opacity=".35"/>
+  <g opacity=".6" fill="#ffffff"><ellipse cx="180" cy="96" rx="41" ry="23"/><ellipse cx="216" cy="103" rx="30" ry="18"/><ellipse cx="145" cy="105" rx="27" ry="16"/></g>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#b6dca0"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#a1cd8a" opacity=".85"/>
+  <g fill="#cdae83">
+    <rect x="40" y="404" width="12" height="80" rx="4"/>
+    <rect x="120" y="404" width="12" height="80" rx="4"/>
+    <rect x="200" y="404" width="12" height="80" rx="4"/>
+    <rect x="280" y="404" width="12" height="80" rx="4"/>
+    <rect x="34" y="424" width="258" height="10" rx="5"/>
+    <rect x="34" y="452" width="258" height="10" rx="5"/>
+  </g>
+  <path d="M420 496 C 434 473 412 461 438 446" stroke="#8cc27f" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M470 502 C 456 484 478 475 452 464" stroke="#8cc27f" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M620 494 C 634 473 612 461 638 448" stroke="#8cc27f" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M680 500 C 666 483 688 474 662 464" stroke="#8cc27f" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M830 492 C 844 472 822 461 848 448" stroke="#8cc27f" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>

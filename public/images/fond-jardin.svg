@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
+  <!-- Le decor << jardin >>. C'est un jardin : pelouse, haie, fleurs. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <defs>
+  <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f1fbff"/><stop offset="100%" stop-color="#d8f0cf"/></linearGradient>
+  </defs>
+  <rect width="900" height="560" fill="url(#ciel)"/>
+  <circle cx="800" cy="86" r="48" fill="#ffe9a8" opacity=".85"/>
+  <circle cx="800" cy="86" r="74" fill="#ffe9a8" opacity=".35"/>
+  <g opacity=".55" fill="#ffffff"><ellipse cx="200" cy="92" rx="39" ry="22"/><ellipse cx="234" cy="98" rx="28" ry="17"/><ellipse cx="167" cy="100" rx="25" ry="15"/></g>
+  <g fill="#9ecb8c">
+    <circle cx="0" cy="432" r="46"/>
+    <circle cx="74" cy="432" r="46"/>
+    <circle cx="148" cy="432" r="46"/>
+    <circle cx="222" cy="432" r="46"/>
+    <circle cx="296" cy="432" r="46"/>
+    <circle cx="370" cy="432" r="46"/>
+    <circle cx="444" cy="432" r="46"/>
+    <circle cx="518" cy="432" r="46"/>
+    <circle cx="592" cy="432" r="46"/>
+    <circle cx="666" cy="432" r="46"/>
+    <circle cx="740" cy="432" r="46"/>
+    <circle cx="814" cy="432" r="46"/>
+    <circle cx="888" cy="432" r="46"/>
+  </g>
+  <path d="M0 470 Q 150 430 300 460 T 610 452 T 900 478 L900 560 L0 560 Z" fill="#bfe3ac"/>
+  <path d="M0 508 Q 220 478 460 502 T 900 512 L900 560 L0 560 Z" fill="#a9d596" opacity=".85"/>
+  <g opacity=".92"><path d="M120 470 L120 528" stroke="#8fc98a" stroke-width="6" stroke-linecap="round"/><ellipse cx="132.0" cy="470.0" rx="11" ry="16" fill="#f7a8c4" transform="rotate(0.0 132.0 470.0)"/><ellipse cx="123.7" cy="481.4" rx="11" ry="16" fill="#f7a8c4" transform="rotate(72.0 123.7 481.4)"/><ellipse cx="110.3" cy="477.1" rx="11" ry="16" fill="#f7a8c4" transform="rotate(144.0 110.3 477.1)"/><ellipse cx="110.3" cy="462.9" rx="11" ry="16" fill="#f7a8c4" transform="rotate(216.0 110.3 462.9)"/><ellipse cx="123.7" cy="458.6" rx="11" ry="16" fill="#f7a8c4" transform="rotate(288.0 123.7 458.6)"/><circle cx="120" cy="470" r="9" fill="#ffd76a"/></g>
+  <g opacity=".92"><path d="M250 494 L250 552" stroke="#8fc98a" stroke-width="6" stroke-linecap="round"/><ellipse cx="262.0" cy="494.0" rx="11" ry="16" fill="#ffd08a" transform="rotate(0.0 262.0 494.0)"/><ellipse cx="253.7" cy="505.4" rx="11" ry="16" fill="#ffd08a" transform="rotate(72.0 253.7 505.4)"/><ellipse cx="240.3" cy="501.1" rx="11" ry="16" fill="#ffd08a" transform="rotate(144.0 240.3 501.1)"/><ellipse cx="240.3" cy="486.9" rx="11" ry="16" fill="#ffd08a" transform="rotate(216.0 240.3 486.9)"/><ellipse cx="253.7" cy="482.6" rx="11" ry="16" fill="#ffd08a" transform="rotate(288.0 253.7 482.6)"/><circle cx="250" cy="494" r="9" fill="#ffd76a"/></g>
+  <g opacity=".92"><path d="M660 480 L660 538" stroke="#8fc98a" stroke-width="6" stroke-linecap="round"/><ellipse cx="672.0" cy="480.0" rx="11" ry="16" fill="#c3a8f0" transform="rotate(0.0 672.0 480.0)"/><ellipse cx="663.7" cy="491.4" rx="11" ry="16" fill="#c3a8f0" transform="rotate(72.0 663.7 491.4)"/><ellipse cx="650.3" cy="487.1" rx="11" ry="16" fill="#c3a8f0" transform="rotate(144.0 650.3 487.1)"/><ellipse cx="650.3" cy="472.9" rx="11" ry="16" fill="#c3a8f0" transform="rotate(216.0 650.3 472.9)"/><ellipse cx="663.7" cy="468.6" rx="11" ry="16" fill="#c3a8f0" transform="rotate(288.0 663.7 468.6)"/><circle cx="660" cy="480" r="9" fill="#ffd76a"/></g>
+  <g opacity=".92"><path d="M790 500 L790 558" stroke="#8fc98a" stroke-width="6" stroke-linecap="round"/><ellipse cx="802.0" cy="500.0" rx="11" ry="16" fill="#f7a8c4" transform="rotate(0.0 802.0 500.0)"/><ellipse cx="793.7" cy="511.4" rx="11" ry="16" fill="#f7a8c4" transform="rotate(72.0 793.7 511.4)"/><ellipse cx="780.3" cy="507.1" rx="11" ry="16" fill="#f7a8c4" transform="rotate(144.0 780.3 507.1)"/><ellipse cx="780.3" cy="492.9" rx="11" ry="16" fill="#f7a8c4" transform="rotate(216.0 780.3 492.9)"/><ellipse cx="793.7" cy="488.6" rx="11" ry="16" fill="#f7a8c4" transform="rotate(288.0 793.7 488.6)"/><circle cx="790" cy="500" r="9" fill="#ffd76a"/></g>
+  <path d="M400 502 C 414 484 392 474 418 462" stroke="#93c98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M520 506 C 506 490 528 482 502 472" stroke="#93c98a" stroke-width="9" fill="none" stroke-linecap="round"/>
+</svg>

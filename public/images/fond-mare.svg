@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" preserveAspectRatio="xMidYMid slice">
-  <!-- Le fond du monde de l'animal « grenouille ». C'est la mare : nenuphars et roseaux. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
+  <!-- Le decor << mare >>. C'est la mare : nenuphars et roseaux. Tout reste PALE et le haut reste vide : les ballons montent par la, et ce sont eux qu'on doit voir. Genere par outils/fonds-animaux.py. -->
   <defs>
   <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#eaf7fb"/><stop offset="100%" stop-color="#cfeaf0"/></linearGradient>
   </defs>
