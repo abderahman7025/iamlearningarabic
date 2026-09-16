@@ -3627,19 +3627,17 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   40%{transform:scale(1.26) translateY(-18px) rotate(6deg)}
   100%{transform:scale(1)}}
 
-/* 2. Attrape-la */
-.mj-flotte{position:absolute;width:92px;height:92px;border-radius:50%;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
-  border:6px solid var(--mc);
-  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
-  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
-  animation:mjDerive 6s ease-in-out infinite alternate;user-select:none}
+/* 2. Attrape-la.
+   MÊMES BALLONS QUE LA MANCHE DES BULLES, et le même éclatement : le client
+   ne distingue pas les deux jeux par le nom mais par ce qu'il voit, et
+   trouvait l'éclatement « sur le mauvais ». Ils gardent chacun leur
+   mouvement — ceux-ci dérivent sur place, ceux-là montent — et c'est ce qui
+   les distingue. La forme, le nœud, la ficelle et l'éclatement sont écrits
+   une seule fois, plus bas, pour `.mj-flotte` comme pour `.mj-bulle`. */
+.mj-flotte{position:absolute;
+  animation:mjDerive 6s ease-in-out infinite alternate}
 @keyframes mjDerive{0%{transform:translate(0,0) rotate(-6deg)}
   100%{transform:translate(18px,-24px) rotate(6deg)}}
-.mj-flotte.pris{animation:none;transform:scale(1.6);opacity:0;
-  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
-.mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjSecoue{0%,100%{margin-left:0}25%{margin-left:-9px}75%{margin-left:9px}}
 
 /* 3. Le doigt qui dessine */
@@ -3655,19 +3653,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    BAUDRUCHE. La forme se fait a l'ovale (plus haut que large, le bas un peu
    plus pointu), avec son noeud et sa ficelle. Et quand on le touche, il
    ECLATE : il se gonfle d'un coup puis se froisse en rien. */
-.mj-bulle{position:absolute;bottom:-150px;width:92px;height:108px;
+.mj-flotte,.mj-bulle{width:92px;height:108px;
   border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
   border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
   font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
-  animation:mjMonte 8s linear forwards;user-select:none;
-  transform-origin:50% 118%}
+  user-select:none;transform-origin:50% 118%}
+.mj-bulle{position:absolute;bottom:-150px;animation:mjMonte 8s linear forwards}
 /* la ficelle, puis le noeud par-dessus */
-.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
+.mj-flotte::before,.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
   width:2px;height:30px;margin-top:7px;margin-left:-1px;
   background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
-.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
+.mj-flotte::after,.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
   width:0;height:0;margin-left:-7px;
   border-left:7px solid transparent;border-right:7px solid transparent;
   border-top:11px solid var(--mc)}
@@ -3680,8 +3678,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
    eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
    Une onde blanche part du meme point : c'est le claquement. */
-.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;pointer-events:none}
+.mj-flotte.pris,.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;
+  pointer-events:none}
+.mj-flotte.pris::before,.mj-flotte.pris::after,
 .mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
+.mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjEclate{
   0%  {transform:scale(1);    opacity:1}
   55% {transform:scale(1.28); opacity:1}
@@ -3790,7 +3791,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media (max-width:420px){
   .mj-disque{width:180px;height:180px;font-size:5.2rem}
   .mj-aire{height:280px}
-  .mj-flotte,.mj-bulle{width:78px;height:78px;font-size:2.2rem}
+  .mj-flotte,.mj-bulle{width:78px;height:92px;font-size:2.2rem}
   .mj-motar{font-size:3.2rem}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
   .mj-hp{width:56px;height:56px;font-size:1.3rem}
@@ -10847,7 +10848,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v242';
+var _VERSION_REPLI='v243';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16638,7 +16639,9 @@ function _boyScene(ca,reprise){
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
             if(g===cible){
-              f.classList.add('pris');etincelles(aire,f);
+              f.classList.add('pris');
+              lambeaux(aire,f,f.style.getPropertyValue('--mc'));
+              etincelles(aire,f);
               youpi(m.zone,true);
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
@@ -16808,6 +16811,41 @@ function _boyScene(ca,reprise){
 
       /* L'ÉPAISSEUR DU TRAIT : l'aire de l'encre divisée par la longueur du
          geste. Elle règle tout — la taille de l'animal et celle du pinceau. */
+      /* ── LE CHEMIN, CELUI DES MODÈLES DES GRANDS ──
+         La tête de démonstration parcourait la LISTE DES PIXELS du corps.
+         Elle est rangée par ordre d'écriture, mais à rang égal les pixels
+         sont dispersés sur toute la largeur du trait : la tête sautait d'un
+         bord à l'autre au lieu de descendre — « elle bouge de tous les sens
+         bizarrement pour l'alif ».
+         On prend donc LE MÊME CHEMIN que les modèles animés des 6-11 ans :
+         `_trajectoire` donne les gestes dictés par le client, `_cheminPlat`
+         les met bout à bout en segments mesurés, et on avance dessus à la
+         longueur d'arc. C'est une ligne, et elle descend. */
+      var _chem=null;
+      try{
+        var _g0=_trajectoire(glyph);
+        if(_g0){var _p0=_cheminPlat(_g0);if(_p0&&_p0.seg&&_p0.seg.length&&_p0.L)_chem=_p0;}
+      }catch(e){}
+      var _bas=0;
+      try{_bas=_descenteGlyphe(glyph,PX);}catch(e){}
+      function pointDuChemin(t){
+        if(!_chem)return null;
+        t=Math.max(0,Math.min(1,t));
+        var vise=_chem.L*t,sg=_chem.seg[0],k;
+        for(k=0;k<_chem.seg.length;k++){sg=_chem.seg[k];if(sg[5]+sg[4]>=vise)break;}
+        var u=sg[4]?((vise-sg[5])/sg[4]):0;
+        u=Math.max(0,Math.min(1,u));
+        return {x:AX+(sg[0]+(sg[2]-sg[0])*u)*PX,
+                y:AY+_bas+(sg[1]+(sg[3]-sg[1])*u)*PX};
+      }
+      /* Le milieu d'une partie : là où la tête attend quand ce n'est pas le
+         corps — un point, une voyelle, ça ne se parcourt pas. */
+      function milieuDe(p2){
+        var sx=0,sy=0,L=p2.liste;
+        for(var k=0;k<L.length;k++){sx+=L[k]%W;sy+=(L[k]/W)|0;}
+        return L.length?{x:sx/L.length,y:sy/L.length}:null;
+      }
+
       /* L'aire du CORPS seul : la longueur mesuree est celle de son geste,
          et compter les points et la voyelle avec lui gonflait l'epaisseur
          d'un quart — assez pour qu'un appui sur le point, trente pixels plus
@@ -16823,7 +16861,9 @@ function _boyScene(ca,reprise){
          PINCEAU, lui, est large : posé sur un bord du trait, un pinceau de la
          largeur du trait en laissait une bande de l'autre côté, « une petite
          partie en épaisseur qui n'est pas remplie quand on y passe ». */
-      var TAILLE=Math.max(16,epaisseur*1.3);
+      /* Deux fois le trait : « a peine plus gros que la largeur » ne veut
+         pas dire invisible, et a 1,3 fois le client ne la voyait plus. */
+      var TAILLE=Math.max(26,epaisseur*2);
       var PINCEAU=Math.max(26,epaisseur*2.6);
       /* Au-dela, le doigt n'est plus sur la lettre et ne peint rien. Une
          portee large laissait un appui SUR LE POINT peindre le corps, qui
@@ -16999,15 +17039,20 @@ function _boyScene(ca,reprise){
           if(gi&&P){
             var GW=TAILLE*(gi.naturalWidth/gi.naturalHeight);
             /* 1. la tête de démonstration, pâle, qui suit la trajectoire */
-            var L=P.liste,q=L[Math.min(L.length-1,Math.floor(tDemo*L.length))];
-            if(q!==undefined){
+            var d1=(ip===0&&_chem)?pointDuChemin(tDemo):milieuDe(P);
+            if(d1){
               cx.save();cx.globalAlpha=.42;
-              cx.drawImage(gi,(q%W)-GW/2,((q/W)|0)-TAILLE/2,GW,TAILLE);
+              cx.drawImage(gi,d1.x-GW/2,d1.y-TAILLE/2,GW,TAILLE);
               cx.restore();
             }
             /* 2. celle de l'enfant : sous son doigt, ou à l'endroit qu'il
-                  doit atteindre ensuite. */
-            var vise=tete||prochainVide(P);
+                  doit atteindre ensuite — sur le chemin lui aussi, à la part
+                  déjà peinte, pour qu'il descende au lieu de sautiller. */
+            var vise=tete;
+            if(!vise){
+              if(ip===0&&_chem)vise=pointDuChemin(P.avance<0?0:P.avance/P.liste.length);
+              else vise=prochainVide(P)||milieuDe(P);
+            }
             if(vise){
               var vx=(vise.x!==undefined?vise.x:vise[0]);
               var vy=(vise.y!==undefined?vise.y:vise[1]);

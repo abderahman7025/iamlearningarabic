@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 16 septembre 2026, production en v242
+## OÙ ON EN EST — 16 septembre 2026, production en v243
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,33 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v242), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v243), du plus récent au plus ancien :**
+
+- **LES DEUX JEUX DE BALLONS, ET LE MODÈLE QUI DESCEND (v243).**
+
+  - **L'éclatement était « sur le mauvais jeu ».** Il était bien là où je
+    l'avais mis — la manche des BULLES — mais le client ne distingue pas les
+    deux jeux par leur titre : il voit des formes qui flottent et qu'on
+    touche. « Attrape-la » et « Les bulles » ont donc désormais les MÊMES
+    ballons de baudruche et le MÊME éclatement ; ce qui les distingue reste
+    leur mouvement, les uns dérivent sur place, les autres montent. La forme,
+    le nœud, la ficelle et l'éclatement sont écrits une seule fois, pour les
+    deux.
+  - **La tête du tracé était devenue invisible.** « À peine plus gros que la
+    largeur » ne veut pas dire minuscule : elle passe de 1,3 à DEUX fois
+    l'épaisseur du trait.
+  - **LE MODÈLE SUIT LA TRAJECTOIRE, pas la liste de pixels.** « L'animal
+    modèle bouge de tous les sens bizarrement pour l'alif, au lieu de juste
+    descendre ; il doit suivre la trajectoire des modèles des 6-11 ans. » Il
+    parcourait la LISTE DES PIXELS du corps : elle est bien rangée par ordre
+    d'écriture, mais à rang égal les pixels sont dispersés sur toute la
+    largeur du trait — la tête sautait d'un bord à l'autre. On prend
+    maintenant le MÊME CHEMIN que les modèles animés des grands :
+    `_trajectoire` donne les gestes dictés par le client, `_cheminPlat` les
+    met bout à bout en segments mesurés, et la tête avance dessus à la
+    longueur d'arc. La tête de l'enfant, quand il ne touche pas, s'y pose
+    aussi, à la part déjà peinte. Mesuré sur l'alif : quatorze relevés, x
+    constant à 260 px, y de 83 à 140 — une descente, sans écart.
 
 - **LE TRACÉ SE FAIT DANS L'ORDRE, ET LE RESTE D'UNE PASSE (v242).**
 
