@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v247
+## OÙ ON EN EST — 17 septembre 2026, production en v248
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,37 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v247), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v248), du plus récent au plus ancien :**
+
+- **LE « SPLASH » VENAIT DE `youpi`, PAS DE `lambeaux` (v248).**
+
+  Le client a signalé QUATRE FOIS que les deux manches étaient inversées :
+  « attrape-la a le splash, les bulles le ballon disparaît seulement ». J'ai
+  cherché quatre fois au même mauvais endroit — les classes `.mj-flotte` /
+  `.mj-bulle`, la forme, l'appel à `lambeaux` — et je les ai même échangées
+  une fois (v246) faute de comprendre.
+
+  **La cause :** `jeuAttrape` appelait `youpi(m.zone,true)` à CHAQUE bonne
+  prise. `youpi` lance `launchConfetti()` — des confettis plein l'écran — et
+  affiche « Bravo ! » en très grand. C'était ça, le splash : il ne venait
+  d'aucune classe CSS et ne se voyait donc pas en lisant `.mj-flotte`.
+  `jeuBulles`, elle, n'appelle `youpi` qu'à la toute fin : son ballon faisait
+  son éclatement local, discret à côté d'une gerbe de confettis — d'où « il
+  disparaît seulement ».
+
+  **Corrigé :** attrape-la ne fait plus que retirer la bulle, avec le son de
+  réussite ; la fête appartient à la fin de la manche. Et l'éclatement des
+  bulles est plus franc — dix-huit morceaux qui vont deux fois plus loin, et
+  une onde plus large.
+
+  Mesuré sur une bonne réponse : attrape-la → 0 confetti, 0 « Bravo ! », 0
+  étincelle, 0 lambeau. Les bulles → 0 confetti, 18 lambeaux, 1 onde.
+
+  **LA LEÇON, pour la prochaine fois :** quand le client décrit un EFFET,
+  chercher tout ce que la manche déclenche au toucher — `youpi`,
+  `etincelles`, `playBravo`, `launchConfetti` — et pas seulement la classe
+  posée sur l'élément. Comparer les DEUX manches ligne à ligne l'aurait
+  montré du premier coup.
 
 - **LE MODÈLE AVANCE ENFIN À VITESSE CONSTANTE (v247).**
 

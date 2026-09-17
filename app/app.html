@@ -3704,7 +3704,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   45% {transform:scale(1.22); opacity:.9}
   100%{transform:scale(1.42); opacity:0}}
 /* Les lambeaux du ballon, projetes en etoile. */
-.mj-lambeau{position:absolute;width:20px;height:26px;pointer-events:none;
+.mj-lambeau{position:absolute;width:24px;height:30px;pointer-events:none;
   border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
   background:var(--mc);animation:mjLambeau .58s cubic-bezier(.16,.8,.35,1) forwards}
 @keyframes mjLambeau{
@@ -3718,8 +3718,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   pointer-events:none;border:5px solid var(--mc);
   animation:mjOnde .42s ease-out forwards}
 @keyframes mjOnde{
-  0%  {transform:translate(-50%,-50%) scale(.6);opacity:.85;border-width:7px}
-  100%{transform:translate(-50%,-50%) scale(7);  opacity:0;  border-width:1px}}
+  0%  {transform:translate(-50%,-50%) scale(.6);opacity:.9; border-width:8px}
+  100%{transform:translate(-50%,-50%) scale(9);  opacity:0;  border-width:1px}}
 .mj-bulle.non{border-color:#e53935;color:#e53935}
 
 /* 5 et 9. Écoute, voyelles — le haut-parleur est PETIT et de côté, les trois
@@ -10988,7 +10988,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v247';
+var _VERSION_REPLI='v248';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16651,10 +16651,12 @@ function _boyScene(ca,reprise){
     /* SEIZE morceaux, en etoile reguliere pour que ca parte VRAIMENT de tous
        les cotes, avec juste assez de hasard pour que ce ne soit pas un
        compas. */
-    for(var k=0;k<16;k++){
+    for(var k=0;k<18;k++){
       var e=document.createElement('i');e.className='mj-lambeau';
-      var a=(k/16)*Math.PI*2+(Math.random()-0.5)*0.32;
-      var d=64+Math.random()*58;
+      var a=(k/18)*Math.PI*2+(Math.random()-0.5)*0.30;
+      /* Plus loin qu'avant : a cote des confettis d'une autre manche,
+         l'eclatement paraissait timide. */
+      var d=88+Math.random()*72;
       e.style.left=cx+'px';e.style.top=cy+'px';
       e.style.setProperty('--mc',c);
       e.style.setProperty('--dx',Math.round(Math.cos(a)*d)+'px');
@@ -16779,8 +16781,17 @@ function _boyScene(ca,reprise){
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
             if(g===cible){
-              f.classList.add('pris');etincelles(aire,f);
-              youpi(m.zone,true);
+              /* ── ELLE DISPARAIT, ET C'EST TOUT ──
+                 C'EST ICI QU'ETAIT LE « SPLASH ». Pas dans une classe CSS :
+                 dans `youpi`, appele a CHAQUE prise, qui lance des confettis
+                 plein l'ecran et affiche « Bravo ! » en grand. La manche des
+                 bulles, elle, ne l'appelle qu'a la fin — d'ou l'impression
+                 d'inversion que le client signalait depuis quatre versions,
+                 et que j'ai cherchee quatre fois au mauvais endroit.
+                 Ici, on touche, ca s'en va. Le son de reussite suffit ; la
+                 fete appartient a la fin de la manche. */
+              f.classList.add('pris');
+              if(typeof playBravo==='function')playBravo();
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
                 N.dire(te('Bravo !'));m.gagne();}
