@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v248
+## OÙ ON EN EST — 17 septembre 2026, production en v249
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,60 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v248), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v249), du plus récent au plus ancien :**
+
+- **HUIT REMARQUES DU CLIENT, DONT DEUX RÉGRESSIONS À MOI (v249).**
+
+  - **LES RUBRIQUES AVAIENT PERDU LEUR FOND — ma faute.** En posant la carte
+    (v245) j'ai remplacé un bloc CSS en me servant du début de la règle
+    suivante comme borne : `.tuile{…}` s'est retrouvée COLLÉE SUR ELLE-MÊME
+    (`.tuile{position:relative;border-radius:26px;.tuile{…`), donc invalide,
+    et `.tuiles{}` a disparu au passage. Le choix de la lettre n'était plus
+    ni une grille ni une vignette. Les deux règles sont rétablies. **C'est la
+    deuxième fois que cette borne me joue ce tour** (voir aussi la ligne
+    dupliquée du même jour).
+  - **L'ÉCLATEMENT PARTAIT DU BAS.** `mjMonte` anime `bottom` de −150 px à
+    112 % ; `mjEclate`, lui, n'y touche pas. Au changement d'animation le
+    ballon RETOMBAIT d'un coup à sa position de départ, sous le cadre — et
+    les morceaux, calculés après, partaient de là. On recopie maintenant la
+    position du moment en style direct AVANT de changer d'animation.
+  - **Le tremblement : le client avait la bonne intuition.** « La lettre n'a
+    pas toujours la même largeur ; prends le centre de l'épaisseur. » Le
+    centre d'une TRANCHE n'est pas le centre du TRAIT : quand le trait
+    s'épaissit, la tranche penche et le point glisse vers un bord. On recale
+    donc chaque point sur l'axe — balayage perpendiculaire à la marche,
+    milieu des deux demi-largeurs.
+    **Attention, le recalage doit être BORNÉ** : sans borne il déraille aux
+    jonctions (il file dans une autre partie de la lettre) et AJOUTE des
+    à-coups — mesuré, les virages secs passaient de 12 à 113. Borné à trois
+    pixels et suivi d'un lissage plus fort, il gagne : **angle moyen entre
+    deux pas de 4,69° à 3,51°**, soit un quart de tremblement en moins, sans
+    que les à-coups augmentent (12 → 14).
+  - **Les points se visitent un par un.** Ils formaient une seule partie ; ils
+    sont maintenant séparés en TACHES, rangées de droite à gauche. Le modèle
+    se pose sur le premier, l'enfant touche, il passe au deuxième.
+  - **« Trouve la lettre » : la lettre d'abord, le mot ensuite.** Seule la
+    lettre est sous l'animal au départ ; elle s'efface et le mot paraît au
+    moment où la voix dit « trouve la lettre dans le mot ». Et « bravo » ne
+    tombe plus dans la foulée de « répète » : on attend la fin de la phrase,
+    puis une seconde et demie, le temps que l'enfant répète.
+  - **Les voyelles ne rabâchent plus la consigne.** « Où est le son » à la
+    première question, le son seul aux cinq autres.
+  - **LE MICRO PRO ÉTAIT MALTRAITÉ.** `getUserMedia({audio:true})` laisse le
+    navigateur appliquer ses traitements de visioconférence — suppression
+    d'écho, réduction de bruit, gain automatique. Faits pour un micro de
+    portable, ils écrasent les graves d'un bon micro, pompent le niveau et
+    mangent les fins de mots : « comme si je n'avais pas utilisé le micro
+    pro ». Les trois sont coupés, on demande 48 kHz en mono, et le
+    magnétophone monte à 128 kbit/s (le défaut de l'opus tourne autour de
+    40). **Les prises faites avant ce correctif gardent le défaut : elles
+    sont à refaire.**
+  - **La carte se met en paysage.** Deux repères, le même sentier : debout
+    (100 × 140) quand la fenêtre est plus haute que large, couchée
+    (100 × 72) sinon, avec des médaillons plus petits. Le choix se refait au
+    redimensionnement — tourner l'appareil suffit. Vérifié dans les deux
+    sens : en paysage la carte entière tient sans défiler, en portrait les
+    onze étapes tiennent sur un téléphone.
 
 - **LE « SPLASH » VENAIT DE `youpi`, PAS DE `lambeaux` (v248).**
 

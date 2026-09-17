@@ -3749,6 +3749,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .mj-mot{text-align:center}
 .mj-bete{width:140px;max-width:36%;display:block;margin:0 auto 4px;
   animation:mjSautille 2.4s ease-in-out infinite}
+/* La lettre seule, sous l'animal, avant que le mot n'arrive. */
+.mj-lettre-seule{font-family:'Scheherazade New',serif;
+  font-size:clamp(4rem,18vw,7rem);line-height:1.2;color:var(--mc);
+  text-align:center;padding:6px 0 10px;
+  animation:mjRespire 3.2s ease-in-out infinite}
 .mj-motar{direction:rtl;display:flex;justify-content:center;flex-wrap:nowrap;gap:0;
   font-family:'Scheherazade New',serif;font-size:4.4rem;line-height:1.5;margin-top:4px}
 /* Aucun rembourrage : il écarterait les morceaux, et le mot coupé serait plus
@@ -3920,6 +3925,14 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
   padding-bottom:140%;border-radius:28px;overflow:hidden;
   background:#ddf0d0 url("/images/carte-animaux.svg") center/100% 100% no-repeat;
   box-shadow:0 10px 30px rgba(60,90,50,.18)}
+/* COUCHÉE : le paysage s'étale, les médaillons rapetissent pour tenir
+   côte à côte — onze sur trois rangées au lieu de quatre. La hauteur du
+   cadre est posée par le code (`poseLeRepere`), pas ici : elle dépend du
+   repère choisi. */
+.carte-monde.couchee{max-width:min(1100px,100%)}
+.carte-monde.couchee .carte-etape{width:15%}
+.carte-monde.couchee .carte-nom{font-size:.72rem;padding:1px 6px}
+.carte-monde.couchee .carte-ar{font-size:.8rem}
 .carte-sentier{position:absolute;inset:0;width:100%;height:100%;
   pointer-events:none}
 .carte-sentier .sol{fill:none;stroke:#e8d9b4;stroke-width:6.4;
@@ -3958,7 +3971,12 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
   .carte-nom{font-size:.9rem}.carte-ar{font-size:1rem}
   .carte-etat{width:26px;height:26px;font-size:1.05rem}
 }
-.tuile{position:relative;border-radius:26px;.tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
+/* La grille des RUBRIQUES — le choix de la lettre s'en sert encore
+   (`tuiles tuiles-large`). Elle avait disparu avec la carte : le choix de
+   la lettre n'etait plus une grille du tout. */
+.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+  gap:16px;padding:0 2px 24px}
+.tuile{position:relative;border-radius:26px;padding:14px 10px 12px;cursor:pointer;
   background:linear-gradient(160deg,color-mix(in srgb,var(--tc) 26%,#ffffff) 0%,
     color-mix(in srgb,var(--tc) 12%,#ffffff) 100%);
   border:3px solid var(--tc);
@@ -9290,17 +9308,45 @@ function renderTuilesAnimaux(ca){
      dans le repere 100 x 140 de `carte-animaux.svg` : les deux doivent
      bouger ensemble. Le sentier n'est pas dans l'image — il passe PAR les
      etapes, et lui seul sait ou elles sont. */
-  var CARTE_ETAPES=[[23,19],[52,25],[79,18],
-                    [83,50],[54,56],[24,51],
-                    [20,86],[49,92],[79,85],
-                    [80,118],[47,125]];
+  /* ── DEBOUT OU COUCHÉE ──
+     Le client : « la carte doit être responsive, se mettre en paysage quand
+     il faut ». Une carte haute de 140 pour 100 de large demande de faire
+     défiler tout l'écran dès qu'on tourne la tablette. On a donc DEUX
+     dispositions, le même sentier dans les deux : debout quand la fenêtre
+     est plus haute que large, couchée sinon. Le choix se refait au
+     redimensionnement — tourner l'appareil suffit. */
+  var CARTE_DEBOUT={h:140,pts:[[23,19],[52,25],[79,18],
+                               [83,50],[54,56],[24,51],
+                               [20,86],[49,92],[79,85],
+                               [80,118],[47,125]]};
+  /* Couchée : quatre rangées deviennent trois, et l'on s'étale en largeur. */
+  var CARTE_COUCHEE={h:72,pts:[[11,14],[28,20],[45,13],[62,19],[79,12],
+                               [89,34],[71,40],[53,33],[35,39],
+                               [17,53],[37,59]]};
+  function carteDebout(){
+    try{return window.innerHeight>=window.innerWidth*0.95;}catch(e){return true;}
+  }
+  var CARTE=carteDebout()?CARTE_DEBOUT:CARTE_COUCHEE;
+  var CARTE_ETAPES=CARTE.pts;
   var carte=document.createElement('div');carte.className='carte-monde';
   var sentier=document.createElementNS('http://www.w3.org/2000/svg','svg');
   sentier.setAttribute('class','carte-sentier');
-  sentier.setAttribute('viewBox','0 0 100 140');
   sentier.setAttribute('preserveAspectRatio','none');
   sentier.setAttribute('aria-hidden','true');
-  (function(){
+  function poseLeRepere(){
+    CARTE=carteDebout()?CARTE_DEBOUT:CARTE_COUCHEE;
+    CARTE_ETAPES=CARTE.pts;
+    carte.style.paddingBottom=CARTE.h+'%';
+    carte.classList.toggle('couchee',CARTE===CARTE_COUCHEE);
+    sentier.setAttribute('viewBox','0 0 100 '+CARTE.h);
+    dessineLeSentier();
+    [].slice.call(carte.querySelectorAll('.carte-etape')).forEach(function(t,k){
+      var p=CARTE_ETAPES[k];if(!p)return;
+      t.style.left=p[0]+'%';
+      t.style.top=(p[1]/CARTE.h*100)+'%';
+    });
+  }
+  function dessineLeSentier(){
     /* Un trait adouci qui passe par toutes les etapes : chaque sommet est
        arrondi par une courbe, sinon le sentier ferait des angles droits. */
     var d='M'+CARTE_ETAPES[0][0]+' '+CARTE_ETAPES[0][1];
@@ -9309,12 +9355,13 @@ function renderTuilesAnimaux(ca){
       var my=(a[1]+b[1])/2;
       d+=' C'+a[0]+' '+my+' '+b[0]+' '+my+' '+b[0]+' '+b[1];
     }
+    while(sentier.firstChild)sentier.removeChild(sentier.firstChild);
     var bord=document.createElementNS('http://www.w3.org/2000/svg','path');
     bord.setAttribute('class','bord');bord.setAttribute('d',d);
     var sol=document.createElementNS('http://www.w3.org/2000/svg','path');
     sol.setAttribute('class','sol');sol.setAttribute('d',d);
     sentier.appendChild(bord);sentier.appendChild(sol);
-  })();
+  }
   carte.appendChild(sentier);
   var grille=carte;   /* les etapes se posent directement sur la carte */
   var precedenteFinie=true;
@@ -9336,7 +9383,7 @@ function renderTuilesAnimaux(ca){
     t.style.setProperty('--tc',coul);
     var pos=CARTE_ETAPES[i]||[50,10+i*12];
     t.style.left=pos[0]+'%';
-    t.style.top=(pos[1]/140*100)+'%';
+    t.style.top=(pos[1]/CARTE.h*100)+'%';
     var rond=document.createElement('div');rond.className='carte-rond';
     var im=document.createElement('img');
     im.src=imgs[i]||'';im.alt='';im.setAttribute('aria-hidden','true');
@@ -9373,6 +9420,12 @@ function renderTuilesAnimaux(ca){
     precedenteFinie=finie&&!fermee;
   });
   wrap.appendChild(carte);
+  /* On pose le repère une fois la carte remplie, et on le refait si l'on
+     tourne l'appareil ou si la fenêtre change de forme. */
+  poseLeRepere();
+  window.addEventListener('resize',function(){
+    if(carte.isConnected)poseLeRepere();
+  });
 
   /* ── L'ALBUM, SOUS LA CARTE ──
      Demande du client : les animaux gagnes se rangent la, juste en dessous,
@@ -10988,7 +11041,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v248';
+var _VERSION_REPLI='v249';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16921,6 +16974,30 @@ function _boyScene(ca,reprise){
       var rev=null;
       try{rev=_revelateur(glyph,AX,AY,PX,0,0,W,H,'#000');}catch(e){}
 
+      /* Coupe une liste de pixels en TACHES D'ENCRE, rangees de droite a
+         gauche. `_tachesEncre` sait trouver les composantes ; on ne fait que
+         les remettre dans l'ordre de la main. */
+      function separeLesTaches(liste){
+        if(!liste||!liste.length)return [];
+        var masque=new Uint8Array(W*H),i;
+        for(i=0;i<liste.length;i++)masque[liste[i]]=1;
+        var t,acc={};
+        try{t=_tachesEncre(masque,W,H);}catch(e){return [liste];}
+        for(i=0;i<liste.length;i++){
+          var lb=t.lab[liste[i]];if(!lb)continue;
+          (acc[lb]||(acc[lb]=[])).push(liste[i]);
+        }
+        var groupes=Object.keys(acc).map(function(lb){return acc[lb];});
+        if(groupes.length<2)return [liste];
+        /* de droite a gauche : on compare l'abscisse moyenne */
+        groupes.sort(function(a,b){
+          var ma=0,mb=0,k;
+          for(k=0;k<a.length;k++)ma+=a[k]%W;
+          for(k=0;k<b.length;k++)mb+=b[k]%W;
+          return (mb/b.length)-(ma/a.length);
+        });
+        return groupes;
+      }
       function partieDe(nom,liste){
         if(!liste||!liste.length)return null;
         var rang=new Int32Array(W*H);
@@ -16937,7 +17014,18 @@ function _boyScene(ca,reprise){
       var parties=[];
       if(rev){
         var p1=partieDe('corps',rev.ordre);if(p1)parties.push(p1);
-        var p2=partieDe('point',rev.points);if(p2)parties.push(p2);
+        /* ── UN POINT À LA FOIS ──
+           Le client : « quand il y a plusieurs points sur la lettre,
+           l'animal modèle doit aller sur le PREMIER point, puis l'enfant
+           touche, le modèle va dans le deuxième, on appuie, ainsi de
+           suite. » Les points formaient une seule partie : le modèle s'y
+           posait n'importe où et rien ne disait par lequel commencer. On
+           les sépare donc en TACHES — le ṯā en a trois — rangées de droite
+           à gauche, comme la main les pose. */
+        separeLesTaches(rev.points).forEach(function(lst,np){
+          var pp=partieDe('point',lst);
+          if(pp){pp.rang1=np;parties.push(pp);}
+        });
         var p3=partieDe('voyelle',rev.voyelle);if(p3)parties.push(p3);
       }
       /* Secours : sans découpage, toute l'encre en une seule partie, sans
@@ -17080,15 +17168,63 @@ function _boyScene(ca,reprise){
           }
           return sortie;
         }
+        /* ══ LE MILIEU DE L'ÉPAISSEUR ══
+           Le client a trouvé la cause lui-même : « la lettre n'a pas
+           toujours la même largeur ; tu devrais prendre le centre de
+           l'épaisseur comme référence ».
+           C'est juste. Le centre d'une TRANCHE n'est pas le centre du
+           TRAIT : quand le trait s'épaissit ou s'amincit, la tranche penche
+           d'un côté, et le point glisse vers le bord. D'une tranche à
+           l'autre il repart de l'autre côté — la tête tremble alors même
+           que le chemin, lui, est bon.
+           On recale donc chaque point sur l'axe : on regarde PERPENDICULAI-
+           REMENT à la direction de marche, on mesure jusqu'où va l'encre de
+           part et d'autre, et on se met au milieu. */
+        function auMilieu(t){
+          if(t.length<2)return t;
+          var res=[];
+          for(var q=0;q<t.length;q++){
+            var a4=t[Math.max(0,q-1)],b4=t[Math.min(t.length-1,q+1)];
+            var dx4=b4.x-a4.x,dy4=b4.y-a4.y,n5=Math.sqrt(dx4*dx4+dy4*dy4);
+            if(n5<0.001){res.push(t[q]);continue;}
+            /* la normale au sens de la marche */
+            var nx=-dy4/n5,ny=dx4/n5;
+            var cx4=t[q].x,cy4=t[q].y,MAX=60,d1=0,d2=0,r4;
+            function encre(x,y){
+              var ix=Math.round(x),iy=Math.round(y);
+              return ix>=0&&iy>=0&&ix<W&&iy<H&&p2.rang[iy*W+ix]>=0;
+            }
+            if(!encre(cx4,cy4)){res.push(t[q]);continue;}
+            for(r4=1;r4<=MAX;r4++){if(!encre(cx4+nx*r4,cy4+ny*r4))break;d1=r4;}
+            for(r4=1;r4<=MAX;r4++){if(!encre(cx4-nx*r4,cy4-ny*r4))break;d2=r4;}
+            /* Une traversee qui touche la borne n'est pas une epaisseur :
+               c'est qu'on longe le trait. On laisse le point tel quel. */
+            if(d1>=MAX||d2>=MAX){res.push(t[q]);continue;}
+            /* BORNE a trois pixels. Sans borne, le balayage deraille aux
+               jonctions — il file dans une autre partie de la lettre — et
+               ajoute des a-coups au lieu d en enlever : mesure, les virages
+               secs passaient de 12 a 113. Borne, il calme le trace sans
+               jamais le jeter ailleurs. */
+            var dec=(d1-d2)/2;
+            if(dec>3)dec=3; if(dec<-3)dec=-3;
+            res.push({x:cx4+nx*dec, y:cy4+ny*dec});
+          }
+          return res;
+        }
         var lisse=[];
         traits.forEach(function(t,ti){
+          /* Recale UNE FOIS, sur le trace grossier, puis on adoucit plus
+             fort : mesure sur les trente lettres, l angle moyen entre deux
+             pas tombe de 4,69 a 3,51 degres — un quart de tremblement en
+             moins — sans que les a-coups augmentent (12 -> 14). */
+          t=auMilieu(t);
           /* Adoucir, poser un point par pixel, adoucir encore a CETTE
              finesse, puis un point tous les deux pixels. Mesure sur les
              trente lettres : les virages de plus de soixante degres tombent
              de 51 a 12, et les points hors de l encre restent a un demi
              pour cent. Adoucir une seule fois, avant le reechantillonnage,
              ne voyait pas le bruit d angle du pas final. */
-          var u=reechantillonne(adoucit(reechantillonne(adoucit(t,5),1),12),2);
+          var u=reechantillonne(adoucit(reechantillonne(adoucit(t,7),1),16),2);
           u.forEach(function(p3,q){
             if(ti>0&&q===0)p3.saut=true;   /* on reprend le stylo ici */
             lisse.push(p3);
@@ -17192,6 +17328,13 @@ function _boyScene(ca,reprise){
         var i=y*W+x;
         if(c.x[i]<0)return null;
         return [c.x[i],c.y[i]];
+      }
+      /* Le milieu d'une partie : la ou la tete se pose quand il n'y a rien
+         a parcourir — un point. */
+      function milieuDe(p2){
+        var sx=0,sy=0,L=p2.liste;
+        for(var k=0;k<L.length;k++){sx+=L[k]%W;sy+=(L[k]/W)|0;}
+        return L.length?{x:sx/L.length,y:sy/L.length}:null;
       }
       /* Là où l'animal doit mener : le PREMIER PIXEL PAS ENCORE PEINT de la
          partie, dans l'ordre de la liste — donc dans l'ordre d'écriture. */
@@ -17305,10 +17448,11 @@ function _boyScene(ca,reprise){
           var P=active();
           if(gi&&P){
             var GW=TAILLE*(gi.naturalWidth/gi.naturalHeight);
-            /* 1. la tête de démonstration, pâle, qui suit la trajectoire.
-                  PAS SUR LES POINTS : un point se pose, il ne se parcourt
-                  pas, et une tête qui tourne autour n'apprend rien. */
-            var d1=(P.nom==='point')?null:pointDuGeste(P,tDemo);
+            /* 1. la tête de démonstration, pâle. Sur le corps et la
+                  voyelle elle PARCOURT le geste ; sur un point elle se pose
+                  DESSUS et attend — un point ne se parcourt pas, il se
+                  pose, et on les fait un par un. */
+            var d1=(P.nom==='point')?milieuDe(P):pointDuGeste(P,tDemo);
             if(d1){
               cx.save();cx.globalAlpha=.42;
               cx.drawImage(gi,d1.x-GW/2,d1.y-TAILLE/2,GW,TAILLE);
@@ -17317,7 +17461,10 @@ function _boyScene(ca,reprise){
             /* 2. celle de l'enfant : sous son doigt, ou à l'endroit qu'il
                   doit atteindre ensuite — sur la même trajectoire, à la part
                   déjà peinte, pour qu'elle glisse au lieu de sautiller. */
-            var vise=tete||pointDuGeste(P,P.avance<0?0:P.avance/P.liste.length);
+            /* Celle de l'enfant : sous son doigt, ou la ou il doit aller.
+               Sur un point, c'est le point lui-meme. */
+            var vise=tete||((P.nom==='point')?milieuDe(P)
+              :pointDuGeste(P,P.avance<0?0:P.avance/P.liste.length));
             if(vise){
               var vx=(vise.x!==undefined?vise.x:vise[0]);
               var vy=(vise.y!==undefined?vise.y:vise[1]);
@@ -17408,6 +17555,22 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(b.classList.contains('creve'))return;
           if(g===cible){
+            /* ── ON FIGE LE BALLON AVANT DE LE FAIRE ÉCLATER ──
+               `mjMonte` anime `bottom` de -150 px à 112 % ; `mjEclate`, lui,
+               n'y touche pas. Au changement d'animation le ballon RETOMBAIT
+               donc d'un coup à sa position de départ, sous le cadre — et
+               l'éclatement, calculé après, partait du bas de l'écran au lieu
+               du ballon. Le client : « le splash se fait en bas ».
+               On recopie donc la position du moment en style direct, avant
+               de changer d'animation : le ballon reste où il est, et ses
+               morceaux partent de LUI. */
+            (function(){
+              var ra=aire.getBoundingClientRect(),rb=b.getBoundingClientRect();
+              var ech=aire.offsetWidth?(ra.width/aire.offsetWidth):1;
+              if(!(ech>0.05&&ech<20))ech=1;
+              b.style.bottom=((ra.bottom-rb.bottom)/ech)+'px';
+              b.style.left=((rb.left-ra.left)/ech)+'px';
+            })();
             b.classList.add('creve');
             lambeaux(aire,b,b.style.getPropertyValue('--mc'));
             etincelles(aire,b);
@@ -17572,7 +17735,19 @@ function _boyScene(ca,reprise){
         jauge.firstChild.style.width=Math.round(n/liste.length*100)+'%';
         var mot=liste[n];
         zone.innerHTML='';
+        /* ── LA LETTRE D'ABORD, LE MOT ENSUITE ──
+           Le client : « mets uniquement la lettre sous l'animal au début,
+           puis quand la voix dit "trouve la lettre dans le mot", la lettre
+           disparaît et le mot apparaît ». On montre donc les deux au même
+           endroit, et on bascule de l'un à l'autre au moment dit. */
+        var seule=null;
+        if(n===0){
+          seule=document.createElement('div');seule.className='mj-lettre-seule';
+          seule.textContent=_sansCercle(L.ar);
+          zone.appendChild(seule);
+        }
         var boite=document.createElement('div');boite.className='mj-motar';
+        if(seule)boite.style.display='none';
         /* ── LE MOT COUPÉ RESTE LE MÊME MOT ──
            Chaque lettre est une case à toucher, donc une balise à part — et
            couper une chaîne arabe casse la liaison. Chaque morceau porte
@@ -17599,16 +17774,31 @@ function _boyScene(ca,reprise){
           boite.appendChild(sp);
         });
         zone.appendChild(boite);
+        /* Le mot prend la place de la lettre, au moment où la voix l'annonce. */
+        function montreLeMot(){
+          if(seule&&seule.parentNode){seule.parentNode.removeChild(seule);seule=null;}
+          boite.style.display='';
+        }
         if(n===0)N.plusTard(function(){
           /* Le SON de la lettre, pas son nom : « ce n'est pas bé, mais juste
              le b ». Le nom se dit « bā », le son s'entend dans le mot. */
           phraseAvecLettre('Dans un mot, elle se prononce',L.ar,null);
           N.plusTard(function(){
             N.dire(te('Répète !'));
-            N.plusTard(function(){
-              N.dire(te('Bravo !'));
-              N.dire(te('Trouve la lettre dans le mot !'));
-            },30);
+            /* ── ON LAISSE L'ENFANT RÉPÉTER ──
+               « Bravo » tombait dans la foulée de « répète », sans qu'il ait
+               eu le temps d'ouvrir la bouche. On attend la fin de la phrase,
+               PUIS une seconde et demie de silence, et c'est seulement là
+               qu'on félicite et qu'on montre le mot. */
+            N.surSilence(function(){
+              N.plusTard(function(){
+                N.dire(te('Bravo !'));
+                N.plusTard(function(){
+                  N.dire(te('Trouve la lettre dans le mot !'));
+                  montreLeMot();
+                },20);
+              },1500);
+            });
           },20);
         },150);
         else N.plusTard(function(){N.dire(te('Trouve la lettre dans le mot !'));},380);
@@ -17889,7 +18079,11 @@ function _boyScene(ca,reprise){
         });
         zone.appendChild(r);
         N.plusTard(function(){
-          N.dire(te('Où est le son'));
+          /* ── LA CONSIGNE UNE FOIS, LE SON SIX FOIS ──
+             « Ne répète pas à chaque fois "où est le son" : il y a six
+             questions, pour la première dis-le, pour les cinq autres dis
+             juste le son. » */
+          if(n===0)N.dire(te('Où est le son'));
           N.plusTard(function(){N.direToujours(A+cible[0]);},20);
         },150);
       }
@@ -22390,7 +22584,22 @@ function adminStartRecord(ar, label, item, btn, info) {
     return;
   }
   
-  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream) {
+  /* ── ON PREND LE MICRO TEL QU'IL EST ──
+     Le client : « les sons enregistrés avec mon micro pro ne sont pas bien
+     joués, comme si je ne l'avais pas utilisé ». C'est exactement ce qui se
+     passait : `{audio:true}` laisse le navigateur appliquer SES traitements
+     de visioconférence — suppression d'écho, réduction de bruit, gain
+     automatique. Ils sont faits pour un micro d'ordinateur portable dans une
+     pièce qui résonne ; sur un bon micro ils écrasent les graves, pompent le
+     niveau et mangent les fins de mots. On les coupe tous les trois, et on
+     demande 48 kHz en mono — la voix n'a pas besoin de stéréo. */
+  navigator.mediaDevices.getUserMedia({audio:{
+    echoCancellation:false, noiseSuppression:false, autoGainControl:false,
+    channelCount:1, sampleRate:48000
+  }}).catch(function(){
+    /* Un appareil qui refuse ces réglages vaut mieux qu'aucun micro. */
+    return navigator.mediaDevices.getUserMedia({audio:true});
+  }).then(function(stream) {
     adminStream = stream;
     adminChunks = [];
     adminCurrentKey = 'audio_' + ar;
@@ -22400,7 +22609,13 @@ function adminStartRecord(ar, label, item, btn, info) {
        `audio/mp4` — c'est le cas de Safari, donc de tout iPhone — rendait
        alors un fichier étiqueté webm mais contenant du mp4 : illisible à la
        relecture. On reprend le type que le magnétophone annonce. */
-    adminRecorder = new MediaRecorder(stream);
+    /* 128 kbit/s : le débit par défaut de l'opus tourne autour de 40, ce qui
+       s'entend sur une voix enregistrée au bon micro. */
+    try{
+      adminRecorder = new MediaRecorder(stream, {audioBitsPerSecond:128000});
+    }catch(e){
+      adminRecorder = new MediaRecorder(stream);
+    }
     adminRecorder.ondataavailable = function(e) { if (e.data && e.data.size) adminChunks.push(e.data); };
     adminRecorder.onstop = function() {
       var type = (adminRecorder && adminRecorder.mimeType) || 'audio/webm';
