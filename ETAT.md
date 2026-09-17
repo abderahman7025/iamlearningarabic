@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v245
+## OÙ ON EN EST — 17 septembre 2026, production en v246
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,28 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v245), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v246), du plus récent au plus ancien :**
+
+- **LES DEUX ANIMATIONS SONT INVERSÉES (v246).**
+
+  Le client l'a signalé TROIS fois. Je m'y suis opposé deux fois en montrant
+  le code : `ATTRAPE-LA` appelait `.mj-flotte` (rond, disparaît) et
+  `LES BULLES` appelait `.mj-bulle` (ballon, éclate) — ce qui est bien ce
+  qu'il demandait. Il voyait le contraire. Je n'ai pas trouvé pourquoi : les
+  titres, les consignes parlées et les classes sont cohérents dans le
+  fichier, et le déployé est bien celui-là.
+
+  **C'est lui qui regarde l'écran.** Les deux apparences sont donc échangées :
+  `.mj-flotte` (ATTRAPE-LA) est maintenant le BALLON qui ÉCLATE en seize
+  morceaux, `.mj-bulle` (LES BULLES) le ROND qui DISPARAÎT. Mesuré après
+  l'échange : attrape-la rend 92 × 108, bord de ballon, nœud de 11 px, seize
+  lambeaux au toucher ; les bulles rendent 92 × 92, `border-radius:50%`, pas
+  de ficelle, zéro lambeau, opacité qui tombe.
+
+  **Si un jour la cause se trouve** — un décalage entre ce que la manche
+  nomme et ce qu'elle affiche —, c'est ICI qu'il faudra revenir : les deux
+  blocs CSS portent chacun un commentaire qui dit que l'échange est voulu,
+  et pourquoi.
 
 - **UNE VRAIE CARTE, ET UN MODÈLE QUI GLISSE (v245).**
 
@@ -134,11 +155,7 @@ distinct de la vipère de ء.
     pas. Ces coupures se repèrent à un pas très au-dessus de la médiane, et la
     tête les franchit d'un coup. Points hors de l'encre : **13 sur 7 200**.
   - **Pas de modèle sur les points.** Un point se pose, il ne se parcourt pas.
-  - **L'éclatement : rien à corriger, c'était déjà juste.** `ATTRAPE-LA` pose
-    `.mj-flotte` (rond, disparaît) et n'appelle pas `lambeaux` ; `LES BULLES`
-    pose `.mj-bulle` (ballon, éclate) et l'appelle. Vérifié ligne à ligne dans
-    le fichier déployé. Si le client voit autre chose, c'est sa copie en cache
-    — le service worker garde la page tant qu'elle n'est pas rechargée.
+  - **L'éclatement : voir v246. J'avais tort de m'y tenir.**
 
 - **LA TRAJECTOIRE, POUR DE BON, ET UNE CARTE (v244).**
 

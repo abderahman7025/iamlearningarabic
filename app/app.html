@@ -3635,21 +3635,30 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   40%{transform:scale(1.26) translateY(-18px) rotate(6deg)}
   100%{transform:scale(1)}}
 
-/* 2. Attrape-la.
-   DES BULLES RONDES, qui DISPARAISSENT quand on les touche. Elles n'ont
-   jamais été des ballons : « le jeu attrape-la, il ne faut rien toucher ».
-   L'éclatement appartient à l'autre manche, celle des bulles qui montent —
-   c'est là, et là seulement, qu'un ballon crève. */
-.mj-flotte{position:absolute;width:92px;height:92px;border-radius:50%;
+/* 2. Attrape-la — LES BALLONS QUI ÉCLATENT.
+   Le client a repris trois fois : « le jeu attrape-la doit éclater ». Le
+   code disait le contraire de ce qu'il voit à l'écran, et c'est lui qui
+   regarde : ce sont donc CES formes-là qui sont des ballons de baudruche,
+   avec nœud et ficelle, et qui crèvent de tous les côtés au toucher.
+   La manche des bulles, elle, a des ronds qui disparaissent. */
+.mj-flotte{position:absolute;width:92px;height:108px;
+  border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
-  border:6px solid var(--mc);
-  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
-  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
-  user-select:none;
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
+  border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
+  font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
+  user-select:none;transform-origin:50% 118%;
   animation:mjDerive 6s ease-in-out infinite alternate}
-.mj-flotte.pris{animation:none;transform:scale(1.6);opacity:0;
-  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
+/* la ficelle, puis le noeud par-dessus */
+.mj-flotte::before{content:'';position:absolute;left:50%;top:100%;
+  width:2px;height:30px;margin-top:7px;margin-left:-1px;
+  background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
+.mj-flotte::after{content:'';position:absolute;left:50%;top:100%;
+  width:0;height:0;margin-left:-7px;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-top:11px solid var(--mc)}
+.mj-flotte.pris{animation:mjEclate .13s ease-out forwards;pointer-events:none}
+.mj-flotte.pris::before,.mj-flotte.pris::after{opacity:0}
 .mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjDerive{0%{transform:translate(0,0) rotate(-6deg)}
   100%{transform:translate(18px,-24px) rotate(6deg)}}
@@ -3663,27 +3672,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 30%,transparent)}
 .mj-cadre canvas{display:block;width:100%;height:auto}
 
-/* 4. Les ballons.
-   Un cercle, c'etait une bulle de savon ; le client veut un BALLON DE
-   BAUDRUCHE. La forme se fait a l'ovale (plus haut que large, le bas un peu
-   plus pointu), avec son noeud et sa ficelle. Et quand on le touche, il
-   ECLATE : il se gonfle d'un coup puis se froisse en rien. */
-.mj-bulle{position:absolute;bottom:-150px;width:92px;height:108px;
-  border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
+/* 4. Les bulles — DES RONDS QUI DISPARAISSENT.
+   Elles montent et s'en vont quand on les touche, sans bruit. C'est
+   « attrape-la », plus haut, qui a les ballons et l'éclatement : le client
+   l'a repris trois fois, et c'est lui qui voit l'écran. */
+.mj-bulle{position:absolute;bottom:-150px;width:92px;height:92px;
+  border-radius:50%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
-  border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
-  font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
-  user-select:none;transform-origin:50% 118%;
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
+  border:6px solid var(--mc);
+  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
+  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
+  user-select:none;
   animation:mjMonte 8s linear forwards}
-/* la ficelle, puis le noeud par-dessus */
-.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
-  width:2px;height:30px;margin-top:7px;margin-left:-1px;
-  background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
-.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
-  width:0;height:0;margin-left:-7px;
-  border-left:7px solid transparent;border-right:7px solid transparent;
-  border-top:11px solid var(--mc)}
 @keyframes mjMonte{0%{bottom:-150px;transform:translateX(0)}
   50%{transform:translateX(16px)}100%{bottom:112%;transform:translateX(0)}}
 /* ── IL ÉCLATE, IL NE DISPARAIT PAS ──
@@ -3693,8 +3694,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
    eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
    Une onde blanche part du meme point : c'est le claquement. */
-.mj-bulle.creve{animation:mjEclate .13s ease-out forwards;pointer-events:none}
-.mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
+.mj-bulle.creve{animation:none;transform:scale(1.6);opacity:0;
+  pointer-events:none;
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
 @keyframes mjEclate{
   0%  {transform:scale(1);    opacity:1}
   55% {transform:scale(1.28); opacity:1}
@@ -3803,8 +3805,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media (max-width:420px){
   .mj-disque{width:180px;height:180px;font-size:5.2rem}
   .mj-aire{height:280px}
-  .mj-flotte{width:78px;height:78px;font-size:2.2rem}
-  .mj-bulle{width:78px;height:92px;font-size:2.2rem}
+  .mj-flotte{width:78px;height:92px;font-size:2.2rem}
+  .mj-bulle{width:78px;height:78px;font-size:2.2rem}
   .mj-motar{font-size:3.2rem}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
   .mj-hp{width:56px;height:56px;font-size:1.3rem}
@@ -10984,7 +10986,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v245';
+var _VERSION_REPLI='v246';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16775,7 +16777,9 @@ function _boyScene(ca,reprise){
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
             if(g===cible){
-              f.classList.add('pris');etincelles(aire,f);
+              f.classList.add('pris');
+              lambeaux(aire,f,f.style.getPropertyValue('--mc'));
+              etincelles(aire,f);
               youpi(m.zone,true);
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
@@ -17342,9 +17346,7 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(b.classList.contains('creve'))return;
           if(g===cible){
-            b.classList.add('creve');
-            lambeaux(aire,b,b.style.getPropertyValue('--mc'));
-            etincelles(aire,b);
+            b.classList.add('creve');etincelles(aire,b);
             if(typeof playBravo==='function')playBravo();
             pris++;jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
             if(pris>=BUT){vivant=false;youpi(m.zone);m.gagne();}
