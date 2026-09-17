@@ -11047,7 +11047,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v250';
+var _VERSION_REPLI='v251';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17577,6 +17577,19 @@ function _boyScene(ca,reprise){
               b.style.bottom=((ra.bottom-rb.bottom)/ech)+'px';
               b.style.left=((rb.left-ra.left)/ech)+'px';
             })();
+            /* ══ LÀ ÉTAIT LE BLOCAGE ══
+               Chaque ballon reçoit à sa naissance une durée de montée EN
+               STYLE DIRECT — `b.style.animationDuration = '7.3s'` — pour
+               qu'ils ne montent pas tous à la même vitesse. Or un style
+               direct l'emporte sur une feuille de style : en ajoutant la
+               classe `creve`, on changeait bien l'animation pour `mjEclate`,
+               mais elle gardait les SEPT SECONDES de la montée. Le ballon se
+               gonflait donc imperceptiblement et ne s'effaçait qu'à la
+               quatrième seconde, longtemps après ses morceaux — « les
+               ballons ne disparaissent toujours pas ».
+               On pose donc l'éclatement lui aussi en style direct : de
+               niveau égal, et écrit en dernier, il gagne. */
+            b.style.animation='mjEclate .2s ease-out forwards';
             b.classList.add('creve');
             /* Les morceaux partent À L'INSTANT OÙ le ballon disparaît, pas
                avant : 40 % de deux dixièmes de seconde, le temps qu'il se

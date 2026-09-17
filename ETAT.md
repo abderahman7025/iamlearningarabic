@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v250
+## OÙ ON EN EST — 17 septembre 2026, production en v251
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,31 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v250), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v251), du plus récent au plus ancien :**
+
+- **LE BALLON NE DISPARAISSAIT PAS — LA DURÉE ÉTAIT ÉCRASÉE (v251).** Quatrième
+  plainte du client sur ce ballon, et cette fois la cause n'était ni dans
+  l'animation ni dans la classe : **elle était dans un style direct posé
+  ailleurs.** À la naissance de chaque ballon, `pose()` écrit
+  `b.style.animationDuration = '7.3s'` pour que tous ne montent pas à la même
+  vitesse. Un style direct l'emporte sur une feuille de style : en ajoutant la
+  classe `creve`, on changeait bien l'animation pour `mjEclate`, mais elle
+  **gardait les sept secondes de la montée**. Mesuré : le ballon restait
+  entièrement opaque à une seconde et ne s'effaçait qu'à la quatrième — les
+  morceaux, eux, partaient à 80 ms. On pose donc l'éclatement lui aussi en
+  style direct (`b.style.animation='mjEclate .2s ease-out forwards'`) : de
+  niveau égal, écrit en dernier, il gagne. Durée mesurée 7300 ms → 200 ms,
+  ballon parti à 110 ms.
+
+  **LEÇON, LA DEUXIÈME SUR CE MÊME JEU.** Quand une animation « ne se produit
+  pas », ne pas relire seulement la règle CSS et le code du clic : chercher
+  **tout style direct posé sur le même élément ailleurs dans le fichier**
+  (`grep animationDuration`). Une propriété longue (`animation-duration`) posée
+  en direct survit à un changement de raccourci (`animation`) fait par une
+  classe. Et pour MESURER : le volet navigateur masqué ne fait pas avancer les
+  animations, donc échantillonner l'opacité dans le temps ne donne rien —
+  prendre `element.getAnimations()[0]`, lire `getComputedTiming().duration` et
+  forcer `currentTime` aux instants voulus.
 
 - **LE BALLON CRÈVE, PUIS IL N'EST PLUS LÀ (v250).** « Les ballons doivent
   disparaître juste après l'effet splash. » Il s'effaçait EN FONDU pendant que
