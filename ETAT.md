@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v251
+## OÙ ON EN EST — 17 septembre 2026, production en v252
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v251), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v252), du plus récent au plus ancien :**
+
+- **« TROUVE LA LETTRE » : ON RAPPELLE, ON N'EXPLIQUE PLUS (v252).** C'est la
+  dernière manche du cours ; l'enfant a déjà rencontré la lettre, l'a
+  attrapée, tracée, écoutée. « Dans un mot, elle se prononce… » lui réapprenait
+  ce qu'il venait de faire. La phrase est maintenant **« Rappelle-toi, cette
+  lettre est le… »** suivie de la lettre, comme à la rencontre.
+  **Nouvelle clé à enregistrer au studio** ; l'ancienne a été retirée de la
+  liste, elle ne servait plus.
+
+- **L'ANIMAL À GAUCHE, LE MOT EN GRAND (v252).** Les deux tenaient l'un SOUS
+  l'autre, ce qui ne laissait au mot qu'un tiers de la hauteur. En paysage ils
+  sont maintenant côte à côte (`.mj-mot-duo`), et le mot prend la place :
+  **70 px → 127 px sur un téléphone couché, 164 px sur une tablette**, borné
+  par la largeur autant que par la hauteur (`min(16vw,34vh)`) pour qu'un mot de
+  six lettres ne déborde jamais. En portrait rien ne bouge — sauf sur petit
+  écran, où le mot passe de 3,2 rem à `min(19vw,4.8rem)`.
+
+- **ET SURTOUT : ON RÉPOND À LA LETTRE LA PLUS PROCHE (v252).** Le client :
+  « les enfants touchent d'autres lettres du mot sans le vouloir ». Grossir ne
+  suffit pas pour les lettres FINES : mesuré, même à 127 px l'alif d'« أَسَد »
+  ne fait que **21 px de large** — c'est un trait vertical, il n'y a rien
+  d'autre à toucher, alors que son voisin en fait 62. On ne demande donc plus
+  au doigt de tomber DANS la lettre : chaque lettre possède le terrain jusqu'à
+  mi-chemin du centre de sa voisine. **L'alif passe de 21 px à 75 px de zone
+  utile**, sans qu'on ait écarté les lettres — un mot arabe est lié, les
+  séparer le casserait (voir le commentaire de `.mj-lettre`).
+  Vérifié par des clics posés : à 560 px c'est le sīn qui répond (il est
+  vraiment plus proche), à 572 px — dans la boîte du sīn — c'est l'alif, et à
+  700 px, loin du mot, **rien ne répond** : la boîte est large, un appui dans
+  le vide ne doit pas compter comme une réponse.
+  C'est la règle déjà demandée pour « relie les pareilles » : « s'il arrive à
+  peine à côté, ça doit valider ».
 
 - **LE BALLON NE DISPARAISSAIT PAS — LA DURÉE ÉTAIT ÉCRASÉE (v251).** Quatrième
   plainte du client sur ce ballon, et cette fois la cause n'était ni dans

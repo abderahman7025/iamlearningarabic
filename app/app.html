@@ -3767,6 +3767,27 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .mj-lettre.juste{color:#047857;background:rgba(16,185,129,.22);transform:scale(1.14)}
 .mj-lettre.non{color:#c62828;animation:mjSecoue .4s}
 
+/* ── EN PAYSAGE : L'ANIMAL À GAUCHE, LE MOT EN GRAND ──
+   « Les enfants touchent d'autres lettres du mot sans le vouloir. »
+   La bonne réponse n'est pas d'écarter les lettres — un mot arabe est lié,
+   les séparer le casserait (voir `.mj-lettre`, aucun rembourrage) — mais de
+   GROSSIR LA CIBLE. Le doigt d'un enfant de quatre ans fait un bon
+   centimètre : à 4,4 rem une lettre en faisait à peine plus, d'où les
+   touchers à côté. Ici le mot prend toute la hauteur qu'on lui laisse, et
+   chaque lettre devient deux à trois fois plus large.
+   La taille est bornée par la LARGEUR autant que par la hauteur : un mot de
+   six lettres à 12vw déborderait, `min()` l'en empêche. */
+.mj-mot-tx{min-width:0}
+@media (orientation:landscape){
+  .mj-mot-duo{display:flex;align-items:center;justify-content:center;
+    gap:clamp(12px,3vw,44px);padding:0 6px}
+  .mj-mot-duo .mj-bete{width:min(34vh,230px);max-width:32%;margin:0;
+    flex:0 0 auto}
+  .mj-mot-tx{flex:1 1 auto}
+  .mj-motar{font-size:min(16vw,34vh);line-height:1.35;margin-top:0}
+  .mj-lettre-seule{font-size:min(16vw,34vh);padding:0}
+}
+
 /* 7. Relier — on TRACE le trait, on n'appuie pas sur les deux cases. */
 .mj-rel{position:relative;display:flex;justify-content:space-between;
   gap:60px;max-width:480px;margin:0 auto;padding:0 4px;touch-action:none}
@@ -3817,7 +3838,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .mj-aire{height:280px}
   .mj-flotte{width:78px;height:78px;font-size:2.2rem}
   .mj-bulle{width:78px;height:92px;font-size:2.2rem}
-  .mj-motar{font-size:3.2rem}
+  .mj-motar{font-size:min(19vw,4.8rem)}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
   .mj-hp{width:56px;height:56px;font-size:1.3rem}
   .mj-rel{gap:30px}
@@ -11047,7 +11068,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v251';
+var _VERSION_REPLI='v252';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17746,12 +17767,21 @@ function _boyScene(ca,reprise){
       var n=0;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
+      /* ── L'ANIMAL D'UN CÔTÉ, LE MOT DE L'AUTRE ──
+         Le client : « mets l'animal à gauche en mode paysage, et le mot
+         beaucoup plus gros ». Les deux tenaient l'un SOUS l'autre, ce qui
+         ne laissait au mot qu'un tiers de la hauteur ; côte à côte, il a
+         toute la place. En portrait rien ne change : la boîte reste un bloc
+         ordinaire, l'animal au-dessus, le mot en dessous. */
+      var duo=document.createElement('div');duo.className='mj-mot-duo';
+      m.zone.appendChild(duo);
       if(image){
         var im=document.createElement('img');im.className='mj-bete';
         im.src=image;im.alt='';im.setAttribute('aria-hidden','true');
-        m.zone.appendChild(im);
+        duo.appendChild(im);
       }
-      var zone=document.createElement('div');m.zone.appendChild(zone);
+      var zone=document.createElement('div');zone.className='mj-mot-tx';
+      duo.appendChild(zone);
       var _ZWJ='‍';
       function lieApres(mo){
         var b=String(mo).replace(_MARQUES,'');_MARQUES.lastIndex=0;
@@ -17781,26 +17811,58 @@ function _boyScene(ca,reprise){
            couper une chaîne arabe casse la liaison. Chaque morceau porte
            donc un LIANT SANS CHASSE du côté de la coupe, et seulement là où
            son voisin s'attache vraiment (`_SANS_LIEN_APRES`). */
-        var mo=coupeEnLettres(mot),trouve=false;
+        var mo=coupeEnLettres(mot),trouve=false,cases=[];
         mo.forEach(function(morceau,k){
           var sp=document.createElement('span');sp.className='mj-lettre';
           sp.textContent=(k>0&&lieApres(mo[k-1])?_ZWJ:'')+morceau
                         +(k<mo.length-1&&lieApres(morceau)?_ZWJ:'');
-          sp.onclick=function(){
-            if(trouve)return;
-            if(_memeLettre(morceau,L.ar)){
-              trouve=true;sp.classList.add('juste');
-              youpi(m.zone,true);
-              N.plusTard(function(){N.direToujours(_sansCercle(mot));},380);
-              n++;N.plusTard(tour,1700);
-            }else{
-              sp.classList.add('non');
-              if(typeof playError==='function')playError();
-              N.plusTard(function(){sp.classList.remove('non');},430);
-            }
-          };
+          cases.push({sp:sp,m:morceau});
           boite.appendChild(sp);
         });
+        function repond(c){
+          if(trouve)return;
+          if(_memeLettre(c.m,L.ar)){
+            trouve=true;c.sp.classList.add('juste');
+            youpi(m.zone,true);
+            N.plusTard(function(){N.direToujours(_sansCercle(mot));},380);
+            n++;N.plusTard(tour,1700);
+          }else{
+            c.sp.classList.add('non');
+            if(typeof playError==='function')playError();
+            N.plusTard(function(){c.sp.classList.remove('non');},430);
+          }
+        }
+        /* ── LA LETTRE LA PLUS PROCHE, PAS CELLE QU'ON TOUCHE PILE ──
+           « Les enfants touchent d'autres lettres du mot sans le vouloir. »
+           Grossir le mot ne suffit pas pour les lettres FINES : mesuré, même
+           à 127 px l'alif d'« أَسَد » ne fait que 26 px de large — c'est un
+           trait vertical, il n'y a rien d'autre à toucher. Son voisin, lui,
+           en fait 80.
+           On ne demande donc plus au doigt de tomber DANS la lettre, mais
+           d'en être le plus proche : chaque lettre possède le terrain
+           jusqu'à mi-chemin du centre de sa voisine. L'alif passe ainsi de
+           26 px à une cinquantaine, sans qu'on ait écarté les lettres — un
+           mot arabe est lié, les séparer le casserait.
+           C'est la règle que le client avait déjà demandée pour « relie les
+           pareilles » : « s'il arrive à peine à côté, ça doit valider ».
+           Hors du mot, on ne répond pas : la boîte est large, et un appui
+           dans le vide ne doit pas compter comme une réponse. */
+        boite.onclick=function(ev){
+          if(trouve||!cases.length)return;
+          var x=(ev&&ev.clientX!=null)?ev.clientX:null;
+          if(x==null)return;
+          var g=Infinity,d=-Infinity,best=null,dm=Infinity;
+          cases.forEach(function(c){
+            var r=c.sp.getBoundingClientRect();
+            if(r.left<g)g=r.left;
+            if(r.right>d)d=r.right;
+            var e=Math.abs(x-(r.left+r.width/2));
+            if(e<dm){dm=e;best=c;}
+          });
+          var marge=parseFloat(getComputedStyle(boite).fontSize)*0.35||20;
+          if(x<g-marge||x>d+marge)return;
+          if(best)repond(best);
+        };
         zone.appendChild(boite);
         /* Le mot prend la place de la lettre, au moment où la voix l'annonce. */
         function montreLeMot(){
@@ -17808,9 +17870,15 @@ function _boyScene(ca,reprise){
           boite.style.display='';
         }
         if(n===0)N.plusTard(function(){
-          /* Le SON de la lettre, pas son nom : « ce n'est pas bé, mais juste
-             le b ». Le nom se dit « bā », le son s'entend dans le mot. */
-          phraseAvecLettre('Dans un mot, elle se prononce',L.ar,null);
+          /* ── ON RAPPELLE LA LETTRE, ON NE LA RÉEXPLIQUE PAS ──
+             Le client : « il ne faut pas dire "dans un mot, on prononce…",
+             il faut dire : rappelle-toi, cette lettre est le alif ».
+             C'est la DERNIÈRE manche du cours : l'enfant a déjà rencontré la
+             lettre, l'a attrapée, tracée, écoutée. Ici on ne lui apprend
+             plus rien, on lui remet le nom en tête avant de le lâcher dans
+             le mot. Comme à la rencontre, la phrase française est suivie de
+             la lettre elle-même — c'est l'enregistrement du cours. */
+          phraseAvecLettre('Rappelle-toi, cette lettre est le',L.ar,null);
           N.plusTard(function(){
             N.dire(te('Répète !'));
             /* ── ON LAISSE L'ENFANT RÉPÉTER ──
@@ -22003,7 +22071,7 @@ var ADMIN_SOUNDS = [
   {ar:'Éclate les bulles avec la lettre',label:'Éclate les bulles avec la lettre…'},
   {ar:'Écoute bien !',label:'Écoute bien !'},
   {ar:'Touche la bonne lettre !',label:'Touche la bonne lettre !'},
-  {ar:'Dans un mot, elle se prononce',label:'Dans un mot, elle se prononce…'},
+  {ar:'Rappelle-toi, cette lettre est le',label:'Rappelle-toi, cette lettre est le…'},
   {ar:'Trouve la lettre dans le mot !',label:'Trouve la lettre dans le mot !'},
   {ar:'Relie les deux mêmes lettres !',label:'Relie les deux mêmes lettres !'},
   {ar:'Retrouve les paires !',label:'Retrouve les paires !'},
