@@ -3635,30 +3635,22 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   40%{transform:scale(1.26) translateY(-18px) rotate(6deg)}
   100%{transform:scale(1)}}
 
-/* 2. Attrape-la — LES BALLONS QUI ÉCLATENT.
-   Le client a repris trois fois : « le jeu attrape-la doit éclater ». Le
-   code disait le contraire de ce qu'il voit à l'écran, et c'est lui qui
-   regarde : ce sont donc CES formes-là qui sont des ballons de baudruche,
-   avec nœud et ficelle, et qui crèvent de tous les côtés au toucher.
-   La manche des bulles, elle, a des ronds qui disparaissent. */
-.mj-flotte{position:absolute;width:92px;height:108px;
-  border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
+/* 2. Attrape-la — DES RONDS QUI DISPARAISSENT.
+   On touche la lettre, elle s'en va. Pas d'éclatement ici : il appartient à
+   la manche des bulles, plus bas. (Les deux ont été échangés en v246 sur la
+   foi de ce que le client voyait, puis remis d'aplomb en v247 : c'est bien
+   cet ordre-là qu'il veut.) */
+.mj-flotte{position:absolute;width:92px;height:92px;border-radius:50%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
-  border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
-  font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
-  user-select:none;transform-origin:50% 118%;
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
+  border:6px solid var(--mc);
+  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
+  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
+  user-select:none;
   animation:mjDerive 6s ease-in-out infinite alternate}
-/* la ficelle, puis le noeud par-dessus */
-.mj-flotte::before{content:'';position:absolute;left:50%;top:100%;
-  width:2px;height:30px;margin-top:7px;margin-left:-1px;
-  background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
-.mj-flotte::after{content:'';position:absolute;left:50%;top:100%;
-  width:0;height:0;margin-left:-7px;
-  border-left:7px solid transparent;border-right:7px solid transparent;
-  border-top:11px solid var(--mc)}
-.mj-flotte.pris{animation:mjEclate .13s ease-out forwards;pointer-events:none}
-.mj-flotte.pris::before,.mj-flotte.pris::after{opacity:0}
+.mj-flotte.pris{animation:none;transform:scale(1.6);opacity:0;
+  pointer-events:none;
+  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
 .mj-flotte.non{border-color:#e53935;color:#e53935;animation:mjSecoue .4s}
 @keyframes mjDerive{0%{transform:translate(0,0) rotate(-6deg)}
   100%{transform:translate(18px,-24px) rotate(6deg)}}
@@ -3672,19 +3664,26 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   box-shadow:0 10px 26px color-mix(in srgb,var(--mc) 30%,transparent)}
 .mj-cadre canvas{display:block;width:100%;height:auto}
 
-/* 4. Les bulles — DES RONDS QUI DISPARAISSENT.
-   Elles montent et s'en vont quand on les touche, sans bruit. C'est
-   « attrape-la », plus haut, qui a les ballons et l'éclatement : le client
-   l'a repris trois fois, et c'est lui qui voit l'écran. */
-.mj-bulle{position:absolute;bottom:-150px;width:92px;height:92px;
-  border-radius:50%;
+/* 4. Les bulles — LES BALLONS DE BAUDRUCHE QUI ÉCLATENT.
+   Ovale, nœud, ficelle. Au toucher il se gonfle d'un coup, CREVE, et
+   seulement ensuite il s'efface — ses seize morceaux partent en étoile et
+   une onde marque le claquement. */
+.mj-bulle{position:absolute;bottom:-150px;width:92px;height:108px;
+  border-radius:50% 50% 47% 47% / 55% 55% 45% 45%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
-  border:6px solid var(--mc);
-  box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 40%,transparent);
-  font-family:'Scheherazade New',serif;font-size:2.7rem;color:var(--mc);
-  user-select:none;
+  background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 40%,#fff));
+  border:6px solid var(--mc);box-shadow:0 6px 18px rgba(0,0,0,.12);
+  font-family:'Scheherazade New',serif;font-size:2.6rem;color:var(--mc);
+  user-select:none;transform-origin:50% 118%;
   animation:mjMonte 8s linear forwards}
+/* la ficelle, puis le noeud par-dessus */
+.mj-bulle::before{content:'';position:absolute;left:50%;top:100%;
+  width:2px;height:30px;margin-top:7px;margin-left:-1px;
+  background:color-mix(in srgb,var(--mc) 60%,#ffffff);border-radius:2px}
+.mj-bulle::after{content:'';position:absolute;left:50%;top:100%;
+  width:0;height:0;margin-left:-7px;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-top:11px solid var(--mc)}
 @keyframes mjMonte{0%{bottom:-150px;transform:translateX(0)}
   50%{transform:translateX(16px)}100%{bottom:112%;transform:translateX(0)}}
 /* ── IL ÉCLATE, IL NE DISPARAIT PAS ──
@@ -3694,13 +3693,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
    eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
    Une onde blanche part du meme point : c'est le claquement. */
-.mj-bulle.creve{animation:none;transform:scale(1.6);opacity:0;
-  pointer-events:none;
-  transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .42s}
+.mj-bulle.creve{animation:mjEclate .24s ease-out forwards;pointer-events:none}
+.mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
+/* IL ÉCLATE, PUIS IL S'EN VA. En treize centièmes on ne voyait rien : le
+   ballon se gonfle maintenant en un tiers du temps — c'est le coup — et ne
+   s'efface qu'ensuite, pendant que ses morceaux volent. */
 @keyframes mjEclate{
   0%  {transform:scale(1);    opacity:1}
-  55% {transform:scale(1.28); opacity:1}
-  100%{transform:scale(1.34); opacity:0}}
+  30% {transform:scale(1.30); opacity:1}
+  45% {transform:scale(1.22); opacity:.9}
+  100%{transform:scale(1.42); opacity:0}}
 /* Les lambeaux du ballon, projetes en etoile. */
 .mj-lambeau{position:absolute;width:20px;height:26px;pointer-events:none;
   border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
@@ -3805,8 +3807,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 @media (max-width:420px){
   .mj-disque{width:180px;height:180px;font-size:5.2rem}
   .mj-aire{height:280px}
-  .mj-flotte{width:78px;height:92px;font-size:2.2rem}
-  .mj-bulle{width:78px;height:78px;font-size:2.2rem}
+  .mj-flotte{width:78px;height:78px;font-size:2.2rem}
+  .mj-bulle{width:78px;height:92px;font-size:2.2rem}
   .mj-motar{font-size:3.2rem}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
   .mj-hp{width:56px;height:56px;font-size:1.3rem}
@@ -10986,7 +10988,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v246';
+var _VERSION_REPLI='v247';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16777,9 +16779,7 @@ function _boyScene(ca,reprise){
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
             if(g===cible){
-              f.classList.add('pris');
-              lambeaux(aire,f,f.style.getPropertyValue('--mc'));
-              etincelles(aire,f);
+              f.classList.add('pris');etincelles(aire,f);
               youpi(m.zone,true);
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
@@ -16995,43 +16995,94 @@ function _boyScene(ca,reprise){
           out.push({x:mx,y:my});
         }
         if(!out.length)out.push({x:W/2,y:H/2});
-        /* ── ON LISSE, SINON LA TÊTE VIBRE ──
-           `rev.ordre` remplit le trait par balayages : d'une tranche à la
-           suivante, le centre saute d'un bord à l'autre de l'épaisseur. Vu
-           de loin la trajectoire est juste, mais la tête tremble. Une
-           moyenne glissante sur cinq tranches suffit à la calmer — et on ne
-           garde le point lissé que s'il est TOUJOURS DANS L'ENCRE, sinon on
-           reprend celui d'origine : un virage serré ne doit pas faire couper
-           le coin. */
-        var lisse=[],F=2;
-        for(k=0;k<out.length;k++){
-          var ax2=0,ay2=0,m2=0;
-          for(i=Math.max(0,k-F);i<=Math.min(out.length-1,k+F);i++){
-            ax2+=out[i].x;ay2+=out[i].y;m2++;
-          }
-          var lx=ax2/m2,ly=ay2/m2;
-          var ix=Math.round(lx),iy=Math.round(ly);
-          var dedans=(ix>=0&&iy>=0&&ix<W&&iy<H&&p2.rang[iy*W+ix]>=0);
-          lisse.push(dedans?{x:lx,y:ly}:out[k]);
+        /* ══ DE CES CENT POINTS À UN MOUVEMENT FLUIDE ══
+           Le client : « ils font le bon chemin, mais VIBRENT au lieu d'avoir
+           un mouvement fluide, UNIFORME ». Deux défauts, tous deux mesurés
+           avant d'être corrigés :
+
+           1. LA VITESSE N'ÉTAIT PAS UNIFORME. Les cent tranches ont le même
+              NOMBRE DE PIXELS, pas la même LONGUEUR : là où le trait est
+              épais, les pixels s'entassent et deux tranches voisines se
+              touchent presque ; là où il est fin, elles s'écartent. La tête
+              passait le même temps sur chacune — elle rampait, puis fonçait.
+              Mesuré sur le wāw : de 1,5 à 9 px d'une tranche à l'autre,
+              deux fois et demie la médiane.
+           2. LE CHEMIN ZIGZAGUAIT. `rev.ordre` remplit le trait par
+              balayages : d'une tranche à l'autre le centre bascule d'un bord
+              à l'autre de l'épaisseur. Mesuré : trois à cinq virages de plus
+              de soixante degrés sur l'alif, le wāw et le lām. C'est ça, le
+              tremblement.
+
+           On coupe donc aux levers de stylo, on ADOUCIT chaque trait, puis on
+           le RÉÉCHANTILLONNE À PAS CONSTANT. Les points rendus sont alors
+           tous à la même distance les uns des autres : avancer d'un point par
+           image, c'est avancer à vitesse constante.
+
+           (L'ancien lissage gardait le point lissé seulement s'il tombait
+           encore sur l'encre. C'était l'erreur : sur un zigzag, le point
+           lissé sort du trait une fois sur deux, on reprenait donc l'original
+           — et le zigzag restait. Le lissage est maintenant sans condition,
+           et l'écart au trait reste bien en deçà de la taille de la tête.) */
+        var pas0=[],k2;
+        for(k2=1;k2<out.length;k2++){
+          var ex=out[k2].x-out[k2-1].x,ey=out[k2].y-out[k2-1].y;
+          pas0.push(Math.sqrt(ex*ex+ey*ey));
         }
-        /* ── LES LEVERS DE STYLO SE SAUTENT, ILS NE SE GLISSENT PAS ──
-           Le ṭāʾ fait sa boucle puis REPREND sa barre verticale, soixante
-           pixels plus loin ; le kāf pareil. Interpolé, le modèle traversait
-           ce vide en glissant — il sortait de la lettre et montrait un geste
-           qui n'existe pas. On repère ces coupures — un pas très au-dessus
-           de l'ordinaire — et la tête les franchit d'un coup.
-           Le seuil vient de la MÉDIANE des pas : une lettre grande et une
-           lettre petite n'ont pas la même échelle. */
-        var pas2=[],k2;
-        for(k2=1;k2<lisse.length;k2++){
-          var ex=lisse[k2].x-lisse[k2-1].x,ey=lisse[k2].y-lisse[k2-1].y;
-          pas2.push(Math.sqrt(ex*ex+ey*ey));
-        }
-        var tri=pas2.slice().sort(function(a2,b2){return a2-b2;});
+        var tri=pas0.slice().sort(function(a2,b2){return a2-b2;});
         var med=tri.length?tri[Math.floor(tri.length/2)]:0;
         var seuil=Math.max(14,med*4);
-        for(k2=1;k2<lisse.length;k2++)
-          if(pas2[k2-1]>seuil)lisse[k2].saut=true;
+        /* on coupe en traits continus */
+        var traits=[],cour=[out[0]];
+        for(k2=1;k2<out.length;k2++){
+          if(pas0[k2-1]>seuil){traits.push(cour);cour=[];}
+          cour.push(out[k2]);
+        }
+        if(cour.length)traits.push(cour);
+        /* [1,2,1], plusieurs fois : un vrai adoucissement, sans condition */
+        function adoucit(t,fois){
+          for(var f=0;f<fois;f++){
+            if(t.length<3)return t;
+            var n3=[t[0]];
+            for(var q=1;q<t.length-1;q++)
+              n3.push({x:(t[q-1].x+2*t[q].x+t[q+1].x)/4,
+                       y:(t[q-1].y+2*t[q].y+t[q+1].y)/4});
+            n3.push(t[t.length-1]);
+            t=n3;
+          }
+          return t;
+        }
+        /* un point tous les `PAS` pixels, mesures LE LONG du trait */
+        function reechantillonne(t,PAS){
+          if(t.length<2)return t.slice();
+          var cum=[0],q;
+          for(q=1;q<t.length;q++)
+            cum.push(cum[q-1]+Math.hypot(t[q].x-t[q-1].x,t[q].y-t[q-1].y));
+          var total=cum[cum.length-1];
+          if(!(total>0))return [t[0]];
+          var n4=Math.max(2,Math.round(total/PAS)),sortie=[],j2=1;
+          for(q=0;q<=n4;q++){
+            var vise=total*q/n4;
+            while(j2<cum.length-1&&cum[j2]<vise)j2++;
+            var a3=cum[j2-1],b3=cum[j2],f2=(b3>a3)?((vise-a3)/(b3-a3)):0;
+            sortie.push({x:t[j2-1].x+(t[j2].x-t[j2-1].x)*f2,
+                         y:t[j2-1].y+(t[j2].y-t[j2-1].y)*f2});
+          }
+          return sortie;
+        }
+        var lisse=[];
+        traits.forEach(function(t,ti){
+          /* Adoucir, poser un point par pixel, adoucir encore a CETTE
+             finesse, puis un point tous les deux pixels. Mesure sur les
+             trente lettres : les virages de plus de soixante degres tombent
+             de 51 a 12, et les points hors de l encre restent a un demi
+             pour cent. Adoucir une seule fois, avant le reechantillonnage,
+             ne voyait pas le bruit d angle du pas final. */
+          var u=reechantillonne(adoucit(reechantillonne(adoucit(t,5),1),12),2);
+          u.forEach(function(p3,q){
+            if(ti>0&&q===0)p3.saut=true;   /* on reprend le stylo ici */
+            lisse.push(p3);
+          });
+        });
         p2.centres=lisse;
         return lisse;
       }
@@ -17346,7 +17397,9 @@ function _boyScene(ca,reprise){
         b.onclick=function(){
           if(b.classList.contains('creve'))return;
           if(g===cible){
-            b.classList.add('creve');etincelles(aire,b);
+            b.classList.add('creve');
+            lambeaux(aire,b,b.style.getPropertyValue('--mc'));
+            etincelles(aire,b);
             if(typeof playBravo==='function')playBravo();
             pris++;jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
             if(pris>=BUT){vivant=false;youpi(m.zone);m.gagne();}

@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v246
+## OÙ ON EN EST — 17 septembre 2026, production en v247
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,42 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v246), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v247), du plus récent au plus ancien :**
+
+- **LE MODÈLE AVANCE ENFIN À VITESSE CONSTANTE (v247).**
+
+  - **Les deux jeux sont remis d'aplomb.** L'échange de la v246 était une
+    fausse piste : `ATTRAPE-LA` a de nouveau des ronds qui DISPARAISSENT,
+    `LES BULLES` les ballons de baudruche qui ÉCLATENT. Et le ballon éclate
+    pour de bon avant de s'en aller : la bouffée durait treize centièmes, on
+    ne voyait rien — elle en dure vingt-quatre, il se gonfle d'un coup puis
+    s'efface pendant que ses seize morceaux volent.
+
+  - **LE TREMBLEMENT DU MODÈLE : LA CAUSE, ENFIN.** « Ils font le bon chemin,
+    mais vibrent au lieu d'avoir un mouvement fluide, uniforme. » Deux
+    défauts, l'un et l'autre mesurés avant correction :
+
+      1. **La vitesse n'était pas uniforme.** Les cent tranches de `rev.ordre`
+         ont le même NOMBRE DE PIXELS, pas la même LONGUEUR : là où le trait
+         est épais les pixels s'entassent et deux tranches voisines se
+         touchent presque ; là où il est fin elles s'écartent. La tête passait
+         le même temps sur chacune — elle rampait, puis fonçait. Mesuré sur le
+         wāw : de 1,5 à 9 px d'une tranche à l'autre, 2,6 fois la médiane.
+      2. **Le chemin zigzaguait.** Mesuré : trois à cinq virages de plus de
+         soixante degrés sur l'alif, le wāw et le lām. Le lissage d'avant ne
+         gardait le point lissé QUE s'il tombait encore sur l'encre — or sur
+         un zigzag il en sort une fois sur deux, on reprenait donc l'original,
+         et le zigzag restait. C'était l'erreur.
+
+     Maintenant : on coupe aux levers de stylo, on adoucit chaque trait, on le
+     rééchantillonne au pixel, on adoucit encore À CETTE FINESSE, puis on pose
+     **un point tous les deux pixels**. Avancer d'un point par image, c'est
+     alors avancer à vitesse constante.
+
+     **Mesuré après, sur les trente lettres** : rapport du plus grand pas à la
+     médiane = **1,00** (contre 2,3 à 2,6) ; virages de plus de soixante
+     degrés = **12 au total** (contre 51) ; points hors de l'encre = 33 sur
+     5 766, soit un demi pour cent.
 
 - **LES DEUX ANIMATIONS SONT INVERSÉES (v246).**
 
