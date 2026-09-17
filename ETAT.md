@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v249
+## OÙ ON EN EST — 17 septembre 2026, production en v250
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,29 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v249), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v250), du plus récent au plus ancien :**
+
+- **LE BALLON CRÈVE, PUIS IL N'EST PLUS LÀ (v250).** « Les ballons doivent
+  disparaître juste après l'effet splash. » Il s'effaçait EN FONDU pendant que
+  ses morceaux volaient : on le voyait pâlir, ce qui n'est pas crever. Il se
+  tend maintenant d'un coup (40 % de deux dixièmes de seconde), les morceaux
+  partent à 80 ms, et à 110 ms il n'y a plus rien — l'opacité tombe d'un seul
+  cran. L'ordre compte : **d'abord l'éclat, ensuite le vide.**
+
+- **TROIS ANIMAUX PAR RANGÉE EN PAYSAGE (v250).** La carte couchée en alignait
+  cinq : une frise, pas une carte. Quatre rangées de 3-3-3-2 désormais, dans un
+  cadre un peu plus haut (100 × 88) avec des médaillons à 14 %.
+  **Et la carte debout gagne quatre points de hauteur** (140 → 144) : la
+  dernière vignette dépassait du cadre de sept pixels sur téléphone.
+  Mesuré dans les deux sens — 0 médaillon qui se touche, 0 nom qui se touche,
+  0 vignette hors cadre, en 492 × 433 comme en 250 × 420.
+
+  **Piège de mesure** : compter les rangées en groupant les vignettes par leur
+  centre vertical donne n'importe quoi si le seuil est fixe — les vignettes
+  d'une même rangée sont volontairement décalées. Grouper avec un seuil qui
+  dépend de la hauteur d'une vignette (0,55 × h). Et pour les chevauchements,
+  comparer les MÉDAILLONS et les ÉTIQUETTES, pas les boîtes `.carte-etape` :
+  elles se recouvrent par leur marge sans que rien ne se voie.
 
 - **HUIT REMARQUES DU CLIENT, DONT DEUX RÉGRESSIONS À MOI (v249).**
 

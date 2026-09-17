@@ -3693,16 +3693,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    sont SES MORCEAUX qui partent, seize, dans toutes les directions. C'est
    eux qu'on regarde ; le ballon, lui, a simplement cesse d'etre la.
    Une onde blanche part du meme point : c'est le claquement. */
-.mj-bulle.creve{animation:mjEclate .24s ease-out forwards;pointer-events:none}
+.mj-bulle.creve{animation:mjEclate .2s ease-out forwards;pointer-events:none}
 .mj-bulle.creve::before,.mj-bulle.creve::after{opacity:0}
-/* IL ÉCLATE, PUIS IL S'EN VA. En treize centièmes on ne voyait rien : le
-   ballon se gonfle maintenant en un tiers du temps — c'est le coup — et ne
-   s'efface qu'ensuite, pendant que ses morceaux volent. */
+/* IL SE GONFLE, IL CRÈVE, IL N'EST PLUS LÀ.
+   Le client : « les ballons doivent disparaître JUSTE APRÈS l'effet
+   splash ». Il s'effaçait en fondu pendant que ses morceaux volaient — on
+   le voyait pâlir, ce qui n'est pas crever. Il se tend donc d'un coup, et
+   au moment précis où les morceaux partent il n'y a PLUS RIEN : l'opacité
+   tombe d'un seul cran, en trois centièmes de seconde. */
 @keyframes mjEclate{
   0%  {transform:scale(1);    opacity:1}
-  30% {transform:scale(1.30); opacity:1}
-  45% {transform:scale(1.22); opacity:.9}
-  100%{transform:scale(1.42); opacity:0}}
+  40% {transform:scale(1.34); opacity:1}
+  55% {transform:scale(1.40); opacity:0}
+  100%{transform:scale(1.40); opacity:0}}
 /* Les lambeaux du ballon, projetes en etoile. */
 .mj-lambeau{position:absolute;width:24px;height:30px;pointer-events:none;
   border-radius:60% 40% 55% 45% / 50% 55% 45% 50%;
@@ -3930,7 +3933,7 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
    cadre est posée par le code (`poseLeRepere`), pas ici : elle dépend du
    repère choisi. */
 .carte-monde.couchee{max-width:min(1100px,100%)}
-.carte-monde.couchee .carte-etape{width:15%}
+.carte-monde.couchee .carte-etape{width:14%}
 .carte-monde.couchee .carte-nom{font-size:.72rem;padding:1px 6px}
 .carte-monde.couchee .carte-ar{font-size:.8rem}
 .carte-sentier{position:absolute;inset:0;width:100%;height:100%;
@@ -9315,14 +9318,17 @@ function renderTuilesAnimaux(ca){
      dispositions, le même sentier dans les deux : debout quand la fenêtre
      est plus haute que large, couchée sinon. Le choix se refait au
      redimensionnement — tourner l'appareil suffit. */
-  var CARTE_DEBOUT={h:140,pts:[[23,19],[52,25],[79,18],
+  var CARTE_DEBOUT={h:144,pts:[[23,19],[52,25],[79,18],
                                [83,50],[54,56],[24,51],
                                [20,86],[49,92],[79,85],
                                [80,118],[47,125]]};
-  /* Couchée : quatre rangées deviennent trois, et l'on s'étale en largeur. */
-  var CARTE_COUCHEE={h:72,pts:[[11,14],[28,20],[45,13],[62,19],[79,12],
-                               [89,34],[71,40],[53,33],[35,39],
-                               [17,53],[37,59]]};
+  /* Couchée : TROIS par rangée, le client y tient — cinq d'affilée
+     faisaient une frise, pas une carte. Quatre rangées donc, et un cadre
+     un peu plus haut pour les loger sans qu'elles se touchent. */
+  var CARTE_COUCHEE={h:88,pts:[[20,14],[50,20],[80,13],
+                               [80,34],[50,40],[20,33],
+                               [20,54],[50,60],[80,53],
+                               [65,75],[35,76]]};
   function carteDebout(){
     try{return window.innerHeight>=window.innerWidth*0.95;}catch(e){return true;}
   }
@@ -11041,7 +11047,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v249';
+var _VERSION_REPLI='v250';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17572,8 +17578,17 @@ function _boyScene(ca,reprise){
               b.style.left=((rb.left-ra.left)/ech)+'px';
             })();
             b.classList.add('creve');
-            lambeaux(aire,b,b.style.getPropertyValue('--mc'));
-            etincelles(aire,b);
+            /* Les morceaux partent À L'INSTANT OÙ le ballon disparaît, pas
+               avant : 40 % de deux dixièmes de seconde, le temps qu'il se
+               tende. Lancés tout de suite, ils volaient autour d'un ballon
+               encore entier — on ne comprenait pas ce qui avait crevé. */
+            (function(el,coul){
+              setTimeout(function(){
+                if(!aire.isConnected)return;
+                lambeaux(aire,el,coul);
+                etincelles(aire,el);
+              },80);
+            })(b,b.style.getPropertyValue('--mc'));
             if(typeof playBravo==='function')playBravo();
             pris++;jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
             if(pris>=BUT){vivant=false;youpi(m.zone);m.gagne();}
