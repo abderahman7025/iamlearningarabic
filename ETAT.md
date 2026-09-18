@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 17 septembre 2026, production en v252
+## OÙ ON EN EST — 18 septembre 2026, production en v253
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,48 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v252), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v253), du plus récent au plus ancien :**
+
+- **LES 6-11 ANS PASSAIENT LEURS PAGES AU MILIEU D'UNE PHRASE — RÉGRESSION DE
+  LA v238, TROUVÉE À LA v253.** Le client : « tes changements sur l'interface
+  3/5 ans ont modifié les interfaces 6/11 ans ; les pages passent à la suite en
+  plein milieu de la phrase, les lettres et les mots ne s'affichent qu'une
+  fraction de seconde dans le hublot ».
+
+  **La cause.** `_playFromIdx` DÉCOUPE une phrase longue à chaque « . ! ? » et
+  dit les morceaux l'un après l'autre, enchaînés par un `setTimeout` de 80 ms.
+  Pendant ce blanc, `speechSynthesis` ne parle pas et n'a rien en attente :
+  pour le guet de la narration, la phrase est finie. Tant qu'il fallait
+  **300 ms** de silence d'affilée, le blanc passait inaperçu. La v238 — « les
+  sons mettent trop de temps à arriver » — a ramené le guet à **100 ms** pour
+  enchaîner plus vite, et le blanc de 80 ms a suffi. La scène enchaînait alors
+  sur l'état suivant, d'où le hublot qui clignote : chez les 6-11 ans, une
+  scène avance état par état sur `surSilence`.
+
+  **Pourquoi seulement chez les 6-11 ans.** Mesuré : **19 des 123 phrases
+  françaises** se coupent en deux ou trois morceaux — ce sont les explications
+  longues, et elles sont toutes là-bas. Les 3-5 ans n'ont que des phrases
+  d'une seule proposition, un seul morceau, aucun blanc.
+
+  **La correction.** Le guet regarde AUSSI la file de morceaux : tant qu'il en
+  reste un à dire, on parle encore. Et, par l'autre bout, **le silence d'avant
+  le début ne compte plus** — entre l'ordre de parler et le premier son, le
+  navigateur met parfois plus de 320 ms (il charge une voix), et ce blanc-là
+  faisait passer la page AVANT que la voix commence ; on attend jusqu'à 1,2 s,
+  sauf si le son est coupé. Enfin, si le garde-fou de durée coupe une phrase,
+  il arrête les morceaux restants au lieu de les laisser se dire par-dessus la
+  suivante.
+
+  **Mesuré sur le vrai moteur**, phrase de trois morceaux, voix finie à
+  2940 ms : la page avançait à **963 ms**, elle avance maintenant à 3045 ms.
+  Sans rien perdre de la v238 — un son enregistré d'une seconde enchaîne
+  toujours à 1127 ms, et le son coupé n'attend personne (404 ms).
+
+  **LEÇON.** Un réglage de TEMPS est global par nature. Celui-ci a été réglé
+  en regardant une interface et a cassé l'autre, sans que rien ne le signale
+  pendant quinze versions. Avant de resserrer un délai partagé, chercher ce
+  qui produit des blancs LÉGITIMES plus longs que le nouveau seuil — ici, le
+  découpage des phrases longues, à trois fonctions de distance.
 
 - **« TROUVE LA LETTRE » : ON RAPPELLE, ON N'EXPLIQUE PLUS (v252).** C'est la
   dernière manche du cours ; l'enfant a déjà rencontré la lettre, l'a

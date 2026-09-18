@@ -11068,7 +11068,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v252';
+var _VERSION_REPLI='v253';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11190,13 +11190,35 @@ function _boyNarration(){
       if(typeof _prechargeSons==='function'&&q.length)
         _prechargeSons(q.slice(0,2));
     }catch(e){}
-    var t0=Date.now(),quiet=0;
+    var t0=Date.now(),quiet=0,aParle=false;
     tmr=setInterval(function(){
       var ss=window.speechSynthesis,a=window._kidAudio;
+      /* ══ UNE PHRASE COUPEE EN MORCEAUX N'EST PAS UNE PHRASE FINIE ══
+         REGRESSION DE LA v238, TROUVEE A LA v253 — elle ne se voyait que
+         chez les 6-11 ans : « les pages passent a la suite en plein milieu
+         de la phrase, les lettres ne s'affichent qu'une fraction de seconde
+         dans le hublot ».
+         `_playFromIdx` DECOUPE une phrase longue a chaque « . ! ? » et dit
+         les morceaux l'un apres l'autre, enchaines par un `setTimeout` de
+         80 ms. Pendant ce blanc, `speechSynthesis` ne parle pas et n'a rien
+         en attente : pour le guet, la phrase est finie. Tant qu'il fallait
+         300 ms de silence d'affilee, le blanc passait inapercu ; la v238 a
+         ramene le guet a 100 ms pour enchainer plus vite — et le blanc de
+         80 ms a suffi. La scene enchainait alors sur l'etat suivant au
+         milieu de la phrase, d'ou le hublot qui clignote.
+         Mesure : 19 des 123 phrases francaises du cours, dont toutes les
+         explications longues, se coupent ainsi en deux ou trois morceaux.
+         On regarde donc AUSSI la file de morceaux : tant qu'il en reste un
+         a dire, on parle encore. */
+      var enMorceaux=false;
+      try{
+        enMorceaux=(!_spkPaused && !!_spkChunks && _spkIdx<_spkChunks.length);
+      }catch(e){}
       /* Un lecteur qu'on vient de rembobiner est encore `paused` le temps
          que le navigateur le relance : on le compte comme parlant. */
       var parle=(ss&&(ss.speaking||ss.pending))
-        ||(a&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600));
+        ||(a&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600))
+        ||enMorceaux;
       /* ── UN ENREGISTREMENT DURE CE QU'IL DURE ──
          `estim` devine la duree sur la LONGUEUR DU TEXTE, et plafonne a 9 s :
          la phrase du soukoun, dite par le client, passe les 9 s, et le
@@ -11210,12 +11232,31 @@ function _boyNarration(){
       /* En pause, le temps ne court pas : sans cela le garde-fou de duree
          finirait par declarer la phrase dite alors qu'elle est suspendue. */
       if(enPause){t0=Date.now();quiet=0;return;}
+      if(parle)aParle=true;
       quiet=parle?0:quiet+1;
+      /* ── LE SILENCE D'AVANT LE DEBUT N'EST PAS UN SILENCE ──
+         Meme piege, par l'autre bout : entre l'ordre de parler et le premier
+         son, le navigateur met parfois plus de 320 ms — il charge une voix,
+         ou le fichier n'est pas encore la. Ce blanc-la etait compte comme
+         une fin de phrase, et la page passait AVANT que la voix commence.
+         Tant qu'on n'a rien entendu, on ne compte donc pas. On ne s'entete
+         pas non plus : passe une seconde et deux dixiemes, si rien n'est
+         venu, c'est qu'il ne viendra rien. Et quand le son est coupe, on
+         n'attend evidemment personne. */
+      if(!aParle&&st.soundOn&&Date.now()-t0<1200)quiet=0;
       /* On regarde deux fois plus souvent et on enchaîne aussitôt : le
          guet valait 100 ms, il fallait trois silences d'affilée puis un
          demi-tour de 100 ms — presque une demi-seconde de blanc entre deux
          phrases, alors que le lecteur suivant est déjà prêt. */
       if((quiet>=2&&Date.now()-t0>320)||Date.now()-t0>maxMs){
+        /* Si le garde-fou de duree a coupe une phrase encore decoupee en
+           morceaux, on ARRETE les morceaux qui restent. Sans cela ils
+           continueraient a se dire par-dessus la phrase suivante, et la file
+           `_spkChunks` resterait en plan : la phrase d'apres, si elle est
+           enregistree, ne passe pas par `stopSpeech` et croirait qu'on parle
+           encore. On ne nettoie que dans ce cas — une phrase finie
+           normalement n'a plus rien a arreter. */
+        if(enMorceaux){try{stopSpeech();}catch(e){}}
         clearInterval(tmr);tmr=null;busy=false;enCours=null;setTimeout(pump,20);
       }
     },50);
