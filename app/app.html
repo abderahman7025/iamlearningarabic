@@ -3413,6 +3413,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   top:var(--hub-ligne,62%);
   border-top:3px dashed rgba(var(--sk-rgb-f),.42);z-index:0}
 .boy-hublot.ligne span{position:relative;z-index:1}
+/* Ce qu'on touche pour réentendre : le mot déjà écrit en couleur. Pas de
+   cadre, pas de barre — il grossit à peine sous le doigt, assez pour dire
+   qu'il répond. */
+.boy-sonore{cursor:pointer;display:inline-block;
+  transition:transform .15s ease,opacity .15s ease}
+.boy-sonore:hover{opacity:.82}
+.boy-sonore:active{transform:scale(.94);opacity:.6}
 /* Piste d'atterrissage : la ligne d'écriture du cours adulte, en piste */
 .boy-piste{position:relative;margin:14px 0 6px;padding:34px 0}
 .boy-piste .sol{position:absolute;left:0;right:0;top:50%;height:0;border-top:4px dashed rgba(var(--sk-rgb-f),.45)}
@@ -11079,7 +11086,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v256';
+var _VERSION_REPLI='v257';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14852,7 +14859,13 @@ function _boyScene(ca,reprise){
       var w=cadre.clientWidth;
       if(w>0){var v=cadre.getBoundingClientRect().width/w;if(v>0.2&&v<6)ech=v;}
     }catch(e){}
-    var MIN=22/ech, MAX=56/ech;
+    /* ── LES TITRES COURTS ONT LE DROIT D'ÊTRE GRANDS ──
+       Le client, sur la page du mot : « écris le texte en plus gros que
+       ça ! ». Le plafond valait 56 px à l'écran : une phrase courte le
+       touchait tout de suite et s'arrêtait là, alors que sa colonne était
+       loin d'être pleine. On le monte à 72. Les phrases longues ne bougent
+       pas — elles sont retenues par la LARGEUR, pas par le plafond. */
+    var MIN=22/ech, MAX=72/ech;
     var REF=40;
     t.style.fontSize=REF+'px';
     var large=laPlusLarge();
@@ -15283,41 +15296,72 @@ function _boyScene(ca,reprise){
     /* Un cours quitté laisse son écouteur derrière lui : sans ce garde-fou
        il travaillerait sur un cadre qui n'est plus à l'affiche. */
     if(!wrap.isConnected)return;
-    if(!essai){wrap.style.transform='';wrap.style.transformOrigin='';
-               wrap.style.height='';wrap.style.width='';
-               wrap.style.marginLeft='';wrap.style.marginRight='';_echelleCadre=1;}
+    /* ══ LE PLUS GRAND AGRANDISSEMENT QUI TIENNE VRAIMENT ══
+       Le client : « les cadres des pages contrôles, écoute et rappel sont
+       toujours petits » — le grand rectangle qui porte le texte, les bulles
+       de réponse et les boutons.
+
+       Pour agrandir, on ne fait pas que grossir : on RÉTRÉCIT d'abord la
+       largeur CSS du cadre à 100/k %, puis on le grossit d'autant. À l'écran
+       la largeur revient à 100 %, mais DANS LA MISE EN PAGE le cadre est
+       devenu étroit — et le texte, réparti en deux colonnes, s'y replie sur
+       bien plus de lignes. La hauteur rendue n'est donc PAS la hauteur à
+       plat multipliée par k : elle grandit plus vite que ça.
+       Le calcul en un coup ne pouvait pas le savoir. Deux passes se
+       contredisaient sans fin — l'une mesurait la page à plat et demandait
+       ×1,67, l'autre la mesurait déjà rétrécie et redescendait à ×1,03 — et
+       c'est la seconde qui parlait en dernier. Le cadre restait à 62 % de sa
+       taille, d'autant plus petit que la page est courte : exactement les
+       contrôles, l'écoute et les rappels.
+
+       On ne CALCULE donc plus l'agrandissement, on le CHERCHE : la hauteur
+       rendue croît avec k, on peut donc prendre le plus grand k qui tienne
+       encore, par dichotomie, en mesurant à chaque essai. Sept essais
+       suffisent à le serrer à moins d'un centième. */
+    wrap.style.transform='';wrap.style.transformOrigin='';
+    wrap.style.width='';wrap.style.height='';
+    wrap.style.marginLeft='';wrap.style.marginRight='';_echelleCadre=1;
     var vv=window.visualViewport;
     var vh=(vv&&vh_ok(vv.height))||window.innerHeight||0;
     if(!vh)return;
     var haut=wrap.getBoundingClientRect().top;
     var dispo=vh-haut-8;
     if(dispo<=40)return;
-    /* Le bas du contenu vivant : le dernier bouton, pas la marge de page. */
-    var bas=haut,els=wrap.getElementsByTagName('*');
-    for(var n=0;n<els.length;n++){
-      var r=els[n].getBoundingClientRect();
-      if(r.width>0&&r.height>0&&r.bottom>bas)bas=r.bottom;
+    /* Pose un agrandissement et REND la hauteur qu'il occupe a l'ecran.
+       Le bas du contenu vivant : le dernier bouton, pas la marge de page. */
+    function poseEtMesure(k){
+      wrap.style.transformOrigin='top left';
+      /* Origine EN HAUT À GAUCHE, pas au centre : au centre, le milieu du
+         cadre tombe à droite du milieu de la page et le grossissement le
+         pousse hors de l'écran. Les marges automatiques qui le centrent sont
+         neutralisées pour la même raison. */
+      wrap.style.width=(100/k)+'%';
+      wrap.style.marginLeft='0';wrap.style.marginRight='0';
+      wrap.style.transform='scale('+k+')';
+      wrap.style.height='';
+      var b=haut,e2=wrap.getElementsByTagName('*');
+      for(var q=0;q<e2.length;q++){
+        var r2=e2[q].getBoundingClientRect();
+        if(r2.width>0&&r2.height>0&&r2.bottom>b)b=r2.bottom;
+      }
+      return b-haut;
     }
-    var h=(bas-haut)/(_echelleCadre||1);
-    if(h<=0)return;
-    var k=dispo/h;
-    k=Math.max(0.40,Math.min(1.7,k));
+    var MIN=0.40,MAX=1.7,k;
+    if(poseEtMesure(MAX)<=dispo){k=MAX;}
+    else{
+      var bas2=MIN,haut2=MAX;
+      for(var it=0;it<7;it++){
+        var mi=(bas2+haut2)/2;
+        if(poseEtMesure(mi)<=dispo)bas2=mi;else haut2=mi;
+      }
+      k=bas2;
+    }
+    var rendu=poseEtMesure(k);
+    if(rendu<=0)return;
     _echelleCadre=k;
-    /* Origine EN HAUT À GAUCHE, pas au centre. Le cadre reçoit une largeur
-       CSS de 100/k % : au centre, son milieu tombe alors bien à droite du
-       milieu de la page, et le grossissement le poussait hors de l'écran.
-       Depuis le coin gauche, la largeur revient exactement à 100 %. */
-    wrap.style.transformOrigin='top left';
-    wrap.style.width=(100/k)+'%';
-    /* `boy-wrap` est centré par des marges automatiques. Dès que sa largeur
-       CSS descend sous 100 % — le cas quand on agrandit — ces marges le
-       décalent vers la droite, et le grossissement depuis le coin gauche
-       l'envoyait alors dépasser du bord. On les neutralise. */
-    wrap.style.marginLeft='0';wrap.style.marginRight='0';
-    wrap.style.transform='scale('+k+')';
     /* Sans cette hauteur, la place laissée reste celle d'avant et la page
        garde une traîne vide — ou se met à défiler pour rien. */
-    wrap.style.height=Math.ceil(h*k)+'px';
+    wrap.style.height=Math.ceil(rendu)+'px';
     /* Le texte s'est replacé à la nouvelle largeur : une seule reprise. */
     /* ── ILS NE SUIVENT PAS L'ECHELLE ──
        Le panneau entier est mis a l'echelle pour remplir la hauteur ; la
@@ -16048,6 +16092,32 @@ function _boyScene(ca,reprise){
     return f;
   };
   /* Contrôle : QCM sur des cibles */
+  /* ══ LE MOT EN COULEUR EST LE BOUTON ══
+     Le client : « dans les pages rappel ou écoute, il y a des boutons
+     réécouter en gris moche ; enlève-les et fais en sorte que l'écriture
+     écrite en une autre couleur (comme "alif") soit cliquable — on entend le
+     son de la lettre en cliquant dessus, plutôt que cette grosse barre ».
+     Il avait raison sur la mesure : la barre faisait 714 × 96 pixels, plus
+     large que la question elle-même.
+     Le mot en couleur est déjà ce que l'enfant regarde ; il devient ce qu'il
+     touche. Quand la page n'a rien en couleur — l'écoute, où la lettre est
+     justement ce qu'il faut deviner — c'est la première ligne du titre,
+     celle qui porte l'oreille 👂, qui sert de bouton. */
+  function sonAuToucher(p,son){
+    if(!p||!son)return;
+    var t=p.querySelector('.boy-titre');if(!t)return;
+    var cibles=[].slice.call(t.querySelectorAll('span[style*="--sk-vif"]'));
+    if(!cibles.length)cibles=[].slice.call(t.querySelectorAll('.boy-ligne')).slice(0,1);
+    cibles.forEach(function(el){
+      el.classList.add('boy-sonore');
+      el.setAttribute('role','button');
+      el.setAttribute('tabindex','0');
+      el.onclick=function(ev){ev.stopPropagation();N.stop();N.direToujours(son);};
+      el.onkeydown=function(ev){
+        if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();N.stop();N.direToujours(son);}
+      };
+    });
+  }
   api.controle=function(etape,html,fr,options,cible){
     return function(){
       /* Une question attend une reponse : elle ne s'enchaine pas, et son
@@ -16060,9 +16130,8 @@ function _boyScene(ca,reprise){
       var ecoute=N.aEnreg(sonCible);
       if(ecoute){
         N.plusTard(function(){N.dire(sonCible);},700);
-        var rj=document.createElement('button');rj.className='boy-btn sec';
-        rj.style.cssText+=';padding:10px;font-size:1.2rem;margin-top:6px';
-        rj.textContent=te('🔊 RÉÉCOUTER');rj.onclick=function(){N.stop();N.dire(sonCible);};p.appendChild(rj);
+        /* Plus de barre grise : c'est le son écrit en couleur qu'on touche. */
+        sonAuToucher(p,sonCible);
       }
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px';
@@ -18468,11 +18537,9 @@ function _boyScene(ca,reprise){
       var t=opts.filter(function(o){return o.g===cible;})[0];
       var sonCible=son||(t?t.s:cible);
       N.plusTard(function(){N.direToujours(sonCible);},700);
-      var rj=document.createElement('button');rj.className='boy-btn sec';
-      rj.style.cssText+=';padding:10px;font-size:1.2rem;margin-top:6px';
-      rj.textContent=te('🔊 RÉÉCOUTER');
-      rj.onclick=function(){N.stop();N.direToujours(sonCible);};
-      p.appendChild(rj);
+      /* Ici rien n'est écrit en couleur — la lettre est ce qu'il faut
+         deviner : c'est « Écoute bien 👂 » qui se touche pour réentendre. */
+      sonAuToucher(p,sonCible);
       var r=document.createElement('div');
       r.style.cssText='display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;direction:rtl';
       var repondu=false,premier=true;
@@ -19739,17 +19806,23 @@ function _boyLetterCourse(ca,idx,premiere){
            « exception » de ces lettres-la. */
         : {h:TB('Pour cette lettre, il faut apprendre les <b>4 formes</b>.'),
            f:te('Pour cette lettre, il faut apprendre les quatre formes.')} ]
+    /* ── CE QUI EST ÉCRIT SE LIT, CE QUI EST DIT S'EXPLIQUE ──
+       Le client : « à l'étape "à retenir", je t'ai dit de faire des
+       phrases : garde le texte, mais la voix explique mieux que ça ».
+       L'écrit reste court — il tient sur une ligne et se retient d'un coup
+       d'œil. La voix, elle, ne lit plus la note : elle dit la règle en
+       entier, avec ses mots à lui. */
     : [ {h:TB('<b>Seule</b> et <b>début</b> : les deux formes à connaître.'),
-         f:te('Seule et début : les deux formes à connaître.')},
+         f:te('Il y a deux formes à connaître par cœur : la forme seule, et la forme du début.')},
         {h:TB('Au <b>milieu</b> : la forme du début, avec un trait.'),
-         f:te('Au milieu : la forme du début, avec un trait.')},
+         f:te('Au milieu du mot, on reprend la forme du début, et on lui ajoute un trait devant.')},
         {h:TB('À la <b>fin</b> : la forme seule, avec un trait.'),
-         f:te('À la fin : la forme seule, avec un trait.')}
+         f:te('À la fin du mot, on reprend la forme seule, et on lui ajoute un trait devant.')}
       ].concat(attache?[]:[
         /* Une lettre qui ne s'attache pas doit l'emporter avec elle : c'est
            ce qui la distingue, et le client le veut ecrit ici. */
         {h:TB('Elle ne s\'accroche <b>JAMAIS</b> à la lettre suivante 🚫'),
-         f:te('Cette lettre ne s\'accroche jamais à la lettre suivante.')}
+         f:te('Attention : cette lettre ne s\'accroche jamais à la lettre qui la suit. On écrit la suivante un peu plus loin.')}
       ])));
   sc.push(function(api){
     /* Le resultat vient de l'ecran du mot, ou la lettre a ete enregistree.

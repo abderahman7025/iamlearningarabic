@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v256
+## OÙ ON EN EST — 19 septembre 2026, production en v257
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,62 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v256), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v257), du plus récent au plus ancien :**
+
+- **LE CADRE SE CHERCHE AU LIEU DE SE CALCULER (v257).** « Les cadres des
+  pages contrôles, écoute et rappel sont toujours petits » — le grand
+  rectangle qui porte le texte, les bulles de réponse et les boutons.
+
+  **Pour agrandir, `ajusteEcran` ne fait pas que grossir** : il RÉTRÉCIT
+  d'abord la largeur CSS du cadre à 100/k %, puis le grossit d'autant. À
+  l'écran la largeur revient à 100 %, mais dans la MISE EN PAGE le cadre est
+  devenu étroit, et le texte réparti en deux colonnes s'y replie sur bien plus
+  de lignes. **La hauteur rendue n'est donc pas la hauteur à plat × k.**
+  Le calcul en un coup ne pouvait pas le savoir : deux passes se
+  contredisaient sans fin — l'une mesurait la page à plat et demandait ×1,67,
+  l'autre la mesurait déjà rétrécie et redescendait à ×1,03 — et c'est la
+  seconde qui parlait en dernier.
+
+  On ne calcule donc plus l'agrandissement, **on le cherche par dichotomie**,
+  en mesurant la hauteur réellement rendue à chaque essai (la hauteur rendue
+  croît avec k, la recherche est donc valide ; sept essais suffisent).
+
+  | page | avant | après | place perdue en bas |
+  |---|---|---|---|
+  | CONTRÔLE | ×1,03 — 321 px | **×1,26 — 551 px** | 264 → 12 px |
+  | ÉCOUTE | ×1,00 — 327 px | **×1,23 — 554 px** | 259 → 11 px |
+  | RAPPEL | ×1,03 — 321 px | **×1,26 — 551 px** | 264 → 12 px |
+
+  Les 44 pages du cours vérifiées : **aucune ne déborde**.
+
+  **PIÈGE DE BANC, À RETENIR.** Un service worker tournait sur le banc local
+  et servait une copie EN CACHE de `app.html` : plusieurs mesures portaient
+  sur du code périmé, et une correction paraissait sans effet. Désinscrire le
+  service worker et vider les caches AVANT toute mesure sur le banc.
+
+- **LE MOT EN COULEUR EST LE BOUTON (v257).** « Il y a des boutons réécouter
+  en gris moche ; enlève-les et fais en sorte que l'écriture écrite en une
+  autre couleur (comme "alif") soit cliquable. » Il avait raison sur la
+  mesure : la barre faisait **714 × 96 px**, plus large que la question.
+  Le mot en couleur est déjà ce que l'enfant regarde ; il devient ce qu'il
+  touche (`.boy-sonore`, il s'enfonce à peine sous le doigt). Sur la page
+  d'écoute, où la lettre est justement ce qu'il faut deviner, c'est
+  « Écoute bien 👂 » qui sert de bouton.
+
+- **LES TITRES COURTS ONT LE DROIT D'ÊTRE GRANDS (v257).** Sur la page du mot,
+  « écris le texte en plus gros que ça ». Le plafond de `remplitLaLargeur`
+  valait 56 px vus ; il passe à 72. Le titre du mot gagne environ un quart.
+  Les phrases longues ne bougent pas : elles sont retenues par la LARGEUR de
+  leur colonne, pas par le plafond.
+
+- **« À RETENIR » : L'ÉCRIT SE LIT, LA VOIX EXPLIQUE (v257).** « Je t'ai dit
+  de faire des phrases : garde le texte, mais la voix explique mieux que
+  ça. » L'écrit reste court — il tient sur une ligne. La voix ne le lit plus,
+  elle dit la règle en entier : « Il y a deux formes à connaître par cœur :
+  la forme seule, et la forme du début », « Au milieu du mot, on reprend la
+  forme du début, et on lui ajoute un trait devant », etc.
+  **Ces phrases-là n'ont pas encore de traduction** : dans les autres langues
+  elles seront lues en français. À traduire si le besoin vient.
 
 - **ON NE CALCULE PLUS LA LIGNE DE BASE, ON LA MESURE (v256).** Le client :
   « la lettre étudiée est toujours trop haute par rapport au reste du mot qui
