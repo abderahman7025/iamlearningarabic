@@ -4096,9 +4096,20 @@ body.fond-espace .tuile-nom{color:#20242e}
   padding:12px 8px 8px;text-align:center;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10)}
 /* L'ARABE EST CE QU'ON REGARDE : il prend toute la place que la case lui
    laisse. C'est la demande du client — le mot etait bien trop petit. */
+/* ── DANS UN MOT, ON PARTAGE UNE LIGNE, PAS UN MILIEU ──
+   Le client : « les lettres, une fois qu'elles vont à leur place dans le
+   mot, sont à peine trop hautes ».
+   Le mot est une boîte flexible et ses morceaux étaient alignés sur leur
+   MILIEU (`align-items:center`). Or la lettre du jour n'est pas un morceau
+   de texte comme les autres : c'est une pile de calques, dont la boîte n'a
+   pas la même hauteur que celle de ses voisines. Centrées, deux boîtes de
+   hauteurs différentes ne posent pas leur écriture au même endroit — la
+   lettre montait. Mesuré sur les quatre formes du bā : début −6,0 px,
+   milieu −6,6 px, fin −15,0 px au-dessus du reste du mot, et seule +5,3 px
+   en dessous. Une écriture, ça s'aligne sur sa LIGNE. */
 .rec-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
   font-size:clamp(38px,13vh,94px);line-height:1.35;color:var(--sk-fonce);
-  min-height:1.4em;display:flex;align-items:center;justify-content:center}
+  min-height:1.4em;display:flex;align-items:baseline;justify-content:center}
 .rec-lbl{font-size:1.02rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
   color:rgba(var(--sk-rgb-f),.62);margin-top:2px}
 /* Le morceau qui manque, puis qui vient : il grandit à sa place au lieu de
@@ -11068,7 +11079,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v254';
+var _VERSION_REPLI='v255';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11262,7 +11273,17 @@ function _boyNarration(){
     },50);
   }
   function sansEmoji(t){return String(t).replace(/[←-⇿⌀-○◍-➿⬀-⯿️⃣]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|\uD83E[\uDC00-\uDFFF]/g,' ').replace(/\s+/g,' ').trim();}
-  function sansGuillemets(t){return String(t).replace(/«[^»]*»/g,' ').replace(/\s+([!?…,.])/g,'$1').replace(/\s+/g,' ').trim();}
+  /* ── CE QUI EST ENTRE GUILLEMETS NE SE DIT PAS PAR LA SYNTHESE ──
+     Le client : « les sons qu'on a mis entre guillemets, il ne faut pas les
+     dire par la voix de synthese ». C'est SA voix qui les dit, juste apres,
+     et on les entendait deux fois — une fois mal, une fois bien.
+     En retirant le son on laisse parfois une ponctuation en l'air : « que le
+     son de la lettre : » finissait sur un deux-points. On fait donc le
+     menage derriere, y compris en fin de phrase. */
+  function sansGuillemets(t){return String(t).replace(/«[^»]*»/g,' ')
+    .replace(/\s+([!?…,.;:])/g,'$1')
+    .replace(/[:;,]\s*$/,'')
+    .replace(/\s+/g,' ').trim();}
   /* ── ON VA CHERCHER LE FICHIER DES QU'ON SAIT QU'ON LE DIRA ──
      « On entend "ou est le son", puis UNE SECONDE APRES le son de la
      lettre. » Ce blanc etait le telechargement, demande seulement au moment
@@ -16365,6 +16386,12 @@ function _boyScene(ca,reprise){
       mDebut.trou.textContent=formes[1];mDebut.trou.classList.add('vu');
       /* Les deux du bas : la place est gardee — le mot ne sautera pas quand
          la lettre arrivera — mais les deux calques sont invisibles. */
+      /* NOTE : `deuxCalques` calcule la place de ses calques a partir d'un
+         interligne de 1,5 alors que `.rec-mot` ecrit en 1,35 — soit 0,075 em
+         d'ecart possible. Corrige puis REMIS EN ETAT : je n'ai pas su mesurer
+         ou tombe l'encre dessinee, et la correction deplacait la lettre dans
+         le sens meme dont le client se plaint. A verifier a l'oeil avant d'y
+         toucher. */
       var cMil=deuxCalques(formes[2],DEB,LIEN);
       var cFin=deuxCalques(formes[3],ISO,LIEN);
       mMilieu.trou.appendChild(cMil.hote);mMilieu.trou.classList.add('vu');
@@ -19367,7 +19394,10 @@ function _boyLetterCourse(ca,idx,premiere){
          en-dessous ». L'enfant a le signe sous les yeux : lui dire ou il est
          n'apprend rien, et la phrase partait sur un mot technique. */
       teF('Avec cette voyelle :<br>ça fait {son}',{son:q(v[1])}),
-      teF('Avec cette voyelle, ça fait {son}',{son:(lat+v[1]).toLowerCase()}),null,true));
+      /* Le son entre guillemets : la synthese s'arrete a « ça fait », et
+         c'est l'enregistrement de la lettre voyellee qui le dit. */
+      teF('Avec cette voyelle, ça fait {son}',
+          {son:'« '+(lat+v[1]).toLowerCase()+' »'}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
       teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:b((lat+v[1]).toLowerCase()),ou:b(combien)}),
@@ -19400,7 +19430,8 @@ function _boyLetterCourse(ca,idx,premiere){
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
       teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])}),
-      teF('Avec deux {signe}, ça fait {son}',{signe:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
+      teF('Avec deux {signe}, ça fait {son}',
+          {signe:v[2],son:'« '+(lat+v[1]).toLowerCase()+' »'}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
@@ -19417,7 +19448,8 @@ function _boyLetterCourse(ca,idx,premiere){
       muette?(TB('Avec le soukoun,<br>on ne <b>prononce rien</b> ⭕'))
             :(TBF('Avec le soukoun, on ne prononce<br>que le son de la lettre : {son} ⭕',{son:q('')})),
       muette?te('Avec le soukoun, on ne prononce rien.')
-            :teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',{son:latMin})));
+            :teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',
+                 {son:'« '+latMin+' »'})));
     /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
        fait donc tracer sur les formes début et milieu, les seules où il
        apparaît. */
@@ -19440,7 +19472,7 @@ function _boyLetterCourse(ca,idx,premiere){
       sc.push(B.obs(teF('ALLONGEMENT {n}/3',{n:n+1}),A+v[0],A+v[0],teF('Avec {lettre} :<br>ça fait {son} 🎵',{lettre:b(v[2]),son:q(v[1])}),
         teF('Avec {lettre}, on obtient {son}',
             {lettre:[te('l\'alif'),te('le waw'),te('le ya')][n],
-             son:(lat+v[1]).toLowerCase()})));
+             son:'« '+(lat+v[1]).toLowerCase()+' »'})));
       if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
       /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au

@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 18 septembre 2026, production en v254
+## OÙ ON EN EST — 19 septembre 2026, production en v255
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,71 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v254), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v255), du plus récent au plus ancien :**
+
+- **LE SON NE SE DIT PLUS DEUX FOIS (v255).** Le client : « tu dis "avec cette
+  voyelle, ça fait bou" puis on entend le son "bou" enregistré en studio. On
+  doit avoir "avec cette voyelle, ça fait" puis ma voix studio dit bou. En
+  gros, les sons qu'on a mis entre guillemets, il ne faut pas les dire par la
+  voix de synthèse. »
+
+  Le texte ÉCRIT mettait déjà le son entre guillemets (`q()`), et
+  `sansGuillemets` retire du parlé tout ce qui est entre « » — mais la phrase
+  DITE, elle, recevait le son en clair. La synthèse le prononçait donc, puis
+  `hublot` disait la lettre voyellée 600 ms plus tard : deux fois le même son,
+  une fois mal, une fois bien.
+  Les quatre endroits concernés reçoivent maintenant leur son entre
+  guillemets — la CLÉ de traduction ne change pas, seule la valeur injectée,
+  donc les douze langues suivent. Vérifié page par page, en journalisant ce
+  que la page demande à dire :
+
+  | page | avant | après |
+  |---|---|---|
+  | VOYELLE | « ça fait **ba** » puis بَ | « ça fait » puis بَ |
+  | TANWĪN | « ça fait **ban** » puis بً | « ça fait » puis بً |
+  | SOUKOUN | « …de la lettre : **b** » puis بْ | « …de la lettre » puis بْ |
+  | ALLONGEMENT | « on obtient **baaa** » puis بَا | « on obtient » puis بَا |
+
+  `sansGuillemets` fait aussi le ménage derrière : en retirant le son on
+  laissait une ponctuation en l'air (« que le son de la lettre : »).
+  **EXCEPTION ASSUMÉE** : la page « lettre grave » (« on ne dit pas bè mais
+  ba ») garde ses deux sons dans la synthèse — rien ne les redit après elle,
+  et les retirer laisserait « on ne dit pas, mais, car c'est une lettre
+  grave ».
+
+- **LES LETTRES SE POSAIENT SUR LEUR MILIEU, PAS SUR LA LIGNE (v255).** « Les
+  lettres, une fois qu'elles vont à leur place dans le mot, sont à peine trop
+  hautes. » C'est le RÉCAPITULATIF. `.rec-mot` est une boîte flexible et ses
+  morceaux étaient alignés sur leur MILIEU (`align-items:center`). Or la
+  lettre du jour n'est pas un morceau de texte comme les autres — c'est une
+  pile de calques, dont la boîte n'a pas la hauteur de ses voisines. Centrées,
+  deux boîtes de hauteurs différentes ne posent pas leur écriture au même
+  endroit. Une écriture s'aligne sur sa LIGNE.
+
+  | forme | avant | après |
+  |---|---|---|
+  | seule | +5,3 px | **−0,1 px** |
+  | début | −6,0 px | **+0,1 px** |
+  | fin | −15,0 px | −4,6 px |
+  | milieu | −6,6 px | −4,0 px |
+
+  **PISTE LAISSÉE OUVERTE, EXPRÈS.** `deuxCalques` calcule la place de ses
+  calques à partir d'un interligne de 1,5 alors que `.rec-mot` écrit en 1,35 :
+  0,075 em d'écart, ce qui expliquerait les 4 px qui restent sur *fin* et
+  *milieu*. J'ai corrigé, puis REMIS EN ÉTAT : je n'ai pas su mesurer où tombe
+  l'encre DESSINÉE (un canvas, pas du texte), et la correction déplaçait la
+  lettre dans le sens même dont le client se plaint. À vérifier à l'œil avant
+  d'y toucher.
+
+- **NON REPRODUIT : les cadres qui rétrécissent.** « Certains cadres, comme
+  dans les contrôles, sont à la bonne taille puis rapetissent et sont vers le
+  haut. » Sur le banc, l'échelle du cadre d'un CONTRÔLE reste à 1,4096 pendant
+  quatre secondes, sans bouger, et c'est toujours `.boy-panel` qui définit le
+  bas. `ajusteEcran` prend le bas du PLUS BAS des éléments vivants : si une
+  décoration animée (la volée de bravos, le personnage) descend plus bas que
+  le contenu, l'échelle diminue — c'est la piste, mais elle demande de savoir
+  QUAND cela arrive chez lui (à l'arrivée sur la page, ou après avoir
+  répondu).
 
 - **LA DEUXIÈME FACE DE LA MÊME RÉGRESSION (v254).** Le client, après la
   v253 : « pour la lettre isolée c'est ok, mais les trois autres formes,
