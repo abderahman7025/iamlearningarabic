@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 18 septembre 2026, production en v253
+## OÙ ON EN EST — 18 septembre 2026, production en v254
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,46 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v253), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v254), du plus récent au plus ancien :**
+
+- **LA DEUXIÈME FACE DE LA MÊME RÉGRESSION (v254).** Le client, après la
+  v253 : « pour la lettre isolée c'est ok, mais les trois autres formes,
+  toujours le même problème ». Deux causes distinctes, donc, pour un seul
+  symptôme — et la v253 n'en avait corrigé qu'une.
+
+  **La cause.** `titre()` ne met la phrase de la page dans la file qu'au bout
+  de **420 ms** — le temps que la page se pose. Or `attendSilence()` commence
+  à guetter le silence dès **220 ms**, et `surSilence` conclut dès qu'il
+  trouve la file vide. Entre 220 et 420 ms elle l'est : la page était donc
+  déclarée muette AVANT d'avoir ouvert la bouche.
+
+  **Pourquoi seulement les trois autres formes.** La page de la lettre isolée
+  (`api.obs`) ne fait qu'afficher son hublot et son bouton : elle n'attend
+  rien. Les pages début · milieu · fin passent par `api.forme`, qui attend le
+  silence pour faire paraître le mot et y faire glisser la lettre. C'est la
+  seule qui tombe dans le trou — d'où « la lettre isolée est ok ».
+
+  **Ce blanc a toujours existé ; c'est la v238 qui l'a découvert.** Avant
+  elle, la phrase de la page PRÉCÉDENTE tenait encore le moteur occupé trois
+  dixièmes de seconde après son dernier son, et ce reste couvrait le trou. En
+  raccourcissant ce délai pour enchaîner plus vite, on a ouvert la fenêtre.
+
+  **La correction : on annonce l'intention.** Le compte `_sceneParle` monte
+  dès la construction de la page et ne redescend qu'une fois la phrase
+  réellement mise dans la file. `go()` le remet à zéro à chaque page, rien ne
+  peut donc rester coincé ; une pause en cours de route est couverte aussi,
+  le geste différé rejouant le `N.dire`.
+
+  **Mesuré sur la vraie page « FORME 2/4 · DÉBUT » du cours du bā**, voix
+  simulée de 2500 ms : le mot paraissait dans le hublot à **431 ms**, il
+  paraît maintenant à 3076 ms. Les trois formes vérifiées (début 4183,
+  milieu 2514, fin 2683), plus l'identification (2563) et le récapitulatif :
+  aucune ne reste plantée.
+
+  **LEÇON.** Un même symptôme peut avoir DEUX causes, et corriger la première
+  cache la seconde. Le client a vu ce que je n'avais pas vu : « la lettre
+  isolée est ok » — cette moitié-là de la phrase était le diagnostic, elle
+  disait quelle famille de pages restait touchée.
 
 - **LES 6-11 ANS PASSAIENT LEURS PAGES AU MILIEU D'UNE PHRASE — RÉGRESSION DE
   LA v238, TROUVÉE À LA v253.** Le client : « tes changements sur l'interface

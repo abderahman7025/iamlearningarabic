@@ -11068,7 +11068,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v253';
+var _VERSION_REPLI='v254';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14744,7 +14744,31 @@ function _boyScene(ca,reprise){
     p.appendChild(t);
     /* fr === false : la scène dit elle-même sa phrase, morceau par morceau,
        pour caler une animation dessus (voir le tableau des formes). */
-    if(fr!==false)N.plusTard(function(){N.dire(fr||html);},420);
+    /* ══ UNE PAGE QUI VA PARLER N'EST PAS UNE PAGE QUI S'EST TUE ══
+       Les pages des formes début · milieu · fin passaient aussitôt : « les
+       lettres et les mots ne s'affichent qu'une fraction de seconde dans le
+       hublot ».
+       La phrase de la page n'est mise dans la file qu'au bout de 420 ms — le
+       temps que la page se pose. Or `attendSilence` commence à guetter le
+       silence dès 220 ms, et `surSilence` conclut dès qu'il trouve la file
+       vide. Entre 220 et 420 ms elle l'est : la page était donc declarée
+       muette AVANT d'avoir ouvert la bouche, le mot paraissait dans le
+       hublot et la lettre y glissait dans la seconde.
+       Ce blanc a toujours existé ; c'est la v238 qui l'a découvert. Avant
+       elle, la phrase de la page PRECEDENTE tenait encore le moteur occupé
+       trois dixièmes de seconde après son dernier son, et ce reste couvrait
+       le trou. En raccourcissant ce délai pour enchaîner plus vite, on a
+       ouvert la fenêtre.
+       On annonce donc l'intention : le compte des scènes qui parlent monte
+       TOUT DE SUITE, et ne redescend qu'une fois la phrase réellement mise
+       dans la file. `go()` le remet à zéro à chaque page, rien ne peut donc
+       rester coincé. */
+    if(fr!==false){
+      _sceneParle++;
+      N.plusTard(function(){
+        try{N.dire(fr||html);}finally{_sceneParle--;}
+      },420);
+    }
     /* ── LA PLUS GRANDE POLICE QUI REMPLIT LA COLONNE ──
        Le client veut le texte ecrit aussi grand que la place le permet, ses
        coupures de ligne etant respectees telles quelles. On part donc de la
