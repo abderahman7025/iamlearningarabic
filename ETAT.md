@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v255
+## OÙ ON EN EST — 19 septembre 2026, production en v256
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,61 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v255), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v256), du plus récent au plus ancien :**
+
+- **ON NE CALCULE PLUS LA LIGNE DE BASE, ON LA MESURE (v256).** Le client :
+  « la lettre étudiée est toujours trop haute par rapport au reste du mot qui
+  vient s'ajouter à elle ; vérifie les deux hauteurs et remets la lettre au
+  niveau du mot ». Puis le détail qui tranche : **« la lettre isolée reste à
+  la bonne hauteur, mais pas les trois autres formes »** — ce sont exactement
+  les trois où le mot se construit AUTOUR d'elle (`api.forme`) ; l'isolée
+  reste seule dans son hublot, elle n'a rien à s'aligner.
+
+  La lettre du jour n'est pas un morceau de texte comme ses voisines : c'est
+  une boîte à part — un bloc en ligne, parfois une pile de calques — et sa
+  ligne de base ne tombe pas où tombe celle du texte qui l'entoure. La v255
+  avait corrigé l'alignement des BOÎTES (`align-items:baseline`) ; il restait
+  l'écart propre à la lettre.
+
+  `aligneSurLeMot(mot,trou)` pose une sonde de taille nulle dans la lettre et
+  une autre dans le reste du mot — le bas d'une boîte vide tombe exactement
+  sur la ligne de base de sa ligne — et décale la lettre de l'écart trouvé.
+  Quel que soit le SENS de l'erreur, quelle que soit la police, quelle que
+  soit la mise à l'échelle de la page. En dessous d'un demi-pixel, on ne
+  bouge pas. On repasse après le glissement, après les vols, et quand la
+  police arabe arrive — sa ligne de base n'est pas celle de la police de
+  repli.
+
+  | | correction posée | écart restant |
+  |---|---|---|
+  | FORME · début | −1,6 px | −0,02 px |
+  | FORME · milieu | aucune (déjà juste) | −0,36 px |
+  | FORME · fin | +1,2 px | −0,06 px |
+  | récap · seule | −5,9 px | +0,03 px |
+  | récap · début | **+6,7 px** | +1,27 px |
+  | récap · fin | **+12,7 px** | −0,07 px |
+  | récap · milieu | **+5,5 px** | +0,97 px |
+
+  Les corrections vers le BAS confirment le client mot pour mot : les lettres
+  étaient trop hautes, jusqu'à 12,7 px.
+
+- **LA PAGE SE POSE AVANT D'ÊTRE VUE (v256).** « Certains cadres, comme dans
+  les contrôles, sont à la bonne taille puis rapetissent et remontent — on
+  arrive sur la page, la voix dit "où est…" et hop, tout devient plus petit. »
+
+  Les deux réglages se répondent : `calibreLesTextes` GROSSIT le texte jusqu'à
+  remplir sa colonne, ce qui rend la page plus haute ; `ajusteEcran` RÉDUIT
+  alors la page pour qu'elle tienne, ce qui rétrécit la colonne, donc le
+  texte… Il faut deux ou trois allers-retours pour que cela s'arrête. Ils se
+  faisaient par rendez-vous différés — 60, 120, **400**, 500 ms — c'est-à-dire
+  à l'écran, une image après l'autre, et le pas de 400 ms tombe juste quand la
+  voix commence. **Non reproduit sur le banc** (il converge du premier coup),
+  mais le mécanisme est écrit noir sur blanc dans le code.
+
+  On fait donc ces allers-retours TOUT DE SUITE, en boucle, avant le premier
+  dessin. Vérifié sur six pages : première image et état à 2,5 s **identiques
+  à 0 %**, coût de construction 30 à 137 ms. Les passes différées restent pour
+  ce qui arrive vraiment plus tard — police, image, barre d'adresse.
 
 - **LE SON NE SE DIT PLUS DEUX FOIS (v255).** Le client : « tu dis "avec cette
   voyelle, ça fait bou" puis on entend le son "bou" enregistré en studio. On

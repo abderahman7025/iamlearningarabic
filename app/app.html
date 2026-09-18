@@ -11079,7 +11079,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v255';
+var _VERSION_REPLI='v256';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15372,8 +15372,34 @@ function _boyScene(ca,reprise){
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
        la largeur de sa colonne qui la commande. On la reprend un peu plus
        tard, quand la police arabe est arrivee et que tout s'est pose. */
-    calibreLesTextes();
-    ajusteEcran();ajusteBientot();
+    /* ══ LA PAGE SE POSE AVANT D'ETRE VUE ══
+       Le client : « certains cadres, comme dans les contrôles, sont à la
+       bonne taille puis rapetissent et remontent — on arrive sur la page, la
+       voix dit "où est…" et hop, tout devient plus petit ».
+       Les deux réglages se répondent : `calibreLesTextes` GROSSIT le texte
+       jusqu'à ce qu'il remplisse sa colonne, ce qui rend la page plus haute,
+       et `ajusteEcran` RÉDUIT alors la page pour qu'elle tienne en hauteur —
+       ce qui rétrécit la colonne, donc le texte, donc… Il faut deux ou trois
+       allers-retours pour que cela s'arrête.
+       Ces allers-retours se faisaient par des rendez-vous différés — 60, 120,
+       400, 500 ms — c'est-à-dire À L'ÉCRAN, une image après l'autre : la page
+       se posait sous les yeux de l'enfant, et le pas de 400 ms tombe juste
+       quand la voix commence. On les fait donc maintenant TOUT DE SUITE, en
+       boucle, avant que le navigateur ne dessine quoi que ce soit. La
+       première image est déjà la bonne.
+       Les passes différées restent : elles ne servent plus qu'aux choses qui
+       arrivent vraiment plus tard — la police arabe, une image, la barre
+       d'adresse qui se replie — et ne trouvent plus rien à changer. */
+    function converge(tours){
+      var avant=_echelleCadre;
+      for(var p=0;p<(tours||4);p++){
+        calibreLesTextes();ajusteEcran();
+        /* Moins d'un demi pour cent d'écart : c'est posé. */
+        if(Math.abs(_echelleCadre-avant)<0.005)break;
+        avant=_echelleCadre;
+      }
+    }
+    converge();ajusteBientot();
     /* Quatre passes, pas deux : la mise a l'echelle de l'ecran
        (`ajusteEcran`) change la largeur reelle des cases APRES les premieres,
        et le mot du recapitulatif se calait alors sur une case qui n'existait
@@ -16170,6 +16196,54 @@ function _boyScene(ca,reprise){
      rapetissant pendant que le hublot s'efface.
      Les morceaux du mot sont ceux du recapitulatif : le compagnon qui
      s'attache de part et d'autre, selon la place qu'on montre. */
+  /* ══ LA LETTRE SE POSE AU NIVEAU DU MOT ══
+     Le client : « la lettre étudiée est toujours trop haute par rapport au
+     reste du mot qui vient s'ajouter à elle ; vérifie les deux hauteurs et
+     remets la lettre au niveau du mot ». Et le détail qui tranche : « la
+     lettre isolée reste à la bonne hauteur, mais pas les trois autres
+     formes » — ce sont justement les trois où le mot se construit AUTOUR
+     d'elle ; l'isolée, elle, reste seule dans son hublot.
+
+     Pourquoi elle dérive : la lettre du jour n'est pas un morceau de texte
+     comme ses voisines. C'est une boîte à part — un bloc en ligne, parfois
+     une pile de calques — et sa ligne de base ne tombe pas forcément là où
+     tombe celle du texte qui l'entoure. On a d'abord essayé de la calculer à
+     partir des mesures de la police ; c'est ce calcul qui se trompait.
+
+     On ne calcule donc plus : ON MESURE. Une sonde de taille nulle posée
+     dans la lettre, une autre dans le reste du mot — le bas d'une boîte
+     vide tombe exactement sur la ligne de base de sa ligne — et on décale la
+     lettre de l'écart trouvé. Quel que soit le sens de l'erreur, quelle que
+     soit la police, quelle que soit la mise à l'échelle de la page. */
+  function _baseSondee(el){
+    var s=document.createElement('i');
+    s.setAttribute('aria-hidden','true');
+    s.style.cssText='display:inline-block;width:0;height:0;overflow:hidden';
+    el.appendChild(s);
+    var b=s.getBoundingClientRect().bottom;
+    if(s.parentNode)s.parentNode.removeChild(s);
+    return b;
+  }
+  function aligneSurLeMot(mot,trou){
+    if(!mot||!trou||!mot.isConnected||!trou.isConnected)return;
+    /* Le voisin qui porte vraiment du texte : un mot peut n'avoir de
+       morceau que d'un seul côté de la lettre. */
+    var cote=null;
+    for(var i=0;i<mot.children.length;i++){
+      var c=mot.children[i];
+      if(c!==trou&&String(c.textContent||'').replace(/[\s\u200d]/g,'')){cote=c;break;}
+    }
+    if(!cote)return;
+    trou.style.position='relative';trou.style.top='0px';
+    var d=_baseSondee(cote)-_baseSondee(trou);
+    /* La page est mise à l'échelle : l'écart est mesuré à l'écran, le
+       décalage s'écrit en pixels de mise en page. */
+    var ech=mot.offsetWidth?(mot.getBoundingClientRect().width/mot.offsetWidth):1;
+    if(!(ech>0.05&&ech<20))ech=1;
+    d=d/ech;
+    /* Un demi-pixel n'est pas une faute : on ne bouge que si cela se voit. */
+    if(Math.abs(d)>0.5)trou.style.top=d.toFixed(2)+'px';
+  }
   api.forme=function(etape,glyph,son,html,fr,avant,apres,trou){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
@@ -16294,6 +16368,15 @@ function _boyScene(ca,reprise){
           lettre.style.padding='0';
           lettre.style.color='var(--sk-fonce)';
           t.textContent='';t.appendChild(lettre);t.classList.add('vu');
+          /* Elle vient d'entrer dans le mot : c'est maintenant qu'on regarde
+             si elle est au bon niveau. On y repasse une fois le glissement
+             fini, et quand la police arabe arrive — sa ligne de base n'est
+             pas celle de la police de repli. */
+          aligneSurLeMot(m,t);
+          N.plusTard(function(){aligneSurLeMot(m,t);},700);
+          N.plusTard(function(){aligneSurLeMot(m,t);},1600);
+          try{if(document.fonts&&document.fonts.ready)
+            document.fonts.ready.then(function(){aligneSurLeMot(m,t);});}catch(e){}
           var apres=lettre.getBoundingClientRect();
           var ech=lettre.offsetWidth?(apres.width/lettre.offsetWidth):1;
           if(!(ech>0.05&&ech<20))ech=1;
@@ -16437,6 +16520,19 @@ function _boyScene(ca,reprise){
         {vise:[mDebut,mSeule],dit:te('Donc il faut retenir ces deux formes.'),
          act:function(k){k();}}
       ];
+      /* Les quatre cases du tableau sont des mots, elles aussi : la lettre y
+         doit tomber sur la meme ligne que ses voisines. On repasse apres les
+         vols, qui remplacent la lettre par une pile de calques. */
+      function recaleLesQuatre(){
+        [mSeule,mDebut,mFin,mMilieu].forEach(function(o){
+          aligneSurLeMot(o.trou.parentNode,o.trou);
+        });
+      }
+      recaleLesQuatre();
+      N.plusTard(recaleLesQuatre,600);N.plusTard(recaleLesQuatre,1800);
+      N.plusTard(recaleLesQuatre,4200);
+      try{if(document.fonts&&document.fonts.ready)
+        document.fonts.ready.then(recaleLesQuatre);}catch(e){}
       var n=0;
       (function joue(){
         if(n>=temps.length){
