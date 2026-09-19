@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v258
+## OÙ ON EN EST — 19 septembre 2026, production en v259
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,47 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v258), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v259), du plus récent au plus ancien :**
+
+- **LA LETTRE ÉTAIT UNE BOÎTE, ELLE REDEVIENT DU TEXTE (v259).** Le client,
+  captures à l'appui, sur cinq mots et les deux habillages : « les lettres
+  dans le mot sont un peu au-dessus par rapport au reste du mot, et ce, quel
+  que soit le cours ».
+  **Ma sonde mesurait zéro — et elle avait raison.** Ce n'est pas la ligne de
+  base qui était décalée, c'est la BOÎTE. La case qui accueille la lettre
+  (`.rec-trou`) est un bloc en ligne : le navigateur ne la pose donc pas comme
+  du texte, il lui SYNTHÉTISE une ligne de base à partir de sa propre boîte.
+  Avec une lettre plus haute que son interligne — toutes les formes attachées,
+  dont le trait de liaison déborde — cette ligne tombe trop haut et la lettre
+  monte. Et la sonde, posée DANS la case, montait avec elle : elle mesurait
+  l'erreur depuis l'intérieur de l'erreur.
+  La case redevient `display:inline` sur les pages de forme : elle partage la
+  ligne de ses voisines, il n'y a plus rien à synthétiser ni à corriger après
+  coup. Vérifié sur alif (ابن), wāw (وردة) et yā (يدك).
+  **LEÇON : une sonde posée dans l'objet suspect ne peut pas le mesurer.**
+
+- **PLUS DE BANDE VIDE DANS LE CADRE (v259).** « Regarde le cadre dont je te
+  parle, la partie hachurée en rouge est vide. » Le cadre remplissait bien
+  l'écran depuis la v258 — c'est son CONTENU qui restait collé en haut. Le
+  panneau répartit maintenant sa hauteur : le contenu se centre, la barre de
+  boutons reste en bas. Écoute : contenu de 366 px centré dans 605, 82 px
+  au-dessus, bouton à 45 px du bas.
+
+- **LA VOYELLE SE DIT DEUX SECONDES APRÈS LE TEXTE (v259).** « Pour toutes les
+  voyelles, on doit attendre environ deux secondes après avoir lu le texte,
+  puis donner le son de la voyelle. » Le son partait 600 ms après l'ARRIVÉE de
+  la page, donc par-dessus la phrase. On attend la fin de la parole, puis deux
+  secondes de silence.
+
+- **RESTE À FAIRE, demandé le 19 septembre au matin (captures) :**
+  - tous les sons entourés en rouge — « a », « i », « ou », « b », « ba »,
+    « an »… — doivent passer par la voix du studio, dans TOUS les cours. Le
+    mécanisme existe (`ditSyl`, v258) ; il faut savoir quelles clés sont
+    enregistrées pour les voyelles NUES, sinon la synthèse lirait un signe
+    combinant ;
+  - remettre les mots dictés par le client aux étapes « quelle forme manque »,
+    « un mot avec … », « relie » — **les mots en question sont à redemander** ;
+  - poser les têtes d'animaux sur la page « un mot avec … ».
 
 - **LE PLAFOND BRIDAIT LES PAGES COURTES (v258).** Troisième passe sur les
   cadres, et cette fois ce n'était plus le calcul mais **la borne**. Une page

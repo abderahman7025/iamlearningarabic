@@ -3415,6 +3415,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   top:var(--hub-ligne,62%);
   border-top:3px dashed rgba(var(--sk-rgb-f),.42);z-index:0}
 .boy-hublot.ligne span{position:relative;z-index:1}
+/* ── PAS DE BANDE VIDE SOUS LE CONTENU ──
+   Le client, capture à l'appui : « regarde le cadre dont je te parle, la
+   partie hachurée en rouge est vide ». Le cadre remplit bien l'écran — c'est
+   son CONTENU qui restait collé en haut, laissant un grand blanc au-dessus
+   des boutons. Le panneau répartit donc sa hauteur : le contenu se centre
+   dans la place qu'il a, et la barre de boutons reste en bas. */
+.boy-panel{display:flex;flex-direction:column}
+.boy-panel>.boy-step{flex:0 0 auto}
+.boy-panel>.boy-barre{flex:0 0 auto;margin-top:auto}
+.boy-panel>.boy-2col{flex:1 1 auto;align-content:center}
 /* Ce qu'on touche pour réentendre : le mot déjà écrit en couleur. Pas de
    cadre, pas de barre — il grossit à peine sous le doigt, assez pour dire
    qu'il répond. */
@@ -11088,7 +11098,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v258';
+var _VERSION_REPLI='v259';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15172,7 +15182,16 @@ function _boyScene(ca,reprise){
       var n=document.createElement('div');n.className='boy-note';
       n.textContent=note||_HAB.noteBulle;p.appendChild(n);
     }
-    if(son)N.plusTard(function(){N.dire(son);},600);
+    /* ── ON LAISSE LE TEXTE FINIR, PUIS ON ATTEND ──
+       Le client : « pour toutes les voyelles, on doit attendre environ deux
+       secondes après avoir lu le texte, puis donner le son de la voyelle ».
+       Six cents millisecondes après l'ARRIVÉE de la page, le son tombait par
+       dessus la phrase. On attend maintenant que la page ait fini de parler,
+       PUIS deux secondes de silence — le temps que l'enfant regarde le signe
+       avant de l'entendre. */
+    if(son)N.plusTard(function(){
+      N.surSilence(function(){N.plusTard(function(){N.dire(son);},2000);});
+    },600);
     return h;
   }
   /* Piste d'atterrissage : reprend la « ligne d'écriture » du cours adulte.
@@ -16471,7 +16490,25 @@ function _boyScene(ca,reprise){
           lettre.style.transformOrigin='';
           lettre.style.padding='0';
           lettre.style.color='var(--sk-fonce)';
+          /* ══ LA LETTRE REDEVIENT DU TEXTE ══
+             Le client, capture à l'appui, sur cinq mots et les deux
+             habillages : « les lettres dans le mot sont un peu au-dessus par
+             rapport au reste du mot, et ce, quel que soit le cours ».
+             Ma sonde de ligne de base mesurait pourtant zéro — et elle avait
+             raison : ce n'est pas la ligne qui est décalée, c'est la BOÎTE.
+             La case qui accueille la lettre est un bloc en ligne
+             (`display:inline-block`) ; le navigateur ne la pose donc pas
+             comme du texte, il lui SYNTHÉTISE une ligne de base à partir de
+             sa propre boîte. Avec une lettre plus haute que son interligne —
+             c'est le cas de toutes les formes attachées, dont le trait de
+             liaison déborde — cette ligne de base tombe trop haut, et la
+             lettre monte. La sonde, posée dans la case, montait avec elle :
+             elle mesurait l'erreur depuis l'intérieur de l'erreur.
+             On enlève donc la boîte : la case redevient du texte ordinaire
+             (`display:inline`), elle partage la ligne de ses voisines et il
+             n'y a plus rien à synthétiser — ni à corriger après coup. */
           t.textContent='';t.appendChild(lettre);t.classList.add('vu');
+          t.style.display='inline';
           /* Elle vient d'entrer dans le mot : c'est maintenant qu'on regarde
              si elle est au bon niveau. On y repasse une fois le glissement
              fini, et quand la police arabe arrive — sa ligne de base n'est
