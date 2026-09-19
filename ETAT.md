@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v261
+## OÙ ON EN EST — 19 septembre 2026, production en v262
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,45 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v261), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v262), du plus récent au plus ancien :**
+
+- **UN TITRE QUI SE RÉTRÉCIT NE PEUT PLUS GRANDIR (v262).** « Les deux
+  premières pages ont le texte devenu tout petit. »
+  Mesure sur « MISSION 1 · BRIEFING » : panneau large de **659 px**, bloc de
+  titre large de **111** — il prend la largeur de SON TEXTE, rien ne l'étire.
+  `dispoLargeur()` mesurait donc la place disponible sur le texte lui-même :
+  la police calculée était celle qu'il avait déjà, et elle ne pouvait jamais
+  monter. Cercle fermé. On prend maintenant la plus grande des deux largeurs —
+  la sienne et celle du bloc qui la porte — sans dépasser son `max-width`.
+  **26 px → 46 px** sur ces pages.
+
+- **UNE SEULE TAILLE D'ÉCRITURE, CELLE DE « FORME 2/4 · DÉBUT » (v262).**
+  Demande du client. On ne cherche plus à REMPLIR la colonne — sa largeur
+  change d'une page à l'autre, puisque agrandir une page rétrécit sa largeur
+  de mise en page. On vise **38 px vus**, et on ne descend que si la phrase
+  déborderait. Sur 52 titres des deux cours : médiane 41, de 26 à 46, **aucune
+  page ne déborde**. Plafond d'agrandissement ramené à 1,45 : à 1,9 deux pages
+  sortaient de l'écran une fois les titres à leur vraie taille.
+
+- **LE STUDIO D'ABORD, LA SYNTHÈSE EN RELAIS (v262).** La règle, dictée par le
+  client : « quand il y a un mot, une lettre en arabe — arabe ou transcription
+  phonétique — elle doit être jouée depuis le studio ; et s'il n'y a pas
+  d'enregistrement, alors la synthèse prend le relais ».
+  `_phraseAvecSons` ne retire donc le son de la phrase QUE si
+  `_sonEnregistre` le trouve. Sinon la phrase reste entière. Jamais les deux,
+  jamais le vide. Vérifié : sans enregistrement → « Prenons la lettre ba.
+  Seule, elle se dit b. » ; avec → « Prenons la lettre » · بَ · « Seule, elle
+  se dit » · بْ. Tous les endroits passent par cette règle unique.
+
+- **SONS AJOUTÉS AU STUDIO (v262) :** le « n » du tanwīn, et chaque voyelle
+  seule (اَ اِ اُ) et doublée (اً اٍ اٌ) — sur l'alif, comme demandé.
+
+- **ET, TOUJOURS À SA DEMANDE :** la lettre du hublot **baissée** de 6 % de la
+  taille du texte (l'écart vient de l'encre, pas de la ligne de base : aucun
+  calcul ne pouvait le voir) ; les **quatre cases du récapitulatif remises
+  comme avant** ; le **dessin de l'animal monté dans le titre** de l'étape
+  finale, en grand, et retiré de dessus le hublot ; les points de **« à
+  retenir » décentrés** — je les avais centrés sans qu'il le demande.
 
 - **TOUTES LES PHRASES SONT REMISES (v261).** Le client, dans la minute :
   « tu remets tout de suite toutes les phrases qu'il y avait !! » — et il a

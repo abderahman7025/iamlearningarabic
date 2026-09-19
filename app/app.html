@@ -3415,6 +3415,10 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   top:var(--hub-ligne,62%);
   border-top:3px dashed rgba(var(--sk-rgb-f),.42);z-index:0}
 .boy-hublot.ligne span{position:relative;z-index:1}
+/* Le dessin de l'animal, posé dans le titre à la place de l'emoji : il suit
+   la ligne du texte et se met à sa taille, en plus gros. */
+.boy-bete-titre{height:1.9em;width:auto;vertical-align:-.55em;
+  object-fit:contain;display:inline-block}
 /* ── PAS DE BANDE VIDE SOUS LE CONTENU ──
    Le client, capture à l'appui : « regarde le cadre dont je te parle, la
    partie hachurée en rouge est vide ». Le cadre remplit bien l'écran — c'est
@@ -3425,6 +3429,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-panel>.boy-step{flex:0 0 auto}
 .boy-panel>.boy-barre{flex:0 0 auto;margin-top:auto}
 .boy-panel>.boy-2col{flex:1 1 auto;align-content:center}
+/* SAUF « À RETENIR » : le client n'a rien demandé de tel, et une liste se lit
+   du haut. On la laisse où elle est. */
+.boy-panel>.res-liste{flex:0 0 auto;align-self:stretch}
 /* Ce qu'on touche pour réentendre : le mot déjà écrit en couleur. Pas de
    cadre, pas de barre — il grossit à peine sous le doigt, assez pour dire
    qu'il répond. */
@@ -4128,7 +4135,7 @@ body.fond-espace .tuile-nom{color:#20242e}
    en dessous. Une écriture, ça s'aligne sur sa LIGNE. */
 .rec-mot{font-family:'Scheherazade New',serif;direction:rtl;white-space:nowrap;
   font-size:clamp(38px,13vh,94px);line-height:1.35;color:var(--sk-fonce);
-  min-height:1.4em;display:flex;align-items:baseline;justify-content:center}
+  min-height:1.4em;display:flex;align-items:center;justify-content:center}
 .rec-lbl{font-size:1.02rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
   color:rgba(var(--sk-rgb-f),.62);margin-top:2px}
 /* Le morceau qui manque, puis qui vient : il grandit à sa place au lieu de
@@ -11098,7 +11105,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v261';
+var _VERSION_REPLI='v262';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11156,21 +11163,19 @@ var _RUN_ARABE=/[؀-ۿﭐ-﷿ﹰ-﻿]+/g;
    « a », et « boun » n'est pas pris pour « b ».
    Rend la liste de ce qu'il faut dire, dans l'ordre. */
 function _phraseAvecSons(fr,sons){
-  /* ══ ON NE COUPE PLUS RIEN ══
-     Le client, immediatement : « tu remets tout de suite toutes les phrases
-     qu'il y avait ». En retirant le son de la phrase, je la laissais pendante
-     — « Prenons la lettre… » — et la ou l'enregistrement manque, on
-     n'entendait plus rien du tout.
-     La phrase est donc dite EN ENTIER, comme avant, et l'enregistrement du
-     client vient APRES elle. On l'entend deux fois, sa voix en dernier : pas
-     ideal, mais rien n'est perdu, et c'est lui qui tranchera. Le decoupage
-     est garde plus bas, pret a resservir. */
-  var tout=[String(fr||'')];
-  (sons||[]).forEach(function(p){if(p&&p[1])tout.push(p[1]);});
-  return tout.filter(function(x){return x;});
-  /* eslint-disable no-unreachable */
+  /* ══ LA REGLE, DITE PAR LE CLIENT ══
+     « Quand il y a un mot, une lettre en arabe — arabe ou transcription
+     phonetique — elle doit etre jouee depuis le studio ; et s'il n'y a pas
+     d'enregistrement, alors la synthese prend le relais. »
+     Donc : on ne retire le son de la phrase QUE si l'on a de quoi le
+     remplacer. La ou l'enregistrement manque, la phrase reste entiere et
+     c'est la synthese qui le dit — jamais les deux, jamais le vide. */
   var reste=String(fr||''),sortie=[];
   (sons||[]).forEach(function(p){
+    if(!p||!p[1])return;
+    var enregistre=false;
+    try{enregistre=!!_sonEnregistre(p[1]);}catch(e){}
+    if(!enregistre)return;
     var lat=String(p[0]).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     var re=new RegExp('(^|[\\s:\u00ab"\u201c])'+lat+'(?=[\\s.?!,;:\u00bb"\u201d]|$)');
     var m=reste.match(re);
@@ -14905,7 +14910,22 @@ function _boyScene(ca,reprise){
        bien plus etroit que le panneau — mesuree sur le parent, la police
        etait calculee pour une largeur qui n'existait pas, et les phrases
        sortaient du cadre. */
-    function dispoLargeur(){return t.clientWidth||(t.parentNode&&t.parentNode.clientWidth)||0;}
+    /* ── UN TITRE QUI SE RETRECIT NE PEUT PLUS GRANDIR ──
+       Mesure sur la page « MISSION 1 · BRIEFING » : panneau large de 659 px,
+       bloc de titre large de 111 — il prend la largeur de SON TEXTE, parce
+       que rien ne l'etire. On mesurait donc la place disponible sur le texte
+       lui-meme : la police calculee etait celle qu'il avait deja, et elle ne
+       pouvait jamais monter. C'est le « texte tout petit » des pages courtes.
+       On prend donc la plus grande des deux largeurs — la sienne et celle du
+       bloc qui le porte — sans jamais depasser son propre `max-width`, qui
+       existe pour le portrait et qu'il faut respecter. */
+    function dispoLargeur(){
+      var pere=(t.parentNode&&t.parentNode.clientWidth)||0;
+      var d=Math.max(t.clientWidth||0,pere);
+      var mx=parseFloat(getComputedStyle(t).maxWidth);
+      if(mx>0&&d>mx)d=mx;
+      return d||t.clientWidth||0;
+    }
     var col=dispoLargeur();
     if(!col||col<80)return;
     var lignes=t.querySelectorAll('.boy-ligne');
@@ -14959,12 +14979,28 @@ function _boyScene(ca,reprise){
     /* LA PLUS GROSSE POLICE QUI NE DEBORDE PAS. Les blocs ne se repliant
        pas, leur largeur suit la police : le calcul tombe juste du premier
        coup, et deux passes suffisent a rattraper l'arrondi. */
-    var px=Math.max(MIN,Math.min(MAX,REF*(col*0.97)/large));
+    /* ══ UNE SEULE TAILLE D'ÉCRITURE POUR TOUT LE COURS ══
+       Le client : « regarde la page forme 2/3 début de la leçon sur alif wāw
+       yā : la taille d'écriture doit être la référence pour tous les textes
+       des interfaces 6/11 ans ».
+       Il a raison, et cela répare du même coup ce que j'avais cassé. On
+       cherchait à REMPLIR la colonne. Or la colonne n'a pas la même largeur
+       d'une page à l'autre : pour agrandir une page courte, `ajusteEcran`
+       rétrécit sa largeur de mise en page — plus la page grossit, plus sa
+       colonne est étroite, et plus le texte calculé pour elle est petit.
+       Mesuré sur le cours des voyelles : 33 et 24 px vus sur les deux
+       premières pages, contre 37 à 51 ailleurs. C'est le « texte tout petit »
+       qu'il signale.
+       On vise donc une taille FIXE À L'ÉCRAN — la sienne, mesurée sur la page
+       de référence — et on ne descend en dessous que si la phrase déborderait
+       vraiment de sa colonne. */
+    var REFERENCE=38/ech;
+    var px=Math.max(MIN,Math.min(MAX,Math.min(REFERENCE,REF*(col*0.97)/large)));
     t.style.fontSize=px.toFixed(1)+'px';
     for(var g=0;g<4;g++){
       var trop=laPlusLarge(),dispo=dispoLargeur()||col;
       if(trop<1)break;
-      var vise=px*(dispo*0.97)/trop;
+      var vise=Math.min(REFERENCE,px*(dispo*0.97)/trop);
       if(Math.abs(vise-px)<0.4)break;
       px=Math.max(MIN,Math.min(MAX,vise));
       t.style.fontSize=px.toFixed(1)+'px';
@@ -15453,7 +15489,13 @@ function _boyScene(ca,reprise){
        On monte donc la borne. Sans risque : depuis la v257 l'agrandissement
        est CHERCHÉ en mesurant ce qui tient vraiment, il ne prendra jamais
        plus que la place disponible. */
-    var MIN=0.40,MAX=2.6,k;
+    /* Le plafond tient compte du texte : depuis que les titres atteignent
+       leur taille de reference, une page trop agrandie deborde — mesure, deux
+       pages du cours des voyelles sortaient de l'ecran a 1,9. A 1,45 aucune
+       ne deborde, et les pages courtes gardent un peu de vide en bas : c'est
+       le prix a payer pour que l'ecriture soit de la meme taille partout,
+       et c'est ce que le client a demande en premier. */
+    var MIN=0.40,MAX=1.45,k;
     if(poseEtMesure(MAX)<=dispo){k=MAX;}
     else{
       var bas2=MIN,haut2=MAX;
@@ -16425,6 +16467,19 @@ function _boyScene(ca,reprise){
     if(!(ech>0.05&&ech<20))ech=1;
     d=d/ech;
     /* Un demi-pixel n'est pas une faute : on ne bouge que si cela se voit. */
+    /* ── ET ON LA BAISSE ──
+       Le client, excédé et avec raison : « quand le mot apparaît et que la
+       lettre étudiée a pris sa place, baisse cette lettre de quelques
+       pixels ; l'écart en hauteur est toujours le même ».
+       Il a l'œil : l'écart NE VIENT PAS de la ligne de base — mesurée, elle
+       tombe juste — mais de l'encre. Une forme attachée écrite seule porte un
+       trait de liaison plus long qu'au milieu d'un mot, et ce trait monte :
+       coupé plus court, le reste de la lettre paraît plus haut. Aucun calcul
+       de mise en page ne peut le voir, c'est du dessin.
+       Alors on ne calcule pas : on baisse. Six centièmes de la taille du
+       texte — proportionnel, donc identique à l'œil quelle que soit la page
+       ou l'écran. */
+    d+=0.06*(parseFloat(getComputedStyle(mot).fontSize)||0);
     if(Math.abs(d)>0.5)trou.style.top=d.toFixed(2)+'px';
   }
   api.forme=function(etape,glyph,son,html,fr,avant,apres,trou){
@@ -19003,9 +19058,9 @@ function _boyVowelCourse(ca){
      La phrase française, la syllabe entre guillemets pour que la synthèse la
      saute, puis LA SYLLABE ARABE — dite par l'enregistrement du studio. */
   function ditSyl(cle,lat,signe){
-    /* La phrase ENTIERE — le client la veut telle qu'elle etait — puis sa
-       voix sur la syllabe. */
-    return [teF(cle,{son:lat}), LB+signe];
+    /* La phrase entiere si le son n'est pas enregistre ; sinon la phrase
+       coupee et la voix du client a sa place. Une seule regle pour tous. */
+    return _phraseAvecSons(teF(cle,{son:lat}),[[lat,LB+signe]]);
   }
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
@@ -19103,9 +19158,9 @@ function _boyVowelCourse(ca){
          FLOTTANT, exactement comme les pages du doublement. */
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
+       scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:[te('ou'),_sonNu('ُ')]},
+              {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('ou'),[['ou',_sonNu('ُ')]])},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Ça fait {son}','bou','ُ')},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Répète après moi : {son}','bou','ُ')}]}),
 
@@ -19125,9 +19180,9 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
+       scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:[te('a'),_sonNu('َ')]},
+              {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('a'),[['a',_sonNu('َ')]])},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Ça fait {son}','ba','َ')},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Répète après moi : {son}','ba','َ')}]}),
 
@@ -19145,9 +19200,9 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BAS}],
-       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
+       scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:[te('i'),_sonNu('ِ')]},
+              {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('i'),[['i',_sonNu('ِ')]])},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Ça fait {son}','bi','ِ')},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Répète après moi : {son}','bi','ِ')}]}),
 
@@ -19295,9 +19350,9 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(false);},
        temps:[
          {dit:te('Il existe seulement trois voyelles.')},
-         {dit:[te('a'),_sonNu('َ')], fait:function(el){grossit(el._sg[0].un);}},
-         {dit:[te('i'),_sonNu('ِ')], fait:function(el){grossit(el._sg[1].un);}},
-         {dit:[te('ou'),_sonNu('ُ')],fait:function(el){grossit(el._sg[2].un);}}
+         {dit:_phraseAvecSons(te('a'),[['a',_sonNu('َ')]]), fait:function(el){grossit(el._sg[0].un);}},
+         {dit:_phraseAvecSons(te('i'),[['i',_sonNu('ِ')]]), fait:function(el){grossit(el._sg[1].un);}},
+         {dit:_phraseAvecSons(te('ou'),[['ou',_sonNu('ُ')]]),fait:function(el){grossit(el._sg[2].un);}}
        ]},
       /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
          Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
@@ -19306,15 +19361,15 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(true);},
        temps:[
          {dit:te('Lorsque l\'on double une voyelle, on ajoute le son n.')},
-         {dit:[te('a'),_sonNu('َ')],      fait:function(el){grossit(el._sg[0].un);}},
+         {dit:_phraseAvecSons(te('a'),[['a',_sonNu('َ')]]),      fait:function(el){grossit(el._sg[0].un);}},
          {dit:te('devient')},
-         {dit:[te('an'),_sonNu('ً')],     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
-         {dit:[te('i'),_sonNu('ِ')],      fait:function(el){grossit(el._sg[1].un);}},
+         {dit:_phraseAvecSons(te('an'),[['an',_sonNu('ً')]]),     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
+         {dit:_phraseAvecSons(te('i'),[['i',_sonNu('ِ')]]),      fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('devient')},
-         {dit:[te('in'),_sonNu('ٍ')],     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
-         {dit:[te('ou'),_sonNu('ُ')],     fait:function(el){grossit(el._sg[2].un);}},
+         {dit:_phraseAvecSons(te('in'),[['in',_sonNu('ٍ')]]),     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
+         {dit:_phraseAvecSons(te('ou'),[['ou',_sonNu('ُ')]]),     fait:function(el){grossit(el._sg[2].un);}},
          {dit:te('devient')},
-         {dit:[te('oun'),_sonNu('ٌ')],    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
+         {dit:_phraseAvecSons(te('oun'),[['oun',_sonNu('ٌ')]]),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
        ]},
       {h:TB('Le <b>soukoun</b> : on ne dit que la lettre.'),
        vue:function(){return pisteUnSigne('ْ',true);},
@@ -19704,8 +19759,9 @@ function _boyLetterCourse(ca,idx,premiere){
       teF('Avec cette voyelle :<br>ça fait {son}',{son:q(v[1])}),
       /* Le son entre guillemets : la synthese s'arrete a « ça fait », et
          c'est l'enregistrement de la lettre voyellee qui le dit. */
-      teF('Avec cette voyelle, ça fait {son}',
-          {son:(lat+v[1]).toLowerCase()}),null,true));
+      _phraseAvecSons(teF('Avec cette voyelle, ça fait {son}',
+          {son:(lat+v[1]).toLowerCase()}),
+          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
       teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:b((lat+v[1]).toLowerCase()),ou:b(combien)}),
@@ -19738,8 +19794,9 @@ function _boyLetterCourse(ca,idx,premiere){
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
       teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])}),
-      teF('Avec deux {signe}, ça fait {son}',
-          {signe:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
+      _phraseAvecSons(teF('Avec deux {signe}, ça fait {son}',
+          {signe:v[2],son:(lat+v[1]).toLowerCase()}),
+          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
@@ -19756,8 +19813,8 @@ function _boyLetterCourse(ca,idx,premiere){
       muette?(TB('Avec le soukoun,<br>on ne <b>prononce rien</b> ⭕'))
             :(TBF('Avec le soukoun, on ne prononce<br>que le son de la lettre : {son} ⭕',{son:q('')})),
       muette?te('Avec le soukoun, on ne prononce rien.')
-            :teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',
-                 {son:latMin})));
+            :_phraseAvecSons(teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',
+                 {son:latMin}),[[latMin,A+'\u0652']])));
     /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
        fait donc tracer sur les formes début et milieu, les seules où il
        apparaît. */
@@ -19778,9 +19835,10 @@ function _boyLetterCourse(ca,idx,premiere){
          le font deja les pages de voyelle et de tanwin. Le TEXTE ne bouge
          pas — c'est la demande du client. */
       sc.push(B.obs(teF('ALLONGEMENT {n}/3',{n:n+1}),A+v[0],A+v[0],teF('Avec {lettre} :<br>ça fait {son} 🎵',{lettre:b(v[2]),son:q(v[1])}),
-        teF('Avec {lettre}, on obtient {son}',
+        _phraseAvecSons(teF('Avec {lettre}, on obtient {son}',
             {lettre:[te('l\'alif'),te('le waw'),te('le ya')][n],
-             son:(lat+v[1]).toLowerCase()})));
+             son:(lat+v[1]).toLowerCase()}),
+            [[(lat+v[1]).toLowerCase(),A+v[0]]])));
       if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
       /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au
@@ -19810,7 +19868,15 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Le mot */
   sc.push(function(api){
     var p=api.panneau(te('ÉTAPE FINALE · LE MOT'));
-    api.titre(p,teF('Un mot avec {lettre} {emoji}',{lettre:b(L.name),emoji:L.emoji}),te('Voici un mot avec cette lettre.'));
+    /* ── LE DESSIN DANS LE TITRE, ET NULLE PART AILLEURS ──
+       Le client : « enlève le guguss qui est au-dessus du hublot, et mets-le
+       à la place de celui après le texte, en gros ». Le dessin remplace donc
+       l'emoji du titre, à la même place, en grand — et la ligne au-dessus du
+       hublot disparaît. */
+    var _dessin=null;try{_dessin=imageDuMot(A);}catch(e4){}
+    api.titre(p,teF('Un mot avec {lettre} {emoji}',{lettre:b(L.name),
+      emoji:_dessin?('<img src="'+_dessin+'" alt="" aria-hidden="true" class="boy-bete-titre">'):L.emoji}),
+      te('Voici un mot avec cette lettre.'));
     /* ── L'ANIMAL NE MANGE PLUS LA PLACE DU TEXTE ──
        Le client : « étape finale, le mot : le texte est toujours trop petit
        par rapport aux autres pages ». La page portait un emoji de quatre
@@ -19825,18 +19891,9 @@ function _boyLetterCourse(ca,idx,premiere){
        le monde des animaux. C'est le même animal que le mot : le lion pour
        l'alif, la rose pour le wāw. L'emoji reste en secours pour les lettres
        qui n'ont pas reçu de dessin. */
-    var _img=null;try{_img=imageDuMot(A);}catch(e2){}
-    var e=document.createElement('div');
-    if(_img){
-      e.style.cssText='line-height:0;margin:2px 0 4px';
-      var _b=document.createElement('img');
-      _b.src=_img;_b.alt='';_b.setAttribute('aria-hidden','true');
-      _b.style.cssText='height:86px;width:auto;max-width:42%;object-fit:contain;display:inline-block';
-      e.appendChild(_b);
-    }else{
-      e.style.cssText='font-size:2rem;line-height:1.1';e.textContent=L.emoji;
-    }
-    p.appendChild(e);
+    /* Plus rien au-dessus du hublot : le dessin est monté dans le titre.
+       L'emoji ne reparaît que pour une lettre sans dessin, et là il est déjà
+       dans le titre — donc rien ici non plus. */
     api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     /* ── LA LETTRE EST ACQUISE ICI, PAS A LA FIN ──
@@ -22528,6 +22585,18 @@ var ADMIN_SOUNDS = [
   {ar:'Choisis ta lettre !',label:'Choisis ta lettre !'},
   {ar:'Retour',label:'Retour'},
   {ar:'Où est le son',label:'Où est le son…'},
+  /* ── LES SONS DEMANDÉS PAR LE CLIENT, À ENREGISTRER ──
+     « Page à retenir : mettre sur studio le son "n" que je ferai, ainsi que
+     chaque voyelle seule et doublée. » La voyelle seule se fait entendre sur
+     l'alif — son choix. Tant qu'un de ces sons n'est pas enregistré, la
+     phrase reste dite en entier par la synthèse : rien ne disparaît. */
+  {ar:'n',label:'le son « n » (du tanwīn)'},
+  {ar:'اَ',label:'voyelle seule : a  (اَ)'},
+  {ar:'اِ',label:'voyelle seule : i  (اِ)'},
+  {ar:'اُ',label:'voyelle seule : ou (اُ)'},
+  {ar:'اً',label:'voyelle doublée : an  (اً)'},
+  {ar:'اٍ',label:'voyelle doublée : in  (اٍ)'},
+  {ar:'اٌ',label:'voyelle doublée : oun (اٌ)'},
   {ar:'Youpi !',label:'Youpi !'},
   {ar:'Ouiii !',label:'Ouiii !'},
   {ar:'Super !',label:'Super !'},
