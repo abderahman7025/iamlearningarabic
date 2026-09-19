@@ -3392,6 +3392,8 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* De l'air autour d'une lettre arabe posée dans une phrase française : sans
    cela le mot d'avant et la virgule d'après viennent se coller dessus. */
 .ar-air{display:inline-block;margin:0 .34em;line-height:1}
+/* Un signe seul : presque le double, pour qu'il ne se colle pas au mot. */
+.ar-signe{margin:0 .62em}
 /* Un mot sur lequel on peut appuyer, au fil d'une phrase du cours. */
 .boy-lien{color:var(--sk-vif);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .boy-lien:active{opacity:.6}
@@ -11086,7 +11088,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v257';
+var _VERSION_REPLI='v258';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11131,7 +11133,17 @@ function _sansCercle(t){return String(t===null||t===undefined?'':t).split(_VOW_B
    rend de l'air, partout où une phrase est affichée. */
 var _RUN_ARABE=/[؀-ۿﭐ-﷿ﹰ-﻿]+/g;
 function _airAutourArabe(html){
-  return String(html).replace(_RUN_ARABE,function(m){return '<span class="ar-air">'+m+'</span>';});
+  return String(html).replace(_RUN_ARABE,function(m){
+    /* ── UNE VOYELLE SEULE DEMANDE PLUS D'AIR QU'UN MOT ──
+       Le client : « il faut mettre un espace après une voyelle arabe
+       lorsqu'elle est dans une phrase au milieu de mots en une autre
+       langue ». Un signe n'a pas de corps : posé entre deux mots français,
+       il se lit comme un accent tombé sur le mot d'à côté. Le mot arabe, lui,
+       se distingue tout seul par son dessin — il garde son air ordinaire. */
+    var seul=false;
+    try{seul=_signeSeul(m);}catch(e){}
+    return '<span class="ar-air'+(seul?' ar-signe':'')+'">'+m+'</span>';
+  });
 }
 /* Un signe seul (voyelle, tanwīn, soukoun) n'a pas de corps : à la taille
    d'une lettre il est minuscule. On le grossit là où il s'affiche seul. */
@@ -14248,6 +14260,8 @@ var _TE={
 'Parfois, tu verras la hamzah sur le {lettre}.':{en:'Sometimes you will see the hamza on the {lettre}.',es:'A veces verás la hamza sobre el {lettre}.',de:'Manchmal siehst du die Hamza auf dem {lettre}.',nl:'Soms zie je de hamza op de {lettre}.',it:'A volte vedrai la hamza sul {lettre}.',pt:'Às vezes verás a hamza sobre o {lettre}.',ru:'Иногда ты увидишь хамзу на {lettre}.',tr:'Bazen hamzeyi {lettre} üstünde göreceksin.',zh:'有时你会看到哈姆扎写在 {lettre} 上。',id:'Kadang kamu melihat hamzah di atas {lettre}.',ur:'کبھی ہمزہ کو {lettre} کے اوپر دیکھو گے۔',hi:'कभी हमज़ा को {lettre} के ऊपर देखोगे।'},
 'SUPPORT {n}/3 · TRACÉ':{en:'SEAT {n}/3 · WRITING',es:'SOPORTE {n}/3 · TRAZO',de:'TRÄGER {n}/3 · SCHREIBEN',nl:'DRAGER {n}/3 · SCHRIJVEN',it:'SUPPORTO {n}/3 · TRACCIATO',pt:'SUPORTE {n}/3 · TRAÇADO',ru:'ОПОРА {n}/3 · ПИСЬМО',tr:'KÜRSÜ {n}/3 · YAZMA',zh:'座位 {n}/3 · 书写',id:'DUDUKAN {n}/3 · MENULIS',ur:'کرسی {n}/۳ · لکھائی',hi:'आधार {n}/3 · लेखन'},
 'Avec cette voyelle :<br>ça fait {son}':{en:'With this vowel:<br>it says {son}',es:'Con esta vocal:<br>suena {son}',de:'Mit diesem Vokal:<br>das klingt wie {son}',nl:'Met deze klinker:<br>dat klinkt als {son}',it:'Con questa vocale:<br>suona {son}',pt:'Com esta vogal:<br>soa {son}',ru:'С этой огласовкой:<br>звучит {son}',tr:'Bu hareke ile:<br>sesi {son}',zh:'加上这个符号：<br>读作 {son}',id:'Dengan vokal ini:<br>bunyinya {son}',ur:'اس حرکت کے ساتھ:<br>آواز {son}',hi:'इस स्वर के साथ:<br>ध्वनि {son}'},
+'Ça fait {son}':{en:'It says {son}',es:'Suena {son}',de:'Das klingt wie {son}',nl:'Dat klinkt als {son}',it:'Suona {son}',pt:'Soa {son}',ru:'Звучит {son}',tr:'Sesi {son}',zh:'读作 {son}',id:'Bunyinya {son}',ur:'آواز {son}',hi:'ध्वनि {son}'},
+'Répète après moi : {son}':{en:'Repeat after me: {son}',es:'Repite conmigo: {son}',de:'Sprich mir nach: {son}',nl:'Zeg me na: {son}',it:'Ripeti dopo di me: {son}',pt:'Repete comigo: {son}',ru:'Повторяй за мной: {son}',tr:'Benden sonra tekrarla: {son}',zh:'跟我读：{son}',id:'Ulangi setelah saya: {son}',ur:'میرے بعد دہراؤ: {son}',hi:'मेरे बाद दोहराओ: {son}'},
 'Avec cette voyelle, ça fait {son}':{en:'With this vowel, it says {son}',es:'Con esta vocal, suena {son}',de:'Mit diesem Vokal, das klingt wie {son}',nl:'Met deze klinker, dat klinkt als {son}',it:'Con questa vocale, suona {son}',pt:'Com esta vogal, soa {son}',ru:'С этой огласовкой звучит {son}',tr:'Bu hareke ile sesi {son}',zh:'加上这个符号，读作 {son}',id:'Dengan vokal ini, bunyinya {son}',ur:'اس حرکت کے ساتھ آواز {son}',hi:'इस स्वर के साथ ध्वनि {son}'},
 'VOYELLE {n}/3 · TRACÉ':{en:'VOWEL {n}/3 · WRITING',es:'VOCAL {n}/3 · TRAZO',de:'VOKAL {n}/3 · SCHREIBEN',nl:'KLINKER {n}/3 · SCHRIJVEN',it:'VOCALE {n}/3 · TRACCIATO',pt:'VOGAL {n}/3 · TRAÇADO',ru:'ОГЛАСОВКА {n}/3 · ПИСЬМО',tr:'HAREKE {n}/3 · YAZMA',zh:'元音 {n}/3 · 书写',id:'VOKAL {n}/3 · MENULIS',ur:'حرکت {n}/۳ · لکھائی',hi:'स्वर {n}/3 · लेखन'},
 'Trace cette syllabe dans {ou}.':{en:'Write this syllable {ou}.',es:'Traza esta sílaba {ou}.',de:'Schreibe diese Silbe {ou}.',nl:'Schrijf deze lettergreep {ou}.',it:'Traccia questa sillaba {ou}.',pt:'Traça esta sílaba {ou}.',ru:'Напиши этот слог {ou}.',tr:'Bu heceyi {ou} yaz.',zh:'{ou}写出这个音节。',id:'Tulis suku kata ini {ou}.',ur:'یہ حرفی جوڑ {ou} لکھو۔',hi:'यह अक्षर-जोड़ {ou} लिखो।'},
@@ -15346,7 +15360,19 @@ function _boyScene(ca,reprise){
       }
       return b-haut;
     }
-    var MIN=0.40,MAX=1.7,k;
+    /* ── LE PLAFOND BRIDAIT LES PAGES COURTES ──
+       Le client, troisième fois : « les pages contrôles et écoute, le cadre
+       ne prend pas toute la hauteur de l'écran comme les autres pages ».
+       Ce n'était plus le calcul — c'était la BORNE. Une page de contrôle n'a
+       qu'une question et trois bulles : pour remplir un grand écran il lui
+       faut deux fois et demie sa taille, et on lui en accordait au plus une
+       fois sept dixièmes. Les pages chargées — le tracé, le récapitulatif —
+       n'atteignaient jamais ce plafond et remplissaient, elles. D'où l'écart
+       qu'il voit d'une page à l'autre.
+       On monte donc la borne. Sans risque : depuis la v257 l'agrandissement
+       est CHERCHÉ en mesurant ce qui tient vraiment, il ne prendra jamais
+       plus que la place disponible. */
+    var MIN=0.40,MAX=2.6,k;
     if(poseEtMesure(MAX)<=dispo){k=MAX;}
     else{
       var bas2=MIN,haut2=MAX;
@@ -15861,7 +15887,16 @@ function _boyScene(ca,reprise){
         pose(n);n++;
         var suite=(n<etapes.length)?joue:null;
         if(e.dit){
-          N.dire(e.dit);
+          /* ── LA PHRASE, PUIS LA VOIX DU CLIENT SUR LA SYLLABE ──
+             Le client : « il faut lire les mots arabes "ba" (ou autres) avec
+             le son enregistré dans studio, DANS TOUS LES COURS ».
+             Un état peut donc porter PLUSIEURS paroles : la phrase française
+             d'abord, la syllabe arabe ensuite — celle-ci par `direToujours`,
+             qui va chercher l'enregistrement. La file étant servie dans
+             l'ordre, l'état suivant attend que TOUT soit dit. */
+          [].concat(e.dit).forEach(function(_p,_i){
+            if(_i)N.direToujours(_p);else N.dire(_p);
+          });
           if(suite)N.plusTard(function(){N.surSilence(suite);},250);
           else N.plusTard(function(){N.surSilence(function(){_sceneParle--;});},250);
         }else if(suite)N.plusTard(suite,e.d||1200);
@@ -18867,6 +18902,12 @@ function _boyVowelCourse(ca){
 
   var LB='ب';
   var mF='َ', mK='ِ', mD='ُ', mS='ْ';
+  /* ── CE QUI SE DIT D'UNE SYLLABE ──
+     La phrase française, la syllabe entre guillemets pour que la synthèse la
+     saute, puis LA SYLLABE ARABE — dite par l'enregistrement du studio. */
+  function ditSyl(cle,lat,signe){
+    return [teF(cle,{son:'« '+lat+' »'}), LB+signe];
+  }
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
      les signes se tiennent tout pres d'elle, au-dessus et en dessous. */
@@ -18961,11 +19002,11 @@ function _boyVowelCourse(ca){
          FLOTTANT, exactement comme les pages du doublement. */
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:te('b')},
+       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
               {L:[0],P:1,F:[0],dit:te('ou')},
-              {L:[0],P:1,F:[0],t:'bou',dit:te('Ça fait bou.')},
-              {L:[0],P:1,F:[0],t:'bou',dit:te('Répète après moi : bou.')}]}),
+              {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Ça fait {son}','bou','ُ')},
+              {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Répète après moi : {son}','bou','ُ')}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
@@ -18982,11 +19023,11 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:te('b')},
+       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
               {L:[0],P:1,F:[0],dit:te('a')},
-              {L:[0],P:1,F:[0],t:'ba',dit:te('Ça fait ba.')},
-              {L:[0],P:1,F:[0],t:'ba',dit:te('Répète après moi : ba.')}]}),
+              {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Ça fait {son}','ba','َ')},
+              {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Répète après moi : {son}','ba','َ')}]}),
 
     B.illustre(te('ÉTAPE 5'),
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
@@ -19001,11 +19042,11 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BAS}],
-       scene:[{L:[0],P:1,dit:te('b')},
+       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
               {L:[0],P:1,F:[0],dit:te('i')},
-              {L:[0],P:1,F:[0],t:'bi',dit:te('Ça fait bi.')},
-              {L:[0],P:1,F:[0],t:'bi',dit:te('Répète après moi : bi.')}]}),
+              {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Ça fait {son}','bi','ِ')},
+              {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Répète après moi : {son}','bi','ِ')}]}),
 
     B.brief(te('ÉCRITURE'),
       TB('Maintenant, on va<br>les <b>écrire</b> ! Tu es '+PRET+' ?'),
@@ -19081,7 +19122,7 @@ function _boyVowelCourse(ca){
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
        scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Ici on a bou.')},
               {L:[0],P:1,F:[0,1],t:'boun',dit:te('Avec une deuxième voyelle, ça donne boun.')},
-              {L:[0],P:1,F:[0,1],t:'boun',dit:te('Répète après moi : boun.')}]}),
+              {L:[0],P:1,F:[0,1],t:'boun',dit:ditSyl('Répète après moi : {son}','boun','ٌ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
@@ -19093,7 +19134,7 @@ function _boyVowelCourse(ca){
        flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
        scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ici on a ba.')},
               {L:[0],P:1,F:[0,1],t:'ban',dit:te('Avec une deuxième voyelle, ça donne ban.')},
-              {L:[0],P:1,F:[0,1],t:'ban',dit:te('Répète après moi : ban.')}]}),
+              {L:[0],P:1,F:[0,1],t:'ban',dit:ditSyl('Répète après moi : {son}','ban','ً')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
@@ -19104,7 +19145,7 @@ function _boyVowelCourse(ca){
        flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
        scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Ici on a bi.')},
               {L:[0],P:1,F:[0,1],t:'bin',dit:te('Avec une deuxième voyelle, ça donne bin.')},
-              {L:[0],P:1,F:[0,1],t:'bin',dit:te('Répète après moi : bin.')}]}),
+              {L:[0],P:1,F:[0,1],t:'bin',dit:ditSyl('Répète après moi : {son}','bin','ٍ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
@@ -19140,7 +19181,7 @@ function _boyVowelCourse(ca){
        scene:[{L:[0],P:1,d:1000},
               {L:[0],P:1,F:[0],bat:1,
                dit:te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.')},
-              {L:[0],P:1,F:[0],bat:1,t:'b',dit:te('Répète après moi : b.')}]}),
+              {L:[0],P:1,F:[0],bat:1,t:'b',dit:ditSyl('Répète après moi : {son}','b','ْ')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
       TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
@@ -19666,7 +19707,15 @@ function _boyLetterCourse(ca,idx,premiere){
   sc.push(function(api){
     var p=api.panneau(te('ÉTAPE FINALE · LE MOT'));
     api.titre(p,teF('Un mot avec {lettre} {emoji}',{lettre:b(L.name),emoji:L.emoji}),te('Voici un mot avec cette lettre.'));
-    var e=document.createElement('div');e.style.cssText='font-size:4rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
+    /* ── L'ANIMAL NE MANGE PLUS LA PLACE DU TEXTE ──
+       Le client : « étape finale, le mot : le texte est toujours trop petit
+       par rapport aux autres pages ». La page portait un emoji de quatre
+       rem, un hublot et une note : elle était si haute qu'elle ne pouvait
+       plus être agrandie, et son titre restait petit quand les autres pages
+       grossissaient. L'emoji est un décor — il est déjà dans le titre. On le
+       réduit de moitié, la page gagne la hauteur, et le texte grossit
+       d'autant. */
+    var e=document.createElement('div');e.style.cssText='font-size:2rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
     api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     /* ── LA LETTRE EST ACQUISE ICI, PAS A LA FIN ──

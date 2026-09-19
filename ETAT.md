@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v257
+## OÙ ON EN EST — 19 septembre 2026, production en v258
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,59 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v257), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v258), du plus récent au plus ancien :**
+
+- **LE PLAFOND BRIDAIT LES PAGES COURTES (v258).** Troisième passe sur les
+  cadres, et cette fois ce n'était plus le calcul mais **la borne**. Une page
+  de contrôle n'a qu'une question et trois bulles : pour remplir un grand
+  écran il lui faut deux fois et demie sa taille, et on ne lui en accordait
+  au plus qu'une fois sept dixièmes. Les pages chargées — tracé,
+  récapitulatif — n'atteignaient jamais ce plafond et remplissaient, elles :
+  d'où l'écart d'une page à l'autre que le client voyait.
+  La borne passe de **1,7 à 2,6**. Sans risque : depuis la v257
+  l'agrandissement est CHERCHÉ en mesurant ce qui tient vraiment.
+  Mesuré sur le cours de l'alif, fenêtre de 768 px — **les 44 pages, aucune
+  ne déborde**, et il ne reste que 11 à 14 px sous le cadre partout :
+  contrôle ×1,41 (565 px), écoute ×1,53 (556 px), mot à trou ×1,79.
+
+- **LA PAGE DU MOT : L'ANIMAL NE MANGE PLUS LA PLACE DU TEXTE (v258).**
+  « Le texte est toujours trop petit par rapport aux autres pages. » La page
+  portait un emoji de 4 rem EN PLUS du hublot et de la note : si haute qu'elle
+  ne pouvait plus être agrandie. L'emoji est un décor — il est déjà dans le
+  titre — il passe à 2 rem. La page gagne la hauteur : **×1,15 → ×1,38, titre
+  de 39 à 46 px à l'écran.**
+
+- **LES SYLLABES ARABES SE DISENT AVEC LA VOIX DU STUDIO, DANS TOUS LES COURS
+  (v258).** « Il faut lire les mots arabes "ba" (ou autres) avec le son
+  enregistré dans studio, DANS TOUS LES COURS. » La v255 l'avait fait pour le
+  cours des lettres ; le cours des VOYELLES disait encore « Ça fait bou » par
+  la synthèse.
+  Un état de scène peut désormais porter PLUSIEURS paroles : la phrase
+  française d'abord, la syllabe arabe ensuite, par `direToujours` qui va
+  chercher l'enregistrement. Dix endroits convertis via `ditSyl(clé,lat,signe)`
+  — la syllabe part entre guillemets, donc la synthèse la saute.
+  **Et le « b » seul**, que la synthèse lisait « bé » : c'est la consonne pure,
+  celle du soukoun. La phrase française est vide, il ne reste que sa voix.
+  Vérifié en journalisant ce que la page demande : `بْ` · « plus » · « Ça
+  fait » · `بُ` · « Répète après moi » · `بُ`.
+  **Deux clés à trous ajoutées et traduites** en douze langues : `Ça fait
+  {son}` et `Répète après moi : {son}`.
+
+- **UNE VOYELLE SEULE PREND PLUS D'AIR (v258).** « Il faut mettre un espace
+  après une voyelle arabe lorsqu'elle est dans une phrase au milieu de mots en
+  une autre langue. » Un signe n'a pas de corps : posé entre deux mots
+  français il se lit comme un accent tombé sur le mot d'à côté. `_airAutourArabe`
+  reconnaît maintenant le signe seul (`_signeSeul`) et lui donne **0,62 em de
+  chaque côté au lieu de 0,34**. Un MOT arabe garde son air ordinaire : il se
+  distingue déjà par son dessin.
+
+- **NON REPRODUIT : la hauteur des lettres début · milieu · fin.** Vérifié sur
+  alif, wāw et yā, pages de forme : la sonde de ligne de base mesure **0,00 px
+  d'écart** entre la lettre et le reste du mot, et la correction automatique
+  ne pose donc aucun décalage. Ce que le client voit n'est pas un décalage de
+  LIGNE DE BASE — c'est peut-être l'encre elle-même (il l'explique : le trait
+  de liaison est plus long écrit seul que dans le mot, et il monte un peu).
+  **Il faut une capture d'écran de sa part pour viser juste.**
 
 - **LE CADRE SE CHERCHE AU LIEU DE SE CALCULER (v257).** « Les cadres des
   pages contrôles, écoute et rappel sont toujours petits » — le grand
