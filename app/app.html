@@ -3426,6 +3426,17 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    des boutons. Le panneau répartit donc sa hauteur : le contenu se centre
    dans la place qu'il a, et la barre de boutons reste en bas. */
 .boy-panel{display:flex;flex-direction:column}
+/* ── UNE COLONNE SOUPLE NE DOIT PAS RETRECIR SES BLOCS ──
+   Le client : « page récapitulatif, remets les cases grosses et larges comme
+   avant ». En rendant le panneau souple pour supprimer la bande vide, j'ai
+   transformé ses blocs en éléments flexibles : ceux qui se centraient par des
+   marges automatiques — la grille des quatre formes — se sont rétrécis à leur
+   contenu. Mesuré : grille de 352 px dans un panneau de 1336, au lieu des 880
+   qu'elle avait. Les cases en faisaient les frais.
+   On leur rend donc toute la largeur ; les décors posés en absolu et les
+   boutons gardent la leur. */
+.boy-panel>*{width:100%}
+.boy-panel>.boy-perso,.boy-panel>.boy-bravo,.boy-panel>.boy-btn{width:auto}
 .boy-panel>.boy-step{flex:0 0 auto}
 .boy-panel>.boy-barre{flex:0 0 auto;margin-top:auto}
 .boy-panel>.boy-2col{flex:1 1 auto;align-content:center}
@@ -11105,7 +11116,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v262';
+var _VERSION_REPLI='v263';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14994,7 +15005,10 @@ function _boyScene(ca,reprise){
        On vise donc une taille FIXE À L'ÉCRAN — la sienne, mesurée sur la page
        de référence — et on ne descend en dessous que si la phrase déborderait
        vraiment de sa colonne. */
-    var REFERENCE=38/ech;
+    /* 48 px vus : la plus grande taille que les pages atteignent sans
+       deborder. Le client : « essaie de faire la meme grosse taille de
+       police, et uniquement pour les pages ou ca deborde, baisse un peu ». */
+    var REFERENCE=48/ech;
     var px=Math.max(MIN,Math.min(MAX,Math.min(REFERENCE,REF*(col*0.97)/large)));
     t.style.fontSize=px.toFixed(1)+'px';
     for(var g=0;g<4;g++){
@@ -15646,9 +15660,28 @@ function _boyScene(ca,reprise){
     if(max<44)max=44;
     bs.forEach(function(b){b.style.flex='0 0 '+max+'px';b.style.width=max+'px';});
   }
+  /* ── LES BOUTONS ONT UNE SEULE TAILLE, EUX AUSSI ──
+     Le client : « des fois ils sont enormes, des fois minuscules ». Leur
+     ecriture suivait l'agrandissement de la page : mesure, 21 px vus sur la
+     plupart des pages, 12 sur le recapitulatif, qui est reduit. On les ecrit
+     donc a une taille FIXE A L'ECRAN, comme les titres. Le texte peut alors
+     tenir sur moins de lignes et le bouton reste large : c'est ce qu'il
+     demande — « grossis, quitte a mettre plus de mots par ligne ». */
+  function taillePourLesBoutons(){
+    var ech=1;
+    try{
+      var w2=wrap.clientWidth;
+      if(w2>0){var q=wrap.getBoundingClientRect().width/w2;if(q>0.2&&q<6)ech=q;}
+    }catch(e){}
+    [].slice.call(wrap.querySelectorAll('.boy-barre .boy-btn')).forEach(function(b){
+      b.style.fontSize=(22/ech).toFixed(1)+'px';
+      b.style.whiteSpace='normal';
+    });
+  }
   function calibreLesTextes(){
     [].slice.call(wrap.querySelectorAll('.boy-titre')).forEach(remplitLaLargeur);
     [].slice.call(wrap.querySelectorAll('.rec-mot')).forEach(remplitLeMot);
+    taillePourLesBoutons();
     [].slice.call(wrap.querySelectorAll('.boy-barre')).forEach(egaliseLaRangee);
   }
   /* ── LE MOT DU RECAPITULATIF, AUSSI GROS QUE SA CASE LE PERMET ──
@@ -16449,7 +16482,7 @@ function _boyScene(ca,reprise){
     if(s.parentNode)s.parentNode.removeChild(s);
     return b;
   }
-  function aligneSurLeMot(mot,trou){
+  function aligneSurLeMot(mot,trou,baisse){
     if(!mot||!trou||!mot.isConnected||!trou.isConnected)return;
     /* Le voisin qui porte vraiment du texte : un mot peut n'avoir de
        morceau que d'un seul côté de la lettre. */
@@ -16479,10 +16512,18 @@ function _boyScene(ca,reprise){
        Alors on ne calcule pas : on baisse. Six centièmes de la taille du
        texte — proportionnel, donc identique à l'œil quelle que soit la page
        ou l'écran. */
-    d+=0.06*(parseFloat(getComputedStyle(mot).fontSize)||0);
+    /* ── COMBIEN ON BAISSE, ET QUAND ──
+       Le client, apres essai : « remets la forme seule comme elle etait,
+       ainsi que la forme debut pour les lettres qui ne s'attachent pas apres
+       (alif wāw dāl ḏāl rā zāy) ; pour le reste, remonte de la moitie ».
+       C'est exact et cela se comprend : ces formes-la n'ont PAS de trait de
+       liaison a droite — rien n'est coupe, rien ne remonte. Le reglage arrive
+       donc du dehors : zero pour elles, trois centiemes pour les autres. */
+    var _b=(baisse===undefined)?0.03:baisse;
+    d+=_b*(parseFloat(getComputedStyle(mot).fontSize)||0);
     if(Math.abs(d)>0.5)trou.style.top=d.toFixed(2)+'px';
   }
-  api.forme=function(etape,glyph,son,html,fr,avant,apres,trou){
+  api.forme=function(etape,glyph,son,html,fr,avant,apres,trou,baisse){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       /* LE HUBLOT NE S'EN VA PAS. Tout se joue dedans : la lettre y est
@@ -16628,11 +16669,11 @@ function _boyScene(ca,reprise){
              si elle est au bon niveau. On y repasse une fois le glissement
              fini, et quand la police arabe arrive — sa ligne de base n'est
              pas celle de la police de repli. */
-          aligneSurLeMot(m,t);
-          N.plusTard(function(){aligneSurLeMot(m,t);},700);
-          N.plusTard(function(){aligneSurLeMot(m,t);},1600);
+          aligneSurLeMot(m,t,baisse);
+          N.plusTard(function(){aligneSurLeMot(m,t,baisse);},700);
+          N.plusTard(function(){aligneSurLeMot(m,t,baisse);},1600);
           try{if(document.fonts&&document.fonts.ready)
-            document.fonts.ready.then(function(){aligneSurLeMot(m,t);});}catch(e){}
+            document.fonts.ready.then(function(){aligneSurLeMot(m,t,baisse);});}catch(e){}
           var apres=lettre.getBoundingClientRect();
           var ech=lettre.offsetWidth?(apres.width/lettre.offsetWidth):1;
           if(!(ech>0.05&&ech<20))ech=1;
@@ -16780,9 +16821,13 @@ function _boyScene(ca,reprise){
          doit tomber sur la meme ligne que ses voisines. On repasse apres les
          vols, qui remplacent la lettre par une pile de calques. */
       function recaleLesQuatre(){
-        [mSeule,mDebut,mFin,mMilieu].forEach(function(o){
-          aligneSurLeMot(o.trou.parentNode,o.trou);
-        });
+        /* Meme regle qu'aux pages de forme : la seule ne bouge pas, ni la
+           debut quand la lettre ne s'attache pas apres. */
+        var _sansTrait=(formes[1]===formes[0]);
+        [[mSeule,0],[mDebut,_sansTrait?0:0.03],[mFin,0.03],[mMilieu,0.03]]
+          .forEach(function(o){
+            aligneSurLeMot(o[0].trou.parentNode,o[0].trou,o[1]);
+          });
       }
       recaleLesQuatre();
       N.plusTard(recaleLesQuatre,600);N.plusTard(recaleLesQuatre,1800);
@@ -19159,7 +19204,12 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
-              {L:[0],P:1,dit:te('plus')},
+              {L:[0],P:1,dit:(function(){
+                /* Le signe « + ». La synthese francaise lit « plus » sans
+                   son s — « plu ». Le client veut l'entendre en entier : on
+                   lui donne l'orthographe qui se prononce. Les autres langues
+                   gardent leur mot. */
+                var _p=te('plus');return (_p==='plus')?'plusse':_p;})()},
               {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('ou'),[['ou',_sonNu('ُ')]])},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Ça fait {son}','bou','ُ')},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Répète après moi : {son}','bou','ُ')}]}),
@@ -19181,7 +19231,12 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
-              {L:[0],P:1,dit:te('plus')},
+              {L:[0],P:1,dit:(function(){
+                /* Le signe « + ». La synthese francaise lit « plus » sans
+                   son s — « plu ». Le client veut l'entendre en entier : on
+                   lui donne l'orthographe qui se prononce. Les autres langues
+                   gardent leur mot. */
+                var _p=te('plus');return (_p==='plus')?'plusse':_p;})()},
               {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('a'),[['a',_sonNu('َ')]])},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Ça fait {son}','ba','َ')},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Répète après moi : {son}','ba','َ')}]}),
@@ -19201,7 +19256,12 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BAS}],
        scene:[{L:[0],P:1,dit:_phraseAvecSons(te('b'),[['b',LB+'ْ']])},
-              {L:[0],P:1,dit:te('plus')},
+              {L:[0],P:1,dit:(function(){
+                /* Le signe « + ». La synthese francaise lit « plus » sans
+                   son s — « plu ». Le client veut l'entendre en entier : on
+                   lui donne l'orthographe qui se prononce. Les autres langues
+                   gardent leur mot. */
+                var _p=te('plus');return (_p==='plus')?'plusse':_p;})()},
               {L:[0],P:1,F:[0],dit:_phraseAvecSons(te('i'),[['i',_sonNu('ِ')]])},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Ça fait {son}','bi','ِ')},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Répète après moi : {son}','bi','ِ')}]}),
@@ -19278,7 +19338,7 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
-       scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Ici on a bou.')},
+       scene:[{L:[0],P:1,F:[0],t:'bou',dit:_phraseAvecSons(te('Ici on a bou.'),[['bou',LB+'ُ']])},
               {L:[0],P:1,F:[0,1],t:'boun',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne boun.'),[['boun',LB+'ٌ']])},
               {L:[0],P:1,F:[0,1],t:'boun',dit:ditSyl('Répète après moi : {son}','boun','ٌ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
@@ -19290,7 +19350,7 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
-       scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ici on a ba.')},
+       scene:[{L:[0],P:1,F:[0],t:'ba',dit:_phraseAvecSons(te('Ici on a ba.'),[['ba',LB+'َ']])},
               {L:[0],P:1,F:[0,1],t:'ban',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne ban.'),[['ban',LB+'ً']])},
               {L:[0],P:1,F:[0,1],t:'ban',dit:ditSyl('Répète après moi : {son}','ban','ً')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
@@ -19301,7 +19361,7 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
-       scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Ici on a bi.')},
+       scene:[{L:[0],P:1,F:[0],t:'bi',dit:_phraseAvecSons(te('Ici on a bi.'),[['bi',LB+'ِ']])},
               {L:[0],P:1,F:[0,1],t:'bin',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne bin.'),[['bin',LB+'ٍ']])},
               {L:[0],P:1,F:[0,1],t:'bin',dit:ditSyl('Répète après moi : {son}','bin','ٍ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
@@ -19680,8 +19740,12 @@ function _boyLetterCourse(ca,idx,premiere){
         _ap=(n===1||n===2)?_apres:'';
         _tr=f.form;
       }
+      /* Une forme sans trait de liaison a droite ne remonte pas : on ne la
+         baisse donc pas. C'est le cas de la forme seule, et de la forme
+         debut des lettres qui ne s'attachent pas a la suivante. */
+      var _baisse=(n===0||(n===1&&!attache))?0:0.03;
       sc.push(B.forme(teF('FORME{rep} · {forme}',{rep:rep,forme:NOMS[n]}),
-        f.form,S,_dit.h,_dit.f,_av,_ap,_tr));
+        f.form,S,_dit.h,_dit.f,_av,_ap,_tr,_baisse));
     }
     sc.push(formeUnique
       ? B.tracer(te('FORME · TRACÉ'),f.form,TB('Trace la <b>lettre</b> ✍️'),te('Trace la lettre.'))
@@ -19876,7 +19940,7 @@ function _boyLetterCourse(ca,idx,premiere){
     var _dessin=null;try{_dessin=imageDuMot(A);}catch(e4){}
     api.titre(p,teF('Un mot avec {lettre} {emoji}',{lettre:b(L.name),
       emoji:_dessin?('<img src="'+_dessin+'" alt="" aria-hidden="true" class="boy-bete-titre">'):L.emoji}),
-      te('Voici un mot avec cette lettre.'));
+      [te('Voici un mot avec cette lettre.'),L.wordAr]);
     /* ── L'ANIMAL NE MANGE PLUS LA PLACE DU TEXTE ──
        Le client : « étape finale, le mot : le texte est toujours trop petit
        par rapport aux autres pages ». La page portait un emoji de quatre
@@ -19894,7 +19958,9 @@ function _boyLetterCourse(ca,idx,premiere){
     /* Plus rien au-dessus du hublot : le dessin est monté dans le titre.
        L'emoji ne reparaît que pour une lettre sans dessin, et là il est déjà
        dans le titre — donc rien ici non plus. */
-    api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
+    /* Le mot est dit par le titre, juste apres sa phrase : le hublot ne le
+       redit donc pas tout seul. Le toucher, lui, le fait toujours entendre. */
+    api.hublot(p,L.wordAr,null,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     /* ── LA LETTRE EST ACQUISE ICI, PAS A LA FIN ──
        Le cours est vu : la lettre compte. Les exercices qui suivent restent

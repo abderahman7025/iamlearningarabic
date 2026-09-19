@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v262
+## OÙ ON EN EST — 20 septembre 2026, production en v263
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,37 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v262), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v263), du plus récent au plus ancien :**
+
+- **LES CASES DU RÉCAPITULATIF, ET POURQUOI ELLES AVAIENT MAIGRI (v263).**
+  En rendant le panneau souple (v259, pour supprimer la bande vide), j'ai
+  transformé ses blocs en éléments flexibles : ceux qui se centraient par des
+  MARGES AUTOMATIQUES se sont rétrécis à leur contenu. Mesuré : grille de
+  **352 px dans un panneau de 1336**, au lieu de ses 880. Les cases passaient
+  de 270 à 97 px. Les blocs du panneau reprennent toute la largeur ; les
+  décors posés en absolu et les boutons gardent la leur.
+  **LEÇON : passer un conteneur en `flex` change le dimensionnement de TOUS
+  ses enfants, y compris ceux qu'on ne regardait pas.**
+
+- **COMBIEN ON BAISSE LA LETTRE, ET QUAND (v263).** Le client : « remets la
+  forme seule comme elle était, ainsi que la forme début pour les lettres qui
+  ne s'attachent pas après — alif wāw dāl ḏāl rā zāy ; pour le reste, remonte
+  de la moitié ». C'est exact et cela s'explique : ces formes-là n'ont pas de
+  trait de liaison à droite, rien n'est coupé, rien ne remonte. Le réglage
+  vient donc du cours : **zéro** pour elles, **0,03 em** pour les autres.
+
+- **UNE SEULE TAILLE, POUR LE TEXTE ET POUR LES BOUTONS (v263).** Les boutons
+  suivaient l'agrandissement de la page : mesuré, **21 px vus** sur la plupart
+  des pages et **12** sur le récapitulatif, qui est réduit. Ils sont
+  maintenant écrits à taille fixe à l'écran, comme les titres : **26–27 px
+  partout**. Le texte vise 48 px vus au lieu de 38 ; sur 52 titres, médiane
+  40, et **aucune page ne déborde**.
+
+- **ENCORE DES SONS AU STUDIO (v263) :** « Ici on a … » (doublement) et « ça
+  fait … » (tanwīn) passent par l'enregistrement ; l'étape finale dit le mot
+  arabe juste après sa phrase — et le hublot ne le redit plus tout seul.
+  Le « + » des pages de composition se dit **« plusse »** : la synthèse
+  française lisait « plu ». Les autres langues gardent leur mot.
 
 - **UN TITRE QUI SE RÉTRÉCIT NE PEUT PLUS GRANDIR (v262).** « Les deux
   premières pages ont le texte devenu tout petit. »
