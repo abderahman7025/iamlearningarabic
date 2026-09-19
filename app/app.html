@@ -11098,7 +11098,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v260';
+var _VERSION_REPLI='v261';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11156,6 +11156,19 @@ var _RUN_ARABE=/[؀-ۿﭐ-﷿ﹰ-﻿]+/g;
    « a », et « boun » n'est pas pris pour « b ».
    Rend la liste de ce qu'il faut dire, dans l'ordre. */
 function _phraseAvecSons(fr,sons){
+  /* ══ ON NE COUPE PLUS RIEN ══
+     Le client, immediatement : « tu remets tout de suite toutes les phrases
+     qu'il y avait ». En retirant le son de la phrase, je la laissais pendante
+     — « Prenons la lettre… » — et la ou l'enregistrement manque, on
+     n'entendait plus rien du tout.
+     La phrase est donc dite EN ENTIER, comme avant, et l'enregistrement du
+     client vient APRES elle. On l'entend deux fois, sa voix en dernier : pas
+     ideal, mais rien n'est perdu, et c'est lui qui tranchera. Le decoupage
+     est garde plus bas, pret a resservir. */
+  var tout=[String(fr||'')];
+  (sons||[]).forEach(function(p){if(p&&p[1])tout.push(p[1]);});
+  return tout.filter(function(x){return x;});
+  /* eslint-disable no-unreachable */
   var reste=String(fr||''),sortie=[];
   (sons||[]).forEach(function(p){
     var lat=String(p[0]).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
@@ -18990,7 +19003,9 @@ function _boyVowelCourse(ca){
      La phrase française, la syllabe entre guillemets pour que la synthèse la
      saute, puis LA SYLLABE ARABE — dite par l'enregistrement du studio. */
   function ditSyl(cle,lat,signe){
-    return [teF(cle,{son:'« '+lat+' »'}), LB+signe];
+    /* La phrase ENTIERE — le client la veut telle qu'elle etait — puis sa
+       voix sur la syllabe. */
+    return [teF(cle,{son:lat}), LB+signe];
   }
 
   /* Les hauteurs, en pourcentage du cadre. La ligne d'ecriture est a 52 % :
@@ -19088,9 +19103,9 @@ function _boyVowelCourse(ca){
          FLOTTANT, exactement comme les pages du doublement. */
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
+       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:_sonNu('ُ')},
+              {L:[0],P:1,F:[0],dit:[te('ou'),_sonNu('ُ')]},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Ça fait {son}','bou','ُ')},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Répète après moi : {son}','bou','ُ')}]}),
 
@@ -19110,9 +19125,9 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
-       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
+       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:_sonNu('َ')},
+              {L:[0],P:1,F:[0],dit:[te('a'),_sonNu('َ')]},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Ça fait {son}','ba','َ')},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Répète après moi : {son}','ba','َ')}]}),
 
@@ -19130,9 +19145,9 @@ function _boyVowelCourse(ca){
       false,
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BAS}],
-       scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
+       scene:[{L:[0],P:1,dit:[te('b'),LB+'ْ']},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:_sonNu('ِ')},
+              {L:[0],P:1,F:[0],dit:[te('i'),_sonNu('ِ')]},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Ça fait {son}','bi','ِ')},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Répète après moi : {son}','bi','ِ')}]}),
 
@@ -19280,9 +19295,9 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(false);},
        temps:[
          {dit:te('Il existe seulement trois voyelles.')},
-         {dit:_sonNu('َ'), fait:function(el){grossit(el._sg[0].un);}},
-         {dit:_sonNu('ِ'), fait:function(el){grossit(el._sg[1].un);}},
-         {dit:_sonNu('ُ'),fait:function(el){grossit(el._sg[2].un);}}
+         {dit:[te('a'),_sonNu('َ')], fait:function(el){grossit(el._sg[0].un);}},
+         {dit:[te('i'),_sonNu('ِ')], fait:function(el){grossit(el._sg[1].un);}},
+         {dit:[te('ou'),_sonNu('ُ')],fait:function(el){grossit(el._sg[2].un);}}
        ]},
       /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
          Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
@@ -19291,15 +19306,15 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(true);},
        temps:[
          {dit:te('Lorsque l\'on double une voyelle, on ajoute le son n.')},
-         {dit:_sonNu('َ'),      fait:function(el){grossit(el._sg[0].un);}},
+         {dit:[te('a'),_sonNu('َ')],      fait:function(el){grossit(el._sg[0].un);}},
          {dit:te('devient')},
-         {dit:_sonNu('ً'),     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
-         {dit:_sonNu('ِ'),      fait:function(el){grossit(el._sg[1].un);}},
+         {dit:[te('an'),_sonNu('ً')],     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
+         {dit:[te('i'),_sonNu('ِ')],      fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('devient')},
-         {dit:_sonNu('ٍ'),     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
-         {dit:_sonNu('ُ'),     fait:function(el){grossit(el._sg[2].un);}},
+         {dit:[te('in'),_sonNu('ٍ')],     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
+         {dit:[te('ou'),_sonNu('ُ')],     fait:function(el){grossit(el._sg[2].un);}},
          {dit:te('devient')},
-         {dit:_sonNu('ٌ'),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
+         {dit:[te('oun'),_sonNu('ٌ')],    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
        ]},
       {h:TB('Le <b>soukoun</b> : on ne dit que la lettre.'),
        vue:function(){return pisteUnSigne('ْ',true);},
@@ -19690,7 +19705,7 @@ function _boyLetterCourse(ca,idx,premiere){
       /* Le son entre guillemets : la synthese s'arrete a « ça fait », et
          c'est l'enregistrement de la lettre voyellee qui le dit. */
       teF('Avec cette voyelle, ça fait {son}',
-          {son:'« '+(lat+v[1]).toLowerCase()+' »'}),null,true));
+          {son:(lat+v[1]).toLowerCase()}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
       teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:b((lat+v[1]).toLowerCase()),ou:b(combien)}),
@@ -19724,7 +19739,7 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
       teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])}),
       teF('Avec deux {signe}, ça fait {son}',
-          {signe:v[2],son:'« '+(lat+v[1]).toLowerCase()+' »'}),null,true));
+          {signe:v[2],son:(lat+v[1]).toLowerCase()}),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
@@ -19742,7 +19757,7 @@ function _boyLetterCourse(ca,idx,premiere){
             :(TBF('Avec le soukoun, on ne prononce<br>que le son de la lettre : {son} ⭕',{son:q('')})),
       muette?te('Avec le soukoun, on ne prononce rien.')
             :teF('Avec le soukoun, on ne prononce que le son de la lettre : {son}',
-                 {son:'« '+latMin+' »'})));
+                 {son:latMin})));
     /* Le soukoun ne se pose jamais sur la dernière lettre d'un mot : on le
        fait donc tracer sur les formes début et milieu, les seules où il
        apparaît. */
@@ -19765,7 +19780,7 @@ function _boyLetterCourse(ca,idx,premiere){
       sc.push(B.obs(teF('ALLONGEMENT {n}/3',{n:n+1}),A+v[0],A+v[0],teF('Avec {lettre} :<br>ça fait {son} 🎵',{lettre:b(v[2]),son:q(v[1])}),
         teF('Avec {lettre}, on obtient {son}',
             {lettre:[te('l\'alif'),te('le waw'),te('le ya')][n],
-             son:'« '+(lat+v[1]).toLowerCase()+' »'})));
+             son:(lat+v[1]).toLowerCase()})));
       if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
       /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au

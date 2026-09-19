@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v260
+## OÙ ON EN EST — 19 septembre 2026, production en v261
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,27 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v260), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v261), du plus récent au plus ancien :**
+
+- **TOUTES LES PHRASES SONT REMISES (v261).** Le client, dans la minute :
+  « tu remets tout de suite toutes les phrases qu'il y avait !! » — et il a
+  raison. En retirant le son de la phrase pour que la synthèse ne le dise
+  pas, je laissais la phrase PENDANTE (« Prenons la lettre… ») et, là où
+  l'enregistrement manque, on n'entendait plus rien du tout. J'avais échangé
+  un défaut d'oreille contre une perte de contenu : mauvais marché.
+  **La phrase est de nouveau dite EN ENTIER**, partout — cours des lettres et
+  cours des voyelles —, et l'enregistrement du client vient APRÈS elle.
+  Rétabli : les quatre phrases de la v255 (voyelle · tanwīn · soukoun ·
+  allongement), les dix de la v258, les treize états de décomposition, et le
+  découpage de la v260.
+  Vérifié : « Prenons la lettre ba. Seule, elle se dit b. » → بَ → بْ.
+  **Le découpage `_phraseAvecSons` est conservé dans le code, prêt à
+  resservir** — il ne sert plus, mais il marche : la vraie question est de
+  savoir quelles clés sont enregistrées, et c'est au client de le dire.
+
+  **LEÇON.** Retirer du contenu pour corriger un défaut de forme est un
+  échange perdant tant qu'on n'a pas la preuve que le remplaçant existe. Ici,
+  la preuve, c'est la liste des enregistrements du studio — que je n'ai pas.
 
 - **TOUS LES SONS PASSENT PAR LA VOIX DU STUDIO (v260).** « Tout ce que j'ai
   entouré est censé être dit par les voix enregistrées, et ce, pour tous les
