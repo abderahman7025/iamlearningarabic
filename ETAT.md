@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 19 septembre 2026, production en v259
+## OÙ ON EN EST — 19 septembre 2026, production en v260
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,38 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v259), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v260), du plus récent au plus ancien :**
+
+- **TOUS LES SONS PASSENT PAR LA VOIX DU STUDIO (v260).** « Tout ce que j'ai
+  entouré est censé être dit par les voix enregistrées, et ce, pour tous les
+  cours. »
+  On ne crée PAS de phrase nouvelle à traduire : `_phraseAvecSons(fr,[[lat,
+  arabe],…])` **découpe la phrase existante**, dans la langue où elle est
+  déjà écrite, et intercale l'enregistrement. Le son n'est reconnu que s'il
+  est isolé — précédé d'un espace, d'un deux-points ou d'un guillemet, suivi
+  d'une ponctuation ou d'une fin : « n'a aucune » ne contient donc pas le son
+  « a », et « boun » n'est pas pris pour « b ».
+  `titre` et les états de scène acceptent désormais une LISTE : ce qui porte
+  de l'arabe part par `direToujours` (l'enregistrement), le reste par la
+  synthèse. Dix-neuf endroits convertis dans le cours des voyelles.
+  **Voyelle nue = la voyelle sur l'alif** (`_sonNu`), choix du client :
+  اَ · اِ · اُ · اً · اٍ · اٌ.
+  **PIÈGE, et il m'a coûté une passe** : `reste.indexOf(m[0])` retrouve le
+  MÊME TEXTE plus loin, pas la correspondance. « Si ce trait est au dessus…»
+  se coupait sur le « a » de « au ». C'est `m.index` qu'il faut.
+
+- **LE DESSIN DE L'ANIMAL SUR LA PAGE DU MOT (v260).** « Mets aussi les têtes
+  d'animaux données pour la photo du milieu, tous les cours. » Ce sont les
+  trente-cinq dessins du monde des animaux : `imageDuMot(A)` donne le lion
+  pour l'alif, la rose pour le wāw. L'emoji reste en secours pour une lettre
+  sans dessin.
+
+- **LES VRAIS MOTS DANS LE MOT À TROU (v260).** « Remets les mots que je
+  t'avais donnés — tu les retrouves dans les hublots seule · début · milieu ·
+  fin. » Ce sont ceux de `_MOTS_FORMES`. L'exercice fabriquait des mots avec
+  un compagnon (اب, باب, بابا) ; il reprend maintenant le mot que l'enfant
+  vient de voir, découpé par `_placeDansMot`. Vérifié sur l'alif : « سمعنا »
+  avec son alif manquant. Le schéma fabriqué reste en secours.
 
 - **LA LETTRE ÉTAIT UNE BOÎTE, ELLE REDEVIENT DU TEXTE (v259).** Le client,
   captures à l'appui, sur cinq mots et les deux habillages : « les lettres

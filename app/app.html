@@ -11098,7 +11098,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v259';
+var _VERSION_REPLI='v260';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11142,6 +11142,44 @@ function _sansCercle(t){return String(t===null||t===undefined?'':t).split(_VOW_B
    chasse autour d'elle, et la ponctuation qui suit vient buter dessus. On lui
    rend de l'air, partout où une phrase est affichée. */
 var _RUN_ARABE=/[؀-ۿﭐ-﷿ﹰ-﻿]+/g;
+/* ══ LA PHRASE, ET LA VOIX DU CLIENT SUR CHACUN DE SES SONS ══
+   Le client, capture a l'appui : « tout ce que j'ai entoure est cense etre
+   dit par les voix enregistrees dans le studio, et ce, pour tous les cours ».
+   Une phrase de lecon nomme un son en lettres francaises — « il se prononce
+   a », « on dira juste b ». La synthese le lisait a sa facon : « be » pour le
+   b, un « an » nasal pour le tanwin. Il faut donc COUPER la phrase autour de
+   ses sons, et intercaler l'enregistrement.
+   On ne cree pas de nouvelle phrase a traduire : on decoupe CELLE QUI EXISTE,
+   dans la langue ou elle est deja ecrite. Le son n'est reconnu que s'il est
+   isole — precede d'un espace, d'un deux-points ou d'un guillemet, suivi
+   d'une ponctuation ou d'une fin. « n'a aucune » ne contient donc pas le son
+   « a », et « boun » n'est pas pris pour « b ».
+   Rend la liste de ce qu'il faut dire, dans l'ordre. */
+function _phraseAvecSons(fr,sons){
+  var reste=String(fr||''),sortie=[];
+  (sons||[]).forEach(function(p){
+    var lat=String(p[0]).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re=new RegExp('(^|[\\s:\u00ab"\u201c])'+lat+'(?=[\\s.?!,;:\u00bb"\u201d]|$)');
+    var m=reste.match(re);
+    if(!m)return;
+    /* LA POSITION DE LA CORRESPONDANCE, pas celle du meme texte plus loin.
+       `indexOf` retrouvait « a » dans « au dessus » et coupait la phrase au
+       mauvais endroit — mesure : « Si ce trait est / a / u dessus… ». */
+    var i=m.index;
+    sortie.push(reste.slice(0,i+m[1].length));
+    sortie.push(p[1]);
+    reste=reste.slice(i+m[0].length);
+  });
+  sortie.push(reste);
+  return sortie.map(function(x){
+    return String(x).replace(/\s+([.?!,;:])/g,'$1')
+                    .replace(/^[\s.?!,;:]+/,'')
+                    .replace(/\s{2,}/g,' ').trim();
+  }).filter(function(x){return x;});
+}
+/* Une voyelle NUE se fait entendre sur l'alif : c'est le choix du client —
+   « pour une voyelle nue, prends la meme voyelle avec alif ». */
+function _sonNu(signe){return '\u0627'+signe;}
 function _airAutourArabe(html){
   return String(html).replace(_RUN_ARABE,function(m){
     /* ── UNE VOYELLE SEULE DEMANDE PLUS D'AIR QU'UN MOT ──
@@ -14772,6 +14810,17 @@ function _boyScene(ca,reprise){
       if(!N.enPause())lanceEnchainement();
     });
   }
+  /* Une parole peut etre une phrase, ou une LISTE : morceaux de phrase et
+     sons arabes en alternance. Ce qui porte de l'arabe passe par
+     `direToujours`, qui va chercher l'enregistrement du studio ; le reste
+     passe par la synthese. */
+  var _ARABE=/[\u0600-\u06FF]/;
+  function _ditLaSuite(p){
+    [].concat(p).forEach(function(x){
+      if(x===null||x===undefined||x==='')return;
+      if(_ARABE.test(String(x)))N.direToujours(x);else N.dire(x);
+    });
+  }
   function titre(p,html,fr){
     var t=document.createElement('div');t.className='boy-titre';
     /* UN ESPACE DERRIERE CHAQUE COUPURE. En paysage la CSS cache les
@@ -14818,7 +14867,7 @@ function _boyScene(ca,reprise){
     if(fr!==false){
       _sceneParle++;
       N.plusTard(function(){
-        try{N.dire(fr||html);}finally{_sceneParle--;}
+        try{_ditLaSuite(fr||html);}finally{_sceneParle--;}
       },420);
     }
     /* ── LA PLUS GRANDE POLICE QUI REMPLIT LA COLONNE ──
@@ -15913,9 +15962,7 @@ function _boyScene(ca,reprise){
              d'abord, la syllabe arabe ensuite — celle-ci par `direToujours`,
              qui va chercher l'enregistrement. La file étant servie dans
              l'ordre, l'état suivant attend que TOUT soit dit. */
-          [].concat(e.dit).forEach(function(_p,_i){
-            if(_i)N.direToujours(_p);else N.dire(_p);
-          });
+          _ditLaSuite(e.dit);
           if(suite)N.plusTard(function(){N.surSilence(suite);},250);
           else N.plusTard(function(){N.surSilence(function(){_sceneParle--;});},250);
         }else if(suite)N.plusTard(suite,e.d||1200);
@@ -18988,7 +19035,8 @@ function _boyVowelCourse(ca){
 
     B.illustre(te('ÉTAPE 1 · LA LETTRE'),
       TB('Prenons la lettre <b>« ba »</b>.<br>Seule, elle se dit « <b>b</b> ».'),
-      te('Prenons la lettre ba. Seule, elle se dit b.'),
+      _phraseAvecSons(te('Prenons la lettre ba. Seule, elle se dit b.'),
+                      [['ba',LB+'َ'],['b',LB+'ْ']]),
       {calques:[LB],
        scene:[{P:1,d:900},{L:[0],P:1,d:1400},{L:[0],P:1,t:'ba',d:2200}]}),
 
@@ -19007,7 +19055,8 @@ function _boyVowelCourse(ca){
 
     B.illustre(te('ÉTAPE 3 · LA PREMIÈRE'),
       TB('Voici la première :<br>elle se dit « <b>ou</b> ». Elle<br>est toujours <b>au dessus</b>.'),
-      te('Voici la première : elle se dit ou. Elle est toujours au dessus.'),
+      _phraseAvecSons(te('Voici la première : elle se dit ou. Elle est toujours au dessus.'),
+                      [['ou',_sonNu('ُ')]]),
       /* PAS DE LETTRE ICI : on presente la voyelle, elle seule. Elle reste
          donc en grand d'un bout a l'autre — descendue sous la ligne, barree,
          puis remontee au-dessus, qui est sa place. La lettre viendra a la
@@ -19041,14 +19090,15 @@ function _boyVowelCourse(ca){
        flottants:[{m:mD,c:CDA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:te('ou')},
+              {L:[0],P:1,F:[0],dit:_sonNu('ُ')},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Ça fait {son}','bou','ُ')},
               {L:[0],P:1,F:[0],t:'bou',dit:ditSyl('Répète après moi : {son}','bou','ُ')}]}),
 
     /* On commence par la fatha SEULE, en grand : c'est elle qu'on presente. */
     B.illustre(te('ÉTAPE 4'),
       TB('Si ce trait est au dessus<br>d’une lettre, il se<br>prononce « <b>a</b> ».'),
-      te('Si ce trait est au dessus d\'une lettre, il se prononce a.'),
+      _phraseAvecSons(te('Si ce trait est au dessus d\'une lettre, il se prononce a.'),
+                      [['a',_sonNu('َ')]]),
       /* La ligne d'ecriture est la des le debut, et le trait se montre
          AU-DESSUS d'elle : c'est de cela qu'on parle. Aucune lettre — la
          phrase presente le TRAIT, et il reste grand jusqu'au bout. */
@@ -19062,13 +19112,14 @@ function _boyVowelCourse(ca){
        flottants:[{m:mF,c:CFA,x:50,y:HAUT}],
        scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:te('a')},
+              {L:[0],P:1,F:[0],dit:_sonNu('َ')},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Ça fait {son}','ba','َ')},
               {L:[0],P:1,F:[0],t:'ba',dit:ditSyl('Répète après moi : {son}','ba','َ')}]}),
 
     B.illustre(te('ÉTAPE 5'),
       TB('En revanche, si ce trait<br>est en dessous d’une<br>lettre, il se dit « <b>i</b> ».'),
-      te('En revanche, si ce trait est en dessous d\'une lettre, il se dit i.'),
+      _phraseAvecSons(te('En revanche, si ce trait est en dessous d\'une lettre, il se dit i.'),
+                      [['i',_sonNu('ِ')]]),
       /* Le meme trait, montre SOUS la ligne, et lui seul : comme pour la
          fatha, c'est le trait qu'on presente, pas la syllabe. */
       {flottants:[{m:mK,c:CKA,x:50,y:BAS}],
@@ -19081,7 +19132,7 @@ function _boyVowelCourse(ca){
        flottants:[{m:mK,c:CKA,x:50,y:BAS}],
        scene:[{L:[0],P:1,dit:ditSyl('{son}','b','ْ')},
               {L:[0],P:1,dit:te('plus')},
-              {L:[0],P:1,F:[0],dit:te('i')},
+              {L:[0],P:1,F:[0],dit:_sonNu('ِ')},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Ça fait {son}','bi','ِ')},
               {L:[0],P:1,F:[0],t:'bi',dit:ditSyl('Répète après moi : {son}','bi','ِ')}]}),
 
@@ -19117,9 +19168,9 @@ function _boyVowelCourse(ca){
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« a »</b> ?'),te('Où est le son a ?'),[F,K,D],F),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« i »</b> ?'),te('Où est le son i ?'),[F,K,D],K),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« ou »</b> ?'),te('Où est le son ou ?'),[F,K,D],D)
+      B.controle('CONTRÔLE',TB('Où est le son <b>« a »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],F),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« i »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],K),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« ou »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],D)
     ]),
 
     B.brief(te('BRAVO'),
@@ -19158,7 +19209,7 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mD,c:CDA,x:50,y:HAUT},{m:mD,c:CDA,x:43,y:HAUT}],
        scene:[{L:[0],P:1,F:[0],t:'bou',dit:te('Ici on a bou.')},
-              {L:[0],P:1,F:[0,1],t:'boun',dit:te('Avec une deuxième voyelle, ça donne boun.')},
+              {L:[0],P:1,F:[0,1],t:'boun',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne boun.'),[['boun',LB+'ٌ']])},
               {L:[0],P:1,F:[0,1],t:'boun',dit:ditSyl('Répète après moi : {son}','boun','ٌ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TD,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
@@ -19170,7 +19221,7 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mF,c:CFA,x:50,y:HAUTD},{m:mF,c:CFA,x:50,y:HAUTD2}],
        scene:[{L:[0],P:1,F:[0],t:'ba',dit:te('Ici on a ba.')},
-              {L:[0],P:1,F:[0,1],t:'ban',dit:te('Avec une deuxième voyelle, ça donne ban.')},
+              {L:[0],P:1,F:[0,1],t:'ban',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne ban.'),[['ban',LB+'ً']])},
               {L:[0],P:1,F:[0,1],t:'ban',dit:ditSyl('Répète après moi : {son}','ban','ً')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TF,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
@@ -19181,20 +19232,21 @@ function _boyVowelCourse(ca){
       {calques:[LB],
        flottants:[{m:mK,c:CKA,x:50,y:BASD},{m:mK,c:CKA,x:50,y:BASD2}],
        scene:[{L:[0],P:1,F:[0],t:'bi',dit:te('Ici on a bi.')},
-              {L:[0],P:1,F:[0,1],t:'bin',dit:te('Avec une deuxième voyelle, ça donne bin.')},
+              {L:[0],P:1,F:[0,1],t:'bin',dit:_phraseAvecSons(te('Avec une deuxième voyelle, ça donne bin.'),[['bin',LB+'ٍ']])},
               {L:[0],P:1,F:[0,1],t:'bin',dit:ditSyl('Répète après moi : {son}','bin','ٍ')}]}),
     B.tracer(te('DOUBLEMENT · TRACÉ'),TK,
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« an »</b> ?'),te('Où est le son an ?'),[TF,TK,TD],TF),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« oun »</b> ?'),te('Où est le son oun ?'),[TF,TK,TD],TD),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« in »</b> ?'),te('Où est le son in ?'),[TF,TK,TD],TK)
+      B.controle('CONTRÔLE',TB('Où est le son <b>« an »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TF),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« oun »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TD),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« in »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TK)
     ]),
 
     B.illustre(te('LE SOUKOUN'),
       TB('Tu te rappelles de la<br>lettre « ba » ? Seul,<br>on dit « <b>b</b> ».'),
-      te('Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.'),
+      _phraseAvecSons(te('Pour finir, tu te rappelles de la lettre ba ? Seul, on dit b.'),
+                      [['ba',LB+'َ'],['b',LB+'ْ']]),
       {calques:[LB],
        scene:[{P:1,d:800},{L:[0],P:1,d:1300},{L:[0],P:1,t:'b',d:2000}]}),
 
@@ -19217,7 +19269,7 @@ function _boyVowelCourse(ca){
           maintenant. Rien a decouper ici. */
        scene:[{L:[0],P:1,d:1000},
               {L:[0],P:1,F:[0],bat:1,
-               dit:te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.')},
+               dit:_phraseAvecSons(te('Parfois tu trouveras ce petit rond au dessus. Il n\'a aucune prononciation. On dira juste b.'),[['b',LB+'\u0652']])},
               {L:[0],P:1,F:[0],bat:1,t:'b',dit:ditSyl('Répète après moi : {son}','b','ْ')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
@@ -19228,9 +19280,9 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(false);},
        temps:[
          {dit:te('Il existe seulement trois voyelles.')},
-         {dit:te('a'), fait:function(el){grossit(el._sg[0].un);}},
-         {dit:te('i'), fait:function(el){grossit(el._sg[1].un);}},
-         {dit:te('ou'),fait:function(el){grossit(el._sg[2].un);}}
+         {dit:_sonNu('َ'), fait:function(el){grossit(el._sg[0].un);}},
+         {dit:_sonNu('ِ'), fait:function(el){grossit(el._sg[1].un);}},
+         {dit:_sonNu('ُ'),fait:function(el){grossit(el._sg[2].un);}}
        ]},
       /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
          Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
@@ -19239,15 +19291,15 @@ function _boyVowelCourse(ca){
        vue:function(){return pisteVoyelles(true);},
        temps:[
          {dit:te('Lorsque l\'on double une voyelle, on ajoute le son n.')},
-         {dit:te('a'),      fait:function(el){grossit(el._sg[0].un);}},
+         {dit:_sonNu('َ'),      fait:function(el){grossit(el._sg[0].un);}},
          {dit:te('devient')},
-         {dit:te('an'),     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
-         {dit:te('i'),      fait:function(el){grossit(el._sg[1].un);}},
+         {dit:_sonNu('ً'),     fait:function(el){parait(el._sg[0].deux,el._sg[0].un);}},
+         {dit:_sonNu('ِ'),      fait:function(el){grossit(el._sg[1].un);}},
          {dit:te('devient')},
-         {dit:te('in'),     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
-         {dit:te('ou'),     fait:function(el){grossit(el._sg[2].un);}},
+         {dit:_sonNu('ٍ'),     fait:function(el){parait(el._sg[1].deux,el._sg[1].un);}},
+         {dit:_sonNu('ُ'),     fait:function(el){grossit(el._sg[2].un);}},
          {dit:te('devient')},
-         {dit:te('oun'),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
+         {dit:_sonNu('ٌ'),    fait:function(el){parait(el._sg[2].deux,el._sg[2].un);}}
        ]},
       {h:TB('Le <b>soukoun</b> : on ne dit que la lettre.'),
        vue:function(){return pisteUnSigne('ْ',true);},
@@ -19752,7 +19804,24 @@ function _boyLetterCourse(ca,idx,premiere){
        grossissaient. L'emoji est un décor — il est déjà dans le titre. On le
        réduit de moitié, la page gagne la hauteur, et le texte grossit
        d'autant. */
-    var e=document.createElement('div');e.style.cssText='font-size:2rem;line-height:1.1';e.textContent=L.emoji;p.appendChild(e);
+    /* ── LE DESSIN DE L'ANIMAL, PAS SON EMOJI ──
+       Le client : « mets aussi les têtes d'animaux données pour la photo du
+       milieu, tous les cours » — les trente-cinq dessins qu'il a faits pour
+       le monde des animaux. C'est le même animal que le mot : le lion pour
+       l'alif, la rose pour le wāw. L'emoji reste en secours pour les lettres
+       qui n'ont pas reçu de dessin. */
+    var _img=null;try{_img=imageDuMot(A);}catch(e2){}
+    var e=document.createElement('div');
+    if(_img){
+      e.style.cssText='line-height:0;margin:2px 0 4px';
+      var _b=document.createElement('img');
+      _b.src=_img;_b.alt='';_b.setAttribute('aria-hidden','true');
+      _b.style.cssText='height:86px;width:auto;max-width:42%;object-fit:contain;display:inline-block';
+      e.appendChild(_b);
+    }else{
+      e.style.cssText='font-size:2rem;line-height:1.1';e.textContent=L.emoji;
+    }
+    p.appendChild(e);
     api.hublot(p,L.wordAr,L.wordAr,_HAB.noteMot);
     var l=document.createElement('div');l.className='boy-note';l.textContent=L.wordLat;p.appendChild(l);
     /* ── LA LETTRE EST ACQUISE ICI, PAS A LA FIN ──
@@ -19813,7 +19882,21 @@ function _boyLetterCourse(ca,idx,premiere){
        dans le trou — l'enfant a un appui, au lieu d'une suite de compagnons.
        Quelle forme va dans le trou : debut si elle ouvre le mot et qu'elle
        s'attache, seule sinon ; milieu au milieu, fin a la fin. */
+    /* ── LES VRAIS MOTS, PAS DES MOTS FABRIQUES ──
+       Le client : « tu dois remettre les mots que je t'avais donnés dans
+       toutes ces étapes de tous les cours — tu les retrouves dans les hublots
+       des lettres seule, début, milieu, fin ». Ce sont ceux de
+       `_MOTS_FORMES`, ceux-là mêmes que l'enfant vient de voir page après
+       page. On les reprend ici : la question porte sur un mot qu'il connaît,
+       au lieu d'un assemblage inventé avec un compagnon.
+       Le schéma fabriqué reste EN SECOURS, pour une lettre dont le mot de
+       cette place-là manquerait. */
     var _questions=_places.map(function(_g){
+      var _nf=_g+1;                    /* 1 début · 2 milieu · 3 fin */
+      var _pm=null;
+      try{_pm=_placeDansMot((_MOTS_FORMES[A]||[])[_nf],A,_nf);}catch(e3){}
+      /* En écriture arabe, ce qui PRÉCÈDE la lettre se pose à sa DROITE. */
+      if(_pm)return {dr:_pm.avant,ga:_pm.apres,iF:_nf};
       if(_g===0)return {dr:'',ga:(attache?_TATWEEL:'')+_cmp,iF:attache?1:0};
       if(_g===1)return {dr:_cmp+_TATWEEL,ga:(attache?_TATWEEL:'')+_cmp,iF:attache?2:3};
       return {dr:_cmp+A+_cmp+_TATWEEL,ga:'',iF:3};
