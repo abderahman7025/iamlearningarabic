@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v270
+## OÙ ON EN EST — 22 septembre 2026, production en v271
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,41 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v270), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v271), du plus récent au plus ancien :**
+
+- **LA FÊTE SUIT LE MOT « BRAVO » (v271).** Plutôt que de l'accrocher aux
+  quelques endroits connus, on l'accroche AU MOT : la narration prévient
+  quand elle dit bravo, et la fête part — où qu'on soit. Mesuré : 34
+  étincelles et 40 confettis à chaque « Bravo ! ».
+
+- **ET ELLE S'ARRÊTE QUAND ON TOURNE LA PAGE (v271).** « La voix qui était
+  jouée doit être arrêtée ; actuellement on continue à entendre bravo et à
+  avoir les étoiles. » Étincelles et confettis vivent hors des pages : ils
+  survivaient au changement. `_arreteLaFete()` les retire en même temps que
+  `N.stop()` fait taire la voix. Vérifié : 0 et 0 après le changement.
+
+- **LA ROUE DES PAGES (v271).** « Imagine que toutes les pages forment un
+  cercle posé sur le sol ; quand ça passe à la suivante, la roue tourne. »
+  Pour montrer deux pages il en faut deux, or celle qui part est détruite au
+  moment où l'on rebâtit : on en prend donc une PHOTO — une copie figée posée
+  par-dessus, qui ne répond à rien et s'efface seule — et on la fait pivoter
+  vers l'arrière pendant que la vraie arrive de l'autre côté. Pivot autour de
+  l'axe vertical, avec réduction : c'est ce qui donne la roue plutôt qu'un
+  glissement.
+
+- **LES PAGES DE TRACÉ ONT LE MÊME RÉGIME (v271).** « Fais le même principe
+  avec les bords et le glissement pour les pages canevas en plein écran, avec
+  le bouton effacer au lieu de pause. »
+  **Deux surprises** : ces pages posent leurs boutons dans une couche
+  `.boy-plein` attachée au BODY — hors de l'écran du cours, d'où mes deux
+  premières tentatives sans effet — et cette couche est à `z-index:9000`, donc
+  les bords rangés à 40 passaient dessous, inatteignables justement là où le
+  client les veut. Les bords sont maintenant posés sur le BODY à 9100, le
+  geste s'écoute sur toute la page, et la recherche des boutons joint
+  explicitement `.boy-plein`. « Effacer » reste : c'est un outil de la page,
+  pas une navigation.
+  **Et on retire TOUS les bords à chaque page**, pas seulement les siens :
+  posés sur le BODY, ils ne partent plus avec l'écran du cours.
 
 - **LE GLISSEMENT RENVOYAIT À LA CARTE DES MONDES (v270).** « Ça fait deux
   fois que, quand je glisse, ça me ramène à la carte. »

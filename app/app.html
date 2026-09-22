@@ -3446,21 +3446,40 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   70%{opacity:.95;transform:scale(1) rotate(-12deg)}
   100%{opacity:0;transform:scale(.55) rotate(18deg)}}
 @media (prefers-reduced-motion:reduce){.fete-scintille{display:none}}
-/* La page qui arrive glisse du bord d'où elle vient. Court : c'est un
-   accompagnement du geste, pas un spectacle. */
-@keyframes boyEntreD{from{opacity:0;transform:translateX(7%)}to{opacity:1;transform:none}}
-@keyframes boyEntreG{from{opacity:0;transform:translateX(-7%)}to{opacity:1;transform:none}}
-.boy-panel.entre-d{animation:boyEntreD .26s cubic-bezier(.22,.7,.3,1) both}
-.boy-panel.entre-g{animation:boyEntreG .26s cubic-bezier(.22,.7,.3,1) both}
+/* ── LA ROUE DES PAGES ──
+   Les pages d'une leçon sont posées en cercle, à plat. Quand on avance, la
+   roue tourne : celle du milieu est en face et pleine grandeur, celle qui
+   part s'éloigne en pivotant, celle qui vient arrive de l'autre côté. Le
+   pivot se fait autour de l'axe vertical — c'est ce qui donne la roue et non
+   un simple glissement. */
+.boy-wrap{perspective:1400px;perspective-origin:50% 45%}
+@keyframes roueEntreD{
+  from{opacity:0;transform:translateX(34%) rotateY(-38deg) scale(.74)}
+  to  {opacity:1;transform:none}}
+@keyframes roueEntreG{
+  from{opacity:0;transform:translateX(-34%) rotateY(38deg) scale(.74)}
+  to  {opacity:1;transform:none}}
+@keyframes rouePartG{
+  from{opacity:1;transform:none}
+  to  {opacity:0;transform:translateX(-30%) rotateY(34deg) scale(.72)}}
+@keyframes rouePartD{
+  from{opacity:1;transform:none}
+  to  {opacity:0;transform:translateX(30%) rotateY(-34deg) scale(.72)}}
+.boy-panel.entre-d{animation:roueEntreD .38s cubic-bezier(.22,.68,.3,1) both}
+.boy-panel.entre-g{animation:roueEntreG .38s cubic-bezier(.22,.68,.3,1) both}
+.boy-panel.roue-part{transform-origin:50% 50%;will-change:transform,opacity}
+.boy-panel.roue-part.part-g{animation:rouePartG .38s cubic-bezier(.3,0,.7,1) both}
+.boy-panel.roue-part.part-d{animation:rouePartD .38s cubic-bezier(.3,0,.7,1) both}
 @media (prefers-reduced-motion:reduce){
-  .boy-panel.entre-d,.boy-panel.entre-g{animation:none}}
+  .boy-panel.entre-d,.boy-panel.entre-g,.boy-panel.roue-part{animation:none}
+  .boy-panel.roue-part{display:none}}
 /* Un son entre guillemets tient d'un seul tenant, avec son point. */
 .insecable{white-space:nowrap}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
 .boy-bord{position:fixed;top:0;bottom:0;width:clamp(44px,6vw,86px);
-  border:0;background:transparent;cursor:pointer;z-index:40;
+  border:0;background:transparent;cursor:pointer;z-index:9100;
   display:flex;align-items:center;justify-content:center;
   opacity:0;transition:opacity .18s ease;padding:0}
 .boy-bord-g{left:0}
@@ -11181,7 +11200,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v270';
+var _VERSION_REPLI='v271';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11356,6 +11375,8 @@ function _boyNarration(){
     busy=true;
     var txt=q.shift(),maxMs=estim(txt);
     enCours=txt;
+    /* La fete part AU MOMENT ou le mot est dit, pas avant. */
+    try{_feteSiBravo(txt);}catch(e){}
     try{speakText(txt,_voixEnfant(),null);}catch(e){}
     /* ── LA SUIVANTE EST DEJA EN ROUTE ──
        « On entend "où est le son", puis UNE SECONDE APRÈS le son de la
@@ -14747,6 +14768,11 @@ function _boyScene(ca,reprise){
       launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
   }
   api.feteBravo=feteBravo;
+  /* La narration appellera ceci chaque fois qu'elle dira « bravo ». */
+  try{window._surBravo=function(){
+    if(!wrap||!wrap.isConnected)return;
+    feteBravo(_dernierPanneau,3);
+  };}catch(e){}
   /* ── QUAND TOUTE LA VOIX DE LA PAGE A ETE JOUEE ──
      `surSilence` seul ne suffit pas : une scene qui parle etat par etat
      laisse un blanc de quelques dixiemes entre deux phrases, et le premier
@@ -14841,11 +14867,19 @@ function _boyScene(ca,reprise){
         if(!actif||b.classList.contains('eteint'))return;
         fn();
       };
-      ca.appendChild(b);return b;
+      /* Sur le BODY, et non dans l'écran du cours : la couche plein écran du
+         tracé est posée là, à 9000, et des bords rangés en dessous auraient
+         été inatteignables justement sur les pages où le client les veut. */
+      document.body.appendChild(b);return b;
     }
+    /* ── ON RETIRE TOUS LES BORDS, PAS SEULEMENT LES SIENS ──
+       Ils sont posés sur le BODY depuis qu'ils doivent passer au-dessus de la
+       couche plein écran : vider l'écran du cours ne les emporte donc plus.
+       Un cours quitté en laisserait derrière lui — inertes, mais visibles au
+       survol. On fait table rase à chaque page. */
     try{
-      if(_bordG&&_bordG.parentNode)_bordG.parentNode.removeChild(_bordG);
-      if(_bordD&&_bordD.parentNode)_bordD.parentNode.removeChild(_bordD);
+      [].slice.call(document.querySelectorAll('.boy-bord'))
+        .forEach(function(x){if(x.parentNode)x.parentNode.removeChild(x);});
     }catch(e){}
     _bordG=bande('g','\u2039',reculer||function(){},!!reculer);
     _bordD=bande('d','\u203a',function(){avancer();},true);
@@ -14898,24 +14932,24 @@ function _boyScene(ca,reprise){
         if(dx<0){if(_bordD&&!_bordD.classList.contains('eteint'))_bordD.click();}
         else{if(_bordG&&!_bordG.classList.contains('eteint'))_bordG.click();}
       }
-      ca.addEventListener('pointerdown',function(ev){
+      document.addEventListener('pointerdown',function(ev){
         if(ev.pointerType==='touch')return;   /* le toucher a ses propres ecouteurs */
         depart(ev.clientX,ev.clientY,ev.target);
       },{passive:true});
-      ca.addEventListener('pointerup',function(ev){
+      document.addEventListener('pointerup',function(ev){
         if(ev.pointerType==='touch')return;
         arrivee(ev.clientX,ev.clientY);
       },{passive:true});
-      ca.addEventListener('touchstart',function(ev){
+      document.addEventListener('touchstart',function(ev){
         if(!ev.touches||ev.touches.length!==1){bon=false;return;}
         depart(ev.touches[0].clientX,ev.touches[0].clientY,ev.target);
       },{passive:true});
-      ca.addEventListener('touchend',function(ev){
+      document.addEventListener('touchend',function(ev){
         var t=(ev.changedTouches&&ev.changedTouches[0])||null;
         if(!t){bon=false;return;}
         arrivee(t.clientX,t.clientY);
       },{passive:true});
-      ca.addEventListener('touchcancel',function(){bon=false;},{passive:true});
+      document.addEventListener('touchcancel',function(){bon=false;},{passive:true});
     }
   }
   function ajouteRetour(){
@@ -15011,6 +15045,46 @@ function _boyScene(ca,reprise){
        On ne regarde donc plus son NOM, on regarde CE QU'IL FAIT. */
     var _estSuite=false;
     try{_estSuite=!!principal&&principal._fait===suivant;}catch(e){}
+    /* ── LES PAGES DE TRACÉ AUSSI ──
+       Le client : « fais le même principe avec les bords et le glissement
+       pour les pages canevas en plein écran où il faut repasser sur les
+       modèles, avec le bouton effacer au lieu de pause ».
+       Ces pages-là posent leurs boutons elles-mêmes : leur « Suite » ne passe
+       pas par `suivant` directement, et leur « ‹ Retour » n'est pas celui de
+       la rangée. On les reconnaît donc à leur NOM — ici c'est légitime, c'est
+       le seul lien qu'on ait avec eux — et on les cache. « Effacer », lui,
+       reste : c'est un outil de la page, pas une navigation. */
+    function _cacheLesNav(){
+      try{
+        var _nomSuite=String(te('Suite ›')).trim();
+        var _nomRetour=String(te('‹ Retour')).trim();
+        /* On cherche dans TOUT l'ecran du cours, pas seulement dans le
+           panneau : la page de trace pose ses boutons dans une couche plein
+           ecran qui lui est propre, en dehors de lui. */
+        /* La couche du tracé est posée sur le BODY, pas dans l'écran du
+           cours : on la joint explicitement à la recherche. */
+        var _racines=[ca||p];
+        [].slice.call(document.querySelectorAll('.boy-plein')).forEach(function(x){_racines.push(x);});
+        var _tous=[];
+        _racines.forEach(function(r2){
+          if(r2)[].slice.call(r2.querySelectorAll('.boy-btn')).forEach(function(b){_tous.push(b);});
+        });
+        _tous.forEach(function(b){
+          if(b.className.indexOf('boy-bord')>=0)return;
+          var t2=String(b.textContent||'').trim();
+          if(t2===_nomSuite||t2===_nomRetour){
+            b.style.display='none';
+            /* Celui qui avance devient le bouton que les bords actionnent. */
+            if(t2===_nomSuite&&!principal)principal=b;
+          }
+        });
+      }catch(e){}
+    }
+    _cacheLesNav();
+    /* La couche plein ecran du trace n'existe pas encore quand on passe ici :
+       elle se construit apres, une fois la page posee. On repasse donc. */
+    N.plusTard(_cacheLesNav,350);
+    N.plusTard(_cacheLesNav,1100);
     if(principal){
       principal.style.marginTop='0';
       if(_estSuite)principal.style.display='none';
@@ -15907,7 +15981,12 @@ function _boyScene(ca,reprise){
        voix qui ne viendra jamais. */
     _sceneParle=0;_sceneFete=0;
     arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
-    N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);
+    N.videTimers();N.stop();
+    /* On tourne la page : la voix se tait — c'est `N.stop()` — et la fête
+       qu'elle avait lancée s'en va avec elle. */
+    try{_arreteLaFete();}catch(e){}
+    var _ancien=_photoDeLaPage();
+    wrap.innerHTML='';jauge();scenes[i](api);
     /* L'animation est posée sur le PANNEAU, pas sur le cadre : celui-ci porte
        déjà la mise à l'échelle, et deux transformations sur le même élément
        se remplacent au lieu de s'ajouter. */
@@ -16098,6 +16177,33 @@ function _boyScene(ca,reprise){
      la nouvelle entre par le bord d'où elle vient : vers l'avant elle arrive
      de la droite, vers l'arrière de la gauche. */
   var _sensNav=0;
+  /* ══ LA ROUE DES PAGES ══
+     Le client : « imagine que toutes les pages d'une leçon forment un cercle
+     posé sur le sol ; quand ça passe à la suivante, la roue tourne, celle du
+     milieu plus grosse que celles à côté ».
+     Pour montrer deux pages à la fois il en faut deux : or celle qui part est
+     détruite au moment où l'on rebâtit. On en prend donc une PHOTO — une
+     copie figée, posée par-dessus — et on la fait tourner vers l'arrière
+     pendant que la vraie page arrive de l'autre côté. La copie ne répond à
+     rien et s'efface toute seule. */
+  function _photoDeLaPage(){
+    try{
+      var p=wrap.querySelector('.boy-panel');
+      if(!p||!_sensNav)return null;
+      var r=p.getBoundingClientRect();
+      if(!(r.width>40&&r.height>40))return null;
+      var c=p.cloneNode(true);
+      c.className='boy-panel roue-part';
+      c.setAttribute('aria-hidden','true');
+      c.style.cssText+=';position:fixed;pointer-events:none;z-index:35;'
+        +'left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;'
+        +'height:'+r.height+'px;margin:0';
+      c.classList.add(_sensNav>0?'part-g':'part-d');
+      document.body.appendChild(c);
+      setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},420);
+      return c;
+    }catch(e){return null;}
+  }
   function suivant(){i++;if(i>=scenes.length){fini();return;}_sensNav=1;go();}
   function precedent(){if(i<=0)return;i--;_sensNav=-1;go();}
   api.precedent=precedent;
@@ -22554,6 +22660,40 @@ window.onload=()=>{
    Une trentaine d'etincelles semees au hasard sur l'ecran, chacune avec son
    retard et sa duree : elles naissent, brillent, et s'en vont. Rien n'est
    cliquable, rien ne retient le doigt, et tout se retire tout seul. */
+/* ── ON RANGE LA FETE ──
+   Le client : « quand on scrolle, la voix qui était jouée doit être arrêtée ;
+   actuellement on continue à entendre bravo et à avoir les étoiles ».
+   Les étincelles et les confettis vivent hors des pages — ils survivaient
+   donc au changement. On les retire d'un coup. */
+function _arreteLaFete(){
+  try{
+    [].slice.call(document.querySelectorAll('.fete-scintille,.confetti-el'))
+      .forEach(function(e){if(e.parentNode)e.parentNode.removeChild(e);});
+  }catch(e){}
+}
+/* ── LA FETE SUIT LE MOT « BRAVO » ──
+   Le client : « les confettis, étoiles, etc. doivent être joués chaque fois
+   qu'on a le mot bravo dit par la voix ». Plutôt que de l'accrocher aux
+   quelques endroits que je connais, on l'accroche AU MOT : la narration
+   prévient quand elle dit bravo, et la fête part — où qu'on soit.
+   `_surBravo` est posé par le cours affiché, qui sait faire jaillir les
+   cœurs au-dessus de son personnage ; sans lui, les étincelles suffisent. */
+function _estUnBravo(t){
+  try{
+    var b=String(te('Bravo !')).replace(/[\s!.…]+$/,'').toLowerCase();
+    var x=String(t||'').replace(/[\s!.…]+$/,'').toLowerCase();
+    return !!b&&x===b;
+  }catch(e){return false;}
+}
+function _feteSiBravo(t){
+  if(!_estUnBravo(t))return;
+  try{
+    if(typeof window._surBravo==='function'){window._surBravo();return;}
+  }catch(e){}
+  try{_scintille(34);}catch(e){}
+  try{if(typeof launchConfetti==='function')
+    launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+}
 function _scintille(combien){
   try{
     var n=combien||30;
