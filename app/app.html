@@ -3204,6 +3204,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* Sa police est calculee au rendu, a partir de la largeur de son encre —
    voir `tailleDuSigneSeul`. Un signe est un petit trait dans une grande
    boite : sa taille de police ne dit rien de ce qu'on voit. */
+/* ── LE SIGNE QUI SE SITUE, SANS LETTRE SOUS LUI ──
+   Le client : « augmente un peu la taille de la ḍamma — je ne parle pas de
+   la grosse du début, mais du reste ».
+   Attention : la taille ordinaire de `.sc-flot` est celle d'un signe POSÉ SUR
+   UNE LETTRE, et elle doit rester celle-là — c'est la proportion de
+   l'écriture. On ne touche donc qu'au cas du client : le signe qui a quitté
+   le centre pour se situer par rapport à la ligne, sans lettre sous lui. Il
+   passe de la moitié aux deux tiers de la largeur du cadre. */
+.sc-flot.situe{font-size:calc(var(--sc-l,340px) / 1.5)}
 .sc-flot.seul{font-size:var(--sc-seul,120px)}
 .sc-flot.vu{opacity:1}
 /* LE BATTEMENT. Il ne peut pas passer par `transform` : celui-ci porte la
@@ -3437,6 +3446,14 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   70%{opacity:.95;transform:scale(1) rotate(-12deg)}
   100%{opacity:0;transform:scale(.55) rotate(18deg)}}
 @media (prefers-reduced-motion:reduce){.fete-scintille{display:none}}
+/* La page qui arrive glisse du bord d'où elle vient. Court : c'est un
+   accompagnement du geste, pas un spectacle. */
+@keyframes boyEntreD{from{opacity:0;transform:translateX(7%)}to{opacity:1;transform:none}}
+@keyframes boyEntreG{from{opacity:0;transform:translateX(-7%)}to{opacity:1;transform:none}}
+.boy-panel.entre-d{animation:boyEntreD .26s cubic-bezier(.22,.7,.3,1) both}
+.boy-panel.entre-g{animation:boyEntreG .26s cubic-bezier(.22,.7,.3,1) both}
+@media (prefers-reduced-motion:reduce){
+  .boy-panel.entre-d,.boy-panel.entre-g{animation:none}}
 /* Un son entre guillemets tient d'un seul tenant, avec son point. */
 .insecable{white-space:nowrap}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
@@ -11164,7 +11181,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v268';
+var _VERSION_REPLI='v269';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15877,6 +15894,20 @@ function _boyScene(ca,reprise){
     _sceneParle=0;_sceneFete=0;
     arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
     N.videTimers();N.stop();wrap.innerHTML='';jauge();scenes[i](api);
+    /* L'animation est posée sur le PANNEAU, pas sur le cadre : celui-ci porte
+       déjà la mise à l'échelle, et deux transformations sur le même élément
+       se remplacent au lieu de s'ajouter. */
+    if(_sensNav){
+      try{
+        var _p0=wrap.querySelector('.boy-panel');
+        if(_p0){
+          _p0.classList.remove('entre-d','entre-g');
+          void _p0.offsetWidth;
+          _p0.classList.add(_sensNav>0?'entre-d':'entre-g');
+        }
+      }catch(e){}
+      _sensNav=0;
+    }
     _texteMuetSiImage();ajouteRetour();
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
@@ -16047,8 +16078,14 @@ function _boyScene(ca,reprise){
     }
     m.setAttribute('data-cale','1');
   }
-  function suivant(){i++;if(i>=scenes.length){fini();return;}go();}
-  function precedent(){if(i<=0)return;i--;go();}
+  /* ── LA PAGE GLISSE DU COTE OU L'ON VA ──
+     Le client : « quand on scrolle, ce serait top un effet de translation de
+     la page du côté où on va ». On note le SENS avant de rebâtir la page, et
+     la nouvelle entre par le bord d'où elle vient : vers l'avant elle arrive
+     de la droite, vers l'arrière de la gauche. */
+  var _sensNav=0;
+  function suivant(){i++;if(i>=scenes.length){fini();return;}_sensNav=1;go();}
+  function precedent(){if(i<=0)return;i--;_sensNav=-1;go();}
   api.precedent=precedent;
   api.suivant=suivant;
   /* Une halte tous les PAS_SEANCE ecrans, posee au chapitre suivant. On n'en
@@ -16328,6 +16365,9 @@ function _boyScene(ca,reprise){
           var on=F.indexOf(k)>=0;
           f.classList.toggle('vu',on);
           f.classList.toggle('seul',seul);
+          /* Il s'est situé par rapport à la ligne, et rien ne le porte : ni
+             gros comme au début, ni réduit comme sur une lettre. */
+          f.classList.toggle('situe',!!e.petit&&L.length===0);
           f.classList.toggle('bat',on&&!!e.bat);
           /* LA PLACE D'ABORD, LA COMPENSATION ENSUITE. L'inverse calait le
              signe pour l'ancienne hauteur, puis on le deplacait : la damma

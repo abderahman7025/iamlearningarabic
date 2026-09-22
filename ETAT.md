@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v268
+## OÙ ON EN EST — 22 septembre 2026, production en v269
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,25 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v268), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v269), du plus récent au plus ancien :**
+
+- **LA PAGE GLISSE DU CÔTÉ OÙ L'ON VA (v269).** Demande du client. On note le
+  SENS avant de rebâtir la page ; la nouvelle entre par le bord d'où elle
+  vient — de la droite vers l'avant, de la gauche vers l'arrière. 260 ms :
+  c'est un accompagnement du geste, pas un spectacle.
+  **L'animation est posée sur le PANNEAU, pas sur le cadre** : celui-ci porte
+  déjà la mise à l'échelle, et deux transformations sur le même élément se
+  remplacent au lieu de s'ajouter.
+
+- **LE SIGNE QUI SE SITUE GROSSIT (v269).** « Augmente un peu la taille de la
+  ḍamma — pas la grosse du début, le reste. »
+  **Piège évité** : la taille ordinaire de `.sc-flot` est celle d'un signe
+  POSÉ SUR UNE LETTRE, et c'est la proportion de l'écriture — la changer
+  aurait faussé toutes les pages où le signe coiffe une lettre. On n'a donc
+  touché qu'au cas du client : le signe qui a quitté le centre pour se situer
+  par rapport à la ligne, sans lettre sous lui (`.sc-flot.situe`).
+  Mesuré, les trois tailles restent distinctes : **587 px au centre, 279 une
+  fois situé (contre 209), 209 sur une lettre.**
 
 - **LES GUILLEMETS NE SE COUPENT PLUS (v268).** « On a "ba" sur deux lignes ;
   il ne faut jamais couper les guillemets avec leur contenu, ni le point juste
