@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v266
+## OÙ ON EN EST — 22 septembre 2026, production en v267
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,32 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v266), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v267), du plus récent au plus ancien :**
+
+- **LES PAGES À DEUX COLONNES : LA HAUTEUR SE MESURAIT SUR ELLE-MÊME (v267).**
+  Le client, excédé et dans le vrai : « je parle des textes sur les pages où
+  il y a un texte à gauche et un canevas à droite ; ça a augmenté, mais pas
+  encore assez ». Je mesurais les pages en portrait et les briefings — pas
+  celles-là.
+  **Mesure sur ces pages : la hauteur du titre est EXACTEMENT celle de son
+  parent** — 129 pour 129, 65 pour 65, 193 pour 193. La colonne de gauche n'a
+  pas de hauteur propre : elle prend celle de son contenu. En bornant la
+  police par cette hauteur, je la bornais par la place que le texte occupait
+  DÉJÀ. Il ne pouvait pas grandir d'un pixel.
+  **C'est le troisième piège de la même famille** — après la largeur du titre
+  qui se rétrécit et la hauteur que le cadre se posait à lui-même. La règle
+  est maintenant écrite : *une mesure qui sert à dimensionner ne doit jamais
+  être prise sur ce qu'on dimensionne.*
+  La place se mesure donc sur ce qui NE dépend pas du texte : la colonne d'à
+  côté (hublot, canevas, bulles), et jamais plus des deux tiers de la hauteur
+  vue — le tiers seulement quand la page porte un canevas, car c'est lui
+  l'exercice. Des deux bornes on garde la plus stricte.
+
+  | | avant | après |
+  |---|---|---|
+  | pages à deux colonnes | 33 px | **41 à 87, médiane 53** |
+  | toutes pages confondues | — | médiane 51 |
+  | pages qui débordent | — | **aucune** (49 pages vérifiées) |
 
 - **LE GLISSEMENT MARCHE AU DOIGT (v266).** Les événements de pointeur sont
   censés couvrir souris et doigt, mais sur téléphone le navigateur prend le

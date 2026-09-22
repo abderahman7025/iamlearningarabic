@@ -11144,7 +11144,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v266';
+var _VERSION_REPLI='v267';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15187,15 +15187,58 @@ function _boyScene(ca,reprise){
        On la CHERCHE donc, par dichotomie : la plus grande qui ne déborde ni
        en largeur ni en hauteur de la place qu'on lui laisse. Huit essais
        suffisent à la serrer au dixième. */
-    function place(){
-      var h=0;
-      try{
-        var par=t.parentNode;
-        if(par&&par.clientHeight>20)h=par.clientHeight;
-      }catch(e){}
-      return h;
-    }
-    var hDispo=place();
+    /* ══ LA HAUTEUR DISPONIBLE N'EST PAS CELLE QU'ON OCCUPE DEJA ══
+       Le client : « je parle des textes sur les pages où il y a un texte à
+       gauche et un canevas à droite ; ça a augmenté, mais pas encore assez ».
+       Il visait juste. Mesuré sur ces pages-là : la hauteur du titre est
+       EXACTEMENT celle de son parent — 129 pour 129, 65 pour 65, 193 pour
+       193. La colonne de gauche n'a pas de hauteur propre : elle prend celle
+       de son contenu. En bornant la police par cette hauteur, je la bornais
+       par la place que le texte occupait DÉJÀ : il ne pouvait plus grandir
+       d'un pixel. Même piège que la largeur du titre qui se rétrécit, une
+       semaine plus tôt.
+       On ne borne donc plus par la hauteur. Si le texte fait grandir la page,
+       c'est `ajusteEcran` qui s'en occupe — lui mesure ce qui tient vraiment,
+       et il le fait déjà pour tout le reste. */
+    /* La place, mesuree sur ce qui NE DEPEND PAS du texte : la colonne d'a
+       cote — le hublot, le canevas, les bulles de reponse. Elle a sa hauteur
+       propre, et c'est exactement la hauteur que le texte peut occuper sans
+       rendre la page plus haute qu'elle ne l'est deja. Sans voisin — une
+       page d'un seul tenant — on ne borne pas : `ajusteEcran` s'en charge. */
+    var hDispo=0;
+    try{
+      var _colG=t.closest&&t.closest('.boy-col-g');
+      var _voisin=_colG&&_colG.parentNode&&_colG.parentNode.querySelector('.boy-col-d');
+      if(_voisin&&_voisin.clientHeight>60)hDispo=_voisin.clientHeight;
+    }catch(e){}
+    /* ── SANS VOISIN, C'EST L'ECRAN QUI DONNE LA MESURE ──
+       Une page d'un seul tenant n'a personne a qui se comparer. Sans borne du
+       tout, le texte grossissait jusqu'a faire deborder la page — mesure,
+       trois pages du cours des voyelles sortaient de l'ecran. On lui laisse
+       donc les deux tiers de la hauteur VUE, convertie en pixels de mise en
+       page : ni la fenetre ni le haut du cadre ne dependent du texte, la
+       mesure est donc stable. */
+    /* Et, dans TOUS les cas, jamais plus que les deux tiers de la hauteur
+       vue : un voisin tres haut — le canevas de trace — laissait le texte
+       grandir au point de faire deborder la page. Des deux bornes on garde
+       la plus stricte. */
+    try{
+      var _vv=window.visualViewport;
+      var _vh=(_vv&&_vv.height)||window.innerHeight||0;
+      var _cadre2=t.closest('.boy-wrap,.boy-plein');
+      var _haut=_cadre2?_cadre2.getBoundingClientRect().top:0;
+      var _libre=(_vh-_haut-8);
+      if(_libre>80){
+        /* Une page de TRACE porte un canevas : c'est lui l'exercice, et il
+           lui faut de la hauteur. Le texte s'y contente du tiers. Mesure :
+           avec les deux tiers, les huit pages de trace du cours de l'alif
+           sortaient de l'ecran. */
+        var _p2=t.closest('.boy-panel');
+        var _canevas=!!(_p2&&_p2.querySelector('canvas'));
+        var _max=(_libre/ech)*(_canevas?0.30:0.62);
+        if(!hDispo||_max<hDispo)hDispo=_max;
+      }
+    }catch(e){}
     function tient(v){
       t.style.fontSize=v.toFixed(1)+'px';
       if(t.scrollWidth>t.clientWidth+1)return false;
