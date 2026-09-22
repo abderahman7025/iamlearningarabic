@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 20 septembre 2026, production en v263
+## OÙ ON EN EST — 22 septembre 2026, production en v264
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,46 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v263), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v264), du plus récent au plus ancien :**
+
+- **LE TEXTE PEUT ENFIN SE REPLIER — ET C'EST CE QUI LE BRIDAIT (v264).**
+  Le client, captures et taille écrite à la main : « regarde la taille du
+  texte par rapport à l'espace disponible : c'est beaucoup trop petit ; je
+  sais pas si tu as fait un bloc, mais le nombre de mots par ligne doit
+  pouvoir changer si on augmente la taille ».
+  Il avait mis le doigt dessus : chaque ligne écrite était un bloc
+  **insécable** (`white-space:nowrap`), donc la police ne pouvait jamais
+  dépasser la largeur de la plus longue. Une phrase un peu longue restait
+  minuscule au milieu d'un cadre vide. Les coupures restent ses sauts de
+  ligne, mais une ligne trop longue se replie maintenant — et la taille est
+  CHERCHÉE par dichotomie, la plus grande qui ne déborde ni en largeur ni en
+  hauteur. **Mesuré, interface fille : 47 à 73 px vus au lieu de 32 à 50, et
+  aucune page ne déborde.**
+
+- **LES BOUTONS TIENNENT SUR UNE LIGNE (v264).** « Leur nom doit être sur la
+  même ligne que le texte du bouton et ne jamais dépasser ; la largeur du
+  bouton doit s'adapter. » En les laissant se replier (v263) j'avais obtenu
+  l'inverse. Le texte tient sur une ligne, c'est le bouton qui s'élargit.
+
+- **LES CŒURS DU BRAVO SONT REVENUS (v264).** « Les cœurs ne sont plus là
+  quand on dit bravo. » Ma règle de largeur (v263) mettait la main sur les
+  décors posés en absolu : `.boy-bravo` perdait ses 46 px, et la volée, calée
+  sur son milieu, partait hors du cadre. Seuls les blocs qui doivent tenir
+  toute la largeur sont visés désormais.
+
+- **« BRAVO, ON DIT … » APRÈS LE SILENCE (v264).** Sur les pages « on dit
+  comment ? », la réponse arrive après les deux temps d'attente de la scène,
+  dite par la voix du studio si elle existe. Vérifié : « On commence par ce
+  symbole. Te souviens-tu de lui ? » → « Bravo, on dit ou ».
+
+- **LA QUESTION NE RESTE PLUS SANS RÉPONSE (v264).** « Où est ce son ? » ne
+  faisait entendre quelque chose QUE si l'enregistrement existait ; ailleurs,
+  silence. Le son est maintenant toujours joué — studio si présent, synthèse
+  sinon. Et le « n » du doublement passe par le studio.
+
+- **RESTE À FAIRE, demandé le 22 septembre :** remplacer les boutons
+  « suivant » et « retour » par un **glissement du doigt** à gauche et à
+  droite. Question posée au client avant de le faire (voir plus bas).
 
 - **LES CASES DU RÉCAPITULATIF, ET POURQUOI ELLES AVAIENT MAIGRI (v263).**
   En rendant le panneau souple (v259, pour supprimer la bande vide), j'ai
