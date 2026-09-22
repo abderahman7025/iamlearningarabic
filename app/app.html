@@ -3419,6 +3419,25 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    la ligne du texte et se met à sa taille, en plus gros. */
 .boy-bete-titre{height:1.9em;width:auto;vertical-align:-.55em;
   object-fit:contain;display:inline-block}
+/* ── LES BORDS QUI TOURNENT LA PAGE ──
+   Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
+   souris, le bord s'eclaire des qu'elle arrive dessus. */
+.boy-bord{position:fixed;top:0;bottom:0;width:clamp(44px,6vw,86px);
+  border:0;background:transparent;cursor:pointer;z-index:40;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .18s ease;padding:0}
+.boy-bord-g{left:0}
+.boy-bord-d{right:0}
+.boy-bord>i{font-style:normal;font-size:clamp(28px,4vw,44px);line-height:1;
+  color:var(--sk-fonce);background:rgba(255,255,255,.86);
+  border-radius:50%;width:1.7em;height:1.7em;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.boy-bord:hover,.boy-bord:focus-visible{opacity:1}
+.boy-bord:active>i{transform:scale(.92)}
+.boy-bord.eteint{pointer-events:none}
+.boy-bord.eteint:hover{opacity:0}
+@media (prefers-reduced-motion:reduce){.boy-bord{transition:none}}
 /* ── PAS DE BANDE VIDE SOUS LE CONTENU ──
    Le client, capture à l'appui : « regarde le cadre dont je te parle, la
    partie hachurée en rouge est vide ». Le cadre remplit bien l'écran — c'est
@@ -11122,7 +11141,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v264';
+var _VERSION_REPLI='v265';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14738,6 +14757,68 @@ function _boyScene(ca,reprise){
     if(!p.querySelector('.boy-scene,.boy-hublot,canvas,.rec-grille,.boy-cible,.boy-piste,.trou-mot'))return;
     t.parentNode.removeChild(t);
   }
+  /* ══ LES BORDS DE L'ÉCRAN, ET LE DOIGT ══
+     Deux bandes, une à chaque bord. À la souris elles restent invisibles et
+     paraissent quand on s'en approche — « quand la souris vient à droite ou
+     à gauche de l'écran, quelque chose doit apparaître pour signaler qu'on
+     peut cliquer ». Au doigt, on glisse : vers la gauche pour avancer, vers
+     la droite pour revenir.
+     Le glissement ne part JAMAIS d'un canevas ni d'un élément qui répond —
+     sinon on tracerait la lettre au lieu de tourner la page. */
+  var _bordG=null,_bordD=null,_gesteArme=false;
+  function _poseLesBords(p,reculer,avancer,peutAvancer){
+    if(!p||!p.isConnected)return;
+    function bande(cote,signe,fn,actif){
+      var b=document.createElement('button');
+      b.className='boy-bord boy-bord-'+cote+(actif?'':' eteint');
+      b.setAttribute('aria-label',cote==='g'?te('Revoir l\'écran précédent'):te('Suite ›'));
+      b.innerHTML='<i>'+signe+'</i>';
+      /* On regarde l'etat AU MOMENT DU CLIC, pas a la pose. `pointer-events`
+         suffit a la souris, mais pas au clavier ni a un clic provoque : le
+         bord repondait alors sur une question sans reponse. */
+      b.onclick=function(ev){
+        ev.stopPropagation();
+        if(!actif||b.classList.contains('eteint'))return;
+        fn();
+      };
+      ca.appendChild(b);return b;
+    }
+    try{
+      if(_bordG&&_bordG.parentNode)_bordG.parentNode.removeChild(_bordG);
+      if(_bordD&&_bordD.parentNode)_bordD.parentNode.removeChild(_bordD);
+    }catch(e){}
+    _bordG=bande('g','\u2039',reculer||function(){},!!reculer);
+    _bordD=bande('d','\u203a',function(){avancer();},true);
+    /* ── LE BORD DROIT SUIT LE BOUTON QU'IL COMMANDE ──
+       « Bloquer tant que pas de réponse juste », dit le client. C'est déjà la
+       règle du bouton caché : il n'existe pas sur une question tant qu'elle
+       n'est pas résolue, et il est éteint tant que la voix parle. Le bord se
+       contente donc de LE REGARDER, quatre fois par seconde : s'il ne peut
+       pas, le bord s'éteint et ne répond ni au clic ni au glissement. */
+    var veille=setInterval(function(){
+      if(!_bordD||!_bordD.isConnected){clearInterval(veille);return;}
+      var ouvert=true;
+      try{ouvert=!!peutAvancer&&!!peutAvancer();}catch(e){ouvert=false;}
+      _bordD.classList.toggle('eteint',!ouvert);
+    },250);
+    try{_bordD.classList.toggle('eteint',!(peutAvancer&&peutAvancer()));}catch(e){}
+    if(!_gesteArme){
+      _gesteArme=true;
+      var x0=0,y0=0,bon=false;
+      ca.addEventListener('pointerdown',function(ev){
+        var t=ev.target;
+        bon=!(t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case'));
+        x0=ev.clientX;y0=ev.clientY;
+      },{passive:true});
+      ca.addEventListener('pointerup',function(ev){
+        if(!bon)return;bon=false;
+        var dx=ev.clientX-x0,dy=ev.clientY-y0;
+        if(Math.abs(dx)<70||Math.abs(dy)>60)return;
+        if(dx<0){if(_bordD&&!_bordD.classList.contains('eteint'))_bordD.click();}
+        else{if(_bordG&&!_bordG.classList.contains('eteint'))_bordG.click();}
+      },{passive:true});
+    }
+  }
   function ajouteRetour(){
     if(!_dernierPanneau)return;
     var p=_dernierPanneau;
@@ -14785,8 +14866,9 @@ function _boyScene(ca,reprise){
     }
     /* RETOUR — tout a gauche, toujours. C'est un recours, pas la marche a
        suivre. */
-    if(i>0)petit(te('‹ Retour'),te('Revoir l\'écran précédent'),function(){
-      arreteEnchainement();N.stop();precedent();});
+    /* Le « ‹ Retour » de la rangée est retiré lui aussi : c'est le bord
+       gauche qui ramène en arrière. Celui d'en haut, qui sort du cours,
+       reste — le client y tient. */
     /* PAUSE — seulement la ou quelque chose se joue tout seul. */
     /* Elle commande aussi le bouton d'avancement : voir `ouvreSuite`, pose
        plus bas, une fois le bouton principal range dans la rangee. */
@@ -14802,10 +14884,45 @@ function _boyScene(ca,reprise){
         ouvreSuite(N.enPause());
       });
     }
+    /* ══ « SUITE » ET « RETOUR » NE SE VOIENT PLUS ══
+       Le client : « au lieu des boutons suivant et retour, je veux juste
+       qu'on puisse glisser à gauche ou à droite ».
+       On ne SUPPRIME pas le bouton pour autant : toute la règle d'ouverture
+       est accrochée à lui — éteint tant que la voix parle, absent sur une
+       question tant qu'elle n'a pas sa bonne réponse. On le cache, et ce
+       sont les bords de l'écran qui l'actionnent. Rien de la règle ne
+       change ; seule la façon d'appuyer change.
+       Les boutons de DESTINATION — « lettre suivante », « menu » — restent
+       visibles : ce ne sont pas des « suite ». */
+    var _estSuite=false;
+    try{_estSuite=!!principal&&
+      String(principal.textContent||'').trim()===String(te('Suite ›')).trim();}catch(e){}
     if(principal){
       principal.style.marginTop='0';
+      if(_estSuite)principal.style.display='none';
       rangee.appendChild(principal);
     }
+    /* Le bord gauche revient en arrière, le bord droit avance : on leur donne
+       de quoi le faire, et de quoi savoir si c'est permis. */
+    _poseLesBords(p,(i>0)?function(){
+      arreteEnchainement();N.stop();precedent();
+    }:null, function(){
+      /* Le bouton cache si on l'a ; sinon on avance directement — une page
+         qui s'enchaine toute seule n'en a pas, et il n'y a rien a attendre. */
+      if(principal&&principal.isConnected&&!principal.disabled){principal.click();return true;}
+      arreteEnchainement();N.stop();suivant();return true;
+    }, function(){
+      /* ── ON NE BLOQUE QUE LA QUESTION SANS REPONSE ──
+         Le client : « oui, bloquer tant que pas de reponse juste ». Ailleurs
+         — une page qui parle, un canevas, un briefing — on laisse passer :
+         le bouton n'y etait eteint que pour empecher de sauter pendant la
+         voix, et le glissement demande un geste volontaire.
+         `data-verrou` marque justement les pages ou seule la bonne reponse
+         fait avancer. */
+      if(p.getAttribute&&p.getAttribute('data-verrou'))
+        return !!(principal&&principal.isConnected&&!principal.disabled);
+      return true;
+    });
     if(!rangee.children.length){p.removeChild(rangee);return;}
     egaliseLaRangee(rangee);
     /* ── SUITE NE S'OUVRE QU'EN PAUSE ──

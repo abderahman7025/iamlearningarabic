@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v264
+## OÙ ON EN EST — 22 septembre 2026, production en v265
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,29 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v264), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v265), du plus récent au plus ancien :**
+
+- **ON TOURNE LA PAGE AU DOIGT (v265).** Le client : « au lieu des boutons
+  suivant et retour, je veux juste qu'on puisse glisser à gauche ou à droite ;
+  pour l'ordi et la souris, quand la souris vient à droite ou à gauche de
+  l'écran, quelque chose doit apparaître pour signaler qu'on peut cliquer ».
+
+  Deux bandes aux bords de l'écran, invisibles, qui paraissent quand la
+  souris s'en approche ; au doigt, un glissement de 70 px suffit — vers la
+  gauche pour avancer, vers la droite pour revenir. Le glissement ne part
+  JAMAIS d'un canevas ni d'un élément qui répond, sinon on tracerait la
+  lettre au lieu de tourner la page.
+
+  **Le bouton « Suite » n'est pas supprimé, il est CACHÉ** : toute la règle
+  d'ouverture y est accrochée — absent sur une question tant qu'elle n'a pas
+  sa bonne réponse, éteint tant que la voix parle. Le bord ne fait que
+  l'actionner. Les boutons de DESTINATION (« lettre suivante », « menu »)
+  restent visibles : ce ne sont pas des « suite ».
+  **On ne bloque que la question** (`data-verrou`), comme demandé ; partout
+  ailleurs on laisse passer. Vérifié : sur un contrôle le bord reste éteint
+  et ne répond ni au clic ni au clavier ; sur une page ordinaire le
+  glissement fait passer.
+  Pause et le Retour du haut restent — le client y tient.
 
 - **LE TEXTE PEUT ENFIN SE REPLIER — ET C'EST CE QUI LE BRIDAIT (v264).**
   Le client, captures et taille écrite à la main : « regarde la taille du
