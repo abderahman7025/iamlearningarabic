@@ -11181,7 +11181,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v269';
+var _VERSION_REPLI='v270';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14835,6 +14835,9 @@ function _boyScene(ca,reprise){
          bord repondait alors sur une question sans reponse. */
       b.onclick=function(ev){
         ev.stopPropagation();
+        /* Meme regle que pour le geste : un bord laisse par un cours quitte
+           ne commande plus rien. */
+        if(!wrap||!wrap.isConnected)return;
         if(!actif||b.classList.contains('eteint'))return;
         fn();
       };
@@ -14871,12 +14874,23 @@ function _boyScene(ca,reprise){
          lui arrive toujours, et on dit au navigateur qu'il peut garder le
          defilement vertical mais nous laisser l'horizontal
          (`touch-action:pan-y`, pose sur le cadre). */
+      /* ══ SEUL LE COURS AFFICHE REPOND ══
+         Le client : « ça fait deux fois que, quand je glisse, ça me ramène à
+         la carte des mondes ».
+         Chaque cours ouvert accroche ses écouteurs de geste à l'écran, et on
+         ne les retirait jamais. Un seul glissement réveillait donc TOUS les
+         cours ouverts depuis le début de la séance — y compris un qui était
+         à sa dernière page, et celui-là, en avançant, rend la carte.
+         Un cours quitté a son cadre détaché de l'écran : c'est à cela qu'on
+         le reconnaît. Il se tait. */
+      function vivant(){return !!(wrap&&wrap.isConnected);}
       function depart(x,y,t){
+        if(!vivant()){bon=false;return;}
         bon=!(t&&t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case,.boy-bord'));
         x0=x;y0=y;
       }
       function arrivee(x,y){
-        if(!bon)return;bon=false;
+        if(!bon||!vivant())return;bon=false;
         var dx=x-x0,dy=y-y0;
         /* Un geste franc : au moins 60 px sur la largeur, et plus horizontal
            que vertical — sinon c'est un defilement, pas un tour de page. */

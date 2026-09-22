@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v269
+## OÙ ON EN EST — 22 septembre 2026, production en v270
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,25 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v269), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v270), du plus récent au plus ancien :**
+
+- **LE GLISSEMENT RENVOYAIT À LA CARTE DES MONDES (v270).** « Ça fait deux
+  fois que, quand je glisse, ça me ramène à la carte. »
+
+  **Chaque cours ouvert accrochait ses écouteurs de geste à l'écran, et on ne
+  les retirait jamais.** Un seul glissement réveillait donc TOUS les cours
+  ouverts depuis le début de la séance. Celui qui se trouvait à sa dernière
+  page appelait `fini()` en avançant — et `fini()`, c'est la carte.
+  Un cours quitté a son cadre détaché de l'écran : c'est à cela qu'on le
+  reconnaît. Le geste et les bords vérifient donc `wrap.isConnected` avant
+  d'agir. Vérifié dans la situation du client — un cours laissé à sa dernière
+  page, un autre ouvert par-dessus : le glissement avance normalement et la
+  carte ne revient pas.
+
+  **LEÇON, la même que celle du banc deux jours plus tôt :** un moteur de
+  scène quitté n'est pas mort. Ses minuteurs tournent, ses écouteurs
+  répondent. Tout ce qu'il accroche HORS de son propre cadre doit se taire
+  quand son cadre n'est plus à l'écran.
 
 - **LA PAGE GLISSE DU CÔTÉ OÙ L'ON VA (v269).** Demande du client. On note le
   SENS avant de rebâtir la page ; la nouvelle entre par le bord d'où elle
