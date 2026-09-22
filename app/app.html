@@ -3422,6 +3422,23 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 /* Le defilement vertical reste au navigateur ; le geste horizontal nous
    revient, sinon le telephone l'avale et le `pointerup` n'arrive jamais. */
 .boy-wrap{touch-action:pan-y}
+/* Le signe du bouton — pause, reprise — plus discret que son mot. */
+.boy-btn .pico{font-style:normal;font-size:.62em;line-height:1;
+  vertical-align:.08em;opacity:.85}
+/* Les etincelles du bravo : partout sur l'ecran, sous la main de personne. */
+.fete-scintille{position:fixed;inset:0;pointer-events:none;z-index:9998;overflow:hidden}
+.fete-scintille>i{position:absolute;font-style:normal;line-height:1;
+  color:var(--sk-vif,#ffd54f);opacity:0;transform:scale(.4);
+  text-shadow:0 0 10px rgba(255,255,255,.9);
+  animation:feteEtincelle 1.2s ease-out forwards}
+@keyframes feteEtincelle{
+  0%{opacity:0;transform:scale(.3) rotate(0deg)}
+  35%{opacity:1;transform:scale(1.15) rotate(25deg)}
+  70%{opacity:.95;transform:scale(1) rotate(-12deg)}
+  100%{opacity:0;transform:scale(.55) rotate(18deg)}}
+@media (prefers-reduced-motion:reduce){.fete-scintille{display:none}}
+/* Un son entre guillemets tient d'un seul tenant, avec son point. */
+.insecable{white-space:nowrap}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
@@ -4114,12 +4131,15 @@ body.fond-espace .tuile-nom{color:#20242e}
 .res-point{display:flex;align-items:center;gap:12px;text-align:left;
   background:#fff;border:2px solid rgba(var(--sk-rgb),.24);border-radius:16px;
   padding:7px 16px;box-shadow:0 4px 14px rgba(var(--sk-rgb-f),.10);
-  font-family:Outfit,sans-serif;font-size:1.28rem;font-weight:800;
+  /* Le client : « augmente la taille des textes arabe et français ». Le
+     reducteur qui fait tenir un point sur une ligne part de cette valeur : on
+     la monte, il ne descendra que s'il le faut vraiment. */
+  font-family:Outfit,sans-serif;font-size:1.92rem;font-weight:800;
   color:var(--sk-fonce);line-height:1.35;
   opacity:0;transform:translateY(10px);
   transition:opacity .35s ease,transform .35s ease}
 .res-point.vu{opacity:1;transform:none}
-.res-point i{font-style:normal;flex:none;font-size:1.25rem;line-height:1.1}
+.res-point i{font-style:normal;flex:none;font-size:1.7rem;line-height:1.1}
 .res-point .res-tx{flex:1 1 auto;min-width:0}
 @media (prefers-reduced-motion:reduce){.res-point{transition:none}}
 
@@ -11144,7 +11164,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v267';
+var _VERSION_REPLI='v268';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11237,6 +11257,12 @@ function _phraseAvecSons(fr,sons){
 /* Une voyelle NUE se fait entendre sur l'alif : c'est le choix du client —
    « pour une voyelle nue, prends la meme voyelle avec alif ». */
 function _sonNu(signe){return '\u0627'+signe;}
+/* Soude « … » et la ponctuation qui suit : un seul morceau, jamais coupe.
+   On travaille sur le HTML, donc on saute les balises sans les abimer. */
+function _soudeLesGuillemets(html){
+  return String(html).replace(/\u00ab(?:(?!\u00bb)[\s\S])*\u00bb[\s]*[.,;:!?\u2026]*/g,
+    function(m){return '<span class="insecable">'+m+'</span>';});
+}
 function _airAutourArabe(html){
   return String(html).replace(_RUN_ARABE,function(m){
     /* ── UNE VOYELLE SEULE DEMANDE PLUS D'AIR QU'UN MOT ──
@@ -14693,6 +14719,17 @@ function _boyScene(ca,reprise){
     N.plusTard(function(){el.innerHTML='';},2600);
   }
   api.bravo=bravo;
+  /* ── LA FETE COMPLETE ──
+     Les coeurs au-dessus du personnage, les etincelles sur tout l'ecran, et
+     les confettis. Une seule porte d'entree : partout ou l'on felicite, on
+     appelle celle-ci. */
+  function feteBravo(p,combien){
+    try{bravo(p||_dernierPanneau,combien||3);}catch(e){}
+    try{_scintille(34);}catch(e){}
+    try{if(typeof launchConfetti==='function')
+      launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+  }
+  api.feteBravo=feteBravo;
   /* ── QUAND TOUTE LA VOIX DE LA PAGE A ETE JOUEE ──
      `surSilence` seul ne suffit pas : une scene qui parle etat par etat
      laisse un blanc de quelques dixiemes entre deux phrases, et le premier
@@ -14892,7 +14929,11 @@ function _boyScene(ca,reprise){
       var b=document.createElement('button');
       b.className='boy-btn sec boy-nav';
       b.setAttribute('aria-label',aria);b.title=aria;
-      b.textContent=txt;b.onclick=fn;
+      /* Le signe — ❙❙ ou ▶ — est un repere, pas un mot : il se fait petit
+         devant le texte, que le client trouvait ecrase par lui. */
+      b.innerHTML=String(txt).replace(/^([\u2759\u258f\u25b6\u258c]+|\u2759\u2759)\s*/,
+        function(m){return '<i class="pico">'+m.trim()+'</i> ';});
+      b.onclick=fn;
       rangee.appendChild(b);return b;
     }
     /* RETOUR — tout a gauche, toujours. C'est un recours, pas la marche a
@@ -14933,9 +14974,12 @@ function _boyScene(ca,reprise){
        change ; seule la façon d'appuyer change.
        Les boutons de DESTINATION — « lettre suivante », « menu » — restent
        visibles : ce ne sont pas des « suite ». */
+    /* ── « C'EST PARTI ! » AUSSI ──
+       Le client : « enlève le bouton "c'est parti" du début ». Il ne portait
+       pas le nom « Suite », mais il fait la meme chose — avancer d'une page.
+       On ne regarde donc plus son NOM, on regarde CE QU'IL FAIT. */
     var _estSuite=false;
-    try{_estSuite=!!principal&&
-      String(principal.textContent||'').trim()===String(te('Suite ›')).trim();}catch(e){}
+    try{_estSuite=!!principal&&principal._fait===suivant;}catch(e){}
     if(principal){
       principal.style.marginTop='0';
       if(_estSuite)principal.style.display='none';
@@ -15025,7 +15069,16 @@ function _boyScene(ca,reprise){
        recouper, deux lignes en devenaient trois et aucune taille de police
        n'etait stable. Ici le compte est exact par construction, et c'est la
        police qui s'adapte — voir `remplitLaLargeur`. */
-    var _lignes=_airAutourArabe(_sansCercle(html)).split(/<br\b[^>]*>/i);
+    /* ══ LES GUILLEMETS NE SE COUPENT PAS DE LEUR CONTENU ══
+       Le client : « on a "ba" sur deux lignes — "ba" à la fin de la première
+       et le guillemet fermant sur la seconde avec le point. Il ne faut jamais
+       couper les guillemets avec leur contenu, ni le point juste après. »
+       Depuis que les lignes se replient (v264), le navigateur coupe où il
+       peut, et « ba ». offre trois espaces où couper. On soude donc le groupe
+       entier — guillemet ouvrant, contenu, guillemet fermant, et la
+       ponctuation qui suit — en un seul morceau insécable. */
+    var _lignes=_soudeLesGuillemets(_airAutourArabe(_sansCercle(html)))
+                  .split(/<br\b[^>]*>/i);
     t.innerHTML=_lignes.map(function(l){
       return '<span class="boy-ligne">'+l+'</span>';
     }).join('');
@@ -15612,7 +15665,13 @@ function _boyScene(ca,reprise){
   }
   function bouton(p,label,fn,sec){
     var b=document.createElement('button');b.className='boy-btn'+(sec?' sec':'');
-    b.textContent=label;b.onclick=function(){N.stop();fn();};p.appendChild(b);return b;
+    b.textContent=label;
+    /* On garde en memoire CE QUE FAIT le bouton : `ajouteRetour` cache ceux
+       qui ne font qu'avancer — « Suite », « C'est parti ! » — puisque ce sont
+       les bords de l'ecran qui s'en chargent. Les boutons de DESTINATION,
+       eux, restent visibles. */
+    b._fait=fn;
+    b.onclick=function(){N.stop();fn();};p.appendChild(b);return b;
   }
   api.panneau=panneau;api.titre=titre;api.hublot=hublot;api.piste=piste;api.bouton=bouton;
 
@@ -16360,7 +16419,7 @@ function _boyScene(ca,reprise){
       _sceneFete++;
       attendSilence(function(){
         N.plusTard(function(){
-          N.dire(te('Bravo !'));bravo(p,2);
+          N.dire(te('Bravo !'));feteBravo(p,3);
           N.plusTard(function(){N.surSilence(function(){_sceneFete--;});},250);
         },1000);
       },false);
@@ -17189,9 +17248,16 @@ function _boyScene(ca,reprise){
           var tx=d.querySelector('.res-tx');if(!tx)return;
           tx.style.fontSize='';
           var px=parseFloat(getComputedStyle(tx).fontSize)||20,garde=0;
+          /* ── DEUX LIGNES VALENT MIEUX QU'UN TEXTE MINUSCULE ──
+             Le client : « page à retenir, augmente la taille des textes arabe
+             et français ». Le réducteur faisait tenir CHAQUE point sur une
+             seule ligne : un point un peu long tombait donc à une taille
+             minuscule — mesuré, 28 px vus quand le reste de la page en fait
+             50. On lui accorde deux lignes : la phrase se replie au lieu de
+             rapetisser, et la liste reste lisible d'un coup d'œil. */
           function uneLigne(){
             var lh=parseFloat(getComputedStyle(tx).lineHeight)||(px*1.35);
-            return tx.offsetHeight<=lh*1.4;
+            return tx.offsetHeight<=lh*2.4;
           }
           while(!uneLigne()&&px>11&&garde++<40){
             px-=0.6;tx.style.fontSize=px.toFixed(2)+'px';
@@ -18978,6 +19044,9 @@ function _boyScene(ca,reprise){
       }
       var t=document.createElement('div');t.className='mj-prix-tx';
       t.textContent='🎉 '+te('Bravo !');
+      /* La page de fin merite la meme fete que les autres bravos — le client
+         la cite nommement. */
+      try{_scintille(46);}catch(e){}
       z.appendChild(t);
       p.appendChild(z);
       N.plusTard(function(){
@@ -22423,6 +22492,34 @@ window.onload=()=>{
 ═══════════════════════════════════════════════════════════ -->
 <script>
 /* D. Confettis sur bonne réponse */
+/* ══ LE SCINTILLEMENT DU BRAVO ══
+   Le client : « chaque fois que l'on dit bravo, il faut qu'il y ait une
+   animation : les petits coeurs autour de la fille, mais aussi quelque chose
+   sur tout l'ecran, comme des petites etoiles qui brillent, des trucs qui
+   scintillent, et des confettis ».
+   Une trentaine d'etincelles semees au hasard sur l'ecran, chacune avec son
+   retard et sa duree : elles naissent, brillent, et s'en vont. Rien n'est
+   cliquable, rien ne retient le doigt, et tout se retire tout seul. */
+function _scintille(combien){
+  try{
+    var n=combien||30;
+    var h=document.createElement('div');
+    h.className='fete-scintille';h.setAttribute('aria-hidden','true');
+    var etoiles=['\u2726','\u2727','\u272f','\u2b50','\u2728'];
+    for(var i=0;i<n;i++){
+      var e=document.createElement('i');
+      e.textContent=etoiles[i%etoiles.length];
+      e.style.left=(Math.random()*96+2).toFixed(1)+'%';
+      e.style.top=(Math.random()*88+4).toFixed(1)+'%';
+      e.style.fontSize=(10+Math.random()*26).toFixed(0)+'px';
+      e.style.animationDelay=(Math.random()*0.9).toFixed(2)+'s';
+      e.style.animationDuration=(0.9+Math.random()*0.8).toFixed(2)+'s';
+      h.appendChild(e);
+    }
+    document.body.appendChild(h);
+    setTimeout(function(){if(h.parentNode)h.parentNode.removeChild(h);},2600);
+  }catch(e){}
+}
 function launchConfetti(profile) {
   var colors;
   if (profile === 'girl') {

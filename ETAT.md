@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v267
+## OÙ ON EN EST — 22 septembre 2026, production en v268
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,43 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v267), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v268), du plus récent au plus ancien :**
+
+- **LES GUILLEMETS NE SE COUPENT PLUS (v268).** « On a "ba" sur deux lignes ;
+  il ne faut jamais couper les guillemets avec leur contenu, ni le point juste
+  après. » Depuis que les lignes se replient (v264), le navigateur coupe où il
+  peut, et « ba ». offre trois endroits. Le groupe entier — guillemet, contenu,
+  guillemet, ponctuation — est soudé en un morceau insécable. Vérifié :
+  « ba » et « b ». tiennent chacun d'un seul tenant.
+
+- **« C'EST PARTI ! » DISPARAÎT AUSSI (v268).** Il ne portait pas le nom
+  « Suite » mais faisait la même chose. On ne regarde plus le NOM du bouton,
+  on regarde CE QU'IL FAIT : tout bouton dont l'action est `suivant` est
+  caché, les boutons de destination restent.
+
+- **LE SIGNE DE PAUSE MAIGRIT (v268).** ❙❙ et ▶ passent à 62 % de la taille du
+  mot : un repère, pas un mot.
+
+- **CHAQUE BRAVO EST UNE FÊTE (v268).** Cœurs au-dessus du personnage,
+  **étincelles sur tout l'écran** (une trentaine, semées au hasard, chacune
+  avec son retard) et confettis. Une seule porte d'entrée, `feteBravo`, pour
+  que ce soit pareil partout — y compris la page « tu es un champion ».
+
+- **« À RETENIR » : DEUX LIGNES PLUTÔT QU'UN TEXTE MINUSCULE (v268).** Le
+  réducteur faisait tenir chaque point sur UNE ligne : un point un peu long
+  tombait à 28 px quand le reste de la page en fait 50. Deux lignes lui sont
+  accordées — 32 px, et la liste reste lisible d'un coup d'œil.
+
+- **LE BLOCAGE DES QUESTIONS, VÉRIFIÉ (v268).** Le client le croyait
+  contournable au glissement. Testé sur une page fraîche, contrôle verrouillé :
+  le bord reste éteint et le glissement ne fait rien.
+  **PIÈGE DE BANC** : appeler `_boyVowelCourse` en boucle laisse les minuteurs
+  de la scène précédente en vie ; ils font avancer — ou terminent — le cours
+  pendant la mesure suivante, et l'on croit à une fuite. Toujours repartir
+  d'un chargement de page, et vérifier que la page est STABLE avant d'agir.
+
+- **LES DEUX HABILLAGES SONT LE MÊME MOTEUR.** Vérifié côté garçon : mêmes
+  tailles (44 px), mêmes groupes insécables, même barre réduite à « Pause ».
 
 - **LES PAGES À DEUX COLONNES : LA HAUTEUR SE MESURAIT SUR ELLE-MÊME (v267).**
   Le client, excédé et dans le vrai : « je parle des textes sur les pages où
