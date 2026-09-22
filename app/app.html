@@ -3419,6 +3419,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    la ligne du texte et se met à sa taille, en plus gros. */
 .boy-bete-titre{height:1.9em;width:auto;vertical-align:-.55em;
   object-fit:contain;display:inline-block}
+/* Le defilement vertical reste au navigateur ; le geste horizontal nous
+   revient, sinon le telephone l'avale et le `pointerup` n'arrive jamais. */
+.boy-wrap{touch-action:pan-y}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
@@ -11141,7 +11144,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v265';
+var _VERSION_REPLI='v266';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14805,18 +14808,46 @@ function _boyScene(ca,reprise){
     if(!_gesteArme){
       _gesteArme=true;
       var x0=0,y0=0,bon=false;
-      ca.addEventListener('pointerdown',function(ev){
-        var t=ev.target;
-        bon=!(t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case'));
-        x0=ev.clientX;y0=ev.clientY;
-      },{passive:true});
-      ca.addEventListener('pointerup',function(ev){
+      /* ── LE DOIGT, ET LA SOURIS ──
+         Le client : « sur portable, on scrolle avec le doigt ». Les
+         evenements de pointeur sont censes couvrir les deux, mais sur
+         telephone le navigateur peut prendre le geste a son compte pour
+         faire defiler la page — il envoie alors `pointercancel` et le
+         `pointerup` n'arrive jamais. On ecoute donc AUSSI le toucher, qui
+         lui arrive toujours, et on dit au navigateur qu'il peut garder le
+         defilement vertical mais nous laisser l'horizontal
+         (`touch-action:pan-y`, pose sur le cadre). */
+      function depart(x,y,t){
+        bon=!(t&&t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case,.boy-bord'));
+        x0=x;y0=y;
+      }
+      function arrivee(x,y){
         if(!bon)return;bon=false;
-        var dx=ev.clientX-x0,dy=ev.clientY-y0;
-        if(Math.abs(dx)<70||Math.abs(dy)>60)return;
+        var dx=x-x0,dy=y-y0;
+        /* Un geste franc : au moins 60 px sur la largeur, et plus horizontal
+           que vertical — sinon c'est un defilement, pas un tour de page. */
+        if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.4)return;
         if(dx<0){if(_bordD&&!_bordD.classList.contains('eteint'))_bordD.click();}
         else{if(_bordG&&!_bordG.classList.contains('eteint'))_bordG.click();}
+      }
+      ca.addEventListener('pointerdown',function(ev){
+        if(ev.pointerType==='touch')return;   /* le toucher a ses propres ecouteurs */
+        depart(ev.clientX,ev.clientY,ev.target);
       },{passive:true});
+      ca.addEventListener('pointerup',function(ev){
+        if(ev.pointerType==='touch')return;
+        arrivee(ev.clientX,ev.clientY);
+      },{passive:true});
+      ca.addEventListener('touchstart',function(ev){
+        if(!ev.touches||ev.touches.length!==1){bon=false;return;}
+        depart(ev.touches[0].clientX,ev.touches[0].clientY,ev.target);
+      },{passive:true});
+      ca.addEventListener('touchend',function(ev){
+        var t=(ev.changedTouches&&ev.changedTouches[0])||null;
+        if(!t){bon=false;return;}
+        arrivee(t.clientX,t.clientY);
+      },{passive:true});
+      ca.addEventListener('touchcancel',function(){bon=false;},{passive:true});
     }
   }
   function ajouteRetour(){
@@ -14881,6 +14912,14 @@ function _boyScene(ca,reprise){
         }else{
           arreteEnchainement();N.pause();pb.textContent=te('▶ Reprendre');
         }
+        /* ── LE BOUTON SE REMET A SA TAILLE ──
+           Le client : « le texte "revenir" dépasse ! ». Les boutons d'une
+           rangée reçoivent tous la largeur du plus large, mesurée UNE FOIS,
+           à la pose. Or ce bouton change de nom en cours de route — « Pause »
+           fait deux syllabes, « Reprendre » trois — et le texte sortait de la
+           boîte taillée pour l'ancien. On remesure la rangée après chaque
+           changement de nom. */
+        egaliseLaRangee(rangee);
         ouvreSuite(N.enPause());
       });
     }
@@ -15787,6 +15826,22 @@ function _boyScene(ca,reprise){
      ils se partagent la largeur au lieu de deborder. */
   function egaliseLaRangee(r){
     if(!r||!r.isConnected)return;
+    /* ══ LA LARGEUR DU BOUTON SUIT SON NOM ══
+       Le client : « le texte "revenir" dépasse ! la largeur du bouton doit
+       s'adapter ».
+       Cette fonction donnait à tous les boutons d'une rangée la largeur du
+       plus large, mesurée UNE FOIS. Un bouton qui change de nom en cours de
+       route — « Pause » devient « Reprendre » — gardait la boîte taillée
+       pour l'ancien, et le texte en sortait. Remesurer ne suffisait pas : il
+       reste que la largeur est IMPOSÉE, donc fausse dès que le nom bouge.
+       On ne l'impose donc plus. Chaque bouton prend la largeur de son texte,
+       avec le minimum généreux de la feuille de style — c'est exactement ce
+       qui était demandé, et il n'y a plus rien à remesurer. */
+    [].slice.call(r.children).forEach(function(b){
+      b.style.flex='0 0 auto';b.style.width='auto';b.style.minWidth='';
+    });
+    if(1)return;
+    /* eslint-disable no-unreachable */
     var bs=[].slice.call(r.children);
     if(!bs.length)return;
     bs.forEach(function(b){b.style.flex='0 0 auto';b.style.width='auto';});
@@ -16159,7 +16214,14 @@ function _boyScene(ca,reprise){
            largeur du cadre ; pose sur la lettre, il suit la taille de
            celle-ci et garde sa proportion d'ecriture. L'etat le dit : sans
            aucune lettre a l'ecran, le signe est seul. */
-        var seul=(L.length===0);
+        /* ── LE SIGNE PEUT CESSER D'ETRE SEUL AVANT QU'UNE LETTRE ARRIVE ──
+           Le client : « au tout début, la ḍamma est grosse au centre ; elle
+           doit prendre sa taille finale, plus petite, DÈS QU'ELLE DESCEND ».
+           Il a raison : une fois qu'elle se situe par rapport à la ligne,
+           elle n'est plus un signe montré en gros, elle est un signe écrit.
+           Un état peut donc le dire lui-même (`petit`), sans attendre qu'une
+           lettre paraisse. */
+        var seul=(L.length===0)&&!e.petit;
         flot.forEach(function(f,k){
           var on=F.indexOf(k)>=0;
           f.classList.toggle('vu',on);
@@ -19355,10 +19417,12 @@ function _boyVowelCourse(ca){
       {flottants:[{m:mD,c:CDA,x:50,y:MILIEU}],
        /* La ligne n'arrive qu'avec le mouvement : tant que le signe est au
           centre, il n'y a rien a situer par rapport a elle. */
+       /* Grosse au centre le temps qu'on la nomme ; à sa taille d'écriture
+          dès le premier mouvement, et jusqu'à la fin. */
        scene:[{F:[0],t:'ou',d:1800},
-              {F:[0],P:1,fx:50,fy:BAS,d:1100},
-              {F:[0],P:1,fx:50,fy:BAS,X:[50,BAS],d:1500},
-              {F:[0],P:1,fx:50,fy:HAUT,d:2400}]}),
+              {F:[0],P:1,petit:1,fx:50,fy:BAS,d:1100},
+              {F:[0],P:1,petit:1,fx:50,fy:BAS,X:[50,BAS],d:1500},
+              {F:[0],P:1,petit:1,fx:50,fy:HAUT,d:2400}]}),
 
     /* ── ON ASSEMBLE LE SON, A VOIX HAUTE ──
        La lettre parait quand la voix dit « b », la voyelle quand elle dit
@@ -19454,7 +19518,7 @@ function _boyVowelCourse(ca){
           secondes et dire : bravo, on dit [la réponse] ». Les deux
           temps d'attente de la scène tiennent ce silence ; la réponse
           vient ensuite, par sa voix si elle est enregistrée. */
-       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000},
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:3800},
               {F:[0],P:1,dit:_phraseAvecSons(
                  teF('Bravo, on dit {son}',{son:'ou'}),
                  [['ou',_sonNu('ُ')]])}]}),
@@ -19470,7 +19534,7 @@ function _boyVowelCourse(ca){
           secondes et dire : bravo, on dit [la réponse] ». Les deux
           temps d'attente de la scène tiennent ce silence ; la réponse
           vient ensuite, par sa voix si elle est enregistrée. */
-       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000},
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:3800},
               {F:[0],P:1,dit:_phraseAvecSons(
                  teF('Bravo, on dit {son}',{son:'a'}),
                  [['a',_sonNu('َ')]])}]}),
@@ -19486,7 +19550,7 @@ function _boyVowelCourse(ca){
           secondes et dire : bravo, on dit [la réponse] ». Les deux
           temps d'attente de la scène tiennent ce silence ; la réponse
           vient ensuite, par sa voix si elle est enregistrée. */
-       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:2000},
+       scene:[{F:[0],P:1,d:3200},{F:[0],P:1,d:3800},
               {F:[0],P:1,dit:_phraseAvecSons(
                  teF('Bravo, on dit {son}',{son:'i'}),
                  [['i',_sonNu('ِ')]])}]}),
@@ -19494,9 +19558,9 @@ function _boyVowelCourse(ca){
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« a »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],F),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« i »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],K),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« ou »</b> ?'),te('Où est ce son ?'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],D)
+      B.controle('CONTRÔLE',TB('Où est le son <b>« a »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],F),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« i »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],K),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« ou »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],D)
     ]),
 
     B.brief(te('BRAVO'),
@@ -19564,9 +19628,9 @@ function _boyVowelCourse(ca){
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« an »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TF),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« oun »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TD),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« in »</b> ?'),te('Où est ce son ?'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TK)
+      B.controle('CONTRÔLE',TB('Où est le son <b>« an »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TF),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« oun »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TD),
+      B.controle('CONTRÔLE',TB('Où est le son <b>« in »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TK)
     ]),
 
     B.illustre(te('LE SOUKOUN'),

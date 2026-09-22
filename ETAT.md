@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v265
+## OÙ ON EN EST — 22 septembre 2026, production en v266
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,43 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v265), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v266), du plus récent au plus ancien :**
+
+- **LE GLISSEMENT MARCHE AU DOIGT (v266).** Les événements de pointeur sont
+  censés couvrir souris et doigt, mais sur téléphone le navigateur prend le
+  geste à son compte pour faire défiler : il envoie `pointercancel` et le
+  `pointerup` n'arrive jamais. On écoute donc AUSSI `touchstart/touchend`, et
+  `.boy-wrap` porte `touch-action:pan-y` — le défilement vertical reste au
+  navigateur, l'horizontal nous revient. Vérifié avec de vrais `TouchEvent` :
+  vers la gauche on avance, vers la droite on revient.
+
+- **LA LARGEUR DU BOUTON SUIT SON NOM (v266).** « Le texte "revenir" dépasse ! »
+  `egaliseLaRangee` donnait à tous les boutons la largeur du plus large,
+  mesurée UNE FOIS. Un bouton qui change de nom en route — « Pause » devient
+  « Reprendre » — gardait la boîte de l'ancien. Remesurer ne suffisait pas :
+  le défaut est d'IMPOSER une largeur. On ne l'impose plus. Mesuré : 206 px
+  dans les deux états, plus aucun débordement.
+
+- **« OÙ EST LE SON » + LE SON (v266).** Correction du client sur lui-même :
+  pas « où est ce son », mais « où est le son », puis le son joué. Six
+  contrôles.
+
+- **DEUX SECONDES AVANT LA RÉPONSE (v266).** Sur les pages « on dit
+  comment ? », le temps d'attente passe de 2 à 3,8 s pour que « bravo, on
+  dit… » tombe bien après la fin de la voix, pas dessus.
+
+- **LA ḌAMMA PREND SA TAILLE D'ÉCRITURE EN DESCENDANT (v266).** « Elle est
+  grosse au tout début, et elle doit devenir sa taille finale dès qu'elle
+  descend. » Le signe n'était « seul » — donc montré en gros — que tant
+  qu'aucune lettre n'était à l'écran ; il restait gros toute la scène. Un état
+  peut maintenant le dire lui-même. Mesuré : 550 px au centre, 233 px dès le
+  premier mouvement.
+
+- **LE TEXTE, VÉRIFIÉ EN PORTRAIT (v266).** Le client ne voyait pas le
+  changement de la v264 : mesuré sur téléphone 375 × 812, les titres font
+  **46 à 51 px vus** et la phrase se replie sur cinq lignes en remplissant la
+  carte. La capture est au dossier. S'il ne le voit toujours pas, c'est son
+  cache — le service worker sert pourtant le réseau d'abord.
 
 - **ON TOURNE LA PAGE AU DOIGT (v265).** Le client : « au lieu des boutons
   suivant et retour, je veux juste qu'on puisse glisser à gauche ou à droite ;
