@@ -3114,12 +3114,17 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    le script). Aucune règle plus bas ne doit écrire une couleur en dur :
    sinon la licorne repasse au bleu sans qu'on comprenne pourquoi.
    Le calque plein écran du tracé vit hors de `.boy-wrap` — d'où sa classe. */
-.boy-wrap,.boy-plein{
+/* `.boy-glisse` en fait partie pour la meme raison que `.boy-plein` : la
+   bande du carrousel est posee sur le BODY, hors de `.boy-wrap`. Sans elle
+   ici, `var(--sk-pale)` et `var(--sk-rgb)` ne valent rien dans les copies —
+   le galet rose palit jusqu'au blanc et sa bordure disparait. C'est ce que
+   le client a vu : « le cadre ne doit pas disparaitre quand je glisse ». */
+.boy-wrap,.boy-plein,.boy-glisse{
   --sk-fonce:#01579b;--sk-moyen:#0277bd;--sk-vif:#0288d1;--sk-clair:#039be5;
   --sk-pale:#e8f6ff;--sk-rgb:2,136,209;--sk-rgb-f:1,87,155;
   --sk-bulle-a:#ffffff;--sk-bulle-b:#cdeafc;--sk-bulle-c:#9ad4f5;
   --sk-jauge:#4fc3f7;--sk-doux:#f2fafe;--sk-doux-actif:#dcf0fb}
-.boy-wrap.licorne,.boy-plein.licorne{
+.boy-wrap.licorne,.boy-plein.licorne,.boy-glisse.licorne{
   --sk-fonce:#7b1747;--sk-moyen:#b3195f;--sk-vif:#d81b78;--sk-clair:#f0629f;
   --sk-pale:#fff0f7;--sk-rgb:216,27,120;--sk-rgb-f:123,23,71;
   --sk-bulle-a:#ffffff;--sk-bulle-b:#ffd9ec;--sk-bulle-c:#f7b6dc;
@@ -3459,18 +3464,22 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    Les pages sont donc posees cote a cote sur une meme bande, et cette bande
    coulisse. Le pivot s'en va : il donnait l'idee d'une roue, or une roue
    n'attend pas la main. Une bande, si. */
+/* La carte qui arrive est d'abord un peu plus petite et prend sa taille en
+   se posant ; celle qui s'en va retrecit en partant. Le client : « ce serait
+   bien que le nouveau cadre qui arrive soit plus petit et grossisse en
+   arrivant, pour avoir sa taille normale lorsqu'il est completement la ». */
 @keyframes roueEntreD{
-  from{transform:translateX(100%)}
+  from{transform:translateX(100%) scale(.88)}
   to  {transform:none}}
 @keyframes roueEntreG{
-  from{transform:translateX(-100%)}
+  from{transform:translateX(-100%) scale(.88)}
   to  {transform:none}}
 @keyframes rouePartG{
   from{transform:none}
-  to  {transform:translateX(-100%)}}
+  to  {transform:translateX(-100%) scale(.88)}}
 @keyframes rouePartD{
   from{transform:none}
-  to  {transform:translateX(100%)}}
+  to  {transform:translateX(100%) scale(.88)}}
 /* ── LE CALQUE DU GLISSEMENT ──
    Les deux cartes y sont posees en position fixe, aux pixels de l'ecran, et
    ne repondent a rien : la main commande la bande, pas ce qu'il y a dessus.
@@ -3479,15 +3488,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    pour une autre largeur que celle ou on les montre. */
 .boy-glisse{position:fixed;inset:0;z-index:36;pointer-events:none;
   overflow:hidden}
-.boy-glisse .boy-panel{transform-origin:top left;will-change:transform}
-/* ── LA CARTE QU'ON N'A PAS ENCORE VUE ──
-   Elle arrive vide : son contenu se batira au lache. Sans rien, la main
-   pousserait la page contre du blanc et l'enfant ne verrait pas qu'une autre
-   carte vient. On en montre donc le CADRE — le meme galet arrondi, a peine
-   pose sur le fond du cours — et il se remplit a l'arrivee. */
-.boy-glisse .boy-panel:empty{border-radius:26px;
-  background:rgba(var(--sk-rgb-f,120,120,120),.055);
-  box-shadow:inset 0 0 0 3px rgba(var(--sk-rgb-f,120,120,120),.16)}
+/* ── DEUX TRANSFORMATIONS, DONC DEUX ELEMENTS ──
+   La carte doit a la fois SE DEPLACER — depuis son coin haut-gauche, sinon
+   elle ne tomberait pas a la bonne place — et GROSSIR depuis son CENTRE. Une
+   seule transformation ne peut pas avoir deux origines. La case porte donc
+   le deplacement, et la carte, dedans, sa taille.
+   La carte encore vide garde tout son decor : c'est le galet du cours, il ne
+   lui manque que son contenu, qui arrive au lache. */
+.boy-glisse .boy-case{transform-origin:top left;will-change:transform}
+.boy-glisse .boy-panel{transform-origin:50% 50%;will-change:transform}
 .boy-panel.entre-d{animation:roueEntreD .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.entre-g{animation:roueEntreG .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.roue-part{transform-origin:50% 50%;will-change:transform,opacity}
@@ -11223,7 +11232,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v273';
+var _VERSION_REPLI='v274';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16357,17 +16366,29 @@ function _boyScene(ca,reprise){
      effet. Les copies n'en ont pas besoin : on l'eteint. Les largeurs, elles,
      sont prises sur la MISE EN PAGE (`offsetWidth`) et non sur ce qu'on voit
      a l'ecran — ce qu'on voit depend justement de l'animation en cours. */
-  function _pose(c,r,k,dx){
-    c.style.position='fixed';c.style.margin='0';c.style.pointerEvents='none';
+  /* La case porte la PLACE — elle se deplace depuis son coin haut-gauche,
+     a l'echelle du cadre du cours. La carte, dedans, porte sa TAILLE, qu'elle
+     prend depuis son centre. */
+  var _PETIT=0.88;
+  function _pose(c,r,k,dx,taille){
+    var w=document.createElement('div');
+    w.className='boy-case';
+    w.style.cssText='position:fixed;pointer-events:none;'
+      +'left:'+r.left+'px;top:'+r.top+'px;'
+      +'width:'+r.lw+'px;height:'+r.lh+'px;'
+      +'transform:translateX('+dx+'px) scale('+k+')';
+    c.style.position='relative';c.style.margin='0';c.style.pointerEvents='none';
     c.style.animation='none';c.style.transition='none';
-    c.style.left=r.left+'px';c.style.top=r.top+'px';
-    c.style.width=r.lw+'px';c.style.height=r.lh+'px';
-    c.style.transformOrigin='top left';
-    c.style.transform='translateX('+dx+'px) scale('+k+')';
+    c.style.left='0';c.style.top='0';
+    c.style.width='100%';c.style.height='100%';
+    c.style.transform='scale('+taille+')';
+    w.appendChild(c);
+    return w;
   }
-  function _pousse(c,dx,k){
-    c.style.transform='translateX('+dx+'px) scale('+k+')';
+  function _pousse(w,dx,k){
+    w.style.transform='translateX('+dx+'px) scale('+k+')';
   }
+  function _taille(c,t){c.style.transform='scale('+t+')';}
 
   function _glisseNettoie(){
     try{
@@ -16400,9 +16421,12 @@ function _boyScene(ca,reprise){
       var j=i+sens;
       if(_photos[j]!==undefined)b.innerHTML=_photos[j];
       var pas=r.width+18;
-      _pose(a,r,k,0);
-      _pose(b,r,k,sens>0?pas:-pas);
-      ov.appendChild(b);ov.appendChild(a);
+      var wa=_pose(a,r,k,0,1);
+      var wb=_pose(b,r,k,sens>0?pas:-pas,_PETIT);
+      ov.appendChild(wb);ov.appendChild(wa);
+      /* Les couleurs de l'habillage : la bande est sur le body, elle ne les
+         herite de personne. */
+      try{if(_HAB&&_HAB.classe)ov.classList.add(_HAB.classe);}catch(e){}
       document.body.appendChild(ov);
       p.style.visibility='hidden';
       /* Une page bloquee — une question sans reponse juste, ou la premiere
@@ -16413,7 +16437,8 @@ function _boyScene(ca,reprise){
         if(sens>0)libre=_ouvertADroite();
         else libre=!!(_bordG&&_bordG.isConnected);
       }catch(e){}
-      return {ov:ov,a:a,b:b,p:p,r:r,k:k,pas:pas,sens:sens,libre:libre,dx:0};
+      return {ov:ov,a:a,b:b,wa:wa,wb:wb,p:p,r:r,k:k,pas:pas,sens:sens,
+              libre:libre,dx:0};
     }catch(e){return null;}
   }
 
@@ -16425,8 +16450,14 @@ function _boyScene(ca,reprise){
     if(_glis.sens<0&&d<0)d=0;
     if(!_glis.libre)d=d*0.22;
     _glis.dx=d;
-    _pousse(_glis.a,d,_glis.k);
-    _pousse(_glis.b,d+(_glis.sens>0?_glis.pas:-_glis.pas),_glis.k);
+    /* La part du chemin deja faite commande les tailles : celle qui part
+       retrecit, celle qui vient grossit, et a mi-course on voit la moitie de
+       chacune — c'est la demande du client, mot pour mot. */
+    var t=Math.min(1,Math.abs(d)/_glis.pas);
+    _pousse(_glis.wa,d,_glis.k);
+    _pousse(_glis.wb,d+(_glis.sens>0?_glis.pas:-_glis.pas),_glis.k);
+    _taille(_glis.a,1-(1-_PETIT)*t);
+    _taille(_glis.b,_PETIT+(1-_PETIT)*t);
   }
 
   function _glisseLache(annule){
@@ -16435,10 +16466,12 @@ function _boyScene(ca,reprise){
     var seuil=Math.max(70,g.r.width*0.22);
     var passe=!annule&&g.libre&&Math.abs(g.dx)>=seuil;
     var fin=passe?(g.sens>0?-g.pas:g.pas):0;
-    [g.a,g.b].forEach(function(c){
+    [g.a,g.b,g.wa,g.wb].forEach(function(c){
       c.style.transition='transform .26s cubic-bezier(.22,.68,.3,1)';});
-    _pousse(g.a,fin,g.k);
-    _pousse(g.b,fin+(g.sens>0?g.pas:-g.pas),g.k);
+    _pousse(g.wa,fin,g.k);
+    _pousse(g.wb,fin+(g.sens>0?g.pas:-g.pas),g.k);
+    _taille(g.a,passe?_PETIT:1);
+    _taille(g.b,passe?1:_PETIT);
     setTimeout(function(){
       try{if(g.p&&g.p.isConnected)g.p.style.visibility='';}catch(e){}
       if(!passe){

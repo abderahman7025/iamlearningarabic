@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v273
+## OÙ ON EN EST — 24 septembre 2026, production en v274
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,28 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v273), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v274), du plus récent au plus ancien :**
+
+- **LE CADRE NE DISPARAÎT PLUS PENDANT LE GLISSEMENT (v274).** « Le rectangle
+  rose pâle aux coins arrondis ne doit pas disparaître quand je glisse. »
+  Les couleurs de l'habillage sont posées sur `.boy-wrap` ; la bande du
+  carrousel, elle, vit sur le BODY. `var(--sk-pale)` et `var(--sk-rgb)` n'y
+  valaient donc rien : le galet pâlissait jusqu'au blanc et sa bordure
+  disparaissait. `.boy-glisse` rejoint `.boy-plein` dans la liste des
+  porteurs, et la bande reçoit la classe de l'habillage — exactement comme
+  le calque du tracé le fait depuis toujours, pour la même raison.
+  **Règle :** un élément posé sur le body n'hérite d'AUCUNE variable du
+  cours. Toute copie sortie du cadre doit les reprendre explicitement.
+
+- **LES CARTES GROSSISSENT EN ARRIVANT (v274).** « Le nouveau cadre qui arrive
+  serait plus petit et grossirait pour avoir sa taille normale lorsqu'il est
+  complètement là ; pareil pour celui sur lequel on était, qui rapétisse en
+  partant. » De 0,88 à 1, au fil de la course du doigt, et de même sur les
+  pages qui tournent toutes seules.
+  **Pourquoi deux éléments par carte :** elle doit se DÉPLACER depuis son
+  coin haut-gauche — sinon elle ne tombe pas à la bonne place — et GROSSIR
+  depuis son centre. Une seule transformation ne peut pas avoir deux
+  origines. La case porte le déplacement, la carte porte sa taille.
 
 - **LE CARROUSEL QUI SUIT LE DOIGT (v273).** « Fais comme si toutes les pages
   d'une leçon étaient sur une même page, une seule visible, et qu'on puisse
