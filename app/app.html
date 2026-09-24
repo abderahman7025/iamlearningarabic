@@ -3497,6 +3497,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    lui manque que son contenu, qui arrive au lache. */
 .boy-glisse .boy-case{transform-origin:top left;will-change:transform}
 .boy-glisse .boy-panel{transform-origin:50% 50%;will-change:transform}
+/* ── LE CONTENU PARAIT ET S'EFFACE, LE CADRE RESTE ──
+   Le client : « le contenu du cadre sur lequel on va doit apparaitre en
+   fondu en arrivant, et disparaitre en s'en allant ». C'est bien le CONTENU
+   et non la carte : le galet rose, lui, ne doit jamais s'effacer — c'est la
+   demande d'avant. On agit donc sur les enfants du panneau, pas sur lui. */
+.boy-glisse .boy-panel>*{opacity:var(--fondu,1)}
+.boy-glisse.en-lache .boy-panel>*{transition:opacity .26s ease}
 .boy-panel.entre-d{animation:roueEntreD .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.entre-g{animation:roueEntreG .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.roue-part{transform-origin:50% 50%;will-change:transform,opacity}
@@ -3513,7 +3520,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    La rangée qu'elle occupait rendait au cadre une bonne quarantaine de
    pixels : c'est cette place-là qui passe dans les modèles. Elle se pose au
    coin bas-droit, sous la ligne d'écriture, là où aucune lettre ne va. */
-.boy-gomme{position:absolute;right:7px;bottom:7px;z-index:3;
+.boy-gomme{position:absolute;left:7px;bottom:7px;z-index:3;
   width:32px;height:32px;border-radius:50%;padding:0;margin:0;
   border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
   color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
@@ -11245,7 +11252,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v275';
+var _VERSION_REPLI='v276';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13480,8 +13487,18 @@ function _blocEcriture(hote,o){
      depassait de 78 px — mesure faite sur les quatre ecrans concernes. On le
      ramene alors a la hauteur commune ; le signe reste grand, c'est le vide
      autour de lui qu'on retire. */
-  if(window.innerWidth>window.innerHeight&&window.innerHeight<=460)
-    CH0=Math.min(CH0,224);
+  /* ── EN PAYSAGE, C'EST L'ECRAN QUI DIT LA FORME ──
+     Le cadre prend toute la largeur du panneau, et sa hauteur suit sa forme :
+     large, il devient tres haut. Couche, un telephone offre 844 px de large
+     pour 390 de haut — le cadre en reclamait 530 et sortait de l'ecran, ne
+     laissant plus rien au texte.
+     La forme se conserve a travers la mise a l'echelle du cadre du cours :
+     on peut donc la borner une fois pour toutes, ici, en pixels d'ecran.
+     Le cadre ne prendra jamais plus de 46 % de la hauteur vue. */
+  if(window.innerWidth>window.innerHeight){
+    var _budget=window.innerHeight*0.46, _vu=window.innerWidth*0.94;
+    if(_vu>0)CH0=Math.min(CH0,Math.max(120,Math.round(CW0*_budget/_vu)));
+  }
   /* ── LA BANDE DU RAPPEL, DANS LE CADRE ──
      De tete, l'enfant peut demander a revoir une forme. Elle s'affichait SOUS
      son propre trace, au meme endroit : les deux encres se superposaient et
@@ -13516,7 +13533,8 @@ function _blocEcriture(hote,o){
   k=Math.max(1,k);
   var CW=Math.round(CW0*k),CH=Math.round(CH0*k),PX=Math.round(PX0*k);
 
-  var el=document.createElement('div');el.style.cssText='width:100%';
+  var el=document.createElement('div');el.className='boy-ecriture';
+  el.style.cssText='width:100%';
   var boite=document.createElement('div');
   /* Le cadre prend TOUTE la largeur qu'on lui laisse — c'est la taille a
      laquelle l'enfant ecrit, et le client la veut grande. J'avais plafonne sa
@@ -16045,6 +16063,15 @@ function _boyScene(ca,reprise){
     if(!estPaysage())return;
     var p=wrap.querySelector('.boy-panel');
     if(!p||p.getAttribute('data-col2'))return;
+    /* ── UNE PAGE DE TRACE GARDE TOUTE SA LARGEUR ──
+       Le client : « tu as mis le canevas a droite du texte ! remets-le comme
+       au debut, le texte en haut et le canevas en bas ». Il a raison, et pas
+       seulement par gout : la taille du modele est commandee par la LARGEUR
+       de son cadre — c'est la mesure qui l'a montre. Le ranger dans une
+       demi-page revient a diviser les modeles par deux, juste apres les
+       avoir agrandis. Le texte passe donc au-dessus, sur toute la largeur,
+       et la zone d'ecriture en dessous, sur toute la largeur aussi. */
+    if(p.querySelector('.boy-ecriture'))return;
     var titre=null,droite=[],bas=[];
     [].slice.call(p.children).forEach(function(el){
       if(el.classList.contains('boy-step'))return;          /* reste en tête */
@@ -16491,15 +16518,40 @@ function _boyScene(ca,reprise){
   }
 
   /* La page a l'ecran entre en reserve avant d'etre effacee : c'est elle
-     qu'on montrera si l'on revient sur ses pas. Pas les pages a canevas — le
-     dessin ne survit pas au texte de la copie, et un cadre vide vaut mieux
-     qu'un cadre faux — et pas plus de dix, on oublie les plus lointaines. */
+     qu'on montrera si l'on revient sur ses pas. On n'en garde pas plus de
+     dix : les plus lointaines s'oublient.
+     ── UN CANEVAS NE SE COPIE PAS EN TEXTE ──
+     Je les avais d'abord ecartes : toute page en portant une ne rentrait pas
+     en reserve. Mauvais calcul — le HUBLOT en est un, et c'est lui qui porte
+     la lettre : la moitie des pages du cours se retrouvaient donc sans
+     reserve, et l'on revenait en arriere sur un cadre vide. On remplace
+     chaque canevas par SON IMAGE, prise a l'instant : la copie garde alors
+     tout, jusqu'au trace que l'enfant vient de faire. */
   function _noteLaPhoto(){
     try{
       if(_iPrec<0)return;
       var p=wrap.querySelector('.boy-panel');
-      if(!p||p.querySelector('canvas'))return;
-      _photos[_iPrec]=p.innerHTML;
+      if(!p)return;
+      var _c=p.cloneNode(true);
+      var _av=p.querySelectorAll('canvas'),_ap=_c.querySelectorAll('canvas');
+      for(var _n=_ap.length-1;_n>=0;_n--){
+        try{
+          var _im=document.createElement('img');
+          _im.src=_av[_n].toDataURL('image/png');
+          _im.setAttribute('style',_ap[_n].getAttribute('style')||'');
+          _im.setAttribute('aria-hidden','true');
+          _ap[_n].parentNode.replaceChild(_im,_ap[_n]);
+        }catch(e){}
+      }
+      /* ── ON RETIENT LA HAUTEUR AVEC LE CONTENU ──
+         Le client veut que la page voisine arrive A SA TAILLE A ELLE. Premier
+         essai : laisser la copie reprendre sa hauteur naturelle. Mesure :
+         2312 px la ou la vraie page en faisait 631. C'est que le panneau est
+         une boite en colonne — ses enfants se partagent une hauteur DONNEE ;
+         sans elle, chacun reclame la sienne et le total s'envole.
+         La bonne hauteur, c'est celle que la page avait vraiment. On la note
+         en meme temps que son contenu. */
+      _photos[_iPrec]={h:p.offsetHeight,html:_c.innerHTML};
       var cles=Object.keys(_photos);
       if(cles.length>10){
         cles.sort(function(a,b){return Math.abs(b-i)-Math.abs(a-i);});
@@ -16518,18 +16570,25 @@ function _boyScene(ca,reprise){
      a l'echelle du cadre du cours. La carte, dedans, porte sa TAILLE, qu'elle
      prend depuis son centre. */
   var _PETIT=0.88;
-  function _pose(c,r,k,dx,taille){
+  /* `hauteur` vaut 'auto' quand la carte connait la sienne : le client veut
+     que la page voisine arrive A SA TAILLE A ELLE, et non a celle de la page
+     qu'on quitte. Seule la hauteur change d'une page a l'autre — la largeur,
+     c'est celle du cadre du cours, la meme pour toutes. Un cadre encore vide
+     n'a aucune taille propre : il emprunte celle d'ou l'on part. */
+  function _pose(c,r,k,dx,taille,hauteur){
     var w=document.createElement('div');
     w.className='boy-case';
     w.style.cssText='position:fixed;pointer-events:none;'
       +'left:'+r.left+'px;top:'+r.top+'px;'
-      +'width:'+r.lw+'px;height:'+r.lh+'px;'
+      +'width:'+r.lw+'px;'
       +'transform:translateX('+dx+'px) scale('+k+')';
     c.style.position='relative';c.style.margin='0';c.style.pointerEvents='none';
     c.style.animation='none';c.style.transition='none';
     c.style.left='0';c.style.top='0';
-    c.style.width='100%';c.style.height='100%';
+    c.style.width='100%';
+    c.style.height=(hauteur==='auto')?'auto':(hauteur+'px');
     c.style.transform='scale('+taille+')';
+    c.style.setProperty('--fondu',String(taille===1?1:0));
     w.appendChild(c);
     return w;
   }
@@ -16567,10 +16626,14 @@ function _boyScene(ca,reprise){
       var b=p.cloneNode(false);
       b.classList.remove('entre-d','entre-g','roue-part','part-g','part-d');
       var j=i+sens;
-      if(_photos[j]!==undefined)b.innerHTML=_photos[j];
+      if(_photos[j])b.innerHTML=_photos[j].html;
+
       var pas=r.width+18;
-      var wa=_pose(a,r,k,0,1);
-      var wb=_pose(b,r,k,sens>0?pas:-pas,_PETIT);
+      var wa=_pose(a,r,k,0,1,r.lh);
+      /* Si l'on connait deja cette page, elle sait sa hauteur : on la laisse
+         la prendre. Sinon c'est un cadre vide, qui emprunte celle d'ici. */
+      var wb=_pose(b,r,k,sens>0?pas:-pas,_PETIT,
+                   _photos[j]?_photos[j].h:r.lh);
       ov.appendChild(wb);ov.appendChild(wa);
       /* Les couleurs de l'habillage : la bande est sur le body, elle ne les
          herite de personne. */
@@ -16606,6 +16669,9 @@ function _boyScene(ca,reprise){
     _pousse(_glis.wb,d+(_glis.sens>0?_glis.pas:-_glis.pas),_glis.k);
     _taille(_glis.a,1-(1-_PETIT)*t);
     _taille(_glis.b,_PETIT+(1-_PETIT)*t);
+    /* Le contenu s'en va comme la carte s'en va, et parait comme elle vient. */
+    _glis.a.style.setProperty('--fondu',(1-t).toFixed(3));
+    _glis.b.style.setProperty('--fondu',t.toFixed(3));
   }
 
   function _glisseLache(annule){
@@ -16616,10 +16682,13 @@ function _boyScene(ca,reprise){
     var fin=passe?(g.sens>0?-g.pas:g.pas):0;
     [g.a,g.b,g.wa,g.wb].forEach(function(c){
       c.style.transition='transform .26s cubic-bezier(.22,.68,.3,1)';});
+    try{g.ov.classList.add('en-lache');}catch(e){}
     _pousse(g.wa,fin,g.k);
     _pousse(g.wb,fin+(g.sens>0?g.pas:-g.pas),g.k);
     _taille(g.a,passe?_PETIT:1);
     _taille(g.b,passe?1:_PETIT);
+    g.a.style.setProperty('--fondu',passe?'0':'1');
+    g.b.style.setProperty('--fondu',passe?'1':'0');
     setTimeout(function(){
       try{if(g.p&&g.p.isConnected)g.p.style.visibility='';}catch(e){}
       if(!passe){

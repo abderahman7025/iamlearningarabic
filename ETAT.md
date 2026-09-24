@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v275
+## OÙ ON EN EST — 24 septembre 2026, production en v276
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,40 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v275), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v276), du plus récent au plus ancien :**
+
+- **LE CANEVAS REVIENT SOUS LE TEXTE (v276).** « C'est nul, tu as mis le
+  canevas à droite du texte ! Remets-le comme au début : le texte en haut, le
+  canevas en bas. » En paysage, `deuxColonnes` rangeait tout ce qui n'est pas
+  le titre dans la colonne de droite — la zone d'écriture avec. Elle en est
+  désormais exemptée (`.boy-ecriture`), et pas seulement par goût : la taille
+  du modèle est commandée par la LARGEUR de son cadre. Le ranger dans une
+  demi-page revenait à diviser les modèles par deux, juste après les avoir
+  agrandis.
+  **Et la forme du cadre se borne par celle de l'écran.** Couché, un
+  téléphone offre 844 px de large pour 390 de haut : le cadre, qui prend
+  toute la largeur, en réclamait 530 et sortait de l'écran. La forme se
+  conserve à travers la mise à l'échelle du cours — on peut donc la borner
+  une fois pour toutes, en pixels d'écran : jamais plus de 46 % de la hauteur
+  vue. La gomme est passée à GAUCHE, où le personnage ne la couvre pas.
+
+- **LA CARTE VOISINE ARRIVE À SA TAILLE, ET SON CONTENU EN FONDU (v276).**
+  « Fais venir le cadre de sa taille à lui ; et son contenu doit apparaître
+  en fondu en arrivant, et disparaître en s'en allant. » Le fondu porte sur
+  les ENFANTS du panneau, jamais sur lui : le galet rose ne doit pas
+  s'effacer — c'est la demande d'avant.
+  **Deux mesures, deux surprises :**
+  1. *Laisser la copie reprendre sa hauteur naturelle donnait 2312 px là où
+     la vraie page en faisait 631.* Le panneau est une boîte en colonne : ses
+     enfants se partagent une hauteur DONNÉE ; sans elle, chacun réclame la
+     sienne et le total s'envole. La bonne hauteur est celle que la page
+     avait vraiment — on la note en réserve avec son contenu.
+  2. *Écarter de la réserve toute page à canevas était un mauvais calcul.* Le
+     HUBLOT en est un, et c'est lui qui porte la lettre : la moitié des pages
+     n'entrait pas en réserve, et l'on revenait en arrière sur un cadre vide.
+     Chaque canevas est désormais remplacé par SON IMAGE au moment de la mise
+     en réserve — la copie garde tout, jusqu'au tracé que l'enfant vient de
+     faire. Mesuré : **13 ms** par tour de page.
 
 - **LES MODÈLES DU TRACÉ ONT GRANDI D'UN TIERS (v275).** « Le canevas doit
   être plus grand ; je veux que les modèles soient bien gros, pour les
