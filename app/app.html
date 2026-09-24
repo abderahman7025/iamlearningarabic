@@ -3507,6 +3507,19 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .boy-panel.roue-part{display:none}}
 /* Un son entre guillemets tient d'un seul tenant, avec son point. */
 .insecable{white-space:nowrap}
+/* ── LA GOMME, AU COIN DU CADRE ──
+   Le client : « remplace le bouton effacer par un petit bouton rond avec une
+   gomme, sur le côté du canevas — je veux que les modèles soient bien gros ».
+   La rangée qu'elle occupait rendait au cadre une bonne quarantaine de
+   pixels : c'est cette place-là qui passe dans les modèles. Elle se pose au
+   coin bas-droit, sous la ligne d'écriture, là où aucune lettre ne va. */
+.boy-gomme{position:absolute;right:7px;bottom:7px;z-index:3;
+  width:32px;height:32px;border-radius:50%;padding:0;margin:0;
+  border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
+  color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;line-height:1;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.20)}
+.boy-gomme svg{width:18px;height:18px;display:block}
+.boy-gomme:active{transform:scale(.90)}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
@@ -11232,7 +11245,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v274';
+var _VERSION_REPLI='v275';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11340,6 +11353,19 @@ function _surDeuxLignes(html){
      donc l'un OU l'autre qu'on cherche, selon qu'on passe avant ou apres
      lui. On coupe devant la premiere balise ouvrante rencontree. */
   return t.replace(/\s*(<(?:b|span)[\s>])/,'<br>$1');
+}
+/* ── JAMAIS UN SIGNE DE PONCTUATION SEUL SUR SA LIGNE ──
+   Le client : « on a le "!" seul sur une deuxieme ligne ; ca ne doit jamais
+   arriver nulle part ». En francais, le point d'exclamation, le point
+   d'interrogation, le point-virgule et le deux-points se posent APRES une
+   espace — et une espace ordinaire est justement un endroit ou la ligne a le
+   droit de se couper. On la remplace par une espace INSECABLE : la
+   typographie reste juste, et le signe ne quitte plus son mot.
+   On ne touche qu'au texte, jamais a l'interieur des balises. */
+function _colleLaPonctuation(html){
+  return String(html).replace(/(^|>)([^<]+)/g,function(m,av,txt){
+    return av+txt.replace(/[ \u00a0\u202f]+([!?;:])/g,'\u00a0$1');
+  });
 }
 function _soudeLesGuillemets(html){
   return String(html).replace(/\u00ab(?:(?!\u00bb)[\s\S])*\u00bb[\s]*[.,;:!?\u2026]*/g,
@@ -11643,6 +11669,37 @@ function _marquesDeLaLettre(lettreAr){
    que l'enfant verra. Le resultat est en `em`, valable a toute taille, et
    retenu — le rendu d'un canevas coute cher. */
 var _ENCRE_LIGNE={};
+/* ── L'ENCRE EN LARGEUR, PAS LA CHASSE ──
+   `measureText` rend la CHASSE — la place que le texte fait avancer le
+   crayon. Un signe combinant, damma ou kasra, n'en a aucune : il se pose sur
+   la lettre d'avant. Le navigateur repond donc zero, et un garde-fou bati
+   dessus ne mord jamais ; c'est ainsi que la troisieme damma s'est retrouvee
+   coupee par le bord du cadre.
+   On fait donc comme pour la hauteur : on dessine, et on regarde ou est
+   l'encre. Le resultat est en em de part et d'autre de l'origine du dessin,
+   et il se retient — la mesure coute un canevas. */
+var _ENCRE_LARG={};
+function _encreLargeur(texte){
+  var cle=String(texte);
+  if(_ENCRE_LARG[cle])return _ENCRE_LARG[cle];
+  var r={g:0.5,d:0.5};
+  try{
+    var T=120,W=900,H=640,X=W/2,Y=H*0.55;
+    var cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    var c=cv.getContext('2d');
+    c.font=T+"px 'Scheherazade New',serif";
+    c.textAlign='center';c.textBaseline='alphabetic';c.fillStyle='#000';
+    _dessineSurLigne(c,cle,X,Y,T);
+    var d=c.getImageData(0,0,W,H).data,g=-1,dr=-1,x,y;
+    for(x=0;x<W;x++){
+      for(y=0;y<H;y++){
+        if(d[(y*W+x)*4+3]>25){if(g<0)g=x;dr=x;break;}
+      }
+    }
+    if(g>=0)r={g:(X-g)/T,d:(dr-X)/T};
+  }catch(e){}
+  _ENCRE_LARG[cle]=r;return r;
+}
 function _encreAutourLigne(texte){
   var cle=String(texte);
   if(_ENCRE_LIGNE[cle])return _ENCRE_LIGNE[cle];
@@ -13406,14 +13463,25 @@ function _armePleinEcran(el){
    panneau, où le client a réglé les gestes. k ne descend jamais sous 1. */
 function _blocEcriture(hote,o){
   var liste=o.liste,nb=liste.length;
-  var CW0=520,CH0=o.signeSeul?250:220;
+  /* ── LE CADRE EST LARGE, DONC IL EST PLAT ──
+     Mesure faite sur un telephone : le cadre s'affiche en 255 px de large —
+     c'est la largeur du panneau qui commande, et rien d'autre. Sa hauteur en
+     decoule : 255 x 250/520, soit 127 px. Un modele dessine dans 520 x 250
+     se voit donc a la MOITIE de sa taille, et c'est ce que le client
+     reproche depuis le debut.
+     Le seul levier est la FORME du cadre : a largeur vue constante, un cadre
+     moins plat est un cadre plus haut, et le modele grandit d'autant. On lui
+     rend les ~45 px que la rangee « effacer » lui prenait — la gomme est
+     passee au coin — et la page, deja plafonnee a son agrandissement maximal,
+     avait de la marge sous elle. */
+  var CW0=520,CH0=o.signeSeul?330:300;
   /* Un signe montre seul recoit un cadre plus haut : a la taille d'une lettre
      il serait minuscule. Couche, l'ecran n'a que ~390 px et ce cadre-la
      depassait de 78 px — mesure faite sur les quatre ecrans concernes. On le
      ramene alors a la hauteur commune ; le signe reste grand, c'est le vide
      autour de lui qu'on retire. */
   if(window.innerWidth>window.innerHeight&&window.innerHeight<=460)
-    CH0=Math.min(CH0,168);
+    CH0=Math.min(CH0,224);
   /* ── LA BANDE DU RAPPEL, DANS LE CADRE ──
      De tete, l'enfant peut demander a revoir une forme. Elle s'affichait SOUS
      son propre trace, au meme endroit : les deux encres se superposaient et
@@ -13434,7 +13502,15 @@ function _blocEcriture(hote,o){
      l'echelle, si bien que la taille apparente ne changerait pas. C'est la
      borne de tenue, juste en dessous, qui redescend le signe le jour ou il
      ne rentre pas. */
-  var PX0=o.signeSeul?260:({1:150,2:126,3:104}[nb]||80);
+  /* Le modele grandit du meme pas que le cadre : sans cela il flotterait au
+     milieu d'une case devenue trop haute pour lui. La borne de tenue, plus
+     bas, le redescend le jour ou il ne rentre pas. */
+  /* Un signe seul ne remplit pas son corps : mesure faite, l'encre d'une
+     damma fait 0,38 fois la taille de police. A 350 elle occupait 132 px
+     dans un cadre qui lui en offrait 262 — c'est la POLICE qui bridait, pas
+     la place. On la laisse donc monter tres haut : les bornes de tenue,
+     juste en dessous, ramenent le signe des qu'il touche un bord. */
+  var PX0=o.signeSeul?640:({1:205,2:172,3:142}[nb]||110);
   var k=(o.dispoW||CW0)/CW0;
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
@@ -13447,7 +13523,15 @@ function _blocEcriture(hote,o){
      largeur par la hauteur libre pour l'empecher de deborder : cela revenait
      a retrecir la zone d'ecriture, ce qu'il a vu tout de suite. Le
      debordement se regle ailleurs, en laissant le panneau defiler. */
-  boite.style.cssText='position:relative;width:'+CW+'px;max-width:100%;margin:6px auto;'
+  /* ── LE CADRE DEBORDE SUR LES MARGES DU PANNEAU ──
+     Mesure : le cadre s'affichait sur 255 px de large et la borne qui
+     l'empeche de toucher ses voisins ramenait alors le modele a 72 px de
+     haut — c'est la LARGEUR qui bridait, pas la hauteur. Or le panneau garde
+     18 px de marge de chaque cote, faits pour du texte. Une zone d'ecriture
+     n'en a pas besoin : elle va d'un bord a l'autre, et le modele gagne le
+     cinquieme de largeur qui lui manquait. */
+  boite.style.cssText='position:relative;width:calc(100% + 36px);'
+    +'max-width:calc(100% + 36px);margin:6px -18px;'
     +'border-radius:14px;overflow:hidden;background:#fff;border:3px solid rgba('+_HAB.rgb+',.30)';
   var cvM=document.createElement('canvas');cvM.width=CW;cvM.height=CH;
   cvM.style.cssText='display:block;width:100%;height:auto';
@@ -13480,9 +13564,24 @@ function _blocEcriture(hote,o){
   /* Un signe seul descend bien plus bas que le corps d'une lettre :
      on remonte sa ligne d'écriture pour lui laisser la place. */
   var BANDE=Math.round(BANDE0*k);
-  /* La ligne d'ecriture se place dans ce qui RESTE sous la bande, aux memes
-     proportions qu'avant : la zone de trace ne retrecit pas. */
-  var baseY=BANDE+Math.round((CH-BANDE)*(o.signeSeul?0.50:0.62));
+  /* ── LA LIGNE SE MET LA OU LE SIGNE A BESOIN DE PLACE ──
+     Mesure faite sur la page de la damma : l'encre occupait la moitie HAUTE
+     du cadre, et les 81 px du bas (tels qu'ils s'affichent) restaient vides.
+     Rien d'etonnant : la ligne etait au milieu et une damma n'a rien sous
+     elle. Le modele etait donc bride par une demi-hauteur, alors que le
+     cadre entier lui tendait les bras.
+     Un signe seul est TOUT au-dessus de la ligne — damma, fatha — ou TOUT en
+     dessous — kasra. On met donc la ligne au bout oppose, et sa place double.
+     C'est aussi ce qu'un enfant voit sur son cahier : le trait est bas quand
+     on ecrit dessus, haut quand on ecrit dessous. Les lettres, elles, ont un
+     corps des deux cotes : leur ligne ne bouge pas. */
+  var _part=o.signeSeul?0.50:0.62;
+  if(o.signeSeul)try{
+    var _e0=_encreAutourLigne(liste[0]);
+    if(_e0.bas<0)       _part=0.82;    /* tout au-dessus : la ligne descend */
+    else if(_e0.haut<0) _part=0.22;    /* tout en dessous : la ligne monte  */
+  }catch(e){}
+  var baseY=BANDE+Math.round((CH-BANDE)*_part);
   /* ── UN SIGNE SEUL SE POSE CONTRE LA LIGNE ──
      Une fatha s'ecrit 0,7 em AU-DESSUS de la ligne : dessinee grande dans un
      cadre couche haut de 168 px, elle sortait entierement du canevas et le
@@ -13491,6 +13590,24 @@ function _blocEcriture(hote,o){
      juste au-dessus pour la fatha et la damma, juste en dessous pour la
      kasra, ce que l'enfant doit justement retenir. La ligne pointillee, elle,
      ne bouge pas. Le decalage est celui de son encre, mesure. */
+  /* ── ET IL DOIT TENIR EN LARGEUR ──
+     Une case fait CW/nb de large. On borne la hauteur depuis longtemps ;
+     la largeur, jamais — tant que les modeles restaient petits, cela ne se
+     voyait pas. Maintenant qu'ils remplissent le cadre, deux voisins
+     pourraient se toucher. La mesure est exacte : c'est le navigateur qui
+     donne la largeur du texte, a la police pres. */
+  /* Le modele est CENTRE dans sa case : c'est donc son cote le plus large
+     qui decide, des deux. Une demi-case, marge deduite, doit le contenir. */
+  function _tientEnLargeur(px){
+    var demi=(CW/nb)/2-Math.round(9*k),pire=0;
+    try{
+      liste.forEach(function(g){
+        var e=_encreLargeur(g),w=Math.max(e.g,e.d);
+        if(w>pire)pire=w;});
+    }catch(e){return px;}
+    if(!(pire>0)||!(demi>0))return px;
+    return Math.min(px,demi/pire);
+  }
   var baseDessin=baseY,_ecart=0;
   if(o.signeSeul){
     var _e=_encreAutourLigne(liste[0]),_mg=Math.round(9*k),_pres=0.10;
@@ -13503,6 +13620,7 @@ function _blocEcriture(hote,o){
     var _h=_e.haut-_ecart, _b=_e.bas+_ecart, _max=PX;
     if(_h>0.01)_max=Math.min(_max,(baseY-_mg)/_h);
     if(_b>0.01)_max=Math.min(_max,(CH-baseY-_mg)/_b);
+    _max=Math.min(_max,_tientEnLargeur(PX));
     PX=Math.max(48,Math.round(Math.min(PX,_max)));
     baseDessin=baseY+Math.round(_ecart*PX);
   }else{
@@ -13522,6 +13640,7 @@ function _blocEcriture(hote,o){
     var _maxT=PX;
     if(_hT>0.01)_maxT=Math.min(_maxT,(baseY-_mgT)/_hT);
     if(_bT>0.01)_maxT=Math.min(_maxT,(CH-baseY-_mgT)/_bT);
+    _maxT=Math.min(_maxT,_tientEnLargeur(PX));
     PX=Math.max(40,Math.round(Math.min(PX,_maxT)));
   }
   var pas=CW/nb;
@@ -13674,12 +13793,40 @@ function _blocEcriture(hote,o){
        d'enfant. */
     b.style.cssText+=';width:auto;min-width:132px;padding:11px 10px;font-size:.85rem;'
       +'margin:0;white-space:nowrap';
-    b.textContent=txt;b.onclick=fn;(ou||barre).appendChild(b);return b;
+    b.textContent=txt;b.onclick=fn;
+    var cible=(ou||barre);
+    /* La rangee se montre des qu'elle a quelque chose a porter : voir tout
+       en bas, ou on la cache quand elle reste vide. */
+    if(cible===barre)barre.style.display='';
+    cible.appendChild(b);return b;
   }
-  /* EFFACER ne touche qu'à l'encre : le modèle, lui, reste.
-     « REVOIR » a été retiré à la demande du client : l'animation tourne en
-     boucle sur la case voisine, il n'y a rien à relancer. */
-  petitBouton(te('↺ EFFACER'),function(){cxE.clearRect(0,0,CW,CH);});
+  /* ── EFFACER TIENT DANS UN ROND ──
+     Elle ne touche qu'a l'encre : le modele, lui, reste. Elle vit DANS le
+     cadre, a son coin bas-droit — sous la ligne d'ecriture, la ou aucune
+     lettre ne passe — pour rendre au modele la rangee qu'elle occupait. */
+  function poseLaGomme(){
+    var g=document.createElement('button');
+    g.type='button';g.className='boy-gomme';
+    var nom=String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'');
+    g.setAttribute('aria-label',nom);g.title=nom;
+    g.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
+      +' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+      +' aria-hidden="true">'
+      +'<path d="M8.5 21H20"/>'
+      +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
+      +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
+      +'<path d="M11.2 8l4.6 4.6"/></svg>';
+    g.onclick=function(ev){ev.preventDefault();cxE.clearRect(0,0,CW,CH);};
+    boite.appendChild(g);
+    return g;
+  }
+  poseLaGomme();
+  /* « EFFACER » n'est plus un bouton de la rangee : c'est la gomme ronde
+     posee au coin du cadre, juste au-dessus. « REVOIR » avait ete retire
+     avant elle — l'animation tourne en boucle sur la case voisine, il n'y a
+     rien a relancer. La rangee peut donc rester vide : on la cache alors,
+     pour ne pas laisser sa marge manger la page. */
+  if(!barre.children.length)barre.style.display='none';
   /* Le filet du trace de tete : UN BOUTON PAR FORME, que l'enfant allume et
      eteint a sa guise. Sans filet, celui qui ne se souvient plus n'a aucune
      porte de sortie et laisse tomber la lecon ; avec un bouton unique qui
@@ -15277,7 +15424,8 @@ function _boyScene(ca,reprise){
        peut, et « ba ». offre trois espaces où couper. On soude donc le groupe
        entier — guillemet ouvrant, contenu, guillemet fermant, et la
        ponctuation qui suit — en un seul morceau insécable. */
-    var _lignes=_soudeLesGuillemets(_airAutourArabe(_sansCercle(html)))
+    var _lignes=_colleLaPonctuation(
+                  _soudeLesGuillemets(_airAutourArabe(_sansCercle(html))))
                   .split(/<br\b[^>]*>/i);
     t.innerHTML=_lignes.map(function(l){
       return '<span class="boy-ligne">'+l+'</span>';
@@ -16538,8 +16686,15 @@ function _boyScene(ca,reprise){
       /* Une page de felicitations merite la fete : les memes confettis que
          l'ecran de fin, aux couleurs de l'habillage, et une volee de coeurs
          au-dessus du personnage. */
-      if(fete&&typeof launchConfetti==='function')
-        try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+      /* Le client : « page "tu es un(e) champion(ne)" : ajoute aussi les
+         etoiles de felicitations ». Elles partaient sur le mot « bravo » dit
+         par la voix ; ici la voix dit autre chose, et la page restait sans
+         elles. On les lance avec les confettis. */
+      if(fete){
+        try{if(typeof launchConfetti==='function')
+          launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
+        try{_scintille(34);}catch(e){}
+      }
       var p=panneau(etape);titre(p,html,fr);
       if(fete)N.plusTard(function(){bravo(p,3);},400);
       bouton(p,label||te('Suite ›'),suivant);
@@ -17680,7 +17835,7 @@ function _boyScene(ca,reprise){
            la phrase est posee ligne par ligne. Ici la rangee est large : une
            coupure y laissait la moitie de la place vide a droite. On les
            retire et on laisse le texte occuper sa ligne. */
-        tx.innerHTML=String(o.h).replace(/<br\s*\/?>/gi,' ');
+        tx.innerHTML=_colleLaPonctuation(String(o.h).replace(/<br\s*\/?>/gi,' '));
         d.appendChild(pu);d.appendChild(tx);
         /* Un point peut MONTRER au lieu de dire : la vue se construit ici,
            a chaque rendu, pour que le retour en arriere la retrouve neuve. */

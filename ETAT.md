@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v274
+## OÙ ON EN EST — 24 septembre 2026, production en v275
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,51 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v274), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v275), du plus récent au plus ancien :**
+
+- **LES MODÈLES DU TRACÉ ONT GRANDI D'UN TIERS (v275).** « Le canevas doit
+  être plus grand ; je veux que les modèles soient bien gros, pour les
+  enfants. » Mesuré sur téléphone : l'encre passe de **65 px à 87 px** de
+  haut, le cadre de **255 x 127 à 307 x 198**. Quatre leviers, dans l'ordre
+  où la mesure les a désignés :
+  1. *La gomme libère sa rangée.* « Effacer » devient un bouton rond au coin
+     bas-droit du cadre, sous la ligne d'écriture, là où aucune lettre ne
+     passe. La rangée entière revient au modèle.
+  2. *La ligne se met là où le signe a besoin de place.* L'encre d'une damma
+     occupait la moitié HAUTE du cadre et les 81 px du bas restaient vides :
+     la ligne était au milieu, et une damma n'a rien sous elle. Un signe seul
+     est tout au-dessus (damma, fatha) ou tout en dessous (kasra) : on met la
+     ligne au bout opposé, et sa place double. Les lettres, qui ont un corps
+     des deux côtés, gardent leur ligne au 0,62.
+  3. *La police ne bridait plus rien... jusqu'à ce qu'elle bride tout.*
+     L'encre d'une damma vaut 0,38 fois sa taille de police : à 350 elle
+     occupait 132 px dans un cadre qui lui en offrait 262. On la laisse monter
+     à 640 et ce sont les bornes de tenue qui décident.
+  4. *Le cadre déborde sur les marges du panneau.* Une zone d'écriture n'a
+     pas besoin des 18 px faits pour du texte : elle va d'un bord à l'autre.
+  **Le piège, et il est instructif :** le garde-fou de largeur que j'avais
+  bâti sur `measureText` ne mordait JAMAIS. `measureText` rend la CHASSE, la
+  place dont le crayon avance ; un signe combinant — damma, kasra — n'en a
+  aucune, il se pose sur la lettre d'avant. Le navigateur répond zéro. C'est
+  ainsi que la troisième damma s'est retrouvée coupée par le bord. On mesure
+  donc l'ENCRE, comme on le fait déjà pour la hauteur : on dessine, et on
+  regarde où elle est (`_encreLargeur`).
+  **Ce qui bride encore :** trois modèles par ligne sur un téléphone de 375
+  px. C'est la largeur, et elle seule. Passer à deux modèles les doublerait
+  presque — décision du client, pas la mienne.
+
+- **LES ÉTOILES SUR LA PAGE DE FÉLICITATIONS (v275).** Elles partaient sur le
+  mot « bravo » dit par la voix ; sur « Tu es une championne » la voix dit
+  autre chose, et la page restait sans elles. Elles partent maintenant avec
+  les confettis, sur toute page marquée « fête ».
+
+- **JAMAIS UN SIGNE DE PONCTUATION SEUL SUR SA LIGNE (v275).** « On a le « ! »
+  seul sur une deuxième ligne ; ça ne doit jamais arriver nulle part. » En
+  français, `!`, `?`, `;` et `:` se posent après une espace — et une espace
+  ordinaire est justement un endroit où la ligne a le droit de se couper. On
+  la remplace par une espace insécable : la typographie reste juste, et le
+  signe ne quitte plus son mot. Posé dans `titre()` et dans la page « à
+  retenir », et on ne touche qu'au texte, jamais à l'intérieur des balises.
 
 - **LE CADRE NE DISPARAÎT PLUS PENDANT LE GLISSEMENT (v274).** « Le rectangle
   rose pâle aux coins arrondis ne doit pas disparaître quand je glisse. »
