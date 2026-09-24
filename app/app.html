@@ -3452,19 +3452,42 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    part s'éloigne en pivotant, celle qui vient arrive de l'autre côté. Le
    pivot se fait autour de l'axe vertical — c'est ce qui donne la roue et non
    un simple glissement. */
-.boy-wrap{perspective:1400px;perspective-origin:50% 45%}
+/* ── PLUS DE ROUE : UN CARROUSEL ──
+   Le client, apres l'avoir vue : « pourquoi ne pas plutot faire comme si
+   toutes les pages d'une lecon etaient sur une meme page, une seule visible,
+   et qu'on puisse glisser de droite a gauche ou l'inverse ».
+   Les pages sont donc posees cote a cote sur une meme bande, et cette bande
+   coulisse. Le pivot s'en va : il donnait l'idee d'une roue, or une roue
+   n'attend pas la main. Une bande, si. */
 @keyframes roueEntreD{
-  from{opacity:0;transform:translateX(34%) rotateY(-38deg) scale(.74)}
-  to  {opacity:1;transform:none}}
+  from{transform:translateX(100%)}
+  to  {transform:none}}
 @keyframes roueEntreG{
-  from{opacity:0;transform:translateX(-34%) rotateY(38deg) scale(.74)}
-  to  {opacity:1;transform:none}}
+  from{transform:translateX(-100%)}
+  to  {transform:none}}
 @keyframes rouePartG{
-  from{opacity:1;transform:none}
-  to  {opacity:0;transform:translateX(-30%) rotateY(34deg) scale(.72)}}
+  from{transform:none}
+  to  {transform:translateX(-100%)}}
 @keyframes rouePartD{
-  from{opacity:1;transform:none}
-  to  {opacity:0;transform:translateX(30%) rotateY(-34deg) scale(.72)}}
+  from{transform:none}
+  to  {transform:translateX(100%)}}
+/* ── LE CALQUE DU GLISSEMENT ──
+   Les deux cartes y sont posees en position fixe, aux pixels de l'ecran, et
+   ne repondent a rien : la main commande la bande, pas ce qu'il y a dessus.
+   Le cadre du cours porte une mise a l'echelle ; les copies la reprennent
+   telle quelle, depuis leur coin haut-gauche, sinon leur texte serait ecrit
+   pour une autre largeur que celle ou on les montre. */
+.boy-glisse{position:fixed;inset:0;z-index:36;pointer-events:none;
+  overflow:hidden}
+.boy-glisse .boy-panel{transform-origin:top left;will-change:transform}
+/* ── LA CARTE QU'ON N'A PAS ENCORE VUE ──
+   Elle arrive vide : son contenu se batira au lache. Sans rien, la main
+   pousserait la page contre du blanc et l'enfant ne verrait pas qu'une autre
+   carte vient. On en montre donc le CADRE — le meme galet arrondi, a peine
+   pose sur le fond du cours — et il se remplit a l'arrivee. */
+.boy-glisse .boy-panel:empty{border-radius:26px;
+  background:rgba(var(--sk-rgb-f,120,120,120),.055);
+  box-shadow:inset 0 0 0 3px rgba(var(--sk-rgb-f,120,120,120),.16)}
 .boy-panel.entre-d{animation:roueEntreD .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.entre-g{animation:roueEntreG .38s cubic-bezier(.22,.68,.3,1) both}
 .boy-panel.roue-part{transform-origin:50% 50%;will-change:transform,opacity}
@@ -11200,7 +11223,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v272';
+var _VERSION_REPLI='v273';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14863,6 +14886,14 @@ function _boyScene(ca,reprise){
      Le glissement ne part JAMAIS d'un canevas ni d'un élément qui répond —
      sinon on tracerait la lettre au lieu de tourner la page. */
   var _bordG=null,_bordD=null,_gesteArme=false;
+  /* La veille du bord droit, et la question qu'elle pose. Une seule des deux
+     a droit de cite : voir juste en dessous. */
+  var _veilleBords=null,_peutAvancer=null;
+  /* La question du moment : peut-on avancer d'ici ? Le carrousel la pose
+     lui aussi, pour savoir s'il doit resister sous le doigt. */
+  function _ouvertADroite(){
+    try{return !_peutAvancer||!!_peutAvancer();}catch(e){return false;}
+  }
   function _poseLesBords(p,reculer,avancer,peutAvancer){
     if(!p||!p.isConnected)return;
     function bande(cote,signe,fn,actif){
@@ -14903,13 +14934,21 @@ function _boyScene(ca,reprise){
        n'est pas résolue, et il est éteint tant que la voix parle. Le bord se
        contente donc de LE REGARDER, quatre fois par seconde : s'il ne peut
        pas, le bord s'éteint et ne répond ni au clic ni au glissement. */
-    var veille=setInterval(function(){
-      if(!_bordD||!_bordD.isConnected){clearInterval(veille);return;}
-      var ouvert=true;
-      try{ouvert=!!peutAvancer&&!!peutAvancer();}catch(e){ouvert=false;}
-      _bordD.classList.toggle('eteint',!ouvert);
+    /* ── UNE SEULE VEILLE, CELLE DE LA PAGE AFFICHEE ──
+       Chaque page ouvrait la sienne et aucune ne s'arretait : elles ecrivaient
+       toutes sur le MEME bord — il n'y en a qu'un — chacune avec la question
+       de SA page. Sur un controle, la veille en cours disait « ferme » et
+       celle d'une page precedente, restee en vie, disait « ouvert » un quart
+       de seconde plus tard. Le verrou clignotait, et un glissement tombant au
+       mauvais moment sautait la question sans reponse. On ferme la
+       precedente avant d'ouvrir la sienne. */
+    if(_veilleBords)clearInterval(_veilleBords);
+    _peutAvancer=peutAvancer||null;
+    _veilleBords=setInterval(function(){
+      if(!_bordD||!_bordD.isConnected){clearInterval(_veilleBords);_veilleBords=null;return;}
+      _bordD.classList.toggle('eteint',!_ouvertADroite());
     },250);
-    try{_bordD.classList.toggle('eteint',!(peutAvancer&&peutAvancer()));}catch(e){}
+    try{_bordD.classList.toggle('eteint',!_ouvertADroite());}catch(e){}
     if(!_gesteArme){
       _gesteArme=true;
       var x0=0,y0=0,bon=false;
@@ -14937,11 +14976,34 @@ function _boyScene(ca,reprise){
         bon=!(t&&t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case,.boy-bord'));
         x0=x;y0=y;
       }
-      function arrivee(x,y){
-        if(!bon||!vivant())return;bon=false;
+      /* ── LA BANDE SUIT LA MAIN ──
+         Tant que le geste reste court ou vertical, on ne fait rien : c'est
+         peut-etre un defilement. Passe quatorze pixels franchement
+         horizontaux, la bande s'ouvre — et elle s'ouvre SOUS LE DOIGT : on
+         repart de la, sinon les deux cartes sauteraient d'un coup de ces
+         quatorze pixels. */
+      function bouge(x,y){
+        if(!bon||!vivant()){if(_glis)_glisseLache(true);return;}
         var dx=x-x0,dy=y-y0;
-        /* Un geste franc : au moins 60 px sur la largeur, et plus horizontal
-           que vertical — sinon c'est un defilement, pas un tour de page. */
+        if(!_glis){
+          if(Math.abs(dx)<14||Math.abs(dx)<Math.abs(dy)*1.2)return;
+          _glis=_glisseOuvre(dx<0?1:-1);
+          if(!_glis){bon=false;return;}
+          x0=x;
+          return;
+        }
+        _glisseBouge(x-x0);
+      }
+      function arrivee(x,y){
+        if(_glis){bon=false;_glisseLache(!vivant());return;}
+        /* La bande a ete emportee par un enchainement : ce lache ne commande
+           plus rien. */
+        if(_glisAnnule){_glisAnnule=false;bon=false;return;}
+        if(!bon||!vivant())return;bon=false;
+        /* Sans bande — une souris qui saute d'un point a l'autre, un
+           navigateur qui n'a pas envoye les mouvements — on juge sur le
+           trajet : au moins 60 px de large, et plus horizontal que vertical. */
+        var dx=x-x0,dy=y-y0;
         if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.4)return;
         if(dx<0){if(_bordD&&!_bordD.classList.contains('eteint'))_bordD.click();}
         else{if(_bordG&&!_bordG.classList.contains('eteint'))_bordG.click();}
@@ -14949,6 +15011,11 @@ function _boyScene(ca,reprise){
       document.addEventListener('pointerdown',function(ev){
         if(ev.pointerType==='touch')return;   /* le toucher a ses propres ecouteurs */
         depart(ev.clientX,ev.clientY,ev.target);
+      },{passive:true});
+      document.addEventListener('pointermove',function(ev){
+        if(ev.pointerType==='touch')return;
+        if(!ev.buttons){if(_glis)_glisseLache(true);return;}
+        bouge(ev.clientX,ev.clientY);
       },{passive:true});
       document.addEventListener('pointerup',function(ev){
         if(ev.pointerType==='touch')return;
@@ -14958,12 +15025,17 @@ function _boyScene(ca,reprise){
         if(!ev.touches||ev.touches.length!==1){bon=false;return;}
         depart(ev.touches[0].clientX,ev.touches[0].clientY,ev.target);
       },{passive:true});
+      document.addEventListener('touchmove',function(ev){
+        if(!ev.touches||ev.touches.length!==1)return;
+        bouge(ev.touches[0].clientX,ev.touches[0].clientY);
+      },{passive:true});
       document.addEventListener('touchend',function(ev){
         var t=(ev.changedTouches&&ev.changedTouches[0])||null;
-        if(!t){bon=false;return;}
+        if(!t){bon=false;if(_glis)_glisseLache(true);return;}
         arrivee(t.clientX,t.clientY);
       },{passive:true});
-      document.addEventListener('touchcancel',function(){bon=false;},{passive:true});
+      document.addEventListener('touchcancel',function(){
+        bon=false;if(_glis)_glisseLache(true);},{passive:true});
     }
   }
   function ajouteRetour(){
@@ -15999,11 +16071,26 @@ function _boyScene(ca,reprise){
     /* On tourne la page : la voix se tait — c'est `N.stop()` — et la fête
        qu'elle avait lancée s'en va avec elle. */
     try{_arreteLaFete();}catch(e){}
+    /* ── LA PAGE PEUT TOURNER TOUTE SEULE, LE DOIGT ENCORE POSE ──
+       Un enchainement automatique tombe pendant le glissement : la page que
+       la bande montre n'existera plus dans un instant, et la copie figee
+       resterait par-dessus la nouvelle, deux textes l'un sur l'autre. On
+       retire la bande sur-le-champ, et on note que le geste est mort — sinon
+       le lache qui vient tournerait une page de plus. */
+    if(_glis&&!_sansRoue){
+      var _gm=_glis;_glis=null;_glisAnnule=true;
+      try{if(_gm.ov.parentNode)_gm.ov.parentNode.removeChild(_gm.ov);}catch(e){}
+    }
+    _noteLaPhoto();
     var _ancien=_photoDeLaPage();
     wrap.innerHTML='';jauge();scenes[i](api);
+    _iPrec=i;
     /* L'animation est posée sur le PANNEAU, pas sur le cadre : celui-ci porte
        déjà la mise à l'échelle, et deux transformations sur le même élément
        se remplacent au lieu de s'ajouter. */
+    /* Quand c'est la bande qui a mene le geste, elle a deja tout montre :
+       la page arrive en place, sans rejouer le glissement par-dessus. */
+    if(_sansRoue)_sensNav=0;
     if(_sensNav){
       try{
         var _p0=wrap.querySelector('.boy-panel');
@@ -16203,7 +16290,7 @@ function _boyScene(ca,reprise){
   function _photoDeLaPage(){
     try{
       var p=wrap.querySelector('.boy-panel');
-      if(!p||!_sensNav)return null;
+      if(!p||!_sensNav||_sansRoue)return null;
       var r=p.getBoundingClientRect();
       if(!(r.width>40&&r.height>40))return null;
       var c=p.cloneNode(true);
@@ -16218,6 +16305,163 @@ function _boyScene(ca,reprise){
       return c;
     }catch(e){return null;}
   }
+  /* ── LE CARROUSEL QUI SUIT LE DOIGT ──
+     Le client : « si je commence le glissement et que je m'arrete a la
+     moitie, le doigt toujours appuye, je verrai la moitie du cadre des deux
+     lecons ». Il faut donc DEUX cartes a l'ecran pendant le geste.
+     Or la page voisine n'existe pas. Les scenes se batissent une a une dans
+     le cadre, et en construire une d'avance lancerait sa voix, ses minuteurs
+     et son enregistrement de progression — on ne peut pas. On montre donc :
+       — la page qu'on quitte : une PHOTO, copie figee posee par-dessus ;
+       — la page qu'on rejoint : SA photo a elle si on l'a deja vue — c'est
+         le cas de tout retour en arriere — et sinon son CADRE VIDE, meme
+         decor, memes dimensions.
+     Au lache, la vraie page se batit derriere et prend la place du cadre :
+     le decor ne bouge pas, seul le contenu apparait. */
+  var _photos={},_iPrec=-1,_sansRoue=false,_glis=null,_glisAnnule=false;
+
+  /* Un canevas ne se copie pas : `cloneNode` rend une toile blanche. On y
+     redessine donc l'original, sinon le trace de l'enfant s'effacerait au
+     moment meme ou il tourne la page. */
+  function _copieLesCanevas(src,dst){
+    try{
+      var a=src.querySelectorAll('canvas'),b=dst.querySelectorAll('canvas');
+      for(var n=0;n<a.length&&n<b.length;n++){
+        b[n].width=a[n].width;b[n].height=a[n].height;
+        try{b[n].getContext('2d').drawImage(a[n],0,0);}catch(e){}
+      }
+    }catch(e){}
+  }
+
+  /* La page a l'ecran entre en reserve avant d'etre effacee : c'est elle
+     qu'on montrera si l'on revient sur ses pas. Pas les pages a canevas — le
+     dessin ne survit pas au texte de la copie, et un cadre vide vaut mieux
+     qu'un cadre faux — et pas plus de dix, on oublie les plus lointaines. */
+  function _noteLaPhoto(){
+    try{
+      if(_iPrec<0)return;
+      var p=wrap.querySelector('.boy-panel');
+      if(!p||p.querySelector('canvas'))return;
+      _photos[_iPrec]=p.innerHTML;
+      var cles=Object.keys(_photos);
+      if(cles.length>10){
+        cles.sort(function(a,b){return Math.abs(b-i)-Math.abs(a-i);});
+        delete _photos[cles[0]];
+      }
+    }catch(e){}
+  }
+
+  /* ── UNE ANIMATION BAT UN STYLE ECRIT A LA MAIN ──
+     Le panneau porte son animation d'entree ; tant qu'elle court, c'est ELLE
+     qui dicte la transformation, et le decalage qu'on ecrit ici n'a aucun
+     effet. Les copies n'en ont pas besoin : on l'eteint. Les largeurs, elles,
+     sont prises sur la MISE EN PAGE (`offsetWidth`) et non sur ce qu'on voit
+     a l'ecran — ce qu'on voit depend justement de l'animation en cours. */
+  function _pose(c,r,k,dx){
+    c.style.position='fixed';c.style.margin='0';c.style.pointerEvents='none';
+    c.style.animation='none';c.style.transition='none';
+    c.style.left=r.left+'px';c.style.top=r.top+'px';
+    c.style.width=r.lw+'px';c.style.height=r.lh+'px';
+    c.style.transformOrigin='top left';
+    c.style.transform='translateX('+dx+'px) scale('+k+')';
+  }
+  function _pousse(c,dx,k){
+    c.style.transform='translateX('+dx+'px) scale('+k+')';
+  }
+
+  function _glisseNettoie(){
+    try{
+      [].slice.call(document.querySelectorAll('.boy-glisse'))
+        .forEach(function(x){if(x.parentNode)x.parentNode.removeChild(x);});
+    }catch(e){}
+  }
+
+  function _glisseOuvre(sens){
+    try{
+      var p=wrap.querySelector('.boy-panel');if(!p)return null;
+      /* On saisit la page ; son animation d'arrivee, si elle court encore, a
+         fini son office — et tant qu'elle court, sa place a l'ecran change
+         d'une image a l'autre : impossible d'y poser une copie. */
+      try{p.style.animation='none';}catch(e){}
+      var g0=p.getBoundingClientRect();
+      if(!(g0.width>40&&g0.height>40))return null;
+      var k=_echelleCadre||1;
+      var r={left:g0.left,top:g0.top,width:g0.width,height:g0.height,
+             lw:p.offsetWidth||(g0.width/k),lh:p.offsetHeight||(g0.height/k)};
+      _glisseNettoie();
+      var ov=document.createElement('div');ov.className='boy-glisse';
+      ov.setAttribute('aria-hidden','true');
+      /* La carte qu'on quitte : copie fidele, canevas compris. */
+      var a=p.cloneNode(true);_copieLesCanevas(p,a);
+      a.classList.remove('entre-d','entre-g','roue-part','part-g','part-d');
+      /* La carte voisine : son contenu si on l'a deja vu, son cadre sinon. */
+      var b=p.cloneNode(false);
+      b.classList.remove('entre-d','entre-g','roue-part','part-g','part-d');
+      var j=i+sens;
+      if(_photos[j]!==undefined)b.innerHTML=_photos[j];
+      var pas=r.width+18;
+      _pose(a,r,k,0);
+      _pose(b,r,k,sens>0?pas:-pas);
+      ov.appendChild(b);ov.appendChild(a);
+      document.body.appendChild(ov);
+      p.style.visibility='hidden';
+      /* Une page bloquee — une question sans reponse juste, ou la premiere
+         page quand on recule — se laisse pousser du bout des doigts, mais
+         revient toujours. L'enfant sent que ca ne passe pas. */
+      var libre=false;
+      try{
+        if(sens>0)libre=_ouvertADroite();
+        else libre=!!(_bordG&&_bordG.isConnected);
+      }catch(e){}
+      return {ov:ov,a:a,b:b,p:p,r:r,k:k,pas:pas,sens:sens,libre:libre,dx:0};
+    }catch(e){return null;}
+  }
+
+  function _glisseBouge(dx){
+    if(!_glis)return;
+    var d=dx;
+    /* On ne pousse que dans le sens ou le geste est parti. */
+    if(_glis.sens>0&&d>0)d=0;
+    if(_glis.sens<0&&d<0)d=0;
+    if(!_glis.libre)d=d*0.22;
+    _glis.dx=d;
+    _pousse(_glis.a,d,_glis.k);
+    _pousse(_glis.b,d+(_glis.sens>0?_glis.pas:-_glis.pas),_glis.k);
+  }
+
+  function _glisseLache(annule){
+    if(!_glis)return;
+    var g=_glis;_glis=null;
+    var seuil=Math.max(70,g.r.width*0.22);
+    var passe=!annule&&g.libre&&Math.abs(g.dx)>=seuil;
+    var fin=passe?(g.sens>0?-g.pas:g.pas):0;
+    [g.a,g.b].forEach(function(c){
+      c.style.transition='transform .26s cubic-bezier(.22,.68,.3,1)';});
+    _pousse(g.a,fin,g.k);
+    _pousse(g.b,fin+(g.sens>0?g.pas:-g.pas),g.k);
+    setTimeout(function(){
+      try{if(g.p&&g.p.isConnected)g.p.style.visibility='';}catch(e){}
+      if(!passe){
+        if(g.ov.parentNode)g.ov.parentNode.removeChild(g.ov);
+        return;
+      }
+      /* La page se tourne par SON bord : c'est lui qui sait si la question
+         est resolue, et c'est lui qui appelle le bon bouton. On lui demande
+         seulement de ne pas rejouer l'animation — la bande vient de la
+         faire. */
+      _sansRoue=true;
+      try{
+        var bd=(g.sens>0?_bordD:_bordG);
+        var ok=(g.sens>0)?_ouvertADroite():!!(_bordG&&_bordG.isConnected);
+        if(ok&&bd&&bd.isConnected)bd.click();
+      }catch(e){}
+      _sansRoue=false;
+      setTimeout(function(){
+        if(g.ov.parentNode)g.ov.parentNode.removeChild(g.ov);
+      },60);
+    },255);
+  }
+
   function suivant(){i++;if(i>=scenes.length){fini();return;}_sensNav=1;go();}
   function precedent(){if(i<=0)return;i--;_sensNav=-1;go();}
   api.precedent=precedent;

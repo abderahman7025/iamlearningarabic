@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v272
+## OÙ ON EN EST — 24 septembre 2026, production en v273
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,47 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v272), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v273), du plus récent au plus ancien :**
+
+- **LE CARROUSEL QUI SUIT LE DOIGT (v273).** « Fais comme si toutes les pages
+  d'une leçon étaient sur une même page, une seule visible, et qu'on puisse
+  glisser de droite à gauche ou l'inverse ; si je m'arrête à la moitié, le
+  doigt toujours appuyé, je verrai la moitié du cadre des deux leçons. »
+  La roue est remplacée par une bande : deux cartes côte à côte qui suivent
+  la main au pixel, un cinquième de course seulement quand la page est
+  verrouillée, et retour en place au lâcher si l'on n'a pas franchi le
+  quart de la largeur.
+  **La difficulté :** la page voisine n'existe pas. Les scènes se bâtissent
+  une à une dans le cadre, et en construire une d'avance lancerait sa voix,
+  ses minuteurs et son enregistrement de progression. On montre donc la
+  PHOTO de la page qu'on quitte, et pour celle qu'on rejoint : sa photo à
+  elle si on l'a déjà vue — tout retour en arrière — et sinon son CADRE
+  VIDE. Au lâcher, la vraie page se bâtit derrière et prend la place du
+  cadre.
+  **Trois pièges, tous mesurés au banc :**
+  1. *Une animation bat un style écrit à la main.* Le panneau porte son
+     animation d'entrée ; tant qu'elle court, c'est elle qui dicte la
+     transformation et le décalage écrit sur la copie n'a aucun effet. On
+     l'éteint sur les copies — et sur la page saisie, dont la place à
+     l'écran changeait d'une image à l'autre : impossible d'y poser quoi que
+     ce soit. Les largeurs se prennent sur `offsetWidth`, la mise en page,
+     jamais sur ce qu'on voit.
+  2. *La page peut tourner toute seule, le doigt encore posé.* La copie
+     serait restée par-dessus la nouvelle, deux textes l'un sur l'autre. La
+     bande se retire sur-le-champ, et le lâcher qui suit ne commande plus
+     rien — sans quoi il tournait une page de plus.
+  3. *Un canevas ne se copie pas* : `cloneNode` rend une toile blanche. On y
+     redessine l'original, sinon le tracé de l'enfant s'effaçait au moment
+     même où il tourne la page.
+
+- **LE VERROU DES QUESTIONS NE CLIGNOTE PLUS (v273).** Trouvé en éprouvant le
+  carrousel. Chaque page ouvrait sa veille du bord droit et aucune ne
+  s'arrêtait : elles écrivaient toutes sur le MÊME bord — il n'y en a qu'un —
+  chacune avec la question de SA page. Sur un contrôle, la veille en cours
+  disait « fermé » et une veille d'une page précédente, restée en vie,
+  disait « ouvert » un quart de seconde plus tard. Un glissement tombant au
+  mauvais moment sautait donc la question sans réponse. Une seule veille à
+  la fois, celle de la page affichée.
 
 - **LE TRACÉ RESTE DANS LE CADRE DU COURS (v272).** « Je vois que le canevas
   en plein écran fait la taille du cadre de chaque leçon ; enlève donc le
