@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 22 septembre 2026, production en v271
+## OÙ ON EN EST — 24 septembre 2026, production en v272
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,28 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v271), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v272), du plus récent au plus ancien :**
+
+- **LE TRACÉ RESTE DANS LE CADRE DU COURS (v272).** « Je vois que le canevas
+  en plein écran fait la taille du cadre de chaque leçon ; enlève donc le
+  plein écran, garde la même taille de canevas, et le fond c'est celui du
+  cours. » Le calque ne s'ouvre plus tout seul — tout son mécanisme est
+  conservé, il n'est simplement plus appelé. Le tracé se fait dans la page,
+  avec le décor autour, et il ne reste que « ↺ Effacer ».
+
+- **LA QUESTION SUR DEUX LIGNES (v272).** « Où est le son » sur la première,
+  le son sur la seconde. On coupe devant la balise qui met le son en avant,
+  sans toucher à la phrase écrite : elle garde sa clé, donc ses traductions.
+  **Piège** : `TB()` remplace le `<b>` de la phrase par un span coloré — le
+  repère cherché n'existait plus après son passage. On reconnaît donc les
+  deux.
+
+- **RESTE OUVERT : le carrousel qui suit le doigt.** Le client veut voir les
+  DEUX cartes pendant le glissement, moitié-moitié, le doigt encore posé.
+  Aujourd'hui la page suivante n'existe pas encore au moment du geste : les
+  scènes se construisent dans le cadre, une à la fois, et en bâtir une
+  d'avance déclencherait sa voix, ses minuteurs et son enregistrement de
+  progression. Question posée au client avant d'y toucher.
 
 - **LA FÊTE SUIT LE MOT « BRAVO » (v271).** Plutôt que de l'accrocher aux
   quelques endroits connus, on l'accroche AU MOT : la narration prévient

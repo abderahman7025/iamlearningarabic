@@ -11200,7 +11200,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v271';
+var _VERSION_REPLI='v272';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11295,6 +11295,20 @@ function _phraseAvecSons(fr,sons){
 function _sonNu(signe){return '\u0627'+signe;}
 /* Soude « … » et la ponctuation qui suit : un seul morceau, jamais coupe.
    On travaille sur le HTML, donc on saute les balises sans les abimer. */
+/* ── LA QUESTION SUR UNE LIGNE, LE SON SUR LA SUIVANTE ──
+   Le client : « mets "où est le son" sur la première ligne, et "…" ?
+   sur la deuxième ». On coupe donc juste avant le son mis en avant, sans
+   toucher à la phrase écrite — elle garde sa clé, donc ses traductions :
+   toutes les langues mettent ce son en gras, où qu'il tombe dans leur
+   tournure. */
+function _surDeuxLignes(html){
+  var t=String(html||'');
+  if(t.indexOf('<br')>=0)return t;          /* deja coupee par l'auteur */
+  /* `TB` a deja remplace le `<b>` de la phrase par un span colore : c'est
+     donc l'un OU l'autre qu'on cherche, selon qu'on passe avant ou apres
+     lui. On coupe devant la premiere balise ouvrante rencontree. */
+  return t.replace(/\s*(<(?:b|span)[\s>])/,'<br>$1');
+}
 function _soudeLesGuillemets(html){
   return String(html).replace(/\u00ab(?:(?!\u00bb)[\s\S])*\u00bb[\s]*[.,;:!?\u2026]*/g,
     function(m){return '<span class="insecable">'+m+'</span>';});
@@ -16763,9 +16777,15 @@ function _boyScene(ca,reprise){
          on quitte l'application puis qu'on y retourne. */
       function pleinEcranNatif(){_pleinEcranPaysage();}
       function quitterPleinEcranNatif(){_quitterPleinEcranPaysage();}
-      /* Plus de bouton « agrandir » : le client veut le plein écran paysage
-         d'office, sur tous les tracés. Le calque s'ouvre donc tout seul. */
-      N.plusTard(agrandir,60);
+      /* ── PLUS DE CALQUE PLEIN ÉCRAN ──
+         Le client : « je vois que le canevas en plein écran fait la taille du
+         cadre de chaque leçon ; enlève donc le plein écran, garde la même
+         taille de canevas, et le reste — le fond — c'est le fond du cours ».
+         Il a raison : le calque n'apportait plus rien qu'une rupture. Le
+         tracé reste donc dans le cadre, avec le décor du cours autour, et la
+         page se tourne comme toutes les autres. Tout le mécanisme du calque
+         est conservé plus bas — il ne s'ouvre simplement plus tout seul. */
+      /* N.plusTard(agrandir,60); — retiré à la demande du client */
       var btn=veilleuse(bouton(p,te('Suite ›'),suivant));
       N.plusTard(function(){btn.style.opacity='1';},9000);
     };
@@ -19830,9 +19850,9 @@ function _boyVowelCourse(ca){
       TB('À toi de les <b>écrire</b> ✍️'),te('À toi de les écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« a »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],F),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« i »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],K),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« ou »</b> ?'),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],D)
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« a »</b> ?')),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],F),
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« i »</b> ?')),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],K),
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« ou »</b> ?')),te('Où est le son'),[[F,_sonNu('َ')],[K,_sonNu('ِ')],[D,_sonNu('ُ')]],D)
     ]),
 
     B.brief(te('BRAVO'),
@@ -19900,9 +19920,9 @@ function _boyVowelCourse(ca){
       TB('À toi d’<b>écrire</b> ✍️'),te('À toi d\'écrire.')),
 
     _melange([
-      B.controle('CONTRÔLE',TB('Où est le son <b>« an »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TF),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« oun »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TD),
-      B.controle('CONTRÔLE',TB('Où est le son <b>« in »</b> ?'),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TK)
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« an »</b> ?')),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TF),
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« oun »</b> ?')),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TD),
+      B.controle('CONTRÔLE',_surDeuxLignes(TB('Où est le son <b>« in »</b> ?')),te('Où est le son'),[[TF,_sonNu('ً')],[TK,_sonNu('ٍ')],[TD,_sonNu('ٌ')]],TK)
     ]),
 
     B.illustre(te('LE SOUKOUN'),
