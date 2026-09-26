@@ -11252,7 +11252,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v276';
+var _VERSION_REPLI='v277';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11359,7 +11359,7 @@ function _surDeuxLignes(html){
   /* `TB` a deja remplace le `<b>` de la phrase par un span colore : c'est
      donc l'un OU l'autre qu'on cherche, selon qu'on passe avant ou apres
      lui. On coupe devant la premiere balise ouvrante rencontree. */
-  return t.replace(/\s*(<(?:b|span)[\s>])/,'<br>$1');
+  return t.replace(/\s*(<(?:b|span)[\s>])/,'<br data-dur="1">$1');
 }
 /* ── JAMAIS UN SIGNE DE PONCTUATION SEUL SUR SA LIGNE ──
    Le client : « on a le "!" seul sur une deuxieme ligne ; ca ne doit jamais
@@ -11369,6 +11369,52 @@ function _surDeuxLignes(html){
    droit de se couper. On la remplace par une espace INSECABLE : la
    typographie reste juste, et le signe ne quitte plus son mot.
    On ne touche qu'au texte, jamais a l'interieur des balises. */
+/* ── LA TYPOGRAPHIE, SUR TOUT CE QUI S'AFFICHE ──
+   Le client, pour la troisieme fois : « je ne veux pas de point ou de
+   guillemets seuls sur une ligne ! ». Les deux reglages precedents etaient
+   poses sur le TITRE seulement ; la page « a retenir », les questions et
+   tout ce qui s'ecrit ailleurs leur echappaient — d'ou « « n » coupe en deux
+   et le « ? » seul sur sa ligne.
+   On ne cherche donc plus les endroits un par un : on passe sur TOUS les
+   textes de la page, une fois construite. Trois regles :
+     - une espace apres « et avant » devient insecable : le guillemet ne
+       quitte plus son contenu ;
+     - une espace avant ! ? ; : aussi ;
+     - une espace avant un pictogramme de fin (✍️, ⚠️) aussi.
+   On ne touche qu'aux espaces DEJA la : l'espagnol et l'italien ecrivent
+   «an» sans espace, et le restent.
+   Reste un cas qu'aucune espace ne regle : « <b>« wa »</b> ? » — le point
+   d'interrogation est dans un autre noeud que le mot. On soude alors
+   l'element et le signe dans un meme morceau insecable. */
+var _PICTO_FIN=null;
+try{_PICTO_FIN=new RegExp('[ \\u202f]+(\\p{Extended_Pictographic})','gu');}catch(e){}
+var _INLINES={B:1,STRONG:1,SPAN:1,I:1,EM:1,A:1,SMALL:1,U:1};
+function _typoFr(racine){
+  if(!racine)return;
+  try{
+    var w=document.createTreeWalker(racine,4,null),n,liste=[];
+    while((n=w.nextNode()))liste.push(n);
+    liste.forEach(function(t){
+      var p=t.parentNode;if(!p)return;
+      if(p.nodeName==='SCRIPT'||p.nodeName==='STYLE')return;
+      var v=t.nodeValue||'',v0=v;
+      v=v.replace(/\u00ab[ \u202f]+/g,'\u00ab\u00a0')
+         .replace(/[ \u202f]+\u00bb/g,'\u00a0\u00bb')
+         .replace(/[ \u202f]+([!?;:])/g,'\u00a0$1');
+      if(_PICTO_FIN)v=v.replace(_PICTO_FIN,'\u00a0$1');
+      if(v!==v0)t.nodeValue=v;
+      if(p.getAttribute&&p.getAttribute('data-colle'))return;
+      var m=/^\u00a0?[!?;:.,\u00bb\u2026]+/.exec(v);
+      var av=t.previousSibling;
+      if(!m||!av||av.nodeType!==1||!_INLINES[av.nodeName])return;
+      try{if(String(getComputedStyle(av).display).indexOf('inline')!==0)return;}catch(e){return;}
+      if(m[0].length<v.length)t.splitText(m[0].length);
+      var sp=document.createElement('span');
+      sp.className='insecable';sp.setAttribute('data-colle','1');
+      p.insertBefore(sp,av);sp.appendChild(av);sp.appendChild(t);
+    });
+  }catch(e){}
+}
 function _colleLaPonctuation(html){
   return String(html).replace(/(^|>)([^<]+)/g,function(m,av,txt){
     return av+txt.replace(/[ \u00a0\u202f]+([!?;:])/g,'\u00a0$1');
@@ -14989,10 +15035,23 @@ function _boyScene(ca,reprise){
      laisse un blanc de quelques dixiemes entre deux phrases, et le premier
      de ces blancs passait pour la fin. On compte donc les scenes encore en
      train de parler, et on n'attend le silence qu'une fois ce compte a zero. */
+  /* ── CHAQUE PAGE A SON NUMERO ──
+     Le client : « lorsqu'on passe a la page suivante ou precedente, rien de
+     l'ancienne page ne doit etre joue » — sur la page du soukoun, un
+     « Bravo » venait de la page d'avant.
+     `attendSilence` guettait avec une minuterie a lui, que le changement de
+     page ne connaissait pas. Et comme `go()` remet le compte des voix a zero,
+     elle concluait aussitot que « la page s'est tue » — et felicitait sur la
+     suivante. Chaque page porte donc un numero ; ce qui a ete lance sous un
+     autre numero se tait. */
+  var _generation=0;
   function attendSilence(fn,avecFete){
+    var _g=_generation;
     N.plusTard(function(){
+      if(_g!==_generation)return;
       var t0=Date.now();
       var id=setInterval(function(){
+        if(_g!==_generation){clearInterval(id);return;}
         if(_sceneParle>0||(avecFete&&_sceneFete>0)){
           /* GARDE-FOU : une scene qui oublie de rendre la main. Il valait
              vingt secondes, et il ABANDONNAIT — l attente etait simplement
@@ -15003,7 +15062,7 @@ function _boyScene(ca,reprise){
              attend le silence. */
           if(Date.now()-t0<120000)return;
         }
-        clearInterval(id);N.surSilence(fn);
+        clearInterval(id);N.surSilence(function(){if(_g===_generation)fn();});
       },90);
     },220);
   }
@@ -15273,8 +15332,12 @@ function _boyScene(ca,reprise){
     if(!attend){
       var pb=petit(te('❙❙ Pause'),te('Mettre en pause'),function(){
         if(N.enPause()){
-          N.reprend();pb.textContent=te('❙❙ Pause');
-          if(_pretAEnchainer)lanceEnchainement();
+          /* ── REPRENDRE, C'EST RECOMMENCER LA PAGE ──
+             Le client : « chaque bouton "reprendre" reprend le texte AINSI
+             QUE LES ANIMATIONS depuis le debut ». On rebatit donc la page, sur
+             place, sans la faire glisser : la voix et le dessin repartent
+             ensemble de zero. */
+          _sensNav=0;go();return;
         }else{
           arreteEnchainement();N.pause();pb.textContent=te('▶ Reprendre');
         }
@@ -15442,9 +15505,23 @@ function _boyScene(ca,reprise){
        peut, et « ba ». offre trois espaces où couper. On soude donc le groupe
        entier — guillemet ouvrant, contenu, guillemet fermant, et la
        ponctuation qui suit — en un seul morceau insécable. */
-    var _lignes=_colleLaPonctuation(
-                  _soudeLesGuillemets(_airAutourArabe(_sansCercle(html))))
-                  .split(/<br\b[^>]*>/i);
+    var _src=_colleLaPonctuation(
+                  _soudeLesGuillemets(_airAutourArabe(_sansCercle(html))));
+    /* ── EN PAYSAGE, LA PHRASE D'UN TRAIT ──
+       Le client, sur quatre pages : « le texte forme 4 lignes avec
+       enormement d'espace sur les cotes », « ecris la phrase sur une seule
+       ligne ». Les coupures sont ecrites pour le PORTRAIT, ou la largeur
+       manque. En paysage elles etaient autrefois cachees par la feuille de
+       style ; depuis que chaque ligne ecrite est devenue son propre bloc,
+       elles s'imposaient partout. On les retire donc en paysage — sauf
+       celles marquees `data-dur`, que le client a demandees lui-meme
+       (« ou est le son » sur la premiere ligne, le son sur la seconde). */
+    var _uneLigne=false;
+    if(estPaysage()&&/<br\b(?![^>]*data-dur)[^>]*>/i.test(_src)){
+      _src=_src.replace(/<br\b(?![^>]*data-dur)[^>]*>/gi,' ');
+      _uneLigne=!/<br\b/i.test(_src);
+    }else if(estPaysage()&&!/<br\b/i.test(_src))_uneLigne=true;
+    var _lignes=_src.split(/<br\b[^>]*>/i);
     t.innerHTML=_lignes.map(function(l){
       return '<span class="boy-ligne">'+l+'</span>';
     }).join('');
@@ -15452,6 +15529,7 @@ function _boyScene(ca,reprise){
        la largeur manque. En paysage elles disparaissent et le texte se
        repartit sur la largeur — sauf celles marquees `dur`. */
     if((t.innerHTML.match(/<br\s*\/?>/gi)||[]).length>=3)t.classList.add('titre-long');
+    if(_uneLigne)t.setAttribute('data-une-ligne','1');
     p.appendChild(t);
     /* fr === false : la scène dit elle-même sa phrase, morceau par morceau,
        pour caler une animation dessus (voir le tableau des formes). */
@@ -15663,6 +15741,36 @@ function _boyScene(ca,reprise){
       if(t.scrollWidth>t.clientWidth+1)return false;
       if(hDispo&&t.scrollHeight>hDispo+1)return false;
       return true;
+    }
+    /* ── D'ABORD SUR UNE SEULE LIGNE ──
+       Une phrase qui tient d'un trait en paysage y reste, tant qu'elle se
+       lit encore bien : trente pixels a l'ecran au moins. En dessous, on la
+       laisse se replier plutot que de l'ecrire minuscule. */
+    /* ── MESUREE CONTRE LA PLACE, PAS CONTRE ELLE-MEME ──
+       Premier essai : la ligne unique debordait du cadre et la page partait
+       de travers. Le bloc du titre prend la largeur de son texte ; un texte
+       qui ne se replie plus l'elargit donc, et « est-ce que ca deborde ? »
+       repondait toujours non — le piege deja rencontre en v263. La place est
+       donc prise AVANT, le texte encore replie, et c'est a elle qu'on compare.
+       Une page en deux colonnes n'y a pas droit : sa colonne de texte est
+       etroite par nature, la phrase s'y repartit librement. */
+    if(t.getAttribute('data-une-ligne')&&!(t.closest&&t.closest('.boy-col-g'))){
+      var _dL=dispoLargeur()||col;
+      [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='nowrap';});
+      var tientL=function(v){
+        t.style.fontSize=v.toFixed(1)+'px';
+        if(laPlusLarge()>_dL+1)return false;
+        if(hDispo&&t.scrollHeight>hDispo+1)return false;
+        return true;
+      };
+      var _b1=MIN,_h1=MAX,_p1;
+      if(tientL(MAX))_p1=MAX;
+      else{
+        for(var _i1=0;_i1<8;_i1++){var _m1=(_b1+_h1)/2;if(tientL(_m1))_b1=_m1;else _h1=_m1;}
+        _p1=_b1;
+      }
+      if(_p1*ech>=30&&tientL(_p1)){t.style.fontSize=_p1.toFixed(1)+'px';return;}
+      [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='normal';});
     }
     var bas2=MIN,haut2=MAX,px;
     if(tient(MAX))px=MAX;
@@ -16249,12 +16357,20 @@ function _boyScene(ca,reprise){
     /* On change d'ecran : la scene qui parlait n'existe plus, son compte
        repart de zero — sinon le bouton de la page suivante attendrait une
        voix qui ne viendra jamais. */
-    _sceneParle=0;_sceneFete=0;
+    _sceneParle=0;_sceneFete=0;_generation++;
     arreteEnchainement();_pretAEnchainer=false;_avance=null;N.reveille();
     N.videTimers();N.stop();
     /* On tourne la page : la voix se tait — c'est `N.stop()` — et la fête
        qu'elle avait lancée s'en va avec elle. */
     try{_arreteLaFete();}catch(e){}
+    /* ── LA LETTRE QUI VOLE PART AVEC SA PAGE ──
+       Trouve au banc : une page quittee pendant qu'une lettre volait vers sa
+       place dans le mot laissait la copie volante sur l'ecran, pour de bon —
+       un grand alif fige par-dessus tout. Elle est posee sur le body et son
+       retrait etait confie a une minuterie de la page, que le changement de
+       page annule justement. On les retire donc toutes ici. */
+    try{[].slice.call(document.querySelectorAll('.boy-volant'))
+      .forEach(function(x){if(x.parentNode)x.parentNode.removeChild(x);});}catch(e){}
     /* ── LA PAGE PEUT TOURNER TOUTE SEULE, LE DOIGT ENCORE POSE ──
        Un enchainement automatique tombe pendant le glissement : la page que
        la bande montre n'existera plus dans un instant, et la copie figee
@@ -16287,6 +16403,7 @@ function _boyScene(ca,reprise){
       _sensNav=0;
     }
     _texteMuetSiImage();ajouteRetour();
+    _typoFr(wrap);
     ca.scrollTop=0;deuxColonnes();
     /* La taille du texte se decide APRES le passage en deux colonnes : c'est
        la largeur de sa colonne qui la commande. On la reprend un peu plus
@@ -16323,7 +16440,7 @@ function _boyScene(ca,reprise){
        (`ajusteEcran`) change la largeur reelle des cases APRES les premieres,
        et le mot du recapitulatif se calait alors sur une case qui n'existait
        plus. Chaque passe repart de la taille courante et converge. */
-    function recale(){if(!wrap.isConnected)return;calibreLesTextes();ajusteEcran();}
+    function recale(){if(!wrap.isConnected)return;_typoFr(wrap);calibreLesTextes();ajusteEcran();}
     N.plusTard(recale,120);N.plusTard(recale,500);
     N.plusTard(recale,900);N.plusTard(recale,1600);
     /* Et une fois la POLICE ARABE arrivee : mesuree sur la police de repli,
@@ -17444,6 +17561,7 @@ function _boyScene(ca,reprise){
       if(!(kf>0.02&&kf<20))kf=k;
     }
     var c=document.createElement('div');
+    c.className='boy-volant';
     c.textContent=depuis.textContent||'';
     c.setAttribute('aria-hidden','true');
     c.style.cssText='position:fixed;z-index:9500;pointer-events:none;'
@@ -17841,7 +17959,10 @@ function _boyScene(ca,reprise){
         /* Meme regle qu'aux pages de forme : la seule ne bouge pas, ni la
            debut quand la lettre ne s'attache pas apres. */
         var _sansTrait=(formes[1]===formes[0]);
-        [[mSeule,0],[mDebut,_sansTrait?0:0.03],[mFin,0.03],[mMilieu,0.03]]
+        /* Trois centiemes plus haut que sur les pages de forme : le client,
+           « dans toutes les pages recapitulatif, les lettres sont un peu plus
+           basses que le reste du mot ». */
+        [[mSeule,-0.03],[mDebut,_sansTrait?-0.03:0],[mFin,0],[mMilieu,0]]
           .forEach(function(o){
             aligneSurLeMot(o[0].trou.parentNode,o[0].trou,o[1]);
           });
@@ -17904,7 +18025,8 @@ function _boyScene(ca,reprise){
            la phrase est posee ligne par ligne. Ici la rangee est large : une
            coupure y laissait la moitie de la place vide a droite. On les
            retire et on laisse le texte occuper sa ligne. */
-        tx.innerHTML=_colleLaPonctuation(String(o.h).replace(/<br\s*\/?>/gi,' '));
+        tx.innerHTML=_colleLaPonctuation(_soudeLesGuillemets(
+                       String(o.h).replace(/<br\s*\/?>/gi,' ')));
         d.appendChild(pu);d.appendChild(tx);
         /* Un point peut MONTRER au lieu de dire : la vue se construit ici,
            a chaque rendu, pour que le retour en arriere la retrouve neuve. */
@@ -20677,7 +20799,11 @@ function _boyLetterCourse(ca,idx,premiere){
       ? B.forme(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
           TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
           teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}),
-          _pSeule.avant,_pSeule.apres,_pSeule.lettre)
+          /* Zero : la forme seule n'a pas de trait de liaison, rien a
+             compenser. L'oubli de ce dernier argument la baissait de trois
+             centiemes — « la lettre devient un peu trop basse quand le reste
+             du mot apparait », pour toutes les lettres seules. */
+          _pSeule.avant,_pSeule.apres,_pSeule.lettre,0)
       : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
           TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
           teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}))));
@@ -20882,7 +21008,7 @@ function _boyLetterCourse(ca,idx,premiere){
           [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
-      teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:b((lat+v[1]).toLowerCase()),ou:b(combien)}),
+      teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:q(v[1]),ou:b(combien)}),
       teF('Trace cette syllabe dans {ou}.',{ou:combien}),null,nomsMontres));
   });
   /* Les propositions melangent les FORMES : l'enfant doit reconnaitre le
@@ -20906,7 +21032,8 @@ function _boyLetterCourse(ca,idx,premiere){
   var tanwFormes=aMontrer.filter(function(n){return n===0||n===3;});
   var tanwListe=function(signe){return tanwFormes.map(function(n){return _avecSigne(formes[n].form,signe);});};
   var tanwNoms=tanwFormes.map(function(n){return NOMS[n].toLowerCase();});
-  var tanwCombien=tanwFormes.length>1?teF('ses {n} formes de fin de mot',{n:tanwFormes.length}):te('cette forme');
+  /* « de fin de mot » retire a la demande du client : la page le montre. */
+  var tanwCombien=tanwFormes.length>1?teF('ses {n} formes',{n:tanwFormes.length}):te('cette forme');
   /* On ne dit plus « double » : on NOMME le signe qui est double. L'enfant
      vient d'apprendre les trois voyelles, il les reconnait. */
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
@@ -20917,7 +21044,7 @@ function _boyLetterCourse(ca,idx,premiere){
           [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
-      'Trace '+b((lat+v[1]).toLowerCase())+'<br>dans '+b(tanwCombien)+' ✍️',
+      'Trace '+q(v[1])+'<br>dans '+b(tanwCombien)+' ✍️',
       teF('Trace ce tanwîn dans {ou}.',{ou:tanwCombien}),null,tanwNoms));
   });
   /* Pas de soukoun sur le tā marbūṭa : cela n'existe pas. */
@@ -20977,7 +21104,7 @@ function _boyLetterCourse(ca,idx,premiere){
       }
       var plusieursP=casesP.length>1;
       sc.push(B.tracer(teF('ALLONGEMENT {n}/3 · TRACÉ',{n:n+1}),casesP,
-        'Trace '+b((lat+v[1]).toLowerCase())
+        'Trace '+q(v[1])
           +(plusieursP?('<br>dans '+b(casesP.length+' places')):'')+' ✍️',
         plusieursP?te('Trace cet allongement dans ses différentes places.')
                   :te('Trace cet allongement.'),null,nomsP));
@@ -23199,11 +23326,15 @@ function _arreteLaFete(){
    prévient quand elle dit bravo, et la fête part — où qu'on soit.
    `_surBravo` est posé par le cours affiché, qui sait faire jaillir les
    cœurs au-dessus de son personnage ; sans lui, les étincelles suffisent. */
+/* Le mot OUVRE la phrase : « Bravo ! », mais aussi « Bravo, on dit ou » —
+   c'est ce que disent les pages de voyelle, et la fete ne partait pas. */
 function _estUnBravo(t){
   try{
-    var b=String(te('Bravo !')).replace(/[\s!.…]+$/,'').toLowerCase();
-    var x=String(t||'').replace(/[\s!.…]+$/,'').toLowerCase();
-    return !!b&&x===b;
+    var b=String(te('Bravo !')).replace(/[\s!.,…]+$/,'').toLowerCase();
+    var x=String(t||'').replace(/^[\s🎉✨⭐]+/,'').toLowerCase();
+    if(!b||x.indexOf(b)!==0)return false;
+    var apres=x.charAt(b.length);
+    return !apres||!/[a-zà-ÿ0-9]/i.test(apres);
   }catch(e){return false;}
 }
 function _feteSiBravo(t){

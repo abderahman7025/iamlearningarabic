@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v276
+## OÙ ON EN EST — 24 septembre 2026, production en v277
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,41 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v276), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v277), du plus récent au plus ancien :**
+
+- **LOT DE CORRECTIONS SUR CAPTURES (v277)** — première moitié des 17 points
+  envoyés le 26 septembre (la seconde, tracé et gestes, suit en v278).
+  * *Typographie sur TOUT ce qui s'affiche* (`_typoFr`, passé sur la page
+    construite puis à chaque recalage) : espace insécable après « et avant »,
+    avant ! ? ; : et avant un pictogramme de fin. Seules les espaces DÉJÀ là
+    changent — l'espagnol écrit « an » collé et le reste. Le cas
+    `<b>« wa »</b> ?` (signe dans un autre nœud que le mot) est soudé dans un
+    morceau insécable. Les réglages précédents n'étaient posés que sur le
+    titre : « à retenir » et le reste leur échappaient.
+  * *En paysage, la phrase d'un trait.* Les coupures sont écrites pour le
+    portrait ; depuis que chaque ligne est un bloc, elles s'imposaient
+    partout (« 4 lignes avec énormément d'espace sur les côtés »). Retirées en
+    paysage sauf `data-dur` (« où est le son » / le son, demandé par le
+    client). Une seule ligne tant qu'elle se lit à 30 px au moins, sinon
+    elle se replie. **Piège** : la mesure se faisait sur le bloc du titre, qui
+    s'élargit avec un texte non replié — la page partait de travers. La
+    place est prise AVANT, texte encore replié (le piège de v263).
+  * *Tracés* : sons entre guillemets (voyelle, tanwīn, allongement) ;
+    « de fin de mot » retiré des pages tanwīn.
+  * *Bravo* : la fête part aussi sur « Bravo, on dit… » — `_estUnBravo`
+    exigeait la phrase exacte « Bravo ! ».
+  * *Rien de l'ancienne page sur la nouvelle* : `attendSilence` guettait avec
+    une minuterie à lui, et comme `go()` remet le compte des voix à zéro,
+    elle concluait « la page s'est tue » et félicitait sur la suivante. Chaque
+    page porte un numéro (`_generation`) ; ce qui a été lancé sous un autre se
+    tait.
+  * *La lettre volante part avec sa page* (trouvé au banc) : quittée en plein
+    vol, la copie restait figée à l'écran pour de bon — son retrait était
+    confié à une minuterie que le changement de page annule.
+  * *« Reprendre » rebat la page* : texte ET animations depuis le début.
+  * *Hauteur des lettres* : la forme seule de l'identification recevait
+    0,03 em de baisse par OUBLI d'argument (défaut de `aligneSurLeMot`) ; le
+    récapitulatif remonte de 0,03 em partout, à la demande du client.
 
 - **LE CANEVAS REVIENT SOUS LE TEXTE (v276).** « C'est nul, tu as mis le
   canevas à droite du texte ! Remets-le comme au début : le texte en haut, le
