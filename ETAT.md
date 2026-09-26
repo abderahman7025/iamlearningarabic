@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v277
+## OÙ ON EN EST — 24 septembre 2026, production en v278
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,29 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v277), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v278), du plus récent au plus ancien :**
+
+- **LOT DE CORRECTIONS SUR CAPTURES, SECONDE MOITIÉ (v278)** — tracé et gestes.
+  * *Les bords ne prennent plus le doigt.* Ils couvrent toute la hauteur, 44
+    à 86 px de chaque côté, au-dessus de tout : invisibles au doigt, ils
+    prenaient quand même le toucher. D'où « on ne peut pas commencer la
+    damma de droite » et « la gomme ramène à la page précédente ». Sur écran
+    tactile (`hover:none` / `pointer:coarse`) ils laissent passer ; le
+    glissement les actionne quand même, par programme.
+  * *Une marge de 7 % de chaque côté du canevas* : la première forme ne
+    touche plus le bord droit. Les modèles y perdent environ 14 % — c'est la
+    largeur qui les borne.
+  * *La gomme au milieu du bas*, 42 px (58 à l'écran sur téléphone).
+  * *De tête* : le cadre repart de sa hauteur d'origine (220 + la bande des
+    rappels) et entre, en paysage, dans les 46 % d'écran ; sous CHAQUE forme,
+    à sa place exacte, un œil (sans le nom) et une gomme qui n'efface que sa
+    case. Vérifié : 135 px d'encre effacés dans « seule », « début » intact.
+  * *Glissement bien plus réactif* : la bande s'ouvre dès 8 px, la page
+    passe au huitième de la largeur (au lieu du quart) ou sur un coup sec
+    (0,33 px/ms sur les derniers points). Vérifié : coup sec de 30 px =
+    page suivante ; glissement lent de 30 px = rien.
+  * *Mot à trou* : à quatre formes la fille s'en va ; à deux, on MESURE si
+    elle couvre une cible et on pousse la rangée juste de quoi la dégager.
 
 - **LOT DE CORRECTIONS SUR CAPTURES (v277)** — première moitié des 17 points
   envoyés le 26 septembre (la seconde, tracé et gestes, suit en v278).

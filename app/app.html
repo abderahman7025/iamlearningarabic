@@ -3520,13 +3520,28 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    La rangée qu'elle occupait rendait au cadre une bonne quarantaine de
    pixels : c'est cette place-là qui passe dans les modèles. Elle se pose au
    coin bas-droit, sous la ligne d'écriture, là où aucune lettre ne va. */
-.boy-gomme{position:absolute;left:7px;bottom:7px;z-index:3;
-  width:32px;height:32px;border-radius:50%;padding:0;margin:0;
+/* Au milieu du bas, et plus grosse : le client. Loin des bords, que la
+   souris utilise encore pour tourner la page. */
+.boy-gomme{position:absolute;left:50%;bottom:6px;z-index:3;transform:translateX(-50%);
+  width:42px;height:42px;border-radius:50%;padding:0;margin:0;
   border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
   color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
   cursor:pointer;line-height:1;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.20)}
-.boy-gomme svg{width:18px;height:18px;display:block}
-.boy-gomme:active{transform:scale(.90)}
+.boy-gomme svg{width:23px;height:23px;display:block}
+.boy-gomme:active{transform:translateX(-50%) scale(.90)}
+/* ── DE TETE : UN OEIL ET UNE GOMME SOUS CHAQUE FORME ── */
+.boy-sous-cases{position:relative;height:50px;margin:2px -18px 0;
+  width:calc(100% + 36px)}
+.boy-sous-cases .paire{position:absolute;top:2px;transform:translateX(-50%);
+  display:flex;gap:8px}
+.boy-sous-cases button{width:44px;height:44px;border-radius:50%;padding:0;margin:0;
+  border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
+  color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.18)}
+.boy-sous-cases button svg{width:24px;height:24px;display:block}
+.boy-sous-cases button.oeil{opacity:.6}
+.boy-sous-cases button.oeil.ouvert{opacity:1;background:rgba(var(--sk-rgb),.14)}
+.boy-sous-cases button:active{transform:scale(.9)}
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
@@ -3544,6 +3559,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-bord:hover,.boy-bord:focus-visible{opacity:1}
 .boy-bord:active>i{transform:scale(.92)}
 .boy-bord.eteint{pointer-events:none}
+/* ── AU DOIGT, LES BORDS LAISSENT PASSER ──
+   Ils couvrent toute la hauteur de l'ecran, sur 44 a 86 px de chaque cote, et
+   passent au-dessus de tout. Au doigt ils sont invisibles — on glisse — mais
+   ils prenaient quand meme le toucher : l'enfant ne pouvait pas commencer la
+   damma de droite, « trop au bord », et la gomme posee a gauche ramenait a la
+   page precedente. Sur un ecran tactile ils ne servent qu'a la souris : ils
+   laissent donc passer le doigt. Le glissement, lui, est ecoute sur toute la
+   page et les actionne quand meme. */
+@media (hover:none),(pointer:coarse){.boy-bord{pointer-events:none}}
 .boy-bord.eteint:hover{opacity:0}
 @media (prefers-reduced-motion:reduce){.boy-bord{transition:none}}
 /* ── PAS DE BANDE VIDE SOUS LE CONTENU ──
@@ -11252,7 +11276,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v277';
+var _VERSION_REPLI='v278';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13552,8 +13576,20 @@ function _blocEcriture(hote,o){
      part, au-dessus — ce n'est pas ce que le client demande non plus. Elle
      occupe donc une bande en HAUT DU MEME CADRE, au-dessus de la ligne ou
      l'enfant ecrit : le modele en haut, son trace juste en dessous. */
+  /* ── DE TETE, LE CADRE REVIENT A SA HAUTEUR D'AVANT ──
+     Le client : « dans toutes les pages etape finale de tete, le canevas est
+     trop grand ». Il porte en plus la bande des rappels, qui lui ajoute un
+     tiers : parti de la hauteur agrandie des autres traces, il devenait
+     demesure. Il repart donc de sa hauteur d'origine, et la bande, en
+     paysage, entre dans la meme part d'ecran que le reste. */
+  if(o.deTete)CH0=Math.min(CH0,220);
   var BANDE0=o.deTete?Math.round(CH0*0.36):0;
   CH0+=BANDE0;
+  if(o.deTete&&window.innerWidth>window.innerHeight){
+    var _bd=window.innerHeight*0.46,_vd=window.innerWidth*0.94;
+    var _maxT=Math.max(150,Math.round(CW0*_bd/_vd));
+    if(CH0>_maxT){var _r=_maxT/CH0;BANDE0=Math.round(BANDE0*_r);CH0=_maxT;}
+  }
   /* Moins il y a de cases, plus le modèle peut être grand : un doigt
      d'enfant a besoin de place pour repasser dessus. */
   /* Un signe seul se repasse mal quand il est petit : le doigt d'un enfant
@@ -13578,6 +13614,13 @@ function _blocEcriture(hote,o){
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
   var CW=Math.round(CW0*k),CH=Math.round(CH0*k),PX=Math.round(PX0*k);
+  /* ── UNE MARGE DE CHAQUE COTE ──
+     Le client : « on ne peut pas ecrire la premiere damma en commencant par
+     la droite, c'est trop au bord ». Les cases allaient d'un bord du cadre a
+     l'autre : la premiere forme touchait presque le bord droit, et le doigt
+     qui part de sa droite tombait hors du cadre. Les cases s'ecartent donc
+     des deux bords de 7 % de la largeur. */
+  var MX=Math.round(CW*0.07);
 
   var el=document.createElement('div');el.className='boy-ecriture';
   el.style.cssText='width:100%';
@@ -13663,7 +13706,7 @@ function _blocEcriture(hote,o){
   /* Le modele est CENTRE dans sa case : c'est donc son cote le plus large
      qui decide, des deux. Une demi-case, marge deduite, doit le contenir. */
   function _tientEnLargeur(px){
-    var demi=(CW/nb)/2-Math.round(9*k),pire=0;
+    var demi=((CW-2*MX)/nb)/2-Math.round(9*k),pire=0;
     try{
       liste.forEach(function(g){
         var e=_encreLargeur(g),w=Math.max(e.g,e.d);
@@ -13707,13 +13750,13 @@ function _blocEcriture(hote,o){
     _maxT=Math.min(_maxT,_tientEnLargeur(PX));
     PX=Math.max(40,Math.round(Math.min(PX,_maxT)));
   }
-  var pas=CW/nb;
+  var pas=(CW-2*MX)/nb;
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
      garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
      on pose la case n en partant de la droite. */
-  function caseX(n){return CW-pas*(n+0.5);}
+  function caseX(n){return CW-MX-pas*(n+0.5);}
   /* La case où tombe un trait se lit dans sa seule position en x. */
-  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-x)/pas)));}
+  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-MX-x)/pas)));}
   /* Le modèle entier, d'un bloc : les cases où rien ne s'anime. */
   function modeleEntier(n){
     cx.save();
@@ -13831,8 +13874,8 @@ function _blocEcriture(hote,o){
        à chaque image. */
     /* La boîte déborde un peu de la case : certaines formes attachées
        sont plus larges qu'elle, et le calque les couperait. */
-    var xg=Math.max(0,Math.round(CW-pas*(n+1)-pas*0.18));
-    var xd=Math.min(CW,Math.round(CW-pas*n+pas*0.18));
+    var xg=Math.max(0,Math.round(CW-MX-pas*(n+1)-pas*0.18));
+    var xd=Math.min(CW,Math.round(CW-MX-pas*n+pas*0.18));
     rev=(n>=0&&n<nb)
       ? _revelateur(liste[n],caseX(n),baseDessin,PX,xg,0,xd-xg,CH)
       : null;
@@ -13884,7 +13927,7 @@ function _blocEcriture(hote,o){
     boite.appendChild(g);
     return g;
   }
-  poseLaGomme();
+  if(!o.deTete)poseLaGomme();
   /* « EFFACER » n'est plus un bouton de la rangee : c'est la gomme ronde
      posee au coin du cadre, juste au-dessus. « REVOIR » avait ete retire
      avant elle — l'animation tourne en boucle sur la case voisine, il n'y a
@@ -13903,17 +13946,42 @@ function _blocEcriture(hote,o){
        l'envers : a cinq boutons la barre revient a la ligne, et le dernier
        repassait a gauche. En `direction:rtl`, le retour a la ligne suit le
        meme sens qu'eux. */
-    var rangee=document.createElement('div');
-    rangee.style.cssText='display:flex;gap:6px;justify-content:center;flex-wrap:wrap;'
-      +'margin-top:6px;direction:rtl';
-    el.appendChild(rangee);
+    /* ── SOUS CHAQUE FORME, SON OEIL ET SA GOMME ──
+       Le client : « mets sous chaque forme le bouton oeil, sans le nom de la
+       forme, et un bouton gomme, en assez gros ». Ils ne sont plus rangees a
+       part : chaque paire se pose SOUS SA CASE, a sa place exacte — l'enfant
+       n'a plus a faire le lien entre un bouton et une forme. Le nom reste
+       ecrit dans le cadre. La gomme n'efface que sa case. */
+    void nomsB;
+    var sous=document.createElement('div');sous.className='boy-sous-cases';
+    el.appendChild(sous);
+    var SVG_OEIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+      +' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      +'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>'
+      +'<circle cx="12" cy="12" r="3"/></svg>';
+    var SVG_GOMME='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
+      +' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+      +'<path d="M8.5 21H20"/>'
+      +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
+      +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
+      +'<path d="M11.2 8l4.6 4.6"/></svg>';
+    var nomGomme=String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'');
     for(var ib=0;ib<nb;ib++)(function(n){
-      var b=petitBouton('👁 '+(nomsB[n]||('#'+(n+1))),function(){
-        montres[n]=!montres[n];
-        b.style.opacity=montres[n]?'1':'.55';
-        guide(3);
-      },rangee);
-      b.style.opacity='.55';
+      var paire=document.createElement('div');paire.className='paire';
+      paire.style.left=(caseX(n)/CW*100).toFixed(3)+'%';
+      var oe=document.createElement('button');oe.type='button';oe.className='oeil';
+      oe.innerHTML=SVG_OEIL;oe.setAttribute('aria-label',nomsB[n]||'');
+      oe.onclick=function(ev){ev.preventDefault();
+        montres[n]=!montres[n];oe.classList.toggle('ouvert',!!montres[n]);guide(3);};
+      var go2=document.createElement('button');go2.type='button';
+      go2.innerHTML=SVG_GOMME;go2.setAttribute('aria-label',nomGomme);
+      go2.onclick=function(ev){ev.preventDefault();
+        /* Sa case seulement ; les deux cases du bout vont jusqu'au bord du
+           cadre, pour emporter aussi un trait parti dans la marge. */
+        var g=(n===nb-1)?0:Math.round(CW-MX-pas*(n+1));
+        var d=(n===0)?CW:Math.round(CW-MX-pas*n);
+        cxE.clearRect(g,0,d-g,CH);};
+      paire.appendChild(oe);paire.appendChild(go2);sous.appendChild(paire);
     })(ib);
   }
   var trace=false;
@@ -15218,13 +15286,22 @@ function _boyScene(ca,reprise){
       function bouge(x,y){
         if(!bon||!vivant()){if(_glis)_glisseLache(true);return;}
         var dx=x-x0,dy=y-y0;
+        /* ── BIEN PLUS REACTIF ──
+           Le client : « il faut glisser sur une grande partie de l'ecran pour
+           que ca commence ; il faudrait que ce soit bien plus reactif ». La
+           bande s'ouvre des 8 px, pour peu que le geste soit au moins aussi
+           horizontal que vertical. */
         if(!_glis){
-          if(Math.abs(dx)<14||Math.abs(dx)<Math.abs(dy)*1.2)return;
+          if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy))return;
           _glis=_glisseOuvre(dx<0?1:-1);
           if(!_glis){bon=false;return;}
           x0=x;
           return;
         }
+        /* Les derniers points du geste : c'est sa VITESSE qui dira, au lache,
+           si l'enfant a voulu tourner la page d'un petit coup sec. */
+        _glis.hist.push([x,Date.now()]);
+        if(_glis.hist.length>6)_glis.hist.shift();
         _glisseBouge(x-x0);
       }
       function arrivee(x,y){
@@ -15237,7 +15314,7 @@ function _boyScene(ca,reprise){
            navigateur qui n'a pas envoye les mouvements — on juge sur le
            trajet : au moins 60 px de large, et plus horizontal que vertical. */
         var dx=x-x0,dy=y-y0;
-        if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.4)return;
+        if(Math.abs(dx)<40||Math.abs(dx)<Math.abs(dy)*1.2)return;
         if(dx<0){if(_bordD&&!_bordD.classList.contains('eteint'))_bordD.click();}
         else{if(_bordG&&!_bordG.classList.contains('eteint'))_bordG.click();}
       }
@@ -16766,7 +16843,7 @@ function _boyScene(ca,reprise){
         else libre=!!(_bordG&&_bordG.isConnected);
       }catch(e){}
       return {ov:ov,a:a,b:b,wa:wa,wb:wb,p:p,r:r,k:k,pas:pas,sens:sens,
-              libre:libre,dx:0};
+              libre:libre,dx:0,hist:[]};
     }catch(e){return null;}
   }
 
@@ -16794,8 +16871,22 @@ function _boyScene(ca,reprise){
   function _glisseLache(annule){
     if(!_glis)return;
     var g=_glis;_glis=null;
-    var seuil=Math.max(70,g.r.width*0.22);
-    var passe=!annule&&g.libre&&Math.abs(g.dx)>=seuil;
+    /* La page passe au huitieme de la largeur — et non plus au quart — ou
+       sur un petit coup sec : un tiers de pixel par milliseconde, dans le
+       bon sens, sur les derniers points du geste. */
+    var seuil=Math.max(40,g.r.width*0.12);
+    var vite=false;
+    try{
+      var h=g.hist||[];
+      if(h.length>=2){
+        var a0=h[0],a1=h[h.length-1],dt=a1[1]-a0[1];
+        if(dt>0&&dt<220){
+          var v=(a1[0]-a0[0])/dt;
+          vite=(g.sens>0)?(v<-0.33):(v>0.33);
+        }
+      }
+    }catch(e){}
+    var passe=!annule&&g.libre&&(Math.abs(g.dx)>=seuil||(vite&&Math.abs(g.dx)>=18));
     var fin=passe?(g.sens>0?-g.pas:g.pas):0;
     [g.a,g.b,g.wa,g.wb].forEach(function(c){
       c.style.transition='transform .26s cubic-bezier(.22,.68,.3,1)';});
@@ -20004,6 +20095,33 @@ function _boyScene(ca,reprise){
       r.style.cssText='display:grid;grid-template-columns:repeat(2,auto);gap:10px;'
         +'justify-content:center;margin-top:8px;direction:rtl';
       var repondu=false,premier=true;
+      /* ── LA FILLE NE CACHE PLUS UNE REPONSE ──
+         Le client : « quand il n'y a que 2 formes, les decaler sur la gauche
+         pour que la fille n'en cache pas une ; s'il y en a 4, enlever la
+         fille ». A quatre, elle s'en va. A deux, on MESURE : si elle couvre
+         une cible, on pousse la rangee vers la gauche juste de quoi la
+         degager — rien si elle ne gene pas, en portrait notamment. */
+      function degageLaFille(){
+        if(!p.isConnected)return;
+        var perso=p.querySelector('.boy-perso'),bv=p.querySelector('.boy-bravo');
+        if(!perso)return;
+        if(opts.length>2){perso.style.display='none';if(bv)bv.style.display='none';return;}
+        r.style.paddingRight='';
+        var rp=perso.getBoundingClientRect(),chev=0;
+        [].slice.call(r.children).forEach(function(c){
+          var rc=c.getBoundingClientRect();
+          var ox=Math.min(rc.right,rp.right)-Math.max(rc.left,rp.left);
+          var oy=Math.min(rc.bottom,rp.bottom)-Math.max(rc.top,rp.top);
+          if(ox>0&&oy>0)chev=Math.max(chev,rc.right-rp.left);
+        });
+        if(chev>0){
+          var e2=r.offsetWidth?(r.getBoundingClientRect().width/r.offsetWidth):1;
+          if(!(e2>0.05&&e2<20))e2=1;
+          r.style.paddingRight=(2*chev/e2+14).toFixed(0)+'px';
+        }
+      }
+      N.plusTard(degageLaFille,160);N.plusTard(degageLaFille,700);
+      N.plusTard(degageLaFille,1700);
       opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(o){
         var b=document.createElement('div');b.className='boy-cible';
         poseCible(b,o.g);
