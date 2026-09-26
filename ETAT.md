@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v278
+## OÙ ON EN EST — 24 septembre 2026, production en v279
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,42 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v278), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v279), du plus récent au plus ancien :**
+
+- **RÉGRESSION DE v277 RÉPARÉE, ET NOUVEAU LOT (v279).**
+  * *Les coupures de l'auteur reviennent.* v277 les retirait sur TOUTES les
+    pages en paysage ; le client : « tu as modifié des choses qu'il ne fallait
+    pas » (« Tu es prête ? », « 3 voyelles » sur une ligne, bouton Pause trop
+    gros). La phrase d'un trait ne vaut plus que pour les pages de TRACÉ
+    (`data-trace`). « Cette règle vaut pour… » passe de 4 lignes à 2
+    (`_parDeux`, qui regroupe les coupures de chaque langue). Vérifié contre
+    v276 chargée au banc : bouton Pause 220×68 et 202×62 px, identiques.
+  * *Le dernier signe mangé* (« ? », « . », « ! ») : `dispoLargeur` comptait la
+    marge intérieure du parent (`clientWidth`) — 36 px de trop ; la ligne
+    débordait et le panneau coupait. On la retire.
+  * *Gomme-OUTIL* sur tous les canevas : deux fois plus grosse (84 px), on la
+    touche, elle s'allume, on touche la forme — seule sa case s'efface, et
+    elle s'éteint. En haut quand la ligne est en haut (kasra). De tête : un
+    œil et une gomme à GAUCHE, centrés en hauteur, même principe ; la
+    marge gauche s'élargit pour qu'ils ne couvrent pas la dernière forme.
+  * *Modèle dévoilé entier* : l'alif touchait le haut du cadre, il était
+    coupé. Sa taille tient dans la bande (encre mesurée) et sa ligne descend
+    le plus bas possible.
+  * *Crayon lisse* : courbes quadratiques par les milieux, joints arrondis.
+  * *Double damma* resserrée : 0,07 em au lieu de 0,10 (canevas, bulles,
+    à retenir).
+  * *À retenir* : voyelles 84 px, la licorne fournie (`vaisseauVide`) au lieu
+    de l'emoji, coupure après « : » (hors attributs : le premier essai avait
+    pris le « : » de `color:var(--sk-vif)`), et « Reprendre » repart du POINT
+    entamé (`_resumeDepuis`).
+  * *Tanwīn* : point final, texte de 60 à 69 px — la ligne la plus longue
+    remplissait sa colonne ; ces pages donnent plus de largeur au texte
+    (`texte-large`).
+  * *Mot à trou* : bulles de 81 à 169 px (deux colonnes à deux formes, au
+    lieu de quatre). Le « tululun » (`playBravo`) part bien au bon clic :
+    vérifié, quatre notes créées.
+  * *Dernière page d'un cours* : « Bravo ! » seul, puis une phrase par ligne
+    (`_bravoPuisPhrases`, seulement quand il y a plus de deux lignes).
 
 - **LOT DE CORRECTIONS SUR CAPTURES, SECONDE MOITIÉ (v278)** — tracé et gestes.
   * *Les bords ne prennent plus le doigt.* Ils couvrent toute la hauteur, 44

@@ -3287,15 +3287,26 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-2col .boy-col-g{min-width:0}
 .boy-2col .boy-titre{max-width:none;margin:0;font-size:1.95rem;line-height:1.6}
 .boy-2col .boy-hublot{margin:0 auto}
+/* ── LE TEXTE PREND LA PLACE ──
+   Pages tanwin : « grossis la police ». Mesure : la ligne la plus longue
+   remplissait exactement sa colonne (453 px) — c'est la largeur qui bridait.
+   Le hublot n'a pas besoin de la sienne : ici, le texte en prend davantage. */
+.texte-large .boy-2col{grid-template-columns:minmax(0,2.1fr) minmax(0,1fr)}
 /* ── LE MOT A TROU, EN PAYSAGE ──
    La colonne de droite tient les QUATRE propositions sur une seule rangee —
    le client les veut ainsi. Elles se partagent la largeur au lieu de garder
    leurs 104 px, sans quoi elles sortiraient de la colonne. Et le mot
    descend : colle en haut, il paraissait pose de travers. */
+/* A deux formes, deux colonnes : dans quatre, chaque bulle n'avait que le
+   quart de la place et restait petite. */
+.boy-2col .trou-cibles.n2{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.boy-2col .trou-cibles.n3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 .boy-2col .trou-cibles{grid-template-columns:repeat(4,minmax(0,1fr))!important;
   gap:8px!important;width:100%}
 .boy-2col .trou-cibles .boy-cible{width:100%;height:auto;aspect-ratio:1;
-  max-width:104px;font-size:clamp(1.1rem,4.4vh,2.6rem)}
+  max-width:140px;font-size:clamp(1.5rem,6vh,3.4rem)}
+/* Plus grosses, a la demande du client. */
+.ecran-trou .boy-cible{width:132px;height:132px;font-size:3.3rem}
 .boy-2col .trou-mot{margin-top:clamp(6px,5vh,42px)!important}
 /* La page de déduction : ses deux lignes doivent tomber en face des deux
    rangées du tableau, on les écarte donc autant que lui. */
@@ -3520,28 +3531,33 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    La rangée qu'elle occupait rendait au cadre une bonne quarantaine de
    pixels : c'est cette place-là qui passe dans les modèles. Elle se pose au
    coin bas-droit, sous la ligne d'écriture, là où aucune lettre ne va. */
-/* Au milieu du bas, et plus grosse : le client. Loin des bords, que la
-   souris utilise encore pour tourner la page. */
+/* Au milieu du bas, deux fois plus grosse : le client, « meme si elle passe
+   sur la ligne d'ecriture ». En haut quand la ligne est en haut (kasra). */
 .boy-gomme{position:absolute;left:50%;bottom:6px;z-index:3;transform:translateX(-50%);
-  width:42px;height:42px;border-radius:50%;padding:0;margin:0;
+  width:84px;height:84px;border-radius:50%;padding:0;margin:0;
   border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
   color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
   cursor:pointer;line-height:1;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.20)}
-.boy-gomme svg{width:23px;height:23px;display:block}
+.boy-gomme svg{width:46px;height:46px;display:block}
+.boy-gomme.en-haut{bottom:auto;top:6px}
 .boy-gomme:active{transform:translateX(-50%) scale(.90)}
-/* ── DE TETE : UN OEIL ET UNE GOMME SOUS CHAQUE FORME ── */
-.boy-sous-cases{position:relative;height:50px;margin:2px -18px 0;
-  width:calc(100% + 36px)}
-.boy-sous-cases .paire{position:absolute;top:2px;transform:translateX(-50%);
-  display:flex;gap:8px}
-.boy-sous-cases button{width:44px;height:44px;border-radius:50%;padding:0;margin:0;
-  border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.94);
+/* ── L'OUTIL PRIS ──
+   On touche la gomme (ou l'oeil) : elle s'allume. On touche ensuite ce
+   qu'on veut effacer (ou devoiler) : cela seul s'efface, et l'outil se
+   repose. */
+.boy-gomme.actif,.boy-outils-g button.actif{background:var(--sk-vif);color:#fff;
+  border-color:var(--sk-vif);box-shadow:0 0 0 5px rgba(var(--sk-rgb),.25)}
+.outil-pris canvas{cursor:crosshair}
+/* ── DE TETE : UN OEIL ET UNE GOMME, A GAUCHE ── */
+.boy-outils-g{position:absolute;left:8px;top:50%;transform:translateY(-50%);z-index:3;
+  display:flex;flex-direction:column;gap:10px}
+.boy-outils-g button{border-radius:50%;padding:0;margin:0;
+  border:2px solid rgba(var(--sk-rgb),.35);background:rgba(255,255,255,.95);
   color:var(--sk-fonce);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.18)}
-.boy-sous-cases button svg{width:24px;height:24px;display:block}
-.boy-sous-cases button.oeil{opacity:.6}
-.boy-sous-cases button.oeil.ouvert{opacity:1;background:rgba(var(--sk-rgb),.14)}
-.boy-sous-cases button:active{transform:scale(.9)}
+  cursor:pointer;box-shadow:0 2px 7px rgba(var(--sk-rgb-f),.20)}
+.boy-outils-g button svg{width:58%;height:58%;display:block}
+.boy-outils-g button:active{transform:scale(.92)}
+
 /* ── LES BORDS QUI TOURNENT LA PAGE ──
    Invisibles tant qu'on ne s'en approche pas. Au doigt on glisse ; a la
    souris, le bord s'eclaire des qu'elle arrive dessus. */
@@ -4252,6 +4268,8 @@ body.fond-espace .tuile-nom{color:#20242e}
   transition:opacity .35s ease,transform .35s ease}
 .res-point.vu{opacity:1;transform:none}
 .res-point i{font-style:normal;flex:none;font-size:1.7rem;line-height:1.1}
+/* La licorne fournie par le client, a la place de l'emoji. */
+.res-point i img.res-puce{display:block;height:1.9em;width:auto}
 .res-point .res-tx{flex:1 1 auto;min-width:0}
 @media (prefers-reduced-motion:reduce){.res-point{transition:none}}
 
@@ -4264,11 +4282,12 @@ body.fond-espace .tuile-nom{color:#20242e}
 /* La hauteur de la rangee est celle de cette piste : plus elle est basse,
    moins la page est haute, et plus `ajusteEcran` peut l'agrandir. Les signes,
    eux, gardent leur taille — ils debordent un peu de la boite, sans gene. */
-.res-piste{position:relative;flex:0 0 auto;width:186px;height:66px}
+.res-piste{position:relative;flex:0 0 auto;width:224px;height:84px}
 .res-piste .sol{position:absolute;left:2px;right:2px;top:50%;
   border-top:3px dashed rgba(var(--sk-rgb-f),.42)}
 .res-piste .sg{position:absolute;transform:translate(-50%,-50%);
-  font-family:'Scheherazade New',serif;font-size:58px;line-height:1;
+  /* 84 et non 58 : le client, « augmente la taille des voyelles arabes ». */
+  font-family:'Scheherazade New',serif;font-size:84px;line-height:1;
   color:var(--sk-vif);
   transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s ease}
 /* UN SIGNE GRANDIT DU BON COTE : celui du dessus vers le haut, celui du
@@ -4467,8 +4486,8 @@ body.fond-espace .tuile-nom{color:#20242e}
   .ecran-trou .trou-mot{font-size:clamp(1.5rem,9vh,2.6rem) !important;
     line-height:1.25 !important;margin:2px 0 0 !important}
   .ecran-trou .boy-note{margin:2px 0 0;font-size:.78rem}
-  .ecran-trou .boy-cible{width:clamp(54px,18vh,88px);height:clamp(54px,18vh,88px);
-    font-size:clamp(1.25rem,7vh,2.1rem)}
+  .ecran-trou .boy-cible{width:clamp(64px,22vh,110px);height:clamp(64px,22vh,110px);
+    font-size:clamp(1.5rem,8.5vh,2.7rem)}
 
 /* Conteneurs principaux fluides */
 .sess-map-wrap,.puzzle-wrap{max-width:min(680px,96%);padding-left:clamp(10px,3vw,20px);padding-right:clamp(10px,3vw,20px)}
@@ -11276,7 +11295,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v278';
+var _VERSION_REPLI='v279';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11438,6 +11457,54 @@ function _typoFr(racine){
       p.insertBefore(sp,av);sp.appendChild(av);sp.appendChild(t);
     });
   }catch(e){}
+}
+/* Quatre lignes ecrites deviennent deux : la 1re avec la 2e, la 3e avec la
+   4e. Le client, sur « Cette regle vaut pour toutes les lettres… » : « le
+   texte forme 4 lignes avec enormement d'espace sur les cotes ». Chaque
+   langue garde ses propres coupures, simplement regroupees. */
+function _parDeux(html){
+  var l=String(html).split(/<br\b[^>]*>/i);
+  if(l.length<3)return html;
+  var o=[];
+  for(var i=0;i<l.length;i+=2)o.push(l[i]+(l[i+1]!==undefined?' '+l[i+1]:''));
+  return o.join('<br>');
+}
+/* ── LA DERNIERE PAGE D'UN COURS ──
+   Le client : « mets "Bravo !" sur la premiere ligne, seul, puis les deux
+   autres phrases sur les lignes 2 et 3 ». On garde la premiere ligne telle
+   quelle, et le reste se range UNE PHRASE PAR LIGNE, ou que l'auteur ait
+   coupe — dans toutes les langues. Le pictogramme de fin reste avec sa
+   phrase. */
+function _bravoPuisPhrases(html){
+  try{
+    var s0=String(html),i=s0.search(/<br\b[^>]*>/i);
+    if(i<0)return s0;
+    var tete=s0.slice(0,i);
+    if(!_estUnBravo(tete.replace(/<[^>]+>/g,'')))return s0;
+    /* Deux lignes apres « Bravo » : c'est deja ce que le client veut — on
+       ne touche a rien (« Tu maitrises alif 🎖️ » n'a pas de point final, le
+       regroupement par phrases l'aurait soude a la suivante). */
+    var _apres=s0.slice(i).split(/<br\b[^>]*>/i).filter(function(x){
+      return !!x.replace(/<[^>]+>/g,'').replace(/\s/g,'');});
+    if(_apres.length<=2)return [tete].concat(_apres).join('<br data-dur="1">');
+    var reste=s0.slice(i).replace(/<br\b[^>]*>/gi,' ').replace(/^\s+|\s+$/g,'');
+    var re=new RegExp('([!?.](?:[\\s\\u00a0]*(?:\\p{Extended_Pictographic}\\uFE0F?)+)?)(?:[\\s\\u00a0]+|$)','u');
+    var lignes=[''];
+    reste.split(/(<[^>]+>)/).forEach(function(x){
+      if(!x)return;
+      if(x.charAt(0)==='<'){lignes[lignes.length-1]+=x;return;}
+      var b=x.split(re);
+      for(var k=0;k<b.length;k++){
+        if(b[k]===undefined)continue;
+        lignes[lignes.length-1]+=b[k];
+        if(k%2===1)lignes.push('');
+      }
+    });
+    lignes=lignes.map(function(l){return l.replace(/^\s+|\s+$/g,'');})
+      .filter(function(l){return !!l.replace(/<[^>]+>/g,'').replace(/\s/g,'');});
+    if(!lignes.length)return s0;
+    return [tete].concat(lignes).join('<br data-dur="1">');
+  }catch(e){return html;}
 }
 function _colleLaPonctuation(html){
   return String(html).replace(/(^|>)([^<]+)/g,function(m,av,txt){
@@ -12067,7 +12134,8 @@ function _dessineSurLigne(cx,texte,x,baseY,px){
     if(simple==='\u064f'){                       /* damma : cote a cote */
       /* 0,10 de part et d'autre : les deux damma se touchent presque, et
          c'est ainsi que le client les veut. */
-      var ec=px*0.10;
+      /* 0,07 : le client les veut encore plus rapprochees. */
+      var ec=px*0.07;
       _pose(-ec,0);_pose(ec,0);
     }else{                                       /* traits : l'un sur l'autre */
       /* Les deux traits presque colles : a 0,17 ils laissaient un blanc entre
@@ -13621,6 +13689,16 @@ function _blocEcriture(hote,o){
      qui part de sa droite tombait hors du cadre. Les cases s'ecartent donc
      des deux bords de 7 % de la largeur. */
   var MX=Math.round(CW*0.07);
+  /* Marge droite, marge gauche. De tete, la gauche porte les deux outils :
+     elle s'elargit d'autant, pour qu'ils ne couvrent pas la derniere forme. */
+  var MXd=MX,MXg=MX,_Bout=0;
+  if(o.deTete){
+    var _WL=(hote&&hote.clientWidth)||300;
+    _Bout=Math.max(46,Math.min(64,Math.round(_WL*0.085)));
+    var _HL=_WL*CH/CW;
+    if(2*_Bout+12>_HL-10)_Bout=Math.max(34,Math.floor((_HL-22)/2));
+    MXg=Math.round((_Bout+16)/_WL*CW);
+  }
 
   var el=document.createElement('div');el.className='boy-ecriture';
   el.style.cssText='width:100%';
@@ -13706,7 +13784,7 @@ function _blocEcriture(hote,o){
   /* Le modele est CENTRE dans sa case : c'est donc son cote le plus large
      qui decide, des deux. Une demi-case, marge deduite, doit le contenir. */
   function _tientEnLargeur(px){
-    var demi=((CW-2*MX)/nb)/2-Math.round(9*k),pire=0;
+    var demi=((CW-MXd-MXg)/nb)/2-Math.round(9*k),pire=0;
     try{
       liste.forEach(function(g){
         var e=_encreLargeur(g),w=Math.max(e.g,e.d);
@@ -13750,13 +13828,13 @@ function _blocEcriture(hote,o){
     _maxT=Math.min(_maxT,_tientEnLargeur(PX));
     PX=Math.max(40,Math.round(Math.min(PX,_maxT)));
   }
-  var pas=(CW-2*MX)/nb;
+  var pas=(CW-MXd-MXg)/nb;
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
      garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
      on pose la case n en partant de la droite. */
-  function caseX(n){return CW-MX-pas*(n+0.5);}
+  function caseX(n){return CW-MXd-pas*(n+0.5);}
   /* La case où tombe un trait se lit dans sa seule position en x. */
-  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-MX-x)/pas)));}
+  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-MXd-x)/pas)));}
   /* Le modèle entier, d'un bloc : les cases où rien ne s'anime. */
   function modeleEntier(n){
     cx.save();
@@ -13776,7 +13854,21 @@ function _blocEcriture(hote,o){
      que l'oeil aille droit du modele a ce qu'il a ecrit. */
   function dessineRappel(){
     if(!BANDE)return;
-    var PR=Math.round(PX*0.62),baseR=Math.round(BANDE*0.80),vus=0;
+    /* ── LE MODELE DEVOILE, ENTIER ET LE PLUS BAS POSSIBLE ──
+       Le client : « baisse la position des modeles que l'on peut faire
+       apparaitre ». Mesure : l'alif devoile touchait le HAUT du cadre — il
+       etait coupe. Sa taille tient desormais dans la bande (encre du dessus
+       et du dessous comprises, mesurees), et sa ligne descend jusqu'a ce que
+       ce qui pend sous elle touche le bas de la bande. */
+    var _hR=0,_bR=0;
+    for(var _r=0;_r<nb;_r++){
+      var _eR=_encreAutourLigne(liste[_r]);
+      if(_eR.haut>_hR)_hR=_eR.haut;if(_eR.bas>_bR)_bR=_eR.bas;
+    }
+    var _mR=Math.round(4*k);
+    var PR=Math.round(PX*0.62);
+    if(_hR+_bR>0.01)PR=Math.min(PR,Math.floor((BANDE-2*_mR)/(_hR+Math.max(0,_bR))));
+    var baseR=Math.max(Math.ceil(_hR*PR)+_mR,BANDE-Math.ceil(Math.max(0,_bR)*PR)-_mR),vus=0;
     for(var n=0;n<nb;n++)if(montres[n]){
       vus++;
       cx.save();
@@ -13874,8 +13966,8 @@ function _blocEcriture(hote,o){
        à chaque image. */
     /* La boîte déborde un peu de la case : certaines formes attachées
        sont plus larges qu'elle, et le calque les couperait. */
-    var xg=Math.max(0,Math.round(CW-MX-pas*(n+1)-pas*0.18));
-    var xd=Math.min(CW,Math.round(CW-MX-pas*n+pas*0.18));
+    var xg=Math.max(0,Math.round(CW-MXd-pas*(n+1)-pas*0.18));
+    var xd=Math.min(CW,Math.round(CW-MXd-pas*n+pas*0.18));
     rev=(n>=0&&n<nb)
       ? _revelateur(liste[n],caseX(n),baseDessin,PX,xg,0,xd-xg,CH)
       : null;
@@ -13923,9 +14015,41 @@ function _blocEcriture(hote,o){
       +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
       +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
       +'<path d="M11.2 8l4.6 4.6"/></svg>';
-    g.onclick=function(ev){ev.preventDefault();cxE.clearRect(0,0,CW,CH);};
+    /* ── ELLE S'ALLUME, ELLE N'EFFACE PAS TOUT ──
+       Le client : « cliquer dessus ne doit pas directement tout effacer :
+       l'enfant clique sur la gomme, elle est selectionnee, puis il clique sur
+       la lettre, forme ou voyelle a effacer, et ca n'efface qu'elle ». */
+    g._outil='gomme';boutonsOutil.push(g);
+    g.onclick=function(ev){ev.preventDefault();ev.stopPropagation();choisitOutil('gomme');};
+    /* La kasra s'ecrit sous une ligne posee en haut : la gomme monte avec. */
+    if(_part<0.5)g.classList.add('en-haut');
     boite.appendChild(g);
     return g;
+  }
+  /* ── LES OUTILS ──
+     On prend un outil, puis on touche la forme : l'outil agit sur SA case,
+     et se repose. La case est celle ou tombe le doigt — les memes bornes que
+     l'animation, les deux du bout allant jusqu'au bord du cadre pour
+     emporter aussi un trait parti dans la marge. */
+  var outil=null,boutonsOutil=[];
+  function choisitOutil(nom){
+    outil=(outil===nom)?null:nom;
+    boutonsOutil.forEach(function(x){x.classList.toggle('actif',x._outil===outil);});
+    boite.classList.toggle('outil-pris',!!outil);
+  }
+  function lacheOutil(){
+    outil=null;
+    boutonsOutil.forEach(function(x){x.classList.remove('actif');});
+    boite.classList.remove('outil-pris');
+  }
+  function appliqueOutil(q){
+    var n=caseDe(q.x);
+    if(outil==='gomme'){
+      var g0=(n===nb-1)?0:Math.round(CW-MXd-pas*(n+1));
+      var d0=(n===0)?CW:Math.round(CW-MXd-pas*n);
+      cxE.clearRect(g0,0,d0-g0,CH);
+    }else if(outil==='oeil'){montres[n]=!montres[n];guide(3);}
+    lacheOutil();
   }
   if(!o.deTete)poseLaGomme();
   /* « EFFACER » n'est plus un bouton de la rangee : c'est la gomme ronde
@@ -13938,23 +14062,12 @@ function _blocEcriture(hote,o){
      eteint a sa guise. Sans filet, celui qui ne se souvient plus n'a aucune
      porte de sortie et laisse tomber la lecon ; avec un bouton unique qui
      montre tout, il n'a plus qu'a repasser. */
+  /* ── DE TETE : UN SEUL OEIL, UNE SEULE GOMME, A GAUCHE ──
+     Le client : « mets un bouton seulement de chaque, sur la gauche, centre
+     en hauteur ; quand on clique sur un des boutons, il faut ensuite cliquer
+     sur une des formes pour la gommer ou faire apparaitre son modele ». Les
+     quatre paires sous les cases s'en vont. */
   if(o.deTete){
-    var nomsB=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
-    /* LEUR PROPRE RANGEE, EN ECRITURE ARABE. Ils commandent les cases du
-       canvas, lesquelles vont de droite a gauche — la case 0, l'isolee, est
-       tout a DROITE (voir `caseX`). Il ne suffit pas de les ranger a
-       l'envers : a cinq boutons la barre revient a la ligne, et le dernier
-       repassait a gauche. En `direction:rtl`, le retour a la ligne suit le
-       meme sens qu'eux. */
-    /* ── SOUS CHAQUE FORME, SON OEIL ET SA GOMME ──
-       Le client : « mets sous chaque forme le bouton oeil, sans le nom de la
-       forme, et un bouton gomme, en assez gros ». Ils ne sont plus rangees a
-       part : chaque paire se pose SOUS SA CASE, a sa place exacte — l'enfant
-       n'a plus a faire le lien entre un bouton et une forme. Le nom reste
-       ecrit dans le cadre. La gomme n'efface que sa case. */
-    void nomsB;
-    var sous=document.createElement('div');sous.className='boy-sous-cases';
-    el.appendChild(sous);
     var SVG_OEIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
       +' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       +'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>'
@@ -13965,30 +14078,32 @@ function _blocEcriture(hote,o){
       +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
       +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
       +'<path d="M11.2 8l4.6 4.6"/></svg>';
-    var nomGomme=String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'');
-    for(var ib=0;ib<nb;ib++)(function(n){
-      var paire=document.createElement('div');paire.className='paire';
-      paire.style.left=(caseX(n)/CW*100).toFixed(3)+'%';
-      var oe=document.createElement('button');oe.type='button';oe.className='oeil';
-      oe.innerHTML=SVG_OEIL;oe.setAttribute('aria-label',nomsB[n]||'');
-      oe.onclick=function(ev){ev.preventDefault();
-        montres[n]=!montres[n];oe.classList.toggle('ouvert',!!montres[n]);guide(3);};
-      var go2=document.createElement('button');go2.type='button';
-      go2.innerHTML=SVG_GOMME;go2.setAttribute('aria-label',nomGomme);
-      go2.onclick=function(ev){ev.preventDefault();
-        /* Sa case seulement ; les deux cases du bout vont jusqu'au bord du
-           cadre, pour emporter aussi un trait parti dans la marge. */
-        var g=(n===nb-1)?0:Math.round(CW-MX-pas*(n+1));
-        var d=(n===0)?CW:Math.round(CW-MX-pas*n);
-        cxE.clearRect(g,0,d-g,CH);};
-      paire.appendChild(oe);paire.appendChild(go2);sous.appendChild(paire);
-    })(ib);
+    var colonne=document.createElement('div');colonne.className='boy-outils-g';
+    [['oeil',SVG_OEIL,te('Voir le modèle')],
+     ['gomme',SVG_GOMME,String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'')]]
+      .forEach(function(d){
+        var b=document.createElement('button');b.type='button';
+        b.innerHTML=d[1];b.setAttribute('aria-label',d[2]);b.title=d[2];
+        b.style.width=b.style.height=_Bout+'px';
+        b._outil=d[0];boutonsOutil.push(b);
+        b.onclick=function(ev){ev.preventDefault();ev.stopPropagation();choisitOutil(d[0]);};
+        colonne.appendChild(b);
+      });
+    boite.appendChild(colonne);
   }
   var trace=false;
   function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
     return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
+  /* ── LE CRAYON LISSE ──
+     Le client : « le crayon n'est pas lisse quand on ecrit en tournant ».
+     Chaque mouvement ajoutait un SEGMENT DROIT au trait, et les angles
+     s'aiguisaient. On passe par le milieu de chaque segment et on tourne
+     autour du point touche : une courbe, qui suit la main sans facettes. */
+  var _p1=null,_mil=null;
   function deb(e){
+    if(outil){appliqueOutil(pos(e));e.preventDefault();return;}
     trace=true;if(o.siEcrit)o.siEcrit();var q=pos(e);
+    _p1=q;_mil=q;
     caseEcrite=caseDe(q.x);
     /* Un cran à gauche de la case attaquée. On ne relance rien tant que
        l'enfant reste dans la même case, sinon l'animation repartirait de
@@ -14004,8 +14119,16 @@ function _blocEcriture(hote,o){
        echappait donc au changement de couleur par interface. C'est le
        canevas ou l'enfant ecrit vraiment : violet pastel cote fille, bleu
        turquoise cote garcon, comme partout ailleurs. */
-    cxE.strokeStyle=_encreProfil();cxE.lineCap='round';cxE.lineTo(q.x,q.y);cxE.stroke();e.preventDefault();}
-  function fin(){trace=false;}
+    cxE.strokeStyle=_encreProfil();cxE.lineCap='round';cxE.lineJoin='round';
+    var m={x:(_p1.x+q.x)/2,y:(_p1.y+q.y)/2};
+    cxE.beginPath();cxE.moveTo(_mil.x,_mil.y);
+    cxE.quadraticCurveTo(_p1.x,_p1.y,m.x,m.y);cxE.stroke();
+    _p1=q;_mil=m;e.preventDefault();}
+  function fin(){
+    if(trace&&_p1&&_mil){
+      cxE.beginPath();cxE.moveTo(_mil.x,_mil.y);cxE.lineTo(_p1.x,_p1.y);cxE.stroke();
+    }
+    trace=false;}
   cvE.addEventListener('mousedown',deb);cvE.addEventListener('mousemove',mv);cvE.addEventListener('mouseup',fin);
   cvE.addEventListener('touchstart',deb,{passive:false});cvE.addEventListener('touchmove',mv,{passive:false});cvE.addEventListener('touchend',fin);
   /* La première case s'écrit toute seule dès l'arrivée sur l'écran. */
@@ -15112,7 +15235,7 @@ function _boyScene(ca,reprise){
      elle concluait aussitot que « la page s'est tue » — et felicitait sur la
      suivante. Chaque page porte donc un numero ; ce qui a ete lance sous un
      autre numero se tait. */
-  var _generation=0;
+  var _generation=0,_resumeDepuis=0;
   function attendSilence(fn,avecFete){
     var _g=_generation;
     N.plusTard(function(){
@@ -15414,7 +15537,9 @@ function _boyScene(ca,reprise){
              QUE LES ANIMATIONS depuis le debut ». On rebatit donc la page, sur
              place, sans la faire glisser : la voix et le dessin repartent
              ensemble de zero. */
-          _sensNav=0;go();return;
+          _sensNav=0;
+          if(typeof p._pointEnCours==='number')_resumeDepuis=p._pointEnCours;
+          go();return;
         }else{
           arreteEnchainement();N.pause();pb.textContent=te('▶ Reprendre');
         }
@@ -15593,11 +15718,19 @@ function _boyScene(ca,reprise){
        elles s'imposaient partout. On les retire donc en paysage — sauf
        celles marquees `data-dur`, que le client a demandees lui-meme
        (« ou est le son » sur la premiere ligne, le son sur la seconde). */
+    /* ── SEULEMENT SUR LES PAGES DE TRACE ──
+       v277 retirait les coupures sur TOUTES les pages en paysage. Le client :
+       « tu as modifie des choses qu'il ne fallait pas » — « Maintenant, on va
+       les ecrire ! / Tu es prete ? » et « Il existe seulement / 3 voyelles »
+       sont ecrits sur deux lignes, et doivent le rester. Sa demande ne
+       visait que les pages de trace (« Trace la forme seule », « De tete,
+       maintenant ! … ») : la phrase d'un trait, la, et nulle part ailleurs. */
     var _uneLigne=false;
-    if(estPaysage()&&/<br\b(?![^>]*data-dur)[^>]*>/i.test(_src)){
+    var _trace=!!(p&&p.getAttribute&&p.getAttribute('data-trace'));
+    if(_trace&&estPaysage()){
       _src=_src.replace(/<br\b(?![^>]*data-dur)[^>]*>/gi,' ');
       _uneLigne=!/<br\b/i.test(_src);
-    }else if(estPaysage()&&!/<br\b/i.test(_src))_uneLigne=true;
+    }
     var _lignes=_src.split(/<br\b[^>]*>/i);
     t.innerHTML=_lignes.map(function(l){
       return '<span class="boy-ligne">'+l+'</span>';
@@ -15666,8 +15799,18 @@ function _boyScene(ca,reprise){
        On prend donc la plus grande des deux largeurs — la sienne et celle du
        bloc qui le porte — sans jamais depasser son propre `max-width`, qui
        existe pour le portrait et qu'il faut respecter. */
+    /* ── SANS LES MARGES DU PARENT ──
+       `clientWidth` compte la marge interieure : dans un panneau, 36 px de
+       trop. Une ligne mesuree ainsi debordait d'autant et le panneau, qui
+       coupe ce qui depasse, mangeait son dernier signe — le « ? » de « Tu es
+       prete ? », le « . », le « ! » de « championne ». */
     function dispoLargeur(){
-      var pere=(t.parentNode&&t.parentNode.clientWidth)||0;
+      var pere=0;
+      try{
+        var _pn=t.parentNode;
+        if(_pn){var _cs=getComputedStyle(_pn);
+          pere=_pn.clientWidth-(parseFloat(_cs.paddingLeft)||0)-(parseFloat(_cs.paddingRight)||0);}
+      }catch(e){}
       var d=Math.max(t.clientWidth||0,pere);
       var mx=parseFloat(getComputedStyle(t).maxWidth);
       if(mx>0&&d>mx)d=mx;
@@ -15836,7 +15979,8 @@ function _boyScene(ca,reprise){
       [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='nowrap';});
       var tientL=function(v){
         t.style.fontSize=v.toFixed(1)+'px';
-        if(laPlusLarge()>_dL+1)return false;
+        /* 2 % de garde : l'encre d'un pictogramme deborde de sa chasse. */
+        if(laPlusLarge()>_dL*0.98)return false;
         if(hDispo&&t.scrollHeight>hDispo+1)return false;
         return true;
       };
@@ -15963,12 +16107,12 @@ function _boyScene(ca,reprise){
     var cote=(simple==='ُ');
     var a=document.createElement('span');
     a.textContent=base+simple;
-    a.style.cssText='display:inline-block'+(cote?';transform:translateX(-0.10em)':'');
+    a.style.cssText='display:inline-block'+(cote?';transform:translateX(-0.07em)':'');
     pile.appendChild(a);
     var b=document.createElement('span');
     b.textContent=base+simple;
     b.style.cssText='position:absolute;left:0;top:0;display:inline-block;transform:'
-      +(cote?'translateX(0.10em)'
+      +(cote?'translateX(0.07em)'
             :'translateY('+(simple==='ِ'?'0.105em':'-0.105em')+')');
     pile.appendChild(b);
     centreEncre(pile,forme);
@@ -17272,6 +17416,15 @@ function _boyScene(ca,reprise){
         else if(etapes.some(function(x){return x.dit;}))_sceneParle--;
       })();
   }
+  /* Une scene dont le texte prend plus de largeur (voir `.texte-large`). */
+  api.large=function(f){
+    var g=function(){
+      f.apply(this,arguments);
+      if(_dernierPanneau)_dernierPanneau.classList.add('texte-large');
+    };
+    g._chapitre=f._chapitre;
+    return g;
+  };
   api.illustre=function(etape,html,fr,plan,label){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
@@ -17337,6 +17490,7 @@ function _boyScene(ca,reprise){
          la seule que le client veut entendre. Le texte, lui, reste affiche. */
       if(_ecranDuTrace<0)_ecranDuTrace=i;
       var p=panneau(etape);p.setAttribute('data-attend','1');
+      p.setAttribute('data-trace','1');
       titre(p,html,(i===_ecranDuTrace)?te('À toi de tracer.'):false);
       var modele=Array.isArray(glyph)?glyph[0]:_sansCercle(glyph);
       /* Le modele est repete : l'enfant s'exerce plusieurs fois sur la meme
@@ -18104,11 +18258,15 @@ function _boyScene(ca,reprise){
      Chaque point est {h: ce qui s'ecrit, f: ce qui se dit}. */
   api.resume=function(points){
     return function(){
+      var _depart=_resumeDepuis;_resumeDepuis=0;
       var p=panneau(te('À RETENIR'));
       var l=document.createElement('div');l.className='res-liste';
       var lignes=points.map(function(o){
         var d=document.createElement('div');d.className='res-point';
-        var pu=document.createElement('i');pu.textContent=_HAB.veh||'•';
+        var pu=document.createElement('i');
+        var _im=(_HAB.vaisseauVideSens&&_HAB.vaisseauVideSens.gd)||_HAB.vaisseauVide;
+        if(_im)pu.innerHTML='<img class="res-puce" src="'+_im+'" alt="">';
+        else pu.textContent=_HAB.veh||'•';
         pu.setAttribute('aria-hidden','true');
         var tx=document.createElement('span');tx.className='res-tx';
         /* ── UN POINT = UNE LIGNE ──
@@ -18116,8 +18274,10 @@ function _boyScene(ca,reprise){
            la phrase est posee ligne par ligne. Ici la rangee est large : une
            coupure y laissait la moitie de la place vide a droite. On les
            retire et on laisse le texte occuper sa ligne. */
+        /* Les coupures marquees `data-dur` restent : le client les a
+           demandees (« coupe la deuxieme phrase apres les deux-points »). */
         tx.innerHTML=_colleLaPonctuation(_soudeLesGuillemets(
-                       String(o.h).replace(/<br\s*\/?>/gi,' ')));
+                       String(o.h).replace(/<br\b(?![^>]*data-dur)[^>]*>/gi,' ')));
         d.appendChild(pu);d.appendChild(tx);
         /* Un point peut MONTRER au lieu de dire : la vue se construit ici,
            a chaque rendu, pour que le retour en arriere la retrouve neuve. */
@@ -18166,14 +18326,27 @@ function _boyScene(ca,reprise){
       window.addEventListener('resize',tientSurUneLigne);
       _sceneParle++;
       var n=0;
-      /* ── LA PAGE S'ANNONCE ──
-         Le client veut l'entendre nommee avant qu'on n'enonce quoi que ce
-         soit : « ce qu'il faut retenir », puis les points, un par un. */
-      N.dire(te('Ce qu\'il faut retenir.'));
-      N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,320);});},250);
+      /* ── REPRENDRE, C'EST REPRENDRE ICI ──
+         Le client : « quand on met pause et qu'on reprend, il faut reprendre
+         a la derniere chose a retenir entamee ». Les points deja vus se
+         posent d'un coup, avec leur etat final, et la voix repart du point
+         en cours. */
+      if(_depart>0&&_depart<lignes.length){
+        for(;n<_depart;n++){
+          lignes[n].classList.add('vu');
+          var _o0=points[n];
+          if(_o0.temps)_o0.temps.forEach(function(e){
+            if(e.fait)try{e.fait(_o0.__el);}catch(x){}});
+        }
+        N.plusTard(joue,300);
+      }else{
+        N.dire(te('Ce qu\'il faut retenir.'));
+        N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,320);});},250);
+      }
       function joue(){
         if(n>=lignes.length){_sceneParle--;return;}
         var k=n++,o=points[k];
+        p._pointEnCours=k;
         lignes[k].classList.add('vu');
         function suite(){
           N.plusTard(function(){N.surSilence(function(){N.plusTard(joue,300);});},250);
@@ -18376,7 +18549,7 @@ function _boyScene(ca,reprise){
       if(d)rangee.appendChild(d);
       p.appendChild(rangee);
       /* Le texte se pose ENTRE les deux montures. */
-      titre(creux,html,fr);
+      titre(creux,_bravoPuisPhrases(html),fr);
       bouton(p,label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});
     };
   };
@@ -20091,7 +20264,7 @@ function _boyScene(ca,reprise){
       var r=document.createElement('div');
       /* La classe sert au paysage : la colonne de droite est assez large
          pour les quatre d'un seul tenant (voir la feuille de style). */
-      r.className='trou-cibles';
+      r.className='trou-cibles n'+Math.min(4,opts.length);
       r.style.cssText='display:grid;grid-template-columns:repeat(2,auto);gap:10px;'
         +'justify-content:center;margin-top:8px;direction:rtl';
       var repondu=false,premier=true;
@@ -20321,8 +20494,8 @@ function _boyVowelCourse(ca){
          seconde la touchait franchement. */
       {un:pose('ِ',50,82,false,false,0,0),
        deux:double?pose('ِ',50,82,false,true,0,0.105):null},
-      {un:pose('ُ',22,30,true,false,double?-0.10:0,0),
-       deux:double?pose('ُ',22,30,true,true,0.10,0):null}
+      {un:pose('ُ',22,30,true,false,double?-0.07:0,0),
+       deux:double?pose('ُ',22,30,true,true,0.07,0):null}
     ];
     return d;
   }
@@ -20710,7 +20883,8 @@ function _boyVowelCourse(ca){
       /* ── LA PHRASE ENTIERE D'ABORD, LA DEMONSTRATION ENSUITE ──
          Ce qui est ECRIT reste abrege — le client y tient — mais la voix, elle,
          doit faire une vraie phrase avant de derouler « a devient an ». */
-      {h:TB('Deux fois le <b>même signe</b> : on ajoute le son « n ».'),
+      {h:String(TB('Deux fois le <b>même signe</b> : on ajoute le son « n ».'))
+           .replace(/\s:\s(?![^<]*>)/,' :<br data-dur="1">'),
        vue:function(){return pisteVoyelles(true);},
        temps:[
          {dit:_phraseAvecSons(te('Lorsque l\'on double une voyelle, on ajoute le son n.'),
@@ -21073,7 +21247,7 @@ function _boyLetterCourse(ca,idx,premiere){
     /* La page « il faut connaitre par coeur seule et debut » est retiree a la
        demande du client : le recapitulatif qui precede le montre deja, et un
        enfant n'a pas besoin qu'on lui dise ce qu'il vient de voir. */
-    sc.push(B.brief(te('ÉTAPE · PORTÉE'),TB('Cette règle vaut pour<br><b>toutes les lettres</b>,<br>sauf <b>3</b> que l\'on verra<br>plus tard ! ⚠️'),
+    sc.push(B.brief(te('ÉTAPE · PORTÉE'),_parDeux(TB('Cette règle vaut pour<br><b>toutes les lettres</b>,<br>sauf <b>3</b> que l\'on verra<br>plus tard ! ⚠️')),
       te('Cette règle vaut pour toutes les lettres, sauf trois que l\'on verra plus tard.')));
   }
   /* On ne nomme pas les trois exceptions ici : les citer à un enfant qui ne
@@ -21155,11 +21329,11 @@ function _boyLetterCourse(ca,idx,premiere){
   /* On ne dit plus « double » : on NOMME le signe qui est double. L'enfant
      vient d'apprendre les trois voyelles, il les reconnait. */
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
-    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
-      teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])}),
+    sc.push(B.large(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
+      teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])})+'.',
       _phraseAvecSons(teF('Avec deux {signe}, ça fait {son}',
           {signe:v[2],son:(lat+v[1]).toLowerCase()}),
-          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
+          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true)));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+q(v[1])+'<br>dans '+b(tanwCombien)+' ✍️',
