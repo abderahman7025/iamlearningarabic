@@ -3534,6 +3534,23 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .boy-panel.roue-part{display:none}}
 /* Un son entre guillemets tient d'un seul tenant, avec son point. */
 .insecable{white-space:nowrap}
+/* ── LE MOT QUI S'ECRIT DE DROITE A GAUCHE ──
+   Le client : « au tout debut du premier cours, dire qu'en arabe on ecrit de
+   droite a gauche, avec un hublot dans lequel un mot s'ecrit de droite a
+   gauche ». Le mot se decouvre depuis son bord DROIT vers la gauche, tient
+   un instant, et recommence. Meme animation pour les trois interfaces ;
+   chacune garde sa police, sa taille et ses couleurs. */
+@keyframes ecritRtl{0%{clip-path:inset(-20% -5% -20% 100%)}
+  62%,100%{clip-path:inset(-20% -5% -20% -5%)}}
+.ecrit-rtl{display:inline-block;animation:ecritRtl 3.4s linear infinite}
+.hub-rtl>span{animation:ecritRtl 3.4s linear infinite}
+@keyframes flecheRtl{0%,100%{transform:translateX(0)}50%{transform:translateX(-14px)}}
+.fleche-rtl{display:inline-block;animation:flecheRtl 1.3s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.ecrit-rtl,.hub-rtl>span,.fleche-rtl{animation:none}}
+/* 3-5 ans : le mot en tres grand, dans la couleur de la manche. */
+.mj-mot-rtl{font-family:'Scheherazade New',serif;font-size:clamp(4.4rem,15vw,9rem);
+  line-height:1.7;color:var(--mc);text-align:center;direction:rtl;margin-top:4px}
+.mj-fleche-rtl{font-size:3.2rem;text-align:center;color:var(--mc);line-height:1}
 /* ── LA GOMME, AU COIN DU CADRE ──
    Le client : « remplace le bouton effacer par un petit bouton rond avec une
    gomme, sur le côté du canevas — je veux que les modèles soient bien gros ».
@@ -11354,7 +11371,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v284';
+var _VERSION_REPLI='v285';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13530,7 +13547,7 @@ function _revelateur(texte,ax,ay,px,x0,y0,w,h,couleur){
   }).sort(function(a,b){return b.pixels-a.pixels;});
   return {cv:cv,ctx:c,img:img,tampon:c.createImageData(w,h),
           ordre:ordre,points:points,voyelle:voyelle,x0:x0,y0:y0,fait:-1,
-          diag:diag};
+          diag:diag,routes:routes};
 }
 /* Peint la forme révélée. L'avancement va de 0 à 3, en TROIS temps — c'est
    l'ordre d'écriture voulu par le client :
@@ -14944,6 +14961,9 @@ var _TE={
 'VOYELLE {n}/3 · TRACÉ':{en:'VOWEL {n}/3 · WRITING',es:'VOCAL {n}/3 · TRAZO',de:'VOKAL {n}/3 · SCHREIBEN',nl:'KLINKER {n}/3 · SCHRIJVEN',it:'VOCALE {n}/3 · TRACCIATO',pt:'VOGAL {n}/3 · TRAÇADO',ru:'ОГЛАСОВКА {n}/3 · ПИСЬМО',tr:'HAREKE {n}/3 · YAZMA',zh:'元音 {n}/3 · 书写',id:'VOKAL {n}/3 · MENULIS',ur:'حرکت {n}/۳ · لکھائی',hi:'स्वर {n}/3 · लेखन'},
 'Trace cette syllabe dans {ou}.':{en:'Write this syllable {ou}.',es:'Traza esta sílaba {ou}.',de:'Schreibe diese Silbe {ou}.',nl:'Schrijf deze lettergreep {ou}.',it:'Traccia questa sillaba {ou}.',pt:'Traça esta sílaba {ou}.',ru:'Напиши этот слог {ou}.',tr:'Bu heceyi {ou} yaz.',zh:'{ou}写出这个音节。',id:'Tulis suku kata ini {ou}.',ur:'یہ حرفی جوڑ {ou} لکھو۔',hi:'यह अक्षर-जोड़ {ou} लिखो।'},
 'CONTRÔLE {n}':{en:'CHECK {n}',es:'CONTROL {n}',de:'TEST {n}',nl:'CHECK {n}',it:'VERIFICA {n}',pt:'TESTE {n}',ru:'ПРОВЕРКА {n}',tr:'KONTROL {n}',zh:'检查 {n}',id:'UJI {n}',ur:'جانچ {n}',hi:'जाँच {n}'},
+'En arabe, on écrit de droite à gauche.':{en:'In Arabic, we write from right to left.',es:'En árabe se escribe de derecha a izquierda.',de:'Auf Arabisch schreibt man von rechts nach links.',nl:'In het Arabisch schrijf je van rechts naar links.',it:'In arabo si scrive da destra a sinistra.',pt:'Em árabe escreve-se da direita para a esquerda.',ru:'По-арабски пишут справа налево.',tr:'Arapçada sağdan sola yazılır.',zh:'阿拉伯语从右往左写。',id:'Dalam bahasa Arab, kita menulis dari kanan ke kiri.',ur:'عربی دائیں سے بائیں لکھی جاتی ہے۔',hi:'अरबी दाएँ से बाएँ लिखी जाती है।'},
+'En arabe, on écrit<br>de <b>droite</b> à <b>gauche</b>.':{en:'In Arabic, we write<br>from <b>right</b> to <b>left</b>.',es:'En árabe se escribe<br>de <b>derecha</b> a <b>izquierda</b>.',de:'Auf Arabisch schreibt man<br>von <b>rechts</b> nach <b>links</b>.',nl:'In het Arabisch schrijf je<br>van <b>rechts</b> naar <b>links</b>.',it:'In arabo si scrive<br>da <b>destra</b> a <b>sinistra</b>.',pt:'Em árabe escreve-se<br>da <b>direita</b> para a <b>esquerda</b>.',ru:'По-арабски пишут<br><b>справа</b> <b>налево</b>.',tr:'Arapçada<br><b>sağdan</b> <b>sola</b> yazılır.',zh:'阿拉伯语<br>从<b>右</b>往<b>左</b>写。',id:'Dalam bahasa Arab, kita menulis<br>dari <b>kanan</b> ke <b>kiri</b>.',ur:'عربی<br><b>دائیں</b> سے <b>بائیں</b> لکھی جاتی ہے۔',hi:'अरबी<br><b>दाएँ</b> से <b>बाएँ</b> लिखी जाती है।'},
+'DE DROITE À GAUCHE':{en:'FROM RIGHT TO LEFT',es:'DE DERECHA A IZQUIERDA',de:'VON RECHTS NACH LINKS',nl:'VAN RECHTS NAAR LINKS',it:'DA DESTRA A SINISTRA',pt:'DA DIREITA PARA A ESQUERDA',ru:'СПРАВА НАЛЕВО',tr:'SAĞDAN SOLA',zh:'从右往左',id:'DARI KANAN KE KIRI',ur:'دائیں سے بائیں',hi:'दाएँ से बाएँ'},
 'Où est {son} ?':{en:'Where is {son}?',es:'¿Dónde está {son}?',de:'Wo ist {son}?',nl:'Waar is {son}?',it:'Dov\'è {son}?',pt:'Onde está {son}?',ru:'Где {son}?',tr:'{son} nerede?',zh:'{son} 在哪里？',id:'Mana {son}?',ur:'{son} کہاں ہے؟',hi:'{son} कहाँ है?'},
 'ses {n} formes de fin de mot':{en:'its {n} word-final forms',es:'sus {n} formas de final de palabra',de:'seine {n} Endformen',nl:'zijn {n} eindvormen',it:'le sue {n} forme di fine parola',pt:'as suas {n} formas de fim de palavra',ru:'его {n} конечные формы',tr:'{n} kelime sonu biçimi',zh:'它的 {n} 种词尾字形',id:'{n} bentuk akhir katanya',ur:'اس کی {n} آخری شکلیں',hi:'इसके {n} अंतिम रूप'},
 'cette forme':{en:'in this form',es:'en esta forma',de:'in dieser Form',nl:'in deze vorm',it:'in questa forma',pt:'nesta forma',ru:'в этой форме',tr:'bu biçimde',zh:'用这个字形',id:'dalam bentuk ini',ur:'اس شکل میں',hi:'इस रूप में'},
@@ -17517,6 +17537,15 @@ function _boyScene(ca,reprise){
         else if(etapes.some(function(x){return x.dit;}))_sceneParle--;
       })();
   }
+  /* Le sens de l'ecriture : le texte, et un hublot ou le mot s'ecrit. */
+  api.sens=function(etape,html,fr,mot){
+    return function(){
+      var p=panneau(etape);titre(p,html,fr);
+      var h=hublot(p,mot,mot,null);
+      if(h)h.classList.add('hub-rtl');
+      bouton(p,te('Suite ›'),suivant);
+    };
+  };
   api.illustre=function(etape,html,fr,plan,label){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
@@ -18832,6 +18861,25 @@ function _boyScene(ca,reprise){
      Elle respire, elle bondit, elle change de couleur à chaque contact. */
   /* `intro` (facultatif) remplace « Voici la lettre… » par une phrase du
      cours — le waw et ses voyelles, au cours des voyelles. */
+  /* ── 0. DE DROITE A GAUCHE ──
+     Le mot du lion s'ecrit en tres grand, de droite a gauche, sous une fleche
+     qui va dans le meme sens ; la voix le dit, et la manche passe seule. */
+  api.jeuSens=function(mot){
+    return function(){
+      var m=manche(te('DE DROITE À GAUCHE'),'mj-sens',MJ_COUL[0]);
+      var d=document.createElement('div');d.className='mj-mot-rtl';
+      var sp=document.createElement('span');sp.className='ecrit-rtl';
+      sp.textContent=_sansCercle(mot);d.appendChild(sp);
+      var f=document.createElement('div');f.className='mj-fleche-rtl';
+      f.innerHTML='<span class="fleche-rtl">⬅</span>';
+      m.zone.appendChild(d);m.zone.appendChild(f);
+      N.plusTard(function(){
+        N.dire(te('En arabe, on écrit de droite à gauche.'));
+        N.plusTard(function(){N.surSilence(function(){
+          N.plusTard(function(){m.gagne();},3400);});},250);
+      },150);
+    };
+  };
   api.jeuRencontre=function(glyph,son,intro){
     return function(){
       var m=manche(te('LA LETTRE'),'mj-rencontre',MJ_COUL[0]);
@@ -18889,7 +18937,9 @@ function _boyScene(ca,reprise){
     return function(){
       var m=manche(te('ATTRAPE-LA'),'mj-attrape',MJ_COUL[1]);
       var cibles=[].concat(cible),multi=cibles.length>1;
-      var pris=0,BUT=5;
+      /* Autant de prises que de cibles dans la liste : le cours des voyelles
+         en donne neuf — trois wa, trois wi, trois wou. */
+      var pris=0,BUT=multi?cibles.length:5;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
       var aire=document.createElement('div');aire.className='mj-aire';
@@ -19153,7 +19203,23 @@ function _boyScene(ca,reprise){
         if(p2.centres)return p2.centres;
         var L=p2.liste,out=[],k,i,n2,sx,sy,a,b;
         var pas=L.length/TRANCHES;
-        for(k=0;k<TRANCHES;k++){
+        /* ── LE CHEMIN DU CRAYON, PAS CELUI DU REMPLISSAGE ──
+           Le client : « verifie le parcours de chaque animal modele ; sur le
+           dhal, le loup revient puis repart en bas, dans la partie basse de
+           la lettre ». Mesure : le chemin longeait la base vers la gauche,
+           revenait a droite dix pixels plus bas, puis repartait a gauche. Il
+           etait tire de l'ORDRE DE REMPLISSAGE de l'encre : le crayon peint
+           un disque autour de lui, et sur un trait epais la bande qu'il
+           n'atteint pas est rattachee a la fin — l'animal revenait la
+           chercher. Il suit maintenant le crayon lui-meme : le geste de la
+           lettre, pose sur l'encre, trait par trait. Les levers de crayon
+           sont des sauts, que la suite du calcul reconnait deja. */
+        if(p2.nom==='corps'&&rev&&rev.routes&&rev.routes.length){
+          rev.routes.forEach(function(r){
+            r.forEach(function(q){out.push({x:q[0],y:q[1]});});
+          });
+        }
+        if(!out.length)for(k=0;k<TRANCHES;k++){
           a=Math.floor(k*pas);b=Math.floor((k+1)*pas);
           if(b<=a)b=a+1;
           if(a>=L.length)break;
@@ -19621,7 +19687,7 @@ function _boyScene(ca,reprise){
   api.jeuBulles=function(cible,leurres){
     return function(){
       var m=manche(te('LES BULLES'),'mj-bulles',MJ_COUL[3]);
-      var pris=0,BUT=8,vivant=true,rang=0,_sansCible=0;
+      var pris=0,BUT=8,vivant=true,rang=0,_sansCible=0,_avecCible=0,_places=[];
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
       var aire=document.createElement('div');aire.className='mj-aire';
@@ -19635,11 +19701,35 @@ function _boyScene(ca,reprise){
            chaque ballon. Un seul garde-fou : apres quatre ballons sans elle,
            le cinquieme la porte — sinon un enfant de trois ans attendrait
            sans rien a eclater. */
-        var g=(Math.random()<0.4||_sansCible>=4)?cible:_melangeTab(leurres)[0];
+        /* Et jamais plus de DEUX d'affilee : le client est tombe sur quatre
+           alif a la suite. */
+        var g=((Math.random()<0.4||_sansCible>=4)&&_avecCible<2)?cible:_melangeTab(leurres)[0];
         _sansCible=(g===cible)?0:_sansCible+1;
+        _avecCible=(g===cible)?_avecCible+1:0;
         var b=document.createElement('div');b.className='mj-bulle';
         b.textContent=_sansCercle(g);
-        b.style.left=(5+Math.random()*80)+'%';
+        /* ── PAS DE BALLONS PRESQUE SUPERPOSES ──
+           Le client : « on ne voit presque pas le ballon derriere, ecarte-les
+           un peu ». Ils naissent a moins d'une seconde d'intervalle et
+           montent plusieurs secondes : deux voisins pris au hasard tombaient
+           l'un sur l'autre. On tire la place loin des TROIS derniers — au
+           moins 22 % de la largeur. */
+        /* Mesure au banc : exiger 22 % des TROIS derniers etait impossible —
+           trois bandes interdites de 44 % couvrent toute la largeur — et le
+           tirage retombait au hasard (2 % d'ecart vu). Un ballon fait environ
+           13 % de large ; les plus anciens sont deja montes plus haut. On
+           ecarte donc de 16 % des DEUX derniers, et faute de place on garde le
+           tirage le plus eloigne. */
+        var xb=5+Math.random()*80,meilleur=xb,dMeilleur=-1;
+        for(var _e=0;_e<30;_e++){
+          var dmin=_places.reduce(function(m2,px){return Math.min(m2,Math.abs(px-xb));},999);
+          if(dmin>dMeilleur){dMeilleur=dmin;meilleur=xb;}
+          if(dmin>=16)break;
+          xb=5+Math.random()*80;
+        }
+        xb=meilleur;
+        _places.push(xb);if(_places.length>2)_places.shift();
+        b.style.left=xb+'%';
         b.style.setProperty('--mc',MJ_VIF[rang%MJ_VIF.length]);
         b.style.animationDuration=(6+Math.random()*3).toFixed(1)+'s';
         b.onclick=function(){
@@ -20568,6 +20658,7 @@ function _boyLetterJeu(ca,idx,premiere){
      au lieu de trois, huit bulles au lieu de cinq, trois mots au lieu d'un,
      six voyelles au lieu de trois, et le tracé se refait deux fois. */
   B.run([
+  ].concat(idx===0?[B.jeuSens('أَسَد')]:[]).concat([
     B.jeuRencontre(A),
     B.jeuAttrape(A,leurres),
     B.jeuTrace(A,2),
@@ -20601,7 +20692,7 @@ function _boyLetterJeu(ca,idx,premiere){
                          else renderSessionsMap(ca);},
         finie?_HAB.carte:_HAB.monLieu,finie?null:A)(api);
     }
-  ]));
+  ])));
 }
 
 /* Les voyelles, jouées elles aussi : on les rencontre une par une sur le bā
@@ -20632,8 +20723,10 @@ function _boyVowelJeu(ca){
     B.jeuRencontre(syl[0],null,onDit('wa',syl[0])),B.jeuTrace(syl[0],2),
     B.jeuRencontre(syl[1],null,onDit('wi',syl[1])),B.jeuTrace(syl[1],2),
     B.jeuRencontre(syl[2],null,onDit('wou',syl[2])),B.jeuTrace(syl[2],2),
-    /* wa, wi, wou a tour de role — et non plus wa seul. */
-    B.jeuAttrape([syl[0],syl[1],syl[2]],[LB,LB+'\u0652']),
+    /* Trois fois wa, puis trois fois wi, puis trois fois wou — d'affilee :
+       le client, « pour que ca s'impregne dans le cerveau de l'enfant ». */
+    B.jeuAttrape([syl[0],syl[0],syl[0],syl[1],syl[1],syl[1],syl[2],syl[2],syl[2]],
+                 [LB,LB+'\u0652']),
     /* Six tours, et la cible tourne : « pour les voyelles, laisse 6 fois ».
        Les trois syllabes passent donc deux fois chacune, au lieu d'une seule
        martelee six fois. */
@@ -20778,6 +20871,10 @@ function _boyVowelCourse(ca){
     B.brief(_HAB.mission+' 1 · '+_HAB.depart,
       TB('Aujourd’hui :<br>les <b>voyelles</b>'),
       te('Aujourd’hui : les voyelles.'),te('C\'est parti !')),
+
+    /* Le tout premier cours : on dit d'abord dans quel sens on ecrit. */
+    B.sens(te('DE DROITE À GAUCHE'),TB('En arabe, on écrit<br>de <b>droite</b> à <b>gauche</b>.'),
+      te('En arabe, on écrit de droite à gauche.'),'كِتَاب'),
 
     B.brief(te('ÉTAPE 1'),
       TB('Pour comprendre les voyelles,<br>on a besoin d’une <b>lettre</b>.'),
@@ -22052,6 +22149,19 @@ function renderVLesson(ca,s){
   hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';
   hintEl.textContent=t('click_to_listen');
   ca.appendChild(hintEl);
+  /* ── LE SENS DE L'ECRITURE, EN TETE DU PREMIER COURS ──
+     Le client, pour toutes les interfaces : « au tout debut du premier cours,
+     dire qu'en arabe on ecrit de droite a gauche ». Ici, dans le style des
+     adultes : l'encadre habituel, la police arabe du site, sa couleur. */
+  var bSens=document.createElement('div');bSens.className='info-box';
+  bSens.style.cssText+=';margin-bottom:12px;text-align:center;cursor:pointer';
+  bSens.innerHTML='<strong style="display:block;font-size:1rem;margin-bottom:6px">'
+    +te('En arabe, on écrit de droite à gauche.')+'</strong>'
+    +'<div style="font-family:var(--fa);font-size:3.2rem;color:var(--vowel);line-height:1.6;direction:rtl">'
+    +'<span class="ecrit-rtl">كِتَاب</span></div>'
+    +'<div style="font-size:1.8rem;color:var(--gold);line-height:1"><span class="fleche-rtl">⬅</span></div>';
+  bSens.onclick=function(){speak(te('En arabe, on écrit de droite à gauche.'));};
+  ca.appendChild(bSens);
 
   function mkVGrid(cols){
     var sec=document.createElement('div');sec.className='vline-section';

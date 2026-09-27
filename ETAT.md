@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v284
+## OÙ ON EN EST — 24 septembre 2026, production en v285
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,28 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v284), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v285), du plus récent au plus ancien :**
+
+- **v285.**
+  * *« En arabe, on écrit de droite à gauche », au début du premier cours*,
+    trois interfaces : 6-11 ans, une page à hublot (`api.sens`) où كِتَاب
+    se découvre depuis sa droite ; 3-5 ans, une manche au début de la leçon
+    de l'alif (`api.jeuSens`, أَسَد en très grand, flèche, passe seule) ;
+    adultes, un encadré en tête de la leçon des voyelles. Une seule
+    animation (`ecritRtl`, un `clip-path` qui s'ouvre depuis la droite), et
+    la phrase traduite dans les 13 langues.
+  * *L'animal modèle suit le crayon* : le chemin était tiré de l'ordre de
+    REMPLISSAGE ; sur un trait épais, la bande que le crayon n'atteint pas
+    était rattachée à la fin et l'animal revenait la chercher (le dâl : « le
+    loup revient puis repart en bas »). Il suit maintenant les `routes` du
+    geste posé sur l'encre, exposées par `_revelateur`.
+  * *Bulles* : écart de 16 % avec les deux ballons précédents (22 % des
+    trois derniers était impossible, le tirage retombait au hasard) ; jamais
+    plus de deux bonnes lettres d'affilée. Mesuré : 17 % minimum, 2 max.
+  * *Attrape-la des voyelles* : trois wa, trois wi, trois wou d'affilée.
+  * **Piège de travail** : `verif.py | tail -1` n'affiche que le DERNIER bloc ;
+    une erreur de syntaxe dans le bloc principal est passée inaperçue au banc
+    (vérifié : rien n'est parti en ligne). Toujours compter les « OK » (9).
 
 - **3-5 ANS, DEMANDES DU CLIENT (v284).**
   * *Ordre des cours* (question du client) : Lion = alif, waw, ya ;
