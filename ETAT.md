@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v285
+## OÙ ON EN EST — 27 septembre 2026, production en v286
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,37 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v285), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v286), du plus récent au plus ancien :**
+
+- **v286.**
+  * *Traductions enfants complètes.* 233 phrases des interfaces 6-11 et 3-5
+    ans restaient en français dans les douze autres langues (album, révision,
+    pause, jeux 3-5 ans, monde des animaux, cours des voyelles, des
+    prolongations et de lettre). Ajoutées à `_TE`, bloc « Traductions
+    ajoutees en v286 ». Recensement AU BANC, pas seulement dans le code :
+    on remplace `te()` par une version qui note chaque clé absente de `_TE`,
+    puis on construit tous les cours (voyelles, prolongations, 28 lettres,
+    28 leçons 3-5 ans, fille et garçon). Après : il ne manque plus que
+    « ou », « an », « in », « oun », laissés exprès (voir plus bas).
+  * *Les sons dans les phrases dites.* `_phraseAvecSons` remplace une
+    transcription (ba, b, bou, a, alif…) par l'enregistrement du studio en
+    la cherchant DANS la phrase traduite. Chaque traduction garde donc la
+    transcription française telle quelle, entourée d'espaces, une seule
+    fois, dans le même ordre (vérifié par script pour les 13 langues). En
+    chinois, ponctuation ASCII juste après le son ; en ourdou et en hindi,
+    jamais « ۔ » ou « । » collé au son — sinon la recherche échoue. Les
+    sons seuls (« ou », « an »…) ne sont pas traduits pour la même raison.
+    Les phrases ÉCRITES, elles, prennent la transcription de chaque langue
+    (« boo » en anglais, « бу » en russe, « بُ » en ourdou…).
+  * *Phrases en dur passées par la traduction* : « Tourne ton téléphone »,
+    les trois phrases du récapitulatif des formes (`pas`), « Trace jadd. »,
+    « Trace ب dans ses 3 formes » (hamza), les titres « CONTRÔLE »,
+    « SUPPORT n/3 », « TANWĪN n/3 », « <b>n</b> signes à revoir »,
+    « toutes les missions ». Les phrases genrées (prête/prêt,
+    championne/champion) ont leurs deux clés complètes.
+  * *Adultes, turc* : les 7 phrases de l'entraînement existaient, mais dans
+    la liste `overrides` d'une boucle qui saute le turc. Recopiées dans les
+    compléments `C.tr`. La table adulte est complète dans les 13 langues.
 
 - **v285.**
   * *« En arabe, on écrit de droite à gauche », au début du premier cours*,
