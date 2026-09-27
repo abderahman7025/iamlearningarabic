@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v281
+## OÙ ON EN EST — 24 septembre 2026, production en v282
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v281), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v282), du plus récent au plus ancien :**
+
+- **FONDU AUTOMATIQUE, L'UN APRÈS L'AUTRE (v282).** « Je ne veux pas que l'on
+  voie les deux écrans en même temps. » L'ancienne page s'efface en 0,3 s ;
+  la nouvelle attend ce temps-là à opacité nulle (`animation-delay`), puis
+  paraît en 0,35 s. Le glissement à la main, lui, garde ses deux cartes.
 
 - **LES BLANCS DU STUDIO (v281).** Mesure sur douze fichiers : 250 à 750 ms
   de silence AVANT la voix, 115 à 600 ms APRÈS — trois quarts de seconde de

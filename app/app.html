@@ -3523,8 +3523,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    glissement reste a la main — le doigt, ou les bords a la souris. */
 @keyframes fonduEntre{from{opacity:0}to{opacity:1}}
 @keyframes fonduPart{from{opacity:1}to{opacity:0}}
-.boy-panel.fondu-entre{animation:fonduEntre .55s ease both}
-.boy-panel.roue-part.fondu-part{animation:fonduPart .55s ease both}
+/* L'UN APRES L'AUTRE, jamais les deux ensemble : le client, « je ne veux
+   pas que l'on voie les deux ecrans en meme temps ». L'ancienne s'efface en
+   0,3 s ; la nouvelle attend ce temps-la, invisible, puis parait. */
+.boy-panel.fondu-entre{animation:fonduEntre .35s ease .3s both}
+.boy-panel.roue-part.fondu-part{animation:fonduPart .3s ease both}
 @media (prefers-reduced-motion:reduce){
   .boy-panel.fondu-entre,.boy-panel.roue-part.fondu-part{animation:none}
   .boy-panel.entre-d,.boy-panel.entre-g,.boy-panel.roue-part{animation:none}
@@ -11340,7 +11343,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v281';
+var _VERSION_REPLI='v282';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16883,7 +16886,7 @@ function _boyScene(ca,reprise){
       /* Les couleurs de l'habillage : la copie est sur le body. */
       try{if(_HAB&&_HAB.classe)c.classList.add(_HAB.classe);}catch(e){}
       document.body.appendChild(c);
-      setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},main?420:600);
+      setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},main?420:320);
       return c;
     }catch(e){return null;}
   }
