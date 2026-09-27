@@ -3287,11 +3287,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-2col .boy-col-g{min-width:0}
 .boy-2col .boy-titre{max-width:none;margin:0;font-size:1.95rem;line-height:1.6}
 .boy-2col .boy-hublot{margin:0 auto}
-/* ── LE TEXTE PREND LA PLACE ──
-   Pages tanwin : « grossis la police ». Mesure : la ligne la plus longue
-   remplissait exactement sa colonne (453 px) — c'est la largeur qui bridait.
-   Le hublot n'a pas besoin de la sienne : ici, le texte en prend davantage. */
-.texte-large .boy-2col{grid-template-columns:minmax(0,2.1fr) minmax(0,1fr)}
+
 /* ── LE MOT A TROU, EN PAYSAGE ──
    La colonne de droite tient les QUATRE propositions sur une seule rangee —
    le client les veut ainsi. Elles se partagent la largeur au lieu de garder
@@ -11295,7 +11291,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v279';
+var _VERSION_REPLI='v280';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -13691,14 +13687,27 @@ function _blocEcriture(hote,o){
   var MX=Math.round(CW*0.07);
   /* Marge droite, marge gauche. De tete, la gauche porte les deux outils :
      elle s'elargit d'autant, pour qu'ils ne couvrent pas la derniere forme. */
+  /* ── LES OUTILS ONT TOUS LA MEME TAILLE, A L'ECRAN ──
+     Le client : « tous les badges gomme doivent avoir la meme taille — ici
+     c'est trop petit ». La page est mise a l'echelle : un bouton de 84 px de
+     mise en page en faisait 117 sur un ecran, 45 sur un autre. On vise donc
+     une taille VUE — 80 px — et on la convertit avec l'echelle du cadre. */
+  var OUTIL_VU=80;
   var MXd=MX,MXg=MX,_Bout=0;
-  if(o.deTete){
+  (function(){
+    var nOut=o.deTete?2:1;
     var _WL=(hote&&hote.clientWidth)||300;
-    _Bout=Math.max(46,Math.min(64,Math.round(_WL*0.085)));
+    var _e=1;
+    try{var _rh=hote.getBoundingClientRect();if(hote.offsetWidth)_e=_rh.width/hote.offsetWidth;}catch(x){}
+    if(!(_e>0.05&&_e<20))_e=1;
+    _Bout=Math.round(OUTIL_VU/_e);
     var _HL=_WL*CH/CW;
-    if(2*_Bout+12>_HL-10)_Bout=Math.max(34,Math.floor((_HL-22)/2));
-    MXg=Math.round((_Bout+16)/_WL*CW);
-  }
+    var _maxH=Math.floor((_HL-12-(nOut-1)*10)/nOut);
+    if(_Bout>_maxH)_Bout=Math.max(30,_maxH);
+    /* La colonne des outils, a gauche : les cases s'en ecartent — sans en
+       prendre plus d'un sixieme, sur un telephone etroit. */
+    MXg=Math.max(MX,Math.min(Math.round(CW*0.18),Math.round((_Bout+16)/_WL*CW)));
+  })();
 
   var el=document.createElement('div');el.className='boy-ecriture';
   el.style.cssText='width:100%';
@@ -13760,7 +13769,8 @@ function _blocEcriture(hote,o){
      C'est aussi ce qu'un enfant voit sur son cahier : le trait est bas quand
      on ecrit dessus, haut quand on ecrit dessous. Les lettres, elles, ont un
      corps des deux cotes : leur ligne ne bouge pas. */
-  var _part=o.signeSeul?0.50:0.62;
+  /* De tete, la ligne d'ecriture remonte : le client. */
+  var _part=o.signeSeul?0.50:(o.deTete?0.50:0.62);
   if(o.signeSeul)try{
     var _e0=_encreAutourLigne(liste[0]);
     if(_e0.bas<0)       _part=0.82;    /* tout au-dessus : la ligne descend */
@@ -13999,48 +14009,20 @@ function _blocEcriture(hote,o){
     if(cible===barre)barre.style.display='';
     cible.appendChild(b);return b;
   }
-  /* ── EFFACER TIENT DANS UN ROND ──
-     Elle ne touche qu'a l'encre : le modele, lui, reste. Elle vit DANS le
-     cadre, a son coin bas-droit — sous la ligne d'ecriture, la ou aucune
-     lettre ne passe — pour rendre au modele la rangee qu'elle occupait. */
-  function poseLaGomme(){
-    var g=document.createElement('button');
-    g.type='button';g.className='boy-gomme';
-    var nom=String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'');
-    g.setAttribute('aria-label',nom);g.title=nom;
-    g.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"'
-      +' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
-      +' aria-hidden="true">'
-      +'<path d="M8.5 21H20"/>'
-      +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
-      +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
-      +'<path d="M11.2 8l4.6 4.6"/></svg>';
-    /* ── ELLE S'ALLUME, ELLE N'EFFACE PAS TOUT ──
-       Le client : « cliquer dessus ne doit pas directement tout effacer :
-       l'enfant clique sur la gomme, elle est selectionnee, puis il clique sur
-       la lettre, forme ou voyelle a effacer, et ca n'efface qu'elle ». */
-    g._outil='gomme';boutonsOutil.push(g);
-    g.onclick=function(ev){ev.preventDefault();ev.stopPropagation();choisitOutil('gomme');};
-    /* La kasra s'ecrit sous une ligne posee en haut : la gomme monte avec. */
-    if(_part<0.5)g.classList.add('en-haut');
-    boite.appendChild(g);
-    return g;
-  }
-  /* ── LES OUTILS ──
-     On prend un outil, puis on touche la forme : l'outil agit sur SA case,
-     et se repose. La case est celle ou tombe le doigt — les memes bornes que
-     l'animation, les deux du bout allant jusqu'au bord du cadre pour
-     emporter aussi un trait parti dans la marge. */
+  /* ── LES OUTILS, A GAUCHE, QUI RESTENT PRIS ──
+     Le client : « quand on appuie sur la gomme ou sur l'oeil, ca doit rester
+     active jusqu'a rappuyer dessus », et « mets-les tous sur la gauche,
+     centres ». Partout la meme colonne : une gomme sur les pages de trace,
+     un oeil et une gomme de tete. On prend l'outil, on touche les formes une
+     a une — chacune n'agit que sur SA case — et on le repose en le touchant
+     de nouveau. La case est celle ou tombe le doigt ; les deux du bout vont
+     jusqu'au bord du cadre, pour emporter aussi un trait parti dans la
+     marge. */
   var outil=null,boutonsOutil=[];
   function choisitOutil(nom){
     outil=(outil===nom)?null:nom;
     boutonsOutil.forEach(function(x){x.classList.toggle('actif',x._outil===outil);});
     boite.classList.toggle('outil-pris',!!outil);
-  }
-  function lacheOutil(){
-    outil=null;
-    boutonsOutil.forEach(function(x){x.classList.remove('actif');});
-    boite.classList.remove('outil-pris');
   }
   function appliqueOutil(q){
     var n=caseDe(q.x);
@@ -14049,25 +14031,11 @@ function _blocEcriture(hote,o){
       var d0=(n===0)?CW:Math.round(CW-MXd-pas*n);
       cxE.clearRect(g0,0,d0-g0,CH);
     }else if(outil==='oeil'){montres[n]=!montres[n];guide(3);}
-    lacheOutil();
   }
-  if(!o.deTete)poseLaGomme();
-  /* « EFFACER » n'est plus un bouton de la rangee : c'est la gomme ronde
-     posee au coin du cadre, juste au-dessus. « REVOIR » avait ete retire
-     avant elle — l'animation tourne en boucle sur la case voisine, il n'y a
-     rien a relancer. La rangee peut donc rester vide : on la cache alors,
-     pour ne pas laisser sa marge manger la page. */
+  /* La rangee du bas n'a plus rien a porter : on la cache, pour ne pas
+     laisser sa marge manger la page. */
   if(!barre.children.length)barre.style.display='none';
-  /* Le filet du trace de tete : UN BOUTON PAR FORME, que l'enfant allume et
-     eteint a sa guise. Sans filet, celui qui ne se souvient plus n'a aucune
-     porte de sortie et laisse tomber la lecon ; avec un bouton unique qui
-     montre tout, il n'a plus qu'a repasser. */
-  /* ── DE TETE : UN SEUL OEIL, UNE SEULE GOMME, A GAUCHE ──
-     Le client : « mets un bouton seulement de chaque, sur la gauche, centre
-     en hauteur ; quand on clique sur un des boutons, il faut ensuite cliquer
-     sur une des formes pour la gommer ou faire apparaitre son modele ». Les
-     quatre paires sous les cases s'en vont. */
-  if(o.deTete){
+  (function(){
     var SVG_OEIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"'
       +' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       +'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>'
@@ -14078,19 +14046,43 @@ function _blocEcriture(hote,o){
       +'<path d="M15.6 3.6a2 2 0 0 1 2.8 0l2 2a2 2 0 0 1 0 2.8L11 17.8a2 2'
       +' 0 0 1-1.4.6H6.8a2 2 0 0 1-1.4-.6l-1.8-1.8a2 2 0 0 1 0-2.8z"/>'
       +'<path d="M11.2 8l4.6 4.6"/></svg>';
+    var nomG=String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'');
+    var liste=o.deTete
+      ? [['oeil',SVG_OEIL,te('Voir le modèle')],['gomme',SVG_GOMME,nomG]]
+      : [['gomme',SVG_GOMME,nomG]];
     var colonne=document.createElement('div');colonne.className='boy-outils-g';
-    [['oeil',SVG_OEIL,te('Voir le modèle')],
-     ['gomme',SVG_GOMME,String(te('\u21ba EFFACER')).replace(/^[\u21ba\s]+/,'')]]
-      .forEach(function(d){
-        var b=document.createElement('button');b.type='button';
-        b.innerHTML=d[1];b.setAttribute('aria-label',d[2]);b.title=d[2];
-        b.style.width=b.style.height=_Bout+'px';
-        b._outil=d[0];boutonsOutil.push(b);
-        b.onclick=function(ev){ev.preventDefault();ev.stopPropagation();choisitOutil(d[0]);};
-        colonne.appendChild(b);
-      });
+    liste.forEach(function(d){
+      var b=document.createElement('button');b.type='button';
+      b.innerHTML=d[1];b.setAttribute('aria-label',d[2]);b.title=d[2];
+      b.style.width=b.style.height=_Bout+'px';
+      b._outil=d[0];boutonsOutil.push(b);
+      b.onclick=function(ev){ev.preventDefault();ev.stopPropagation();choisitOutil(d[0]);};
+      colonne.appendChild(b);
+    });
     boite.appendChild(colonne);
-  }
+    /* Une fois la page posee a son echelle definitive, on recale la taille
+       VUE des outils — l'estimation de depart vient de la page d'avant. */
+    function tailleOutils(){
+      if(!boite.isConnected)return;
+      var e=boite.offsetWidth?(boite.getBoundingClientRect().width/boite.offsetWidth):1;
+      if(!(e>0.05&&e<20))return;
+      var n=boutonsOutil.length||1,hB=boite.clientHeight||0;
+      var t=OUTIL_VU/e;
+      if(hB>0)t=Math.min(t,(hB-12-(n-1)*10)/n);
+      t=Math.max(30,Math.round(t));
+      var tp=t+'px';
+      boutonsOutil.forEach(function(b){if(b.style.width!==tp)b.style.width=b.style.height=tp;});
+    }
+    /* L'echelle de la page bouge encore apres deux secondes — la police
+       arabe arrive, les recalages s'enchainent, l'ecran tourne. Mesure : un
+       oeil a 70 px vus au lieu de 80, calcule pour une echelle qui n'etait
+       plus la bonne. On suit donc la page tant qu'elle est affichee. */
+    tailleOutils();
+    var _veilleOutils=setInterval(function(){
+      if(!boite.isConnected){clearInterval(_veilleOutils);return;}
+      tailleOutils();
+    },400);
+  })();
   var trace=false;
   function pos(e){var r=cvE.getBoundingClientRect();var s=e.touches?e.touches[0]:e;
     return{x:(s.clientX-r.left)*(CW/r.width),y:(s.clientY-r.top)*(CH/r.height)};}
@@ -15951,7 +15943,15 @@ function _boyScene(ca,reprise){
            avec les deux tiers, les huit pages de trace du cours de l'alif
            sortaient de l'ecran. */
         var _p2=t.closest('.boy-panel');
-        var _canevas=!!(_p2&&_p2.querySelector('canvas'));
+        /* ── UNE ZONE D'ECRITURE, PAS N'IMPORTE QUEL CANEVAS ──
+           Le client : « dans toutes les pages tanwin, le texte est trop
+           petit ; faire comme le reste des pages ». Mesure : 47 px contre 53
+           pour les pages de voyelle, sur un meme ecran. La cause : le hublot
+           du tanwin DESSINE ses deux signes sur un canevas, et la simple
+           presence d'un canevas faisait traiter la page comme une page de
+           trace — le texte n'y avait droit qu'au tiers de la hauteur. C'est
+           la zone d'ecriture qui compte, et elle seule. */
+        var _canevas=!!(_p2&&_p2.querySelector('.boy-ecriture'));
         var _max=(_libre/ech)*(_canevas?0.30:0.62);
         if(!hDispo||_max<hDispo)hDispo=_max;
       }
@@ -16400,7 +16400,7 @@ function _boyScene(ca,reprise){
        demi-page revient a diviser les modeles par deux, juste apres les
        avoir agrandis. Le texte passe donc au-dessus, sur toute la largeur,
        et la zone d'ecriture en dessous, sur toute la largeur aussi. */
-    if(p.querySelector('.boy-ecriture'))return;
+    if(p.querySelector('.boy-ecriture')||p.getAttribute('data-une-colonne'))return;
     var titre=null,droite=[],bas=[];
     [].slice.call(p.children).forEach(function(el){
       if(el.classList.contains('boy-step'))return;          /* reste en tête */
@@ -17416,15 +17416,6 @@ function _boyScene(ca,reprise){
         else if(etapes.some(function(x){return x.dit;}))_sceneParle--;
       })();
   }
-  /* Une scene dont le texte prend plus de largeur (voir `.texte-large`). */
-  api.large=function(f){
-    var g=function(){
-      f.apply(this,arguments);
-      if(_dernierPanneau)_dernierPanneau.classList.add('texte-large');
-    };
-    g._chapitre=f._chapitre;
-    return g;
-  };
   api.illustre=function(etape,html,fr,plan,label){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
@@ -17473,7 +17464,12 @@ function _boyScene(ca,reprise){
   /* Piste : texte + signes au-dessus / en-dessous de la ligne */
   api.surPiste=function(etape,html,fr,haut,bas){
     return function(){
-      var p=panneau(etape);titre(p,html,fr);piste(p,haut,bas);
+      /* Une seule colonne : le texte en haut, sur toute la largeur, la piste
+         dessous. En deux colonnes la phrase n'avait que 373 px et tombait a
+         45 px quand les autres pages en font 69 — le client : « aggrandis la
+         taille du texte comme les autres pages ». */
+      var p=panneau(etape);p.setAttribute('data-une-colonne','1');
+      titre(p,html,fr);piste(p,haut,bas);
       bouton(p,te('Suite ›'),suivant);
     };
   };
@@ -17903,7 +17899,7 @@ function _boyScene(ca,reprise){
     d+=_b*(parseFloat(getComputedStyle(mot).fontSize)||0);
     if(Math.abs(d)>0.5)trou.style.top=d.toFixed(2)+'px';
   }
-  api.forme=function(etape,glyph,son,html,fr,avant,apres,trou,baisse){
+  api.forme=function(etape,glyph,son,html,fr,avant,apres,trou,baisse,centre){
     return function(){
       var p=panneau(etape);titre(p,html,fr);
       /* LE HUBLOT NE S'EN VA PAS. Tout se joue dedans : la lettre y est
@@ -18101,6 +18097,28 @@ function _boyScene(ca,reprise){
           });
           }
           m.classList.add('vu');
+          /* ── LE MOT ENTIER, AU CENTRE DU HUBLOT ──
+             Le client : « pour toutes les lettres, forme seule, le mot en
+             entier est trop bas dans le hublot ». Le mot se pose sur la ligne
+             de la lettre seule ; or celle-ci est centree par son ENCRE, qui
+             pend souvent loin sous la ligne (ج). Une fois la lettre arrivee,
+             on mesure l'encre du mot entier et on le remonte — lettre
+             comprise — jusqu'a ce qu'elle soit au centre du cercle. */
+          if(centre)N.plusTard(function(){
+            if(!m.isConnected)return;
+            try{
+              var mot=String((avant||'')+(trou||glyph)+(apres||'')).replace(/[\u200d\u0640]/g,'');
+              var e=_encreAutourLigne(mot);
+              var F=parseFloat(getComputedStyle(m).fontSize)||40;
+              var haut0=parseFloat(m.style.top)||0;
+              var base=haut0+baseDansBoite(m);
+              var dec=h.clientHeight/2-(base+((e.bas-e.haut)/2)*F);
+              if(Math.abs(dec)>=1){
+                m.style.transition='top .45s ease';
+                m.style.top=(haut0+dec).toFixed(1)+'px';
+              }
+            }catch(x){}
+          },950);
           N.plusTard(function(){_sceneFete--;},1000);
         })();
       },false);
@@ -18207,7 +18225,9 @@ function _boyScene(ca,reprise){
         /* Trois centiemes plus haut que sur les pages de forme : le client,
            « dans toutes les pages recapitulatif, les lettres sont un peu plus
            basses que le reste du mot ». */
-        [[mSeule,-0.03],[mDebut,_sansTrait?-0.03:0],[mFin,0],[mMilieu,0]]
+        /* Milieu et fin encore trois centiemes plus haut : le client,
+           « formes milieu et fin, la lettre est trop basse ». */
+        [[mSeule,-0.03],[mDebut,_sansTrait?-0.03:0],[mFin,-0.03],[mMilieu,-0.03]]
           .forEach(function(o){
             aligneSurLeMot(o[0].trou.parentNode,o[0].trou,o[1]);
           });
@@ -18311,7 +18331,10 @@ function _boyScene(ca,reprise){
              rapetisser, et la liste reste lisible d'un coup d'œil. */
           function uneLigne(){
             var lh=parseFloat(getComputedStyle(tx).lineHeight)||(px*1.35);
-            return tx.offsetHeight<=lh*2.4;
+            /* Chaque coupure voulue par le client est une ligne de plus
+               permise : sans cela, trois lignes imposees faisaient fondre la
+               police jusqu'au minimum. */
+            return tx.offsetHeight<=lh*(2.4+tx.querySelectorAll('br').length);
           }
           while(!uneLigne()&&px>11&&garde++<40){
             px-=0.6;tx.style.fontSize=px.toFixed(2)+'px';
@@ -20869,7 +20892,7 @@ function _boyVowelCourse(ca){
               {L:[0],P:1,F:[0],bat:1,t:'b',dit:ditSyl('Répète après moi : {son}','b','ْ')}]}),
 
     B.tracer(te('LE SOUKOUN · TRACÉ'),SK,
-      TB('Trace le <b>soukoun</b> ✍️'),te('Trace le soukoun.')),
+      TB('À toi de <b>tracer</b> ✍️'),te('Trace le soukoun.')),
 
     B.resume([
       {h:TB('Il y a <b>3 voyelles</b> :'),
@@ -20937,9 +20960,11 @@ function _boyProlongCourse(ca){
       teF('{mission} du jour : les prolongations.',{mission:_HAB.missionMin}),te('C\'est parti !')),
     B.brief(te('ÉTAPE 1 · PRINCIPE'),TB('En arabe, la <b>durée</b><br>d\'une voyelle compte.'),
       te('En arabe, le temps passé sur une voyelle est très important.')),
-    B.obs(te('ÉTAPE 2 · COURT'),'بَ','بَ',TB('Ici c\'est <b>court</b> :<br><b>\u00ab ba \u00bb</b> ⏱️'),te('Ici c\'est court.')),
+    /* Puis la voix dit le son : « on dit ba » — le client. */
+    B.obs(te('ÉTAPE 2 · COURT'),'بَ','بَ',TB('Ici c\'est <b>court</b> :<br><b>\u00ab ba \u00bb</b> ⏱️'),
+      [te('Ici c\'est court.')].concat(_phraseAvecSons(teF('On dit {son}.',{son:'ba'}),[['ba','بَ']]))),
     B.obs(te('ÉTAPE 3 · LONG'),'بَا','بَا',TB('Avec un <b>ا</b> c\'est <b>long</b> :<br><b>\u00ab baaa \u00bb</b> 🎵'),
-      te('Avec un alif, le son devient long.')),
+      [te('Avec un alif, le son devient long.')].concat(_phraseAvecSons(teF('On dit {son}.',{son:'baaa'}),[['baaa','بَا']]))),
     B.brief(te('ÉTAPE 4 · ENJEU'),TB('Allonger ou non<br>peut <b>changer le sens</b> ! ⚠️'),
       te('Allonger ou non peut complètement changer le sens.')),
     B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',TB('Par exemple,<br>sans prolonger :<br><b>je t\'aime vraiment</b> ❤️'),
@@ -20978,13 +21003,18 @@ function _boyProlongCourse(ca){
        prolongation. */
     B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بَاِ','بَاِ',
       TBF('Ici le {lettre} porte une {v} :<br>on ne dit pas <b>\u00ab baa \u00bb</b><br>mais <b>\u00ab ba-ï \u00bb</b> !',{lettre:pa('ا'),v:gros(pa('ِ'))}),
-      te('Ici le alif porte une kasra. On ne dit pas ba prolongé, mais ba i.')),
+      /* Les sons entre guillemets viennent du studio ; faute
+         d'enregistrement, la synthese reprend la phrase entiere. */
+      _phraseAvecSons(te('Ici le alif porte une kasra. On ne dit pas baa, mais ba-ï.'),
+        [['baa','بَا'],['ba-ï','بَاِ']])),
     B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بِيَ','بِيَ',
       TBF('Ici le {lettre} porte une {v} :<br>on ne dit pas <b>\u00ab bii \u00bb</b><br>mais <b>\u00ab biya \u00bb</b> !',{lettre:pi('ي'),v:gros(pi('َ'))}),
-      te('Ici le ya porte une fatha. On ne dit pas bi prolongé, mais biya.')),
+      _phraseAvecSons(te('Ici le ya porte une fatha. On ne dit pas bii, mais biya.'),
+        [['bii','بِي'],['biya','بِيَ']])),
     B.obs(te('ÉTAPE 11 · CONTRE-EXEMPLE'),'بُوَ','بُوَ',
       TBF('Ici le {lettre} porte une {v} :<br>on ne dit pas <b>\u00ab bouu \u00bb</b><br>mais <b>\u00ab bouwa \u00bb</b> !',{lettre:pou('و'),v:gros(pou('َ'))}),
-      te('Ici le waw porte une fatha. On ne dit pas bou prolongé, mais bouwa.')),
+      _phraseAvecSons(te('Ici le waw porte une fatha. On ne dit pas bouu, mais bouwa.'),
+        [['bouu','بُو'],['bouwa','بُوَ']])),
 
     B.controleMulti(te('CONTRÔLE 1'),TB('Trouve <b>la ou les</b><br>prolongations !'),
       te('Trouve la ou les prolongations.'),['بَ','بَا','بُو'],['بَا','بُو']),
@@ -20995,13 +21025,23 @@ function _boyProlongCourse(ca){
       te('Voyons maintenant un dernier petit signe. Il se place toujours au-dessus d\'une lettre et ressemble à un w : la chaddah.')),
     B.brief(te('ÉTAPE 12 · CHADDAH'),TB('Avec ce petit <b>chapeau</b>,<br>on insiste sur la <b>lettre</b> 💪'),
       te('Avec ce petit chapeau, on insiste sur la lettre.')),
-    B.obs(te('ÉTAPE 13 · EXEMPLE'),'جَدّ','جَدّ',TB('<b>جَدّ</b> :<br>ça veut dire<br><b>grand-père</b> 👴'),te('Jad-d, ça veut dire grand-père.')),
+    /* Le client : « remplace le texte et la voix par : On ne dit pas
+       "jadoun", mais "jaddoun" ». Les deux mots sont au studio. */
+    B.obs(te('ÉTAPE 13 · EXEMPLE'),'جَدّ','جَدّ',
+      TB('On ne dit pas <b>« jadoun »</b>,<br>mais <b>« jaddoun »</b>'),
+      _phraseAvecSons(te('On ne dit pas jadoun, mais jaddoun.'),
+        [['jadoun','جَدٌ'],['jaddoun','جَدٌّ']])),
     B.tracer(te('ÉTAPE 13 · TRACÉ'),'جَدّ',TB('Trace <b>جَدّ</b> ✍️'),'Trace jadd.',2),
     B.brief(te('ÉTAPE 14 · NE PAS CONFONDRE'),TB('Chapeau = on insiste<br>sur la <b>lettre</b>.<br class="dur">Prolongation = on insiste<br>sur la <b>voyelle</b>.'),
       te('Le chapeau : on insiste sur la lettre. La prolongation : on insiste sur la voyelle.')),
     B.resume([
-      {h:TBF('Le {a} prolonge le « a », le {ou} le « ou », le {i} le « i ».',
-             {a:pa('ا'),ou:pou('و'),i:pi('ي')}),
+      /* Le client : « ecris plutot : (fatha) est prolonge par le (alif) —
+         les lettres entre parentheses ecrites en arabe — puis pareil avec
+         les autres voyelles, en dessous ». */
+      {h:_airAutourArabe(
+           TBF('{v} est prolongé par le {l}',{v:gros(pa('َ')),l:pa('ا')})+'<br data-dur="1">'
+          +TBF('{v} est prolongé par le {l}',{v:gros(pou('ُ')),l:pou('و')})+'<br data-dur="1">'
+          +TBF('{v} est prolongé par le {l}',{v:gros(pi('ِ')),l:pi('ي')})),
        f:te('Le alif prolonge le a, le waw le ou, le ya le i.')},
       {h:TB('Ils ne prolongent que s\'ils n\'ont <b>aucune voyelle</b>.'),
        f:te('Ils ne prolongent que s\'ils n\'ont aucune voyelle.')},
@@ -21095,7 +21135,7 @@ function _boyLetterCourse(ca,idx,premiere){
              compenser. L'oubli de ce dernier argument la baissait de trois
              centiemes — « la lettre devient un peu trop basse quand le reste
              du mot apparait », pour toutes les lettres seules. */
-          _pSeule.avant,_pSeule.apres,_pSeule.lettre,0)
+          _pSeule.avant,_pSeule.apres,_pSeule.lettre,0,true)
       : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
           TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
           teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}))));
@@ -21329,11 +21369,11 @@ function _boyLetterCourse(ca,idx,premiere){
   /* On ne dit plus « double » : on NOMME le signe qui est double. L'enfant
      vient d'apprendre les trois voyelles, il les reconnait. */
   [['ً','an',te('fatḥa')],['ٍ','in',te('kasra')],['ٌ','oun',te('ḍamma')]].forEach(function(v,n){
-    sc.push(B.large(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
+    sc.push(B.obs('TANWĪN '+(n+1)+'/3',A+v[0],A+v[0],
       teF('Avec deux {signe} :<br>ça fait {son}',{signe:b(v[2]),son:q(v[1])})+'.',
       _phraseAvecSons(teF('Avec deux {signe}, ça fait {son}',
           {signe:v[2],son:(lat+v[1]).toLowerCase()}),
-          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true)));
+          [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
     if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+q(v[1])+'<br>dans '+b(tanwCombien)+' ✍️',
@@ -21358,7 +21398,7 @@ function _boyLetterCourse(ca,idx,premiere){
     if(attache){
       sc.push(B.tracer(te('ÉTAPE · SOUKOUN · TRACÉ'),
         [_avecSigne(formes[1].form,'ْ'),_avecSigne(formes[2].form,'ْ')],
-        TB('Trace le <b>soukoun</b><br>sur le <b>début</b> et le <b>milieu</b> ✍️'),
+        TB('À toi de <b>tracer</b> ✍️'),
         te('Trace le soukoun sur la forme du début et sur celle du milieu.'),
         null,['début','milieu']));
     }
@@ -21396,8 +21436,7 @@ function _boyLetterCourse(ca,idx,premiere){
       }
       var plusieursP=casesP.length>1;
       sc.push(B.tracer(teF('ALLONGEMENT {n}/3 · TRACÉ',{n:n+1}),casesP,
-        'Trace '+q(v[1])
-          +(plusieursP?('<br>dans '+b(casesP.length+' places')):'')+' ✍️',
+        TB('À toi de <b>tracer</b> ✍️'),
         plusieursP?te('Trace cet allongement dans ses différentes places.')
                   :te('Trace cet allongement.'),null,nomsP));
     });
@@ -21520,8 +21559,14 @@ function _boyLetterCourse(ca,idx,premiere){
        des deux cotes, si bien qu'une des quatre formes n'etait plus qu'un
        leurre permanent. On ajoute donc le mot qui la reclame — deux lettres,
        puis une bloquante, puis la notre en derniere place. */
-    var _bloq=_compagnonConnu(idx,A,false);
-    if(_bloq)_questions.push({dr:_cmp+_bloq, ga:'', iF:0});
+    /* Le client : « dans ces pages, tu devais prendre les mots que je
+       t'avais donnes ». La question de la forme ISOLEE etait encore batie
+       avec un compagnon (« حو » + le trou). Elle prend maintenant le mot de
+       la forme seule — celui du hublot de l'identification, choisi par le
+       client pour que la lettre y soit isolee (صراخ pour le khā). */
+    var _pS=null;
+    try{_pS=_placeDansMot((_MOTS_FORMES[A]||[])[0],A,0);}catch(e4){}
+    if(_pS&&(_pS.avant||_pS.apres))_questions.push({dr:_pS.avant,ga:_pS.apres,iF:0});
     if(_questions.length)_questions.sort(function(){return Math.random()-.5;}).forEach(function(_q,_n){
       var _t=(_questions.length>1)
         ? teF('LE MOT À TROU {n}/{sur}',{n:_n+1,sur:_questions.length})
@@ -24608,6 +24653,11 @@ var ADMIN_SOUNDS = [
   /* Exemples du cours des prolongations (fille) */
   {ar:'جَدَ',label:'jada — sans chaddah'},
   {ar:'جَدّ',label:'jad-d — grand-père 👴'},
+  {ar:'جَدٌ',label:'jadoun (sans chaddah)'},
+  {ar:'جَدٌّ',label:'jaddoun (avec chaddah)'},
+  {ar:'بَاِ',label:'ba-ï'},
+  {ar:'بِيَ',label:'biya'},
+  {ar:'بُوَ',label:'bouwa'},
   {ar:'بَوَ',label:'bawa — waw vraie lettre'},
   {ar:'بّ',label:'b-b — chaddah'},
   {ar:'نُورٌ',label:'nūrun — une lumière'}

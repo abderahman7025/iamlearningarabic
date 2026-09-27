@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v279
+## OÙ ON EN EST — 24 septembre 2026, production en v280
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,37 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v279), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v280), du plus récent au plus ancien :**
+
+- **CAPTURES DU 27 SEPTEMBRE, À LA LETTRE (v280).**
+  * *Le texte des pages à hublot dessiné* (tanwīn, « les 3 ») : 47 px contre
+    53 pour les pages de voyelle, sur un même écran 1024×640. Cause : la
+    simple PRÉSENCE d'un canevas faisait traiter la page comme une page de
+    tracé (texte limité à 30 % de la hauteur) ; le hublot du tanwīn dessine
+    ses signes sur un canevas. On regarde désormais `.boy-ecriture`. Tanwīn
+    à 54 px. Le détour `texte-large` de v279 est retiré. La page « les 3 »
+    (seule `surPiste`) passe en une colonne : 45 → 69 px.
+  * *Outils* : une colonne à GAUCHE, centrée, sur TOUS les canevas (gomme ;
+    œil + gomme de tête). Ils RESTENT pris jusqu'à ce qu'on les retouche.
+    Taille VUE fixe, 80 px, convertie avec l'échelle du cadre et SUIVIE tant
+    que la page est affichée (mesure : l'échelle bouge encore après 2 s, un
+    œil tombait à 70 px). La colonne écarte les cases (au plus 18 % du cadre).
+  * *De tête* : ligne d'écriture remontée (0,50 au lieu de 0,62).
+  * *Prolongations* : « On dit ba. » / « On dit baaa. » après les pages court et
+    long ; contre-exemples dits avec leurs sons entre guillemets (studio, ou
+    synthèse à défaut) ; chaddah : « On ne dit pas « jadoun », mais
+    « jaddoun » » ; à retenir : « (fatha) est prolongé par le (alif) », une
+    ligne par voyelle — et le réducteur compte une ligne de plus par coupure
+    voulue, sinon trois lignes imposées faisaient fondre la police.
+    **Au studio** : جَدٌ (jadoun), جَدٌّ (jaddoun), بَاِ (ba-ï), بِيَ (biya), بُوَ (bouwa).
+  * *Titres des tracés soukoun et allongement* : « À toi de tracer ✍️ ».
+  * *Forme seule* : le mot entier se recentre dans le hublot une fois la
+    lettre arrivée (encre du mot mesurée) ; il se posait sur la ligne d'une
+    lettre seule centrée par son encre, qui pend souvent loin (ج).
+  * *Récapitulatif* : milieu et fin encore 0,03 em plus haut.
+  * *Mot à trou* : la question de la forme isolée prend le mot du client
+    (celui de l'identification, صراخ pour le khā) au lieu d'un compagnon.
+    Vérifié sur le khā : fakhr, khālid, nafkh, ṣurākh.
 
 - **RÉGRESSION DE v277 RÉPARÉE, ET NOUVEAU LOT (v279).**
   * *Les coupures de l'auteur reviennent.* v277 les retirait sur TOUTES les
