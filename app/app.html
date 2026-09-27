@@ -4028,7 +4028,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   box-shadow:0 7px 18px color-mix(in srgb,var(--mc) 32%,transparent);
   transition:transform .18s;user-select:none}
 .mjr-case.vise{transform:scale(1.12)}
-.mjr-case.prise{border-color:#10B981;color:#047857;background:#ecfdf5;cursor:default}
+/* Une paire reliee GARDE ses couleurs : le client, « ca ne doit pas devenir
+   vert ». */
+.mjr-case.prise{cursor:default}
 .mjr-case.non{border-color:#e53935;color:#c62828;animation:mjSecoue .4s}
 
 /* 8. Les paires — huit cartes, huit couleurs. */
@@ -4050,7 +4052,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .mjc-face{background:#fff;border:5px solid var(--mc);transform:rotateY(180deg);
   font-family:'Scheherazade New',serif;font-size:3rem;color:var(--mc);
   box-shadow:0 8px 18px color-mix(in srgb,var(--mc) 34%,transparent)}
-.mj-carte.prise .mjc-face{border-color:#10B981;color:#047857;background:#ecfdf5}
+/* Une paire trouvee garde ses couleurs, elle aussi. */
 
 /* La récompense */
 .mj-fete{text-align:center}
@@ -11352,7 +11354,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v283';
+var _VERSION_REPLI='v284';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18828,7 +18830,9 @@ function _boyScene(ca,reprise){
   /* ── 1. LA RENCONTRE ──
      « Voici la lettre bā. Répète : bā ! … Bravo ! Maintenant touche-la. »
      Elle respire, elle bondit, elle change de couleur à chaque contact. */
-  api.jeuRencontre=function(glyph,son){
+  /* `intro` (facultatif) remplace « Voici la lettre… » par une phrase du
+     cours — le waw et ses voyelles, au cours des voyelles. */
+  api.jeuRencontre=function(glyph,son,intro){
     return function(){
       var m=manche(te('LA LETTRE'),'mj-rencontre',MJ_COUL[0]);
       var d=document.createElement('div');d.className='mj-disque';
@@ -18858,7 +18862,8 @@ function _boyScene(ca,reprise){
          derniere manche, que la phrase soit finie, puis une seconde et demie
          de silence : c'est le temps de l'enfant. */
       N.plusTard(function(){
-        phraseAvecLettre('Voici la lettre',son||glyph,null);
+        if(intro)_ditLaSuite(intro);
+        else phraseAvecLettre('Voici la lettre',son||glyph,null);
         N.plusTard(function(){
           N.dire(te('Répète !'));
           N.plusTard(function(){
@@ -18876,9 +18881,14 @@ function _boyScene(ca,reprise){
 
   /* ── 2. ATTRAPE-LA ──
      Six lettres dérivent, la nôtre est du lot. CINQ prises. */
+  /* `cible` peut etre une LISTE : chaque tour vise la suivante. Le client,
+     sur le cours des voyelles : « tu ne proposes que wa, il faut aussi wi et
+     wou ». Et « tous les sons des bonnes reponses doivent etre joues » :
+     chaque prise fait entendre ce qu'on vient d'attraper. */
   api.jeuAttrape=function(cible,leurres,son){
     return function(){
       var m=manche(te('ATTRAPE-LA'),'mj-attrape',MJ_COUL[1]);
+      var cibles=[].concat(cible),multi=cibles.length>1;
       var pris=0,BUT=5;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
@@ -18887,7 +18897,9 @@ function _boyScene(ca,reprise){
       function tour(premier){
         jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
         aire.innerHTML='';
-        var lot=_melangeTab([cible].concat(_melangeTab(leurres).slice(0,5)));
+        var c=cibles[pris%cibles.length];
+        var faux=_melangeTab(leurres.concat(cibles).filter(function(x){return x!==c;}));
+        var lot=_melangeTab([c].concat(faux.slice(0,5)));
         lot.forEach(function(g,k){
           var f=document.createElement('div');f.className='mj-flotte';
           f.textContent=_sansCercle(g);
@@ -18897,7 +18909,7 @@ function _boyScene(ca,reprise){
           f.style.animationDuration=(4+Math.random()*4).toFixed(1)+'s';
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
-            if(g===cible){
+            if(g===c){
               /* ── ELLE DISPARAIT, ET C'EST TOUT ──
                  C'EST ICI QU'ETAIT LE « SPLASH ». Pas dans une classe CSS :
                  dans `youpi`, appele a CHAQUE prise, qui lance des confettis
@@ -18909,10 +18921,12 @@ function _boyScene(ca,reprise){
                  fete appartient a la fin de la manche. */
               f.classList.add('pris');
               if(typeof playBravo==='function')playBravo();
+              /* Le son de la bonne reponse. */
+              N.plusTard(function(){ditGlyphe(g);},160);
               pris++;
               if(pris>=BUT){jauge.firstChild.style.width='100%';
-                N.dire(te('Bravo !'));m.gagne();}
-              else N.plusTard(function(){tour(false);},760);
+                N.plusTard(function(){N.dire(te('Bravo !'));},1000);m.gagne();}
+              else N.plusTard(function(){tour(false);},multi?1400:900);
             }else{
               f.classList.add('non');
               if(typeof playError==='function')playError();
@@ -18921,9 +18935,12 @@ function _boyScene(ca,reprise){
           };
           aire.appendChild(f);
         });
+        /* Une seule cible : on la nomme une fois. Plusieurs : a chaque tour,
+           pour que l'enfant sache laquelle attraper maintenant. */
         if(premier)N.plusTard(function(){
-          phraseAvecLettre('Attrape la lettre',son||cible,null);
+          phraseAvecLettre(multi?'Attrape':'Attrape la lettre',multi?c:(son||c),null);
         },150);
+        else if(multi)N.plusTard(function(){phraseAvecLettre('Attrape',c,null);},120);
       }
       tour(true);
     };
@@ -19551,7 +19568,9 @@ function _boyScene(ca,reprise){
          constante : un aller complet en quatre secondes, quoi qu'il arrive.
          Et on repeint à la cadence de l'écran (`requestAnimationFrame`), pas
          toutes les cinquante millisecondes. */
-      var _t0Demo=Date.now(),DEMO_MS=4000;
+      /* 2,4 s et non plus 4 : le client, « l'animal modele doit se deplacer
+         plus vite sur la lettre ». */
+      var _t0Demo=Date.now(),DEMO_MS=2400;
       (function tourne(){
         if(!cv.isConnected)return;
         demo=requestAnimationFrame(tourne);
@@ -19602,7 +19621,7 @@ function _boyScene(ca,reprise){
   api.jeuBulles=function(cible,leurres){
     return function(){
       var m=manche(te('LES BULLES'),'mj-bulles',MJ_COUL[3]);
-      var pris=0,BUT=8,vivant=true,rang=0;
+      var pris=0,BUT=8,vivant=true,rang=0,_sansCible=0;
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
       var aire=document.createElement('div');aire.className='mj-aire';
@@ -19610,7 +19629,14 @@ function _boyScene(ca,reprise){
       function pose(){
         if(!vivant||!aire.isConnected)return;
         rang++;
-        var g=(rang%2===1)?cible:_melangeTab(leurres)[0];
+        /* ── AU HASARD ──
+           Le client : « arrete de mettre la bonne lettre tous les deux
+           ballons, ca doit etre aleatoire ». Une chance sur deux et demie a
+           chaque ballon. Un seul garde-fou : apres quatre ballons sans elle,
+           le cinquieme la porte — sinon un enfant de trois ans attendrait
+           sans rien a eclater. */
+        var g=(Math.random()<0.4||_sansCible>=4)?cible:_melangeTab(leurres)[0];
+        _sansCible=(g===cible)?0:_sansCible+1;
         var b=document.createElement('div');b.className='mj-bulle';
         b.textContent=_sansCercle(g);
         b.style.left=(5+Math.random()*80)+'%';
@@ -19861,7 +19887,9 @@ function _boyScene(ca,reprise){
           if(_memeLettre(c.m,L.ar)){
             trouve=true;c.sp.classList.add('juste');
             youpi(m.zone,true);
-            N.plusTard(function(){N.direToujours(_sansCercle(mot));},380);
+            /* Le mot n'est plus dit : le client, « la voix ne doit pas
+               prononcer les mots arabes ; l'enfant trouve la lettre, c'est
+               tout ». */
             n++;N.plusTard(tour,1700);
           }else{
             c.sp.classList.add('non');
@@ -20228,7 +20256,7 @@ function _boyScene(ca,reprise){
      L'animal de l'étape saute, les confettis partent, et la voix dit qu'il
      rejoint l'album. Rien n'est à ranger : l'album se DÉDUIT de ce qui est
      acquis (`_albMondesGagnes`), il suffit de le montrer. */
-  api.jeuRecompense=function(image,nom,onRetour,label){
+  api.jeuRecompense=function(image,nom,onRetour,label,lettre){
     return function(){
       if(typeof launchConfetti==='function')
         try{launchConfetti(st.profile==='girl'?'girl':'boy');}catch(e){}
@@ -20246,6 +20274,10 @@ function _boyScene(ca,reprise){
         var im=document.createElement('img');im.className='mj-prix';
         im.src=image;im.alt='';im.setAttribute('aria-hidden','true');
         z.appendChild(im);
+      }else if(lettre){
+        var dl=document.createElement('div');dl.className='mj-disque mj-prix-lettre';
+        dl.textContent=_sansCercle(lettre);
+        z.appendChild(dl);
       }
       var t=document.createElement('div');t.className='mj-prix-tx';
       t.textContent='🎉 '+te('Bravo !');
@@ -20543,20 +20575,33 @@ function _boyLetterJeu(ca,idx,premiere){
     B.jeuEcoute(A,leurres),
     B.jeuMot(L,bete.image),
     B.jeuRelier(A,leurres),
-    B.jeuPaires(A,leurres),
-    B.jeuVoyelles(A),
+    B.jeuPaires(A,leurres)
+  ].concat(
+    /* ── LES VOYELLES VIENNENT APRES LEUR COURS ──
+       Le client : « tu as des exercices avec les voyelles avant qu'on ne les
+       ait vues ». Le Lion (alif, waw, ya) passe AVANT l'Elephant, qui est le
+       cours des voyelles : ses lettres n'ont donc pas de manche de voyelles. */
+    (['ا','و','ي'].indexOf(A)>=0)?[]:[B.jeuVoyelles(A)]
+  ).concat([
     function(api){
       /* La lettre est acquise ici : l'enfant a joué les six manches. */
       var ile=null;
       try{ile=_boyLettreFinie(_boySession,idx);}catch(e){}
       var finie=!!(ile&&ile.finie);
-      B.jeuRecompense(bete.image,finie?bete.nom:'',
+      /* ── L'ANIMAL SEULEMENT QUAND TOUT EST FINI ──
+         Le client : « la carte de l'animal n'est debloquee que si on a fini
+         toutes les lecons ; si on finit alif, ca doit ramener a la page ou il
+         y a alif, waw, ya ». L'image de l'animal s'affichait a la fin de
+         CHAQUE lecon et laissait croire qu'il etait gagne. Avant la derniere,
+         c'est la lettre qu'on vient d'apprendre qui fete la fin, et l'on
+         revient au choix des lettres de l'animal. */
+      B.jeuRecompense(finie?bete.image:null,finie?bete.nom:'',
         finie?function(){renderSessionsMap(ca);}
              :function(){if(_boySession)_boyLetterPicker(ca,_boySession);
                          else renderSessionsMap(ca);},
-        finie?_HAB.carte:_HAB.monLieu)(api);
+        finie?_HAB.carte:_HAB.monLieu,finie?null:A)(api);
     }
-  ]);
+  ]));
 }
 
 /* Les voyelles, jouées elles aussi : on les rencontre une par une sur le bā
@@ -20572,11 +20617,23 @@ function _boyVowelJeu(ca){
   var LB='و';
   _LETTRE_COURS=LB;              /* la rose du wāw : le décor sera la prairie */
   var syl=[LB+'\u064e',LB+'\u0650',LB+'\u064f'];
+  /* ── ON PRESENTE LE WAW, PUIS SES SONS ──
+     Le client : « tu commences le cours avec wa directement, sans
+     explication, sans rien ; au moins montre le waw, dis : voici la lettre
+     waw, elle se prononce w — comme ca on prononce wa, etc. ». Les sons entre
+     guillemets viennent du studio (وْ, وَ, وِ, وُ). */
+  /* Le son arabe part TOUJOURS : depuis le studio s'il y est, sinon par la
+     synthese arabe — la regle du client. Ecrit en lettres latines entre
+     guillemets, il serait retire de la phrase et la voix dirait « elle se
+     prononce… » puis rien : aucun de ces sons n'est encore enregistre. */
+  function onDit(son,g){return [te('Avec ce petit signe, on prononce'),g];}
   B.run([
-    B.jeuRencontre(syl[0]),B.jeuTrace(syl[0],2),
-    B.jeuRencontre(syl[1]),B.jeuTrace(syl[1],2),
-    B.jeuRencontre(syl[2]),B.jeuTrace(syl[2],2),
-    B.jeuAttrape(syl[0],[syl[1],syl[2],LB,LB+'\u0652']),
+    B.jeuRencontre(LB,null,[te('Voici la lettre waw.'),te('Elle se prononce'),LB+'\u0652']),
+    B.jeuRencontre(syl[0],null,onDit('wa',syl[0])),B.jeuTrace(syl[0],2),
+    B.jeuRencontre(syl[1],null,onDit('wi',syl[1])),B.jeuTrace(syl[1],2),
+    B.jeuRencontre(syl[2],null,onDit('wou',syl[2])),B.jeuTrace(syl[2],2),
+    /* wa, wi, wou a tour de role — et non plus wa seul. */
+    B.jeuAttrape([syl[0],syl[1],syl[2]],[LB,LB+'\u0652']),
     /* Six tours, et la cible tourne : « pour les voyelles, laisse 6 fois ».
        Les trois syllabes passent donc deux fois chacune, au lieu d'une seule
        martelee six fois. */

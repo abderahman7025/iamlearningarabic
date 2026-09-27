@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v283
+## OÙ ON EN EST — 24 septembre 2026, production en v284
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,29 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v283), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v284), du plus récent au plus ancien :**
+
+- **3-5 ANS, DEMANDES DU CLIENT (v284).**
+  * *Ordre des cours* (question du client) : Lion = alif, waw, ya ;
+    Éléphant = voyelles (placé après exprès, il s'appuie sur le waw) ; puis
+    les lettres. Les lettres du Lion n'ont plus de manche de voyelles (« des
+    exercices avec les voyelles avant qu'on ne les ait vues »).
+  * *Cours des voyelles* : commence par le waw — « Voici la lettre waw. Elle
+    se prononce [وْ] » — puis « Avec ce petit signe, on prononce [وَ] »,
+    etc. Le son arabe part TOUJOURS (studio, sinon synthèse arabe) : écrit en
+    latin entre guillemets il aurait été retiré de la phrase. **Au studio** :
+    و وْ وَ وِ وُ, rien n'est enregistré.
+  * *Attrape-la* : `cible` peut être une liste, la cible tourne à chaque tour
+    (wa, wi, wou), annoncée à chaque tour ; chaque prise fait entendre ce
+    qu'on attrape.
+  * *Bulles* : la bonne lettre au hasard (40 %), jamais plus de 4 ballons
+    sans elle.
+  * *Memory, relier* : une paire trouvée garde ses couleurs (plus de vert).
+  * *Trouve la lettre* : le mot n'est plus dit.
+  * *Tracé* : l'animal modèle fait son aller en 2,4 s au lieu de 4.
+  * *Fin de leçon* : l'animal ne s'affiche que quand toutes les lettres de
+    l'animal sont faites ; avant, c'est la lettre qui fête la fin, et l'on
+    revient au choix des lettres (alif, waw, ya).
 
 - **3-5 ANS RÉPARÉ (v283).** « Attrape la lettre, on ne voit rien. » La zone du
   jeu faisait **11 px** de large : centrée par des marges automatiques dans
