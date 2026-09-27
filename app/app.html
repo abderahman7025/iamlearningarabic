@@ -3619,6 +3619,15 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-panel>.rec-grille,.boy-panel>.res-liste,.boy-panel>.boy-2col,
 .boy-panel>.boy-barre,.boy-panel>.boy-titre,.boy-panel>.trou-mot,
 .boy-panel>.boy-scene,.boy-panel>.boy-piste{width:100%}
+/* ── LA ZONE DES JEUX DES 3-5 ANS ──
+   Le client : « exercice attrape la lettre, on ne voit rien, je ne peux plus
+   rien faire ». Mesure : la zone du jeu faisait 11 px de large. Elle se
+   centre par des marges automatiques — et dans une colonne souple, un bloc
+   ainsi centre se retrecit a son contenu. Or le jeu « attrape-la » ne
+   contient QUE des lettres posees en absolu : pour la mise en page, il est
+   vide. Le panneau souple date de la v259 ; ce jeu y avait perdu sa largeur
+   depuis. Elle lui est rendue — plafonnee comme avant a 620 px. */
+.boy-panel>.mj{width:100%}
 .boy-panel>.boy-step{flex:0 0 auto}
 .boy-panel>.boy-barre{flex:0 0 auto;margin-top:auto}
 .boy-panel>.boy-2col{flex:1 1 auto;align-content:center}
@@ -11343,7 +11352,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v282';
+var _VERSION_REPLI='v283';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18840,14 +18849,26 @@ function _boyScene(ca,reprise){
       };
       /* La présentation, en trois temps : on la nomme, on la fait répéter,
          on félicite. Puis la consigne du jeu. */
+      /* ── L'ENFANT A LE TEMPS DE REPETER ──
+         Le client : « ca dit voici la lettre alif, repete, bravo — sans
+         laisser a l'enfant le temps de repeter ». « Bravo » etait mis en file
+         juste derriere « repete ». Le seul blanc entre les deux etait celui
+         des silences AUTOUR des enregistrements du studio — la v281 les a
+         coupes, et le blanc a disparu avec eux. On attend donc, comme a la
+         derniere manche, que la phrase soit finie, puis une seconde et demie
+         de silence : c'est le temps de l'enfant. */
       N.plusTard(function(){
         phraseAvecLettre('Voici la lettre',son||glyph,null);
         N.plusTard(function(){
           N.dire(te('Répète !'));
           N.plusTard(function(){
-            N.dire(te('Bravo !'));
-            N.dire(te('Maintenant, touche la lettre !'));
-          },30);
+            N.surSilence(function(){
+              N.plusTard(function(){
+                N.dire(te('Bravo !'));
+                N.dire(te('Maintenant, touche la lettre !'));
+              },1500);
+            });
+          },60);
         },20);
       },150);
     };

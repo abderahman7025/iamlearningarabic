@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v282
+## OÙ ON EN EST — 24 septembre 2026, production en v283
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,21 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v282), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v283), du plus récent au plus ancien :**
+
+- **3-5 ANS RÉPARÉ (v283).** « Attrape la lettre, on ne voit rien. » La zone du
+  jeu faisait **11 px** de large : centrée par des marges automatiques dans
+  le panneau en colonne souple (v259), elle se rétrécissait à son contenu —
+  et ce jeu ne contient QUE des lettres posées en absolu. Déjà cassé en v276
+  (vérifié au banc) : régression de la v259, pas des toutes dernières.
+  `.boy-panel>.mj{width:100%}`. Et « répète, bravo » sans laisser répéter : le
+  seul blanc était celui des silences autour des enregistrements, que la
+  v281 a coupés. La rencontre attend désormais la fin de « Répète ! » puis
+  1,5 s, comme la dernière manche le faisait déjà.
+  **Règle :** toute pause voulue doit être écrite (`surSilence` + délai),
+  jamais laissée aux silences d'un fichier son. **Et** : un changement de
+  mise en page commun (le panneau souple) doit être repassé sur les jeux
+  des 3-5 ans, pas seulement sur les pages des 6-11.
 
 - **FONDU AUTOMATIQUE, L'UN APRÈS L'AUTRE (v282).** « Je ne veux pas que l'on
   voie les deux écrans en même temps. » L'ancienne page s'efface en 0,3 s ;
