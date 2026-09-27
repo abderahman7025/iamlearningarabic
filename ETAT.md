@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 24 septembre 2026, production en v280
+## OÙ ON EN EST — 24 septembre 2026, production en v281
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v280), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v281), du plus récent au plus ancien :**
+
+- **LES BLANCS DU STUDIO (v281).** Mesure sur douze fichiers : 250 à 750 ms
+  de silence AVANT la voix, 115 à 600 ms APRÈS — trois quarts de seconde de
+  blanc par son. `_analyseSilences` décode chaque fichier une fois, trouve
+  où la voix commence et finit (seuil 3 % du pic, marges 80 / 150 ms) et
+  garde ces bornes dans le navigateur (`bornes1_`+url) ; `_joueSon` part de
+  la première trace, et la narration considère le son fini à la dernière
+  (`a._fin`, `a._fini`). Vérifié sur « ba » : départ à 0,225 s au lieu de 0.
+
+- **TRANSITIONS (v281).** Automatique (la page passe seule, bonne réponse) :
+  FONDU ENCHAÎNÉ — l'ancienne se dissout, la nouvelle apparaît. À la main
+  (doigt, bords à la souris, repérés par `_parLaMain`) : glissement. Le
+  glissement est plus fluide : une image par trame (`requestAnimationFrame`),
+  et le fondu du contenu posé en opacité directe sur les enfants au lieu
+  d'une variable CSS héritée qui recalculait le style de tout le contenu à
+  chaque mouvement ; en fin de geste la bande s'efface en fondu au lieu de
+  disparaître d'un coup. **Au banc**, le panneau masqué ne fait tourner
+  aucune trame : tester le glissement avec des `setTimeout`, pas des rAF.
+
+- **CAPTURES DU 27 SEPTEMBRE, 2E SÉRIE (v281).**
+  * *« Les 3 »* : deux colonnes comme avant, lettres à droite, texte plus
+    grand (45 → 52 px) — le texte prend plus de largeur et n'est plus borné
+    à la hauteur de la piste (`page-piste`). La colonne unique de v280 est
+    retirée.
+  * *Forme seule* : le mot est POSÉ centré dès le départ (encre mesurée), la
+    lettre le rejoint en biais ; plus de remontée après coup.
+  * *Récapitulatif* : milieu et fin − 0,06 em pour les lettres qui
+    s'attachent à la suivante (djim trop bas), 0 pour les autres (alif trop
+    haut) — c'est le trait de liaison de gauche qui les sépare.
+  * *« Je t'aime »* : texte et voix du client, mots arabes au studio.
+  * *À retenir* : la voix dit ce qui est écrit, une phrase par ligne.
+  * *Outils* : 80 / 1,5 = 53 px vus.
 
 - **CAPTURES DU 27 SEPTEMBRE, À LA LETTRE (v280).**
   * *Le texte des pages à hublot dessiné* (tanwīn, « les 3 ») : 47 px contre

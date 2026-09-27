@@ -3287,6 +3287,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-2col .boy-col-g{min-width:0}
 .boy-2col .boy-titre{max-width:none;margin:0;font-size:1.95rem;line-height:1.6}
 .boy-2col .boy-hublot{margin:0 auto}
+.page-piste .boy-2col{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}
 
 /* ── LE MOT A TROU, EN PAYSAGE ──
    La colonne de droite tient les QUATRE propositions sur une seule rangee —
@@ -3516,7 +3517,16 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-panel.roue-part{transform-origin:50% 50%;will-change:transform,opacity}
 .boy-panel.roue-part.part-g{animation:rouePartG .38s cubic-bezier(.3,0,.7,1) both}
 .boy-panel.roue-part.part-d{animation:rouePartD .38s cubic-bezier(.3,0,.7,1) both}
+/* ── QUAND LA PAGE PASSE TOUTE SEULE : UN FONDU ENCHAINE ──
+   Le client : « quand c'est automatique, on doit avoir une autre transition :
+   la page actuelle qui disparait, dissoute, et l'autre qui apparait ». Le
+   glissement reste a la main — le doigt, ou les bords a la souris. */
+@keyframes fonduEntre{from{opacity:0}to{opacity:1}}
+@keyframes fonduPart{from{opacity:1}to{opacity:0}}
+.boy-panel.fondu-entre{animation:fonduEntre .55s ease both}
+.boy-panel.roue-part.fondu-part{animation:fonduPart .55s ease both}
 @media (prefers-reduced-motion:reduce){
+  .boy-panel.fondu-entre,.boy-panel.roue-part.fondu-part{animation:none}
   .boy-panel.entre-d,.boy-panel.entre-g,.boy-panel.roue-part{animation:none}
   .boy-panel.roue-part{display:none}}
 /* Un son entre guillemets tient d'un seul tenant, avec son point. */
@@ -6060,6 +6070,41 @@ loadAudioUrls(true);
    d'une leçon avant qu'on en ait besoin, pour que la première non plus.
    Le cache est borné : les enregistrements gardés sur l'appareil sont des
    adresses `data:` de plusieurs dizaines de kilo-octets. */
+/* ── LES SILENCES DES ENREGISTREMENTS ──
+   Le client : « il y a trop d'attente, un blanc, quand on passe de la voix du
+   navigateur a la voix du studio ». Mesure sur douze fichiers du studio :
+   250 a 750 ms de silence AVANT la voix, 115 a 600 ms APRES — pres de trois
+   quarts de seconde de blanc a chaque son. On mesure donc une fois chaque
+   fichier (on le decode et on cherche ou la voix commence et finit), on
+   retient ses bornes, et on le joue de l'une a l'autre. La mesure est gardee
+   dans le navigateur : elle n'est faite qu'une fois par son. */
+var _BORNES={};
+function _analyseSilences(src){
+  if(!src||_BORNES.hasOwnProperty(src))return;
+  _BORNES[src]=null;
+  try{var v=localStorage.getItem('bornes1_'+src);if(v){_BORNES[src]=JSON.parse(v);return;}}catch(e){}
+  try{
+    if(!window.fetch)return;
+    var ac=_ctxSon();if(!ac)return;
+    fetch(src).then(function(r){return r.arrayBuffer();}).then(function(ab){
+      return new Promise(function(ok,ko){ac.decodeAudioData(ab,ok,ko);});
+    }).then(function(buf){
+      var c=buf.getChannelData(0),n=c.length,pk=0,j,x;
+      for(j=0;j<n;j++){x=c[j]<0?-c[j]:c[j];if(x>pk)pk=x;}
+      if(pk<0.01)return;
+      var th=Math.max(0.012,pk*0.03),a=0,b=n-1;
+      while(a<n&&Math.abs(c[a])<th)a++;
+      while(b>0&&Math.abs(c[b])<th)b--;
+      var sr=buf.sampleRate;
+      /* Une marge de chaque cote : 80 ms avant l'attaque, 150 apres la
+         derniere trace — un souffle, une consonne douce ne sont pas mangees. */
+      var r={d:Math.max(0,a/sr-0.08),f:Math.min(buf.duration,b/sr+0.15)};
+      if(!(r.f>r.d+0.05))return;
+      _BORNES[src]=r;
+      try{localStorage.setItem('bornes1_'+src,JSON.stringify(r));}catch(e){}
+    }).catch(function(){});
+  }catch(e){}
+}
 var _lecteurs={},_lecteursOrdre=[];
 var _LECTEURS_MAX=48;
 function _lecteurPour(src){
@@ -6067,6 +6112,7 @@ function _lecteurPour(src){
   if(a)return a;
   a=new Audio(src);a.preload='auto';
   try{a.load();}catch(e){}
+  try{_analyseSilences(src);}catch(e){}
   _lecteurs[src]=a;_lecteursOrdre.push(src);
   while(_lecteursOrdre.length>_LECTEURS_MAX){
     var v=_lecteursOrdre.shift();
@@ -6103,7 +6149,10 @@ function _sonEnregistre(t){
 function _joueSon(src){
   var a;
   try{a=_lecteurPour(src);}catch(e){return null;}
-  try{a.currentTime=0;}catch(e){}
+  /* De la premiere a la derniere trace de voix : voir `_analyseSilences`. */
+  var _b=_BORNES[src];
+  try{a.currentTime=(_b&&_b.d)||0;}catch(e){}
+  a._fin=_b?_b.f:0;a._fini=false;
   /* La narration se sert de ce repère pour savoir qu'une voix joue. Un
      lecteur réutilisé est encore `paused` pendant les premiers
      millisecondes : on note l'instant du départ pour qu'elle ne prenne pas
@@ -11291,7 +11340,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v280';
+var _VERSION_REPLI='v281';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11627,8 +11676,14 @@ function _boyNarration(){
       }catch(e){}
       /* Un lecteur qu'on vient de rembobiner est encore `paused` le temps
          que le navigateur le relance : on le compte comme parlant. */
+      /* La voix du studio est finie a sa derniere trace, pas au bout du
+         fichier : on coupe le silence de queue (`_analyseSilences`). */
+      if(a&&a._fin&&!a._fini&&!a.paused&&a.currentTime>=a._fin){
+        try{a.pause();}catch(e){}
+        a._fini=true;
+      }
       var parle=(ss&&(ss.speaking||ss.pending))
-        ||(a&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600))
+        ||(a&&!a._fini&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600))
         ||enMorceaux;
       /* ── UN ENREGISTREMENT DURE CE QU'IL DURE ──
          `estim` devine la duree sur la LONGUEUR DU TEXTE, et plafonne a 9 s :
@@ -13692,7 +13747,7 @@ function _blocEcriture(hote,o){
      c'est trop petit ». La page est mise a l'echelle : un bouton de 84 px de
      mise en page en faisait 117 sur un ecran, 45 sur un autre. On vise donc
      une taille VUE — 80 px — et on la convertit avec l'echelle du cadre. */
-  var OUTIL_VU=80;
+  var OUTIL_VU=53;   /* 80 / 1,5 : le client */
   var MXd=MX,MXg=MX,_Bout=0;
   (function(){
     var nOut=o.deTete?2:1;
@@ -15227,7 +15282,7 @@ function _boyScene(ca,reprise){
      elle concluait aussitot que « la page s'est tue » — et felicitait sur la
      suivante. Chaque page porte donc un numero ; ce qui a ete lance sous un
      autre numero se tait. */
-  var _generation=0,_resumeDepuis=0;
+  var _generation=0,_resumeDepuis=0,_parLaMain=false;
   function attendSilence(fn,avecFete){
     var _g=_generation;
     N.plusTard(function(){
@@ -15326,7 +15381,9 @@ function _boyScene(ca,reprise){
            ne commande plus rien. */
         if(!wrap||!wrap.isConnected)return;
         if(!actif||b.classList.contains('eteint'))return;
-        fn();
+        /* C'est la main qui tourne la page : elle glisse. */
+        _parLaMain=true;
+        try{fn();}finally{_parLaMain=false;}
       };
       /* Sur le BODY, et non dans l'écran du cours : la couche plein écran du
          tracé est posée là, à 9000, et des bords rangés en dessous auraient
@@ -15918,7 +15975,7 @@ function _boyScene(ca,reprise){
     try{
       var _colG=t.closest&&t.closest('.boy-col-g');
       var _voisin=_colG&&_colG.parentNode&&_colG.parentNode.querySelector('.boy-col-d');
-      if(_voisin&&_voisin.clientHeight>60)hDispo=_voisin.clientHeight;
+      if(_voisin&&_voisin.clientHeight>60&&!t.closest('.page-piste'))hDispo=_voisin.clientHeight;
     }catch(e){}
     /* ── SANS VOISIN, C'EST L'ECRAN QUI DONNE LA MESURE ──
        Une page d'un seul tenant n'a personne a qui se comparer. Sans borne du
@@ -16603,7 +16660,8 @@ function _boyScene(ca,reprise){
       try{if(_gm.ov.parentNode)_gm.ov.parentNode.removeChild(_gm.ov);}catch(e){}
     }
     _noteLaPhoto();
-    var _ancien=_photoDeLaPage();
+    var _main=_parLaMain;
+    var _ancien=_photoDeLaPage(_main);
     wrap.innerHTML='';jauge();scenes[i](api);
     _iPrec=i;
     /* L'animation est posée sur le PANNEAU, pas sur le cadre : celui-ci porte
@@ -16616,9 +16674,9 @@ function _boyScene(ca,reprise){
       try{
         var _p0=wrap.querySelector('.boy-panel');
         if(_p0){
-          _p0.classList.remove('entre-d','entre-g');
+          _p0.classList.remove('entre-d','entre-g','fondu-entre');
           void _p0.offsetWidth;
-          _p0.classList.add(_sensNav>0?'entre-d':'entre-g');
+          _p0.classList.add(_main?(_sensNav>0?'entre-d':'entre-g'):'fondu-entre');
         }
       }catch(e){}
       _sensNav=0;
@@ -16809,7 +16867,7 @@ function _boyScene(ca,reprise){
      copie figée, posée par-dessus — et on la fait tourner vers l'arrière
      pendant que la vraie page arrive de l'autre côté. La copie ne répond à
      rien et s'efface toute seule. */
-  function _photoDeLaPage(){
+  function _photoDeLaPage(main){
     try{
       var p=wrap.querySelector('.boy-panel');
       if(!p||!_sensNav||_sansRoue)return null;
@@ -16821,9 +16879,11 @@ function _boyScene(ca,reprise){
       c.style.cssText+=';position:fixed;pointer-events:none;z-index:35;'
         +'left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;'
         +'height:'+r.height+'px;margin:0';
-      c.classList.add(_sensNav>0?'part-g':'part-d');
+      c.classList.add(main?(_sensNav>0?'part-g':'part-d'):'fondu-part');
+      /* Les couleurs de l'habillage : la copie est sur le body. */
+      try{if(_HAB&&_HAB.classe)c.classList.add(_HAB.classe);}catch(e){}
       document.body.appendChild(c);
-      setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},420);
+      setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},main?420:600);
       return c;
     }catch(e){return null;}
   }
@@ -16926,9 +16986,18 @@ function _boyScene(ca,reprise){
     c.style.width='100%';
     c.style.height=(hauteur==='auto')?'auto':(hauteur+'px');
     c.style.transform='scale('+taille+')';
-    c.style.setProperty('--fondu',String(taille===1?1:0));
+    _fondu(c,taille===1?1:0);
     w.appendChild(c);
     return w;
+  }
+  /* ── LE FONDU, SANS RECALCUL DE STYLE ──
+     La v276 passait par une variable CSS heritee : chaque mouvement du doigt
+     obligeait le navigateur a recalculer le style de TOUT le contenu des deux
+     cartes. L'opacite posee directement sur les enfants du panneau ne touche
+     que le compositeur. */
+  function _fondu(c,v){
+    var k=c.children;
+    for(var i=0;i<k.length;i++)k[i].style.opacity=String(v);
   }
   function _pousse(w,dx,k){
     w.style.transform='translateX('+dx+'px) scale('+k+')';
@@ -16991,7 +17060,18 @@ function _boyScene(ca,reprise){
     }catch(e){return null;}
   }
 
+  /* ── UNE IMAGE PAR TRAME ──
+     Le client : « ce n'est pas assez fluide quand on glisse ». Le doigt
+     envoie souvent plus de mouvements que l'ecran n'affiche d'images ; on ne
+     retient que le dernier, et on le dessine a la trame suivante. */
+  var _glisDx=0,_glisTrame=0;
   function _glisseBouge(dx){
+    if(!_glis)return;
+    _glisDx=dx;
+    if(_glisTrame)return;
+    _glisTrame=requestAnimationFrame(function(){_glisTrame=0;_glisseDessine(_glisDx);});
+  }
+  function _glisseDessine(dx){
     if(!_glis)return;
     var d=dx;
     /* On ne pousse que dans le sens ou le geste est parti. */
@@ -17008,12 +17088,13 @@ function _boyScene(ca,reprise){
     _taille(_glis.a,1-(1-_PETIT)*t);
     _taille(_glis.b,_PETIT+(1-_PETIT)*t);
     /* Le contenu s'en va comme la carte s'en va, et parait comme elle vient. */
-    _glis.a.style.setProperty('--fondu',(1-t).toFixed(3));
-    _glis.b.style.setProperty('--fondu',t.toFixed(3));
+    _fondu(_glis.a,(1-t).toFixed(3));
+    _fondu(_glis.b,t.toFixed(3));
   }
 
   function _glisseLache(annule){
     if(!_glis)return;
+    if(_glisTrame){cancelAnimationFrame(_glisTrame);_glisTrame=0;_glisseDessine(_glisDx);}
     var g=_glis;_glis=null;
     /* La page passe au huitieme de la largeur — et non plus au quart — ou
        sur un petit coup sec : un tiers de pixel par milliseconde, dans le
@@ -17034,13 +17115,15 @@ function _boyScene(ca,reprise){
     var fin=passe?(g.sens>0?-g.pas:g.pas):0;
     [g.a,g.b,g.wa,g.wb].forEach(function(c){
       c.style.transition='transform .26s cubic-bezier(.22,.68,.3,1)';});
+    [g.a,g.b].forEach(function(c){
+      [].forEach.call(c.children,function(x){x.style.transition='opacity .26s ease';});});
     try{g.ov.classList.add('en-lache');}catch(e){}
     _pousse(g.wa,fin,g.k);
     _pousse(g.wb,fin+(g.sens>0?g.pas:-g.pas),g.k);
     _taille(g.a,passe?_PETIT:1);
     _taille(g.b,passe?1:_PETIT);
-    g.a.style.setProperty('--fondu',passe?'0':'1');
-    g.b.style.setProperty('--fondu',passe?'1':'0');
+    _fondu(g.a,passe?0:1);
+    _fondu(g.b,passe?1:0);
     setTimeout(function(){
       try{if(g.p&&g.p.isConnected)g.p.style.visibility='';}catch(e){}
       if(!passe){
@@ -17058,9 +17141,13 @@ function _boyScene(ca,reprise){
         if(ok&&bd&&bd.isConnected)bd.click();
       }catch(e){}
       _sansRoue=false;
+      /* La vraie page est la, a la meme place : la bande s'efface en fondu
+         au lieu de disparaitre d'un coup — plus de saut en fin de geste. */
+      g.ov.style.transition='opacity .18s ease';
+      requestAnimationFrame(function(){g.ov.style.opacity='0';});
       setTimeout(function(){
         if(g.ov.parentNode)g.ov.parentNode.removeChild(g.ov);
-      },60);
+      },220);
     },255);
   }
 
@@ -17464,11 +17551,13 @@ function _boyScene(ca,reprise){
   /* Piste : texte + signes au-dessus / en-dessous de la ligne */
   api.surPiste=function(etape,html,fr,haut,bas){
     return function(){
-      /* Une seule colonne : le texte en haut, sur toute la largeur, la piste
-         dessous. En deux colonnes la phrase n'avait que 373 px et tombait a
-         45 px quand les autres pages en font 69 — le client : « aggrandis la
-         taille du texte comme les autres pages ». */
-      var p=panneau(etape);p.setAttribute('data-une-colonne','1');
+      /* ── LES LETTRES A DROITE, LE TEXTE A GAUCHE, PLUS GRAND ──
+         Le client, apres la v280 qui avait mis la piste sous le texte :
+         « les lettres arabes doivent etre comme avant, a droite, et le texte
+         a gauche, juste plus grand ». Deux colonnes donc, mais le texte en
+         prend davantage, et il n'est plus borne a la hauteur de la piste —
+         celle-ci est basse, et c'est elle qui l'ecrasait a 45 px. */
+      var p=panneau(etape);p.classList.add('page-piste');
       titre(p,html,fr);piste(p,haut,bas);
       bouton(p,te('Suite ›'),suivant);
     };
@@ -17981,11 +18070,27 @@ function _boyScene(ca,reprise){
         var F=parseFloat(getComputedStyle(el).fontSize)||16;
         return {y:(r.top-rh.top)/ech-bord+baseDansBoite(el), ech:ech, F:F};
       }
+      /* ── LE MOT PARAIT DIRECTEMENT A SA PLACE ──
+         Le client : « dans les hublots des lettres seules, le mot est d'abord
+         trop bas, puis remonte a la bonne position ; il doit directement etre
+         bien place ». La v280 le recentrait APRES coup. Il est desormais pose
+         centre des le depart — son encre mesuree — et c'est la lettre qui le
+         rejoint en glissant, en biais s'il le faut (`_decMot`). */
+      var _decMot=0;
       function poseLeMot(){
         if(!m.isConnected||!lettre.isConnected)return;
+        if(m.classList.contains('vu'))return;
         ajusteMot();
         var bl=ligneDeBase(lettre);
-        m.style.top=(bl.y-baseDansBoite(m)).toFixed(1)+'px';
+        _decMot=0;
+        if(centre)try{
+          var mot=String((avant||'')+(trou||glyph)+(apres||'')).replace(/[\u200d\u0640]/g,'');
+          var e=_encreAutourLigne(mot);
+          var F=parseFloat(getComputedStyle(m).fontSize)||40;
+          _decMot=h.clientHeight/2-(bl.y+((e.bas-e.haut)/2)*F);
+          if(Math.abs(_decMot)<1)_decMot=0;
+        }catch(x){_decMot=0;}
+        m.style.top=(bl.y-baseDansBoite(m)+_decMot).toFixed(1)+'px';
       }
       poseLeMot();
       N.plusTard(poseLeMot,140);N.plusTard(poseLeMot,520);
@@ -18062,7 +18167,9 @@ function _boyScene(ca,reprise){
           /* Le point fixe est SUR la ligne de base : la lettre ne monte ni ne
              descend, elle ne fait que glisser sur la largeur en rapetissant. */
           var _orig='50% '+baseDansBoite(lettre).toFixed(1)+'px';
-          var _dep='translateX('+dx.toFixed(1)+'px) scale('+k.toFixed(4)+')';
+          /* Le mot a pu etre pose plus haut que la lettre seule : elle part
+             d'ou elle etait, et le rejoint. */
+          var _dep='translateX('+dx.toFixed(1)+'px) translateY('+(-_decMot).toFixed(1)+'px) scale('+k.toFixed(4)+')';
           lettre.style.transformOrigin=_orig;
           /* ── ELLE GLISSE, ELLE NE SAUTE PAS ──
              On anime par l'API des animations plutot que par une transition :
@@ -18097,28 +18204,6 @@ function _boyScene(ca,reprise){
           });
           }
           m.classList.add('vu');
-          /* ── LE MOT ENTIER, AU CENTRE DU HUBLOT ──
-             Le client : « pour toutes les lettres, forme seule, le mot en
-             entier est trop bas dans le hublot ». Le mot se pose sur la ligne
-             de la lettre seule ; or celle-ci est centree par son ENCRE, qui
-             pend souvent loin sous la ligne (ج). Une fois la lettre arrivee,
-             on mesure l'encre du mot entier et on le remonte — lettre
-             comprise — jusqu'a ce qu'elle soit au centre du cercle. */
-          if(centre)N.plusTard(function(){
-            if(!m.isConnected)return;
-            try{
-              var mot=String((avant||'')+(trou||glyph)+(apres||'')).replace(/[\u200d\u0640]/g,'');
-              var e=_encreAutourLigne(mot);
-              var F=parseFloat(getComputedStyle(m).fontSize)||40;
-              var haut0=parseFloat(m.style.top)||0;
-              var base=haut0+baseDansBoite(m);
-              var dec=h.clientHeight/2-(base+((e.bas-e.haut)/2)*F);
-              if(Math.abs(dec)>=1){
-                m.style.transition='top .45s ease';
-                m.style.top=(haut0+dec).toFixed(1)+'px';
-              }
-            }catch(x){}
-          },950);
           N.plusTard(function(){_sceneFete--;},1000);
         })();
       },false);
@@ -18225,9 +18310,15 @@ function _boyScene(ca,reprise){
         /* Trois centiemes plus haut que sur les pages de forme : le client,
            « dans toutes les pages recapitulatif, les lettres sont un peu plus
            basses que le reste du mot ». */
-        /* Milieu et fin encore trois centiemes plus haut : le client,
-           « formes milieu et fin, la lettre est trop basse ». */
-        [[mSeule,-0.03],[mDebut,_sansTrait?-0.03:0],[mFin,-0.03],[mMilieu,-0.03]]
+        /* ── MILIEU ET FIN : SELON LA LETTRE ──
+           Le client, captures a l'appui : « a peine trop basse » sur le djim,
+           « a peine trop haute » sur l'alif. Une seule valeur ne peut donc
+           pas convenir. Ce qui les separe, c'est le trait de liaison de
+           GAUCHE : le djim en porte un (il s'attache a la suivante), l'alif
+           non. L'un monte encore de trois centiemes, l'autre redescend de
+           trois — il retrouve la valeur de la v279. */
+        [[mSeule,-0.03],[mDebut,_sansTrait?-0.03:0],
+         [mFin,_sansTrait?0:-0.06],[mMilieu,_sansTrait?0:-0.06]]
           .forEach(function(o){
             aligneSurLeMot(o[0].trou.parentNode,o[0].trou,o[1]);
           });
@@ -20967,10 +21058,19 @@ function _boyProlongCourse(ca){
       [te('Avec un alif, le son devient long.')].concat(_phraseAvecSons(teF('On dit {son}.',{son:'baaa'}),[['baaa','بَا']]))),
     B.brief(te('ÉTAPE 4 · ENJEU'),TB('Allonger ou non<br>peut <b>changer le sens</b> ! ⚠️'),
       te('Allonger ou non peut complètement changer le sens.')),
-    B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',TB('Par exemple,<br>sans prolonger :<br><b>je t\'aime vraiment</b> ❤️'),
-      te('Par exemple, sans prolonger : je t\'aime vraiment.')),
-    B.obs(te('ÉTAPE 6 · EXEMPLE'),'لَا أُحِبُّك','لَا أُحِبُّك',TB('Alors qu\'en prolongeant :<br><b>je ne t\'aime pas</b> 💔'),
-      te('Alors qu\'en prolongeant : je ne t\'aime pas.')),
+    /* Le client : « ecrire et dire : Sans prolonger la "fatha", (la-uHibbuk)
+       signifie "je t'aime vraiment", alors qu'en prolongeant la "fatha", on
+       obtient (lâ uHibbuk), qui signifie "je ne t'aime pas" » — ce qui est
+       entre parentheses, ecrit en arabe. Les deux mots arabes sont dits par
+       le studio ; faute d'enregistrement, la synthese reprend la phrase. */
+    B.obs(te('ÉTAPE 5 · EXEMPLE'),'لَأُحِبُّك','لَأُحِبُّك',
+      TB('Sans prolonger la <b>« fatha »</b>,<br><b>لَأُحِبُّك</b> signifie<br><b>« je t\'aime vraiment »</b> ❤️'),
+      _phraseAvecSons(te('Sans prolonger la fatha, la ouhibbouk signifie je t\'aime vraiment.'),
+        [['la ouhibbouk','لَأُحِبُّك']])),
+    B.obs(te('ÉTAPE 6 · EXEMPLE'),'لَا أُحِبُّك','لَا أُحِبُّك',
+      TB('Alors qu\'en prolongeant la <b>« fatha »</b>,<br>on obtient <b>لَا أُحِبُّك</b>,<br>qui signifie <b>« je ne t\'aime pas »</b> 💔'),
+      _phraseAvecSons(te('Alors qu\'en prolongeant la fatha, on obtient lâ ouhibbouk, qui signifie je ne t\'aime pas.'),
+        [['lâ ouhibbouk','لَا أُحِبُّك']])),
     /* De droite à gauche, comme on les lit : bā, bī, bū. Chaque syllabe
        porte la couleur de sa voyelle. */
     /* Seuls la voyelle et sa lettre de prolongation sont en couleur : le
@@ -21042,7 +21142,14 @@ function _boyProlongCourse(ca){
            TBF('{v} est prolongé par le {l}',{v:gros(pa('َ')),l:pa('ا')})+'<br data-dur="1">'
           +TBF('{v} est prolongé par le {l}',{v:gros(pou('ُ')),l:pou('و')})+'<br data-dur="1">'
           +TBF('{v} est prolongé par le {l}',{v:gros(pi('ِ')),l:pi('ي')})),
-       f:te('Le alif prolonge le a, le waw le ou, le ya le i.')},
+       /* Le client : « la voix doit dire exactement ce qui est ecrit sur le
+          premier truc a retenir ». Une phrase par ligne ; la lettre, par le
+          studio quand elle y est. */
+       temps:[
+         {dit:_phraseAvecSons(te('fatha est prolongé par le alif.'),[['alif','ا']])},
+         {dit:_phraseAvecSons(te('damma est prolongé par le waw.'),[['waw','و']])},
+         {dit:_phraseAvecSons(te('kasra est prolongé par le ya.'),[['ya','ي']])}
+       ]},
       {h:TB('Ils ne prolongent que s\'ils n\'ont <b>aucune voyelle</b>.'),
        f:te('Ils ne prolongent que s\'ils n\'ont aucune voyelle.')},
       {h:TB('La <b>chaddah</b> : on insiste sur la lettre.'),
