@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 28 septembre 2026, production en v287
+## OÙ ON EN EST — 28 septembre 2026, production en v288
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,15 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v287), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v288), du plus récent au plus ancien :**
+
+- **v288.**
+  * *L'interface « Adulte » devient « Ados et adultes », sous-titre « 12 ans
+    et plus »* (clés `adult` et `adult_desc`, 13 langues). Le client : un
+    garçon de 15 ans ne se reconnaissait ni dans « Garçon » (6-11 ans) ni
+    dans « Adulte ». Le turc est écrit deux fois : dans son bloc `T.tr` et
+    dans la liste `overrides` que la boucle ne lit pas pour lui — les deux
+    sont à jour.
 
 - **v287.**
   * *Le logo du client devient l'icône de l'application.* Fait par lui sur
