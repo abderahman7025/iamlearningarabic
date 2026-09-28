@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 27 septembre 2026, production en v286
+## OÙ ON EN EST — 28 septembre 2026, production en v287
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,23 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v286), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v287), du plus récent au plus ancien :**
+
+- **v287.**
+  * *Le logo du client devient l'icône de l'application.* Fait par lui sur
+    Canva : un ن bleu marine dont le point est une étoile turquoise, dans un
+    cercle ouvert (version complète : posé sur une tablette, « I Am Learning
+    Arabic » et « أتعلم العربية » dessous). Les images Canva avaient un grain
+    gris sur le fond : nettoyées en ne gardant que les deux couleurs exactes
+    (turquoise 32,180,196 ; marine 15,51,98) sur fond transparent, formes
+    intactes (script `logo_nettoie.py`, choix de la couleur la plus proche).
+    Fichiers dans `public/images/` : `icone-192.png`, `icone-512.png`,
+    `icone-maskable-512.png` (dessin dans les 62 % du centre, pour la découpe
+    Android), `apple-touch-icon.png`, `favicon.png`, `logo-symbole.png`,
+    `logo-complet.png`. Le manifeste remplace l'ancienne icône provisoire (ع
+    doré en SVG) ; `app.html` et `index.html` déclarent favicon et icône iOS.
+    Copies pour le client (photo TikTok, versions transparentes et fond
+    blanc) dans le dossier « logo-iamlearningarabic » de son Bureau.
 
 - **v286.**
   * *Traductions enfants complètes.* 233 phrases des interfaces 6-11 et 3-5
