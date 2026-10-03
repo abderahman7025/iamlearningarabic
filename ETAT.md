@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 3 octobre 2026, production en v290
+## OÙ ON EN EST — 3 octobre 2026, production en v291
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v290), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v291), du plus récent au plus ancien :**
+
+- **v291.** Studio : trois familles et un compteur. La liste mêlait 490
+  lignes ; le client n'a plus à enregistrer que les SONS (lettres et
+  syllabes), les phrases françaises revenant à la voix clonée. `adminGenre`
+  classe chaque clé (pas d'arabe = phrase ; trois lettres ou plus sans les
+  voyelles = mot ; sinon son). Boutons « Sons / Mots arabes / Phrases (voix
+  clonée) / Tout » avec « reste n/total », case « seulement ceux qui ne sont
+  pas en ligne », choix gardé dans `localStorage.admin_vue`. La recherche et
+  le tri passent par `adminApplique()`.
 
 - **v290.** Studio : « Micro par défaut de l'appareil » (et non « de
   l'ordinateur »). Le client enregistre depuis son téléphone Android, micro

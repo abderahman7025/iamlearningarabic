@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v290';
+var _VERSION_REPLI='v291';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -25219,13 +25219,88 @@ var ADMIN_SOUNDS = [
 })();
 
 
+/* ── CE QUE LE CLIENT A VRAIMENT À ENREGISTRER ──
+   « Est-ce normal d'avoir plein de phrases sur le studio, alors que la voix
+   clonée est censée le faire ? Je suis censé juste enregistrer les sons. »
+   La liste mêlait 490 lignes : les sons (lettres, syllabes), les mots
+   arabes, et 109 phrases françaises que la voix clonée dira. Trois familles,
+   un bouton chacune ; le studio s'ouvre sur les sons et compte ce qui reste. */
+var adminRecherche = '';
+var adminVue = { genre: 'son', manquants: false };
+try {
+  var _av = JSON.parse(localStorage.getItem('admin_vue') || 'null');
+  if (_av && _av.genre) adminVue = { genre: _av.genre, manquants: !!_av.manquants };
+} catch (e) {}
+
+function adminGenre(ar) {
+  if (!/[\u0600-\u06FF]/.test(ar)) return 'phrase';
+  /* Sans ses voyelles ni le rond porteur : trois lettres ou plus, c'est un mot. */
+  var nu = String(ar).replace(/[\u064B-\u0652\u0670\u25CC\s]/g, '');
+  return nu.length >= 3 ? 'mot' : 'son';
+}
+
 function adminFilter(q) {
+  adminRecherche = String(q || '');
+  adminApplique();
+}
+
+function adminApplique() {
+  var q = adminRecherche;
   var items = document.querySelectorAll('.admin-item');
   items.forEach(function(item) {
     var label = item.dataset.label || '';
     var ar = item.dataset.ar || '';
-    item.style.display = (!q || label.includes(q.toLowerCase()) || ar.includes(q)) ? '' : 'none';
+    var cherche = (!q || label.includes(q.toLowerCase()) || ar.includes(q));
+    var genre = (adminVue.genre === 'tout' || item.dataset.genre === adminVue.genre);
+    var reste = (!adminVue.manquants || item.dataset.fait !== '1');
+    item.style.display = (cherche && genre && reste) ? '' : 'none';
   });
+}
+
+function adminVueBarre() {
+  var list = document.getElementById('admin-sound-list');
+  if (!list) return;
+  var box = document.getElementById('admin-vue');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'admin-vue';
+    box.style.cssText = 'margin-bottom:9px;font-size:.78rem;color:#fff';
+    list.parentNode.insertBefore(box, list);
+  }
+  var compte = { son: [0, 0], mot: [0, 0], phrase: [0, 0], tout: [0, 0] };
+  ADMIN_SOUNDS.forEach(function (s) {
+    var g = adminGenre(s.ar);
+    var fait = !!(typeof AUDIO_URLS !== 'undefined' && AUDIO_URLS && AUDIO_URLS[s.ar]);
+    compte[g][0]++; compte.tout[0]++;
+    if (!fait) { compte[g][1]++; compte.tout[1]++; }
+  });
+  box.innerHTML = '';
+  var rang = document.createElement('div');
+  rang.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px';
+  [['son', 'Sons'], ['mot', 'Mots arabes'], ['phrase', 'Phrases (voix clonée)'], ['tout', 'Tout']].forEach(function (c) {
+    var b = document.createElement('button');
+    var actif = (adminVue.genre === c[0]);
+    b.textContent = c[1] + ' · reste ' + compte[c[0]][1] + '/' + compte[c[0]][0];
+    b.style.cssText = 'border-radius:999px;padding:7px 11px;cursor:pointer;font-size:.76rem;font-weight:700;'
+      + (actif ? 'background:#f5c842;color:#1b1830;border:1px solid #f5c842'
+               : 'background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2)');
+    b.onclick = function () { adminVue.genre = c[0]; adminVueGarde(); };
+    rang.appendChild(b);
+  });
+  var lab = document.createElement('label');
+  lab.style.cssText = 'display:flex;align-items:center;gap:7px;margin-top:8px;cursor:pointer;color:rgba(255,255,255,.8)';
+  var cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.id = 'admin-vue-manquants'; cb.checked = adminVue.manquants;
+  cb.onchange = function () { adminVue.manquants = cb.checked; adminVueGarde(); };
+  lab.appendChild(cb);
+  lab.appendChild(document.createTextNode('Montrer seulement ceux qui ne sont pas encore en ligne'));
+  box.appendChild(rang); box.appendChild(lab);
+}
+
+function adminVueGarde() {
+  try { localStorage.setItem('admin_vue', JSON.stringify(adminVue)); } catch (e) {}
+  adminVueBarre();
+  adminApplique();
 }
 
 /* Joue l'enregistrement d'une clé, quelle que soit sa langue. La synthèse
@@ -25261,6 +25336,8 @@ function adminRenderList() {
      s'allumait même quand le serveur avait refusé l'envoi. Trois états
      maintenant, et c'est celui du SERVEUR qui compte. */
   ADMIN_SOUNDS.forEach(function(s) { list.appendChild(adminLigne(s)); });
+  adminVueBarre();
+  adminApplique();
 }
 
 /* ── UNE LIGNE DU STUDIO ──
@@ -25278,6 +25355,8 @@ function adminLigne(s) {
     item.className = 'admin-item';
     item.dataset.label = s.label.toLowerCase();
     item.dataset.ar = s.ar;
+    item.dataset.genre = adminGenre(s.ar);
+    item.dataset.fait = monte ? '1' : '';
     /* ── ELLE TIENT EN PORTRAIT ──
        Le client devait tourner son téléphone pour atteindre ▶ et 🎙. La
        cause : le texte de la clé était posé en 2 rem dans une police à
@@ -25394,6 +25473,8 @@ function adminRafraichit(item, s) {
   /* La ligne en cours d'enregistrement garde son bouton ⏹. */
   if (adminEnCours && adminEnCours.ar === s.ar) return;
   if (item && item.parentNode) item.parentNode.replaceChild(adminLigne(s), item);
+  adminVueBarre();
+  adminApplique();
 }
 
 /* ── LE MICRO QU'ON UTILISE VRAIMENT ──
