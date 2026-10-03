@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 28 septembre 2026, production en v288
+## OÙ ON EN EST — 3 octobre 2026, production en v289
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v288), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v289), du plus récent au plus ancien :**
+
+- **v289.** Le studio d'enregistrement (écran admin), avant une grosse
+  séance du client (sons manquants + lecture pour le clone ElevenLabs).
+  * *« J'enregistre un son, puis un nouveau : le premier se met en play, ça
+    annule le premier. »* Quatre variables partagées (`adminRecorder`,
+    `adminChunks`, `adminCurrentKey`, `adminStream`) portaient tous les
+    enregistrements. Défauts : la minuterie d'arrêt (20 s) du premier son
+    n'était jamais annulée et coupait le son en cours vingt secondes plus
+    tard ; le son suivant pouvait vider les morceaux ou changer la clé du
+    précédent ; `adminRenderList()` redessinait TOUTE la liste après chaque
+    envoi (la page sautait, la ligne en cours reperdait son ⏹, le doigt
+    tombait sur le ▶ d'un autre son) ; `localStorage.setItem` plein levait
+    une erreur AVANT l'envoi, sans rien dire. Maintenant : un objet par
+    enregistrement (`adminEnCours`, tout le reste en variables locales),
+    `adminLigne(s)` fabrique une ligne et `adminRafraichit(item, s)` ne
+    remplace qu'elle, la copie locale est facultative, ▶ est ignoré pendant
+    un enregistrement, et toucher le 🎙 d'un autre son arrête-sauvegarde le
+    premier puis démarre le second.
+  * *Le micro.* Les réglages « son brut » (v-antérieure : écho, bruit et gain
+    automatiques coupés, 48 kHz mono, 128 kbit/s) sont bien en place, mais le
+    navigateur prenait le micro PAR DÉFAUT de l'ordinateur sans le dire.
+    `adminMicros()` affiche au-dessus de la liste un choix de micro (gardé
+    dans `localStorage.admin_micro`) et, dès le premier enregistrement, le nom
+    du micro réellement utilisé et « son brut, 48 kHz » — ou un avertissement
+    si le navigateur traite encore le son.
+  * *Réenregistrer un son déjà en ligne.* Le fichier garde son nom, donc son
+    adresse : le navigateur et le cache des silences (`bornes1_` + adresse)
+    gardaient l'ANCIEN son. `api/audio.js` ajoute `?v=` (date de mise à jour
+    dans la liste, `Date.now()` à l'envoi) : adresse neuve à chaque version.
+  * Testé au banc avec un faux micro et un faux serveur : A puis B pendant
+    l'envoi de A → A envoyé sous sa clé avec son audio, B garde son ⏹ ;
+    réserve locale pleine → l'envoi part quand même.
 
 - **v288.**
   * *L'interface « Adulte » devient « Ados et adultes », sous-titre « 12 ans

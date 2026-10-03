@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v288';
+var _VERSION_REPLI='v289';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -25218,10 +25218,6 @@ var ADMIN_SOUNDS = [
   }catch(e){}
 })();
 
-var adminRecorder = null;
-var adminChunks = [];
-var adminCurrentKey = null;
-var adminStream = null;
 
 function adminFilter(q) {
   var items = document.querySelectorAll('.admin-item');
@@ -25258,12 +25254,21 @@ function adminRenderList() {
   var list = document.getElementById('admin-sound-list');
   if (!list) return;
   list.innerHTML = '';
+  adminMicros();
   
   /* ── CE QUI EST VRAIMENT EN LIGNE ──
      La pastille verte se fiait au SEUL stockage de l'appareil : elle
      s'allumait même quand le serveur avait refusé l'envoi. Trois états
      maintenant, et c'est celui du SERVEUR qui compte. */
-  ADMIN_SOUNDS.forEach(function(s) {
+  ADMIN_SOUNDS.forEach(function(s) { list.appendChild(adminLigne(s)); });
+}
+
+/* ── UNE LIGNE DU STUDIO ──
+   La liste se redessinait EN ENTIER après chaque envoi : la page sautait, et
+   la ligne qu'on était en train d'enregistrer reperdait son bouton ⏹ — le
+   doigt retombait alors sur le ▶ ou le 🎙 d'un autre son. Chaque ligne se
+   fabrique maintenant seule, et se remplace seule (`adminRafraichit`). */
+function adminLigne(s) {
     var key = 'audio_' + s.ar;
     var local = !!localStorage.getItem(key);
     var monte = !!(typeof AUDIO_URLS!=='undefined' && AUDIO_URLS && AUDIO_URLS[s.ar]);
@@ -25325,6 +25330,9 @@ function adminRenderList() {
        Ici on joue CE QU'IL Y A : le fichier local d'abord (c'est ce qu'il
        vient d'enregistrer), le cloud ensuite, la synthèse en dernier. */
     listenBtn.onclick = function() {
+      /* Pas de lecture pendant un enregistrement : le son rejoué partirait
+         dans le micro. */
+      if (adminEnCours) return;
       adminJoue(s.ar);
     };
     
@@ -25333,7 +25341,7 @@ function adminRenderList() {
     recBtn.textContent = '🎙';
     recBtn.title = 'Enregistrer';
     recBtn.style.cssText = 'background:rgba(255,80,80,.2);border:1px solid rgba(255,80,80,.3);color:#ff6060;width:40px;height:40px;border-radius:12px;cursor:pointer;font-size:1rem;flex:none';
-    recBtn.onclick = function() { adminStartRecord(s.ar, s.label, item, recBtn, info); };
+    recBtn.onclick = function() { adminStartRecord(s, item, recBtn, info); };
     
     /* ── SUPPRIMER, POUR DE BON ──
         Le bouton ne retirait que la copie gardée sur l'appareil : le fichier
@@ -25348,7 +25356,7 @@ function adminRenderList() {
       delBtn.onclick = function() {
         if (!confirm('Supprimer l\'enregistrement de « ' + s.label + ' » ?')) return;
         try { localStorage.removeItem(key); } catch (e) {}
-        if (!monte) { adminRenderList(); return; }
+        if (!monte) { adminRafraichit(item, s); return; }
         var _d = info.querySelector('.admin-etat');
         if (_d) { _d.textContent = '\u2715 Suppression\u2026'; _d.style.color = '#8ab4ff'; }
         fetch(API_URL + '/api/audio?ar=' + encodeURIComponent(s.ar), {
@@ -25365,10 +25373,10 @@ function adminRenderList() {
               + ((o.data && o.data.error) || ('code ' + o.status))
               + '\n\nLa copie locale, elle, est bien retirée.');
           }
-          adminRenderList();
+          adminRafraichit(item, s);
         })['catch'](function (e) {
           alert('La suppression a échoué : réseau — ' + ((e && e.message) || e));
-          adminRenderList();
+          adminRafraichit(item, s);
         });
       };
       btns.appendChild(delBtn);
@@ -25379,125 +25387,214 @@ function adminRenderList() {
     item.appendChild(arSpan);
     item.appendChild(info);
     item.appendChild(btns);
-    list.appendChild(item);
-  });
+    return item;
 }
 
-function adminStartRecord(ar, label, item, btn, info) {
-  // Si déjà en cours d'enregistrement, arrêter
-  if (adminRecorder && adminRecorder.state === 'recording') {
-    adminRecorder.stop();
-    return;
+function adminRafraichit(item, s) {
+  /* La ligne en cours d'enregistrement garde son bouton ⏹. */
+  if (adminEnCours && adminEnCours.ar === s.ar) return;
+  if (item && item.parentNode) item.parentNode.replaceChild(adminLigne(s), item);
+}
+
+/* ── LE MICRO QU'ON UTILISE VRAIMENT ──
+   Le navigateur prend le micro « par défaut » de l'ordinateur : avec un micro
+   pro branché à côté de celui du portable, rien ne disait lequel
+   enregistrait. Le studio affiche maintenant le nom du micro, laisse en
+   choisir un autre, et dit si le son est bien pris BRUT. */
+function adminMicros(stream, repli) {
+  var list = document.getElementById('admin-sound-list');
+  if (!list || !navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+  var box = document.getElementById('admin-micro');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'admin-micro';
+    box.style.cssText = 'background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:9px 10px;margin-bottom:9px;font-size:.78rem;color:#fff';
+    list.parentNode.insertBefore(box, list);
   }
-  
+  if (stream) {
+    try {
+      var piste = stream.getAudioTracks()[0];
+      var r = piste.getSettings ? piste.getSettings() : {};
+      var brut = (r.echoCancellation === false && r.noiseSuppression === false && r.autoGainControl === false);
+      box._etat = (repli || !brut)
+        ? '\u26a0\ufe0f ' + piste.label + ' — le navigateur traite encore le son'
+        : '\u2705 ' + piste.label + ' — son brut' + (r.sampleRate ? ', ' + Math.round(r.sampleRate / 1000) + ' kHz' : '');
+      box._ok = !(repli || !brut);
+    } catch (e) {}
+  }
+  navigator.mediaDevices.enumerateDevices().then(function (ds) {
+    var choisi = '';
+    try { choisi = localStorage.getItem('admin_micro') || ''; } catch (e) {}
+    box.innerHTML = '';
+    var ligne = document.createElement('div');
+    ligne.style.cssText = 'display:flex;align-items:center;gap:8px';
+    var t = document.createElement('span');
+    t.textContent = '\ud83c\udf99 Micro';
+    t.style.cssText = 'font-weight:700;flex:none';
+    var sel = document.createElement('select');
+    sel.id = 'admin-micro-choix';
+    sel.style.cssText = 'flex:1;min-width:0;background:#1b1830;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:6px;font-size:.78rem';
+    var o0 = document.createElement('option');
+    o0.value = ''; o0.textContent = 'Micro par défaut de l\'ordinateur';
+    sel.appendChild(o0);
+    var n = 0;
+    ds.forEach(function (d) {
+      if (d.kind !== 'audioinput' || d.deviceId === 'default' || d.deviceId === 'communications') return;
+      n++;
+      var o = document.createElement('option');
+      o.value = d.deviceId;
+      o.textContent = d.label || ('Micro ' + n + ' (son nom apparaîtra après le premier enregistrement)');
+      if (d.deviceId === choisi) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.onchange = function () {
+      try { localStorage.setItem('admin_micro', sel.value); } catch (e) {}
+      box._etat = ''; etat.textContent = 'Le micro choisi servira au prochain enregistrement.';
+      etat.style.color = 'rgba(255,255,255,.6)';
+    };
+    ligne.appendChild(t); ligne.appendChild(sel);
+    var etat = document.createElement('div');
+    etat.style.cssText = 'margin-top:6px;color:' + (box._etat ? (box._ok ? '#4caf50' : '#ffb300') : 'rgba(255,255,255,.6)');
+    etat.textContent = box._etat || 'Le nom du micro utilisé s\'affichera ici au premier enregistrement.';
+    box.appendChild(ligne); box.appendChild(etat);
+  })['catch'](function () {});
+}
+
+/* ── UN ENREGISTREMENT, SES PROPRES DONNÉES ──
+   Le client : « j'enregistre un son, puis quand j'enregistre un nouveau, le
+   premier se met en play, ça annule le premier enregistrement ».
+   Tout passait par quatre variables partagées. Trois défauts en sortaient :
+   1. l'arrêt automatique (20 s) n'était jamais annulé : celui du PREMIER son
+      coupait, vingt secondes plus tard, le son qu'on enregistrait alors ;
+   2. le son n° 2 remettait à zéro les morceaux et la clé du n° 1 s'il
+      démarrait avant la fin de sa sauvegarde ;
+   3. la copie gardée sur l'appareil finissait par remplir sa réserve (un
+      studio entier à 128 kbit/s la dépasse) : l'erreur arrêtait tout AVANT
+      l'envoi, sans rien dire.
+   Chaque enregistrement garde maintenant son micro, ses morceaux, sa clé et
+   sa minuterie pour lui seul. Toucher le 🎙 d'un autre son arrête et
+   sauvegarde le premier, puis démarre le second. */
+var adminEnCours = null;
+
+function adminStartRecord(s, item, btn, info) {
+  var ar = s.ar;
+  if (adminEnCours) {
+    var meme = (adminEnCours.ar === ar);
+    adminEnCours.arrete();
+    if (meme) return;                       /* même ligne : c'était « stop » */
+  }
+  /* Rien ne doit sonner pendant qu'on enregistre. */
+  try { stopSpeech(); } catch (e) {}
+  try { if (window._kidAudio) { window._kidAudio.pause(); window._kidAudio = null; } } catch (e) {}
+
+  var moi = { ar: ar, annule: false };
+  moi.arrete = function () { moi.annule = true; if (adminEnCours === moi) adminEnCours = null; };
+  adminEnCours = moi;
+
   /* ── ON PREND LE MICRO TEL QU'IL EST ──
-     Le client : « les sons enregistrés avec mon micro pro ne sont pas bien
-     joués, comme si je ne l'avais pas utilisé ». C'est exactement ce qui se
-     passait : `{audio:true}` laisse le navigateur appliquer SES traitements
-     de visioconférence — suppression d'écho, réduction de bruit, gain
-     automatique. Ils sont faits pour un micro d'ordinateur portable dans une
-     pièce qui résonne ; sur un bon micro ils écrasent les graves, pompent le
-     niveau et mangent les fins de mots. On les coupe tous les trois, et on
-     demande 48 kHz en mono — la voix n'a pas besoin de stéréo. */
-  navigator.mediaDevices.getUserMedia({audio:{
-    echoCancellation:false, noiseSuppression:false, autoGainControl:false,
-    channelCount:1, sampleRate:48000
-  }}).catch(function(){
+     `{audio:true}` laisse le navigateur appliquer ses traitements de
+     visioconférence — suppression d'écho, réduction de bruit, gain
+     automatique. Sur un bon micro ils écrasent les graves, pompent le niveau
+     et mangent les fins de mots. On les coupe tous les trois, 48 kHz, mono. */
+  var brut = { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+               channelCount: 1, sampleRate: 48000 };
+  var choisi = '';
+  try { choisi = localStorage.getItem('admin_micro') || ''; } catch (e) {}
+  var demande = { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+                  channelCount: 1, sampleRate: 48000 };
+  if (choisi) demande.deviceId = { exact: choisi };
+  var repli = false;
+
+  navigator.mediaDevices.getUserMedia({ audio: demande })['catch'](function (e) {
+    /* Le micro choisi n'est plus branché : celui par défaut, toujours brut. */
+    if (!choisi) throw e;
+    return navigator.mediaDevices.getUserMedia({ audio: brut });
+  })['catch'](function () {
     /* Un appareil qui refuse ces réglages vaut mieux qu'aucun micro. */
-    return navigator.mediaDevices.getUserMedia({audio:true});
-  }).then(function(stream) {
-    adminStream = stream;
-    adminChunks = [];
-    adminCurrentKey = 'audio_' + ar;
-    
-    /* ── LE FORMAT EST CELUI DU MAGNETOPHONE, PAS UN FORMAT SUPPOSE ──
-       On écrivait « audio/webm » en dur. Un navigateur qui enregistre en
-       `audio/mp4` — c'est le cas de Safari, donc de tout iPhone — rendait
-       alors un fichier étiqueté webm mais contenant du mp4 : illisible à la
-       relecture. On reprend le type que le magnétophone annonce. */
+    repli = true;
+    return navigator.mediaDevices.getUserMedia({ audio: true });
+  }).then(function (stream) {
+    function lache() { try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} }
+    if (moi.annule || adminEnCours !== moi) { lache(); return; }
+
+    var morceaux = [], minuterie = null, rec;
     /* 128 kbit/s : le débit par défaut de l'opus tourne autour de 40, ce qui
        s'entend sur une voix enregistrée au bon micro. */
-    try{
-      adminRecorder = new MediaRecorder(stream, {audioBitsPerSecond:128000});
-    }catch(e){
-      adminRecorder = new MediaRecorder(stream);
-    }
-    adminRecorder.ondataavailable = function(e) { if (e.data && e.data.size) adminChunks.push(e.data); };
-    adminRecorder.onstop = function() {
-      var type = (adminRecorder && adminRecorder.mimeType) || 'audio/webm';
-      var blob = new Blob(adminChunks, {type: type});
+    try { rec = new MediaRecorder(stream, { audioBitsPerSecond: 128000 }); }
+    catch (e) { rec = new MediaRecorder(stream); }
+    moi.arrete = function () {
+      if (minuterie) { clearTimeout(minuterie); minuterie = null; }
+      if (rec.state === 'recording') rec.stop();
+    };
+    rec.ondataavailable = function (e) { if (e.data && e.data.size) morceaux.push(e.data); };
+    rec.onstop = function () {
+      if (minuterie) { clearTimeout(minuterie); minuterie = null; }
+      if (adminEnCours === moi) adminEnCours = null;
+      lache();
+      btn.textContent = '\ud83c\udf99';
+      btn.style.background = 'rgba(255,80,80,.2)';
+      /* Le format est celui que le magnétophone annonce (mp4 sur iPhone). */
+      var blob = new Blob(morceaux, { type: rec.mimeType || 'audio/webm' });
       if (!blob.size) {
         alert('Rien n\'a été enregistré : le micro n\'a rien capté.'
           + '\n\nVérifie que le navigateur a bien l\'autorisation du microphone.');
-        try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
-        adminRenderList();
+        adminRafraichit(item, s);
         return;
       }
       var reader = new FileReader();
-      reader.onload = function() {
-        /* On garde le lien complet pour le stockage local — une balise Audio
-           sait le lire tel quel — mais on n'envoie que le base64 NU : c'est
-           le préfixe, avec son « ;codecs=opus », qui a fait monter 115
-           fichiers de quinze octets. Les deux bouts sont protégés. */
+      reader.onload = function () {
+        /* On garde le lien complet pour le stockage local, mais on n'envoie
+           que le base64 NU (le préfixe « ;codecs=opus » a déjà fait monter
+           des fichiers de quinze octets). */
         var base64 = reader.result;
         var nu = String(base64).replace(/^data:[^,]*,/, '');
-        var arText = adminCurrentKey.replace('audio_','');
-        // Sauvegarder localement
-        localStorage.setItem(adminCurrentKey, base64);
-        /* ── L'ENVOI DOIT SE VOIR ──
-           Un 403 finissait dans la console : l'enregistrement restait sur
-           l'appareil, la liste affichait « enregistré », et rien n'était
-           jamais monté. On lit maintenant le CODE de la réponse et on le dit
-           à l'écran, en toutes lettres. */
-        var _dit=info.querySelector('.admin-etat');
-        if(_dit){_dit.textContent='↑ Envoi…';_dit.style.color='#8ab4ff';}
+        /* La copie locale est un confort. Réserve pleine : on envoie quand même. */
+        var gardeLocale = true;
+        try { localStorage.setItem('audio_' + ar, base64); }
+        catch (e) { gardeLocale = false; try { localStorage.removeItem('audio_' + ar); } catch (e2) {} }
+        var _dit = info.querySelector('.admin-etat');
+        if (_dit) { _dit.textContent = '\u2191 Envoi\u2026'; _dit.style.color = '#8ab4ff'; }
         fetch(API_URL + '/api/audio', {
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._adminSecret||'')},
-          body: JSON.stringify({ ar: arText, audioBase64: nu })
-        }).then(function(r){
-          return r.json()['catch'](function(){return {};}).then(function(d){
-            return {status:r.status, data:d};
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window._adminSecret || '') },
+          body: JSON.stringify({ ar: ar, audioBase64: nu })
+        }).then(function (r) {
+          return r.json()['catch'](function () { return {}; }).then(function (d) {
+            return { status: r.status, data: d };
           });
-        })
-        .then(function(o){
-          if(o.status===200 && o.data && o.data.url){
-            AUDIO_URLS[arText]=o.data.url;
-            adminRenderList();
-          }else{
-            var m=(o.data&&o.data.error)||('code '+o.status);
-            if(_dit){_dit.textContent='❌ ÉCHEC : '+m;_dit.style.color='#ff6060';}
-            alert('L\'envoi a échoué pour « '+arText+' ».\n\n'+m
-              +'\n\nIl est gardé sur cet appareil : tu peux le réécouter avec ▶, '
-              +'et le bouton « Renvoyer tout » le remontera une fois le '
-              +'problème réglé.');
-            adminRenderList();
+        }).then(function (o) {
+          if (o.status === 200 && o.data && o.data.url) {
+            AUDIO_URLS[ar] = o.data.url;
+            adminRafraichit(item, s);
+          } else {
+            var m = (o.data && o.data.error) || ('code ' + o.status);
+            alert('L\'envoi a échoué pour « ' + ar + ' ».\n\n' + m
+              + (gardeLocale
+                 ? '\n\nIl est gardé sur cet appareil : tu peux le réécouter avec ▶, et le bouton « Renvoyer tout » le remontera une fois le problème réglé.'
+                 : '\n\nIl n\'a pas pu être gardé sur cet appareil non plus (réserve pleine) : il faudra le réenregistrer.'));
+            adminRafraichit(item, s);
           }
-        })
-        .catch(function(e){
-          if(_dit){_dit.textContent='❌ RÉSEAU : '+((e&&e.message)||e);_dit.style.color='#ff6060';}
+        })['catch'](function (e) {
+          if (_dit) { _dit.textContent = '\u274c RÉSEAU : ' + ((e && e.message) || e); _dit.style.color = '#ff6060'; }
         });
-        stream.getTracks().forEach(function(t){t.stop();});
       };
       reader.readAsDataURL(blob);
     };
-    
-    adminRecorder.start();
-    btn.textContent = '⏹';
+
+    rec.start();
+    btn.textContent = '\u23f9';
     btn.style.background = 'rgba(255,80,80,.5)';
     item.style.borderColor = '#ff6060';
-    info.querySelector('div:last-child').textContent = '🔴 Enregistrement...';
-    
-    /* Arrêt automatique. Cinq secondes coupaient les phrases longues — celle
-       du soukoun en fait plus de neuf. Vingt, c'est large pour toutes. */
-    setTimeout(function() {
-      if (adminRecorder && adminRecorder.state === 'recording') {
-        adminRecorder.stop();
-      }
-    }, 20000);
-    
-  }).catch(function(err) {
-    alert('Microphone inaccessible: ' + err.message);
+    var _e = info.querySelector('.admin-etat');
+    if (_e) { _e.textContent = '\ud83d\udd34 Enregistrement...'; _e.style.color = '#ff6060'; }
+    adminMicros(stream, repli);
+
+    /* Arrêt automatique, propre à CET enregistrement. Vingt secondes : la
+       phrase du soukoun en fait plus de neuf. */
+    minuterie = setTimeout(function () { minuterie = null; if (rec.state === 'recording') rec.stop(); }, 20000);
+  })['catch'](function (err) {
+    if (adminEnCours === moi) adminEnCours = null;
+    alert('Microphone inaccessible: ' + ((err && err.message) || err));
   });
 }
 

@@ -58,7 +58,11 @@ async function lireLesSons(req, res, ip) {
         try {
           const ar = Buffer.from(file.name.replace('.webm', ''), 'hex').toString('utf8');
           const { data: urlData } = supabase.storage.from('audio').getPublicUrl(file.name);
-          urls[ar] = urlData.publicUrl;
+          /* Le fichier garde son nom quand on le réenregistre : sans ce
+             numéro, l'adresse ne changeait pas, et le navigateur comme le
+             découpage des silences gardaient l'ANCIEN son en mémoire. */
+          const version = Date.parse(file.updated_at || file.created_at || '') || 0;
+          urls[ar] = urlData.publicUrl + (version ? '?v=' + version : '');
         } catch (err) {
           // Ignore les fichiers invalides
           console.error('[Audio] Invalid file:', file.name, err.message);
@@ -146,7 +150,7 @@ async function deposerUnSon(req, res, ip) {
 
     const { data } = supabase.storage.from('audio').getPublicUrl(fileName);
     logEvent('audio_upload_success', { ip, ar });
-    res.json({ success: true, url: data.publicUrl });
+    res.json({ success: true, url: data.publicUrl + '?v=' + Date.now() });
   } catch (err) {
     console.error('[Audio] Upload error:', err.message);
     logEvent('audio_upload_exception', { ip, error: err.message });
