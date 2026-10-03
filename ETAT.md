@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 3 octobre 2026, production en v289
+## OÙ ON EN EST — 3 octobre 2026, production en v290
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,13 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v289), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v290), du plus récent au plus ancien :**
+
+- **v290.** Studio : « Micro par défaut de l'appareil » (et non « de
+  l'ordinateur »). Le client enregistre depuis son téléphone Android, micro
+  pro branché en USB-C. Chrome Android ne liste que « Speakerphone » et
+  « Headset earpiece » : le micro USB n'a pas de nom à lui, il passe par
+  l'entrée par défaut. À vérifier à l'oreille (voix proche, tapotements).
 
 - **v289.** Le studio d'enregistrement (écran admin), avant une grosse
   séance du client (sons manquants + lecture pour le clone ElevenLabs).

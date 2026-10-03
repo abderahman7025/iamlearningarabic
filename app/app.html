@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v289';
+var _VERSION_REPLI='v290';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -25435,7 +25435,7 @@ function adminMicros(stream, repli) {
     sel.id = 'admin-micro-choix';
     sel.style.cssText = 'flex:1;min-width:0;background:#1b1830;color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:6px;font-size:.78rem';
     var o0 = document.createElement('option');
-    o0.value = ''; o0.textContent = 'Micro par défaut de l\'ordinateur';
+    o0.value = ''; o0.textContent = 'Micro par défaut de l\'appareil';
     sel.appendChild(o0);
     var n = 0;
     ds.forEach(function (d) {
