@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 3 octobre 2026, production en v291
+## OÙ ON EN EST — 3 octobre 2026, production en v292
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v291), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v292), du plus récent au plus ancien :**
+
+- **v292.** Studio : « Tout effacer » n'effaçait que les copies de
+  l'appareil (`localStorage`), jamais le cloud — « je fais tout effacer mais
+  ça n'efface pas ». `adminClearAll()` retire maintenant les copies locales
+  PUIS chaque fichier en ligne (un `DELETE /api/audio?ar=` par clé de
+  `AUDIO_URLS`, l'un après l'autre, compteur à l'écran, bilan des échecs).
+  Côté serveur, la clé à effacer pouvait faire 50 caractères au plus : 400,
+  pour qu'une phrase enregistrée s'efface aussi. Le client repart de zéro
+  avec son micro pro (les anciens sons étaient de mauvaise qualité).
 
 - **v291.** Studio : trois familles et un compteur. La liste mêlait 490
   lignes ; le client n'a plus à enregistrer que les SONS (lettres et

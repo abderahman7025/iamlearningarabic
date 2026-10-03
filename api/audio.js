@@ -184,7 +184,7 @@ async function effacerUnSon(req, res, ip) {
   /* Le corps d'un DELETE n'est pas toujours analysé par la plateforme : on
      accepte donc aussi bien `?ar=` que le corps JSON. */
   const ar = (req.query && req.query.ar) || (req.body && req.body.ar);
-  if (!ar || typeof ar !== 'string' || ar.length > 50)
+  if (!ar || typeof ar !== 'string' || ar.length > 400)
     return res.status(400).json({ error: 'Donnée manquante.' });
 
   try {

@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v291';
+var _VERSION_REPLI='v292';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -25856,10 +25856,68 @@ function adminRenvoyerTout() {
   suivant();
 }
 
+/* ── « TOUT EFFACER » EFFACE VRAIMENT TOUT ──
+   Le client : « je fais tout effacer mais ça n'efface pas ». Le bouton ne
+   retirait que les copies gardées sur l'appareil ; les fichiers restaient
+   dans le cloud, donc dans `AUDIO_URLS`, donc dans la liste et dans
+   l'application. Il efface maintenant les deux, un fichier après l'autre, en
+   montrant où il en est — et il dit ce qui a échoué. */
 function adminClearAll() {
-  if (!confirm('Effacer TOUS les enregistrements ?')) return;
-  ADMIN_SOUNDS.forEach(function(s) { localStorage.removeItem('audio_' + s.ar); });
-  adminRenderList();
+  if (adminEnCours) { alert('Un enregistrement est en cours : arrête-le d\'abord.'); return; }
+  var enLigne = [];
+  try { enLigne = Object.keys(AUDIO_URLS || {}); } catch (e) {}
+  var locaux = [];
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && k.indexOf('audio_') === 0) locaux.push(k);
+    }
+  } catch (e) {}
+  if (!enLigne.length && !locaux.length) { alert('Il n\'y a aucun enregistrement à effacer.'); return; }
+  if (!confirm('Effacer TOUS les enregistrements ?\n\n'
+      + enLigne.length + ' en ligne, ' + locaux.length + ' sur cet appareil.\n\n'
+      + 'L\'application lira ces sons avec la voix de synthèse jusqu\'à ce que tu les '
+      + 'réenregistres. C\'est définitif.')) return;
+
+  locaux.forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  if (!enLigne.length) { adminRenderList(); return; }
+
+  var voile = document.createElement('div');
+  voile.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,3,10,.92);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;color:#fff;text-align:center';
+  var titre = document.createElement('div');
+  titre.style.cssText = 'font-size:1.1rem;font-weight:800;color:#ff8080';
+  titre.textContent = '\ud83d\uddd1 Suppression des enregistrements';
+  var compte = document.createElement('div');
+  compte.style.cssText = 'font-size:.9rem;color:rgba(240,236,228,.7)';
+  voile.appendChild(titre); voile.appendChild(compte);
+  document.body.appendChild(voile);
+
+  var n = 0, ok = 0, rates = [];
+  function suivant() {
+    compte.textContent = n + ' / ' + enLigne.length;
+    if (n >= enLigne.length) {
+      voile.remove();
+      adminRenderList();
+      alert(rates.length
+        ? ok + ' enregistrements effacés, ' + rates.length + ' échecs.\n\n' + rates.slice(0, 6).join('\n')
+        : ok + ' enregistrements effacés. Le studio est vide.');
+      return;
+    }
+    var ar = enLigne[n++];
+    fetch(API_URL + '/api/audio?ar=' + encodeURIComponent(ar), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window._adminSecret || '') },
+      body: JSON.stringify({ ar: ar })
+    }).then(function (r) {
+      return r.json()['catch'](function () { return {}; }).then(function (d) { return { status: r.status, data: d }; });
+    }).then(function (o) {
+      if (o.status === 200 && o.data && o.data.success) { delete AUDIO_URLS[ar]; ok++; }
+      else rates.push(ar + ' : ' + ((o.data && o.data.error) || ('code ' + o.status)));
+    })['catch'](function (e) {
+      rates.push(ar + ' : réseau');
+    }).then(suivant);
+  }
+  suivant();
 }
 
 /* ── LE MOT DE PASSE EST VERIFIE AUPRES DU SERVEUR ──
