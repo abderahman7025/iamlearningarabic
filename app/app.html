@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v293';
+var _VERSION_REPLI='v294';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -21672,9 +21672,19 @@ function _boyLetterCourse(ca,idx,premiere){
   /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
      là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
      française se trompe. « khè » au lieu de « kha ». */
-  function grave(son,juste){
+  /* ── LES DEUX SONS VIENNENT DU STUDIO ──
+     Le client : « le son "kha" est déjà enregistré (c'est la vraie lettre) ;
+     le khè, khèè, khèn, je dois les enregistrer, et ensuite tu fais lire le
+     clone, et il ajoute les sons enregistrés ». Aucune voix de synthèse ne
+     dit « khè » puis « kha » : la phrase se contredisait. Le son JUSTE est la
+     syllabe du studio (خَ, خً, خَا) ; le son FAUTIF a sa propre clé — la
+     lettre suivie de « è », « èn » ou « èè » (« خè ») — que le studio liste
+     parmi les sons. Tant qu'il n'est pas enregistré, la phrase n'est coupée
+     qu'autour du son juste. */
+  function grave(son,juste,signe){
     return B.brief(te('ÉTAPE · ATTENTION'),TBF('On ne dit pas {faux}<br>mais {juste},<br>car c\'est une lettre <b>grave</b> 👂',{faux:b('« '+son+' »'),juste:b('« '+juste+' »')}),
-      teF('On ne dit pas {faux}, mais {juste}, car c\'est une lettre grave.',{faux:son,juste:juste}));
+      _phraseAvecSons(teF('On ne dit pas {faux}, mais {juste}, car c\'est une lettre grave.',{faux:son,juste:juste}),
+        [[son,A+son.slice(latMin.length)],[juste,A+signe]]));
   }
   var latMin=(lat||'').toLowerCase();
   if(finDeMot){
@@ -21868,7 +21878,7 @@ function _boyLetterCourse(ca,idx,premiere){
       _phraseAvecSons(teF('Avec cette voyelle, ça fait {son}',
           {son:(lat+v[1]).toLowerCase()}),
           [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
-    if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a'));
+    if(lourde&&n===0)sc.push(grave(latMin+'è',latMin+'a','\u064e'));
     sc.push(B.tracer(teF('VOYELLE {n}/3 · TRACÉ',{n:n+1}),formesMontrees(v[0]),
       teF('Trace {syllabe}<br>dans {ou} ✍️',{syllabe:q(v[1]),ou:b(combien)}),
       teF('Trace cette syllabe dans {ou}.',{ou:combien}),null,nomsMontres));
@@ -21904,7 +21914,7 @@ function _boyLetterCourse(ca,idx,premiere){
       _phraseAvecSons(teF('Avec deux {signe}, ça fait {son}',
           {signe:v[2],son:(lat+v[1]).toLowerCase()}),
           [[(lat+v[1]).toLowerCase(),A+v[0]]]),null,true));
-    if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an'));
+    if(lourde&&n===0)sc.push(grave(latMin+'èn',latMin+'an','\u064b'));
     sc.push(B.tracer(teF('TANWĪN {n}/3 · TRACÉ',{n:n+1}),tanwListe(v[0]),
       'Trace '+q(v[1])+'<br>dans '+b(tanwCombien)+' ✍️',
       teF('Trace ce tanwîn dans {ou}.',{ou:tanwCombien}),null,tanwNoms));
@@ -21946,7 +21956,7 @@ function _boyLetterCourse(ca,idx,premiere){
             {lettre:[te('l\'alif'),te('le waw'),te('le ya')][n],
              son:(lat+v[1]).toLowerCase()}),
             [[(lat+v[1]).toLowerCase(),A+v[0]]])));
-      if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa'));
+      if(lourde&&n===0)sc.push(grave(latMin+'èè',latMin+'aa','\u064e\u0627'));
       /* Une syllabe prolongée vit à l'intérieur d'un mot : on la fait tracer
          dans les trois places qu'elle y prend — la lettre au début puis au
          milieu, et la prolongation qui appelle la suite ou termine le mot.
@@ -25217,9 +25227,12 @@ var ADMIN_SOUNDS = [
       var l=(_CL_LAT[ar]||'').toLowerCase();if(!l)return;
       [['è','a','fatḥa'],['èn','an','tanwīn fatḥ'],['èè','aa','fatḥa prolongée']]
         .forEach(function(o){
+          /* Le son FAUTIF seul — « khè » — sous la clé « خè » : la phrase
+             autour est dite par la voix clonée, le son juste (« kha ») est
+             déjà la syllabe du studio. */
           ADMIN_SOUNDS.push({
-            ar:'On ne dit pas '+l+o[0]+', mais '+l+o[1]+', car c\'est une lettre grave.',
-            label:(noms[ar]||ar)+' '+o[2]+' — « '+l+o[1]+' », pas « '+l+o[0]+' »'});
+            ar:ar+o[0],
+            label:'« '+l+o[0]+' » — le son FAUTIF de '+(noms[ar]||ar)+' ('+o[2]+'), à dire comme un Français qui se trompe'});
         });
     });
   }catch(e){}
@@ -25242,7 +25255,7 @@ try {
 function adminGenre(ar) {
   if (!/[\u0600-\u06FF]/.test(ar)) return 'phrase';
   /* Sans ses voyelles ni le rond porteur : trois lettres ou plus, c'est un mot. */
-  var nu = String(ar).replace(/[\u064B-\u0652\u0670\u25CC\s]/g, '');
+  var nu = String(ar).replace(/[^\u0621-\u064A\u0671-\u06D3]/g, '');
   return nu.length >= 3 ? 'mot' : 'son';
 }
 

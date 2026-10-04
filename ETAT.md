@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 4 octobre 2026, production en v293
+## OÙ ON EN EST — 4 octobre 2026, production en v294
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v293), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v294), du plus récent au plus ancien :**
+
+- **v294.** Les mises en garde des lettres graves (« On ne dit pas khè, mais
+  kha, car c'est une lettre grave. », 8 lettres × fatḥa, tanwīn, longue).
+  Le clone prononce aussi mal « khè » que « bā » : le client enregistre les
+  24 sons FAUTIFS au studio, sous la clé « lettre + è / èn / èè » (« خè »),
+  le son juste étant déjà la syllabe du studio (خَ, خً, خَا). `grave(son,
+  juste, signe)` coupe la phrase autour des deux ; le clone ne dit plus que
+  « On ne dit pas », « mais », « car c'est une lettre grave. ». Les 24
+  phrases entières sortent de la liste du studio, remplacées par ces 24
+  sons ; `adminGenre` compte les lettres arabes (« خèè » est un son).
 
 - **v293.** Premier pas de la VOIX CLONÉE (clone ElevenLabs du client,
   voir la mémoire `voix-elevenlabs`).
