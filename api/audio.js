@@ -78,6 +78,16 @@ async function lireLesSons(req, res, ip) {
   }
 }
 
+/* Le studio enregistre en webm (ou en mp4 sur iPhone) ; les phrases de la
+   voix clonée arrivent en mp3. Le nom du fichier reste le même pour tous —
+   c'est le type annoncé au navigateur qui doit être juste. */
+function typeDuSon(buf) {
+  if (buf.length > 3 && buf[0] === 0x49 && buf[1] === 0x44 && buf[2] === 0x33) return 'audio/mpeg';      // ID3
+  if (buf.length > 2 && buf[0] === 0xFF && (buf[1] & 0xE0) === 0xE0) return 'audio/mpeg';              // trame mp3
+  if (buf.length > 8 && buf.slice(4, 8).toString('latin1') === 'ftyp') return 'audio/mp4';
+  return 'audio/webm';
+}
+
 async function deposerUnSon(req, res, ip) {
   // ── Admin uniquement + vérification IP ──────────────────────────────────────
   if (!isAdminRequest(req)) {
@@ -109,8 +119,10 @@ async function deposerUnSon(req, res, ip) {
   const { ar, audioBase64 } = req.body || {};
 
   if (!ar || !audioBase64) return res.status(400).json({ error: 'Données manquantes.' });
-  if (typeof ar !== 'string' || ar.length > 50)
-    return res.status(400).json({ error: 'Caractère arabe invalide.' });
+  /* 50 caractères suffisaient pour une syllabe ; une phrase dite par la voix
+     clonée en fait jusqu'à 120, plus dans d'autres langues. */
+  if (typeof ar !== 'string' || ar.length > 400)
+    return res.status(400).json({ error: 'Clé invalide.' });
 
   /* ── LE PREFIXE, QUEL QU'IL SOIT ──
      L'ancienne expression n'acceptait que « data:audio/webm;base64, ». Or un
@@ -141,7 +153,7 @@ async function deposerUnSon(req, res, ip) {
 
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const { error } = await supabase.storage
-      .from('audio').upload(fileName, buffer, { contentType: 'audio/webm', upsert: true });
+      .from('audio').upload(fileName, buffer, { contentType: typeDuSon(buffer), upsert: true });
 
     if (error) {
       logEvent('audio_upload_error', { ip, error: error.message });

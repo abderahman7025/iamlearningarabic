@@ -31,7 +31,7 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 3 octobre 2026, production en v292
+## OÙ ON EN EST — 4 octobre 2026, production en v293
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +101,35 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v292), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v293), du plus récent au plus ancien :**
+
+- **v293.** Premier pas de la VOIX CLONÉE (clone ElevenLabs du client,
+  voir la mémoire `voix-elevenlabs`).
+  * *Le nom d'une lettre vient du studio.* Sept phrases des cours de lettres
+    envoyaient le nom écrit (« bā », « DHā », « 'ayn ») à la voix : « Voici
+    la lettre {lettre}… », « {mission} du moment : la lettre {lettre} »,
+    « Où est la lettre {lettre} ? », « Touche toutes les formes de la lettre
+    {lettre}. », la jumelle (« s'écrit exactement comme la lettre {ref} »),
+    « La lettre {lettre} n'a aucune prononciation… », la hamzah sur son
+    siège. Elles passent par `_phraseAvecSons(…, [[L.name, L.ar]])` : la
+    lettre nue (« ب ») est enregistrée au studio et c'est son NOM. Effet
+    de bord voulu : 174 phrases à faire dire par le clone deviennent une
+    quinzaine de morceaux communs à toutes les lettres.
+  * *« À retenir »* : `N.dire(e.dit)` recevait un tableau quand la phrase
+    était coupée (« fatha est prolongé par le,ا ») ; chaque morceau est dit.
+  * *Serveur (`api/audio.js`)* : la clé d'un son peut faire 400 caractères
+    (50 avant : aucune phrase n'aurait pu être déposée), et le type annoncé
+    suit le contenu (`typeDuSon` : mp3, mp4 ou webm) — les phrases du clone
+    sont des mp3 rangés sous le même nom `hex(clé).webm`.
+  * *L'inventaire des phrases dites* se fait AU BANC, pas dans le code : on
+    remplace `speakText`/`speak` par un enregistreur, `setTimeout`/
+    `setInterval`/`Date.now` par une horloge virtuelle pompée par un
+    `MessageChannel` (les minuteries d'un onglet caché sont bridées), on
+    marque tous les sons arabes comme enregistrés, puis on fait défiler
+    chaque cours avec `api.suivant()` en attendant 5 s virtuelles de silence
+    par page. Français, interface enfants : 186 phrases, 7 428 caractères.
+    La clé de dépôt garde l'espace avant « ! ? ; : » (`_clesSon` cherche la
+    phrase telle quelle, puis avec l'espace).
 
 - **v292.** Studio : « Tout effacer » n'effaçait que les copies de
   l'appareil (`localStorage`), jamais le cloud — « je fais tout effacer mais

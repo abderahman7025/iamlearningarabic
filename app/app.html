@@ -11374,7 +11374,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v292';
+var _VERSION_REPLI='v293';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18755,7 +18755,7 @@ function _boyScene(ca,reprise){
             var e=o.temps[m++];
             if(e.fait)e.fait(o.__el);
             if(e.dit){
-              N.dire(e.dit);
+              [].concat(e.dit).forEach(function(_m){N.dire(_m);});
               N.plusTard(function(){N.surSilence(function(){N.plusTard(pas,180);});},250);
             }else N.plusTard(pas,e.d||500);
           })();
@@ -21610,7 +21610,14 @@ function _boyLetterCourse(ca,idx,premiere){
   var _ileFaite=null;
 
   sc.push(B.brief(_HAB.mission+' · '+_HAB.depart,teF('Nouvelle lettre :<br>{lettre} 🎯',{lettre:b(L.name)}),
-    teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),te('C\'est parti !')));
+    /* ── LE NOM DE LA LETTRE VIENT DU STUDIO ──
+       Le client : « la voix ne lit pas bien les mots arabes comme "ba", "tha",
+       "djim" — tu devais les prendre de mes enregistrements ». Le nom
+       partait écrit (« bā », « DHā », « 'ayn ») à la voix, qui le lisait
+       comme elle pouvait. La lettre nue (« ب ») est enregistrée au studio et
+       c'est justement son NOM : on coupe la phrase autour, comme pour les
+       syllabes. Sans enregistrement, la phrase reste entière. */
+    _phraseAvecSons(teF('{mission} du moment : la lettre {lettre}',{mission:_HAB.missionMin,lettre:L.name}),[[L.name,L.ar]]),te('C\'est parti !')));
   /* Deux lettres qui ne diffèrent que par leurs points : autant le dire tout
      de suite, l'enfant n'a qu'un détail à retenir, pas un tracé de plus. La
      référence est la PREMIÈRE lettre de la famille, celle qu'il a déjà vue. */
@@ -21627,8 +21634,8 @@ function _boyLetterCourse(ca,idx,premiere){
     sc.push(B.controle(_t,
       _n===0?teF('Tu te souviens ?<br>Où est {lettre} ? 🧠',{lettre:b(_rev.name)})
             :teF('Où est {lettre} ? 🧠',{lettre:b(_rev.name)}),
-      _n===0?teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name})
-            :teF('Où est la lettre {lettre} ?',{lettre:_rev.name}),
+      _phraseAvecSons(_n===0?teF('Tu te souviens ? Où est la lettre {lettre} ?',{lettre:_rev.name})
+            :teF('Où est la lettre {lettre} ?',{lettre:_rev.name}),[[_rev.name,_rev.ar]]),
       [_rev.ar].concat(_leurresLettre(_rev,idx,2).map(function(x){return x.ar;})),
       _rev.ar));
   });
@@ -21638,7 +21645,7 @@ function _boyLetterCourse(ca,idx,premiere){
     if(ref){
       sc.push(B.brief(teF('{mission} · UN AIR CONNU',{mission:_HAB.mission}),
         teF('{lettre} s\'écrit exactement comme {ref},<br>{detail} 👀',{lettre:b(L.name),ref:b(ref.name),detail:b(jumelle.point)}),
-        teF('La lettre {lettre} s\'écrit exactement comme la lettre {ref}, {detail}.',{lettre:L.name,ref:ref.name,detail:jumelle.point})));
+        _phraseAvecSons(teF('La lettre {lettre} s\'écrit exactement comme la lettre {ref}, {detail}.',{lettre:L.name,ref:ref.name,detail:jumelle.point}),[[L.name,L.ar],[ref.name,ref.ar]])));
     }
   }
   /* L'écran « toute seule, elle s'écrit ainsi » disait ce que celui-ci montre
@@ -21653,7 +21660,7 @@ function _boyLetterCourse(ca,idx,premiere){
     : (_pSeule
       ? B.forme(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
           TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
-          teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}),
+          _phraseAvecSons(teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}),[[L.name,A]]),
           /* Zero : la forme seule n'a pas de trait de liaison, rien a
              compenser. L'oubli de ce dernier argument la baissait de trois
              centiemes — « la lettre devient un peu trop basse quand le reste
@@ -21661,7 +21668,7 @@ function _boyLetterCourse(ca,idx,premiere){
           _pSeule.avant,_pSeule.apres,_pSeule.lettre,0,true)
       : B.obs(te('ÉTAPE 1 · IDENTIFICATION'),A,S,
           TBF('Voici {lettre}.<br>Toute <b>seule</b>, elle s\'écrit ainsi.',{lettre:b(L.name)}),
-          teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}))));
+          _phraseAvecSons(teF('Voici la lettre {lettre}. Toute seule, elle s\'écrit ainsi.',{lettre:L.name}),[[L.name,A]]))));
   /* Les lettres graves n'ont plus d'écran d'alerte : l'avertissement est dit
      là où il sert, sur les trois écrans de la fatḥa — c'est là que l'oreille
      française se trompe. « khè » au lieu de « kha ». */
@@ -21823,7 +21830,7 @@ function _boyLetterCourse(ca,idx,premiere){
   if(A==='ء'){
     ['أ','ؤ','ئ'].forEach(function(g,n){
       sc.push(B.obs(teF('SUPPORT {n}/3',{n:n+1}),g,g+'َ',teF('Parfois, tu verras<br>la hamzah sur le {lettre} 🪑',{lettre:b(['ا','و','ي'][n])}),
-        teF('Parfois, tu verras la hamzah sur le {lettre}.',{lettre:['alif','waw','ya'][n]})));
+        _phraseAvecSons(teF('Parfois, tu verras la hamzah sur le {lettre}.',{lettre:['alif','waw','ya'][n]}),[[['alif','waw','ya'][n],['ا','و','ي'][n]]])));
       /* Le siège, lui, s'attache : on trace ses formes, la hamzah dessus. */
       var afSiege=_AF[g]||_AF[['ا','و','ي'][n]]||{i:g,m:g,f:g};
       var fSiege=_childForms({ar:g},afSiege);
@@ -21848,7 +21855,7 @@ function _boyLetterCourse(ca,idx,premiere){
   if(_muette){
     sc.push(B.brief(te('ÉTAPE · SANS SON'),
       TBF('La lettre {lettre} n\'a<br><b>aucune prononciation</b>.<br>On ne dit que sa <b>voyelle</b>.',{lettre:b(L.name)}),
-      teF('La lettre {lettre} n\'a aucune prononciation. On ne dit que sa voyelle.',{lettre:L.name})));
+      _phraseAvecSons(teF('La lettre {lettre} n\'a aucune prononciation. On ne dit que sa voyelle.',{lettre:L.name}),[[L.name,L.ar]])));
   }
   [['َ','a',te('au-dessus')],['ِ','i',te('en-dessous')],['ُ','ou',te('au-dessus')]].forEach(function(v,n){
     sc.push(B.obs(teF('VOYELLE {n}/3',{n:n+1}),A+v[0],A+v[0],
@@ -22126,7 +22133,7 @@ function _boyLetterCourse(ca,idx,premiere){
     });
     sc.push(B.controleMulti(te('LE TRI'),
       teF('Touche <b>toutes</b><br>les formes de {lettre} ! 🧺',{lettre:b(L.name)}),
-      teF('Touche toutes les formes de la lettre {lettre}.',{lettre:L.name}),
+      _phraseAvecSons(teF('Touche toutes les formes de la lettre {lettre}.',{lettre:L.name}),[[L.name,L.ar]]),
       _grille,_cibles));
   }
 
