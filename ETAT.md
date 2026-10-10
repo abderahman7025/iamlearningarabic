@@ -64,10 +64,7 @@ communes, à la place du clone ; les anciens fichiers sont gardés hors dépôt
 `Bureau/phrases-6-11-ans.txt`. 35 phrases communes NON refaites, parce
 qu'elles servent aux jeux des 3-5 ans (« Attrape la lettre », « Bravo ! Le
 Lion arrive dans ton album »…) : elles gardent le clone ou leur version
-`petit|`. **Reste : l'interface ados/adultes** — elle lit des textes `t(clé)`
-au clic (introduction, voyelles, prolongations, astuces), dans les 13
-langues, par la synthèse du navigateur ; le serveur refuse une clé de plus
-de 400 caractères et l'introduction en fait 450 : il faudra une clé courte.
+`petit|`. **Ados/adultes en français : fait en v3.0.4** (voir plus bas) ; les autres langues une par une, à sa demande.
 
 **Ce que veut le client (10 octobre)** : garder SA voix pour les sons arabes,
 et mettre la voix Narrateur « pour le reste du site ». Le 3-5 ans est le
@@ -109,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.3
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.4
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -186,8 +183,32 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.3), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.4), du plus récent au plus ancien :**
 
+- **v3.0.4.** La voix Narrateur (v3, posé) dans l'interface ados/adultes, EN
+  FRANÇAIS. Le client : « pour l'interface adulte, il faut traduire tout ce
+  qui est lu dans le site (introduction aussi) », puis « on parle du
+  français, on fait langue par langue ».
+  * **Ce que l'interface lit** (relevé au banc : `speakText` remplacé par un
+    enregistreur, profil adulte, langue fr, puis `renderIntro`, `renderBonus`
+    et ses quatre pages, `renderVLesson`, `renderPLesson`, `renderLLesson`
+    de chaque lettre, et un clic sur tout ce qui porte un `onclick`) :
+    28 textes. 17 sont du français seul (3 623 caractères) → générés et
+    déposés. 11 portent de l'écriture arabe (2 361 caractères : bonus
+    soukoun, wasla, Allah, solaire, astuces de l'alif et de la hamza) → NON
+    générés, l'IA ne dit jamais d'arabe ; ils restent à la synthèse du
+    navigateur. Inventaire gardé : `outils/captures/inv-adulte-fr.json`.
+  * **Une clé courte pour les textes longs** : au-delà de 180 caractères,
+    `_clesSon` ajoute « long| » + `_hacheTexte(texte)` (16 chiffres hexa) ;
+    le serveur refuse une clé de plus de 400 caractères et l'introduction
+    en fait jusqu'à 531. Dix des 17 textes sont rangés ainsi. Le même
+    calcul est dans `outils/voix-adulte.js`, qui génère et dépose :
+    `node outils/voix-adulte.js outils/captures/inv-adulte-fr.json fr`.
+    Vérifié : les clés calculées par l'application sont celles en ligne
+    (622 clés, dont 10 « long| »), aucune clé existante écrasée.
+  * **Pour la langue suivante :** refaire l'inventaire avec `st.lang` sur la
+    langue voulue, puis le même outil avec son code (`en`, `es`…). La voix
+    n'a pas été essayée dans une autre langue que le français.
 - **v3.0.3.** Le mode PORTRAIT des manches 3-5 ans. Le client : « si
   l'enfant passe en mode portrait, tout soit bien agencé, beau, symétrique,
   que certaines choses comme le haut-parleur ou le guguss ne cachent pas de

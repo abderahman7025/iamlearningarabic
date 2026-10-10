@@ -6198,10 +6198,29 @@ function _lecteurPour(src){
    site ». On cherche donc les DEUX écritures.
    On ne restaure l'espace que devant « ! ? ; : … », qui le prennent en
    français ; la virgule et le point, jamais. */
+/* ── UN TEXTE LONG A UNE CLE COURTE ──
+   L'interface ados/adultes lit des paragraphes entiers (une section de
+   l'introduction fait 531 caractères). Le serveur refuse une clé de plus de
+   400 caractères, et le nom du fichier — la clé en hexadécimal — serait de
+   toute façon trop long. Au-delà de 180 caractères, l'enregistrement est donc
+   rangé sous « long| » + une empreinte du texte. Même calcul dans
+   `outils/voix-adulte.js`, qui dépose les fichiers : les deux doivent bouger
+   ensemble. */
+function _hacheTexte(t){
+  var h1=0xdeadbeef,h2=0x41c6ce57,i,c;
+  for(i=0;i<t.length;i++){
+    c=t.charCodeAt(i);
+    h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);
+  }
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return ('0000000'+(h2>>>0).toString(16)).slice(-8)+('0000000'+(h1>>>0).toString(16)).slice(-8);
+}
 function _clesSon(t){
   var l=[t];
   var espace=String(t).replace(/([^\s])([!?;:\u2026])/g,'$1 $2');
   if(espace!==t)l.push(espace);
+  if(String(t).length>180)l.push('long|'+_hacheTexte(String(t)));
   /* ── LES 3-5 ANS ONT LEUR VOIX ──
      Le client : « je ne suis pas satisfait des voix sur l'interface 3-5
      ans » — il veut un narrateur qui JOUE les phrases (enthousiaste, doux,
@@ -11446,7 +11465,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.3';
+var _VERSION_REPLI='v3.0.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
