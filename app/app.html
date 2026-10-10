@@ -11404,7 +11404,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v2.9.9';
+var _VERSION_REPLI='v3.0.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -19557,6 +19557,24 @@ function _boyScene(ca,reprise){
             r.forEach(function(q){out.push({x:q[0],y:q[1]});});
           });
         }
+        /* ── LA VOYELLE, PAS SES MIETTES ──
+           Mesuré au banc sur « wa » : la liste de la voyelle contient, en
+           plus du signe, quelques pixels du BORD de la lettre (le wāw peint
+           avec et sans son signe ne tombe pas exactement sur les mêmes
+           pixels). Le chemin du modèle sautait donc vingt fois du signe à
+           la lettre et retour. On ne trace le chemin que dans les vraies
+           taches du signe ; les miettes restent à peindre, comme avant. */
+        if(!out.length&&p2.nom==='voyelle'){
+          var gros=separeLesTaches(L),plusGros=0,garde={};
+          gros.forEach(function(g2){if(g2.length>plusGros)plusGros=g2.length;});
+          if(gros.length>1){
+            gros.forEach(function(g2){
+              if(g2.length*4>=plusGros)g2.forEach(function(j3){garde[j3]=1;});
+            });
+            L=Array.prototype.filter.call(L,function(j3){return garde[j3]===1;});
+            pas=L.length/TRANCHES;
+          }
+        }
         if(!out.length)for(k=0;k<TRANCHES;k++){
           a=Math.floor(k*pas);b=Math.floor((k+1)*pas);
           if(b<=a)b=a+1;
@@ -19656,60 +19674,225 @@ function _boyScene(ca,reprise){
         /* ══ LE MILIEU DE L'ÉPAISSEUR ══
            Le client a trouvé la cause lui-même : « la lettre n'a pas
            toujours la même largeur ; tu devrais prendre le centre de
-           l'épaisseur comme référence ».
-           C'est juste. Le centre d'une TRANCHE n'est pas le centre du
-           TRAIT : quand le trait s'épaissit ou s'amincit, la tranche penche
-           d'un côté, et le point glisse vers le bord. D'une tranche à
-           l'autre il repart de l'autre côté — la tête tremble alors même
-           que le chemin, lui, est bon.
-           On recale donc chaque point sur l'axe : on regarde PERPENDICULAI-
-           REMENT à la direction de marche, on mesure jusqu'où va l'encre de
-           part et d'autre, et on se met au milieu. */
-        function auMilieu(t){
+           l'épaisseur comme référence ». Puis, en v2.9.9 : « parfois le
+           modèle est pas bien centré sur la lettre (exemple lettre ba).
+           Aussi son mouvement fait des vibrations, au lieu de suivre le
+           centre de la largeur à chaque fois. »
+
+           Mesuré au banc avant de toucher : sur le bā le trait fait 29 px
+           de large et le modèle passait jusqu'à 14 px du milieu ; sur le
+           dāl, 9 px en moyenne. Deux causes :
+           1. le parcours du crayon (`rev.routes`) est un chemin de PIXELS
+              à travers l'encre : il longe un bord et avance en marches
+              d'escalier de dix pixels ;
+           2. le recalage d'alors sondait la normale jusqu'aux deux bords,
+              ce qui déraille aux jonctions (la sonde file dans le trait
+              voisin) — on l'avait donc BORNÉ à ±3 px, bien trop peu pour
+              un trait de 30, et l'adoucissement (±5 px) ne voyait pas des
+              marches de dix.
+
+           On ne sonde plus les bords : on lit la CARTE DES DISTANCES AU
+           BORD. Au milieu d'un trait elle est maximale ; on fait donc
+           MONTER chaque point le long de sa normale tant que la distance
+           augmente, et il s'arrête de lui-même sur la crête — la borne EST
+           la demi-épaisseur locale. Il ne peut pas sauter dans le trait
+           voisin : il faudrait redescendre. Plusieurs passes, chacune à
+           moitié du chemin puis adoucie, et le trait se pose sur l'axe. */
+        function carteBord(){
+          if(p2.bord)return p2.bord;
+          var N2=W*H,d=new Float32Array(N2);
+          var bx=new Int16Array(N2),by=new Int16Array(N2),i,x,y,j;
+          for(i=0;i<N2;i++){
+            if(p2.rang[i]>=0){d[i]=1e9;bx[i]=-1;by[i]=-1;}
+            else{d[i]=0;bx[i]=i%W;by[i]=(i/W)|0;}
+          }
+          function essaie(a,ax2,ay2,b){
+            if(bx[b]<0)return;
+            var ex2=ax2-bx[b],ey2=ay2-by[b],v=ex2*ex2+ey2*ey2;
+            if(v<d[a]){d[a]=v;bx[a]=bx[b];by[a]=by[b];}
+          }
+          for(y=0;y<H;y++)for(x=0;x<W;x++){
+            j=y*W+x;if(!d[j])continue;
+            if(x>0)essaie(j,x,y,j-1);
+            if(y>0)essaie(j,x,y,j-W);
+            if(x>0&&y>0)essaie(j,x,y,j-W-1);
+            if(x<W-1&&y>0)essaie(j,x,y,j-W+1);
+          }
+          for(y=H-1;y>=0;y--)for(x=W-1;x>=0;x--){
+            j=y*W+x;if(!d[j])continue;
+            if(x<W-1)essaie(j,x,y,j+1);
+            if(y<H-1)essaie(j,x,y,j+W);
+            if(x<W-1&&y<H-1)essaie(j,x,y,j+W+1);
+            if(x>0&&y<H-1)essaie(j,x,y,j+W-1);
+          }
+          for(i=0;i<N2;i++)d[i]=Math.sqrt(d[i]);
+          p2.bord=d;
+          return d;
+        }
+        var BORD=carteBord();
+        /* la distance au bord en un point quelconque, entre les pixels */
+        function profondeur(x,y){
+          if(!(x>=0&&y>=0&&x<W-1&&y<H-1))return 0;
+          var ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy,j=iy*W+ix;
+          return (BORD[j]*(1-fx)+BORD[j+1]*fx)*(1-fy)+
+                 (BORD[j+W]*(1-fx)+BORD[j+W+1]*fx)*fy;
+        }
+        /* Un point du parcours tombe parfois juste À CÔTÉ de l'encre (le
+           geste dicté ne touche pas toujours la lettre) : on le ramène sur
+           le pixel d'encre le plus proche, sinon rien ne peut le centrer. */
+        function surLEncre(t){
+          return t.map(function(p){
+            if(profondeur(p.x,p.y)>0.5)return p;
+            var mx=p.x,my=p.y,md=1e9,r,dx5,dy5,xx,yy,d5;
+            for(r=1;r<=12&&md>1e8;r++)
+              for(dy5=-r;dy5<=r;dy5++)for(dx5=-r;dx5<=r;dx5++){
+                if(Math.max(Math.abs(dx5),Math.abs(dy5))!==r)continue;
+                xx=Math.round(p.x)+dx5;yy=Math.round(p.y)+dy5;
+                if(xx<0||yy<0||xx>=W||yy>=H||p2.rang[yy*W+xx]<0)continue;
+                d5=dx5*dx5+dy5*dy5;
+                if(d5<md){md=d5;mx=xx;my=yy;}
+              }
+            return {x:mx,y:my};
+          });
+        }
+        /* Jusqu'où monte la distance au bord depuis ce point, le long de sa
+           normale : rend le décalage (signé) vers la crête et sa hauteur. */
+        function crete(t,q,plafond){
+          var a4=t[Math.max(0,q-2)],b4=t[Math.min(t.length-1,q+2)];
+          var dx4=b4.x-a4.x,dy4=b4.y-a4.y,n5=Math.sqrt(dx4*dx4+dy4*dy4);
+          var c0=profondeur(t[q].x,t[q].y);
+          if(n5<0.001||c0<=0)return {s:0,h:c0,nx:0,ny:0};
+          var nx=-dy4/n5,ny=dx4/n5;
+          var h1=profondeur(t[q].x+nx,t[q].y+ny);
+          var h2=profondeur(t[q].x-nx,t[q].y-ny);
+          var sens=(h1>=h2)?1:-1,haut=c0,s=0,r4,v;
+          if(Math.max(h1,h2)<=c0+0.02)return {s:0,h:c0,nx:nx,ny:ny};
+          for(r4=0.5;r4<=plafond&&haut<plafond;r4+=0.5){
+            v=profondeur(t[q].x+sens*nx*r4,t[q].y+sens*ny*r4);
+            if(v<=haut+0.005)break;
+            haut=v;s=r4;
+          }
+          return {s:sens*s,h:haut,nx:nx,ny:ny};
+        }
+        function auMilieu(t,plafond){
           if(t.length<2)return t;
           var res=[];
           for(var q=0;q<t.length;q++){
-            var a4=t[Math.max(0,q-1)],b4=t[Math.min(t.length-1,q+1)];
-            var dx4=b4.x-a4.x,dy4=b4.y-a4.y,n5=Math.sqrt(dx4*dx4+dy4*dy4);
-            if(n5<0.001){res.push(t[q]);continue;}
-            /* la normale au sens de la marche */
-            var nx=-dy4/n5,ny=dx4/n5;
-            var cx4=t[q].x,cy4=t[q].y,MAX=60,d1=0,d2=0,r4;
-            function encre(x,y){
-              var ix=Math.round(x),iy=Math.round(y);
-              return ix>=0&&iy>=0&&ix<W&&iy<H&&p2.rang[iy*W+ix]>=0;
-            }
-            if(!encre(cx4,cy4)){res.push(t[q]);continue;}
-            for(r4=1;r4<=MAX;r4++){if(!encre(cx4+nx*r4,cy4+ny*r4))break;d1=r4;}
-            for(r4=1;r4<=MAX;r4++){if(!encre(cx4-nx*r4,cy4-ny*r4))break;d2=r4;}
-            /* Une traversee qui touche la borne n'est pas une epaisseur :
-               c'est qu'on longe le trait. On laisse le point tel quel. */
-            if(d1>=MAX||d2>=MAX){res.push(t[q]);continue;}
-            /* BORNE a trois pixels. Sans borne, le balayage deraille aux
-               jonctions — il file dans une autre partie de la lettre — et
-               ajoute des a-coups au lieu d en enlever : mesure, les virages
-               secs passaient de 12 a 113. Borne, il calme le trace sans
-               jamais le jeter ailleurs. */
-            var dec=(d1-d2)/2;
-            if(dec>3)dec=3; if(dec<-3)dec=-3;
-            res.push({x:cx4+nx*dec, y:cy4+ny*dec});
+            var m5=crete(t,q,plafond);
+            /* la MOITIÉ du chemin : la passe suivante finit le travail,
+               sur un tracé que l'adoucissement a déjà calmé */
+            res.push({x:t[q].x+m5.nx*m5.s*0.5,y:t[q].y+m5.ny*m5.s*0.5});
           }
           return res;
         }
+        /* Adoucir SANS quitter l'encre : un point que la moyenne de ses
+           voisins jetterait hors du trait (un virage serré) reste où il
+           est — sauf s'il était déjà dans le blanc. Sans risque ici — le tracé est déjà centré, ce n'est plus le
+           zigzag d'autrefois qui sortait une fois sur deux. */
+        function adoucitDedans(t,fois){
+          for(var f=0;f<fois;f++){
+            if(t.length<3)return t;
+            var n3=[t[0]];
+            for(var q=1;q<t.length-1;q++){
+              var x6=(t[q-1].x+2*t[q].x+t[q+1].x)/4;
+              var y6=(t[q-1].y+2*t[q].y+t[q+1].y)/4;
+              n3.push((profondeur(x6,y6)>=1||profondeur(t[q].x,t[q].y)<1)
+                      ?{x:x6,y:y6}:t[q]);
+            }
+            n3.push(t[t.length-1]);
+            t=n3;
+          }
+          return t;
+        }
+        /* LA DEMI-ÉPAISSEUR DU TRAIT, médiane sur tout le parcours : elle
+           donne le plafond de la montée (dans une tache plus large que le
+           trait — la tête pleine d'un mīm — on ne va pas chercher le fond)
+           et la portée de l'adoucissement final. */
+        /* Un « trait » d'un seul point posé HORS de l'encre (le départ dicté
+           du ʿayn tombe à quinze pixels de la lettre) : le modèle attendait
+           là, dans le vide, avant de sauter sur la lettre. On l'écarte. */
+        var vrais=traits.filter(function(t){
+          return t.length>1||profondeur(t[0].x,t[0].y)>0.5;
+        });
+        if(vrais.length)traits=vrais;
+        /* ── UN CREUX BLANC NE SE TRAVERSE PAS ──
+           Là où le parcours du crayon n'a pas trouvé de passage, il file
+           tout droit — et coupe un creux de la lettre : mesuré sur le fā et
+           le mīm, treize et quinze pixels de suite dans le blanc, entre la
+           tête et le corps. On refait ce bout-là par le plus court chemin
+           DANS l'encre ; le recentrage le ramène ensuite sur l'axe.
+           SAUF si le détour est long : la tête du mīm n'est pas fermée dans
+           cette police, et le geste — une boucle — enjambe sa baie. Forcé
+           dans l'encre, le modèle faisait demi-tour au fond de la baie,
+           remontait au départ et redescendait (essayé, deux rebroussements
+           à 179°). Là, on laisse le bout tel quel : quinze pixels de blanc
+           sous un animal qui en fait le double. Aux deux BOUTS du trait, un
+           point à côté de l'encre rejoint simplement le pixel le plus
+           proche. */
+        function parLEncre(t){
+          function dedans(p){
+            var ix=Math.round(p.x),iy=Math.round(p.y);
+            return ix>=0&&iy>=0&&ix<W&&iy<H&&p2.rang[iy*W+ix]>=0;
+          }
+          var res=[],q=0,vient=null,file=null;
+          while(q<t.length){
+            if(dedans(t[q])){res.push(t[q]);q++;continue;}
+            var fin=q;
+            while(fin<t.length&&!dedans(t[fin]))fin++;
+            if(!res.length||fin>=t.length){
+              surLEncre(t.slice(q,fin)).forEach(function(p){res.push(p);});
+              q=fin;continue;
+            }
+            var A=res[res.length-1],B=t[fin];
+            var a=Math.round(A.y)*W+Math.round(A.x),b=Math.round(B.y)*W+Math.round(B.x);
+            if(!vient){vient=new Int32Array(W*H);file=new Int32Array(W*H);}
+            var i2;for(i2=0;i2<W*H;i2++)vient[i2]=-2;
+            var tete2=0,queue2=0,j,x,y,d,v,xv,yv;
+            file[queue2++]=a;vient[a]=-1;
+            while(tete2<queue2&&vient[b]===-2){
+              j=file[tete2++];x=j%W;y=(j-x)/W;
+              for(d=0;d<8;d++){
+                xv=x+[1,-1,0,0,1,1,-1,-1][d];yv=y+[0,0,1,-1,1,-1,1,-1][d];
+                if(xv<0||yv<0||xv>=W||yv>=H)continue;
+                v=yv*W+xv;
+                if(p2.rang[v]<0||vient[v]!==-2)continue;
+                vient[v]=j;file[queue2++]=v;
+              }
+            }
+            var pont=[];
+            if(vient[b]!==-2)for(j=vient[b];j>=0&&j!==a;j=vient[j])
+              pont.push({x:j%W,y:(j-j%W)/W});
+            if(vient[b]!==-2&&pont.length<=3*(fin-q)+16){
+              pont.reverse();
+              pont.forEach(function(p){res.push(p);});
+            }else while(q<fin)res.push(t[q++]);
+            q=fin;
+          }
+          return res;
+        }
+        traits=traits.map(parLEncre);
+        var demis=[];
+        traits.forEach(function(t){
+          for(var q=0;q<t.length;q+=3){
+            var m6=crete(t,q,80);
+            if(m6.h>0)demis.push(m6.h);
+          }
+        });
+        demis.sort(function(a2,b2){return a2-b2;});
+        var DEMI=demis.length?demis[Math.floor(demis.length/2)]:4;
+        var PLAFOND=DEMI*1.25;
+        var FINAL=Math.max(6,Math.min(60,Math.round(DEMI*DEMI/8)));
         var lisse=[];
         traits.forEach(function(t,ti){
-          /* Recale UNE FOIS, sur le trace grossier, puis on adoucit plus
-             fort : mesure sur les trente lettres, l angle moyen entre deux
-             pas tombe de 4,69 a 3,51 degres — un quart de tremblement en
-             moins — sans que les a-coups augmentent (12 -> 14). */
-          t=auMilieu(t);
-          /* Adoucir, poser un point par pixel, adoucir encore a CETTE
-             finesse, puis un point tous les deux pixels. Mesure sur les
-             trente lettres : les virages de plus de soixante degres tombent
-             de 51 a 12, et les points hors de l encre restent a un demi
-             pour cent. Adoucir une seule fois, avant le reechantillonnage,
-             ne voyait pas le bruit d angle du pas final. */
-          var u=reechantillonne(adoucit(reechantillonne(adoucit(t,7),1),16),2);
+          var u=reechantillonne(adoucit(t,4),2);
+          for(var tour=0;tour<12;tour++){
+            u=adoucitDedans(auMilieu(u,PLAFOND),2);
+            if(tour%3===2)u=reechantillonne(u,2);
+          }
+          /* Un dernier adoucissement, à l'échelle du trait, puis un point
+             tous les deux pixels : avancer d'un point par image, c'est
+             avancer à vitesse constante. */
+          u=reechantillonne(adoucitDedans(u,FINAL),2);
           u.forEach(function(p3,q){
             if(ti>0&&q===0)p3.saut=true;   /* on reprend le stylo ici */
             lisse.push(p3);

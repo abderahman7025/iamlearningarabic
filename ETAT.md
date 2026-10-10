@@ -81,24 +81,14 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ (10 octobre 2026)
+## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ
 
-**Le modèle du tracé (3-5 ans) est mal centré et vibre.** Le client : « pour
-les exercices de repassage sur la lettre, parfois le modèle est pas bien
-centré sur la lettre (exemple lettre ba). Aussi son mouvement fait des
-vibrations, au lieu de suivre le centre de la largeur à chaque fois. »
-C'est `centresDeLordre(p2)` dans `api.jeuTrace` : le chemin vient de
-`rev.routes` (le parcours du crayon), puis un recentrage BORNÉ à ±3 px par
-point et un lissage (voir les commentaires, mesures sur les trente lettres).
-Le recentrage non borné avait été essayé et jetait le point dans une autre
-partie de la lettre aux jonctions. Piste : recentrer par la médiane de
-l'encre sur la normale avec une borne proportionnelle à l'épaisseur du trait,
-plusieurs passes, puis mesurer AU BANC, lettre par lettre, l'écart au centre
-et l'angle entre deux pas — ne pas régler à l'œil.
+Rien d'ouvert au 10 octobre 2026 (le modèle du tracé mal centré : fait en
+v3.0.0, voir plus bas — en attente du regard du client).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v2.9.9
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.0
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -175,8 +165,50 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v2.9.9), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.0), du plus récent au plus ancien :**
 
+- **v3.0.0.** Le modèle du tracé (3-5 ans) suit le MILIEU du trait et ne
+  vibre plus. Le client : « parfois le modèle est pas bien centré sur la
+  lettre (exemple lettre ba). Aussi son mouvement fait des vibrations, au
+  lieu de suivre le centre de la largeur à chaque fois. »
+  Tout est dans `centresDeLordre(p2)` (`api.jeuTrace`), rien d'autre touché.
+  * **Cause, mesurée :** `rev.routes` est un chemin de PIXELS dans l'encre —
+    il longe un bord et avance en marches d'escalier de dix pixels. Le
+    recalage sondait la normale jusqu'aux bords (déraille aux jonctions),
+    d'où sa borne de ±3 px, dérisoire sur un trait de 30 ; l'adoucissement
+    (±5 px) ne voyait pas les marches.
+  * **Remède :** carte des distances au bord de l'encre (`carteBord`,
+    gardée dans `p2.bord`) ; chaque point MONTE le long de sa normale tant
+    que la distance augmente et s'arrête sur la crête (`crete`, `auMilieu`) :
+    la borne est la demi-épaisseur locale, et il ne peut pas sauter dans le
+    trait voisin. Douze passes à demi-pas, adoucies sans sortir de l'encre
+    (`adoucitDedans`), puis un adoucissement final à l'échelle du trait
+    (`FINAL = DEMI²/8` passes). Plafond de montée `1,25 × DEMI` (demi-
+    épaisseur médiane) pour ne pas aller au fond d'une tache pleine.
+  * **Trois défauts trouvés en mesurant, même fonction :** (1) la liste de
+    la VOYELLE contient des miettes du bord de la lettre → le modèle sautait
+    21 fois du fatha au wāw sur « wa » (15 sur « wi ») : le chemin ne prend
+    plus que les vraies taches du signe ; (2) le départ dicté du ʿayn tombe
+    à 15 px de l'encre et formait un « trait » d'un point : écarté ; (3) un
+    bout de parcours dans le blanc est refait par l'encre si le détour est
+    court (`parLEncre`, ≤ 3 × le trou + 16).
+  * **Mesures, 30 lettres, canevas 520×280** (écart au centre = demi-
+    différence des distances aux deux bords sur la normale, hors jonctions) :
+    écart moyen 3,85 → 0,72 px ; pire lettre 16,95 (hā) → 1,67 ; virages de
+    plus de 20° : 332 → 19 ; angle moyen entre deux pas 5,6° → 2,6° ; points
+    hors de l'encre 81 → 13. Le bā : 2,74 / 13,88 max → 0,60 / 1,75 ; angle
+    max 46° → 4,5°. Téléphone (360×330) : 5,11 → 0,81 ; 381 → 24.
+  * **Ce qui reste, sciemment :** 13 points dans le blanc, 8 sur le fā
+    (comme avant) et 5 sur le mīm (8 avant) : le geste dicté ENJAMBE une
+    baie de la lettre. Forcé dans l'encre, le modèle du mīm faisait deux
+    demi-tours (essayé). Et 13 virages de plus de 60° : ce sont les
+    rebroussements du geste lui-même (jīm, sīn, qāf, ʿayn, hamza).
+  * **Pour remesurer** (rien dans le dépôt, à refaire en console sur
+    `/garcon/child`) : `fetch('/app?f=…')`, découper le texte de
+    `encreQuiRemplit`, de `separeLesTaches`/`partieDe` et de
+    `centresDeLordre`, les évaluer dans un `new Function('glyph','W','H',…)`
+    qui appelle `_revelateur` ; on compare ainsi deux versions de la
+    fonction sur la même page. Images dans `outils/captures/trace-*.png`.
 - **v2.9.9.** Troisième relecture du client sur les 3-5 ans.
   * « Attrape » : « Où est la lettre [son] ? » (une lettre) ; « Où est le
     son [son] » (leçon des voyelles).
