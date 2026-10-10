@@ -81,15 +81,23 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ
+## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ (10 octobre 2026)
 
-Rien d'ouvert au 10 octobre 2026 (le modèle du tracé mal centré : fait en
-v3.0.0, puis « il ne va pas au bout » en v3.0.1, voir plus bas — en attente
-du regard du client).
+**Le mode PORTRAIT (3-5 ans).** Le client : « il faut un site responsive :
+si l'enfant passe en mode portrait, tout soit bien agencé, beau, symétrique,
+que certaines choses comme le haut-parleur ou le guguss ne cachent pas de
+lettre ou autre chose importante. » À faire écran par écran, EN MESURANT
+(`resize_window` 375×812 et 768×1024 au banc local) : pour chaque manche de
+`_boyScene`, les rectangles du personnage (`.boy-perso`), du haut-parleur et
+des boutons ne doivent recouvrir ni la lettre ni les réponses ; rien ne doit
+déborder ; les marges gauche et droite égales.
+
+**Le modèle du tracé** (v3.0.0 et v3.0.1) attend le regard du client, qui
+voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.1
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.2
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -166,8 +174,32 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.1), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.2), du plus récent au plus ancien :**
 
+- **v3.0.2.** Quatre demandes du 10 octobre (la cinquième, le portrait, est
+  dans « À FAIRE »).
+  * **Deux « Bravo » à la fin d'un exercice.** Deux causes : la dernière
+    bonne réponse lançait `youpi` (mot tournant, « Bravo ! » une fois sur
+    six) puis la manche disait « Bravo ! » ; et la dernière manche disait
+    « Bravo ! » deux secondes avant la récompense, qui le redit. La dernière
+    réponse se fête en silence (`youpi(zone,true)`), la manche finit par
+    `finManche()` — Super / Génial / Youpi / Waouh, jamais Bravo — et
+    « Bravo ! » reste à `jeuRecompense`.
+  * **La suite se débloque.** Dans un cours, finir une lettre ouvrait déjà
+    la suivante (rejoué au banc). Le vrai défaut : la CARTE ne lisait que le
+    score affiché (≥ 80 %), tiré du carnet d'erreurs — un enfant qui finit
+    toutes les lettres d'un animal en se trompant souvent gardait l'animal
+    suivant sous cadenas. `_sessionFaite(sid)` lit aussi `st.accuracy` (que
+    `_boyValideSession` met à 1/1 exprès) ; les deux cartes l'utilisent.
+  * **Comptes du client :** `_COMPTES_OUVERTS` reçoit `abder.jah@gmail.com`
+    en plus du hotmail, et `_toutOuvert()` ouvre maintenant aussi les
+    LETTRES dans un cours (les deux écrans de choix), pas seulement les
+    étapes de la carte.
+  * **Volume :** `_VOLUME_PHRASES` revient de 0,55 à 1 (« aussi fort que
+    c'était avant que tu les baisses »).
+  * **Ballons :** la bonne lettre sort à 55 % (40 avant) et jamais plus de
+    DEUX autres lettres avant elle (quatre avant) ; toujours deux d'affilée
+    au plus.
 - **v3.0.1.** Le modèle du tracé va JUSQU'AU BOUT. Le client, après la
   v3.0.0 : « noun hamzah sin qaf sont réglés ? le tracé ne va pas au bout
   d'un trait, d'une pointe, du rond (qaf) ». Toujours dans

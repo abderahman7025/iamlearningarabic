@@ -7238,7 +7238,9 @@ function playError(){
   }catch(e){}
 }
 
-var _VOLUME_PHRASES=0.55;
+/* Remis à 1 en v3.0.2 — le client : « remets le son de la voix narrateur
+   aussi fort que c'était avant que tu les baisses ». */
+var _VOLUME_PHRASES=1;
 function speakText(txt,lang,el){
   if(!st.soundOn)return;
   /* La liste des enregistrements n'est pas encore là : on la redemande, sans
@@ -9287,12 +9289,25 @@ function _volCarte(o){
    un compte paye pour se charger, et ce qu'elle ouvre ici n'est que l'ORDRE
    des lecons, pas un contenu reserve. C'est un confort de travail, pas une
    frontiere de securite — et c'est pour cela qu'un simple courriel suffit. */
-var _COMPTES_OUVERTS=['abder.jah@hotmail.com'];
+var _COMPTES_OUVERTS=['abder.jah@hotmail.com','abder.jah@gmail.com'];
 /* L'embleme du monde ou l'enfant se trouve — la goutte, le bateau, la fleur.
    Il sert a habiller les canvas de trace : le cours doit sentir le monde
    qu'on traverse, pas une page blanche. Rempli au rendu de la carte, la
    seule ou l'on sache quelle session appartient a quelle ile. */
 var _ICONE_MONDE={};
+/* ── UNE ÉTAPE FINIE OUVRE LA SUIVANTE, QUELLE QUE SOIT LA NOTE ──
+   Le client : « quand on finit une lettre d'un cours, la lettre suivante
+   doit se débloquer ! » Dans un cours, c'était le cas. Mais la carte, elle,
+   ne lisait que le SCORE affiché (80 % au moins) : un enfant qui avait fini
+   toutes les lettres d'un animal en se trompant souvent gardait l'animal
+   suivant sous cadenas. `_boyValideSession` note pourtant la réussite à 1/1
+   dans `st.accuracy` « pour que l'île se débloque quoi qu'il arrive » —
+   personne ne le lisait ici. */
+function _sessionFaite(sid){
+  if(((st.scores||{})[sid]||0)>=80)return true;
+  var a=(st.accuracy||{})[sid];
+  return !!(a&&a.t>0&&a.c/a.t>=0.8);
+}
 function _toutOuvert(){
   try{
     var m=(localStorage.getItem('arab_email')||'').trim().toLowerCase();
@@ -9736,7 +9751,7 @@ function renderTuilesAnimaux(ca){
     isle.sids.forEach(function(sid){_ICONE_MONDE[sid]=isle.icon;});
     var sessions=isle.sids.map(function(sid){
       return ALL_S.filter(function(x){return x.id===sid;})[0]||null;}).filter(Boolean);
-    var faite=sessions.filter(function(x){return (st.scores[x.id]||0)>=80;}).length;
+    var faite=sessions.filter(function(x){return _sessionFaite(x.id);}).length;
     var finie=(faite===sessions.length);
     var fermee=!precedenteFinie&&!_toutOuvert();
     var coul=cols[i]||'#7FA9D4';
@@ -9998,7 +10013,7 @@ var islandDefs=_ilesDefs();
     var isleSessions=isle.sids.map(function(sid){
       return ALL_S.find(function(s){return s.id===sid;})||null;
     }).filter(Boolean);
-    var doneCount=isleSessions.filter(function(s){return (st.scores[s.id]||0)>=80;}).length;
+    var doneCount=isleSessions.filter(function(s){return _sessionFaite(s.id);}).length;
     var isLocked=!prevIslandDone&&!_toutOuvert();
     var isComplete=doneCount===isleSessions.length;
 
@@ -11257,7 +11272,7 @@ function _boyLetterPickerJeu(ca,session){
   indices.forEach(function(idx,rang){
     var L=CHILD_LETTERS[idx];
     var fait=faites.indexOf(idx)>=0;
-    var ouverte=fait||rang===0||faites.indexOf(indices[rang-1])>=0;
+    var ouverte=fait||rang===0||faites.indexOf(indices[rang-1])>=0||_toutOuvert();
     var t=document.createElement('div');
     t.className='tuile tuile-lettre'+(ouverte?'':' fermee')+(fait?' finie':'');
     t.style.setProperty('--tc',COUL[rang%COUL.length]);
@@ -11333,7 +11348,7 @@ function _boyLetterPicker(ca,session){
     var L=CHILD_LETTERS[idx];
     var fait=faites.indexOf(idx)>=0;
     /* ouverte si deja faite, si c'est la 1re, ou si la precedente est faite */
-    var ouverte=fait||rang===0||faites.indexOf(indices[rang-1])>=0;
+    var ouverte=fait||rang===0||faites.indexOf(indices[rang-1])>=0||_toutOuvert();
     var aFaire=ouverte&&!fait;
     if(aFaire&&premiereOuverte<0)premiereOuverte=rang;
 
@@ -11404,7 +11419,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.1';
+var _VERSION_REPLI='v3.0.2';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -19147,6 +19162,18 @@ function _boyScene(ca,reprise){
     if(!muet)N.plusTard(function(){N.dire(mot);},120);
     setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},1300);
   }
+  /* ── UN SEUL MOT À LA FIN D'UNE MANCHE, ET PAS « BRAVO » ──
+     Le client : « il dit 2 fois bravo à certains moments (fin
+     d'exercices) ». Deux causes : la dernière bonne réponse lançait son mot
+     de fête (qui tourne, et tombe sur « Bravo ! » une fois sur six) puis la
+     manche disait « Bravo ! » ; et la dernière manche disait « Bravo ! »
+     deux secondes avant la page de récompense, qui le redit. La dernière
+     réponse se fête donc en silence, la manche finit sur un autre mot, et
+     « Bravo ! » reste à la récompense. */
+  var _motFin=0;
+  function finManche(){
+    N.dire(te(['Super !','Génial !','Youpi !','Waouh !'][(_motFin++)%4]));
+  }
   function ditGlyphe(g){N.stop();try{speakText(g,_voixEnfant(),null);}catch(e){}}
   /* La lettre au milieu d'une phrase : on la fait dire par SON
      enregistrement, entre deux morceaux de français. */
@@ -20730,7 +20757,10 @@ function _boyScene(ca,reprise){
            sans rien a eclater. */
         /* Et jamais plus de DEUX d'affilee : le client est tombe sur quatre
            alif a la suite. */
-        var g=((Math.random()<0.4||_sansCible>=4)&&_avecCible<2)?cible:_melangeTab(leurres)[0];
+        /* v3.0.2 — « trop de lettres entre les ballons à éclater » : plus
+           d'une chance sur deux, et jamais plus de DEUX autres lettres
+           avant la bonne (c'était quatre). */
+        var g=((Math.random()<0.55||_sansCible>=2)&&_avecCible<2)?cible:_melangeTab(leurres)[0];
         _sansCible=(g===cible)?0:_sansCible+1;
         _avecCible=(g===cible)?_avecCible+1:0;
         var b=document.createElement('div');b.className='mj-bulle';
@@ -20850,7 +20880,7 @@ function _boyScene(ca,reprise){
       m.zone.appendChild(zone);
       function tour(premier){
         if(n>=BUT){jauge.firstChild.style.width='100%';
-          N.dire(te('Bravo !'));m.gagne();return;}
+          finManche();m.gagne();return;}
         jauge.firstChild.style.width=Math.round(n/BUT*100)+'%';
         zone.innerHTML='';
         var cible=cibles[n%cibles.length];
@@ -20865,8 +20895,8 @@ function _boyScene(ca,reprise){
           d.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
           d.onclick=function(){
             if(g===cible){
-              d.classList.add('juste');youpi(m.zone);
-              n++;N.plusTard(function(){tour(false);},900);
+              n++;d.classList.add('juste');youpi(m.zone,n>=BUT);
+              N.plusTard(function(){tour(false);},900);
             }else{
               d.classList.add('non');
               if(typeof playError==='function')playError();
@@ -20972,7 +21002,7 @@ function _boyScene(ca,reprise){
       }
       function tour(){
         if(n>=liste.length){jauge.firstChild.style.width='100%';
-          N.dire(te('Bravo !'));m.gagne();return;}
+          finManche();m.gagne();return;}
         jauge.firstChild.style.width=Math.round(n/liste.length*100)+'%';
         var mot=liste[n];
         zone.innerHTML='';
@@ -21008,7 +21038,7 @@ function _boyScene(ca,reprise){
             trouve=true;c.sp.classList.add('juste');
             /* « La voix doit dire les "waouh", "génial", au lieu de juste
                les écrire. » */
-            youpi(m.zone);
+            youpi(m.zone,n+1>=liste.length);
             /* Le mot n'est plus dit : le client, « la voix ne doit pas
                prononcer les mots arabes ; l'enfant trouve la lettre, c'est
                tout ». */
@@ -21198,7 +21228,7 @@ function _boyScene(ca,reprise){
         faites++;
         /* Dite à chaque paire reliée ; à la dernière, « Bravo ! » suffit. */
         youpi(m.zone,faites===choix.length);
-        if(faites===choix.length){N.dire(te('Bravo !'));m.gagne();}
+        if(faites===choix.length){finManche();m.gagne();}
       }
       function refuse(c){
         c.classList.add('non');
@@ -21308,7 +21338,7 @@ function _boyScene(ca,reprise){
               etincelles(m.zone,b.el);
               bloque=false;trouvees++;
               youpi(m.zone,trouvees===choix.length);
-              if(trouvees===choix.length){N.dire(te('Bravo !'));m.gagne();}
+              if(trouvees===choix.length){finManche();m.gagne();}
             },150);
           }else{
             N.plusTard(function(){
@@ -21340,7 +21370,7 @@ function _boyScene(ca,reprise){
       m.zone.appendChild(zone);
       function tour(){
         if(n>=suite.length){jauge.firstChild.style.width='100%';
-          N.dire(te('Bravo !'));m.gagne();return;}
+          finManche();m.gagne();return;}
         jauge.firstChild.style.width=Math.round(n/suite.length*100)+'%';
         var cible=suite[n];
         zone.innerHTML='';
@@ -21354,8 +21384,8 @@ function _boyScene(ca,reprise){
           d.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
           d.onclick=function(){
             if(v[0]===cible[0]){
-              d.classList.add('juste');youpi(m.zone);
-              n++;N.plusTard(tour,900);
+              n++;d.classList.add('juste');youpi(m.zone,n>=suite.length);
+              N.plusTard(tour,900);
             }else{
               d.classList.add('non');
               if(typeof playError==='function')playError();
