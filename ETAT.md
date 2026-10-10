@@ -206,6 +206,16 @@ distinct de la vipère de ء.
     `node outils/voix-adulte.js outils/captures/inv-adulte-fr.json fr`.
     Vérifié : les clés calculées par l'application sont celles en ligne
     (622 clés, dont 10 « long| »), aucune clé existante écrasée.
+  * **ANGLAIS, fait le 11 octobre (sans changement de version : ce ne sont
+    que des fichiers déposés).** Même voix Narrateur, mais en **`eleven_v4`**,
+    ton posé : en v3 elle roulait les r (« comme un Indien », dit le client),
+    il a écouté v2, v3 et v4 et pris la v4. 17 textes, 2 992 caractères,
+    639 clés en ligne dont 15 « long| ». Inventaire :
+    `outils/captures/inv-adulte-en.json` ; commande :
+    `node outils/voix-adulte.js outils/captures/inv-adulte-en.json en eleven_v4`.
+    Le « ○ » du bonus soukoun est DIT « circle » (table `ROND` de l'outil).
+    Pour l'inventaire, ne cliquer que les éléments dont le `onclick` contient
+    `speakText` : cliquer tous les boutons faisait naviguer la page en anglais.
   * **Pour la langue suivante :** refaire l'inventaire avec `st.lang` sur la
     langue voulue, puis le même outil avec son code (`en`, `es`…). La voix
     n'a pas été essayée dans une autre langue que le français.

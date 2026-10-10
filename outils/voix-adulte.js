@@ -4,7 +4,11 @@
  * Génère avec ElevenLabs (voix Narrateur, v3, ton posé) les textes que
  * l'interface lit au clic, et les dépose par POST /api/audio.
  *
- *   node outils/voix-adulte.js outils/captures/inv-adulte-fr.json fr [--sans-depot]
+ *   node outils/voix-adulte.js outils/captures/inv-adulte-fr.json fr [modele] [--sans-depot]
+ *
+ * Le modèle se choisit À L'OREILLE, langue par langue (choix du client) :
+ * français → eleven_v3 (défaut) ; anglais → eleven_v4 (en v3 la voix roulait
+ * les r).
  *
  * Le fichier d'inventaire vient du banc : `speakText` remplacé par un
  * enregistreur, puis chaque page adulte rendue et cliquée (voir ETAT.md).
@@ -38,6 +42,7 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
 const VOIX = 'Wm3eSTpNFfFtDgCxf6AU'; // Narrateur
 const inv = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const langue = process.argv[3] || 'fr';
+const modele = (process.argv[4] && process.argv[4].indexOf('eleven_') === 0) ? process.argv[4] : 'eleven_v3';
 const sansDepot = process.argv.includes('--sans-depot');
 const dest = path.join(__dirname, 'captures', 'voix-adulte-' + langue);
 fs.mkdirSync(dest, { recursive: true });
@@ -45,7 +50,8 @@ fs.mkdirSync(dest, { recursive: true });
 /* Ce qu'on DIT n'est pas tout à fait ce qu'on écrit : les puces et les
    espaces avant un point ne se prononcent pas. La clé, elle, reste le texte
    exact que l'application passe à `speakText`. */
-const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\s+/g, ' ').trim();
+const ROND = { en: 'circle' };
+const aDire = (t) => t.replace(/○/g, ROND[langue] || '').replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\s+/g, ' ').trim();
 
 (async () => {
   const textes = inv.fr.map((x) => x.t);
@@ -59,7 +65,7 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
           method: 'POST',
           headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
           body: JSON.stringify({
-            text: '[calm] ' + aDire(t), model_id: 'eleven_v3', language_code: langue,
+            text: '[calm] ' + aDire(t), model_id: modele, language_code: langue,
             voice_settings: { stability: 0.5, similarity_boost: 0.95, style: 0, use_speaker_boost: true },
           }),
         });
