@@ -83,21 +83,17 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ (10 octobre 2026)
 
-**Le mode PORTRAIT (3-5 ans).** Le client : « il faut un site responsive :
-si l'enfant passe en mode portrait, tout soit bien agencé, beau, symétrique,
-que certaines choses comme le haut-parleur ou le guguss ne cachent pas de
-lettre ou autre chose importante. » À faire écran par écran, EN MESURANT
-(`resize_window` 375×812 et 768×1024 au banc local) : pour chaque manche de
-`_boyScene`, les rectangles du personnage (`.boy-perso`), du haut-parleur et
-des boutons ne doivent recouvrir ni la lettre ni les réponses ; rien ne doit
-déborder ; les marges gauche et droite égales.
+**Le mode PORTRAIT, la suite.** Les neuf manches des 3-5 ans et le choix de
+la lettre sont faits (v3.0.3). Restent à regarder debout, en mesurant de la
+même façon : la page de récompense, la carte des animaux, et les écrans des
+6-11 ans — le client a dit « un site responsive », pas seulement les petits.
 
 **Le modèle du tracé** (v3.0.0 et v3.0.1) attend le regard du client, qui
 voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.2
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.3
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -174,8 +170,41 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.2), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.3), du plus récent au plus ancien :**
 
+- **v3.0.3.** Le mode PORTRAIT des manches 3-5 ans. Le client : « si
+  l'enfant passe en mode portrait, tout soit bien agencé, beau, symétrique,
+  que certaines choses comme le haut-parleur ou le guguss ne cachent pas de
+  lettre ou autre chose importante. »
+  * **Mesuré avant (375×812, les neuf manches) :** le personnage
+    (`.boy-perso`, coin bas-droit du panneau) recouvrait le cadre du tracé,
+    l'aire des ballons, la lettre de « trouve la lettre », une case de
+    « relie » et une carte des paires ; le haut-parleur (`.mj-hp`, en absolu)
+    recouvrait la première réponse d'« écoute » et des voyelles ; les bulles
+    d'« attrape-la » et les ballons sortaient de l'aire par la droite. Cause
+    commune : `ajusteEcran` grossit le cadre à ×1,45 en rétrécissant sa
+    largeur de mise en page à 69 % — debout sur un téléphone, il ne reste
+    que 234 px pour ranger le jeu.
+  * **Fait, UNIQUEMENT debout** (`@media (orientation:portrait)` + trois
+    tests en JS ; le paysage est inchangé, revérifié en 1024×768) :
+    le personnage au MILIEU, dans une bande que `ajusteEcran` réserve sous
+    le jeu (`padding-bottom = 26 + 92/k`, posée à la première passe) ; le
+    panneau centré dans la hauteur (`margin-top` à la seconde passe) ; le
+    haut-parleur au-dessus des réponses, centré ; « attrape-la » en deux
+    colonnes sur une aire plus haute (`.mj-etroite`, téléphone seulement) ;
+    les ballons ne naissent plus à droite de 50 % sur un téléphone ; les
+    paires en deux colonnes de quatre ; le choix de la lettre centré
+    (`.choix-lettre`).
+  * **Mesuré après :** sur les neuf manches, zéro recouvrement par le
+    personnage ou le haut-parleur, zéro débordement, marges gauche et droite
+    égales ; vérifié aussi à l'œil en 768×1024.
+  * **PIÈGE DE BANC :** dans le volet caché, les animations d'entrée
+    (`tx-zoom-in`, `fondu-entre`) restent figées : `getBoundingClientRect`
+    rend des rectangles rétrécis (panneau à 257 px au lieu de 316). Les
+    recouvrements se lisent quand même ; les tailles, non — prendre une
+    capture.
+  * **Pas encore regardé debout :** la page de récompense, la carte, et les
+    écrans des 6-11 ans.
 - **v3.0.2.** Quatre demandes du 10 octobre (la cinquième, le portrait, est
   dans « À FAIRE »).
   * **Deux « Bravo » à la fin d'un exercice.** Deux causes : la dernière

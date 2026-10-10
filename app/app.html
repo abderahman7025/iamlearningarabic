@@ -4097,6 +4097,33 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .mj-grille{gap:9px}
 }
 
+/* ══ DEBOUT (v3.0.3) ══
+   Le client : « il faut un site responsive : si l'enfant passe en mode
+   portrait, tout soit bien agencé, beau, symétrique, que certaines choses
+   comme le haut-parleur ou le guguss ne cachent pas de lettre ou autre chose
+   importante. » Mesuré au banc en 375×812, manche par manche : le personnage
+   (coin bas-droit du panneau) recouvrait le cadre du tracé, l'aire des
+   ballons, la lettre de « trouve la lettre », une case de « relie » et une
+   carte des paires ; le haut-parleur recouvrait la première réponse ; les
+   bulles d'« attrape-la » et les ballons sortaient de l'aire par la droite.
+   Debout, le personnage se tient donc AU MILIEU, dans une bande que
+   `ajusteEcran` lui réserve sous le jeu ; le haut-parleur passe au-dessus
+   des réponses, centré ; et le panneau se pose au milieu de la hauteur. */
+@media (orientation:portrait){
+  .panneau-jeu .boy-perso,.panneau-jeu .boy-bravo{left:50%;right:auto;
+    margin-left:-23px;transform-origin:center bottom}
+  .panneau-jeu .mj-hp{position:relative;top:auto;right:auto;display:block;
+    margin:0 auto 14px;flex:0 0 auto}
+  .sess-map-wrap.choix-lettre{min-height:calc(100vh - 270px);min-height:calc(100dvh - 270px);box-sizing:border-box;padding-bottom:16px;
+    display:flex;flex-direction:column;justify-content:center}
+}
+@media (orientation:portrait) and (max-width:520px){
+  /* huit cartes : deux colonnes de quatre, deux fois plus grosses */
+  .mj-grille{grid-template-columns:repeat(2,1fr);max-width:236px}
+  .mj-aire.mj-etroite{height:430px}
+  .mj-etroite.mj-quatre .mj-flotte{width:96px;height:96px;font-size:2.8rem}
+}
+
 /* Le bouton de retour des ecrans joues : rond, gros, sans rien a lire. */
 .jeu-retour{display:block;margin:20px auto 26px;padding:14px 30px;border-radius:99px;
   border:4px solid rgba(var(--sk-rgb),.45);background:#fff;color:var(--sk-fonce);
@@ -11253,7 +11280,7 @@ function _boyLetterPickerJeu(ca,session){
   _HAB=_habDuProfil();_fondEnfant(true);_decorMonde(ca,false);
   var COUL=['#F5A524','#2FC4D6','#9B7EDE','#57C84D','#EC6EA8','#F2C230',
             '#1E40AF','#EF4444'];
-  var wrap=document.createElement('div');wrap.className='sess-map-wrap';
+  var wrap=document.createElement('div');wrap.className='sess-map-wrap choix-lettre';
   var titre=document.createElement('div');titre.className='sess-map-title';
   titre.textContent='✋ '+te('Choisis ta lettre');
   wrap.appendChild(titre);
@@ -11419,7 +11446,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.2';
+var _VERSION_REPLI='v3.0.3';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16878,6 +16905,11 @@ function _boyScene(ca,reprise){
     wrap.style.transform='';wrap.style.transformOrigin='';
     wrap.style.width='';wrap.style.height='';
     wrap.style.marginLeft='';wrap.style.marginRight='';_echelleCadre=1;
+    /* DEBOUT, dans une manche des 3-5 ans : voir la fin de la fonction. */
+    wrap.style.marginTop='';
+    var _jeux=[].slice.call(wrap.querySelectorAll('.panneau-jeu'));
+    var _debout=!estPaysage()&&window.innerHeight>window.innerWidth&&_jeux.length>0;
+    if(!essai||!_debout)_jeux.forEach(function(pj){pj.style.paddingBottom='';});
     var vv=window.visualViewport;
     var vh=(vv&&vh_ok(vv.height))||window.innerHeight||0;
     if(!vh)return;
@@ -16957,6 +16989,19 @@ function _boyScene(ca,reprise){
         if(br)br.style.transform='scale('+f.toFixed(4)+')';
       }
     });
+    /* ── DEBOUT : LA BANDE DU PERSONNAGE, ET LE PANNEAU AU MILIEU ──
+       Le personnage garde 46 px de large à l'écran quelle que soit
+       l'échelle : sa bande se compte donc en pixels d'ÉCRAN, divisés par
+       l'échelle trouvée. Elle change la hauteur — la seconde passe
+       (`essai`) recherche l'échelle avec elle, puis centre ce qui reste de
+       vide au-dessus et en dessous. */
+    if(_debout){
+      if(!essai)_jeux.forEach(function(pj){
+        var ps=pj.querySelector('.boy-perso');
+        if(ps&&ps.style.display!=='none')pj.style.paddingBottom=Math.round(26+92/k)+'px';
+      });
+      else if(dispo-rendu>16)wrap.style.marginTop=Math.floor((dispo-rendu)/2)+'px';
+    }
     if(!essai)ajusteEcran(1);
   }
   var _echelleCadre=1;
@@ -19287,6 +19332,8 @@ function _boyScene(ca,reprise){
         jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
         aire.innerHTML='';
         var c=cibles[pris%cibles.length];
+        var etroite=window.innerWidth<=520&&window.innerHeight>window.innerWidth;
+        aire.classList.toggle('mj-etroite',etroite);
         var faux=_melangeTab(leurres.concat(cibles).filter(function(x){return x!==c;}));
         var lot=_melangeTab([c].concat(faux.slice(0,5)));
         /* ── LEÇON DES VOYELLES : QUATRE BULLES, PLUS GROSSES ──
@@ -19306,6 +19353,14 @@ function _boyScene(ca,reprise){
           if(multi){
             f.style.left=(8+(k%2)*46+Math.random()*8)+'%';
             f.style.top=(4+Math.floor(k/2)*44+Math.random()*8)+'%';
+          }
+          /* DEBOUT sur un téléphone, l'aire est étroite : trois bulles de
+             front en sortaient par la droite (mesuré). Deux colonnes, sur
+             une aire plus haute. */
+          if(etroite){
+            f.style.left=(4+(k%2)*46+Math.random()*5)+'%';
+            f.style.top=(multi?(5+Math.floor(k/2)*46+Math.random()*6)
+                              :(3+Math.floor(k/2)*31+Math.random()*5))+'%';
           }
           f.style.animationDuration=(4+Math.random()*4).toFixed(1)+'s';
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
@@ -20777,12 +20832,17 @@ function _boyScene(ca,reprise){
            13 % de large ; les plus anciens sont deja montes plus haut. On
            ecarte donc de 16 % des DEUX derniers, et faute de place on garde le
            tirage le plus eloigne. */
-        var xb=5+Math.random()*80,meilleur=xb,dMeilleur=-1;
+        /* Sur une aire étroite (téléphone debout) un ballon posé à 85 % en
+           sortait à moitié : la place la plus à droite est celle où il
+           tient encore en entier. */
+        var _lg=(window.innerWidth<=520&&window.innerHeight>window.innerWidth)?45:80;
+        var xb=5+Math.random()*_lg,meilleur=xb,dMeilleur=-1;
+        var _ecart=Math.min(16,_lg/3);
         for(var _e=0;_e<30;_e++){
           var dmin=_places.reduce(function(m2,px){return Math.min(m2,Math.abs(px-xb));},999);
           if(dmin>dMeilleur){dMeilleur=dmin;meilleur=xb;}
-          if(dmin>=16)break;
-          xb=5+Math.random()*80;
+          if(dmin>=_ecart)break;
+          xb=5+Math.random()*_lg;
         }
         xb=meilleur;
         _places.push(xb);if(_places.length>2)_places.shift();
