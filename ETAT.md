@@ -81,7 +81,14 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v296
+## OÙ ON EN EST — 10 octobre 2026, production en v2.9.7
+
+**Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
+client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
+v2.9.8, puis v2.9.9, puis v3.0.0. Trois endroits à changer ensemble :
+`_VERSION_REPLI` dans `app/app.html`, et dans `public/sw.js` le commentaire de
+la première ligne et `const CACHE = 'arab-v2.9.7'`. Pour guetter la mise en
+ligne : `curl …/sw.js | grep -o "arab-v[0-9.]*"`.
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -151,7 +158,11 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v296), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v2.9.7), du plus récent au plus ancien :**
+
+- **v2.9.7.** Jeu « Attrape » des 3-5 ans : l'ordre final du client est
+  Encore, Continue, Bravo, Génial, Supeeeer. Numéro de version à points ; le
+  compteur à l'écran compare les versions sans les points.
 
 - **v296.** Jeu « Attrape » des 3-5 ans : « avant "encore", dis "bravo" ».
   Les cinq prises disent Bravo, Encore, Continue, Génial, Supeeeer.

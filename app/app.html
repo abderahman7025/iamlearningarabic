@@ -5051,14 +5051,18 @@ body.fond-espace .tuile-nom{color:#20242e}
     try{
       if(!(window.caches&&caches.keys))return;
       caches.keys().then(function(cles){
-        var n=-1;
+        var n=-1,nom='';
         cles.forEach(function(k){
-          var m=/^arab-v(\d+)$/.exec(k);
-          if(m&&+m[1]>n)n=+m[1];
+          /* « v2.9.7 » : centaine.dizaine.unité. Pour comparer, on retire
+             les points — 2.9.7 vaut 297, et un ancien cache « arab-v296 »
+             se compare de la même façon. */
+          var m=/^arab-v([\d.]+)$/.exec(k);
+          var q=m?parseInt(m[1].replace(/[^0-9]/g,''),10):-1;
+          if(q>n){n=q;nom=m[1];}
         });
         var moi=parseInt(String(v).replace(/[^0-9]/g,''),10);
         if(n>moi){
-          el.textContent=v+' · v'+n+' prête, recharge';
+          el.textContent=v+' · v'+nom+' prête, recharge';
           el.style.opacity='.9';el.style.color='#f5c842';
         }
       })['catch'](function(){});
@@ -11386,7 +11390,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v296';
+var _VERSION_REPLI='v2.9.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -19244,9 +19248,9 @@ function _boyScene(ca,reprise){
                 N.plusTard(function(){N.dire(te('Supeeeer !'));},multi?1000:160);m.gagne();}
               else{
                 if(!multi)(function(mot){N.plusTard(function(){N.dire(te(mot));},160);})
-                  /* « Avant "encore", dis "bravo" » : cinq prises, cinq mots —
-                     Bravo, Encore, Continue, Génial, puis Supeeeer. */
-                  (['Bravo !','Encore !','Continue !','Génial !'][(pris-1)%4]);
+                  /* L'ordre fixé par le client : Encore, Continue, Bravo,
+                     Génial, puis Supeeeer à la cinquième prise. */
+                  (['Encore !','Continue !','Bravo !','Génial !'][(pris-1)%4]);
                 N.plusTard(function(){tour(false);},multi?1400:900);
               }
             }else{
