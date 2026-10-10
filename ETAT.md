@@ -165,8 +165,8 @@ distinct de la vipère de ء.
   * *« Tant que la voix n'a pas fini de parler, toucher l'écran ne fait rien.
     Pareil partout ! »* `N.occupe()` (phrase en cours ou en file) ; `manche()`
     arrête à la capture tout `pointerdown`/`click` de la manche tant qu'elle
-    est vraie. Lu comme une DEMANDE : avant, les réponses répondaient pendant
-    la consigne. Si c'était une plainte, retirer ce bloc suffit.
+    est vraie. C'est bien une DEMANDE du client (confirmée le 10 octobre) :
+    l'enfant écoute la consigne avant de pouvoir répondre. À garder.
   * *Le mot* : la consigne une fois, « Encore ! » aux deux tours suivants ;
     la félicitation (« Waouh ! », « Génial ! ») est dite, plus seulement écrite.
   * *Le tracé* : « Suis le modèle, et repasse avec ton doigt ! », sans le son.
