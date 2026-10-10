@@ -228,6 +228,24 @@ distinct de la vipère de ء.
     `petit-en.json` se refait au banc : `te(phrase)` pour chaque clé
     « petit| » française, `st.lang` sur la langue, et `teF('Bravo ! {nom}
     arrive dans ton album.',{nom})` avec les noms de `_habDuProfil().etapes`.
+  * **6-11 ANS EN ANGLAIS, fait le 11 octobre** (fichiers seulement).
+    Narrateur `eleven_v4`, ton posé partout — comme le français, qui n'a
+    que du posé ; « tout l'anglais en v4 », dit le client. 124 phrases
+    (4 310 caractères) sur les clés communes anglaises ; 803 clés en ligne.
+    Le relevé vient de `outils/inventaire-voix.js` (à coller dans la console
+    du banc) : `inventaireVoix('en',['boy'])` puis `['girl']`, 35 minutes
+    par profil quand trois onglets tournent ensemble. **IL FAUT d'abord
+    remplir `AUDIO_URLS` avec les clés arabes en ligne** : sans cela la
+    narration dit des phrases entières avec les sons translittérés, et le
+    relevé est faux (81 des 152 phrases françaises retrouvées seulement ;
+    avec, 84 sur 88 dites). « plusse » (le signe +) n'est pas traduit : non
+    généré. Les morceaux « You don't say khè, but » font dire le son fautif
+    à l'IA, comme en français.
+  * **Quatre phrases françaises rattrapées** (v3 posé) : « Voici la lettre »,
+    « Écoute bien, et touche la bonne lettre. », « Choisis ta lettre ! »,
+    « Où est la lettre » — retirées à tort de la liste des 152 comme
+    « phrases des 3-5 ans » alors que les 6-11 ans les disent aussi (le
+    relevé l'a montré). Anciens fichiers : `outils/captures/avant-fr4/`.
   * **Pour la langue suivante :** refaire l'inventaire avec `st.lang` sur la
     langue voulue, puis le même outil avec son code (`en`, `es`…). La voix
     n'a pas été essayée dans une autre langue que le français.
