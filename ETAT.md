@@ -31,7 +31,57 @@ production ni par le client : `node outils/serveur-local.js`
 
 ---
 
-## OÙ ON EN EST — 4 octobre 2026, production en v294
+## LES VOIX — à lire en premier pour reprendre (10 octobre 2026)
+
+Trois sources de voix, et une seule règle de recherche : `speakText(txt)` →
+`_sonEnregistre(txt)` → `_clesSon(txt)` → `AUDIO_URLS[clé]` (liste rendue par
+`GET /api/audio`, fichiers dans le bucket Supabase « audio », nom
+`hex(clé).webm` quel que soit le format). Pas de fichier = synthèse du
+navigateur.
+
+1. **Les sons arabes** (lettres, syllabes, mots) : enregistrés par le client
+   au studio, avec SA voix. 378 en ligne, vérifiés un par un le 3 octobre.
+   Restent 24 sons « fautifs » des lettres graves (clés « خè », « خèn »,
+   « خèè »… onglet Sons du studio). L'IA prononce mal l'arabe isolé : on ne
+   lui fait JAMAIS dire une lettre, un nom de lettre ou une syllabe.
+2. **Interface 6-11 ans, en français** : clone ElevenLabs du client
+   (« Abderahman iamlearningarabic », voice_id `Uqmzt456J5LFX8R4qoZ8`),
+   modèle `eleven_multilingual_v2`, vitesse 0,8. 163 phrases en ligne (v293).
+3. **Interface 3-5 ans, en français** : voix « Narrateur » du compte
+   ElevenLabs du client (voice_id `Wm3eSTpNFfFtDgCxf6AU`), modèle `eleven_v4`
+   avec balises d'émotion (`[excited]`, `[softly]`…). 42 phrases, rangées
+   sous la clé `petit|` + phrase : `_clesSon` les cherche D'ABORD quand
+   `st.age==='petit'`, puis retombe sur la clé commune (v295).
+
+**Ce que veut le client (10 octobre)** : garder SA voix pour les sons arabes,
+et mettre la voix Narrateur « pour le reste du site ». Le 3-5 ans est le
+premier pas ; il l'écoute avant de décider du reste. Donc à faire s'il
+valide : refaire les 163 phrases 6-11 ans avec Narrateur (émotions à lui
+faire relire), puis l'interface ados/adultes, puis les 12 autres langues.
+
+**Outils** (hors dépôt, dans le scratchpad de la session — à recréer s'ils
+manquent, la logique est décrite ici) :
+- inventaire des phrases DITES : au banc, `speakText`/`speak` remplacés par un
+  enregistreur, horloge virtuelle (`setTimeout`/`setInterval`/`Date.now`
+  pompés par un `MessageChannel`, car un onglet caché bride ses minuteries),
+  tous les sons arabes marqués enregistrés, puis `api.suivant()` page par
+  page en attendant 5 s virtuelles de silence. Résultats gardés dans
+  `outils/captures/inv-fr.json` et `inv-fr-lettres.json`.
+- génération : `POST https://api.elevenlabs.io/v1/text-to-speech/<voice_id>`
+  (`model_id`, `voice_settings.speed` pour v2 seulement — v3 et v4
+  l'ignorent ; `language_code` pour v3/v4). Clé dans `.env.local`
+  (`ELEVENLABS_API_KEY`), jamais affichée. Forfait Creator, 128 000
+  crédits/mois ; ~12 000 utilisés au 10 octobre.
+- dépôt : `POST /api/audio` `{ar: clé, audioBase64}` avec
+  `Authorization: Bearer <ADMIN_SECRET>` (aussi dans `.env.local`).
+- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 9.
+
+**Fichier de travail du client** : `Bureau/phrases-3-5-ans.txt` — une ligne
+par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
+
+---
+
+## OÙ ON EN EST — 10 octobre 2026, production en v295
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -101,7 +151,24 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v294), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v295), du plus récent au plus ancien :**
+
+- **v295.** Interface 3-5 ans, phrases revues par le client dans
+  `phrases-3-5-ans.txt` et dites par la voix « Narrateur ».
+  * `_clesSon` : préfixe `petit|` cherché d'abord pour les 3-5 ans (jamais
+    pour un son arabe) — les mêmes mots (« Bravo ! », « Écoute bien ! »)
+    gardent une autre voix chez les 6-11 ans.
+  * Textes : « Le savais-tu : En arabe, on écrit de droite à gauche. » ;
+    « Repasse sur la lettre [son] avec ton doigt ! » (le son au milieu) ;
+    « Rappelle-toi, c'est la lettre [son] » ; « Trouve la lettre dans le
+    mot, et appuie dessus ! ». Neuf clés nouvelles traduites dans `_TE`.
+  * Jeu « Attrape » : « Où est [son] ? » au lieu de « Attrape la lettre »,
+    et chaque prise reçoit un mot — « Encore ! », « Continue ! »,
+    « Génial ! », puis « Supeeeer ! » à la dernière — au lieu de rejouer la
+    lettre (« alif, attrape alif »). Cours des voyelles (plusieurs cibles) :
+    on garde le son de la bonne réponse, c'est lui qu'on apprend.
+  * `outils/verif.py` : le contrôle de syntaxe vit maintenant dans le dépôt
+    (il disparaissait du dossier temporaire).
 
 - **v294.** Les mises en garde des lettres graves (« On ne dit pas khè, mais
   kha, car c'est une lettre grave. », 8 lettres × fatḥa, tanwīn, longue).

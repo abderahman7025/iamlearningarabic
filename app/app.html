@@ -6169,6 +6169,18 @@ function _clesSon(t){
   var l=[t];
   var espace=String(t).replace(/([^\s])([!?;:\u2026])/g,'$1 $2');
   if(espace!==t)l.push(espace);
+  /* ── LES 3-5 ANS ONT LEUR VOIX ──
+     Le client : « je ne suis pas satisfait des voix sur l'interface 3-5
+     ans » — il veut un narrateur qui JOUE les phrases (enthousiaste, doux,
+     mystérieux). Or « Bravo ! » ou « Écoute bien ! » se disent aussi chez
+     les 6-11 ans : une seule clé, une seule voix. Les phrases des petits
+     sont donc rangées sous « petit| » + la phrase, et on les cherche
+     d'abord ; sans fichier, on retombe sur la clé commune. Jamais pour un
+     son arabe : ceux-là sont les enregistrements du studio, pour tous. */
+  try{
+    if(typeof st!=='undefined'&&st&&st.age==='petit'&&!/[\u0600-\u06FF]/.test(String(t)))
+      l=l.map(function(x){return 'petit|'+x;}).concat(l);
+  }catch(e){}
   return l;
 }
 function _sonEnregistre(t){
@@ -11374,7 +11386,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v294';
+var _VERSION_REPLI='v295';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15307,6 +15319,16 @@ var _TE={
 'SUPPORT {n}/3':{en:'SEAT {n}/3',es:'SOPORTE {n}/3',de:'TRÄGER {n}/3',nl:'DRAGER {n}/3',it:'SUPPORTO {n}/3',pt:'SUPORTE {n}/3',ru:'ОПОРА {n}/3',tr:'KÜRSÜ {n}/3',zh:'座位 {n}/3',id:'DUDUKAN {n}/3',ur:'کرسی {n}/۳',hi:'आधार {n}/3'},
 'TANWĪN {n}/3':{en:'TANWĪN {n}/3',es:'TANWĪN {n}/3',de:'TANWĪN {n}/3',nl:'TANWĪN {n}/3',it:'TANWĪN {n}/3',pt:'TANWĪN {n}/3',ru:'ТАНВИН {n}/3',tr:'TENVİN {n}/3',zh:'双元音 {n}/3',id:'TANWIN {n}/3',ur:'تنوین {n}/۳',hi:'तनवीन {n}/3'},
 'toutes les {missions}':{en:'all the {missions}',es:'todas las {missions}',de:'alle {missions}',nl:'alle {missions}',it:'tutte le {missions}',pt:'todas as {missions}',ru:'все {missions}',tr:'tüm {missions}',zh:'所有{missions}',id:'semua {missions}',ur:'تمام {missions}',hi:'सभी {missions}'},
+/* v295 : les phrases 3-5 ans revues par le client. */
+'Le savais-tu : En arabe, on écrit de droite à gauche.':{en:'Did you know? In Arabic, we write from right to left.',es:'¿Lo sabías? En árabe se escribe de derecha a izquierda.',de:'Wusstest du schon? Auf Arabisch schreibt man von rechts nach links.',nl:'Wist je dat? In het Arabisch schrijf je van rechts naar links.',it:'Lo sapevi? In arabo si scrive da destra a sinistra.',pt:'Sabias? Em árabe escreve-se da direita para a esquerda.',ru:'А ты знал? По-арабски пишут справа налево.',tr:'Biliyor muydun? Arapça sağdan sola yazılır.',zh:'你知道吗？阿拉伯语是从右往左写的。',id:'Tahukah kamu? Bahasa Arab ditulis dari kanan ke kiri.',ur:'کیا تم جانتے ہو؟ عربی دائیں سے بائیں لکھی جاتی ہے۔',hi:'क्या तुम जानते हो? अरबी दाएँ से बाएँ लिखी जाती है।'},
+'Repasse sur la lettre':{en:'Trace over the letter',es:'Repasa la letra',de:'Fahr den Buchstaben',nl:'Trek de letter',it:'Ripassa la lettera',pt:'Passa o dedo pela letra',ru:'Обведи букву',tr:'Şu harfin üzerinden',zh:'描一描字母',id:'Tebalkan huruf',ur:'اس حرف پر',hi:'इस अक्षर पर'},
+'avec ton doigt !':{en:'with your finger!',es:'¡con el dedo!',de:'mit dem Finger nach!',nl:'over met je vinger!',it:'con il dito!',pt:'com o dedo!',ru:'пальцем!',tr:'parmağınla geç!',zh:'用手指！',id:'dengan jarimu!',ur:'انگلی پھیرو!',hi:'उंगली फेरो!'},
+'Rappelle-toi, c\'est la lettre':{en:'Remember, this is the letter',es:'Recuerda, es la letra',de:'Denk daran, das ist der Buchstabe',nl:'Weet je nog, dit is de letter',it:'Ricorda, è la lettera',pt:'Lembra-te, é a letra',ru:'Помни, это буква',tr:'Hatırla, bu harf:',zh:'记住，这是字母',id:'Ingat, ini huruf',ur:'یاد رکھو، یہ حرف ہے:',hi:'याद रखो, यह अक्षर है:'},
+'Trouve la lettre dans le mot, et appuie dessus !':{en:'Find the letter in the word, and tap it!',es:'¡Encuentra la letra en la palabra y tócala!',de:'Finde den Buchstaben im Wort und tippe ihn an!',nl:'Zoek de letter in het woord en tik erop!',it:'Trova la lettera nella parola e toccala!',pt:'Encontra a letra na palavra e toca nela!',ru:'Найди букву в слове и нажми на неё!',tr:'Kelimedeki harfi bul ve ona dokun!',zh:'在词里找到这个字母，然后点一下！',id:'Temukan huruf itu di dalam kata, lalu sentuh!',ur:'لفظ میں حرف ڈھونڈو اور اسے چھوؤ!',hi:'शब्द में अक्षर ढूँढ़ो और उसे छुओ!'},
+'Où est':{en:'Where is',es:'Dónde está',de:'Wo ist',nl:'Waar is',it:'Dov\'è',pt:'Onde está',ru:'Где',tr:'Nerede:',zh:'在哪里：',id:'Di mana',ur:'کہاں ہے:',hi:'कहाँ है:'},
+'Encore !':{en:'Again!',es:'¡Otra!',de:'Noch eins!',nl:'Nog een!',it:'Ancora!',pt:'Outra!',ru:'Ещё!',tr:'Bir daha!',zh:'再来！',id:'Lagi!',ur:'ایک اور!',hi:'एक और!'},
+'Continue !':{en:'Keep going!',es:'¡Sigue!',de:'Weiter so!',nl:'Ga door!',it:'Continua!',pt:'Continua!',ru:'Продолжай!',tr:'Devam et!',zh:'继续！',id:'Lanjut!',ur:'جاری رکھو!',hi:'जारी रखो!'},
+'Supeeeer !':{en:'Suuuper!',es:'¡Súuuper!',de:'Suuuper!',nl:'Suuuper!',it:'Suuuper!',pt:'Suuuper!',ru:'Супееер!',tr:'Süpeeer!',zh:'太棒啦！',id:'Suuuper!',ur:'زبردست!',hi:'बहुत बढ़िया!'},
 };
 /* FIN TRADUCTIONS ENFANT */
 
@@ -19112,7 +19134,7 @@ function _boyScene(ca,reprise){
       f.innerHTML='<span class="fleche-rtl">⬅</span>';
       m.zone.appendChild(d);m.zone.appendChild(f);
       N.plusTard(function(){
-        N.dire(te('En arabe, on écrit de droite à gauche.'));
+        N.dire(te('Le savais-tu : En arabe, on écrit de droite à gauche.'));
         N.plusTard(function(){N.surSilence(function(){
           N.plusTard(function(){m.gagne();},3400);});},250);
       },150);
@@ -19209,12 +19231,22 @@ function _boyScene(ca,reprise){
                  fete appartient a la fin de la manche. */
               f.classList.add('pris');
               if(typeof playBravo==='function')playBravo();
-              /* Le son de la bonne reponse. */
-              N.plusTard(function(){ditGlyphe(g);},160);
+              /* ── ON ENCOURAGE, ON NE RÉPÈTE PLUS LA LETTRE ──
+                 Le client : « quand il dit "alif, attrape alif"… qu'il dise
+                 plutôt "Où est alif ?" puis "encore", puis "continue !",
+                 puis "génial !" et enfin "supeeeer" ». Une seule lettre à
+                 attraper : chaque prise reçoit son mot. Plusieurs sons à
+                 distinguer (wa, wi, wou) : on garde le son de la bonne
+                 réponse, c'est lui qu'on apprend à reconnaître. */
               pris++;
+              if(multi)N.plusTard(function(){ditGlyphe(g);},160);
               if(pris>=BUT){jauge.firstChild.style.width='100%';
-                N.plusTard(function(){N.dire(te('Bravo !'));},1000);m.gagne();}
-              else N.plusTard(function(){tour(false);},multi?1400:900);
+                N.plusTard(function(){N.dire(te('Supeeeer !'));},multi?1000:160);m.gagne();}
+              else{
+                if(!multi)(function(mot){N.plusTard(function(){N.dire(te(mot));},160);})
+                  (['Encore !','Continue !','Génial !'][(pris-1)%3]);
+                N.plusTard(function(){tour(false);},multi?1400:900);
+              }
             }else{
               f.classList.add('non');
               if(typeof playError==='function')playError();
@@ -19226,9 +19258,9 @@ function _boyScene(ca,reprise){
         /* Une seule cible : on la nomme une fois. Plusieurs : a chaque tour,
            pour que l'enfant sache laquelle attraper maintenant. */
         if(premier)N.plusTard(function(){
-          phraseAvecLettre(multi?'Attrape':'Attrape la lettre',multi?c:(son||c),null);
+          phraseAvecLettre('Où est',multi?c:(son||c),null);
         },150);
-        else if(multi)N.plusTard(function(){phraseAvecLettre('Attrape',c,null);},120);
+        else if(multi)N.plusTard(function(){phraseAvecLettre('Où est',c,null);},120);
       }
       tour(true);
     };
@@ -19911,8 +19943,9 @@ function _boyScene(ca,reprise){
       cv.addEventListener('pointerup',leve);
       cv.addEventListener('pointercancel',leve);
       N.plusTard(function(){
-        phraseAvecLettre(null,glyph,null);
-        N.plusTard(function(){N.dire(te('Repasse sur la lettre avec ton doigt !'));},20);
+        /* « Repasse sur la lettre [alif] avec ton doigt ! » : le client a
+           placé le son au milieu de la consigne. */
+        phraseAvecLettre('Repasse sur la lettre',glyph,'avec ton doigt !');
       },150);
     };
   };
@@ -20271,7 +20304,7 @@ function _boyScene(ca,reprise){
              plus rien, on lui remet le nom en tête avant de le lâcher dans
              le mot. Comme à la rencontre, la phrase française est suivie de
              la lettre elle-même — c'est l'enregistrement du cours. */
-          phraseAvecLettre('Rappelle-toi, cette lettre est le',L.ar,null);
+          phraseAvecLettre('Rappelle-toi, c\'est la lettre',L.ar,null);
           N.plusTard(function(){
             N.dire(te('Répète !'));
             /* ── ON LAISSE L'ENFANT RÉPÉTER ──
@@ -20283,14 +20316,14 @@ function _boyScene(ca,reprise){
               N.plusTard(function(){
                 N.dire(te('Bravo !'));
                 N.plusTard(function(){
-                  N.dire(te('Trouve la lettre dans le mot !'));
+                  N.dire(te('Trouve la lettre dans le mot, et appuie dessus !'));
                   montreLeMot();
                 },20);
               },1500);
             });
           },20);
         },150);
-        else N.plusTard(function(){N.dire(te('Trouve la lettre dans le mot !'));},380);
+        else N.plusTard(function(){N.dire(te('Trouve la lettre dans le mot, et appuie dessus !'));},380);
       }
       tour();
     };
@@ -20887,7 +20920,7 @@ function _boyLetterJeu(ca,idx,premiere){
       _prechargeSons(_avecVoyelles.concat(leurres).concat(
         ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
          'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
-         'Repasse sur la lettre avec ton doigt !',
+         'Repasse sur la lettre','avec ton doigt !','Où est','Encore !','Continue !','Supeeeer !',
          'Relie les deux mêmes lettres !','Retrouve les paires !']
         .map(function(p){return te(p);})));
   }catch(e){}
