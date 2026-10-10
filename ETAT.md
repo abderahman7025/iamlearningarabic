@@ -84,11 +84,12 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 ## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ
 
 Rien d'ouvert au 10 octobre 2026 (le modèle du tracé mal centré : fait en
-v3.0.0, voir plus bas — en attente du regard du client).
+v3.0.0, puis « il ne va pas au bout » en v3.0.1, voir plus bas — en attente
+du regard du client).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.0
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.1
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -165,8 +166,49 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.0), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.1), du plus récent au plus ancien :**
 
+- **v3.0.1.** Le modèle du tracé va JUSQU'AU BOUT. Le client, après la
+  v3.0.0 : « noun hamzah sin qaf sont réglés ? le tracé ne va pas au bout
+  d'un trait, d'une pointe, du rond (qaf) ». Toujours dans
+  `centresDeLordre(p2)`, rien d'autre touché.
+  * **Cause, mesurée** (distance de l'encre la plus lointaine au chemin) :
+    c'est le GESTE DICTÉ lui-même (`_trajectoire`) qui s'arrête avant —
+    nūn : le geste part à −0,13 em quand la pointe est à −0,35 (75 px au
+    canevas) ; qāf : le rond dicté monte à −0,26 em, celui de la police à
+    −0,48, le crayon passe donc SOUS le trou ; sīn : 62 px du bout ; hamza :
+    65 px de la pointe droite. Chez les grands ça ne se voit pas (l'encre non
+    touchée se révèle avec sa voisine). **Les tables de gestes n'ont pas été
+    touchées** : les corriger changerait aussi les 6-11 ans. Et la v3.0.0
+    avait rogné les rebroussements (pointe du jīm 24 → 38 px) : réparé.
+  * **Remède, dans l'ordre :** `sansBoucles` (retire une petite boucle du
+    parcours qui n'entoure aucun blanc) ; `coupe` (coupe le trait à chaque
+    rebroussement — les morceaux s'adoucissent entre deux bouts FIXES) ;
+    `sansRetours` (retire un aller-retour sur de l'encre couverte par un
+    autre passage) ; `ronds` (un trou dont le chemin ne fait pas le tour —
+    enroulement < 330° — reçoit son tour, trouvé en dressant un mur du trou
+    vers l'extérieur) ; `complete`, jusqu'à trois passes : un bout de trait
+    se prolonge s'il reste de l'encre DERRIÈRE lui (sauf si le chemin
+    repasse par là : le ṣād), et une partie d'encre à plus de 2 × la
+    demi-épaisseur du chemin reçoit un aller-retour, accroché au DERNIER
+    passage voisin ou au rebroussement voisin (`insere` range le tout).
+  * **Mesures, encre la plus loin du chemin, v2.9.9 → v3.0.1 (520×280) :**
+    nūn 77,7 → 17,4 px ; hamza 67,8 → 23,4 ; sīn 60,9 → 18,4 ; qāf 50,3 →
+    18,8 (et le tour du rond est fait) ; ṣād 58,5 → 18,1 ; ḍād 49,2 → 16,6 ;
+    kāf 45,5 → 16,1 ; shīn 41 → 12,8 ; lām 40 → 11 ; jīm 23,8 → 16,6. Ce qui
+    reste au-dessus de 20 px est de l'ÉPAISSEUR, pas un bout (dāl 35, hā 31,
+    ḏāl 25 : traits de 40 à 60 px de large). Le centrage n'a pas bougé
+    (écart moyen 0,36 à 1,67 px selon la lettre) ; points hors de l'encre :
+    toujours 8 sur le fā et 5 sur le mīm, zéro ailleurs.
+  * **Ce qui reste, sciemment :** les virages de plus de 60° sont revenus
+    là où le geste REBROUSSE vraiment — une pointe, une dent (sīn 6, ṣād 4,
+    hamza 3…) ; sur les dents du sīn le parcours dicté monte deux fois, à
+    6 px d'écart, d'où une petite fourche en haut de la dent. Le qāf part
+    toujours du cou (c'est le départ dicté), monte, fait le tour du rond,
+    redescend, puis le bol.
+  * **Pour remesurer :** comme en v3.0.0, plus la couverture — distance de
+    chaque pixel d'encre au chemin (chanfrein), on regarde le maximum et
+    l'image `outils/captures/bout-*.png` (rose = encre à plus de 20 px).
 - **v3.0.0.** Le modèle du tracé (3-5 ans) suit le MILIEU du trait et ne
   vibre plus. Le client : « parfois le modèle est pas bien centré sur la
   lettre (exemple lettre ba). Aussi son mouvement fait des vibrations, au

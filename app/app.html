@@ -11404,7 +11404,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.0';
+var _VERSION_REPLI='v3.0.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -19882,20 +19882,526 @@ function _boyScene(ca,reprise){
         var DEMI=demis.length?demis[Math.floor(demis.length/2)]:4;
         var PLAFOND=DEMI*1.25;
         var FINAL=Math.max(6,Math.min(60,Math.round(DEMI*DEMI/8)));
-        var lisse=[];
-        traits.forEach(function(t,ti){
+        /* ══ JUSQU'AU BOUT DU TRAIT, DE LA POINTE, DU ROND ══
+           Le client, après la v3.0.0 : « noun, hamza, sin, qaf : le tracé ne
+           va pas au bout d'un trait, d'une pointe, du rond (qaf) ».
+           Mesuré : le parcours du crayon lui-même s'arrête avant — à 75 px
+           de la pointe du nūn, 62 du bout du sīn, 65 de la pointe droite de
+           la hamza, et il passe SOUS le rond du qāf. Chez les grands cela ne
+           se voit pas (l'encre non touchée se révèle avec sa voisine) ; ici
+           l'animal EST le parcours. Et l'adoucissement de la v3.0.0 rognait
+           en plus les rebroussements (la pointe du jīm : 24 → 38 px).
+           Trois remèdes :
+           1. un REBROUSSEMENT du parcours (aller au bout d'une pointe et
+              revenir) coupe le trait en morceaux ; chaque morceau s'adoucit
+              entre ses deux bouts, qui ne bougent pas ;
+           2. aux deux BOUTS d'un trait, s'il reste de l'encre devant, on
+              prolonge jusqu'à elle ;
+           3. une partie d'encre restée LOIN du chemin (une dent, une pointe,
+              le haut d'un rond) reçoit un aller-retour depuis l'endroit du
+              chemin le plus proche — ou un tour complet, si l'encre fait un
+              anneau et qu'on peut revenir par l'autre côté. */
+        var _vient=null,_file=null;
+        /* le plus court chemin DANS l'encre, de `a` au premier pixel qui
+           satisfait `but` ; `interdit` ferme des pixels */
+        function parcours(a,but,interdit){
+          if(a<0||p2.rang[a]<0)return null;
+          if(!_vient){_vient=new Int32Array(W*H);_file=new Int32Array(W*H);}
+          var i2,t2=0,q2=0,j,x,y,d,v,xv,yv,fin=-1;
+          for(i2=0;i2<W*H;i2++)_vient[i2]=-2;
+          _file[q2++]=a;_vient[a]=-1;
+          while(t2<q2){
+            j=_file[t2++];
+            if(but(j)){fin=j;break;}
+            x=j%W;y=(j-x)/W;
+            for(d=0;d<8;d++){
+              xv=x+[1,-1,0,0,1,1,-1,-1][d];yv=y+[0,0,1,-1,1,-1,1,-1][d];
+              if(xv<0||yv<0||xv>=W||yv>=H)continue;
+              v=yv*W+xv;
+              if(p2.rang[v]<0||_vient[v]!==-2)continue;
+              if(interdit&&interdit[v]&&!but(v))continue;
+              _vient[v]=j;_file[q2++]=v;
+            }
+          }
+          if(fin<0)return null;
+          var ch=[];
+          for(j=fin;j>=0;j=_vient[j])ch.push({x:j%W,y:(j-j%W)/W});
+          return ch.reverse();
+        }
+        function pixel(p){
+          var ix=Math.round(p.x),iy=Math.round(p.y);
+          return (ix<0||iy<0||ix>=W||iy>=H)?-1:iy*W+ix;
+        }
+        /* 1. coupe un trait à ses rebroussements */
+        function coupe(t){
+          var w=Math.max(6,Math.round(DEMI)),n=t.length,res=[],d=0,i;
+          var best=-1,bc=0,ou=[];
+          for(i=w;i<n-w;i++){
+            var ax=t[i].x-t[i-w].x,ay=t[i].y-t[i-w].y;
+            var bx=t[i+w].x-t[i].x,by=t[i+w].y-t[i].y;
+            var na=Math.sqrt(ax*ax+ay*ay),nb=Math.sqrt(bx*bx+by*by);
+            var c=(na>0.5&&nb>0.5)?(ax*bx+ay*by)/(na*nb):1;
+            if(c<-0.7){if(best<0||c<bc){best=i;bc=c;}}
+            else if(best>=0){ou.push(best);best=-1;}
+          }
+          if(best>=0)ou.push(best);
+          /* Deux rebroussements collés (monter d'un côté d'une dent,
+             redescendre de l'autre) n'en font qu'un, au milieu. */
+          for(i=0;i<ou.length;i++){
+            var fin=i;
+            while(fin+1<ou.length&&ou[fin+1]-ou[fin]<=3*w)fin++;
+            var mil=(ou[i]+ou[fin])>>1;
+            if(fin>i)t=t.slice(0,ou[i]).concat([t[mil]],t.slice(ou[fin]+1));
+            if(fin>i){
+              var retire=ou[fin]-ou[i];
+              for(var k3=fin+1;k3<ou.length;k3++)ou[k3]-=retire;
+              ou.splice(i,fin-i+1,ou[i]);
+            }
+            res.push(t.slice(d,ou[i]+1));d=ou[i];
+          }
+          res.push(t.slice(d));
+          return res;
+        }
+        /* Un aller-retour du parcours sur de l'encre que le chemin couvre
+           DE TOUTE FAÇON ailleurs n'est pas une pointe : c'est le geste
+           dicté qui tombe à côté de la lettre (le qāf : son rond est dicté
+           trop bas, le crayon descendait 35 px sur le bras du bol, revenait,
+           puis montait). On retire l'aller et le retour. La pointe du jīm,
+           elle, n'est couverte par rien d'autre : elle reste. */
+        function sansRetours(mcx){
+          /* Couvert par un AUTRE passage : un autre morceau, ou le même
+             bien plus loin (le sīn monte deux fois sur la même dent — on
+             garde la seconde). */
+          function couvert(C,ti,i,a,b){
+            var oui=false,large=Math.round(2*DEMI)+4;
+            mcx.forEach(function(ms,tj){ms.forEach(function(m,mj){
+              if(oui)return;
+              var q0=0,q1=m.length;
+              if(tj===ti&&mj===i)q1=a-large;
+              if(tj===ti&&mj===i+1)q0=b+large;
+              for(var q=q0;q<q1;q+=2)
+                if(Math.hypot(m[q].x-C.x,m[q].y-C.y)<=DEMI){oui=true;return;}
+            });});
+            return oui;
+          }
+          mcx.forEach(function(ms,ti){
+            var i=0;
+            while(i<ms.length-1){
+              var aller=ms[i],retour=ms[i+1],a=aller.length-1,b=0,k,a2,bas;
+              /* le retour longe-t-il l'aller ? on recule sur l'aller tant
+                 que le retour reste à moins d'un trait de lui */
+              while(b<retour.length-1){
+                bas=Math.max(0,a-Math.round(3*DEMI)-6);a2=-1;
+                for(k=bas;k<=a;k++)
+                  if(Math.hypot(aller[k].x-retour[b+1].x,
+                                aller[k].y-retour[b+1].y)<1.2*DEMI){a2=k;break;}
+                if(a2<0)break;
+                a=a2;b++;
+              }
+              var C=aller[aller.length-1],M=aller[(a+aller.length-1)>>1];
+              if(b>=3&&couvert(C,ti,i,a,b)&&couvert(M,ti,i,a,b)){
+                ms.splice(i,2,(a>0?aller.slice(0,a+1):[]).concat(retour.slice(b)));
+                if(i>0)i--;
+              }else i++;
+            }
+          });
+          return mcx;
+        }
+        /* Une petite BOUCLE du parcours qui n'entoure aucun blanc ne suit
+           rien : c'est le crayon qui cherche un point dicté hors de l'encre
+           (dans la tête du qāf, un rectangle de 14 px sur 9). On la retire.
+           Une vraie boucle entoure un trou ou une baie : elle reste. */
+        function sansBoucles(t){
+          function blancDans(i,j){
+            var x0=1e9,x1=-1,y0=1e9,y1=-1,q,x,y,k,dedans,A,B;
+            for(q=i;q<=j;q++){
+              if(t[q].x<x0)x0=t[q].x;if(t[q].x>x1)x1=t[q].x;
+              if(t[q].y<y0)y0=t[q].y;if(t[q].y>y1)y1=t[q].y;
+            }
+            for(y=y0+1;y<y1;y++)for(x=x0+1;x<x1;x++){
+              if(p2.rang[y*W+x]>=0)continue;
+              dedans=false;
+              for(q=i,k=j;q<=j;k=q++){
+                A=t[q];B=t[k];
+                if((A.y>y)!==(B.y>y)&&x<(B.x-A.x)*(y-A.y)/(B.y-A.y)+A.x)dedans=!dedans;
+              }
+              if(dedans)return true;
+            }
+            return false;
+          }
+          var vu={},i,j,k,pj,q,aire,L;
+          for(j=0;j<t.length;j++){
+            pj=pixel(t[j]);i=vu[pj];
+            if(i!==undefined&&j-i>=8&&j-i<=12*DEMI+40){
+              aire=0;L=j-i;
+              for(q=i;q<j;q++)aire+=t[q].x*t[q+1].y-t[q+1].x*t[q].y;
+              aire=Math.abs(aire/2);
+              if(aire>=Math.max(30,0.02*L*L)&&!blancDans(i,j)){
+                t=t.slice(0,i+1).concat(t.slice(j+1));
+                vu={};for(k=0;k<=i;k++)vu[pixel(t[k])]=k;
+                j=i;continue;
+              }
+            }
+            vu[pj]=j;
+          }
+          return t;
+        }
+        /* ── LE ROND ──
+           Un trou de la lettre dont le chemin ne fait PAS le tour (le qāf :
+           son rond est dicté trop bas, le crayon passe dessous) : on ajoute
+           le tour, depuis l'endroit du chemin le plus proche du trou, dans
+           le sens où tourne le trait. Pour trouver le tour, on dresse un mur
+           du trou vers l'extérieur, à l'opposé de ce point : partir d'un
+           côté du mur et de l'autre, c'est prendre le rond par ses deux
+           moitiés. */
+        function ronds(poses){
+          var N2=W*H,ext=new Uint8Array(N2),pile=[],x,y,j,jj;
+          for(x=0;x<W;x++)pile.push(x,(H-1)*W+x);
+          for(y=0;y<H;y++)pile.push(y*W,y*W+W-1);
+          while(pile.length){
+            j=pile.pop();
+            if(ext[j]||p2.rang[j]>=0)continue;
+            ext[j]=1;x=j%W;y=(j-x)/W;
+            if(x>0)pile.push(j-1);if(x<W-1)pile.push(j+1);
+            if(y>0)pile.push(j-W);if(y<H-1)pile.push(j+W);
+          }
+          var creux=new Uint8Array(N2),nc=0;
+          for(j=0;j<N2;j++)if(!ext[j]&&p2.rang[j]<0){creux[j]=1;nc++;}
+          if(!nc)return [];
+          var tt=_tachesEncre(creux,W,H),trous={},ajouts=[];
+          for(j=0;j<N2;j++){
+            if(!creux[j])continue;
+            var o=trous[tt.lab[j]]||(trous[tt.lab[j]]={n:0,sx:0,sy:0});
+            o.n++;o.sx+=j%W;o.sy+=(j-j%W)/W;
+          }
+          function aire(t){
+            var s2=0;
+            for(var q=0;q<t.length;q++){
+              var b2=t[(q+1)%t.length];
+              s2+=t[q].x*b2.y-b2.x*t[q].y;
+            }
+            return s2;
+          }
+          Object.keys(trous).forEach(function(cle){
+            var o=trous[cle];if(o.n<6)return;
+            var cx5=o.sx/o.n,cy5=o.sy/o.n,fait=false,md=1e9,pres=null;
+            poses.forEach(function(ms){
+              var cum=0,mn=0,mx=0,prev=null;
+              ms.forEach(function(m){m.forEach(function(p){
+                var a=Math.atan2(p.y-cy5,p.x-cx5),d;
+                if(prev!==null){
+                  d=a-prev;
+                  while(d>Math.PI)d-=2*Math.PI;
+                  while(d<-Math.PI)d+=2*Math.PI;
+                  cum+=d;if(cum<mn)mn=cum;if(cum>mx)mx=cum;
+                }
+                prev=a;
+                d=Math.hypot(p.x-cx5,p.y-cy5);if(d<md)md=d;
+              });});
+              if(mx-mn>=5.76)fait=true;          /* 330° : le tour est fait */
+            });
+            if(fait)return;
+            poses.forEach(function(ms,ti){ms.forEach(function(m,mi){
+              for(var q=0;q<m.length;q++)
+                if(Math.hypot(m[q].x-cx5,m[q].y-cy5)<=md+3)
+                  pres={ti:ti,mi:mi,q:q,p:m[q]};  /* le DERNIER passage */
+            });});
+            if(!pres)return;
+            var J=pres.p,jJ=pixel(J);
+            if(jJ<0||p2.rang[jJ]<0)return;
+            var ux=cx5-J.x,uy=cy5-J.y,nu=Math.hypot(ux,uy),r,e;
+            if(nu<1)return;
+            ux/=nu;uy/=nu;
+            var mur=new Uint8Array(N2),entre=-1,sorti=-1;
+            for(r=0;r<200;r+=0.5){
+              jj=pixel({x:cx5+ux*r,y:cy5+uy*r});
+              if(jj<0)break;
+              if(p2.rang[jj]>=0){if(entre<0)entre=r;}
+              else if(entre>=0){sorti=r;break;}
+            }
+            if(entre<0||sorti<0)return;
+            for(r=entre-2;r<=sorti+2;r+=0.5)for(e=-1;e<=1;e++){
+              jj=pixel({x:cx5+ux*r-uy*e,y:cy5+uy*r+ux*e});
+              if(jj>=0)mur[jj]=1;
+            }
+            var rm=(entre+sorti)/2;
+            function vers(k){return k===jJ;}
+            var c1=parcours(pixel({x:cx5+ux*rm-uy*4,y:cy5+uy*rm+ux*4}),vers,mur);
+            var c2=parcours(pixel({x:cx5+ux*rm+uy*4,y:cy5+uy*rm-ux*4}),vers,mur);
+            if(!c1||!c2||c1.length+c2.length>500)return;
+            var tour=c1.slice().reverse().concat(c2);
+            if(aire(traits[pres.ti])*aire(tour)<0)tour.reverse();
+            ajouts.push({ti:pres.ti,mi:pres.mi,q:pres.q,tour:tour});
+          });
+          return ajouts;
+        }
+        /* Range les ajouts dans les morceaux : un tour ou un aller-retour
+           coupe le morceau où il s'accroche ; un rebroussement qu'on
+           prolonge emporte sa pointe plus loin ; un bout de trait s'allonge. */
+        function insere(poses,ajouts){
+          return poses.map(function(ms,ti){
+            var neufs=[],prefixe=null;
+            ms.forEach(function(m,mi){
+              var ici=(m.length<3)?[]:ajouts.filter(function(a2){
+                return a2.ti===ti&&!a2.bout&&!a2.rebr&&a2.mi===mi;
+              }).sort(function(a2,b2){return a2.q-b2.q;});
+              var d=0,premier=true;
+              function pousse(seg){
+                if(premier&&prefixe){seg=prefixe.concat(seg);prefixe=null;}
+                premier=false;neufs.push(seg);
+              }
+              ici.forEach(function(a2){
+                var q=Math.max(1,Math.min(m.length-2,a2.q));
+                if(q<=d)q=Math.min(m.length-2,d+1);
+                var P=m[q];
+                pousse(m.slice(d,q+1));
+                if(a2.tour)neufs.push([P].concat(a2.tour,[P]));
+                else{
+                  neufs.push([P].concat(a2.aller));
+                  neufs.push(a2.aller.slice().reverse().concat([P]));
+                }
+                d=q;
+              });
+              pousse(m.slice(d));
+              var rb=ajouts.filter(function(a2){
+                return a2.ti===ti&&a2.rebr&&a2.mi===mi;
+              })[0];
+              if(rb&&mi<ms.length-1){
+                neufs[neufs.length-1]=neufs[neufs.length-1].concat(rb.aller);
+                prefixe=rb.aller.slice().reverse();
+              }
+            });
+            ajouts.forEach(function(a2){
+              if(a2.ti!==ti||!a2.bout)return;
+              if(a2.bout<0)neufs[0]=a2.ch.slice().reverse().concat(neufs[0]);
+              else neufs[neufs.length-1]=neufs[neufs.length-1].concat(a2.ch);
+            });
+            return neufs;
+          });
+        }
+        /* Pose un morceau sur l'axe. Un bout LIBRE (celui du trait) glisse
+           le long de sa normale ; un bout de raccord ne bouge pas. */
+        function pose(t,libreA,libreB){
+          if(t.length<3)return t.slice();
+          var a0=t[0],b0=t[t.length-1];
           var u=reechantillonne(adoucit(t,4),2);
           for(var tour=0;tour<12;tour++){
-            u=adoucitDedans(auMilieu(u,PLAFOND),2);
+            u=auMilieu(u,PLAFOND);
+            if(!libreA)u[0]=a0;
+            if(!libreB)u[u.length-1]=b0;
+            u=adoucitDedans(u,2);
             if(tour%3===2)u=reechantillonne(u,2);
           }
           /* Un dernier adoucissement, à l'échelle du trait, puis un point
              tous les deux pixels : avancer d'un point par image, c'est
              avancer à vitesse constante. */
-          u=reechantillonne(adoucitDedans(u,FINAL),2);
-          u.forEach(function(p3,q){
-            if(ti>0&&q===0)p3.saut=true;   /* on reprend le stylo ici */
-            lisse.push(p3);
+          return reechantillonne(adoucitDedans(u,FINAL),2);
+        }
+        function poseTout(mcx){
+          return mcx.map(function(ms){
+            return ms.map(function(m,mi){
+              return pose(m,mi===0,mi===ms.length-1);
+            });
+          });
+        }
+        /* Une pointe se finit sur son dernier pixel ; un bout CARRÉ, lui, a
+           son dernier pixel dans un coin : on s'arrête avant, là où l'on est
+           encore au milieu. */
+        function sansLeCoin(ch){
+          var F=ch[ch.length-1],i=ch.length-1;
+          while(i>0&&Math.hypot(ch[i].x-F.x,ch[i].y-F.y)<1.5*profondeur(ch[i].x,ch[i].y))i--;
+          return ch.slice(0,Math.min(ch.length,i+2));
+        }
+        /* 2 et 3. Rend les morceaux complétés, ou null s'il n'y a rien à
+           ajouter. `poses` : les morceaux déjà posés sur l'axe. */
+        function complete(poses){
+          var N2=W*H,loin=new Float32Array(N2),qui=new Int32Array(N2);
+          var refs=[],i,x,y,j,v;
+          for(i=0;i<N2;i++){loin[i]=1e9;qui[i]=-1;}
+          function marque(px6,py6,r){
+            var jj=pixel({x:px6,y:py6});
+            if(jj>=0){loin[jj]=0;qui[jj]=r;}
+          }
+          poses.forEach(function(ms,ti){ms.forEach(function(m,mi){
+            for(var q=0;q<m.length;q++){
+              if(q)marque((m[q].x+m[q-1].x)/2,(m[q].y+m[q-1].y)/2,refs.length);
+              marque(m[q].x,m[q].y,refs.length);
+              refs.push({ti:ti,mi:mi,q:q,
+                         bout:(mi===0&&q<2)?-1:
+                              (mi===ms.length-1&&q>=m.length-2)?1:0});
+            }
+          });});
+          function prend(a,b,cout){
+            if(loin[b]+cout<loin[a]){loin[a]=loin[b]+cout;qui[a]=qui[b];}
+          }
+          for(y=0;y<H;y++)for(x=0;x<W;x++){
+            j=y*W+x;
+            if(x>0)prend(j,j-1,1);
+            if(y>0)prend(j,j-W,1);
+            if(x>0&&y>0)prend(j,j-W-1,1.414);
+            if(x<W-1&&y>0)prend(j,j-W+1,1.414);
+          }
+          for(y=H-1;y>=0;y--)for(x=W-1;x>=0;x--){
+            j=y*W+x;
+            if(x<W-1)prend(j,j+1,1);
+            if(y<H-1)prend(j,j+W,1);
+            if(x<W-1&&y<H-1)prend(j,j+W+1,1.414);
+            if(x>0&&y<H-1)prend(j,j+W-1,1.414);
+          }
+          var ajouts=[];
+          /* Le chemin repasse-t-il plus tard par son point de départ (le
+             ṣād revient de sa boucle) ? Alors ce qui dépasse là est une
+             branche du dernier passage, pas un départ à reculer. */
+          function repasse(ti,E){
+            var oui=false,pr=Math.max(3,0.8*DEMI),nb=0;
+            poses[ti].forEach(function(m){m.forEach(function(p){
+              nb++;
+              if(nb>2*DEMI+6&&Math.hypot(p.x-E.x,p.y-E.y)<=pr)oui=true;
+            });});
+            return oui;
+          }
+          /* L'encre est-elle DERRIÈRE ce bout, dans le prolongement du
+             trait ? Sinon ce n'est pas un bout à prolonger mais une branche
+             (la dent du ṣād part du point de départ, sur le côté). */
+          function derriere(m,bout,jF){
+            var n7=Math.min(m.length-1,Math.round(DEMI/2)+1);
+            var E=bout<0?m[0]:m[m.length-1],V=bout<0?m[n7]:m[m.length-1-n7];
+            var ax=V.x-E.x,ay=V.y-E.y,bx=(jF%W)-E.x,by=((jF/W)|0)-E.y;
+            var na=Math.sqrt(ax*ax+ay*ay),nb=Math.sqrt(bx*bx+by*by);
+            return na>0.5&&nb>0.5&&(ax*bx+ay*by)/(na*nb)<-0.3;
+          }
+          /* 2. ce qui reste d'encre DEVANT un bout de trait */
+          var devant={};
+          for(j=0;j<N2;j++){
+            if(p2.rang[j]<0||qui[j]<0)continue;
+            var rf=refs[qui[j]];
+            if(!rf.bout)continue;
+            var cle=rf.ti+(rf.bout<0?'a':'b');
+            if(!devant[cle]||loin[j]>devant[cle].d)
+              devant[cle]={d:loin[j],j:j,ti:rf.ti,bout:rf.bout};
+          }
+          var prolonges={},dejaRebr={};
+          Object.keys(devant).forEach(function(cle){
+            var dv=devant[cle],ms=poses[dv.ti];
+            var m=dv.bout<0?ms[0]:ms[ms.length-1];
+            var E=dv.bout<0?m[0]:m[m.length-1];
+            if(dv.d<=2*profondeur(E.x,E.y)+4)return;
+            if(!derriere(m,dv.bout,dv.j))return;
+            if(dv.bout<0&&repasse(dv.ti,E))return;
+            var ch=parcours(pixel(E),function(k){return k===dv.j;});
+            if(!ch)return;
+            ch=sansLeCoin(ch);
+            if(ch.length<5)return;
+            prolonges[cle]=1;
+            ajouts.push({ti:dv.ti,bout:dv.bout,ch:ch});
+          });
+          /* 3. les parties d'encre restées loin du chemin */
+          var masque=new Uint8Array(N2),reste=0;
+          for(j=0;j<N2;j++)
+            if(p2.rang[j]>=0&&loin[j]>1.5*DEMI&&loin[j]<1e8){masque[j]=1;reste++;}
+          if(reste){
+            var tt=null,sommets={};
+            try{tt=_tachesEncre(masque,W,H);}catch(e){}
+            if(tt)for(j=0;j<N2;j++){
+              if(!masque[j])continue;
+              var lb=tt.lab[j];
+              if(!sommets[lb]||loin[j]>sommets[lb].d)sommets[lb]={d:loin[j],j:j};
+            }
+            Object.keys(sommets).map(function(k){return sommets[k];})
+              .filter(function(s){return s.d>=2*DEMI;})
+              .sort(function(a2,b2){return b2.d-a2.d;}).slice(0,6)
+              .forEach(function(s){
+                var rf=refs[qui[s.j]];
+                if(rf.bout&&prolonges[rf.ti+(rf.bout<0?'a':'b')])return;
+                /* de la pointe jusqu'au chemin, par l'encre */
+                var ch=parcours(s.j,function(k){return loin[k]<=1.5;});
+                if(!ch||ch.length<5||ch.length>220)return;
+                var J=ch[ch.length-1],rj=refs[qui[pixel(J)]];
+                /* Le chemin passe parfois DEUX fois ici (le ṣād : au départ,
+                   puis au retour de sa boucle) : la branche se fait au
+                   DERNIER passage, comme la main. */
+                var pres=Math.max(3,0.8*DEMI),gp,rg=0;
+                poses.forEach(function(ms,ti){ms.forEach(function(m,mi){
+                  for(var q=0;q<m.length;q++,rg++){
+                    gp=m[q];
+                    if(Math.abs(gp.x-J.x)<=pres&&Math.abs(gp.y-J.y)<=pres&&
+                       Math.hypot(gp.x-J.x,gp.y-J.y)<=pres)rj=refs[rg];
+                  }
+                });});
+                var aller=ch.slice().reverse();     /* du chemin à la pointe */
+                /* un rebroussement tout près : c'est LUI qui n'allait pas
+                   au bout — sa pointe part jusqu'ici */
+                var rebr=null;
+                poses.forEach(function(ms,ti){
+                  for(var mi=0;mi<ms.length-1;mi++){
+                    var C=ms[mi][ms[mi].length-1];
+                    if(Math.hypot(C.x-J.x,C.y-J.y)<=1.5*pres)rebr={ti:ti,mi:mi,C:C};
+                  }
+                });
+                if(rebr&&!dejaRebr[rebr.ti+':'+rebr.mi]){
+                  var cr=parcours(pixel(rebr.C),function(k){return k===s.j;});
+                  cr=cr?sansLeCoin(cr):null;
+                  if(cr&&cr.length>=5){
+                    dejaRebr[rebr.ti+':'+rebr.mi]=1;
+                    ajouts.push({ti:rebr.ti,mi:rebr.mi,rebr:true,aller:cr.slice(1)});
+                    return;
+                  }
+                }
+                if(rj.bout){
+                  var mb=poses[rj.ti][rj.mi];
+                  if(rj.bout>0||derriere(mb,rj.bout,s.j)){
+                    aller=sansLeCoin(aller);
+                    if(aller.length>=5)ajouts.push({ti:rj.ti,bout:rj.bout,ch:aller});
+                    return;
+                  }
+                }
+                /* peut-on revenir par un AUTRE côté ? alors c'est un rond */
+                var ferme=new Uint8Array(N2),ro=Math.max(2,Math.round(0.6*DEMI));
+                var garde=Math.ceil(2*ro),k2,dx7,dy7,jj;
+                for(k2=garde;k2<aller.length-garde;k2++)
+                  for(dy7=-ro;dy7<=ro;dy7++)for(dx7=-ro;dx7<=ro;dx7++){
+                    if(dx7*dx7+dy7*dy7>ro*ro)continue;
+                    jj=pixel({x:aller[k2].x+dx7,y:aller[k2].y+dy7});
+                    if(jj>=0)ferme[jj]=1;
+                  }
+                var jJ=pixel(J);
+                var retour=(aller.length>4*garde)?
+                  parcours(s.j,function(k){return k===jJ;},ferme):null;
+                if(retour&&retour.length<=3*aller.length+20)
+                  ajouts.push({ti:rj.ti,mi:rj.mi,q:rj.q,tour:aller.concat(retour.slice(1))});
+                else{
+                  aller=sansLeCoin(aller);
+                  if(aller.length>=Math.max(5,DEMI))
+                    ajouts.push({ti:rj.ti,mi:rj.mi,q:rj.q,aller:aller});
+                }
+              });
+          }
+          return ajouts.length?insere(poses,ajouts):null;
+        }
+        var poses=poseTout(sansRetours(traits.map(function(t){
+          return coupe(sansBoucles(t));
+        })));
+        try{
+          var tours=ronds(poses);
+          if(tours.length)poses=poseTout(sansRetours(insere(poses,tours)));
+        }catch(e){}
+        for(var fois2=0;fois2<3;fois2++){
+          var plus=null;
+          try{plus=complete(poses);}catch(e){plus=null;}
+          if(!plus)break;
+          poses=poseTout(plus);
+        }
+        var lisse=[];
+        poses.forEach(function(ms,ti){
+          var premier=true;
+          ms.forEach(function(m,mi){
+            m.forEach(function(p3,q){
+              if(mi>0&&q===0)return;            /* le raccord, déjà posé */
+              var p4={x:p3.x,y:p3.y};
+              if(ti>0&&premier)p4.saut=true;    /* on reprend le stylo ici */
+              premier=false;
+              lisse.push(p4);
+            });
           });
         });
         p2.centres=lisse;
