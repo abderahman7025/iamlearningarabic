@@ -81,7 +81,7 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v2.9.7
+## OÙ ON EN EST — 10 octobre 2026, production en v2.9.8
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -158,7 +158,25 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v2.9.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v2.9.8), du plus récent au plus ancien :**
+
+- **v2.9.8.** Seconde relecture du client sur les 3-5 ans (ses remarques
+  sont en bas de `Bureau/phrases-3-5-ans.txt`).
+  * *« Tant que la voix n'a pas fini de parler, toucher l'écran ne fait rien.
+    Pareil partout ! »* `N.occupe()` (phrase en cours ou en file) ; `manche()`
+    arrête à la capture tout `pointerdown`/`click` de la manche tant qu'elle
+    est vraie. Lu comme une DEMANDE : avant, les réponses répondaient pendant
+    la consigne. Si c'était une plainte, retirer ce bloc suffit.
+  * *Le mot* : la consigne une fois, « Encore ! » aux deux tours suivants ;
+    la félicitation (« Waouh ! », « Génial ! ») est dite, plus seulement écrite.
+  * *Le tracé* : « Suis le modèle, et repasse avec ton doigt ! », sans le son.
+  * *Leçon des voyelles* : « Voici la lettre [و studio] » (le narrateur
+    disait « vaav ») ; « Attrape » à QUATRE bulles plus grosses (fatḥa,
+    kasra, ḍamma, soukoun, `.mj-quatre`), « Bravo ! » à chaque bonne prise au
+    lieu du son ; la manche `jeuVoyelles` sort de cette leçon.
+  * *Voix* : « Où est » était dit deux fois PAR LE FICHIER (v4 bégaie sur
+    deux mots) — régénéré ; les phrases suivies d'un son sont générées avec
+    `next_text`, pour que la voix ne retombe pas sur le dernier mot.
 
 - **v2.9.7.** Jeu « Attrape » des 3-5 ans : l'ordre final du client est
   Encore, Continue, Bravo, Génial, Supeeeer. Numéro de version à points ; le

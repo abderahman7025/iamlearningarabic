@@ -3887,6 +3887,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
    la manche des bulles, plus bas. (Les deux ont été échangés en v246 sur la
    foi de ce que le client voyait, puis remis d'aplomb en v247 : c'est bien
    cet ordre-là qu'il veut.) */
+.mj-quatre .mj-flotte{width:132px;height:132px;font-size:3.9rem}
 .mj-flotte{position:absolute;width:92px;height:92px;border-radius:50%;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(circle at 32% 26%,#fff,color-mix(in srgb,var(--mc) 26%,#fff));
@@ -4086,6 +4087,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   .mj-disque{width:180px;height:180px;font-size:5.2rem}
   .mj-aire{height:280px}
   .mj-flotte{width:78px;height:78px;font-size:2.2rem}
+  .mj-quatre .mj-flotte{width:108px;height:108px;font-size:3.1rem}
   .mj-bulle{width:78px;height:92px;font-size:2.2rem}
   .mj-motar{font-size:min(19vw,4.8rem)}
   .mj-bulleV{width:92px;height:92px;font-size:2.5rem}
@@ -11390,7 +11392,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v2.9.7';
+var _VERSION_REPLI='v2.9.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11809,6 +11811,9 @@ function _boyNarration(){
   }
   return {
     aEnreg:aEnreg,
+    /* Une phrase en cours ou en attente : les jeux des 3-5 ans s'en servent
+       pour ne rien accepter tant que la consigne n'est pas finie. */
+    occupe:function(){return busy||q.length>0;},
     /* ── LE SON, COUTE QUE COUTE ──
        `dire` se tait sur la lettre de base du cours des voyelles quand elle
        n'est pas enregistree : la synthese la prononce mal, et la-bas c'est
@@ -15333,6 +15338,7 @@ var _TE={
 'Encore !':{en:'Again!',es:'¡Otra!',de:'Noch eins!',nl:'Nog een!',it:'Ancora!',pt:'Outra!',ru:'Ещё!',tr:'Bir daha!',zh:'再来！',id:'Lagi!',ur:'ایک اور!',hi:'एक और!'},
 'Continue !':{en:'Keep going!',es:'¡Sigue!',de:'Weiter so!',nl:'Ga door!',it:'Continua!',pt:'Continua!',ru:'Продолжай!',tr:'Devam et!',zh:'继续！',id:'Lanjut!',ur:'جاری رکھو!',hi:'जारी रखो!'},
 'Supeeeer !':{en:'Suuuper!',es:'¡Súuuper!',de:'Suuuper!',nl:'Suuuper!',it:'Suuuper!',pt:'Suuuper!',ru:'Супееер!',tr:'Süpeeer!',zh:'太棒啦！',id:'Suuuper!',ur:'زبردست!',hi:'बहुत बढ़िया!'},
+'Suis le modèle, et repasse avec ton doigt !':{en:'Follow the model, and trace over it with your finger!',es:'¡Sigue el modelo y repásalo con el dedo!',de:'Folge der Vorlage und fahr sie mit dem Finger nach!',nl:'Volg het voorbeeld en trek het over met je vinger!',it:'Segui il modello e ripassalo con il dito!',pt:'Segue o modelo e passa por cima com o dedo!',ru:'Смотри на образец и обведи его пальцем!',tr:'Örneği takip et ve parmağınla üzerinden geç!',zh:'照着示范，用手指描一描！',id:'Ikuti contohnya, dan tebalkan dengan jarimu!',ur:'نمونے کو دیکھو اور انگلی سے اس پر پھیرو!',hi:'नमूने को देखो और उंगली से उस पर फेरो!'},
 };
 /* FIN TRADUCTIONS ENFANT */
 
@@ -19020,6 +19026,19 @@ function _boyScene(ca,reprise){
        manche entière : les aires n'ont pas à savoir d'où il vient. */
     try{z.style.setProperty('--fond','url("'+_fondDuMonde()+'")');}catch(e){}
     p.appendChild(z);
+    /* ── ON ÉCOUTE D'ABORD ──
+       Le client : « tant que la voix n'a pas fini de parler, toucher l'écran
+       (même les réponses) ne fait rien. Pareil partout ! » Un enfant de trois
+       ans tape avant d'avoir entendu la consigne. Tout toucher dans la
+       manche est donc arrêté ici, à la capture, tant que la narration a une
+       phrase en cours ou en attente. */
+    ['pointerdown','mousedown','touchstart','click'].forEach(function(ev){
+      z.addEventListener(ev,function(e){
+        var parle=false;
+        try{parle=N.occupe();}catch(x){}
+        if(parle){e.stopPropagation();if(ev!=='touchstart')e.preventDefault();}
+      },true);
+    });
     /* ── PAS DE BOUTON « SUITE » ──
        Le client : « enleve les boutons suivants sur toutes les pages qui
        changent automatiquement ». Une manche gagnee passe d'elle-meme apres
@@ -19214,12 +19233,24 @@ function _boyScene(ca,reprise){
         var c=cibles[pris%cibles.length];
         var faux=_melangeTab(leurres.concat(cibles).filter(function(x){return x!==c;}));
         var lot=_melangeTab([c].concat(faux.slice(0,5)));
+        /* ── LEÇON DES VOYELLES : QUATRE BULLES, PLUS GROSSES ──
+           « Mettre 4 bulles (fatha, kasra, damma et soukoun) au lieu de 6,
+           elles seront plus grosses. » Une de chaque, pas de doublon. */
+        if(multi){
+          var _vus={};
+          lot=_melangeTab(cibles.concat(leurres).filter(function(x){if(_vus[x])return false;_vus[x]=1;return true;}));
+          aire.classList.add('mj-quatre');
+        }
         lot.forEach(function(g,k){
           var f=document.createElement('div');f.className='mj-flotte';
           f.textContent=_sansCercle(g);
           f.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
           f.style.left=(5+(k%3)*30+Math.random()*8)+'%';
           f.style.top=(6+Math.floor(k/3)*40+Math.random()*12)+'%';
+          if(multi){
+            f.style.left=(8+(k%2)*46+Math.random()*8)+'%';
+            f.style.top=(4+Math.floor(k/2)*44+Math.random()*8)+'%';
+          }
           f.style.animationDuration=(4+Math.random()*4).toFixed(1)+'s';
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
           f.onclick=function(){
@@ -19243,7 +19274,9 @@ function _boyScene(ca,reprise){
                  distinguer (wa, wi, wou) : on garde le son de la bonne
                  réponse, c'est lui qu'on apprend à reconnaître. */
               pris++;
-              if(multi)N.plusTard(function(){ditGlyphe(g);},160);
+              /* Leçon des voyelles : « au lieu de répéter le son quand
+                 l'enfant clique sur la bonne bulle, dire bravo ». */
+              if(multi&&pris<BUT)N.plusTard(function(){N.dire(te('Bravo !'));},160);
               if(pris>=BUT){jauge.firstChild.style.width='100%';
                 N.plusTard(function(){N.dire(te('Supeeeer !'));},multi?1000:160);m.gagne();}
               else{
@@ -19949,9 +19982,8 @@ function _boyScene(ca,reprise){
       cv.addEventListener('pointerup',leve);
       cv.addEventListener('pointercancel',leve);
       N.plusTard(function(){
-        /* « Repasse sur la lettre [alif] avec ton doigt ! » : le client a
-           placé le son au milieu de la consigne. */
-        phraseAvecLettre('Repasse sur la lettre',glyph,'avec ton doigt !');
+        /* Le client, seconde relecture : la consigne seule, sans la lettre. */
+        N.dire(te('Suis le modèle, et repasse avec ton doigt !'));
       },150);
     };
   };
@@ -20253,7 +20285,9 @@ function _boyScene(ca,reprise){
           if(trouve)return;
           if(_memeLettre(c.m,L.ar)){
             trouve=true;c.sp.classList.add('juste');
-            youpi(m.zone,true);
+            /* « La voix doit dire les "waouh", "génial", au lieu de juste
+               les écrire. » */
+            youpi(m.zone);
             /* Le mot n'est plus dit : le client, « la voix ne doit pas
                prononcer les mots arabes ; l'enfant trouve la lettre, c'est
                tout ». */
@@ -20329,7 +20363,9 @@ function _boyScene(ca,reprise){
             });
           },20);
         },150);
-        else N.plusTard(function(){N.dire(te('Trouve la lettre dans le mot, et appuie dessus !'));},380);
+        /* « Dire une seule fois "trouve la lettre et appuie dessus", et
+           "encore" pour les deux autres fois. » */
+        else N.plusTard(function(){N.dire(te('Encore !'));},380);
       }
       tour();
     };
@@ -20926,7 +20962,7 @@ function _boyLetterJeu(ca,idx,premiere){
       _prechargeSons(_avecVoyelles.concat(leurres).concat(
         ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
          'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
-         'Repasse sur la lettre','avec ton doigt !','Où est','Encore !','Continue !','Supeeeer !',
+         'Suis le modèle, et repasse avec ton doigt !','Où est','Encore !','Continue !','Supeeeer !',
          'Relie les deux mêmes lettres !','Retrouve les paires !']
         .map(function(p){return te(p);})));
   }catch(e){}
@@ -20996,21 +21032,24 @@ function _boyVowelJeu(ca){
      prononce… » puis rien : aucun de ces sons n'est encore enregistre. */
   function onDit(son,g){return [te('Avec ce petit signe, on prononce'),g];}
   B.run([
-    B.jeuRencontre(LB,null,[te('Voici la lettre waw.'),te('Elle se prononce'),LB+'\u0652']),
+    /* « Voici la lettre [waw] » : le nom est l'enregistrement du client —
+       la voix du narrateur disait « vaav ». */
+    B.jeuRencontre(LB,null,[te('Voici la lettre'),LB,te('Elle se prononce'),LB+'\u0652']),
     B.jeuRencontre(syl[0],null,onDit('wa',syl[0])),B.jeuTrace(syl[0],2),
     B.jeuRencontre(syl[1],null,onDit('wi',syl[1])),B.jeuTrace(syl[1],2),
     B.jeuRencontre(syl[2],null,onDit('wou',syl[2])),B.jeuTrace(syl[2],2),
     /* Trois fois wa, puis trois fois wi, puis trois fois wou — d'affilee :
        le client, « pour que ca s'impregne dans le cerveau de l'enfant ». */
     B.jeuAttrape([syl[0],syl[0],syl[0],syl[1],syl[1],syl[1],syl[2],syl[2],syl[2]],
-                 [LB,LB+'\u0652']),
+                 [LB+'\u0652']),
     /* Six tours, et la cible tourne : « pour les voyelles, laisse 6 fois ».
        Les trois syllabes passent donc deux fois chacune, au lieu d'une seule
        martelee six fois. */
     B.jeuEcoute(syl,[LB,LB+'\u0652'],6),
     B.jeuRelier(syl[0],[syl[1],syl[2],LB]),
     B.jeuPaires(syl[2],[syl[0],syl[1],LB]),
-    B.jeuVoyelles(LB),
+    /* La manche « les voyelles » est retirée de la leçon des voyelles : le
+       client l'a demandé deux fois — toute la leçon porte déjà sur elles. */
     function(api){
       _boyValideSession(_boySession&&_boySession.id);
       B.jeuRecompense(bete.image,bete.nom,
