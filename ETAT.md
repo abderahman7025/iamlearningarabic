@@ -81,7 +81,24 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v2.9.8
+## À FAIRE, DEMANDÉ ET PAS ENCORE TRAITÉ (10 octobre 2026)
+
+**Le modèle du tracé (3-5 ans) est mal centré et vibre.** Le client : « pour
+les exercices de repassage sur la lettre, parfois le modèle est pas bien
+centré sur la lettre (exemple lettre ba). Aussi son mouvement fait des
+vibrations, au lieu de suivre le centre de la largeur à chaque fois. »
+C'est `centresDeLordre(p2)` dans `api.jeuTrace` : le chemin vient de
+`rev.routes` (le parcours du crayon), puis un recentrage BORNÉ à ±3 px par
+point et un lissage (voir les commentaires, mesures sur les trente lettres).
+Le recentrage non borné avait été essayé et jetait le point dans une autre
+partie de la lettre aux jonctions. Piste : recentrer par la médiane de
+l'encre sur la normale avec une borne proportionnelle à l'épaisseur du trait,
+plusieurs passes, puis mesurer AU BANC, lettre par lettre, l'écart au centre
+et l'angle entre deux pas — ne pas régler à l'œil.
+
+---
+
+## OÙ ON EN EST — 10 octobre 2026, production en v2.9.9
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -158,7 +175,22 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v2.9.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v2.9.9), du plus récent au plus ancien :**
+
+- **v2.9.9.** Troisième relecture du client sur les 3-5 ans.
+  * « Attrape » : « Où est la lettre [son] ? » (une lettre) ; « Où est le
+    son [son] » (leçon des voyelles).
+  * « Les bulles » devient **« LES BALLONS »** (« Éclate les ballons avec la
+    lettre [son] »), avec un mot à chaque bonne réponse comme « Attrape »
+    (Encore, Continue, Bravo, Génial… Supeeeer). Écoute, relier, paires,
+    voyelles : la félicitation tournante est DITE (`youpi` n'est plus muet).
+  * `N.occupe()` rend la main pendant la DERNIÈRE demi-seconde du fichier en
+    cours quand plus rien n'attend : « autorisez l'appui pendant la
+    prononciation de la dernière syllabe ».
+  * `_VOLUME_PHRASES=0.55` : les phrases enregistrées (clone, Narrateur)
+    jouent moins fort, les sons arabes à 1. Mesure : studio −14,1 dB,
+    Narrateur −14,3 dB, clone −15,5 dB — même niveau ; c'est la brièveté
+    d'une syllabe qui la fait paraître faible. Un `Audio` ne dépasse pas 1.
 
 - **v2.9.8.** Seconde relecture du client sur les 3-5 ans (ses remarques
   sont en bas de `Bureau/phrases-3-5-ans.txt`).

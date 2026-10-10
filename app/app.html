@@ -7238,6 +7238,7 @@ function playError(){
   }catch(e){}
 }
 
+var _VOLUME_PHRASES=0.55;
 function speakText(txt,lang,el){
   if(!st.soundOn)return;
   /* La liste des enregistrements n'est pas encore là : on la redemande, sans
@@ -7262,7 +7263,18 @@ function speakText(txt,lang,el){
      « tresse ». Elle vaut maintenant pour toute phrase. */
   try{
     var _enr=_sonEnregistre(txt);
-    if(_enr){_joueSon(_enr);return;}
+    if(_enr){
+      /* ── LES SONS DU CLIENT D'ABORD ──
+         « Augmenter le son de mes enregistrements, ils ne sont pas assez
+         forts par rapport à la voix narrateur. » Mesure : les deux sont au
+         même niveau (−14 dB) ; c'est la durée qui trompe l'oreille — une
+         syllabe d'un tiers de seconde paraît moins forte qu'une phrase. Un
+         lecteur ne monte pas au-dessus de 1 : on baisse donc la voix des
+         phrases, et les sons arabes restent pleins. */
+      var _lect=_joueSon(_enr);
+      try{if(_lect)_lect.volume=/[\u0600-\u06FF]/.test(String(txt))?1:_VOLUME_PHRASES;}catch(e){}
+      return;
+    }
   }catch(e){}
   var arabicChars=(txt.match(/[\u0600-\u06FF\u0750-\u077F]/g)||[]).length;
   var latinChars=(txt.match(/[a-zA-Z\u00C0-\u024F\u0400-\u04FF]/g)||[]).length;
@@ -11392,7 +11404,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v2.9.8';
+var _VERSION_REPLI='v2.9.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -11813,7 +11825,21 @@ function _boyNarration(){
     aEnreg:aEnreg,
     /* Une phrase en cours ou en attente : les jeux des 3-5 ans s'en servent
        pour ne rien accepter tant que la consigne n'est pas finie. */
-    occupe:function(){return busy||q.length>0;},
+    /* « Autorisez l'appui pendant la prononciation de la dernière syllabe
+       par la voix ! » Rien en attente et le fichier en cours à moins d'une
+       demi-seconde de sa fin : on rend la main. */
+    occupe:function(){
+      if(q.length)return true;
+      if(!busy)return false;
+      try{
+        var a=window._kidAudio;
+        if(a&&!a.paused&&isFinite(a.duration)&&a.duration>0){
+          var fin=(a._fin&&a._fin>0)?a._fin:a.duration;
+          if(fin-a.currentTime<=0.5)return false;
+        }
+      }catch(e){}
+      return true;
+    },
     /* ── LE SON, COUTE QUE COUTE ──
        `dire` se tait sur la lettre de base du cours des voyelles quand elle
        n'est pas enregistree : la synthese la prononce mal, et la-bas c'est
@@ -15339,6 +15365,9 @@ var _TE={
 'Continue !':{en:'Keep going!',es:'¡Sigue!',de:'Weiter so!',nl:'Ga door!',it:'Continua!',pt:'Continua!',ru:'Продолжай!',tr:'Devam et!',zh:'继续！',id:'Lanjut!',ur:'جاری رکھو!',hi:'जारी रखो!'},
 'Supeeeer !':{en:'Suuuper!',es:'¡Súuuper!',de:'Suuuper!',nl:'Suuuper!',it:'Suuuper!',pt:'Suuuper!',ru:'Супееер!',tr:'Süpeeer!',zh:'太棒啦！',id:'Suuuper!',ur:'زبردست!',hi:'बहुत बढ़िया!'},
 'Suis le modèle, et repasse avec ton doigt !':{en:'Follow the model, and trace over it with your finger!',es:'¡Sigue el modelo y repásalo con el dedo!',de:'Folge der Vorlage und fahr sie mit dem Finger nach!',nl:'Volg het voorbeeld en trek het over met je vinger!',it:'Segui il modello e ripassalo con il dito!',pt:'Segue o modelo e passa por cima com o dedo!',ru:'Смотри на образец и обведи его пальцем!',tr:'Örneği takip et ve parmağınla üzerinden geç!',zh:'照着示范，用手指描一描！',id:'Ikuti contohnya, dan tebalkan dengan jarimu!',ur:'نمونے کو دیکھو اور انگلی سے اس پر پھیرو!',hi:'नमूने को देखो और उंगली से उस पर फेरो!'},
+'LES BALLONS':{en:'BALLOONS',es:'LOS GLOBOS',de:'DIE BALLONS',nl:'DE BALLONNEN',it:'I PALLONCINI',pt:'OS BALÕES',ru:'ШАРИКИ',tr:'BALONLAR',zh:'气球',id:'BALON',ur:'غبارے',hi:'गुब्बारे'},
+'Éclate les ballons avec la lettre':{en:'Pop the balloons with the letter',es:'Revienta los globos con la letra',de:'Lass die Ballons mit dem Buchstaben platzen',nl:'Laat de ballonnen met de letter knappen',it:'Scoppia i palloncini con la lettera',pt:'Rebenta os balões com a letra',ru:'Лопай шарики с буквой',tr:'Bu harfin olduğu balonları patlat:',zh:'戳破有这个字母的气球',id:'Pecahkan balon yang berisi huruf',ur:'اس حرف والے غبارے پھوڑو:',hi:'इस अक्षर वाले गुब्बारे फोड़ो:'},
+'Où est la lettre':{en:'Where is the letter',es:'Dónde está la letra',de:'Wo ist der Buchstabe',nl:'Waar is de letter',it:'Dov\'è la lettera',pt:'Onde está a letra',ru:'Где буква',tr:'Bu harf nerede:',zh:'这个字母在哪里：',id:'Di mana huruf',ur:'یہ حرف کہاں ہے:',hi:'यह अक्षर कहाँ है:'},
 };
 /* FIN TRADUCTIONS ENFANT */
 
@@ -19297,9 +19326,9 @@ function _boyScene(ca,reprise){
         /* Une seule cible : on la nomme une fois. Plusieurs : a chaque tour,
            pour que l'enfant sache laquelle attraper maintenant. */
         if(premier)N.plusTard(function(){
-          phraseAvecLettre('Où est',multi?c:(son||c),null);
+          phraseAvecLettre(multi?'Où est le son':'Où est la lettre',multi?c:(son||c),null);
         },150);
-        else if(multi)N.plusTard(function(){phraseAvecLettre('Où est',c,null);},120);
+        else if(multi)N.plusTard(function(){phraseAvecLettre('Où est le son',c,null);},120);
       }
       tour(true);
     };
@@ -19995,7 +20024,7 @@ function _boyScene(ca,reprise){
      petit son de réussite marque le coup. */
   api.jeuBulles=function(cible,leurres){
     return function(){
-      var m=manche(te('LES BULLES'),'mj-bulles',MJ_COUL[3]);
+      var m=manche(te('LES BALLONS'),'mj-bulles',MJ_COUL[3]);
       var pris=0,BUT=8,vivant=true,rang=0,_sansCible=0,_avecCible=0,_places=[];
       var jauge=document.createElement('div');jauge.className='mj-jauge';
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
@@ -20087,7 +20116,10 @@ function _boyScene(ca,reprise){
             })(b,b.style.getPropertyValue('--mc'));
             if(typeof playBravo==='function')playBravo();
             pris++;jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
-            if(pris>=BUT){vivant=false;youpi(m.zone);m.gagne();}
+            /* « Un système comme le jeu "attrape", avec un mot
+               d'encouragement pour chaque bonne réponse. » */
+            if(pris>=BUT){vivant=false;youpi(m.zone,true);N.dire(te('Supeeeer !'));m.gagne();}
+            else N.dire(te(['Encore !','Continue !','Bravo !','Génial !'][(pris-1)%4]));
           }else{
             b.classList.add('non');
             if(typeof playError==='function')playError();
@@ -20102,7 +20134,7 @@ function _boyScene(ca,reprise){
       }
       pose();
       N.plusTard(function(){
-        phraseAvecLettre('Éclate les bulles avec la lettre',cible,null);
+        phraseAvecLettre('Éclate les ballons avec la lettre',cible,null);
       },150);
     };
   };
@@ -20144,7 +20176,7 @@ function _boyScene(ca,reprise){
           d.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
           d.onclick=function(){
             if(g===cible){
-              d.classList.add('juste');youpi(m.zone,true);
+              d.classList.add('juste');youpi(m.zone);
               n++;N.plusTard(function(){tour(false);},900);
             }else{
               d.classList.add('non');
@@ -20475,7 +20507,8 @@ function _boyScene(ca,reprise){
         var l=trait||ligne(getComputedStyle(a).getPropertyValue('--mc')||'#1E40AF');
         place(l,pt(a,bordFace(colA)),pt(b,bordFace(colB)));
         faites++;
-        youpi(m.zone,true);
+        /* Dite à chaque paire reliée ; à la dernière, « Bravo ! » suffit. */
+        youpi(m.zone,faites===choix.length);
         if(faites===choix.length){N.dire(te('Bravo !'));m.gagne();}
       }
       function refuse(c){
@@ -20583,8 +20616,9 @@ function _boyScene(ca,reprise){
           if(a.g===b.g){
             N.plusTard(function(){
               a.el.classList.add('prise');b.el.classList.add('prise');
-              etincelles(m.zone,b.el);youpi(m.zone,true);
+              etincelles(m.zone,b.el);
               bloque=false;trouvees++;
+              youpi(m.zone,trouvees===choix.length);
               if(trouvees===choix.length){N.dire(te('Bravo !'));m.gagne();}
             },150);
           }else{
@@ -20631,7 +20665,7 @@ function _boyScene(ca,reprise){
           d.style.setProperty('--mc',MJ_VIF[k%MJ_VIF.length]);
           d.onclick=function(){
             if(v[0]===cible[0]){
-              d.classList.add('juste');youpi(m.zone,true);
+              d.classList.add('juste');youpi(m.zone);
               n++;N.plusTard(tour,900);
             }else{
               d.classList.add('non');
@@ -20962,7 +20996,7 @@ function _boyLetterJeu(ca,idx,premiere){
       _prechargeSons(_avecVoyelles.concat(leurres).concat(
         ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
          'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
-         'Suis le modèle, et repasse avec ton doigt !','Où est','Encore !','Continue !','Supeeeer !',
+         'Suis le modèle, et repasse avec ton doigt !','Où est la lettre','Éclate les ballons avec la lettre','Encore !','Continue !','Supeeeer !',
          'Relie les deux mêmes lettres !','Retrouve les paires !']
         .map(function(p){return te(p);})));
   }catch(e){}
