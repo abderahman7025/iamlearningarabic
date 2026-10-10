@@ -53,6 +53,22 @@ navigateur.
    sous la clé `petit|` + phrase : `_clesSon` les cherche D'ABORD quand
    `st.age==='petit'`, puis retombe sur la clé commune (v295).
 
+**FAIT le 10 octobre au soir — 6-11 ans en Narrateur v3 « posé ».** Choix du
+client après trois séries d'essais (« catégoriquement v3 posé ») : voix
+Narrateur, `eleven_v3`, texte précédé de `[calm] `, `language_code:'fr'`,
+`voice_settings` stabilité 0,5 / similarity 0,95 / style 0. Il ne veut que du
+posé ou du chaleureux, et AUCUN accent : le v3 sans balise à stabilité 1,0
+lui a sonné canadien. 152 phrases (6 518 caractères) déposées sur les clés
+communes, à la place du clone ; les anciens fichiers sont gardés hors dépôt
+(`Bureau/claude/voix-6-11/avant/`, nom = hex de la clé). Liste :
+`Bureau/phrases-6-11-ans.txt`. 35 phrases communes NON refaites, parce
+qu'elles servent aux jeux des 3-5 ans (« Attrape la lettre », « Bravo ! Le
+Lion arrive dans ton album »…) : elles gardent le clone ou leur version
+`petit|`. **Reste : l'interface ados/adultes** — elle lit des textes `t(clé)`
+au clic (introduction, voyelles, prolongations, astuces), dans les 13
+langues, par la synthèse du navigateur ; le serveur refuse une clé de plus
+de 400 caractères et l'introduction en fait 450 : il faudra une clé courte.
+
 **Ce que veut le client (10 octobre)** : garder SA voix pour les sons arabes,
 et mettre la voix Narrateur « pour le reste du site ». Le 3-5 ans est le
 premier pas ; il l'écoute avant de décider du reste. Donc à faire s'il
