@@ -81,7 +81,7 @@ par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v295
+## OÙ ON EN EST — 10 octobre 2026, production en v296
 
 Le chantier : **illustrer les leçons enfants**. Le client : « chaque règle,
 chaque chose doit être illustrée » — une image AVEC le texte, pas à la place.
@@ -151,7 +151,10 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v295), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v296), du plus récent au plus ancien :**
+
+- **v296.** Jeu « Attrape » des 3-5 ans : « avant "encore", dis "bravo" ».
+  Les cinq prises disent Bravo, Encore, Continue, Génial, Supeeeer.
 
 - **v295.** Interface 3-5 ans, phrases revues par le client dans
   `phrases-3-5-ans.txt` et dites par la voix « Narrateur ».
