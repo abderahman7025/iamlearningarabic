@@ -216,6 +216,18 @@ distinct de la vipère de ء.
     Le « ○ » du bonus soukoun est DIT « circle » (table `ROND` de l'outil).
     Pour l'inventaire, ne cliquer que les éléments dont le `onclick` contient
     `speakText` : cliquer tous les boutons faisait naviguer la page en anglais.
+  * **3-5 ANS EN ANGLAIS, fait le 11 octobre** (fichiers seulement). Le
+    client a écouté trois phrases en v2/v3/v4 et pris la **v4**, avec « les
+    mêmes émotions qu'en français ». 40 phrases (1 028 caractères) sous
+    « petit| » + la phrase anglaise ; 679 clés en ligne, dont 80 « petit| ».
+    Outil : `node outils/voix-petit.js outils/captures/petit-en.json en
+    eleven_v4`. Il relit les émotions du client dans
+    `Bureau/phrases-3-5-ans.txt` et les traduit en balises (table `BALISE`).
+    Le script qui avait fait le français n'existe plus : les balises ont été
+    RÉÉCRITES d'après ses mots, elles ne sont pas garanties identiques.
+    `petit-en.json` se refait au banc : `te(phrase)` pour chaque clé
+    « petit| » française, `st.lang` sur la langue, et `teF('Bravo ! {nom}
+    arrive dans ton album.',{nom})` avec les noms de `_habDuProfil().etapes`.
   * **Pour la langue suivante :** refaire l'inventaire avec `st.lang` sur la
     langue voulue, puis le même outil avec son code (`en`, `es`…). La voix
     n'a pas été essayée dans une autre langue que le français.
