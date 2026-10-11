@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.6
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.7
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,8 +183,31 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.6), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.7), du plus récent au plus ancien :**
 
+- **v3.0.7.** Suite de la v3.0.6, et les voix.
+  * `sansMotSeul` traite aussi les lignes de DEUX mots : en espagnol
+    « ¿Dónde / está [lettre]? » se repliait un mot par ligne. Mesuré sur le
+    bā en 1024×768 : français, anglais, allemand, espagnol sans mot seul et
+    cadres identiques. **Les huit autres langues ne sont PAS mesurées** : le
+    balayage (une iframe par langue) s'est figé, les minuteries d'un volet
+    caché tombent à une par minute. À refaire avec l'horloge virtuelle de
+    `outils/inventaire-voix.js`, qui ne dépend pas du volet.
+  * **Voix 6-11 ans (fichiers seulement) :**
+    - FRANÇAIS refait en `eleven_v4` **chaleureux** (`[warmly]`) : le client a
+      trouvé le v3 posé « trop endormi, trop lent ». 156 phrases, puis 17
+      morceaux que le relevé a trouvés sans enregistrement (« On ne dit pas
+      khè, mais » — la leçon coupe désormais ces phrases autour du son).
+      Anciens fichiers v3 : `Bureau/claude/voix-6-11-v4/avant/`.
+    - ANGLAIS : 14 phrases manquaient (« So you need to remember these two
+      forms. », les points de « Remember »…) : le premier relevé passait à
+      la page suivante après un délai fixe et coupait les pages bavardes.
+      `inventaire-voix.js` attend maintenant 2,6 s virtuelles de silence
+      (`silence()`). Générées en v4 posé.
+    - Contrôle : relevé complet refait en anglais (garçon et fille) et en
+      français (garçon) ; chaque phrase dite a maintenant son enregistrement,
+      sauf « plusse » (le signe +), non traduit. Le relevé français « fille »
+      a été perdu (onglet rechargé) : à refaire.
 - **v3.0.6.** Retours du client sur les leçons 6-11 ans en anglais.
   * **Plus de ligne d'un seul mot.** « In the middle of a / word, / it is
     written like this. » : une ligne de la mise en page du client, trop

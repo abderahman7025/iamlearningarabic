@@ -11484,7 +11484,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.6';
+var _VERSION_REPLI='v3.0.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17301,7 +17301,9 @@ function _boyScene(ca,reprise){
           if(b.width>0.5)mots.push(Math.round((b.top+b.height/2)/3));
         }
       }
-      if(mots.length<3)return;
+      /* deux mots suffisent : « ¿Dónde / está [lettre]? » se repliait un mot
+         par ligne. Une ligne d'UN mot par nature n'est pas touchee. */
+      if(mots.length<2)return;
       var par={};mots.forEach(function(y){par[y]=(par[y]||0)+1;});
       var lignes=Object.keys(par);
       if(lignes.length<2)return;
