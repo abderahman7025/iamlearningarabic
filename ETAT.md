@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.8
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.9
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,8 +183,24 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.9), du plus récent au plus ancien :**
 
+- **v3.0.9.** PANNE CAUSÉE PAR LES VOIX, réparée : `GET /api/audio` ne
+  rendait que 1000 fichiers (`list('', {limit:1000})`, et Supabase ne va
+  jamais au-delà par appel). Les voix des autres langues ont fait passer le
+  bucket au-dessus du millier : tout ce qui venait après dans l'ordre des
+  noms — dont TOUTES les clés « petit| » et « long| » — avait disparu de la
+  liste, et le site retombait sur la voix du navigateur, y compris en
+  français. Vu en comptant : 1000 clés pile, 0 « petit| », 0 « long| ».
+  `lireLesSons` lit maintenant toutes les pages (`offset`, tri par nom).
+  **À surveiller :** la liste est téléchargée entière par chaque appareil
+  au démarrage ; avec douze langues elle pèse plusieurs centaines de Ko. Si
+  le démarrage s'en ressent, ne rendre que la langue de l'utilisateur
+  (plus les sons arabes).
+  * **Voix terminées en v4, trois interfaces :** indonésien, chinois,
+    russe, allemand, portugais, italien, néerlandais, espagnol, turc,
+    hindi. 6-11 ans : entre 121 et 177 phrases par langue, aucun échec.
+    Ourdou : laissé de côté (voir v3.0.8).
 - **v3.0.8.** Les voix dans les autres langues — « v4 pour toutes les
   langues », dit le client le 11 octobre après avoir écouté v2/v3/v4 en
   indonésien, allemand, portugais, italien, néerlandais, chinois et russe.

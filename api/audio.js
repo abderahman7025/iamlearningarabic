@@ -30,9 +30,22 @@ async function lireLesSons(req, res, ip) {
     // On lit AUSSI `error` : sans ça un bucket absent ou une erreur de
     // permission renvoyait data=null, donc {urls:{}} avec un code 200,
     // impossible à distinguer d'un stockage réellement vide.
-    const { data, error: listError } = await supabase.storage
-      .from('audio')
-      .list('', { limit: 1000 });
+    // ── PAGE PAR PAGE ──
+    // `list` ne rend jamais plus de 1000 fichiers. Tant que le bucket en
+    // comptait 600 on ne le voyait pas ; avec les voix des autres langues il
+    // a dépassé le millier, et tout ce qui venait après dans l'ordre des
+    // noms — les clés « petit| » et « long| » entre autres — a disparu de
+    // la liste : le site retombait sur la voix du navigateur. On lit donc
+    // toutes les pages.
+    let data = [], listError = null;
+    for (let debut = 0; debut < 30000; debut += 1000) {
+      const page = await supabase.storage
+        .from('audio')
+        .list('', { limit: 1000, offset: debut, sortBy: { column: 'name', order: 'asc' } });
+      if (page.error) { listError = page.error; break; }
+      data = data.concat(page.data || []);
+      if (!page.data || page.data.length < 1000) break;
+    }
 
     if (listError) {
       console.error('[Audio] Storage list failed:', listError.message);
