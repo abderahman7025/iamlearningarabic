@@ -59,7 +59,16 @@ async function inventaireVoix(langue, profils, maxLettres) {
     now = fin; await tic();
   }
   var dits = {}, ordre = [];
-  window.speakText = function (t) { t = String(t || ''); if (t && !/[؀-ۿ]/.test(t) && !dits[t]) { dits[t] = 1; ordre.push(t); } };
+  var dernier = 0;
+  /* On attend que la page ait TOUT dit : 2,6 s (virtuelles) sans nouvelle
+     phrase. Un délai fixe coupait les pages bavardes — « à retenir » dit
+     quatre phrases, les deux dernières n'étaient jamais relevées, et en
+     anglais c'est la voix du navigateur qui les disait. */
+  async function silence() {
+    var debut = now;
+    while (now - debut < 60000) { await avance(400); if (now - debut > 1800 && now - dernier > 2600) break; }
+  }
+  window.speakText = function (t) { dernier = now; t = String(t || ''); if (t && !/[؀-ۿ]/.test(t) && !dits[t]) { dits[t] = 1; ordre.push(t); } };
   window.speak = function () {};
   try { window.stopSpeech = function () {}; } catch (e) {}
   var vraie = window._boyScene, B = null;
@@ -74,14 +83,13 @@ async function inventaireVoix(langue, profils, maxLettres) {
     var b = B;
     window.__prog = nom + ' — ' + pages + ' pages, ' + ordre.length + ' phrases';
     for (var n = 0; n < 160 && b.wrap && b.wrap.isConnected; n++) {
-      await avance(3000);
+      await silence();
       var cibles = [].slice.call(b.wrap.querySelectorAll('.boy-cible,.boy-flotte,.boy-hublot,.rec-case'));
       for (var c = 0; c < cibles.length && c < 6; c++) {
         try { cibles[c].click(); } catch (e) {}
-        await avance(900);
+        await silence();
         if (!b.wrap.isConnected) break;
       }
-      await avance(1500);
       pages++;
       if (!b.wrap.isConnected) break;
       if (b.wrap.querySelector('[data-fin]')) { await avance(3000); break; }

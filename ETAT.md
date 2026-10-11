@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.5
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.6
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,8 +183,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.5), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.6), du plus récent au plus ancien :**
 
+- **v3.0.6.** Retours du client sur les leçons 6-11 ans en anglais.
+  * **Plus de ligne d'un seul mot.** « In the middle of a / word, / it is
+    written like this. » : une ligne de la mise en page du client, trop
+    longue en anglais, se repliait en laissant son dernier mot seul.
+    `sansMotSeul` (appelé par `calibreLesTextes` après `remplitLaLargeur`)
+    pose `text-wrap:balance` sur les `.boy-ligne` qui ont un mot seul, puis,
+    s'il en reste, réduit la police par crans (0,94 → 0,70).
+    **PIÈGE :** mis dans la feuille de style, `text-wrap:balance` fausse
+    `remplitLaLargeur` — une ligne équilibrée « tient » toujours, la police
+    monte jusqu'à un mot par ligne (mesuré : tracés à l'échelle 0,5).
+    Il ne se pose donc qu'APRÈS le calcul, et `remplitLaLargeur` l'efface
+    en entrant.
+  * **Le cadre et le hublot gardent leur taille.** « Page form 4/4 end : le
+    cadre ainsi que le hublot sont plus petits. » Quand une page à hublot ne
+    tient pas à l'échelle pleine (1,45), `ajusteEcran` réduit maintenant le
+    TITRE par crans (0,93 → 0,68) avant de réduire tout le cadre. Mesuré en
+    anglais sur le bā, 1024×768 : « TANWĪN 2/3 » passait à 1,33 (hublot 231)
+    quand ses voisines étaient à 1,45 (hublot 252) ; toutes à 1,45 après.
+    Le titre réduit reprend sa taille au début de chaque passage
+    (`_tt._avant`, `_tt._reduit`).
+  * **La flèche de droite appelle** quand l'enfant entame la DERNIÈRE forme
+    d'un canevas de tracé : `_blocEcriture` appelle `o.surDerniere` quand
+    `caseEcrite===nb-1`, `api.tracer` pose `.appel` sur `_bordD` (rond blanc
+    qui bat). La bande reste transparente au doigt ; seul le rond se touche.
+    Aucun texte : vaut pour toutes les langues.
+  * **Outil de mesure** (non gardé) : `__mesureFormes(langue, idx)` parcourt
+    une leçon de lettre page par page (faux lecteur dans `_kidAudio` pour
+    que la page n'enchaîne pas), et rend pour chacune la taille du cadre, du
+    hublot, l'échelle, et les mots seuls sur leur ligne (un `Range` par mot).
+    Il faut `navToPage('sessions')` avant de lancer le cours, sinon `ca` est
+    caché et tout mesure zéro.
 - **v3.0.5.** Quatre retours du client sur les jeux des 3-5 ans.
   * **Attrape-la, leçon des voyelles :** « Où est le son » n'est dit qu'au
     premier tour ; ensuite seul le son à trouver (`N.direToujours`).

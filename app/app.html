@@ -3263,7 +3263,26 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
 .boy-titre{font-size:1.28rem;font-weight:900;color:var(--sk-fonce);line-height:1.45;letter-spacing:.01em;
   text-align:center;margin:0 auto 18px;max-width:none}
 /* Une ligne du client : elle occupe sa propre ligne, et rien ne la coupe. */
+/* Quand elle doit quand meme se replier (trop longue pour sa colonne dans une
+   autre langue), `sansMotSeul` EQUILIBRE ses lignes — « In the middle / of a
+   word, » et non « In the middle of a / word, » — mais seulement APRES le
+   calcul de la taille : pose ici, dans la feuille de style, l'equilibrage
+   faussait `remplitLaLargeur` (une ligne equilibree « tient » toujours, la
+   police montait jusqu'a un mot par ligne — mesure). */
 .boy-ligne{display:block;white-space:nowrap}
+/* ── LE BORD DROIT APPELLE ──
+   Le client : « dans tous les canevas où il faut repasser, une fois qu'on
+   commence à écrire la dernière forme, quelque chose doit apparaître à droite
+   de l'écran pour montrer qu'il faut scroller ou cliquer pour passer à la
+   suite ». La flèche du bord droit se montre alors et bat. La BANDE ne prend
+   toujours pas le doigt (on écrit jusqu'au bord) ; seul le rond se touche. */
+.boy-bord.appel{opacity:1;pointer-events:none}
+.boy-bord.appel>i{pointer-events:auto;animation:bordAppel 1s ease-in-out infinite;
+  background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.55),0 6px 20px rgba(0,0,0,.28)}
+.boy-bord.appel.eteint{opacity:0}
+.boy-bord.appel.eteint>i{pointer-events:none}
+@keyframes bordAppel{0%,100%{transform:translateX(0) scale(1)}50%{transform:translateX(-7px) scale(1.14)}}
+@media (prefers-reduced-motion:reduce){.boy-bord.appel>i{animation:none}}
 /* L'ECRAN DE FIN : le texte au centre, une monture de chaque cote. */
 .fete-rangee{display:flex;align-items:center;justify-content:center;
   gap:clamp(8px,3vw,26px);margin:6px auto 10px;max-width:100%}
@@ -11465,7 +11484,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.5';
+var _VERSION_REPLI='v3.0.6';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14294,6 +14313,8 @@ function _blocEcriture(hote,o){
     trace=true;if(o.siEcrit)o.siEcrit();var q=pos(e);
     _p1=q;_mil=q;
     caseEcrite=caseDe(q.x);
+    /* la DERNIERE forme de la page est entamee : l'appelant le saura */
+    if(caseEcrite===nb-1&&o.surDerniere){try{o.surDerniere();}catch(e2){}}
     /* Un cran à gauche de la case attaquée. On ne relance rien tant que
        l'enfant reste dans la même case, sinon l'animation repartirait de
        zéro à chaque trait. */
@@ -16272,6 +16293,8 @@ function _boyScene(ca,reprise){
     if(!col||col<80)return;
     var lignes=t.querySelectorAll('.boy-ligne');
     if(!lignes.length)return;
+    /* l'equilibrage de `sansMotSeul` se pose APRES ce calcul, jamais avant */
+    [].slice.call(lignes).forEach(function(l){l.style.textWrap='';});
     /* On mesure a une taille de reference, puis on met a l'echelle d'un seul
        coup : les blocs ne se repliant pas, leur largeur est proportionnelle a
        la police et le calcul est exact. */
@@ -16933,6 +16956,10 @@ function _boyScene(ca,reprise){
     wrap.style.transform='';wrap.style.transformOrigin='';
     wrap.style.width='';wrap.style.height='';
     wrap.style.marginLeft='';wrap.style.marginRight='';_echelleCadre=1;
+    /* Un titre qu'on a retreci ici (voir plus bas) reprend sa taille avant
+       toute mesure : sinon il retrecirait un peu plus a chaque passage. */
+    var _tt=wrap.querySelector('.boy-titre');
+    if(_tt&&_tt._reduit!==undefined&&_tt.style.fontSize===_tt._reduit)_tt.style.fontSize=_tt._avant;
     /* DEBOUT, dans une manche des 3-5 ans : voir la fin de la fonction. */
     wrap.style.marginTop='';
     var _jeux=[].slice.call(wrap.querySelectorAll('.panneau-jeu'));
@@ -16990,6 +17017,29 @@ function _boyScene(ca,reprise){
         if(poseEtMesure(mi)<=dispo)bas2=mi;else haut2=mi;
       }
       k=bas2;
+    }
+    /* ── LE CADRE ET LE HUBLOT GARDENT LEUR TAILLE, C'EST LE TEXTE QUI CEDE ──
+       Le client : « page form 4/4 end : le cadre ainsi que le hublot sont
+       plus petits que ceux des autres pages ! » Une phrase qui prend une
+       ligne de plus (une autre langue, un mot plus long) ne tenait plus a
+       l'echelle des pages voisines : on reduisait TOUT, cadre et hublot
+       compris — mesure en anglais, « TANWIN 2/3 » a 1,33 quand ses voisines
+       sont a 1,45, hublot de 231 px au lieu de 252. On essaie donc d'abord
+       de reduire le seul titre, par crans, jusqu'a ce que la page tienne a
+       l'echelle pleine. Pages a hublot seulement : un canevas de trace ou un
+       jeu regle sa taille autrement. */
+    if(k<MAX-0.03&&_tt&&!_jeux.length&&wrap.querySelector('.boy-hublot')
+       &&!wrap.querySelector('.boy-ecriture')){
+      var _px=parseFloat(getComputedStyle(_tt).fontSize)||0,_av=_tt.style.fontSize,_pris=false;
+      if(_px>0){
+        [0.93,0.86,0.8,0.74,0.68].some(function(f){
+          _tt.style.fontSize=(_px*f).toFixed(2)+'px';
+          if(poseEtMesure(MAX)<=dispo){k=MAX;_pris=true;return true;}
+          return false;
+        });
+        if(_pris){_tt._avant=_av;_tt._reduit=_tt.style.fontSize;}
+        else _tt.style.fontSize=_av;
+      }
     }
     var rendu=poseEtMesure(k);
     if(rendu<=0)return;
@@ -17229,8 +17279,53 @@ function _boyScene(ca,reprise){
       b.style.whiteSpace='nowrap';
     });
   }
+  /* ── PAS DE LIGNE D'UN SEUL MOT ──
+     Le client, plusieurs fois : « je ne veux pas ce genre de ligne avec un
+     mot ». Une ligne de SA mise en page qui se replie dans une autre langue
+     laissait son dernier mot seul (« In the middle of a / word, »).
+     L'equilibrage du navigateur regle les lignes de trois mots et plus ; pour
+     ce qui reste — deux mots trop larges, un navigateur sans equilibrage —
+     on reduit la police par crans jusqu'a ce qu'aucune ligne VUE ne porte un
+     mot seul. On ne touche pas a une ligne qui n'a qu'un mot par nature. */
+  function motsSeuls(t){
+    var n=0;
+    [].slice.call(t.querySelectorAll('.boy-ligne')).forEach(function(l){
+      var mots=[],tw=document.createTreeWalker(l,NodeFilter.SHOW_TEXT),nd,m,re,r,b;
+      while((nd=tw.nextNode())){
+        re=/[^\s]+/g;
+        while((m=re.exec(nd.nodeValue))){
+          /* un emoji ou une ponctuation seule n'est pas un mot */
+          if(!/[A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u4E00-\u9FFF]/.test(m[0]))continue;
+          r=document.createRange();r.setStart(nd,m.index);r.setEnd(nd,m.index+m[0].length);
+          b=r.getBoundingClientRect();
+          if(b.width>0.5)mots.push(Math.round((b.top+b.height/2)/3));
+        }
+      }
+      if(mots.length<3)return;
+      var par={};mots.forEach(function(y){par[y]=(par[y]||0)+1;});
+      var lignes=Object.keys(par);
+      if(lignes.length<2)return;
+      lignes.forEach(function(y){if(par[y]===1)n++;});
+    });
+    return n;
+  }
+  function sansMotSeul(t){
+    if(!t||!t.isConnected||!t.querySelector('.boy-ligne'))return;
+    if(!motsSeuls(t))return;
+    /* d'abord l'equilibrage du navigateur, a taille egale */
+    [].slice.call(t.querySelectorAll('.boy-ligne')).forEach(function(l){l.style.textWrap='balance';});
+    if(!motsSeuls(t))return;
+    var px=parseFloat(getComputedStyle(t).fontSize)||0,av=t.style.fontSize;
+    if(!(px>0))return;
+    var ok=[0.94,0.88,0.82,0.76,0.7].some(function(f){
+      t.style.fontSize=(px*f).toFixed(2)+'px';
+      return !motsSeuls(t);
+    });
+    if(!ok)t.style.fontSize=av;
+  }
   function calibreLesTextes(){
     [].slice.call(wrap.querySelectorAll('.boy-titre')).forEach(remplitLaLargeur);
+    [].slice.call(wrap.querySelectorAll('.boy-titre')).forEach(sansMotSeul);
     [].slice.call(wrap.querySelectorAll('.rec-mot')).forEach(remplitLeMot);
     taillePourLesBoutons();
     [].slice.call(wrap.querySelectorAll('.boy-barre')).forEach(egaliseLaRangee);
@@ -18026,7 +18121,9 @@ function _boyScene(ca,reprise){
       function siEcrit(){aEcrit=true;suivants.forEach(function(b){b.style.opacity='1';});}
       function veilleuse(b){suivants.push(b);b.style.opacity=aEcrit?'1':'.45';return b;}
       var commun={liste:liste,signeSeul:signeSeul,nomme:Array.isArray(glyph),
-                  nomsCases:nomsCases,siEcrit:siEcrit,deTete:!!deTete};
+                  nomsCases:nomsCases,siEcrit:siEcrit,deTete:!!deTete,
+                  /* voir `.boy-bord.appel` */
+                  surDerniere:function(){try{if(_bordD&&_bordD.isConnected)_bordD.classList.add('appel');}catch(e){}}};
       function opts(sup){var o={},n;for(n in commun)o[n]=commun[n];
         for(n in sup||{})o[n]=sup[n];return o;}
       /* Le bloc du panneau, à la taille où le client a réglé les gestes. */
