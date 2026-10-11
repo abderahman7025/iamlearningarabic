@@ -44,6 +44,11 @@ const inv = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const langue = process.argv[3] || 'fr';
 const modele = (process.argv[4] && process.argv[4].indexOf('eleven_') === 0) ? process.argv[4] : 'eleven_v3';
 const sansDepot = process.argv.includes('--sans-depot');
+/* --mixte : les textes qui portent de l'écriture arabe (liste `mixte` de
+   l'inventaire). Le client les veut dits par le Narrateur, lettres et signes
+   écrits en toutes lettres : voir outils/arabe-pour-la-voix.js. */
+const mixte = process.argv.includes('--mixte');
+const { pourLaVoix } = require('./arabe-pour-la-voix.js');
 const dest = path.join(__dirname, 'captures', 'voix-adulte-' + langue);
 fs.mkdirSync(dest, { recursive: true });
 
@@ -51,10 +56,10 @@ fs.mkdirSync(dest, { recursive: true });
    espaces avant un point ne se prononcent pas. La clé, elle, reste le texte
    exact que l'application passe à `speakText`. */
 const ROND = { en: 'circle' };
-const aDire = (t) => t.replace(/○/g, ROND[langue] || '').replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\s+/g, ' ').trim();
+const aDire = (t) => t.replace(/○/g, ROND[langue] || '').replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\.(?=[A-ZÀ-Ü])/g, '. ').replace(/\s+/g, ' ').trim();
 
 (async () => {
-  const textes = inv.fr.map((x) => x.t).filter((x) => x && x.trim());
+  const textes = (mixte ? inv.mixte : inv.fr).map((x) => x.t).filter((x) => x && x.trim());
   let car = 0; const rates = [];
   for (const t of textes) {
     const k = cle(t);
@@ -65,7 +70,7 @@ const aDire = (t) => t.replace(/○/g, ROND[langue] || '').replace(/\s*•\s*/g,
           method: 'POST',
           headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
           body: JSON.stringify({
-            text: '[calm] ' + aDire(t), model_id: modele, language_code: langue,
+            text: '[calm] ' + (mixte ? pourLaVoix(aDire(t)) : aDire(t)), model_id: modele, language_code: langue,
             voice_settings: { stability: 0.5, similarity_boost: 0.95, style: 0, use_speaker_boost: true },
           }),
         });
