@@ -185,6 +185,22 @@ distinct de la vipère de ء.
 
 **Fait et en ligne (v187 → v3.0.9), du plus récent au plus ancien :**
 
+- **Sans changement de version (11 octobre, fichiers seulement) : LE NARRATEUR
+  DIT 100 % DU SITE.** Le client : « il faut absolument que la voix narrateur
+  dise 100 % du site ! » Les 10 ou 11 textes ados/adultes mêlés d'écriture
+  arabe (bonus soukoun, wasla, Allah, lunaires/solaires, astuces de l'alif et
+  de la hamza) sont maintenant générés en `eleven_v4` dans les douze langues
+  (ourdou exclu) : `node outils/voix-adulte.js outils/captures/inv-adulte-<l>.json
+  <l> eleven_v4 --mixte`. **La règle « l'IA ne dit jamais d'arabe » est LEVÉE
+  pour le Narrateur v4** — il juge qu'elle prononce « parfaitement » les mots
+  arabes. Seul défaut entendu : devant une lettre ou un signe SEUL elle dit
+  « L » pour ل, « a » pour la fatḥa. `outils/arabe-pour-la-voix.js` écrit donc
+  le nom en toutes lettres (ل → لَام, َ → فَتْحَة, ال → أَلْ…) et retire la
+  voyelle finale du DERNIER mot (هَمْزَةُ الْوَصْل, بِسْمِ اللَّه). Liste
+  complète validée par lui : `Bureau/mots-arabes-voix.txt`. Le texte affiché
+  et la clé ne changent pas. Reste dit par le navigateur : « plusse ».
+  Faute connue, non corrigée faute de réponse : « le ل se ne prononce pas »
+  dans le bonus lunaires/solaires (la voix la lit telle quelle).
 - **v3.0.9.** PANNE CAUSÉE PAR LES VOIX, réparée : `GET /api/audio` ne
   rendait que 1000 fichiers (`list('', {limit:1000})`, et Supabase ne va
   jamais au-delà par appel). Les voix des autres langues ont fait passer le
