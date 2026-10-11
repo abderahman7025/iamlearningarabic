@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.4
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.5
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,8 +183,28 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.4), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.5), du plus récent au plus ancien :**
 
+- **v3.0.5.** Quatre retours du client sur les jeux des 3-5 ans.
+  * **Attrape-la, leçon des voyelles :** « Où est le son » n'est dit qu'au
+    premier tour ; ensuite seul le son à trouver (`N.direToujours`).
+  * **Relie les pareilles :** tant que ce jeu est à l'écran (`.mj-relier`
+    dans `wrap`), `depart` refuse tout glissement de page — un geste parti à
+    côté d'une case tournait la page vers la précédente. Les bords se
+    cliquent toujours.
+  * **Dans un JEU on n'attend plus la voix :** le blocage des touchers posé
+    en v2.9.8 dans `manche()` (à la capture, tant que `N.occupe()`) est
+    RETIRÉ — « c'est sur les leçons qu'on doit attendre, pas les jeux des
+    leçons ». Ne pas le remettre.
+  * **Remplis la lettre :** la consigne entière (« Suis le modèle, et repasse
+    avec ton doigt ! ») n'est dite qu'au premier tracé de la leçon
+    (`_traceExplique`, une valeur par `_boyScene`) ; ensuite « À toi de
+    tracer. ». Déposés en Narrateur v4 chaleureux : `petit|À toi de tracer.`
+    et `petit|Your turn to write.`.
+  * Rejoué au banc avec `speakText` remplacé par un enregistreur : tracé 1 →
+    phrase entière, tracé 2 → « À toi de tracer. » ; attrape → « Où est le
+    son » + son, puis « Bravo ! » + son seul ; clic pris tout de suite ;
+    glissement parti de `.mjr-col` → la page reste.
 - **v3.0.4.** La voix Narrateur (v3, posé) dans l'interface ados/adultes, EN
   FRANÇAIS. Le client : « pour l'interface adulte, il faut traduire tout ce
   qui est lu dans le site (introduction aussi) », puis « on parle du

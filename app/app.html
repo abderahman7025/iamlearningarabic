@@ -11465,7 +11465,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.4';
+var _VERSION_REPLI='v3.0.5';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -15841,6 +15841,15 @@ function _boyScene(ca,reprise){
       function depart(x,y,t){
         if(!vivant()){bon=false;return;}
         bon=!(t&&t.closest&&t.closest('canvas,button,input,textarea,.boy-cible,.mjr-case,.mj-carte,.boy-flotte,.boy-hublot,.rec-case,.boy-bord'));
+        /* ── « RELIE » : ON NE TOURNE PAS LA PAGE EN GLISSANT ──
+           Le client : « quand l'enfant veut relier en partant trop à gauche,
+           ça tourne la page et revient sur la précédente. Il faut bloquer
+           le scroll sur ce jeu, et pouvoir changer de page en cliquant sur
+           le bord. » Seul un geste parti D'UNE CASE était protégé : parti
+           d'un centimètre à côté, c'était un glissement de page. Tant que
+           ce jeu est à l'écran, plus aucun glissement ne tourne la page ;
+           les bords, eux, se cliquent toujours. */
+        try{if(wrap.querySelector('.mj-relier'))bon=false;}catch(e){}
         x0=x;y0=y;
       }
       /* ── LA BANDE SUIT LA MAIN ──
@@ -19117,6 +19126,8 @@ function _boyScene(ca,reprise){
   var MJ_VIF=['#1E40AF','#FACC15','#EF4444','#10B981','#A21CAF','#F97316',
               '#0EA5E9','#DB2777'];
   var MJ_YOUPI=['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !'];
+  /* la consigne entière du tracé a-t-elle déjà été dite dans CETTE leçon ? */
+  var _traceExplique=false;
 
   function manche(etape,classe,coul){
     var p=panneau(etape);p.setAttribute('data-attend','1');
@@ -19134,19 +19145,14 @@ function _boyScene(ca,reprise){
        manche entière : les aires n'ont pas à savoir d'où il vient. */
     try{z.style.setProperty('--fond','url("'+_fondDuMonde()+'")');}catch(e){}
     p.appendChild(z);
-    /* ── ON ÉCOUTE D'ABORD ──
-       Le client : « tant que la voix n'a pas fini de parler, toucher l'écran
-       (même les réponses) ne fait rien. Pareil partout ! » Un enfant de trois
-       ans tape avant d'avoir entendu la consigne. Tout toucher dans la
-       manche est donc arrêté ici, à la capture, tant que la narration a une
-       phrase en cours ou en attente. */
-    ['pointerdown','mousedown','touchstart','click'].forEach(function(ev){
-      z.addEventListener(ev,function(e){
-        var parle=false;
-        try{parle=N.occupe();}catch(x){}
-        if(parle){e.stopPropagation();if(ev!=='touchstart')e.preventDefault();}
-      },true);
-    });
+    /* ── DANS UN JEU, ON N'ATTEND PAS LA VOIX ──
+       v2.9.8 arrêtait ici tout toucher tant que la narration parlait (« tant
+       que la voix n'a pas fini de parler, toucher l'écran ne fait rien.
+       Pareil partout ! »). Le client, v3.0.5 : « on doit pouvoir cliquer
+       sur les jeux relie les paires, attrape-la et les autres jeux, sans
+       avoir à attendre la fin de la voix. C'est sur les leçons qu'on doit
+       attendre, pas les jeux des leçons. » Le blocage est donc retiré des
+       manches ; celui des pages de leçon n'est pas ici, il ne bouge pas. */
     /* ── PAS DE BOUTON « SUITE » ──
        Le client : « enleve les boutons suivants sur toutes les pages qui
        changent automatiquement ». Une manche gagnee passe d'elle-meme apres
@@ -19429,7 +19435,9 @@ function _boyScene(ca,reprise){
         if(premier)N.plusTard(function(){
           phraseAvecLettre(multi?'Où est le son':'Où est la lettre',multi?c:(son||c),null);
         },150);
-        else if(multi)N.plusTard(function(){phraseAvecLettre('Où est le son',c,null);},120);
+        /* v3.0.5 — « il dit à chaque fois "où est le son" : il faut le dire
+           une fois, puis dire simplement le son à trouver. » */
+        else if(multi)N.plusTard(function(){N.direToujours(_sansCercle(c));},120);
       }
       tour(true);
     };
@@ -20802,7 +20810,14 @@ function _boyScene(ca,reprise){
       cv.addEventListener('pointercancel',leve);
       N.plusTard(function(){
         /* Le client, seconde relecture : la consigne seule, sans la lettre. */
-        N.dire(te('Suis le modèle, et repasse avec ton doigt !'));
+        /* v3.0.5 — « le son ne doit dire toute la phrase que pour le
+           premier repassage de chaque leçon ; pour le reste, juste quelque
+           chose de court, du type "à toi de tracer". » La leçon des voyelles
+           en a trois (wa, wi, wou). */
+        if(!_traceExplique){
+          _traceExplique=true;
+          N.dire(te('Suis le modèle, et repasse avec ton doigt !'));
+        }else N.dire(te('À toi de tracer.'));
       },150);
     };
   };
@@ -21794,7 +21809,7 @@ function _boyLetterJeu(ca,idx,premiere){
       _prechargeSons(_avecVoyelles.concat(leurres).concat(
         ['Bravo !','Youpi !','Ouiii !','Super !','Génial !','Waouh !',
          'Encore une fois !','Écoute bien !','Touche la bonne lettre !',
-         'Suis le modèle, et repasse avec ton doigt !','Où est la lettre','Éclate les ballons avec la lettre','Encore !','Continue !','Supeeeer !',
+         'Suis le modèle, et repasse avec ton doigt !','À toi de tracer.','Où est la lettre','Éclate les ballons avec la lettre','Encore !','Continue !','Supeeeer !',
          'Relie les deux mêmes lettres !','Retrouve les paires !']
         .map(function(p){return te(p);})));
   }catch(e){}
