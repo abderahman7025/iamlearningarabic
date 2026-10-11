@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.9
+## OÙ ON EN EST — 10 octobre 2026, production en v3.1.0
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,7 +183,7 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.9), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.0), du plus récent au plus ancien :**
 
 - **Sans changement de version (11 octobre, fichiers seulement) : LE NARRATEUR
   DIT 100 % DU SITE.** Le client : « il faut absolument que la voix narrateur
@@ -201,6 +201,12 @@ distinct de la vipère de ء.
   et la clé ne changent pas. Reste dit par le navigateur : « plusse ».
   Faute connue, non corrigée faute de réponse : « le ل se ne prononce pas »
   dans le bonus lunaires/solaires (la voix la lit telle quelle).
+- **v3.1.0.** Une faute du texte ados/adultes, bonus « Lettres lunaires /
+  solaires » (`bonus_s4_p3`, français) : « le ل se ne prononce pas » →
+  « le ل ne se prononce pas ». Le texte ayant changé, sa clé aussi : la
+  section est régénérée en Narrateur v4 (`long|b0ce9a0c0674e334`) ;
+  l'ancien fichier reste dans le bucket, plus appelé par personne.
+  `outils/captures/inv-adulte-fr.json` porte le texte corrigé.
 - **v3.0.9.** PANNE CAUSÉE PAR LES VOIX, réparée : `GET /api/audio` ne
   rendait que 1000 fichiers (`list('', {limit:1000})`, et Supabase ne va
   jamais au-delà par appel). Les voix des autres langues ont fait passer le
