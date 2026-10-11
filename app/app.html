@@ -6239,7 +6239,12 @@ function _clesSon(t){
   var l=[t];
   var espace=String(t).replace(/([^\s])([!?;:\u2026])/g,'$1 $2');
   if(espace!==t)l.push(espace);
-  if(String(t).length>180)l.push('long|'+_hacheTexte(String(t)));
+  /* ... ou plus de 360 OCTETS : le nom du fichier est la cle en hexa, et le
+     depot refuse au-dela d'un millier de caracteres. Une phrase chinoise de
+     174 signes en fait 502 octets (mesure : deux textes refuses, erreur 500). */
+  var _oct=0;
+  try{_oct=unescape(encodeURIComponent(String(t))).length;}catch(e){}
+  if(String(t).length>180||_oct>360)l.push('long|'+_hacheTexte(String(t)));
   /* ── LES 3-5 ANS ONT LEUR VOIX ──
      Le client : « je ne suis pas satisfait des voix sur l'interface 3-5
      ans » — il veut un narrateur qui JOUE les phrases (enthousiaste, doux,
@@ -11484,7 +11489,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.0.7';
+var _VERSION_REPLI='v3.0.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

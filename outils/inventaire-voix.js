@@ -41,7 +41,7 @@ async function inventaireVoix(langue, profils, maxLettres) {
   window.clearTimeout = window.clearInterval = function (i) { for (var k = q.length - 1; k >= 0; k--) if (q[k].i === i) q.splice(k, 1); };
   Date.now = function () { return now; };
   try { performance.now = function () { return now; }; } catch (e) {}
-  window.requestAnimationFrame = function (f) { return window.setTimeout(function () { f(now); }, 250); };   /* 4 images par seconde suffisent */
+  window.requestAnimationFrame = function (f) { return window.setTimeout(function () { f(now); }, 1000); };   /* une image par seconde suffit : on releve des phrases, pas des animations */
   window.cancelAnimationFrame = window.clearTimeout;
   async function avance(ms) {
     var fin = now + ms, n = 0;

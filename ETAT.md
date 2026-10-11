@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## OÙ ON EN EST — 10 octobre 2026, production en v3.0.7
+## OÙ ON EN EST — 10 octobre 2026, production en v3.0.8
 
 **Le numéro de version s'écrit avec des points depuis la v2.9.7** (demande du
 client : « v297 devient v2.9.7 ») : centaine.dizaine.unité. La suivante est
@@ -183,8 +183,42 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.0.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.0.8), du plus récent au plus ancien :**
 
+- **v3.0.8.** Les voix dans les autres langues — « v4 pour toutes les
+  langues », dit le client le 11 octobre après avoir écouté v2/v3/v4 en
+  indonésien, allemand, portugais, italien, néerlandais, chinois et russe.
+  * **Seul changement de code :** `_clesSon` range aussi sous « long| » un
+    texte de plus de 360 OCTETS (pas seulement 180 caractères) : le nom du
+    fichier est la clé en hexa, et le dépôt répond 500 au-delà d'un millier
+    de caractères — deux textes chinois de 174 signes (502 octets) étaient
+    refusés. Même règle dans `outils/voix-adulte.js`.
+  * **Méthode, par langue** (tout en Narrateur `eleven_v4`) :
+    1. 3-5 ans : `petit-<l>.json` (traduction par `te()` des 29 phrases et
+       des 12 phrases d'album) → `node outils/voix-petit.js … <l> eleven_v4`,
+       émotions du fichier français du client ;
+    2. ados/adultes : `inv-adulte-<l>.json` (clic sur tout ce qui appelle
+       `speakText`) → `node outils/voix-adulte.js … <l> eleven_v4`, ton posé ;
+    3. 6-11 ans : `inventaireVoix(<l>,['boy'])` complet puis `['girl']` sur
+       deux lettres (`inv4-enfant-<l>-boy/girl.json`), `python
+       outils/lot-enfant.py <l>` (réunit, retire « plusse » et ce qui est
+       déjà en ligne), puis `voix-adulte.js` sur `lot-enfant-<l>.json`.
+    Les relevés se font en file, chacun dans une iframe neuve d'un onglet
+    hôte (fichiers `public/_hote.js`, `_inv.js`, `_audio.json`, `_pa.js`,
+    TEMPORAIRES, jamais commités) : deux lessons dans la même page se
+    marchent dessus. Vingt minutes par relevé complet.
+  * **L'OURDOU EST LAISSÉ DE CÔTÉ**, décision du client : il s'écrit en
+    alphabet arabe, et toute la chaîne écarte l'écriture arabe (l'IA ne dit
+    jamais d'arabe). Le client envisage de le RETIRER du site (« si l'ourdou
+    s'écrit en arabe, alors on doit le supprimer du site ; pour l'instant ne
+    le traduis pas, laisse de côté ») — ne pas le retirer sans qu'il le
+    redemande.
+  * **État au moment de cette version :** indonésien, chinois et russe
+    complets sur les trois interfaces ; allemand, portugais, italien,
+    néerlandais, espagnol, turc, hindi : 3-5 ans et ados/adultes faits,
+    6-11 ans en cours (voir la suite dans ETAT quand ils seront finis).
+    Un texte vide est relevé chez les ados/adultes en chinois et en hindi
+    (une clé sans traduction) : ignoré.
 - **v3.0.7.** Suite de la v3.0.6, et les voix.
   * `sansMotSeul` traite aussi les lignes de DEUX mots : en espagnol
     « ¿Dónde / está [lettre]? » se repliait un mot par ligne. Mesuré sur le

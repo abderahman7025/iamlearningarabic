@@ -15,7 +15,7 @@
  * Il contient { fr:[{t,src}], mixte:[…] } ; `mixte` — les textes qui portent
  * de l'écriture arabe — n'est PAS généré : l'IA ne dit jamais d'arabe.
  *
- * LA CLÉ : le texte lui-même jusqu'à 180 caractères, sinon « long| » +
+ * LA CLÉ : le texte lui-même jusqu'à 180 caractères ET 360 octets, sinon « long| » +
  * `_hacheTexte(texte)`. Ce calcul est copié de app/app.html (`_clesSon`) :
  * les deux doivent bouger ensemble.
  */
@@ -32,7 +32,7 @@ function _hacheTexte(t) {
   h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return ('0000000' + (h2 >>> 0).toString(16)).slice(-8) + ('0000000' + (h1 >>> 0).toString(16)).slice(-8);
 }
-const cle = (t) => (t.length > 180 ? 'long|' + _hacheTexte(t) : t);
+const cle = (t) => ((t.length > 180 || Buffer.byteLength(t, 'utf8') > 360) ? 'long|' + _hacheTexte(t) : t);
 
 const env = {};
 fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/).forEach((l) => {
@@ -54,7 +54,7 @@ const ROND = { en: 'circle' };
 const aDire = (t) => t.replace(/○/g, ROND[langue] || '').replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\s+/g, ' ').trim();
 
 (async () => {
-  const textes = inv.fr.map((x) => x.t);
+  const textes = inv.fr.map((x) => x.t).filter((x) => x && x.trim());
   let car = 0; const rates = [];
   for (const t of textes) {
     const k = cle(t);
