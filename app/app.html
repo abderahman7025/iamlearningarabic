@@ -4673,6 +4673,198 @@ body.fond-espace .tuile-nom{color:#20242e}
     }
   }
   </script>
+<!-- ════════════════════════════════════════════════════════
+     MOTION — entrées animées et sonores (v3.1.1)
+     Le client : « quand tu arrives sur la page de connexion, et sur la
+     page des interfaces, qu'elles arrivent une à une avec le son ».
+     Trois écrans : s-login, s-welcome (et s-age, même famille), s-menu.
+     - Animations par Web Animations API, sur les propriétés individuelles
+       (translate, scale, rotate) : elles s'ajoutent aux `transform` déjà
+       animés en CSS (lune, lettres qui flottent) au lieu de les écraser.
+     - fill:'backwards' seulement : une fois finie, l'animation s'efface et
+       le :hover d'origine reprend la main.
+     - Sons synthétisés (Web Audio), aucun fichier. Le navigateur interdit le
+       son avant un premier geste : sans geste, l'entrée joue en silence.
+       Respecte le bouton son de l'application (st.soundOn).
+     - Une seule fois par chargement de page et par écran. Rien si
+       prefers-reduced-motion. Un toucher pendant l'intro de connexion la
+       termine d'un coup.
+     Bloc identique dans public/index.html et app/app.html
+     (source : outils/motion-bloc.html).
+     ════════════════════════════════════════════════════════ -->
+<style>
+.mo-brille{position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.32) 50%,transparent 65%);
+  translate:-130% 0}
+</style>
+<script>
+(function(){
+  var reduit=false;
+  try{reduit=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  var ctx=null,vu={},actives=[],minuteurs=[];
+  var GAMME=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760];
+  var SPRING='cubic-bezier(.34,1.56,.64,1)',DOUX='cubic-bezier(.22,1,.36,1)';
+
+  /* ── Son ── */
+  function ouvreAudio(){
+    try{
+      if(!ctx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return;ctx=new A();}
+      if(ctx.state==='suspended')ctx.resume();
+    }catch(e){}
+  }
+  ['pointerdown','touchstart','keydown'].forEach(function(ev){
+    window.addEventListener(ev,ouvreAudio,{passive:true,capture:true});
+  });
+  function muet(){try{return typeof st!=='undefined'&&st&&st.soundOn===false;}catch(e){return false;}}
+  function pret(){return ctx&&ctx.state==='running'&&!muet();}
+  function osc(f,t0,dur,vol,type){
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type||'sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(vol,t0+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g);g.connect(ctx.destination);o.start(t0);o.stop(t0+dur+0.05);
+  }
+  var SONS={
+    note:function(i){var f=GAMME[Math.min(i,GAMME.length-1)],t=ctx.currentTime;
+      osc(f,t,0.55,0.13,'sine');osc(f*4,t,0.12,0.025,'sine');},
+    etoile:function(i){var t=ctx.currentTime;osc(GAMME[6+(i%4)]*2,t,0.25,0.035,'sine');},
+    gong:function(){var t=ctx.currentTime;osc(196,t,1.8,0.09,'sine');osc(293.66,t,1.4,0.05,'sine');osc(392,t,0.9,0.03,'triangle');},
+    souffle:function(){
+      var t=ctx.currentTime,n=ctx.sampleRate*0.7,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);
+      for(var k=0;k<n;k++)d[k]=Math.random()*2-1;
+      var s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();
+      s.buffer=b;f.type='bandpass';f.Q.value=1.2;
+      f.frequency.setValueAtTime(300,t);f.frequency.exponentialRampToValueAtTime(2200,t+0.6);
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.06,t+0.2);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
+      s.connect(f);f.connect(g);g.connect(ctx.destination);s.start(t);s.stop(t+0.75);
+    },
+    tic:function(){osc(1800,ctx.currentTime,0.05,0.025,'sine');},
+    valide:function(){var t=ctx.currentTime;osc(659.25,t,0.25,0.1,'sine');osc(987.77,t+0.09,0.4,0.1,'sine');}
+  };
+  function son(nom,arg,delai){
+    var jouer=function(){if(pret())try{SONS[nom](arg||0);}catch(e){}};
+    if(delai)minuteurs.push(setTimeout(jouer,delai));else jouer();
+  }
+
+  /* ── Animation ── */
+  function depuis(el,props,o){
+    if(!el||!el.animate)return null;
+    try{
+      var a=el.animate([Object.assign({offset:0},props),{}],
+        Object.assign({fill:'backwards',easing:DOUX},o));
+      actives.push(a);return a;
+    }catch(e){return null;}
+  }
+  function brille(el,delai){
+    minuteurs.push(setTimeout(function(){
+      if(getComputedStyle(el).position==='static')el.style.position='relative';
+      var b=document.createElement('span');b.className='mo-brille';el.appendChild(b);
+      var a=b.animate?b.animate([{translate:'-130% 0'},{translate:'130% 0'}],{duration:750,easing:'ease-in-out'}):null;
+      if(a)a.onfinish=function(){b.remove();};else b.remove();
+    },delai));
+  }
+  function termine(){
+    actives.forEach(function(a){try{a.finish();}catch(e){}});
+    minuteurs.forEach(clearTimeout);actives=[];minuteurs=[];
+  }
+
+  /* ── Les trois entrées ── */
+  function introConnexion(scr){
+    depuis(scr.querySelector('.login-deco'),{opacity:0},{duration:700});
+    scr.querySelectorAll('.star-deco').forEach(function(s,i){
+      depuis(s,{opacity:0,scale:'0'},{duration:500,delay:100+i*80,easing:SPRING});son('etoile',i,100+i*80);
+    });
+    depuis(scr.querySelector('.login-moon'),{opacity:0,translate:'0 80px',scale:'.7'},{duration:1000,delay:200});
+    son('gong',0,200);
+    depuis(scr.querySelector('.mosque-svg'),{opacity:0,translate:'0 70px'},{duration:900,delay:400});
+    son('souffle',0,380);
+    scr.querySelectorAll('.mosque-tip').forEach(function(c,i){
+      c.style.transformBox='fill-box';c.style.transformOrigin='center';
+      depuis(c,{opacity:0,scale:'0'},{duration:500,delay:900+i*120,easing:SPRING});son('etoile',i+2,900+i*120);
+    });
+    scr.querySelectorAll('.ar-deco-letter').forEach(function(l,i){
+      depuis(l,{opacity:0,scale:'.3',filter:'blur(10px)'},{duration:700,delay:600+i*110,easing:SPRING});
+      son('note',i,600+i*110);
+    });
+    var box=scr.querySelector('.login-box');
+    depuis(box,{opacity:0,translate:'0 50px',scale:'.9'},{duration:800,delay:1000,easing:SPRING});
+    son('souffle',0,950);
+    if(box)[].forEach.call(box.children,function(c,i){
+      if(c.classList.contains('login-ar')){
+        depuis(c,{opacity:0,clipPath:'inset(0 0 0 100%)'},{duration:800,delay:1150});
+        son('note',5,1150);
+      }else{
+        depuis(c,{opacity:0,translate:'0 16px'},{duration:450,delay:1200+i*60});
+      }
+    });
+    /* Un toucher pendant l'intro la termine d'un coup. */
+    var stop=function(){termine();scr.removeEventListener('pointerdown',stop,true);};
+    scr.addEventListener('pointerdown',stop,true);
+    minuteurs.push(setTimeout(function(){scr.removeEventListener('pointerdown',stop,true);},2200));
+  }
+
+  function entreeCartes(scr){
+    var titre=scr.querySelector('.w-ar');
+    depuis(titre,{opacity:0,scale:'.6',filter:'blur(12px)'},{duration:900,delay:100,easing:SPRING});
+    son('gong',0,100);
+    depuis(scr.querySelector('.w-sub'),{opacity:0,translate:'0 12px'},{duration:600,delay:600});
+    scr.querySelectorAll('.prof-card').forEach(function(c,i){
+      var d=800+i*260;
+      c.style.animation='none'; /* l'ancienne entrée CSS, remplacée */
+      depuis(c,{opacity:0,translate:'0 70px',scale:'.7',rotate:(i%2?'4deg':'-4deg')},{duration:750,delay:d,easing:SPRING});
+      depuis(c.querySelector('.prof-emoji'),{scale:'0',rotate:'-30deg'},{duration:650,delay:d+200,easing:SPRING});
+      son('note',i*2,d);
+      brille(c,d+550);
+      if(!c._moSon){
+        c._moSon=1;
+        c.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse')son('tic');});
+        c.addEventListener('pointerdown',function(){son('valide');});
+      }
+    });
+  }
+
+  function entreeMenuHaut(scr){
+    depuis(scr.querySelector('.menu-header'),{opacity:0,translate:'0 -30px'},{duration:600});
+    depuis(scr.querySelector('.menu-logo-ar'),{opacity:0,clipPath:'inset(0 0 0 100%)'},{duration:900,delay:200});
+    son('gong',0,150);
+    ['streak-bar-wrap','global-prog-wrap'].forEach(function(id,i){
+      depuis(document.getElementById(id),{opacity:0,translate:'0 20px'},{duration:600,delay:1300+i*150});
+    });
+  }
+
+  window.MOTION={
+    /* Appelé par showS() après l'affichage d'un écran. */
+    ecran:function(id){
+      if(reduit||vu[id])return;
+      var scr=document.getElementById(id);if(!scr)return;
+      vu[id]=1;
+      try{
+        if(id==='s-login')introConnexion(scr);
+        else if(id==='s-welcome'||id==='s-age')entreeCartes(scr);
+        else if(id==='s-menu')entreeMenuHaut(scr);
+      }catch(e){}
+    },
+    /* Appelé par buildMenu() à la place de l'ancien glissement. */
+    cartesMenu:function(els){
+      window._menuAnimDone=true;
+      els.forEach(function(el,i){
+        el.style.cssText='';
+        el.style.animation='none'; /* l'ancien waveIn CSS, remplacé */
+        if(reduit)return;
+        var d=350+i*180;
+        depuis(el,{opacity:0,translate:'-60px 0',scale:'.85'},{duration:650,delay:d,easing:SPRING});
+        depuis(el.firstElementChild,{scale:'0',rotate:'-25deg'},{duration:600,delay:d+150,easing:SPRING});
+        son('note',i,d);
+        brille(el,d+500);
+      });
+    },
+    son:son
+  };
+})();
+</script>
+
 </head>
 <body>
 
@@ -6066,7 +6258,7 @@ function showS(id,fwd,noHistory){
   if(id==='s-menu')repriseNoter({type:'menu'});
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   const el=document.getElementById(id);
-  if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));}
+  if(el){el.classList.add('on');animEl(el,nextTx(fwd!==false));if(window.MOTION)MOTION.ecran(id);}
   setTimeout(updateGirlMascot,50);
   if(!noHistory){
     var url=_screenToUrl(id);
@@ -6970,6 +7162,8 @@ function buildMenu(){
   // Animation d'entrée — une seule fois au chargement de page
   if(window._menuAnimDone){
     // Déjà animé : classe déjà ajoutée avant insertion, rien à faire
+  } else if(window.MOTION){
+    MOTION.cartesMenu(els);
   } else {
     function animNext(i){
       if(i>=els.length){window._menuAnimDone=true;return;}
@@ -11489,7 +11683,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.0';
+var _VERSION_REPLI='v3.1.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

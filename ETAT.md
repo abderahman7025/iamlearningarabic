@@ -183,7 +183,24 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.0), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.1), du plus récent au plus ancien :**
+
+- **v3.1.1 (17 octobre) : ENTRÉES ANIMÉES ET SONORES.** Le client, après une
+  intro de chaîne faite en code : « je veux absolument ça » sur la page de
+  connexion, le choix de l'interface (fille / garçon / ados-adultes) et le
+  menu principal, « qu'elles arrivent une à une avec le son ». Un seul bloc,
+  `outils/motion-bloc.html`, copié À L'IDENTIQUE avant `</head>` dans
+  `public/index.html` et `app/app.html` (`window.MOTION`). Branché à deux
+  endroits : `showS()` appelle `MOTION.ecran(id)` (s-login, s-welcome,
+  s-age, s-menu), et `buildMenu()` appelle `MOTION.cartesMenu(els)` à la
+  place de l'ancien glissement. Animations Web Animations API sur
+  `translate`/`scale`/`rotate` (pas `transform`, qui reste aux animations CSS
+  existantes), `fill:'backwards'` pour rendre la main au :hover. Sons
+  synthétisés (Web Audio, aucun fichier), muets tant qu'aucun geste, muets si
+  `st.soundOn` est faux. Une fois par chargement et par écran ; rien si
+  prefers-reduced-motion ; un toucher pendant l'intro de connexion la
+  termine. Aucun texte ajouté, donc rien à traduire. Pour retoucher : modifier
+  le bloc, puis le remplacer tel quel dans les deux fichiers.
 
 - **Sans changement de version (11 octobre, fichiers seulement) : LE NARRATEUR
   DIT 100 % DU SITE.** Le client : « il faut absolument que la voix narrateur
