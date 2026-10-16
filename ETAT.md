@@ -183,7 +183,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.6), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.7), du plus récent au plus ancien :**
+
+- **v3.1.7 (17 octobre).** Titre de la barre du haut (« Cours »,
+  « Sessions »…) CENTRÉ sur la barre au lieu d'être collé au bouton retour,
+  toutes interfaces : balise `<style>` à part après celle du style doré
+  (`#topbar .tb-title` en absolu, `#tb-inter{margin-left:auto}`).
 
 - **v3.1.6 (17 octobre).** Style doré des leçons adultes VALIDÉ (« c'est
   parfait comme ça »). Bug : « des rubriques du menu ont disparu », aussi

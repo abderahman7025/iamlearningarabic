@@ -4785,6 +4785,16 @@ body.fond-espace .tuile-nom{color:#20242e}
 #root.profile-adult #ca .tip-box>button{background:linear-gradient(90deg,#b8860b,#e8a020)!important;
   border:none!important;color:#fff!important;box-shadow:0 6px 16px rgba(184,134,11,.35)}
 </style>
+<style>
+/* ── Titre de la barre du haut CENTRÉ (v3.1.7) ──
+   Le client : « centre-le plutôt que de le coller au bouton retour ».
+   Le titre sort du flux et se centre sur la barre ; le bouton d'interface
+   et le point son gardent leur place à droite (margin-left:auto). */
+#topbar .tb-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  flex:none;max-width:44%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding-top:2px;pointer-events:none}
+#topbar #tb-inter{margin-left:auto}
+</style>
 
 
   <!-- SEO multilingue -->
@@ -12276,7 +12286,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.6';
+var _VERSION_REPLI='v3.1.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
