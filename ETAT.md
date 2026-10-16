@@ -183,7 +183,21 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.8), du plus récent au plus ancien :**
+
+- **v3.1.8 (17 octobre). Cours adulte = mêmes couleurs et même modèle que
+  les 6-11 ans.** Le client : « regarde l'interface 6/11 ans et reprends
+  exactement la même chose » pour les parties colorées des quatre formes et
+  le modèle du canevas.
+  * Formes (`pos-c`, `renderLLesson`) : orange `#e65100` pour l'isolée et
+    la fin, violet `#6a1b9a` pour le début et le milieu, trait de liaison
+    gris-bleu `#90a4ae` — les ISO/DEB/LIEN de `_boyScene`. Avant : bleu,
+    vert, trait blanc (invisible sur l'ivoire). ع/غ restent d'une seule
+    couleur (encre foncée).
+  * Canevas (`createWritingModule`, sert à tous les profils) : modèle en
+    `_TRACE_GRIS` au lieu de l'or à 14 % qu'on ne voyait pas, et le rythme
+    des 6-11 ans (corps 1,05 s, souffle 0,24, points 0,30, souffle 0,18,
+    voyelle 0,30, fin 0,33), en boucle tant que l'élève n'a pas écrit.
 
 - **v3.1.7 (17 octobre).** Titre de la barre du haut (« Cours »,
   « Sessions »…) CENTRÉ sur la barre au lieu d'être collé au bouton retour,

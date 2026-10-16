@@ -4767,8 +4767,6 @@ body.fond-espace .tuile-nom{color:#20242e}
 /* formes de la lettre */
 #root.profile-adult #ca .pos-c{border-radius:20px!important;position:relative;overflow:hidden}
 #root.profile-adult #ca .pos-c .pos-lbl{color:#b08a50!important;font-weight:800}
-/* les traits colorés des formes, prévus pour le sombre : un ton plus soutenu */
-#root.profile-adult #ca .pos-c .pos-ar{filter:saturate(1.4) brightness(.78)}
 #root.profile-adult #ca .pos-c::after{content:'';position:absolute;top:0;bottom:0;width:50%;left:-70%;pointer-events:none;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);transition:left .7s ease}
 #root.profile-adult #ca .pos-c:hover{transform:translateY(-4px)!important;border-color:rgba(184,134,11,.6)!important}
@@ -12286,7 +12284,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.7';
+var _VERSION_REPLI='v3.1.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -24914,7 +24912,13 @@ function renderLLesson(ca,s,idx){
        n'existe pas — elles restent donc blanches, toutes les quatre. */
     const sansCode=(letter.ar==='ع'||letter.ar==='غ');
     const isoBox=document.createElement('div');isoBox.className='pos-c';
-    const coulIso=sansCode?'var(--txt)':'var(--blue)';
+    /* ── LES COULEURS DE L'INTERFACE 6-11 ANS (v3.1.8) ──
+       Le client : « reprends exactement la même chose que les 6-11 ans ».
+       Orange pour l'isolée et ce qui en dérive (la fin), violet pour le
+       début et ce qui en dérive (le milieu), trait de liaison gris-bleu —
+       les constantes ISO, DEB, LIEN de `_boyScene`. */
+    const _ISO='#e65100',_DEB='#6a1b9a',_LIEN='#90a4ae';
+    const coulIso=sansCode?'var(--txt)':_ISO;
     /* La couleur va sur une balise INTÉRIEURE, jamais sur .pos-ar : une règle
        !important de l'habillage adulte force .pos-ar en blanc, et l'isolée
        ressortait blanche alors que les autres formes, colorées par
@@ -24924,7 +24928,8 @@ function renderLLesson(ca,s,idx){
     sortedPos.forEach(p=>{
       const pc=document.createElement('div');pc.className='pos-c';
       const isFin=p.l==='fin';
-      const gpColor=sansCode?'#f0ece4':(isFin?'var(--blue)':'var(--green)');
+      const gpColor=sansCode?'#2a1a00':(isFin?_ISO:_DEB);
+      const gpTrait=sansCode?'#2a1a00':_LIEN;
       /* Le trait de liaison reste blanc : seul le CORPS de la lettre prend
          la couleur, pour que « fin = isolée + — » se voie. Colorer p.g dans
          la chaine ne suffisait pas — la forme attachee porte son trait
@@ -24933,8 +24938,8 @@ function renderLLesson(ca,s,idx){
          kāf milieu, ṭāʾ milieu) : elles passent par la découpe en forme. */
       const cleF=_cleForme(p.ar);
       const parForme=(cleF&&_MASQUE_FORME[cleF])
-        ? _formeCoupeeMasque(p.ar,gpColor,'#f0ece4',1.2) : null;
-      pc.innerHTML=`<div class="pos-lbl">${posMap[p.l]||p.l}</div><div class="pos-ar" style="font-weight:400">${parForme?'':_formeCoupee(p.ar,gpColor,'#f0ece4')}</div>`;
+        ? _formeCoupeeMasque(p.ar,gpColor,gpTrait,1.2) : null;
+      pc.innerHTML=`<div class="pos-lbl">${posMap[p.l]||p.l}</div><div class="pos-ar" style="font-weight:400">${parForme?'':_formeCoupee(p.ar,gpColor,gpTrait)}</div>`;
       if(parForme)pc.querySelector('.pos-ar').appendChild(parForme.hote);
       posRowWrap.appendChild(pc);
     });
@@ -25652,8 +25657,10 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       var fs = rect.width * (window.matchMedia('(orientation:landscape)').matches ? 0.22 : 0.35);
       var baseY = rect.height * 0.65;
       try {
+        /* Sans couleur : le gris-bleu du modèle des 6-11 ans (_TRACE_GRIS),
+           à la demande du client (v3.1.8). L'or à 14 % ne se voyait pas. */
         rev = _revelateur(currentLetterForm, rect.width / 2, baseY, fs,
-                          0, 0, Math.ceil(rect.width), Math.ceil(rect.height), '#f5c842');
+                          0, 0, Math.ceil(rect.width), Math.ceil(rect.height));
       } catch (e) { rev = null; }
       /* Les temps qui ont vraiment quelque chose à montrer. Le corps est
          toujours là ; les points et la voyelle, non. Sans ce tri, une lettre
@@ -25670,18 +25677,25 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
       if (!rev) { revProg = 3; dessineModele(); return; }
       revProg = 0; revDebut = Date.now();
       dessineModele();
+      /* Le RYTHME des 6-11 ans (v3.1.8) : corps 1,05 s, souffle, points,
+         souffle, voyelle, lettre finie montrée un instant, et on enchaîne.
+         Un temps vide (pas de point, pas de voyelle) est sauté. */
+      var ECRITURE = 1050, POSE = 240, POINTS = 300, POSE2 = 180, VOYELLE = 300, FIN = 330;
       revTic = setInterval(function () {
-        /* Tant que l'élève n'a rien écrit, le tracé se rejoue : une seule
-           passe d'une seconde ne se voit pas. Dès qu'il pose son doigt, le
-           modèle reste entier sous sa main. */
+        /* Tant que l'élève n'a rien écrit, le tracé se rejoue. Dès qu'il
+           pose son doigt, le modèle reste entier sous sa main. */
         if (_aEcrit) { revProg = 3; dessineModele(); clearInterval(revTic); revTic = null; return; }
-        var t = (Date.now() - revDebut) % (REV_DUREE + REV_REPOS);
-        var f = Math.min(1, t / REV_DUREE);
-        var n = revTemps.length;
-        var i = Math.min(n - 1, Math.floor(f * n));
-        var dans = f * n - i;
-        revProg = (revTemps[i] - 1) + Math.min(1, dans);
-        if (f >= 1) revProg = 3;
+        var aPts = rev && rev.points && rev.points.length, aVoy = rev && rev.voyelle && rev.voyelle.length;
+        var dPts = aPts ? POINTS : 0, dP2 = (aPts && aVoy) ? POSE2 : 0, dVoy = aVoy ? VOYELLE : 0;
+        var total = ECRITURE + POSE + dPts + dP2 + dVoy + FIN;
+        var c = (Date.now() - revDebut) % total, pr;
+        if (c < ECRITURE) pr = c / ECRITURE;
+        else if ((c -= ECRITURE) < POSE) pr = 1;
+        else if ((c -= POSE) < dPts) pr = 1 + c / POINTS;
+        else if ((c -= dPts) < dP2) pr = 2;
+        else if ((c -= dP2) < dVoy) pr = 2 + c / VOYELLE;
+        else pr = 3;
+        revProg = pr;
         dessineModele();
       }, 33);
     }
@@ -25707,19 +25721,15 @@ function createWritingModule(letterAr, letterPos, session, currentIdx, ca) {
          rendu par _reveleJusqua est déjà à la bonne place, on ne fait que le
          poser — et c'est ici que le modèle prend sa transparence. */
       if (rev) {
-        mctx.save();
-        mctx.globalAlpha = 0.14;
         mctx.drawImage(_reveleJusqua(rev, revProg), rev.x0, rev.y0);
-        mctx.restore();
         return;
       }
       mctx.save();
-      mctx.globalAlpha = 0.14;
       var fontScale = window.matchMedia('(orientation:landscape)').matches ? 0.22 : 0.35;
       mctx.font = (rect.width * fontScale) + 'px \'Scheherazade New\', serif';
       mctx.textAlign = 'center';
       mctx.textBaseline = 'alphabetic';
-      mctx.fillStyle = '#f5c842';
+      mctx.fillStyle = _TRACE_GRIS;
       var fontSize2 = parseFloat(mctx.font);
       /* ── Une voyelle seule se pose CONTRE la ligne d'écriture ──────────
          Un signe sans lettre n'a pas de largeur ni de hauteur d'avance :
