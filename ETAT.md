@@ -183,7 +183,25 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.3), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.4), du plus récent au plus ancien :**
+
+- **v3.1.4 (17 octobre).** Le client : « bcp bcp bcp mieux », puis :
+  * **Lettres coupées dans les médaillons** (ي ج ع… qui descendent) : le
+    dévoilement finissait sur `clip-path: inset(0)` avec `line-height:1`.
+    Il finit maintenant sur un inset NÉGATIF (déborde la boîte) et la
+    ligne fait 1,7.
+  * **Médaillon des voyelles** : un seul trait continu `ــَــُــِــ`
+    (classe `.voy`), signes à 2,5 rem.
+  * **Cours adulte : le contenu apparaît au défilement.** Observateur sur
+    `#ca` (adulte, `st._curPage==='lesson'`) : les blocs (enfants de #ca,
+    ou leurs enfants si un bloc dépasse 90 % de l'écran) reçoivent `.rv`
+    et montent quand ils entrent à l'écran ; la classe est retirée après
+    pour rendre leurs transitions d'origine. Rejoué à chaque onglet.
+  * **La fleur (lettre + ses voyelles) en 3D, plus grande — adulte
+    seulement** : jusqu'à 350 px (270 avant), pétales en sphères nacrées,
+    cœur d'or, bascule lente, pétales qui jaillissent du cœur à l'arrivée
+    (`.fleur3d`, `.fleur-go`). Positions calculées dans `renderLLesson`
+    (`_FW`, `_FR`, `_FS`) ; les enfants gardent l'ancienne fleur.
 
 - **v3.1.3 (17 octobre).**
   * **Menu : la vraie cause du « tout s'affiche d'un coup ».**

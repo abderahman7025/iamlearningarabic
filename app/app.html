@@ -831,12 +831,17 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
   box-shadow:0 8px 20px rgba(150,95,0,.35),inset 0 2px 4px rgba(255,255,255,.6),inset 0 -3px 6px rgba(90,50,0,.3);
   transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
 .par-ligne.a-venir .par-medaille{filter:saturate(.75) brightness(1.04)}
-.par-ar{font-family:var(--fa);font-size:1.75rem;line-height:1;color:#fff;direction:rtl;white-space:nowrap;
+.par-ar{font-family:var(--fa);font-size:1.75rem;line-height:1.7;padding:0 2px;color:#fff;direction:rtl;white-space:nowrap;
   text-shadow:0 2px 6px rgba(90,50,0,.5)}
+/* Voyelles : un seul trait continu, signes plus grands. */
+.par-medaille.voy{height:72px;padding:0 18px}
+.par-medaille.voy .par-ar{font-size:2.5rem;line-height:1.5}
 .par-ligne.vu .par-medaille{animation:parMedaille .9s calc(var(--d,0ms) + 180ms) both cubic-bezier(.34,1.56,.64,1)}
 .par-ligne.vu .par-ar{animation:parEcrit 1s calc(var(--d,0ms) + 420ms) both cubic-bezier(.22,1,.36,1)}
 @keyframes parMedaille{from{transform:scale(0) rotate(-120deg)}to{transform:none}}
-@keyframes parEcrit{from{clip-path:inset(0 0 0 100%);opacity:0}to{clip-path:inset(0);opacity:1}}
+/* La fin du dévoilement déborde largement la boîte : avec inset(0), les
+   lettres qui descendent (ي ج ع…) restaient coupées. */
+@keyframes parEcrit{from{clip-path:inset(-60% -30% -60% 100%);opacity:0}to{clip-path:inset(-60% -30% -60% -30%);opacity:1}}
 .par-carte:hover .par-medaille{transform:scale(1.08) rotate(-4deg)}
 .par-ligne.en-cours .par-carte{border-color:transparent;
   box-shadow:0 14px 36px rgba(184,134,11,.28),0 0 0 4px rgba(232,160,32,.12)}
@@ -907,6 +912,48 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
 .orb-sat.lit .orb-ar,.orb-sat.lit .orb-lat{color:var(--gold)}
 .orb-ar{font-family:var(--fa);font-size:.95rem;color:var(--vowel);line-height:1}
 .orb-lat{font-size:.44rem;color:var(--txt2)}
+
+/* ── LA FLEUR EN 3D (adulte, v3.1.4) ──
+   Le client : « les fleurs avec la lettre et ses variantes doivent être en
+   3D, plus grosses ». Sphères nacrées à reflet, cœur d'or, légère
+   bascule de toute la fleur, pétales qui jaillissent du cœur un à un. */
+.orb-wrap.fleur3d{perspective:900px;margin:22px auto}
+.orb-wrap.fleur3d::before{width:46%;height:46%;margin:0;translate:-50% -50%;
+  border:1.5px dashed rgba(184,134,11,.35)}
+.orb-wrap.fleur3d::after{content:'';position:absolute;inset:6%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(245,200,66,.22) 0%,rgba(245,200,66,0) 65%)}
+.fleur3d .orb-ctr{width:30%;height:30%;font-size:3.1rem;color:#fff;
+  background:radial-gradient(circle at 32% 28%,#fff3c4 0%,#f0c75a 28%,#c99316 66%,#8a5c00 100%);
+  text-shadow:0 3px 8px rgba(80,45,0,.55);
+  box-shadow:0 18px 34px rgba(150,95,0,.45),inset 0 4px 10px rgba(255,255,255,.7),inset 0 -8px 16px rgba(90,50,0,.45),0 0 0 6px rgba(245,200,66,.18)}
+.fleur3d .orb-sat{width:var(--sat);height:var(--sat);gap:1px;backdrop-filter:none;
+  background:radial-gradient(circle at 32% 26%,#ffffff 0%,#fff6dc 35%,#f3dfa8 75%,#d9b45a 100%);
+  border:1.5px solid rgba(184,134,11,.45);
+  box-shadow:0 10px 18px rgba(150,95,0,.28),inset 0 3px 6px rgba(255,255,255,.95),inset 0 -5px 10px rgba(184,134,11,.3)}
+.fleur3d .orb-sat::before{content:'';position:absolute;top:10%;left:22%;width:34%;height:22%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.95),rgba(255,255,255,0));pointer-events:none}
+.fleur3d .orb-ar{font-size:calc(var(--sat)*.4);color:#8a5200;line-height:1.1}
+.fleur3d .orb-lat{font-size:.6rem;font-weight:800;color:#b08a50}
+.fleur3d .orb-sat:hover{translate:0 -4px;box-shadow:0 16px 26px rgba(150,95,0,.35),inset 0 3px 6px #fff,inset 0 -5px 10px rgba(184,134,11,.3)}
+.fleur3d .orb-sat.lit{background:radial-gradient(circle at 32% 26%,#fff3c4 0%,#f0c75a 35%,#c99316 85%);border-color:#fff;
+  box-shadow:0 0 0 4px rgba(245,200,66,.35),0 14px 26px rgba(150,95,0,.4)}
+.fleur3d .orb-sat.lit .orb-ar{color:#fff;text-shadow:0 2px 5px rgba(90,50,0,.5)}
+.fleur3d .orb-sat.lit .orb-lat{color:#fff}
+.fleur3d{animation:fleurBascule 9s ease-in-out infinite;transform-style:preserve-3d}
+@keyframes fleurBascule{0%,100%{transform:rotateX(12deg) rotateY(-6deg)}50%{transform:rotateX(6deg) rotateY(6deg)}}
+.fleur3d.fleur-go .orb-sat{animation:petale .8s calc(var(--i,0)*70ms + 150ms) both cubic-bezier(.34,1.56,.64,1)}
+.fleur3d.fleur-go .orb-ctr{animation:coeur .9s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes petale{from{translate:var(--dx) var(--dy);scale:.2;opacity:0}to{translate:0 0;scale:1;opacity:1}}
+@keyframes coeur{from{scale:0;rotate:-90deg}to{scale:1;rotate:0deg}}
+
+/* ── COURS ADULTE : LE CONTENU APPARAÎT AU DÉFILEMENT (v3.1.4) ── */
+#root.profile-adult .rv{opacity:0;translate:0 34px;
+  transition:opacity .7s ease,translate .9s cubic-bezier(.22,1,.36,1)!important}
+#root.profile-adult .rv.rv-in{opacity:1;translate:0 0}
+@media (prefers-reduced-motion:reduce){
+  #root.profile-adult .rv{opacity:1;translate:none}
+  .fleur3d,.fleur3d .orb-sat,.fleur3d .orb-ctr{animation:none!important}
+}
 
 /* ── VOWEL ── */
 .vline-section{
@@ -12176,7 +12223,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.3';
+var _VERSION_REPLI='v3.1.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -24038,7 +24085,7 @@ function renderSessions(ca){
       titre=v[0].trim(); noms=(v[1]||'').trim();
       /* Les trois voyelles posées sur un trait d'allongement (ـ) : seules,
          elles s'affichaient en morceaux dans le médaillon. */
-      arabe='ـَ ـُ ـِ';
+      arabe='ــَــُــِــ';
     }else if(s.type==='prolong'){
       var w=String(t('prolong_name')).split('·');
       titre=w[0].trim(); noms=(w[1]||'').trim();
@@ -24063,7 +24110,7 @@ function renderSessions(ca){
           +(noms?'<div class="par-noms">'+noms+'</div>':'')
           +etat
         +'</div>'
-        +'<div class="par-medaille"><span class="par-ar">'+arabe+'</span></div>'
+        +'<div class="par-medaille'+(s.type==='vowels'?' voy':'')+'"><span class="par-ar">'+arabe+'</span></div>'
       +'</div>';
 
     /* La carte s'ouvre en grand avant de laisser la place à la leçon :
@@ -24132,6 +24179,55 @@ function _parAnime(page){
     c.addEventListener('pointerleave',function(){c.style.setProperty('--ry','0deg');c.style.setProperty('--rx','0deg');});
   });
 }
+
+/* ── COURS ADULTE : chaque bloc apparaît quand on arrive dessus ──
+   Un observateur sur #ca : dès qu'une leçon (ou un onglet de leçon) pose
+   son contenu, les blocs sont repérés — les enfants directs de #ca, et
+   pour un bloc plus haut que l'écran, ses propres enfants. Ils montent et
+   s'allument en entrant à l'écran ; la classe est retirée ensuite pour
+   rendre aux éléments leurs transitions d'origine. */
+(function(){
+  var reduit=false;try{reduit=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  if(reduit||!window.IntersectionObserver||!window.MutationObserver)return;
+  var io=new IntersectionObserver(function(ents){
+    var lot=0;
+    ents.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var el=e.target;io.unobserve(el);
+      el.style.transitionDelay=(lot++*90)+'ms';
+      el.classList.add('rv-in');
+      /* La fleur : ses pétales jaillissent quand son bloc arrive. */
+      if(el.classList.contains('fleur3d'))el.classList.add('fleur-go');
+      [].forEach.call(el.querySelectorAll('.fleur3d'),function(f){f.classList.add('fleur-go');});
+      setTimeout(function(){el.classList.remove('rv','rv-in');el.style.transitionDelay='';},1300+lot*90);
+    });
+  },{threshold:0.12,rootMargin:'0px 0px -6% 0px'});
+  function blocs(parent,prof,out){
+    [].forEach.call(parent.children,function(c){
+      if(c.dataset.rv||c.offsetParent===null&&getComputedStyle(c).position!=='fixed')return;
+      if(prof<2&&c.offsetHeight>innerHeight*0.9&&c.children.length>1&&!c.classList.contains('orb-wrap'))blocs(c,prof+1,out);
+      else out.push(c);
+    });
+    return out;
+  }
+  var prevu=false;
+  function scan(){
+    prevu=false;
+    var ca=document.getElementById('ca');
+    if(!ca||!st||st.profile!=='adult'||st._curPage!=='lesson')return;
+    blocs(ca,0,[]).forEach(function(el){
+      el.dataset.rv='1';
+      el.classList.add('rv');
+      io.observe(el);
+    });
+  }
+  function demarre(){
+    var ca=document.getElementById('ca');if(!ca)return;
+    new MutationObserver(function(){if(!prevu){prevu=true;requestAnimationFrame(function(){requestAnimationFrame(scan);});}})
+      .observe(ca,{childList:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',demarre);else demarre();
+})();
 
 // OPEN LESSON
 function openLesson(s){
@@ -24835,9 +24931,17 @@ function renderLLesson(ca,s,idx){
   const ctr=document.createElement('div');ctr.className='orb-ctr';ctr.textContent=letter.ar;
   ctr.onclick=()=>{speak(letter.name,.72);ctr.classList.add('rpl');setTimeout(()=>ctr.classList.remove('rpl'),500);};
   orbWrap.appendChild(ctr);
+  /* Adulte : une fleur plus grande (jusqu'à 350 px) et en relief. Les
+     autres profils gardent 270 px. */
+  var _fl=(st.profile==='adult');
+  var _FW=_fl?Math.max(270,Math.min(350,(ca.clientWidth||360)-24)):270;
+  var _FR=_fl?_FW*0.355:95, _FS=_fl?Math.round(_FW*0.18):48;
+  if(_fl){orbWrap.classList.add('fleur3d');orbWrap.style.width=orbWrap.style.height=_FW+'px';
+    orbWrap.style.setProperty('--sat',_FS+'px');}
   orbOrder.forEach((hk,i)=>{
-    const angle=(i/orbOrder.length)*2*Math.PI-Math.PI/2;const x=130+95*Math.cos(angle);const y=130+95*Math.sin(angle);
-    const orb=document.createElement('div');orb.className='orb-sat';orb.style.left=(x-23)+'px';orb.style.top=(y-23)+'px';
+    const angle=(i/orbOrder.length)*2*Math.PI-Math.PI/2;const x=_FW/2+_FR*Math.cos(angle);const y=_FW/2+_FR*Math.sin(angle);
+    const orb=document.createElement('div');orb.className='orb-sat';orb.style.left=(x-_FS/2)+'px';orb.style.top=(y-_FS/2)+'px';
+    if(_fl){orb.style.setProperty('--dx',(_FW/2-x)+'px');orb.style.setProperty('--dy',(_FW/2-y)+'px');orb.style.setProperty('--i',i);}
     orb.innerHTML=`<span class="orb-ar">${hk.ar}</span><span class="orb-lat">${hk.lat}</span>`;
     orb.onclick=function(){document.querySelectorAll('.orb-sat').forEach(o=>o.classList.remove('lit'));this.classList.add('lit');speak(hk.ar,.78);};
     orbWrap.appendChild(orb);
