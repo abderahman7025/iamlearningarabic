@@ -4860,6 +4860,11 @@ body.fond-espace .tuile-nom{color:#20242e}
 .mo-brille{position:absolute;inset:0;pointer-events:none;z-index:3;
   background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.34) 50%,transparent 65%);
   translate:-130% 0}
+/* Menu : la feuille d'origine met .nav-card:nth-child(1..4) à opacity:0 et
+   translateX(-110%) en attendant son ancienne animation. L'inclinaison au
+   toucher (resetTilt) efface le transform en ligne : les cartes repartaient
+   alors hors de l'écran — « les rubriques ont disparu ». */
+#menu-nav .nav-card{opacity:1;transform:none}
 .mo-mot{display:inline-block;white-space:pre}
 .mo-feat{display:flex;align-items:center;gap:10px;padding:3px 0;line-height:1.45}
 .mo-check{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
@@ -12271,7 +12276,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.5';
+var _VERSION_REPLI='v3.1.6';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

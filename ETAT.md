@@ -183,7 +183,15 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.5), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.6), du plus récent au plus ancien :**
+
+- **v3.1.6 (17 octobre).** Style doré des leçons adultes VALIDÉ (« c'est
+  parfait comme ça »). Bug : « des rubriques du menu ont disparu », aussi
+  en glissant le doigt dessus. Cause : l'inclinaison au toucher
+  (`resetTilt`, `TILT_SEL`) remet `style.transform=''`, et la feuille
+  d'origine place `.nav-card:nth-child(1..4)` à `translateX(-110%)` —
+  la carte repartait hors de l'écran (mesuré : left −378 px). Corrigé par
+  `#menu-nav .nav-card{opacity:1;transform:none}` dans le bloc MOTION.
 
 - **v3.1.5 (17 octobre) — À L'ESSAI : leçons adultes en style doré.** Le
   client : « essaie en style doré que je voie si je préfère ». Onglets de
