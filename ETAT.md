@@ -183,7 +183,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.4), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.5), du plus récent au plus ancien :**
+
+- **v3.1.5 (17 octobre) — À L'ESSAI : leçons adultes en style doré.** Le
+  client : « essaie en style doré que je voie si je préfère ». Onglets de
+  lettres, formes FIN/MILIEU/DÉBUT/ISOLÉE, bouton Rappel, encadrés
+  (`info-box`, `tip-box`) passent en ivoire et or. TOUT est dans une
+  balise `<style>` à part, juste après la grande feuille, qui commence par
+  « COURS ADULTE EN STYLE DORÉ » : pour revenir au sombre, supprimer
+  cette balise. **PIÈGE confirmé** : posées à la fin de la grande feuille,
+  ces règles étaient avalées par son bloc non fermé (voir « Pièges ») —
+  toute nouvelle règle va dans une balise `<style>` séparée.
 
 - **v3.1.4 (17 octobre).** Le client : « bcp bcp bcp mieux », puis :
   * **Lettres coupées dans les médaillons** (ي ج ع… qui descendent) : le

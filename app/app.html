@@ -4737,6 +4737,54 @@ body.fond-espace .tuile-nom{color:#20242e}
   #ca{overflow-x:hidden}
 }
 </style>
+<style>
+/* ══ COURS ADULTE EN STYLE DORÉ (v3.1.5, à l'essai) ══════════════════
+   Le client : « essaie en style doré que je voie si je préfère ». Les
+   boîtes sombres des leçons (onglets de lettres, formes FIN/MILIEU/DÉBUT/
+   ISOLÉE, rappel, encadrés) passent en ivoire et or, comme la page des
+   cours. Tout est dans CE bloc : pour revenir au sombre, le supprimer.
+   Les sélecteurs portent `#ca` pour passer devant les règles « BOITES
+   SOMBRES » qui forcent le texte blanc. */
+#root.profile-adult #ca .info-box,
+#root.profile-adult #ca .tip-box,
+#root.profile-adult #ca .pos-c{
+  --txt:#2a1a00;--txt2:#7a5a20;--txt3:#b08a50;--gold:#b8860b;--gold2:#e8a020;
+  color:#5a3d0a!important;backdrop-filter:none;
+  background:linear-gradient(140deg,#fffdf7 0%,#fff3d6 100%)!important;
+  border:1px solid rgba(184,134,11,.3)!important;
+  box-shadow:0 8px 22px rgba(150,95,0,.13),inset 0 1px 0 #fff!important}
+#root.profile-adult #ca .info-box [style*="color:var(--txt)"],#root.profile-adult #ca .info-box [style*="color: var(--txt)"],
+#root.profile-adult #ca .tip-box [style*="color:var(--txt)"],#root.profile-adult #ca .tip-box [style*="color: var(--txt)"],
+#root.profile-adult #ca .pos-c [style*="color:var(--txt)"],#root.profile-adult #ca .pos-c [style*="color: var(--txt)"]{color:#2a1a00!important}
+#root.profile-adult #ca .info-box [style*="color:var(--txt2)"],#root.profile-adult #ca .info-box [style*="color: var(--txt2)"],
+#root.profile-adult #ca .tip-box [style*="color:var(--txt2)"],#root.profile-adult #ca .tip-box [style*="color: var(--txt2)"],
+#root.profile-adult #ca .pos-c [style*="color:var(--txt2)"],#root.profile-adult #ca .pos-c [style*="color: var(--txt2)"]{color:#7a5a20!important}
+#root.profile-adult #ca .info-box strong,#root.profile-adult #ca .tip-box strong{color:#a06c00!important}
+/* les couleurs claires prévues pour le fond sombre, foncées pour l'ivoire */
+#root.profile-adult #ca [style*="#4fc3f7"]{color:#0277bd!important}
+#root.profile-adult #ca .tip-box:hover{border-color:rgba(184,134,11,.55)!important;
+  box-shadow:0 12px 28px rgba(150,95,0,.2),inset 0 1px 0 #fff!important}
+/* formes de la lettre */
+#root.profile-adult #ca .pos-c{border-radius:20px!important;position:relative;overflow:hidden}
+#root.profile-adult #ca .pos-c .pos-lbl{color:#b08a50!important;font-weight:800}
+/* les traits colorés des formes, prévus pour le sombre : un ton plus soutenu */
+#root.profile-adult #ca .pos-c .pos-ar{filter:saturate(1.4) brightness(.78)}
+#root.profile-adult #ca .pos-c::after{content:'';position:absolute;top:0;bottom:0;width:50%;left:-70%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);transition:left .7s ease}
+#root.profile-adult #ca .pos-c:hover{transform:translateY(-4px)!important;border-color:rgba(184,134,11,.6)!important}
+#root.profile-adult #ca .pos-c:hover::after{left:130%}
+/* onglets de lettres */
+#root.profile-adult #ca .ltab{backdrop-filter:none;color:#7a5a20;
+  background:linear-gradient(140deg,#fffdf7,#fff1cc);border:1px solid rgba(184,134,11,.32);
+  box-shadow:0 4px 12px rgba(150,95,0,.12)}
+#root.profile-adult #ca .ltab span{color:inherit!important}
+#root.profile-adult #ca .ltab.on{color:#fff;border-color:#fff;
+  background:radial-gradient(circle at 30% 25%,#fff3c4 0%,#f0c75a 30%,#c99316 75%,#9c6c06 100%);
+  box-shadow:0 8px 20px rgba(150,95,0,.4),inset 0 2px 4px rgba(255,255,255,.6);text-shadow:0 2px 5px rgba(90,50,0,.5)}
+/* bouton « Rappel » (style posé en ligne dans le script) */
+#root.profile-adult #ca .tip-box>button{background:linear-gradient(90deg,#b8860b,#e8a020)!important;
+  border:none!important;color:#fff!important;box-shadow:0 6px 16px rgba(184,134,11,.35)}
+</style>
 
 
   <!-- SEO multilingue -->
@@ -12223,7 +12271,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.4';
+var _VERSION_REPLI='v3.1.5';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
