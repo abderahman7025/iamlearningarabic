@@ -183,7 +183,31 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.2), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.3), du plus récent au plus ancien :**
+
+- **v3.1.3 (17 octobre).**
+  * **Menu : la vraie cause du « tout s'affiche d'un coup ».**
+    `cartesMenu()` posait `_menuAnimDone` ; au `buildMenu()` suivant, la
+    classe `.menu-anim-done` arrivait avec `opacity:1 !important`, plus fort
+    que toute animation. Elle n'est plus jamais posée. PIÈGE : la feuille
+    met `.nav-card:nth-child(1..4)` à `opacity:0; translateX(-110%)` en
+    attendant l'ancienne animation CSS — en la coupant, il faut écrire
+    `opacity:1; transform:none` en ligne, sinon les cartes restent
+    invisibles. L'entrée du menu se rejoue maintenant à CHAQUE affichage.
+  * **« Choisis ton interface » retiré** (`#w-sub{display:none}`) : « tout
+    le monde comprend ».
+  * **Page des cours adulte refaite — « le manuscrit doré ».** Le client
+    n'aimait ni la forme, ni le noir/gris (des cartes sombres sur le fond
+    crème de l'adulte), ni l'absence d'animation. Colonne de 760 px max ;
+    en-tête or avec motif d'étoiles qui dérive, reflet, anneau de
+    progression et pourcentage qui comptent, « رِحْلَتِي » qui s'écrit ;
+    chapitres à losange et trait qui se trace ; cartes ivoire avec
+    médaillon d'or (les voyelles y sont posées sur un tatwīl : ـَ ـُ ـِ) ;
+    rail doré plein derrière soi, pointillé devant ; arrivée 3D de chaque
+    carte quand elle entre à l'écran (`_parAnime`, IntersectionObserver,
+    note de musique par carte), lettres écrites de droite à gauche,
+    inclinaison qui suit la souris, reflet au survol, bordure d'or qui
+    court autour de la leçon du moment. Aucun texte ajouté.
 
 - **v3.1.2 (17 octobre) : « FAIS QQCH DE PRO ».** Retours du client sur la
   v3.1.1 : menu « rien ne se passe, tout est affiché directement », connexion

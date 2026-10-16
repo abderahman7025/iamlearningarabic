@@ -2693,7 +2693,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
   }
   </script>
 <!-- ════════════════════════════════════════════════════════
-     MOTION — décor animé et entrées sonores (v3.1.2)
+     MOTION — décor animé et entrées sonores (v3.1.3)
      Le client (17 oct.) : « fais un effort et fais qqch de pro ».
      1. LE DÉCOR « NUIT D'ORIENT » (canvas) remplace `.login-deco` sur
         s-buy et s-login : ciel, étoiles, étoiles filantes, lune, deux plans
@@ -3252,10 +3252,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
     /* Les cartes : attendre que buildMenu les ait posées. */
     plus(function(){
       var nav=document.getElementById('menu-nav');if(!nav)return;
+      nav.classList.remove('menu-anim-done');window._menuAnimDone=false;
       var cartes=[].slice.call(nav.querySelectorAll('.nav-card'));
       nav.style.perspective='900px';
       cartes.forEach(function(el,i){
-        el.style.cssText='';el.style.animation='none';
+        /* opacity:1 en ligne : la feuille de style met les cartes à 0 en
+           attendant son ancienne animation CSS, qu'on coupe ici. */
+        el.style.cssText='';el.style.animation='none';el.style.opacity='1';el.style.transform='none';
         var d=250+i*160;
         depuis(el,{opacity:0,rotate:'x -80deg',translate:'0 40px',scale:'.9'},{duration:850,delay:d,easing:SPRING});
         depuis(el.firstElementChild,{scale:'0',rotate:'-25deg'},{duration:650,delay:d+180,easing:SPRING});
@@ -3280,7 +3283,9 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
       var scr=document.getElementById(id);if(!scr)return;
       var premier=false;
       try{ if(id==='s-buy'||id==='s-login')premier=SCENE.montre(scr); }catch(e){}
-      if(reduit||vu[id])return;
+      /* Le menu rejoue son entrée à CHAQUE affichage ; les autres écrans,
+         une fois par chargement. */
+      if(reduit||(vu[id]&&id!=='s-menu'))return;
       vu[id]=1;
       try{
         if(id==='s-buy')entreeAccueil(scr,premier);
@@ -3293,8 +3298,11 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
        est jouée par ecran('s-menu') au moment où le menu s'AFFICHE (avant,
        elle se jouait parfois menu caché — « rien ne se passe »). */
     cartesMenu:function(els){
-      window._menuAnimDone=true;
-      els.forEach(function(el){el.style.cssText='';el.style.animation='none';});
+      /* SURTOUT ne pas poser _menuAnimDone : buildMenu ajoute alors
+         `.menu-anim-done`, dont le `opacity:1 !important` écrase toute
+         animation — c'est pourquoi le menu « s'affichait en une traite ». */
+      var nav=document.getElementById('menu-nav');if(nav)nav.classList.remove('menu-anim-done');
+      els.forEach(function(el){el.style.cssText='';el.style.animation='none';el.style.opacity='1';el.style.transform='none';});
     },
     son:son
   };

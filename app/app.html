@@ -382,6 +382,9 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
   animation:float 5s ease-in-out infinite;
 }
 .w-sub{font-size:.9rem;color:var(--txt2);margin-bottom:32px;text-align:center}
+/* Le client : « choisis ton interface ne sert à rien, tout le monde comprend » */
+#w-sub{display:none}
+#s-welcome .w-ar{margin-bottom:30px}
 .prof-cards{display:flex;flex-direction:column;gap:16px;width:100%;max-width:360px}
 
 .prof-card{
@@ -721,75 +724,132 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
 .pos-lbl{font-size:.52rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;word-break:break-word;hyphens:auto}
 .pos-ar{font-family:var(--fa);font-size:2rem;line-height:1.2}
 
-/* ── La page des cours : un parcours, pas une grille ──────────────────
-   Douze cartes identiques qui scintillent toutes pareil ne disent rien.
-   Les leçons sont enfilées sur un rail — doré derrière soi, éteint
-   devant — et seule celle du moment respire. */
-.par-tete{
-  background:linear-gradient(135deg,rgba(245,200,66,.10),rgba(10,7,24,.55));
-  border:1px solid rgba(245,200,66,.18);
-  border-radius:18px;padding:14px 16px 15px;margin:2px 0 6px;
-}
-.par-sur{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gold);opacity:.9;font-weight:800}
-.par-barre{height:6px;border-radius:99px;background:rgba(255,255,255,.09);
-  margin:10px 0 8px;overflow:hidden}
-.par-remplie{height:100%;width:0;border-radius:99px;
-  background:linear-gradient(90deg,var(--gold),#ffe9a3);
-  transition:width 1.1s cubic-bezier(.22,1,.36,1)}
-.par-chiffres{display:flex;justify-content:space-between;gap:8px;
-  font-size:.68rem;color:var(--txt2)}
-.par-chiffres b{color:var(--txt);font-weight:800}
+/* ── La page des cours (adulte) : « le manuscrit doré » — v3.1.3 ───────
+   Le client : « je n'aime pas la forme, la couleur noir gris, aucune
+   animation… fais quelque chose de stylé, dépasse-toi ». L'interface
+   adulte est crème et or : les cartes sombres y faisaient des taches
+   grises. Ici : carte ivoire, médaillon d'or où s'inscrivent les lettres,
+   rail doré, en-tête lumineux avec anneau de progression.
+   Animations : en-tête et anneau qui se dessinent, chaque carte qui
+   arrive en 3D quand elle entre à l'écran (IntersectionObserver), lettres
+   qui s'écrivent de droite à gauche, médaillon qui tourne et se pose,
+   inclinaison 3D qui suit la souris, reflet au survol, bordure d'or qui
+   court autour de la leçon du moment. */
+.par-page{max-width:760px;margin:0 auto;padding-bottom:30px}
+.par-tete{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  margin:4px 0 10px;padding:20px 20px 18px;border-radius:26px;color:#fff;
+  background:linear-gradient(125deg,#7a4a00 0%,#b8860b 42%,#e8b33a 75%,#f6d987 100%);
+  box-shadow:0 18px 44px rgba(150,95,0,.32),inset 0 1px 0 rgba(255,255,255,.35);
+  animation:parTete .9s both cubic-bezier(.22,1,.36,1)}
+.par-tete::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1'%3E%3Cpath d='M28 6l6 16 16 6-16 6-6 16-6-16-16-6 16-6z'/%3E%3Crect x='18' y='18' width='20' height='20' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:56px;animation:parMotif 40s linear infinite}
+.par-tete::after{content:'';position:absolute;top:0;bottom:0;width:40%;left:-50%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  animation:parReflet 5s 1.2s ease-in-out infinite}
+@keyframes parMotif{to{background-position:560px 280px}}
+@keyframes parReflet{0%,60%{left:-50%}100%{left:130%}}
+@keyframes parTete{from{opacity:0;transform:translateY(-24px) scale(.96)}to{opacity:1;transform:none}}
+.par-anneau{position:relative;width:78px;height:78px;flex:none;z-index:1}
+.par-anneau svg{width:100%;height:100%;transform:rotate(-90deg)}
+.par-anneau circle{fill:none;stroke-width:6}
+.par-anneau .fond{stroke:rgba(255,255,255,.25)}
+.par-anneau .plein{stroke:#fff;stroke-linecap:round;stroke-dasharray:176;stroke-dashoffset:176;
+  transition:stroke-dashoffset 1.6s .35s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 0 6px rgba(255,255,255,.7))}
+.par-pct{position:absolute;inset:0;display:grid;place-items:center;font:800 1.05rem/1 Outfit,sans-serif;
+  font-variant-numeric:tabular-nums}
+.par-tete-txt{flex:1;min-width:170px;z-index:1}
+.par-sur{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;font-weight:800;opacity:.92}
+.par-calli{font-family:'Scheherazade New',serif;font-size:2.1rem;line-height:1.35;direction:rtl;text-align:left;
+  text-shadow:0 2px 14px rgba(90,50,0,.35);animation:parEcrit 1.2s .3s both cubic-bezier(.22,1,.36,1)}
+.par-chiffres{display:flex;gap:8px;flex-wrap:wrap;font-size:.7rem;margin-top:4px}
+.par-chiffres span{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+  padding:4px 10px;border-radius:99px;backdrop-filter:blur(6px)}
+.par-chiffres b{font-weight:800}
+.par-barre{flex-basis:100%;height:5px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;z-index:1}
+.par-remplie{height:100%;width:0;border-radius:99px;background:#fff;
+  box-shadow:0 0 12px rgba(255,255,255,.9);transition:width 1.4s .4s cubic-bezier(.22,1,.36,1)}
 
-.par-chap{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--txt2);font-weight:800;margin:18px 0 8px 44px}
+.par-chap{display:flex;align-items:center;gap:10px;margin:26px 0 12px 4px;
+  font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:#8a6200}
+.par-chap::before{content:'';width:10px;height:10px;flex:none;transform:rotate(45deg);
+  background:linear-gradient(135deg,#b8860b,#f3cf6b);box-shadow:0 0 10px rgba(184,134,11,.5)}
+.par-chap::after{content:'';flex:1;height:1px;transform-origin:left;
+  background:linear-gradient(90deg,rgba(184,134,11,.55),rgba(184,134,11,0));
+  animation:parTrait 1.1s .2s both cubic-bezier(.22,1,.36,1)}
+@keyframes parTrait{from{transform:scaleX(0)}to{transform:none}}
 
-.par-ligne{display:flex;gap:12px;align-items:stretch}
-.par-rail{position:relative;width:32px;flex:0 0 32px;display:flex;justify-content:center}
-/* left:50% est indispensable : sans lui le trait se pose à sa place
-   statique, huit pixels à gauche des nœuds, et le rail passe à côté. */
-.par-rail::before{content:'';position:absolute;top:0;bottom:-2px;
-  left:50%;margin-left:-1px;width:2px;
-  background:rgba(255,255,255,.10);border-radius:2px}
-.par-ligne.faite .par-rail::before{background:var(--gold);opacity:.55}
-.par-ligne.en-cours .par-rail::before{
-  background:linear-gradient(180deg,var(--gold),rgba(245,200,66,.10))}
-.par-ligne.derniere .par-rail::before{bottom:auto;height:27px}
-.par-noeud{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;
-  margin-top:14px;display:flex;align-items:center;justify-content:center;
-  font:800 .7rem/1 Outfit,sans-serif;
-  background:#120e26;border:2px solid rgba(255,255,255,.16);color:var(--txt2)}
-.par-ligne.faite .par-noeud{background:var(--gold);border-color:var(--gold);color:#1a1206}
-.par-ligne.en-cours .par-noeud{border-color:var(--gold);color:var(--gold);
-  animation:parPouls 2.6s ease-in-out infinite}
-@keyframes parPouls{
-  0%,100%{box-shadow:0 0 0 4px rgba(245,200,66,.14)}
-  50%{box-shadow:0 0 0 10px rgba(245,200,66,.02)}}
+.par-ligne{display:flex;gap:12px;align-items:stretch;opacity:0}
+.par-ligne.vu{animation:parArrive .85s var(--d,0ms) both cubic-bezier(.22,1,.36,1)}
+@keyframes parArrive{
+  from{opacity:0;transform:perspective(900px) translateX(46px) rotateY(-28deg) scale(.94);filter:blur(6px)}
+  to{opacity:1;transform:none;filter:none}}
+.par-rail{position:relative;width:34px;flex:0 0 34px;display:flex;justify-content:center}
+.par-rail::before{content:'';position:absolute;top:0;bottom:-2px;left:50%;margin-left:-1px;width:2px;
+  background:repeating-linear-gradient(180deg,rgba(184,134,11,.35) 0 5px,transparent 5px 10px)}
+.par-ligne.faite .par-rail::before{background:linear-gradient(180deg,#b8860b,#e8b33a)}
+.par-ligne.en-cours .par-rail::before{background:linear-gradient(180deg,#e8b33a,rgba(184,134,11,.15))}
+.par-ligne.derniere .par-rail::before{bottom:auto;height:30px}
+.par-noeud{position:relative;z-index:1;width:30px;height:30px;border-radius:50%;margin-top:26px;
+  display:flex;align-items:center;justify-content:center;font:800 .72rem/1 Outfit,sans-serif;
+  background:#fffaf0;border:2px solid rgba(184,134,11,.4);color:#b08a50}
+.par-ligne.vu .par-noeud{animation:parPop .6s calc(var(--d,0ms) + 250ms) both cubic-bezier(.34,1.56,.64,1)}
+@keyframes parPop{from{transform:scale(0)}to{transform:none}}
+.par-ligne.faite .par-noeud{background:linear-gradient(135deg,#b8860b,#f0c75a);border-color:#fff;color:#fff;
+  box-shadow:0 4px 12px rgba(184,134,11,.4)}
+.par-ligne.en-cours .par-noeud{background:#fff;border-color:#e8a020;color:#b8860b;
+  box-shadow:0 0 0 0 rgba(232,160,32,.5);animation:parPouls 2.2s ease-in-out infinite}
+@keyframes parPouls{0%,100%{box-shadow:0 0 0 0 rgba(232,160,32,.45)}50%{box-shadow:0 0 0 11px rgba(232,160,32,0)}}
 
-.par-carte{flex:1;min-width:0;margin-bottom:12px;
-  background:rgba(10,7,24,.72);border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;padding:11px 14px 12px;cursor:pointer;
-  transition:transform .28s cubic-bezier(.34,1.56,.64,1),border-color .28s,box-shadow .28s}
-.par-carte:active{transform:scale(.97)}
-.par-carte:hover{border-color:rgba(245,200,66,.28)}
-.par-ligne.en-cours .par-carte{
-  border-color:rgba(245,200,66,.35);
-  background:linear-gradient(120deg,rgba(10,7,24,.92) 0%,rgba(245,200,66,.08) 45%,rgba(10,7,24,.92) 100%);
-  background-size:230% auto;animation:shimmer 5.5s linear infinite;
-  box-shadow:0 6px 26px rgba(245,200,66,.10)}
-.par-num{font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--txt3);font-weight:800}
-.par-titre{font-size:.92rem;font-weight:700;color:var(--txt);margin-top:1px}
-.par-ar{font-family:var(--fa);font-size:1.7rem;line-height:1.55;color:var(--gold);
-  direction:rtl;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.par-noms{font-family:var(--fa);font-size:.76rem;color:var(--txt2);direction:rtl;
+.par-carte{--rx:0deg;--ry:0deg;--ty:0px;position:relative;overflow:hidden;flex:1;min-width:0;margin-bottom:14px;
+  display:flex;align-items:center;gap:14px;padding:16px 16px 16px 18px;border-radius:22px;cursor:pointer;
+  background:linear-gradient(140deg,#fffdf7 0%,#fff6e0 100%);
+  border:1px solid rgba(184,134,11,.22);
+  box-shadow:0 10px 28px rgba(150,95,0,.12),0 2px 6px rgba(120,80,0,.06),inset 0 1px 0 #fff;
+  transform:perspective(800px) rotateX(var(--rx)) rotateY(var(--ry)) translateY(var(--ty));
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s,border-color .35s}
+.par-carte::before{content:'';position:absolute;right:-30px;top:-30px;width:150px;height:150px;pointer-events:none;
+  opacity:.12;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23b8860b' stroke-width='1.2'%3E%3Cpath d='M28 6l6 16 16 6-16 6-6 16-6-16-16-6 16-6z'/%3E%3Crect x='18' y='18' width='20' height='20' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:56px;border-radius:50%;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+.par-carte::after{content:'';position:absolute;top:0;bottom:0;width:45%;left:-60%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transition:left .7s ease}
+.par-carte:hover{--ty:-4px;border-color:rgba(184,134,11,.5);box-shadow:0 18px 40px rgba(150,95,0,.2),0 2px 6px rgba(120,80,0,.06)}
+.par-carte:hover::after{left:120%}
+.par-carte:active{--ty:1px;transition-duration:.12s}
+.par-texte{flex:1;min-width:0;position:relative;z-index:1}
+.par-num{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:#b08a50;font-weight:800}
+.par-titre{font-size:1.02rem;font-weight:800;color:#2a1a00;margin-top:2px}
+.par-noms{font-family:var(--fa);font-size:.82rem;color:#7a5a20;margin-top:3px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.par-etat{margin-top:5px;font-size:.64rem;font-weight:800;letter-spacing:.04em}
-.par-etat.ok{color:var(--green)}
-.par-etat.cours{color:var(--gold)}
-/* entrée : chaque ligne monte à son tour, une seule fois */
-@keyframes parMonte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.par-ligne.entre{animation:parMonte .42s both cubic-bezier(.22,1,.36,1)}
+.par-etat{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:3px 10px;border-radius:99px;
+  font-size:.64rem;font-weight:800;letter-spacing:.04em}
+.par-etat.ok{background:rgba(46,160,90,.12);color:#1f8a4c;border:1px solid rgba(46,160,90,.3)}
+.par-etat.cours{background:linear-gradient(90deg,#b8860b,#e8a020);color:#fff;box-shadow:0 4px 12px rgba(184,134,11,.35)}
+.par-medaille{position:relative;z-index:1;flex:none;min-width:66px;height:66px;padding:0 16px;border-radius:33px;
+  display:grid;place-items:center;
+  background:radial-gradient(circle at 30% 25%,#fff3c4 0%,#f0c75a 30%,#c99316 70%,#9c6c06 100%);
+  box-shadow:0 8px 20px rgba(150,95,0,.35),inset 0 2px 4px rgba(255,255,255,.6),inset 0 -3px 6px rgba(90,50,0,.3);
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.par-ligne.a-venir .par-medaille{filter:saturate(.75) brightness(1.04)}
+.par-ar{font-family:var(--fa);font-size:1.75rem;line-height:1;color:#fff;direction:rtl;white-space:nowrap;
+  text-shadow:0 2px 6px rgba(90,50,0,.5)}
+.par-ligne.vu .par-medaille{animation:parMedaille .9s calc(var(--d,0ms) + 180ms) both cubic-bezier(.34,1.56,.64,1)}
+.par-ligne.vu .par-ar{animation:parEcrit 1s calc(var(--d,0ms) + 420ms) both cubic-bezier(.22,1,.36,1)}
+@keyframes parMedaille{from{transform:scale(0) rotate(-120deg)}to{transform:none}}
+@keyframes parEcrit{from{clip-path:inset(0 0 0 100%);opacity:0}to{clip-path:inset(0);opacity:1}}
+.par-carte:hover .par-medaille{transform:scale(1.08) rotate(-4deg)}
+.par-ligne.en-cours .par-carte{border-color:transparent;
+  box-shadow:0 14px 36px rgba(184,134,11,.28),0 0 0 4px rgba(232,160,32,.12)}
+.par-ligne.en-cours .par-carte>.par-bord{position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;
+  background:linear-gradient(90deg,#b8860b,#fff0b0,#e8a020,#b8860b,#fff0b0);background-size:300% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  animation:parBord 3s linear infinite}
+@keyframes parBord{to{background-position:300% 0}}
+@media (prefers-reduced-motion:reduce){
+  .par-ligne,.par-ligne.vu,.par-ligne.vu *,.par-tete,.par-tete::before,.par-tete::after,.par-calli,.par-chap::after{animation:none!important;opacity:1}
+  .par-ligne{opacity:1}
+}
 
 .badge-row{display:flex;gap:8px;flex-wrap:wrap}
 .bd-big{font-size:.74rem;padding:5px 14px;border-radius:50px;font-weight:700}
@@ -4674,7 +4734,7 @@ body.fond-espace .tuile-nom{color:#20242e}
   }
   </script>
 <!-- ════════════════════════════════════════════════════════
-     MOTION — décor animé et entrées sonores (v3.1.2)
+     MOTION — décor animé et entrées sonores (v3.1.3)
      Le client (17 oct.) : « fais un effort et fais qqch de pro ».
      1. LE DÉCOR « NUIT D'ORIENT » (canvas) remplace `.login-deco` sur
         s-buy et s-login : ciel, étoiles, étoiles filantes, lune, deux plans
@@ -5233,10 +5293,13 @@ body.fond-espace .tuile-nom{color:#20242e}
     /* Les cartes : attendre que buildMenu les ait posées. */
     plus(function(){
       var nav=document.getElementById('menu-nav');if(!nav)return;
+      nav.classList.remove('menu-anim-done');window._menuAnimDone=false;
       var cartes=[].slice.call(nav.querySelectorAll('.nav-card'));
       nav.style.perspective='900px';
       cartes.forEach(function(el,i){
-        el.style.cssText='';el.style.animation='none';
+        /* opacity:1 en ligne : la feuille de style met les cartes à 0 en
+           attendant son ancienne animation CSS, qu'on coupe ici. */
+        el.style.cssText='';el.style.animation='none';el.style.opacity='1';el.style.transform='none';
         var d=250+i*160;
         depuis(el,{opacity:0,rotate:'x -80deg',translate:'0 40px',scale:'.9'},{duration:850,delay:d,easing:SPRING});
         depuis(el.firstElementChild,{scale:'0',rotate:'-25deg'},{duration:650,delay:d+180,easing:SPRING});
@@ -5261,7 +5324,9 @@ body.fond-espace .tuile-nom{color:#20242e}
       var scr=document.getElementById(id);if(!scr)return;
       var premier=false;
       try{ if(id==='s-buy'||id==='s-login')premier=SCENE.montre(scr); }catch(e){}
-      if(reduit||vu[id])return;
+      /* Le menu rejoue son entrée à CHAQUE affichage ; les autres écrans,
+         une fois par chargement. */
+      if(reduit||(vu[id]&&id!=='s-menu'))return;
       vu[id]=1;
       try{
         if(id==='s-buy')entreeAccueil(scr,premier);
@@ -5274,8 +5339,11 @@ body.fond-espace .tuile-nom{color:#20242e}
        est jouée par ecran('s-menu') au moment où le menu s'AFFICHE (avant,
        elle se jouait parfois menu caché — « rien ne se passe »). */
     cartesMenu:function(els){
-      window._menuAnimDone=true;
-      els.forEach(function(el){el.style.cssText='';el.style.animation='none';});
+      /* SURTOUT ne pas poser _menuAnimDone : buildMenu ajoute alors
+         `.menu-anim-done`, dont le `opacity:1 !important` écrase toute
+         animation — c'est pourquoi le menu « s'affichait en une traite ». */
+      var nav=document.getElementById('menu-nav');if(nav)nav.classList.remove('menu-anim-done');
+      els.forEach(function(el){el.style.cssText='';el.style.animation='none';el.style.opacity='1';el.style.transform='none';});
     },
     son:son
   };
@@ -12108,7 +12176,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.2';
+var _VERSION_REPLI='v3.1.3';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -23910,22 +23978,42 @@ function renderSessions(ca){
     if(st.scores[ALL_S[i].id]===undefined){iCours=i;break;}
   }
 
+  /* Tout dans une colonne de 760 px au plus : sur ordinateur, des barres
+     de toute la largeur de l'écran ne ressemblaient à rien. */
+  var page=document.createElement('div');page.className='par-page';
+  ca.appendChild(page);
   var tete=document.createElement('div');
   tete.className='par-tete';
-  tete.innerHTML='<div class="par-sur">'+t('path_title')+'</div>'
-    +'<div class="par-barre"><div class="par-remplie"></div></div>'
-    +'<div class="par-chiffres">'
-      +'<span><b>'+faites+'</b> / '+ALL_S.length+' '+t('path_lessons')+'</span>'
-      +'<span><b>'+lettresFaites+'</b> / '+lettresTotal+' '+t('path_letters')+'</span>'
-    +'</div>';
-  ca.appendChild(tete);
+  tete.innerHTML='<div class="par-anneau"><svg viewBox="0 0 64 64"><circle class="fond" cx="32" cy="32" r="28"/>'
+      +'<circle class="plein" cx="32" cy="32" r="28"/></svg><b class="par-pct">0%</b></div>'
+    +'<div class="par-tete-txt">'
+      +'<div class="par-sur">'+t('path_title')+'</div>'
+      +'<div class="par-calli">رِحْلَتِي</div>'
+      +'<div class="par-chiffres">'
+        +'<span><b>'+faites+'</b> / '+ALL_S.length+' '+t('path_lessons')+'</span>'
+        +'<span><b>'+lettresFaites+'</b> / '+lettresTotal+' '+t('path_letters')+'</span>'
+      +'</div>'
+    +'</div>'
+    +'<div class="par-barre"><div class="par-remplie"></div></div>';
+  page.appendChild(tete);
   /* La barre part de zéro et se remplit : elle se voit se remplir, sinon
      elle n'est qu'un trait de plus. */
   var remplie=tete.querySelector('.par-remplie');
   var pct=ALL_S.length?Math.round(100*faites/ALL_S.length):0;
   /* Un simple délai, pas requestAnimationFrame : dans un onglet qui n'est
      pas au premier plan, rAF ne tourne pas et la barre resterait à zéro. */
-  setTimeout(function(){ remplie.style.width=pct+'%'; },60);
+  setTimeout(function(){
+    remplie.style.width=pct+'%';
+    var anneau=tete.querySelector('.plein');if(anneau)anneau.style.strokeDashoffset=String(176*(1-pct/100));
+  },60);
+  /* Le pourcentage compte jusqu'à sa valeur, au rythme de l'anneau. */
+  (function(){
+    var el=tete.querySelector('.par-pct'),t0=null,d=1600;
+    if(!pct){el.textContent='0%';return;}
+    function pas(now){if(t0===null)t0=now;var k=Math.min(1,(now-t0-350)/d);if(k<0)k=0;
+      el.textContent=Math.round(pct*(1-Math.pow(1-k,3)))+'%';if(k<1)requestAnimationFrame(pas);}
+    requestAnimationFrame(pas);setTimeout(function(){el.textContent=pct+'%';},2200);
+  })();
 
   function chapitre(txt){
     var d=document.createElement('div');
@@ -23935,8 +24023,8 @@ function renderSessions(ca){
 
   ALL_S.forEach(function(s,idx){
     /* Deux chapitres : ce qui se pose avant les lettres, puis les lettres. */
-    if(idx===0)ca.appendChild(chapitre(t('path_basics')));
-    if(idx===3)ca.appendChild(chapitre(t('path_alphabet')));
+    if(idx===0)page.appendChild(chapitre(t('path_basics')));
+    if(idx===3)page.appendChild(chapitre(t('path_alphabet')));
 
     var note=st.scores[s.id];
     var etatCls=(note!==undefined)?'faite':(idx===iCours?'en-cours':'a-venir');
@@ -23948,7 +24036,9 @@ function renderSessions(ca){
     if(s.type==='vowels'){
       var v=String(t('vowels_name')).split('·');
       titre=v[0].trim(); noms=(v[1]||'').trim();
-      arabe='َ ُ ِ ً ٌ ٍ ْ';
+      /* Les trois voyelles posées sur un trait d'allongement (ـ) : seules,
+         elles s'affichaient en morceaux dans le médaillon. */
+      arabe='ـَ ـُ ـِ';
     }else if(s.type==='prolong'){
       var w=String(t('prolong_name')).split('·');
       titre=w[0].trim(); noms=(w[1]||'').trim();
@@ -23966,17 +24056,15 @@ function renderSessions(ca){
     ligne.className='par-ligne '+etatCls+(idx===ALL_S.length-1?' derniere':'');
     ligne.innerHTML='<div class="par-rail"><span class="par-noeud">'+(idx+1)+'</span></div>'
       +'<div class="par-carte">'
-        +'<div class="par-num">'+t('lesson_num')+' '+(idx+1)+'</div>'
-        +(titre?'<div class="par-titre">'+titre+'</div>':'')
-        +'<div class="par-ar">'+arabe+'</div>'
-        +(noms?'<div class="par-noms">'+noms+'</div>':'')
-        +etat
+        +(idx===iCours?'<span class="par-bord"></span>':'')
+        +'<div class="par-texte">'
+          +'<div class="par-num">'+t('lesson_num')+' '+(idx+1)+'</div>'
+          +(titre?'<div class="par-titre">'+titre+'</div>':'')
+          +(noms?'<div class="par-noms">'+noms+'</div>':'')
+          +etat
+        +'</div>'
+        +'<div class="par-medaille"><span class="par-ar">'+arabe+'</span></div>'
       +'</div>';
-
-    if(!dejaAnime){
-      ligne.classList.add('entre');
-      ligne.style.animationDelay=(idx*45)+'ms';
-    }
 
     /* La carte s'ouvre en grand avant de laisser la place à la leçon :
        le geste reliait déjà les deux écrans, on le garde. */
@@ -23986,7 +24074,8 @@ function renderSessions(ca){
       var clone=document.createElement('div');
       clone.style.cssText='position:fixed;top:'+r.top+'px;left:'+r.left+'px;'
         +'width:'+r.width+'px;height:'+r.height+'px;z-index:600;border-radius:16px;'
-        +'background:rgba(10,7,24,.95);border:1px solid rgba(245,200,66,.3);overflow:hidden;'
+        +'background:linear-gradient(140deg,#fffdf7,#f6d987);border:1px solid rgba(184,134,11,.4);overflow:hidden;'
+        +'display:flex;align-items:center;gap:14px;padding:16px 16px 16px 18px;'
         +'transition:all .36s cubic-bezier(.4,0,.2,1);pointer-events:none';
       clone.innerHTML=carte.innerHTML;
       document.body.appendChild(clone);
@@ -24004,10 +24093,44 @@ function renderSessions(ca){
       },30);
     };
 
-    ca.appendChild(ligne);
+    page.appendChild(ligne);
   });
 
   window._sessAnimDone=true;
+  _parAnime(page);
+}
+
+/* Les cartes du parcours arrivent quand elles entrent à l'écran ; celles
+   déjà visibles arrivent en cascade, avec une note chacune. Sur
+   ordinateur, la carte s'incline vers la souris. */
+function _parAnime(page){
+  var lignes=[].slice.call(page.querySelectorAll('.par-ligne'));
+  var reduit=false;try{reduit=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  if(reduit||!window.IntersectionObserver){lignes.forEach(function(l){l.classList.add('vu');});return;}
+  var rang=0,t0=performance.now();
+  var io=new IntersectionObserver(function(ent){
+    ent.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var l=e.target;io.unobserve(l);
+      /* Cascade pour la première vague, sans délai ensuite (au défilement). */
+      var d=performance.now()-t0<600?(rang++)*110+250:0;
+      l.style.setProperty('--d',d+'ms');l.classList.add('vu');
+      if(d&&window.MOTION&&MOTION.son)MOTION.son('note',Math.min(rang,9),d+180);
+    });
+  },{threshold:0.15});
+  lignes.forEach(function(l){io.observe(l);});
+  /* Filet : rien ne doit rester caché si l'observateur ne se déclenche pas. */
+  setTimeout(function(){lignes.forEach(function(l){
+    var r=l.getBoundingClientRect();if(r.top<innerHeight&&!l.classList.contains('vu'))l.classList.add('vu');});},2500);
+  lignes.forEach(function(l){
+    var c=l.querySelector('.par-carte');if(!c)return;
+    c.addEventListener('pointermove',function(e){
+      if(e.pointerType!=='mouse')return;
+      var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-0.5,y=(e.clientY-r.top)/r.height-0.5;
+      c.style.setProperty('--ry',(x*7).toFixed(2)+'deg');c.style.setProperty('--rx',(-y*7).toFixed(2)+'deg');
+    });
+    c.addEventListener('pointerleave',function(){c.style.setProperty('--ry','0deg');c.style.setProperty('--rx','0deg');});
+  });
 }
 
 // OPEN LESSON
