@@ -183,7 +183,33 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.1), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.2), du plus récent au plus ancien :**
+
+- **v3.1.2 (17 octobre) : « FAIS QQCH DE PRO ».** Retours du client sur la
+  v3.1.1 : menu « rien ne se passe, tout est affiché directement », connexion
+  « trop fade », et l'accueil (prix, les « + ») doit bouger aussi.
+  * **Le menu** : l'entrée se jouait dans `buildMenu()`, parfois appelé
+    menu CACHÉ — elle était finie quand le menu s'affichait. Elle part
+    maintenant de `MOTION.ecran('s-menu')` (60 ms après, le temps que
+    `buildMenu` ait posé les cartes) ; `cartesMenu()` ne fait plus que
+    rendre les cartes visibles. Cartes en 3D (bascule `rotate: x`), icônes,
+    reflet, série 🔥, barre de progression qui se remplit.
+  * **Décor « Nuit d'Orient »** (canvas `.mo-scene`) sur s-buy et s-login, à
+    la place de `.login-deco` (cachée par `.mo-scene-on`) : ciel, étoiles,
+    étoiles filantes, lune, deux plans de ville, mosquée aux fenêtres qui
+    vacillent, lanternes qui tombent puis se balancent, lettres arabes et
+    poussière d'or qui montent, parallaxe souris. UN canvas déplacé d'écran
+    en écran. Tout ce qui est fixe est pré-dessiné à chaque redimension
+    (ciel, lune, halo, lueur, lettres, ville) ; boucle arrêtée si l'écran
+    est caché ; un appareil lent passe à une image sur deux.
+  * **Accueil** : titre qui s'écrit, mots un à un, prix qui compte de 0 à
+    74,99 (format de la langue) avec étincelles, « ✓ » remplacés par des
+    pastilles qui se cochent une à une, bouton qui reluit toutes les 5 s.
+    `#buy-features` est remis en lignes par un MutationObserver après
+    chaque changement de langue.
+  * Mesures en navigateur sans carte graphique (pessimistes) : téléphone
+    ~37 i/s ; le flou `backdrop-filter` de la boîte coûte autant que le
+    décor. À regarder sur un vrai téléphone d'entrée de gamme.
 
 - **v3.1.1 (17 octobre) : ENTRÉES ANIMÉES ET SONORES.** Le client, après une
   intro de chaîne faite en code : « je veux absolument ça » sur la page de
