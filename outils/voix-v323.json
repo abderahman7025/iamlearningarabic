@@ -1,0 +1,1310 @@
+[
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "السُّكُون",
+  "dire": "السُّكُون"
+ },
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "هَمْزَةُ الْوَصْلِ",
+  "dire": "هَمْزَةُ الْوَصْل"
+ },
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "لَفْظُ الْجَلَالَةِ : الله",
+  "dire": "لَفْظُ الْجَلَالَةِ، اللَّه"
+ },
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "إِنَّهُ ٱللَّهُ",
+  "dire": "إِنَّهُ اللَّه"
+ },
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "ٱللَّهُ أَكْبَرُ",
+  "dire": "اللَّهُ أَكْبَر"
+ },
+ {
+  "groupe": "bonus",
+  "langue": "ar",
+  "cle": "ٱتَّقِ ٱللَّهَ",
+  "dire": "اتَّقِ اللَّه"
+ },
+ {
+  "groupe": "explications",
+  "langue": "fr",
+  "cle": "Ici, le ل est suivi du ر, qui est une lettre solaire. Il n'a pas de سُكُون : on ne prononce pas le ل.",
+  "texte": "Ici, le ل est suivi du ر, qui est une lettre solaire. Il n'a pas de سُكُون : on ne prononce pas le ل.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "fr",
+  "cle": "Ici, le ل est suivi du ك, qui est une lettre lunaire. Il a un سُكُون : on prononce donc le ل.",
+  "texte": "Ici, le ل est suivi du ك, qui est une lettre lunaire. Il a un سُكُون : on prononce donc le ل.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "en",
+  "cle": "Here, the ل is followed by the ر, which is a solar letter. It has no سُكُون: the ل is not pronounced.",
+  "texte": "Here, the ل is followed by the ر, which is a solar letter. It has no سُكُون: the ل is not pronounced.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "en",
+  "cle": "Here, the ل is followed by the ك, which is a lunar letter. It has a سُكُون: so the ل is pronounced.",
+  "texte": "Here, the ل is followed by the ك, which is a lunar letter. It has a سُكُون: so the ل is pronounced.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "es",
+  "cle": "Aquí, la ل va seguida de la ر, que es una letra solar. No tiene سُكُون: la ل no se pronuncia.",
+  "texte": "Aquí, la ل va seguida de la ر, que es una letra solar. No tiene سُكُون: la ل no se pronuncia.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "es",
+  "cle": "Aquí, la ل va seguida de la ك, que es una letra lunar. Tiene un سُكُون: por tanto, la ل se pronuncia.",
+  "texte": "Aquí, la ل va seguida de la ك, que es una letra lunar. Tiene un سُكُون: por tanto, la ل se pronuncia.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "de",
+  "cle": "Hier folgt auf das ل das ر, ein Sonnenbuchstabe. Es hat kein سُكُون: Das ل wird nicht ausgesprochen.",
+  "texte": "Hier folgt auf das ل das ر, ein Sonnenbuchstabe. Es hat kein سُكُون: Das ل wird nicht ausgesprochen.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "de",
+  "cle": "Hier folgt auf das ل das ك, ein Mondbuchstabe. Es hat ein سُكُون: Das ل wird also ausgesprochen.",
+  "texte": "Hier folgt auf das ل das ك, ein Mondbuchstabe. Es hat ein سُكُون: Das ل wird also ausgesprochen.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "nl",
+  "cle": "Hier wordt de ل gevolgd door de ر, een zonneletter. Hij heeft geen سُكُون: de ل wordt niet uitgesproken.",
+  "texte": "Hier wordt de ل gevolgd door de ر, een zonneletter. Hij heeft geen سُكُون: de ل wordt niet uitgesproken.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "nl",
+  "cle": "Hier wordt de ل gevolgd door de ك, een maanletter. Hij heeft een سُكُون: de ل wordt dus uitgesproken.",
+  "texte": "Hier wordt de ل gevolgd door de ك, een maanletter. Hij heeft een سُكُون: de ل wordt dus uitgesproken.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "it",
+  "cle": "Qui, la ل è seguita dalla ر, che è una lettera solare. Non ha il سُكُون: la ل non si pronuncia.",
+  "texte": "Qui, la ل è seguita dalla ر, che è una lettera solare. Non ha il سُكُون: la ل non si pronuncia.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "it",
+  "cle": "Qui, la ل è seguita dalla ك, che è una lettera lunare. Ha un سُكُون: quindi la ل si pronuncia.",
+  "texte": "Qui, la ل è seguita dalla ك, che è una lettera lunare. Ha un سُكُون: quindi la ل si pronuncia.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "pt",
+  "cle": "Aqui, o ل é seguido do ر, que é uma letra solar. Não tem سُكُون: o ل não se pronuncia.",
+  "texte": "Aqui, o ل é seguido do ر, que é uma letra solar. Não tem سُكُون: o ل não se pronuncia.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "pt",
+  "cle": "Aqui, o ل é seguido do ك, que é uma letra lunar. Tem um سُكُون: por isso, o ل pronuncia-se.",
+  "texte": "Aqui, o ل é seguido do ك, que é uma letra lunar. Tem um سُكُون: por isso, o ل pronuncia-se.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "ru",
+  "cle": "Здесь за ل следует ر — солнечная буква. Над ل нет سُكُون: ل не произносится.",
+  "texte": "Здесь за ل следует ر — солнечная буква. Над ل нет سُكُون: ل не произносится.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "ru",
+  "cle": "Здесь за ل следует ك — лунная буква. Над ل стоит سُكُون: значит, ل произносится.",
+  "texte": "Здесь за ل следует ك — лунная буква. Над ل стоит سُكُون: значит, ل произносится.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "tr",
+  "cle": "Burada ل harfinden sonra bir şemsî harf olan ر gelir. ل'de سُكُون yoktur: ل okunmaz.",
+  "texte": "Burada ل harfinden sonra bir şemsî harf olan ر gelir. ل'de سُكُون yoktur: ل okunmaz.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "tr",
+  "cle": "Burada ل harfinden sonra bir kamerî harf olan ك gelir. ل'de bir سُكُون vardır: bu yüzden ل okunur.",
+  "texte": "Burada ل harfinden sonra bir kamerî harf olan ك gelir. ل'de bir سُكُون vardır: bu yüzden ل okunur.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "zh",
+  "cle": "这里，ل 后面是 ر，它是太阳字母。ل 上没有 سُكُون：ل 不发音。",
+  "texte": "这里，ل 后面是 ر，它是太阳字母。ل 上没有 سُكُون：ل 不发音。",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "zh",
+  "cle": "这里，ل 后面是 ك，它是月亮字母。ل 上有 سُكُون：所以 ل 要发音。",
+  "texte": "这里，ل 后面是 ك，它是月亮字母。ل 上有 سُكُون：所以 ل 要发音。",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "id",
+  "cle": "Di sini, ل diikuti oleh ر, yang merupakan huruf syamsiyah. Ia tidak memiliki سُكُون: ل tidak dibaca.",
+  "texte": "Di sini, ل diikuti oleh ر, yang merupakan huruf syamsiyah. Ia tidak memiliki سُكُون: ل tidak dibaca.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "id",
+  "cle": "Di sini, ل diikuti oleh ك, yang merupakan huruf qamariyah. Ia memiliki سُكُون: jadi ل dibaca.",
+  "texte": "Di sini, ل diikuti oleh ك, yang merupakan huruf qamariyah. Ia memiliki سُكُون: jadi ل dibaca.",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "hi",
+  "cle": "यहाँ ل के बाद ر है, जो एक शम्सी (सौर) अक्षर है। ل पर سُكُون नहीं है: ل नहीं पढ़ा जाता।",
+  "texte": "यहाँ ل के बाद ر है, जो एक शम्सी (सौर) अक्षर है। ل पर سُكُون नहीं है: ل नहीं पढ़ा जाता।",
+  "mixte": true
+ },
+ {
+  "groupe": "explications",
+  "langue": "hi",
+  "cle": "यहाँ ل के बाद ك है, जो एक क़मरी (चंद्र) अक्षर है। ل पर سُكُون है: इसलिए ل पढ़ा जाता है।",
+  "texte": "यहाँ ل के बाद ك है, जो एक क़मरी (चंद्र) अक्षर है। ل पर سُكُون है: इसलिए ل पढ़ा जाता है।",
+  "mixte": true
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَابٌ",
+  "dire": "بَابٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَاتَ",
+  "dire": "بَاتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَبٌّ",
+  "dire": "تَبٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَثَّ",
+  "dire": "بَثَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَبَتَ",
+  "dire": "ثَبَتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَبَتَ",
+  "dire": "تَبَتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَابَ",
+  "dire": "تَابَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَتَبَّتَ",
+  "dire": "تَتَبَّتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بِتٌّ",
+  "dire": "بِتٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَبِتَ",
+  "dire": "تَبِتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَابِتٌ",
+  "dire": "ثَابِتٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَثَبَّتَ",
+  "dire": "تَثَبَّتَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بِثٌّ",
+  "dire": "بِثٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَابَثَ",
+  "dire": "تَابَثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَبٌّ",
+  "dire": "جَبٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حَجَّ",
+  "dire": "حَجَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَجَحَ",
+  "dire": "بَجَحَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَجِبُ",
+  "dire": "تَجِبُ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَثَّ",
+  "dire": "جَثَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حَجَبَ",
+  "dire": "حَجَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حَبَّ",
+  "dire": "حَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَحَثَ",
+  "dire": "بَحَثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَحَبَّ",
+  "dire": "تَحَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَحَدَ",
+  "dire": "جَحَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَحَبَ",
+  "dire": "ثَحَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "خَبَّ",
+  "dire": "خَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَخِلَ",
+  "dire": "بَخِلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَخَبَّثَ",
+  "dire": "تَخَبَّثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "خَجِلَ",
+  "dire": "خَجِلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حَخَبَ",
+  "dire": "حَخَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "خَبُثَ",
+  "dire": "خَبُثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَبَّ",
+  "dire": "دَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَدَأَ",
+  "dire": "بَدَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَخَلَ",
+  "dire": "دَخَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَدَبَ",
+  "dire": "ثَدَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَجَجَ",
+  "dire": "دَجَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَبَّ",
+  "dire": "ذَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَذَخَ",
+  "dire": "بَذَخَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَذَكَّرَ",
+  "dire": "تَذَكَّرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَذَبَ",
+  "dire": "جَذَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَخَرَ",
+  "dire": "ذَخَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَذَبَ",
+  "dire": "دَذَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَبٌّ",
+  "dire": "رَبٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَرَدَ",
+  "dire": "بَرَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَرَحَ",
+  "dire": "جَرَحَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَرَى",
+  "dire": "ثَرَى"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَرٌّ",
+  "dire": "ذَرٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَرَجَ",
+  "dire": "دَرَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "زَجَّ",
+  "dire": "زَجَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَزَّ",
+  "dire": "رَزَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَزَخَ",
+  "dire": "بَزَخَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَزَأَ",
+  "dire": "جَزَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَرَزَ",
+  "dire": "ذَرَزَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَزَجَ",
+  "dire": "دَزَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَبَبٌ",
+  "dire": "سَبَبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَسَطَ",
+  "dire": "بَسَطَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَسَدٌ",
+  "dire": "جَسَدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَجَدَ",
+  "dire": "سَجَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَسَمَ",
+  "dire": "رَسَمَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَرَسَ",
+  "dire": "دَرَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَرَدَ",
+  "dire": "سَرَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَسَبَ",
+  "dire": "ذَسَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَجَرٌ",
+  "dire": "شَجَرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَشَرٌ",
+  "dire": "بَشَرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَشَعٌ",
+  "dire": "جَشَعٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَرِبَ",
+  "dire": "شَرِبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَشَدَ",
+  "dire": "رَشَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَشَجَ",
+  "dire": "دَشَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَشَبَ",
+  "dire": "سَشَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَرَسَ",
+  "dire": "شَرَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَبَرَ",
+  "dire": "صَبَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَصَدَ",
+  "dire": "رَصَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَصَبَ",
+  "dire": "شَصَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَدَرَ",
+  "dire": "صَدَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَصَرٌ",
+  "dire": "بَصَرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَصٌّ",
+  "dire": "جَصٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَصَبَ",
+  "dire": "دَصَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَرَجَ",
+  "dire": "صَرَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَرَبَ",
+  "dire": "ضَرَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَضَعَ",
+  "dire": "رَضَعَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَضَعَ",
+  "dire": "بَضَعَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَضَبَ",
+  "dire": "صَضَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَضَّ",
+  "dire": "شَضَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَجَرَ",
+  "dire": "ضَجَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَضَبَ",
+  "dire": "دَضَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَصَبَ",
+  "dire": "ضَصَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَلَبَ",
+  "dire": "طَلَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَطَلٌ",
+  "dire": "بَطَلٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رُطَبٌ",
+  "dire": "رُطَبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَطَرَ",
+  "dire": "شَطَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَطَبَ",
+  "dire": "ضَطَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَطَبَ",
+  "dire": "صَطَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَرَشَ",
+  "dire": "طَرَشَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَطَجَ",
+  "dire": "دَطَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ظَهَرَ",
+  "dire": "ظَهَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَظَلَ",
+  "dire": "بَظَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَظَّ",
+  "dire": "شَظَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صَظَبَ",
+  "dire": "صَظَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ظَرُفَ",
+  "dire": "ظَرُفَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَظَبَ",
+  "dire": "طَظَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَظَجَ",
+  "dire": "رَظَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَظَبَ",
+  "dire": "دَظَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَدَدٌ",
+  "dire": "عَدَدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَعَدَ",
+  "dire": "رَعَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَعَثَ",
+  "dire": "بَعَثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَعَرَ",
+  "dire": "شَعَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَعِمَ",
+  "dire": "طَعِمَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَعُفَ",
+  "dire": "ضَعُفَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَصَرَ",
+  "dire": "عَصَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَعَجَ",
+  "dire": "دَعَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "غَضِبَ",
+  "dire": "غَضِبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَغَى",
+  "dire": "بَغَى"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَغِبَ",
+  "dire": "رَغِبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَغَلَ",
+  "dire": "شَغَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَغَبَ",
+  "dire": "عَغَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَغَى",
+  "dire": "طَغَى"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَغَطَ",
+  "dire": "ضَغَطَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَغَجَ",
+  "dire": "دَغَجَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَتَحَ",
+  "dire": "فَتَحَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَفَعَ",
+  "dire": "رَفَعَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَفَقَ",
+  "dire": "شَفَقَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَفَا",
+  "dire": "عَفَا"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طِفْلٌ",
+  "dire": "طِفْلٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَفَرَ",
+  "dire": "كَفَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَرَغَ",
+  "dire": "فَرَغَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَفَثَ",
+  "dire": "بَفَثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَلَمٌ",
+  "dire": "قَلَمٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَقَدَ",
+  "dire": "رَقَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَقَدَ",
+  "dire": "فَقَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَقٌّ",
+  "dire": "شَقٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَقَدَ",
+  "dire": "عَقَدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَقْسٌ",
+  "dire": "طَقْسٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَقِيَ",
+  "dire": "بَقِيَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَقَفَ",
+  "dire": "كَقَفَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَتَبَ",
+  "dire": "كَتَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَكَضَ",
+  "dire": "رَكَضَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَكَرَ",
+  "dire": "شَكَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَكَّرَ",
+  "dire": "فَكَّرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَكَسَ",
+  "dire": "عَكَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَكَبَ",
+  "dire": "قَكَبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "طَكَفَ",
+  "dire": "طَكَفَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَكَرَ",
+  "dire": "بَكَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَعِبَ",
+  "dire": "لَعِبَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَلِمَةٌ",
+  "dire": "كَلِمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَلَكٌ",
+  "dire": "فَلَكٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَلَلٌ",
+  "dire": "شَلَلٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَلَكَ",
+  "dire": "رَلَكَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَلَكَ",
+  "dire": "مَلَكَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نَلَسَ",
+  "dire": "نَلَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَتَمَ",
+  "dire": "كَتَمَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَمَلَ",
+  "dire": "شَمَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَهِمَ",
+  "dire": "فَهِمَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَمَسَ",
+  "dire": "لَمَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نَمَا",
+  "dire": "نَمَا"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَمَرٌ",
+  "dire": "قَمَرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نَجَحَ",
+  "dire": "نَجَحَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كِتَابٌ",
+  "dire": "كِتَابٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَنَعَ",
+  "dire": "مَنَعَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَنَّ",
+  "dire": "شَنَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَنٌّ",
+  "dire": "فَنٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَنَمَ",
+  "dire": "رَنَمَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَنَكَ",
+  "dire": "لَنَكَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَنَطَ",
+  "dire": "قَنَطَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "هَنَأَ",
+  "dire": "هَنَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نَهَرَ",
+  "dire": "نَهَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "شَهِدَ",
+  "dire": "شَهِدَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَرِهَ",
+  "dire": "كَرِهَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَهَرَ",
+  "dire": "مَهَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَهَثَ",
+  "dire": "لَهَثَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَهَرَ",
+  "dire": "قَهَرَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "أَكَلَ",
+  "dire": "أَكَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَأَلَ",
+  "dire": "سَأَلَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نَأَى",
+  "dire": "نَأَى"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَرَأَ",
+  "dire": "قَرَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "هَيَّأَ",
+  "dire": "هَيَّأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَلَأَ",
+  "dire": "مَلَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَاءَ",
+  "dire": "جَاءَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَدِينَةٌ",
+  "dire": "مَدِينَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَنَّةٌ",
+  "dire": "جَنَّةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "نِعْمَةٌ",
+  "dire": "نِعْمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "رَحْمَةٌ",
+  "dire": "رَحْمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حِكْمَةٌ",
+  "dire": "حِكْمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فِكْرَةٌ",
+  "dire": "فِكْرَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَهْجَةٌ",
+  "dire": "لَهْجَةٌ"
+ }
+]

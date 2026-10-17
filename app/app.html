@@ -9768,7 +9768,7 @@ function renderBonusAllah(ca, pc, pcHex){
   img4.className='bonus-img';
   box.appendChild(img4);
   box.appendChild(_mkBonusGroup([t('bonus_s3_p1'),t('bonus_s3_p2'),t('bonus_s3_kasra'),t('bonus_s3_fatha'),t('bonus_s3_sukun'),t('bonus_s3_ex'),t('bonus_s3_ex2'),t('bonus_s3_ex3'),t('bonus_s3_ex4')], pc));
-  ['\u0625\u0650\u0646\u064e\u0651\u0647\u064f \u0671\u0644\u0644\u064e\u0651\u0647\u064f','\u0671\u0644\u0644\u064e\u0651\u0647\u064f \u0623\u064e\u0643\u0652\u0628\u064e\u0631\u064f','\u0671\u062a\u064e\u0651\u0642\u0650 \u0671\u0644\u0644\u064e\u0647\u064e'].forEach(function(ar){
+  ['\u0625\u0650\u0646\u064e\u0651\u0647\u064f \u0671\u0644\u0644\u064e\u0651\u0647\u064f','\u0671\u0644\u0644\u064e\u0651\u0647\u064f \u0623\u064e\u0643\u0652\u0628\u064e\u0631\u064f','\u0671\u062a\u064e\u0651\u0642\u0650 \u0671\u0644\u0644\u064e\u0651\u0647\u064e'].forEach(function(ar){
     box.appendChild(_mkBonusAr(ar, pc));
   });
 }
@@ -13625,7 +13625,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.3';
+var _VERSION_REPLI='v3.2.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -25980,7 +25980,8 @@ function renderPLesson(ca,s){
   var ill2=document.createElement('div');ill2.className='info-box';ill2.style.marginBottom='12px';
   var ill2title=document.createElement('div');ill2title.innerHTML='<strong>'+t('prolong_illus')+'</strong>';ill2title.style.marginBottom='8px';ill2.appendChild(ill2title);
   ill2.appendChild(mkDiffRow('إِيَاكَ','إِيَّاكَ'));
-  ill2.appendChild(mkDiffRow('أَوَاهٌ','أَوَّاهٌ'));
+  /* v3.2.3 — écrit comme au studio (أَوَاهْ), sinon l'enregistrement n'était pas trouvé */
+  ill2.appendChild(mkDiffRow('أَوَاهْ','أَوَّاهْ'));
   ca.appendChild(ill2);
 
   // Constat (séparé)

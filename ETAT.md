@@ -183,7 +183,18 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.3), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.4), du plus récent au plus ancien :**
+
+- **v3.2.4 (18 octobre) — voix manquantes, préparées.** Relevé du banc
+  (13 langues, chaque page adulte, tous les `onclick`) comparé aux sons en
+  ligne : manquaient les titres arabes du bonus et les trois exemples de
+  « لَفْظُ الْجَلَالَةِ », les deux explications solaire/lunaire (12 langues,
+  ourdou de côté), et les 184 mots des 200 questions. Liste
+  `outils/voix-v323.json`, générateur `outils/voix-v323.js` (Narrateur v4,
+  à lancer CHEZ LE CLIENT, .bat sur son bureau). Corrigés dans le code :
+  « ٱتَّقِ ٱللَّهَ » (la chadda manquait) et أَوَاهْ / أَوَّاهْ écrits comme au
+  studio (le cours affichait أَوَاهٌ : l'enregistrement n'était pas trouvé).
+  `arabe-pour-la-voix.js` garde « سُكُون » comme MOT.
 
 - **v3.2.3 (18 octobre) — demandes du client sur l'interface adulte.** Bloc
   `outils/refonte-v323.html` copié TEL QUEL après celui de la v3.2.2 (il est
