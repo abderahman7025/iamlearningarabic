@@ -183,7 +183,34 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.9), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.10), du plus récent au plus ancien :**
+
+- **v3.1.10 (17 octobre).**
+  * **Récapitulatif 6-11 ans : la lettre du milieu « trop haute » (bā).**
+    MESURÉ au pixel, avec la VRAIE police (voir piège ci-dessous), sur les
+    24 lettres qui ont un récapitulatif. Deux causes, deux corrections :
+    1. `deuxCalques(…)` y était appelé sans interligne, donc en 1,5, alors
+       que `.rec-mot` écrit en 1,35 : la coupe en L tombait 0,075 em trop
+       haut et la MOITIÉ BASSE du trait de liaison restait en couleur. Passé
+       en `deuxCalques(f,coul,LIEN,1.35)` → trait 100 % gris-bleu partout.
+    2. `recaleLesQuatre` remontait milieu et fin de 0,06 em. Avec les calques
+       à l'interligne vrai, 0 pose le trait de liaison EXACTEMENT sur celui
+       des voisines : écart mesuré ≤ 0,004 em pour presque toutes, 0,01 em
+       pour ج ح خ (fin) et ط ظ (milieu) — moins de 2 px. Seule et début
+       gardent leurs −0,03.
+    Méthode : Playwright, polices Google servies EN LOCAL (le bac à sable ne
+    joint pas fonts.googleapis.com — sans cela on mesure une police de
+    REPLI et tout est faux : paquets npm @fontsource/scheherazade-new,
+    outfit, tajawal, routés sur les URL Google). On attend la fin du
+    récapitulatif (spans ET canvas de la coupe par masque à opacité 1), on
+    capture, et on compare le BAS du trait gris-bleu au bas du trait de la
+    voisine juste à sa droite. Le note précédente (« corrigé puis remis en
+    état, je n'ai pas su mesurer ») est donc levée.
+  * Cours adulte : bleu `#0284c7` et vert `#059669` (plus foncés, demandés).
+  * Fleur adulte : transcription baissée de 4 px, en gris-bleu `#90a4ae`,
+    blanche sur le pétale choisi.
+  * Entraînement adulte, « Quelle forme manque » : la bonne forme prend la
+    place du « ؟ » (comme `api.trou` des 6-11 ans) — `question(…, siJuste)`.
 
 - **v3.1.9 (17 octobre).**
   * Formes adultes : le client garde SON bleu (isolée, fin) et SON vert
