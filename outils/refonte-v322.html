@@ -1,0 +1,167 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     NAVIGATION v3.2.2 (17 octobre) — source : outils/refonte-v322.html,
+     copiée TELLE QUELLE dans app/app.html juste après le bloc v3.2.1.
+     Règles validées par le client :
+     1. un seul bouton retour, en haut à gauche ;
+     2. il remonte d'un niveau : menu → rubrique → liste → contenu ;
+     3. il DIT où il mène (« Menu », « Leçons », « Jeux », « Carte »…) ;
+     4. le retour du téléphone fait la même chose ;
+     5. les onglets d'une page ne s'empilent pas ;
+     6. quitter un cours d'enfant entamé se confirme ;
+     7. retour coupe toujours la voix ;
+     8. sur le menu, le retour du téléphone ne fait pas sortir par mégarde.
+     Et : en fin de lettre ou de cours, le bouton du haut ne dit plus
+     « retour » — il annonce la suite et y mène (flèche vers l'avant).
+     Le changement d'interface passe dans le menu du compte (« A »).
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+#root #tb-inter,#root #menu-inter{display:none!important}
+.cp-inter{width:100%;display:flex;align-items:center;gap:12px;border:none;cursor:pointer;margin-top:10px;
+  padding:10px 12px;border-radius:14px;font:700 .95rem Outfit,system-ui,sans-serif;color:#fff;text-align:left;
+  background:linear-gradient(160deg,#a86cf0,#6d2fc4);box-shadow:0 4px 0 #4a1a8e,0 8px 16px rgba(109,47,196,.3)}
+.cp-inter:active{translate:0 3px;box-shadow:0 1px 0 #4a1a8e}
+.cp-inter svg{width:20px;height:20px;flex:none}
+.cp-inter:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+/* le bouton du haut, quand il mène À LA SUITE : flèche vers l'avant, après le texte */
+#root .tb-back.vers-avant{flex-direction:row-reverse;padding:5px 5px 5px 14px!important;
+  animation:avantAppelle 1.6s ease-in-out infinite}
+#root .tb-back.vers-avant .tb-fl{rotate:180deg}
+@keyframes avantAppelle{0%,100%{translate:0 0}50%{translate:4px 0}}
+/* la bulle de confirmation */
+.nav-voile{position:fixed;inset:0;z-index:960;background:rgba(10,8,20,.45);display:grid;place-items:center;
+  padding:16px;animation:navVoile .2s both}
+@keyframes navVoile{from{opacity:0}to{opacity:1}}
+.nav-bulle{width:min(340px,100%);border-radius:26px;padding:22px 18px 18px;text-align:center;
+  font-family:Outfit,system-ui,sans-serif;color:var(--m-titre,#2a1a00);
+  background:linear-gradient(165deg,var(--m-f1,#fffdf7),var(--m-f2,#fff1cf));
+  box-shadow:0 8px 0 var(--m-tranche,#e2bd63),0 24px 48px rgba(0,0,0,.35);
+  animation:cpOuvre .35s cubic-bezier(.34,1.56,.64,1)}
+body.profile-boy .nav-bulle{color:#fff;background:linear-gradient(165deg,#1d4486,#0f2a5c);box-shadow:0 8px 0 #071736,0 24px 48px rgba(0,0,0,.45)}
+body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#fff,#ffe1ef);box-shadow:0 8px 0 #f3a0c8,0 24px 48px rgba(0,0,0,.3)}
+/* quand le bouton du haut annonce la suite, le titre centré s'efface :
+   les deux se chevauchaient */
+#root #topbar:has(.vers-avant) .tb-title{opacity:0}
+#root .tb-back #back-lbl{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-bulle h3{margin:0 0 6px;font-size:1.25rem;font-weight:800}
+.nav-bulle p{margin:0 0 16px;font-size:.92rem;opacity:.8}
+.nav-bulle .nb-rangee{display:flex;gap:10px}
+.nav-bulle button{flex:1;border:none;border-radius:99px;padding:12px;font:800 .95rem Outfit,system-ui,sans-serif;cursor:pointer;
+  transition:translate .12s,box-shadow .12s}
+.nav-bulle .nb-rester{color:#fff;background:linear-gradient(160deg,#18c792,#0a8a62);box-shadow:0 5px 0 #056b4c}
+.nav-bulle .nb-partir{color:#7a1530;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.15),inset 0 0 0 2px rgba(194,33,67,.35)}
+.nav-bulle button:active{translate:0 4px;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.nav-bulle button:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+/* la suite, en bas d'une lettre (adulte) */
+.suite-lettre{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;max-width:520px;margin:18px auto 6px;
+  border:none;border-radius:99px;padding:14px 22px;cursor:pointer;font:800 1.02rem Outfit,system-ui,sans-serif;color:#fff;
+  background:linear-gradient(160deg,#e8a020,#b8860b);box-shadow:0 6px 0 #8a5c00,0 14px 24px rgba(150,95,0,.3),inset 0 2px 0 rgba(255,255,255,.4);
+  transition:translate .12s,box-shadow .12s}
+.suite-lettre b{font-family:'Scheherazade New',serif;font-size:1.7rem;line-height:1;font-weight:700}
+.suite-lettre:active{translate:0 4px;box-shadow:0 2px 0 #8a5c00}
+.suite-lettre .sl-fl{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.25)}
+.suite-lettre:focus-visible{outline:2px solid #2a1a00;outline-offset:3px}
+/* l'écran de fin d'un cours (adulte) */
+.fin-cours-btns{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.fin-cours-btns button{border:none;border-radius:99px;padding:13px 18px;font:800 .98rem Outfit,system-ui,sans-serif;cursor:pointer}
+.fin-cours-btns .fc-suite{color:#2a1a00;background:linear-gradient(160deg,#ffe08a,#f5c842);box-shadow:0 5px 0 #b8860b}
+.fin-cours-btns .fc-liste{color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.fin-cours-btns button:active{translate:0 3px}
+.retour-bulle{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:950;
+  padding:11px 18px;border-radius:99px;font:800 .88rem Outfit,system-ui,sans-serif;color:#fff;
+  background:linear-gradient(160deg,#2a2f3d,#14171f);box-shadow:0 5px 0 #000,0 12px 24px rgba(0,0,0,.3);
+  animation:sonBulle 2.2s both cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:reduce){#root .tb-back.vers-avant,.nav-voile,.nav-bulle{animation:none!important}}
+</style>
+<script>
+(function(){
+  var ECHANGE='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>';
+  var FL='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+  /* ── 6. Quitter un cours entamé : on demande ── */
+  window._demandeQuitterCours=function(partir){
+    var v=document.createElement('div');v.className='nav-voile';
+    v.innerHTML='<div class="nav-bulle" role="dialog" aria-modal="true"><h3>'+te('Quitter le cours ?')+'</h3>'
+      +'<p>'+te('Tu reprendras où tu en étais.')+'</p><div class="nb-rangee">'
+      +'<button type="button" class="nb-rester">'+te('Continuer')+'</button>'
+      +'<button type="button" class="nb-partir">'+te('Quitter')+'</button></div></div>';
+    document.body.appendChild(v);
+    var r=v.querySelector('.nb-rester');try{r.focus();}catch(e){}
+    function ferme(){if(v.parentNode)v.remove();}
+    r.onclick=ferme;
+    v.querySelector('.nb-partir').onclick=function(){ferme();partir();};
+    v.addEventListener('click',function(e){if(e.target===v)ferme();});
+  };
+
+  /* ── 3. Le bouton dit où il mène ── */
+  function libelle(){
+    var b=document.getElementById('tb-back'),l=document.getElementById('back-lbl');
+    if(!b||!l||b._avant)return;
+    if(b._enfant){l.textContent=b._enfant;return;}
+    var p=st&&st._curPage,kid=st&&(st.profile==='girl'||st.profile==='boy'),x;
+    if(st&&st._bonusSubPage)x=t('bonus');
+    else if(p==='memory')x='Memory';
+    else if(p==='memory-list'||p==='puzzle')x=t('minigames');
+    else if(p==='lesson'||p==='child'||p==='exercise')x=kid?te('Carte'):t('sessions');
+    else x=te('Menu');
+    if(x)l.textContent=x;
+  }
+  window._libelleRetour=libelle;
+
+  /* ── Fin de lettre, fin de cours : le bouton du haut annonce la SUITE ── */
+  window._retourVersAvant=function(texte,action){
+    var b=document.getElementById('tb-back'),l=document.getElementById('back-lbl');if(!b||!l)return;
+    if(!b._avant){b._garde={onclick:b.onclick};}
+    b._avant=true;b.classList.add('vers-avant');
+    l.textContent=String(texte||'').replace(/^[▸›‹\s]+|[▸›‹\s]+$/g,'');
+    b.onclick=function(){try{stopSpeech();}catch(e){}action();};
+  };
+  function finAvant(){
+    var b=document.getElementById('tb-back');if(!b||!b._avant)return;
+    if(document.querySelector('#ca [data-fin]'))return;
+    b._avant=false;b.classList.remove('vers-avant');
+    b.onclick=(b._garde&&b._garde.onclick)||handleBack;b._garde=null;
+    libelle();
+  }
+
+  /* ── 8. Le menu ne se quitte pas par mégarde ── */
+  var ecran=null,averti=0;
+  function bulle(txt){
+    var d=document.createElement('div');d.className='retour-bulle';d.textContent=txt;document.body.appendChild(d);
+    setTimeout(function(){if(d.parentNode)d.remove();},2300);
+  }
+  /* Appelée en tête du gestionnaire `popstate` de l'application : renvoie
+     vrai si elle a traité le retour (premier appui sur le menu). */
+  window._gardeMenu=function(e){
+    var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
+    if(!menuOn)return false;
+    var vers=(e.state&&e.state.screen)||'';
+    if(vers==='s-main'||vers==='s-menu'||(e.state&&e.state._appState))return false;
+    if(Date.now()-averti<2500)return false;     /* deuxième appui : on laisse partir */
+    averti=Date.now();
+    try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
+    bulle(te('Appuie encore sur retour pour quitter'));
+    return true;
+  };
+
+  function arme(){
+    var ca=document.getElementById('ca');
+    if(ca&&window.MutationObserver)new MutationObserver(function(){libelle();finAvant();})
+      .observe(ca,{childList:true});
+    libelle();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
+
+  /* ── Le changement d'interface, dans le menu du compte ── */
+  document.addEventListener('click',function(){
+    setTimeout(function(){
+      var pop=document.querySelector('.cp-pop');if(!pop||pop.querySelector('.cp-inter'))return;
+      var b=document.createElement('button');b.type='button';b.className='cp-inter';
+      b.innerHTML=ECHANGE+'<span>'+te("Changer d'interface")+'</span>';
+      b.onclick=function(e){e.stopPropagation();pop.remove();changerInterface();};
+      var s=pop.querySelector('.cp-sortir');pop.insertBefore(b,s);
+    },0);
+  },true);
+
+  window._FL_AVANT=FL;
+})();
+</script>

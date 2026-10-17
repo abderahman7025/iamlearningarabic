@@ -183,7 +183,35 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.1), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.2), du plus récent au plus ancien :**
+
+- **v3.2.2 (17 octobre) — NAVIGATION.** Règles proposées puis VALIDÉES par
+  le client (en tête de `outils/refonte-v322.html`, bloc copié tel quel
+  après celui de la v3.2.1) : un seul retour en haut à gauche, un niveau à
+  la fois, qui DIT où il mène (`_libelleRetour`, rappelé à chaque
+  changement de `#ca`) ; retour du téléphone = même chose ; onglets non
+  empilés ; quitter un cours d'enfant entamé se confirme
+  (`_demandeQuitterCours`, dans `handleBack` pour le 6-11 et
+  `_retourEnfant(vers, libellé)` pour le 3-5) ; sur le menu, premier
+  retour du téléphone → bulle « Appuie encore sur retour pour quitter »
+  (`_gardeMenu`, appelée en tête du `popstate`). Memory : partie → liste
+  (`memory-list`) → Jeux. Boutons « Retour aux jeux » du bas retirés
+  (liste Memory, partie de Puzzle).
+  * **Fin de lettre / de cours : le bouton du haut annonce la SUITE**
+    (`_retourVersAvant(texte, action)`, classe `vers-avant`, flèche vers
+    l'avant, titre centré masqué). Enfants : écrans `api.mission`
+    (« Lettre suivante », carte…). Adulte : bouton « Lettre suivante  ت ›»
+    en bas de chaque lettre sauf la dernière, et fin d'exercice
+    (`_showFinish`) qui attend le choix : « Leçon suivante › » ou « Toutes
+    les leçons ».
+  * Changer d'interface : le bouton violet disparaît ; l'entrée est dans le
+    menu du compte (`.cp-inter`).
+  * Doua : texte dit = basmala en arabe + traduction + « Seigneur… »
+    (`_texteDua`). Générateur prêt : `node outils/voix-doua.js` (textes et
+    clés dans `outils/doua-textes.json`, tirés de l'application ; modèle
+    eleven_v4, sans `pourLaVoix`). À LANCER sur l'ordinateur du client (la
+    clé est dans son `.env.local` ; le bac à sable ne joint ni ElevenLabs
+    ni le site).
 
 - **v3.2.1 (17 octobre).** Bloc `outils/refonte-v321.html`, copié tel quel
   juste après le bloc v3.2.0.

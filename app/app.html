@@ -5484,6 +5484,173 @@ body.age-petit .tuile-jauge>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
 })();
 </script>
+<!-- ════════════════════════════════════════════════════════════════════
+     NAVIGATION v3.2.2 (17 octobre) — source : outils/refonte-v322.html,
+     copiée TELLE QUELLE dans app/app.html juste après le bloc v3.2.1.
+     Règles validées par le client :
+     1. un seul bouton retour, en haut à gauche ;
+     2. il remonte d'un niveau : menu → rubrique → liste → contenu ;
+     3. il DIT où il mène (« Menu », « Leçons », « Jeux », « Carte »…) ;
+     4. le retour du téléphone fait la même chose ;
+     5. les onglets d'une page ne s'empilent pas ;
+     6. quitter un cours d'enfant entamé se confirme ;
+     7. retour coupe toujours la voix ;
+     8. sur le menu, le retour du téléphone ne fait pas sortir par mégarde.
+     Et : en fin de lettre ou de cours, le bouton du haut ne dit plus
+     « retour » — il annonce la suite et y mène (flèche vers l'avant).
+     Le changement d'interface passe dans le menu du compte (« A »).
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+#root #tb-inter,#root #menu-inter{display:none!important}
+.cp-inter{width:100%;display:flex;align-items:center;gap:12px;border:none;cursor:pointer;margin-top:10px;
+  padding:10px 12px;border-radius:14px;font:700 .95rem Outfit,system-ui,sans-serif;color:#fff;text-align:left;
+  background:linear-gradient(160deg,#a86cf0,#6d2fc4);box-shadow:0 4px 0 #4a1a8e,0 8px 16px rgba(109,47,196,.3)}
+.cp-inter:active{translate:0 3px;box-shadow:0 1px 0 #4a1a8e}
+.cp-inter svg{width:20px;height:20px;flex:none}
+.cp-inter:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+/* le bouton du haut, quand il mène À LA SUITE : flèche vers l'avant, après le texte */
+#root .tb-back.vers-avant{flex-direction:row-reverse;padding:5px 5px 5px 14px!important;
+  animation:avantAppelle 1.6s ease-in-out infinite}
+#root .tb-back.vers-avant .tb-fl{rotate:180deg}
+@keyframes avantAppelle{0%,100%{translate:0 0}50%{translate:4px 0}}
+/* la bulle de confirmation */
+.nav-voile{position:fixed;inset:0;z-index:960;background:rgba(10,8,20,.45);display:grid;place-items:center;
+  padding:16px;animation:navVoile .2s both}
+@keyframes navVoile{from{opacity:0}to{opacity:1}}
+.nav-bulle{width:min(340px,100%);border-radius:26px;padding:22px 18px 18px;text-align:center;
+  font-family:Outfit,system-ui,sans-serif;color:var(--m-titre,#2a1a00);
+  background:linear-gradient(165deg,var(--m-f1,#fffdf7),var(--m-f2,#fff1cf));
+  box-shadow:0 8px 0 var(--m-tranche,#e2bd63),0 24px 48px rgba(0,0,0,.35);
+  animation:cpOuvre .35s cubic-bezier(.34,1.56,.64,1)}
+body.profile-boy .nav-bulle{color:#fff;background:linear-gradient(165deg,#1d4486,#0f2a5c);box-shadow:0 8px 0 #071736,0 24px 48px rgba(0,0,0,.45)}
+body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#fff,#ffe1ef);box-shadow:0 8px 0 #f3a0c8,0 24px 48px rgba(0,0,0,.3)}
+/* quand le bouton du haut annonce la suite, le titre centré s'efface :
+   les deux se chevauchaient */
+#root #topbar:has(.vers-avant) .tb-title{opacity:0}
+#root .tb-back #back-lbl{max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-bulle h3{margin:0 0 6px;font-size:1.25rem;font-weight:800}
+.nav-bulle p{margin:0 0 16px;font-size:.92rem;opacity:.8}
+.nav-bulle .nb-rangee{display:flex;gap:10px}
+.nav-bulle button{flex:1;border:none;border-radius:99px;padding:12px;font:800 .95rem Outfit,system-ui,sans-serif;cursor:pointer;
+  transition:translate .12s,box-shadow .12s}
+.nav-bulle .nb-rester{color:#fff;background:linear-gradient(160deg,#18c792,#0a8a62);box-shadow:0 5px 0 #056b4c}
+.nav-bulle .nb-partir{color:#7a1530;background:#fff;box-shadow:0 5px 0 rgba(0,0,0,.15),inset 0 0 0 2px rgba(194,33,67,.35)}
+.nav-bulle button:active{translate:0 4px;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.nav-bulle button:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+/* la suite, en bas d'une lettre (adulte) */
+.suite-lettre{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;max-width:520px;margin:18px auto 6px;
+  border:none;border-radius:99px;padding:14px 22px;cursor:pointer;font:800 1.02rem Outfit,system-ui,sans-serif;color:#fff;
+  background:linear-gradient(160deg,#e8a020,#b8860b);box-shadow:0 6px 0 #8a5c00,0 14px 24px rgba(150,95,0,.3),inset 0 2px 0 rgba(255,255,255,.4);
+  transition:translate .12s,box-shadow .12s}
+.suite-lettre b{font-family:'Scheherazade New',serif;font-size:1.7rem;line-height:1;font-weight:700}
+.suite-lettre:active{translate:0 4px;box-shadow:0 2px 0 #8a5c00}
+.suite-lettre .sl-fl{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.25)}
+.suite-lettre:focus-visible{outline:2px solid #2a1a00;outline-offset:3px}
+/* l'écran de fin d'un cours (adulte) */
+.fin-cours-btns{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.fin-cours-btns button{border:none;border-radius:99px;padding:13px 18px;font:800 .98rem Outfit,system-ui,sans-serif;cursor:pointer}
+.fin-cours-btns .fc-suite{color:#2a1a00;background:linear-gradient(160deg,#ffe08a,#f5c842);box-shadow:0 5px 0 #b8860b}
+.fin-cours-btns .fc-liste{color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.fin-cours-btns button:active{translate:0 3px}
+.retour-bulle{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:950;
+  padding:11px 18px;border-radius:99px;font:800 .88rem Outfit,system-ui,sans-serif;color:#fff;
+  background:linear-gradient(160deg,#2a2f3d,#14171f);box-shadow:0 5px 0 #000,0 12px 24px rgba(0,0,0,.3);
+  animation:sonBulle 2.2s both cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px)}
+@media (prefers-reduced-motion:reduce){#root .tb-back.vers-avant,.nav-voile,.nav-bulle{animation:none!important}}
+</style>
+<script>
+(function(){
+  var ECHANGE='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>';
+  var FL='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+  /* ── 6. Quitter un cours entamé : on demande ── */
+  window._demandeQuitterCours=function(partir){
+    var v=document.createElement('div');v.className='nav-voile';
+    v.innerHTML='<div class="nav-bulle" role="dialog" aria-modal="true"><h3>'+te('Quitter le cours ?')+'</h3>'
+      +'<p>'+te('Tu reprendras où tu en étais.')+'</p><div class="nb-rangee">'
+      +'<button type="button" class="nb-rester">'+te('Continuer')+'</button>'
+      +'<button type="button" class="nb-partir">'+te('Quitter')+'</button></div></div>';
+    document.body.appendChild(v);
+    var r=v.querySelector('.nb-rester');try{r.focus();}catch(e){}
+    function ferme(){if(v.parentNode)v.remove();}
+    r.onclick=ferme;
+    v.querySelector('.nb-partir').onclick=function(){ferme();partir();};
+    v.addEventListener('click',function(e){if(e.target===v)ferme();});
+  };
+
+  /* ── 3. Le bouton dit où il mène ── */
+  function libelle(){
+    var b=document.getElementById('tb-back'),l=document.getElementById('back-lbl');
+    if(!b||!l||b._avant)return;
+    if(b._enfant){l.textContent=b._enfant;return;}
+    var p=st&&st._curPage,kid=st&&(st.profile==='girl'||st.profile==='boy'),x;
+    if(st&&st._bonusSubPage)x=t('bonus');
+    else if(p==='memory')x='Memory';
+    else if(p==='memory-list'||p==='puzzle')x=t('minigames');
+    else if(p==='lesson'||p==='child'||p==='exercise')x=kid?te('Carte'):t('sessions');
+    else x=te('Menu');
+    if(x)l.textContent=x;
+  }
+  window._libelleRetour=libelle;
+
+  /* ── Fin de lettre, fin de cours : le bouton du haut annonce la SUITE ── */
+  window._retourVersAvant=function(texte,action){
+    var b=document.getElementById('tb-back'),l=document.getElementById('back-lbl');if(!b||!l)return;
+    if(!b._avant){b._garde={onclick:b.onclick};}
+    b._avant=true;b.classList.add('vers-avant');
+    l.textContent=String(texte||'').replace(/^[▸›‹\s]+|[▸›‹\s]+$/g,'');
+    b.onclick=function(){try{stopSpeech();}catch(e){}action();};
+  };
+  function finAvant(){
+    var b=document.getElementById('tb-back');if(!b||!b._avant)return;
+    if(document.querySelector('#ca [data-fin]'))return;
+    b._avant=false;b.classList.remove('vers-avant');
+    b.onclick=(b._garde&&b._garde.onclick)||handleBack;b._garde=null;
+    libelle();
+  }
+
+  /* ── 8. Le menu ne se quitte pas par mégarde ── */
+  var ecran=null,averti=0;
+  function bulle(txt){
+    var d=document.createElement('div');d.className='retour-bulle';d.textContent=txt;document.body.appendChild(d);
+    setTimeout(function(){if(d.parentNode)d.remove();},2300);
+  }
+  /* Appelée en tête du gestionnaire `popstate` de l'application : renvoie
+     vrai si elle a traité le retour (premier appui sur le menu). */
+  window._gardeMenu=function(e){
+    var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
+    if(!menuOn)return false;
+    var vers=(e.state&&e.state.screen)||'';
+    if(vers==='s-main'||vers==='s-menu'||(e.state&&e.state._appState))return false;
+    if(Date.now()-averti<2500)return false;     /* deuxième appui : on laisse partir */
+    averti=Date.now();
+    try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
+    bulle(te('Appuie encore sur retour pour quitter'));
+    return true;
+  };
+
+  function arme(){
+    var ca=document.getElementById('ca');
+    if(ca&&window.MutationObserver)new MutationObserver(function(){libelle();finAvant();})
+      .observe(ca,{childList:true});
+    libelle();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
+
+  /* ── Le changement d'interface, dans le menu du compte ── */
+  document.addEventListener('click',function(){
+    setTimeout(function(){
+      var pop=document.querySelector('.cp-pop');if(!pop||pop.querySelector('.cp-inter'))return;
+      var b=document.createElement('button');b.type='button';b.className='cp-inter';
+      b.innerHTML=ECHANGE+'<span>'+te("Changer d'interface")+'</span>';
+      b.onclick=function(e){e.stopPropagation();pop.remove();changerInterface();};
+      var s=pop.querySelector('.cp-sortir');pop.insertBefore(b,s);
+    },0);
+  },true);
+
+  window._FL_AVANT=FL;
+})();
+</script>
 
 
   <!-- SEO multilingue -->
@@ -7558,6 +7725,8 @@ function showS(id,fwd,noHistory){
   }
 }
 window.addEventListener('popstate',function(e){
+  /* v3.2.2 : sur le menu, le premier retour du téléphone ne fait pas sortir. */
+  if(window._gardeMenu&&_gardeMenu(e))return;
   var path=window.location.pathname;
   var hash=(e.state&&e.state.hash)||'';
   /* Retour vers le menu principal (/fille/accueil) */
@@ -8620,7 +8789,7 @@ function renderPage(page,fwd){
 /* ── Hiérarchie de navigation : page → page mère ── */
 function _navParent(page){
   var TO_SESSIONS=['child','lesson','exercise'];
-  var TO_MINIGAMES=['memory','puzzle'];
+  var TO_MINIGAMES=['memory','memory-list','puzzle'];
   var TO_MENU=['intro','sessions','sessions-map','exercises','minigames',
                'progress','settings','bonus','contact'];
   if(TO_SESSIONS.indexOf(page)>=0)return 'sessions';
@@ -8630,7 +8799,15 @@ function _navParent(page){
 }
 
 function handleBack(){
+  /* v3.2.2 — quitter un cours entamé (6-11 ans) se confirme. */
+  if(!handleBack._ok&&st&&st._curPage==='child'&&document.querySelector('#ca .boy-wrap')
+     &&!document.querySelector('#ca [data-fin]')){
+    _demandeQuitterCours(function(){handleBack._ok=true;try{handleBack();}finally{handleBack._ok=false;}});
+    return;
+  }
   stopSpeech();
+  /* v3.2.2 — une partie de Memory ramène à la liste des jeux de Memory. */
+  if(st&&st._curPage==='memory'&&typeof renderMemoryGame==='function'){renderMemoryGame(document.getElementById('ca'));return;}
   var _stbR=document.getElementById('topbar');
   if(_stbR){_stbR.style.maxHeight='200px';_stbR.style.opacity='1';_stbR.style.transform='translateY(0)';_stbR.style.pointerEvents='';}
   /* Sous-page bonus */
@@ -9041,7 +9218,10 @@ function _runQueue(){
    textes adultes), avec lecture / pause / reprise. Avant, speakQueue la
    confiait à la voix du navigateur. */
 function _texteDua(){
-  return t('intro_dua')+'. '+t('intro_dua2')+'. '+t('intro_dua_tr')+' '+t('intro_dua_tr2');
+  /* Le client (17 oct.) : la basmala en ARABE, puis sa traduction, puis
+     « Seigneur, accroîs mes connaissances ». La clé de l'enregistrement est
+     ce texte exact, langue par langue (voir outils/voix-doua.js). */
+  return t('intro_dua')+'. '+t('intro_dua_tr')+' '+t('intro_dua_tr2');
 }
 function renderIntro(ca){
   ca.innerHTML=`
@@ -11237,12 +11417,20 @@ function _ilesDefs(){
    est leur racine, ils n'ont pas de menu. Chaque écran dit donc lui-même où
    il ramène : la carte le cache, le choix de la lettre et les manches le
    montrent, avec leur destination. */
-function _retourEnfant(vers){
+function _retourEnfant(vers,libelle){
   var b=document.getElementById('tb-back');if(!b)return;
-  if(!vers){b.style.display='none';b.onclick=handleBack;return;}
+  b._avant=false;b.classList.remove('vers-avant');
+  if(!vers){b._enfant=null;b.style.display='none';b.onclick=handleBack;return;}
   b.style.display='flex';
-  var l=document.getElementById('back-lbl');if(l)l.textContent=te('Retour');
-  b.onclick=function(){try{stopSpeech();}catch(e){}vers();};
+  /* v3.2.2 — le bouton dit OÙ il mène. */
+  b._enfant=libelle||te('Retour');
+  var l=document.getElementById('back-lbl');if(l)l.textContent=b._enfant;
+  b.onclick=function(){
+    function part(){try{stopSpeech();}catch(e){}vers();}
+    /* Dans une manche ou un cours entamé, on demande d'abord. */
+    if(document.querySelector('#ca .boy-wrap')&&!document.querySelector('#ca [data-fin]'))_demandeQuitterCours(part);
+    else part();
+  };
 }
 
 function renderTuilesAnimaux(ca){
@@ -11261,7 +11449,7 @@ function renderTuilesAnimaux(ca){
   _retourEnfant(function(){
     document.body.classList.add('choix-age');
     showS('s-age',true);
-  });
+  },te('Parcours'));
   try{var _sv=JSON.parse(localStorage.getItem('arab_scores')||'{}');
       Object.keys(_sv).forEach(function(k){if(st.scores[k]===undefined)st.scores[k]=_sv[k];});}catch(e){}
   try{var _av=JSON.parse(localStorage.getItem('arab_acc')||'{}');
@@ -12293,6 +12481,7 @@ function renderMemoryGame(ca){
 }
 function renderMemoryDeckList(ca,decks){
   ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='64px';ca.style.overflowY='';
+  st._curPage='memory-list';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
   wrap.className='mg-list-wrap';
@@ -12310,10 +12499,8 @@ function renderMemoryDeckList(ca,decks){
     wrap.appendChild(card);
     setTimeout(function(){requestAnimationFrame(function(){card.style.transition='opacity .25s ease-out, transform .25s ease-out';card.style.opacity='1';card.style.transform='translateX(0)';});},di*120+80);
   });
-  var backBtn=document.createElement('button');backBtn.className='rbtn rbtn-m';backBtn.style.marginTop='8px';
-  backBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेलों पर वापस'}[st.lang]||'Retour aux Jeux'));
-  backBtn.onclick=function(){renderMiniGames(ca);};
-  wrap.appendChild(backBtn);ca.appendChild(wrap);
+  /* v3.2.2 : un seul bouton retour, en haut. */
+  ca.appendChild(wrap);
 }
 function renderMemoryPlay(ca,deck){
   ca.innerHTML='';st._curPage='memory';_navPush('minigames/memory');
@@ -12569,12 +12756,7 @@ function renderPuzzleGame(ca){
     });
     gameCard.appendChild(choicesRow);
 
-    // Bouton passer
-    var quitPzBtn=document.createElement('button');
-    quitPzBtn.className='rbtn rbtn-m';quitPzBtn.style.cssText='display:block;margin:14px auto 0';
-    quitPzBtn.textContent='‹ '+(({'fr':'Retour aux Jeux','en':'Back to Games','es':'Volver a Juegos','de':'Zurück zu Spielen','nl':'Terug naar Spellen','it':'Torna ai Giochi','pt':'Voltar aos Jogos','ru':'К Играм','tr':'Oyunlara Dön','zh':'返回游戏','id':'Kembali ke Permainan','ur':'کھیلوں پر واپس','hi':'खेلों पर वापस'}[st.lang]||'Retour aux Jeux'));
-    quitPzBtn.onclick=function(){renderMiniGames(ca);};
-    gameCard.appendChild(quitPzBtn);
+    /* v3.2.2 : un seul bouton retour, en haut. */
     wrap.appendChild(gameCard);
   }
 
@@ -12894,7 +13076,7 @@ function _boyLettreFinie(session,idx){
    grand — et rien d'écrit qu'un enfant devrait lire. */
 function _boyLetterPickerJeu(ca,session){
   _boySession=session;
-  _retourEnfant(function(){renderSessionsMap(ca);});
+  _retourEnfant(function(){renderSessionsMap(ca);},te('Carte'));
   ca.innerHTML='';ca.style.cssText='';ca.style.paddingTop='64px';
   st._curPage='child';
   _HAB=_habDuProfil();_fondEnfant(true);_decorMonde(ca,false);
@@ -13066,7 +13248,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.1';
+var _VERSION_REPLI='v3.2.2';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16419,6 +16601,19 @@ function _decorMonde(ca,actif){
    couleur dans la phrase aurait obligé à la retraduire treize fois. */
 /* DEBUT TRADUCTIONS ENFANT */
 var _TE={
+'Menu':{en:'Menu',es:'Menú',de:'Menü',nl:'Menu',it:'Menu',pt:'Menu',ru:'Меню',tr:'Menü',zh:'菜单',id:'Menu',ur:'مینو',hi:'मेनू'},
+'Carte':{en:'Map',es:'Mapa',de:'Karte',nl:'Kaart',it:'Mappa',pt:'Mapa',ru:'Карта',tr:'Harita',zh:'地图',id:'Peta',ur:'نقشہ',hi:'नक्शा'},
+'Lettres':{en:'Letters',es:'Letras',de:'Buchstaben',nl:'Letters',it:'Lettere',pt:'Letras',ru:'Буквы',tr:'Harfler',zh:'字母',id:'Huruf',ur:'حروف',hi:'अक्षर'},
+'Parcours':{en:'Path',es:'Recorrido',de:'Weg',nl:'Route',it:'Percorso',pt:'Percurso',ru:'Маршрут',tr:'Yol',zh:'路线',id:'Jalur',ur:'راستہ',hi:'रास्ता'},
+'Lettre suivante':{en:'Next letter',es:'Letra siguiente',de:'Nächster Buchstabe',nl:'Volgende letter',it:'Lettera successiva',pt:'Letra seguinte',ru:'Следующая буква',tr:'Sonraki harf',zh:'下一个字母',id:'Huruf berikutnya',ur:'اگلا حرف',hi:'अगला अक्षर'},
+'Leçon suivante':{en:'Next lesson',es:'Lección siguiente',de:'Nächste Lektion',nl:'Volgende les',it:'Lezione successiva',pt:'Lição seguinte',ru:'Следующий урок',tr:'Sonraki ders',zh:'下一课',id:'Pelajaran berikutnya',ur:'اگلا سبق',hi:'अगला पाठ'},
+'Toutes les leçons':{en:'All lessons',es:'Todas las lecciones',de:'Alle Lektionen',nl:'Alle lessen',it:'Tutte le lezioni',pt:'Todas as lições',ru:'Все уроки',tr:'Tüm dersler',zh:'所有课程',id:'Semua pelajaran',ur:'تمام اسباق',hi:'सभी पाठ'},
+'Quitter le cours ?':{en:'Leave the lesson?',es:'¿Salir de la lección?',de:'Lektion verlassen?',nl:'Les verlaten?',it:'Uscire dalla lezione?',pt:'Sair da lição?',ru:'Выйти из урока?',tr:'Dersten çıkılsın mı?',zh:'离开这节课？',id:'Keluar dari pelajaran?',ur:'سبق چھوڑیں؟',hi:'पाठ छोड़ें?'},
+'Tu reprendras où tu en étais.':{en:'You will pick up where you left off.',es:'Seguirás donde lo dejaste.',de:'Du machst später dort weiter.',nl:'Je gaat later verder waar je was.',it:'Riprenderai da dove eri.',pt:'Vais continuar de onde paraste.',ru:'Ты продолжишь с того же места.',tr:'Kaldığın yerden devam edeceksin.',zh:'下次从这里继续。',id:'Kamu akan melanjutkan dari sini.',ur:'آپ وہیں سے دوبارہ شروع کریں گے۔',hi:'तुम वहीं से फिर शुरू करोगे।'},
+'Continuer':{en:'Keep going',es:'Continuar',de:'Weitermachen',nl:'Doorgaan',it:'Continua',pt:'Continuar',ru:'Продолжить',tr:'Devam et',zh:'继续',id:'Lanjutkan',ur:'جاری رکھیں',hi:'जारी रखें'},
+'Quitter':{en:'Leave',es:'Salir',de:'Verlassen',nl:'Verlaten',it:'Esci',pt:'Sair',ru:'Выйти',tr:'Çık',zh:'离开',id:'Keluar',ur:'چھوڑیں',hi:'छोड़ें'},
+'Appuie encore sur retour pour quitter':{en:'Press back again to leave',es:'Pulsa atrás otra vez para salir',de:'Nochmal zurück drücken zum Verlassen',nl:'Druk nogmaals op terug om te verlaten',it:'Premi di nuovo indietro per uscire',pt:'Prima voltar outra vez para sair',ru:'Нажмите «назад» ещё раз, чтобы выйти',tr:'Çıkmak için tekrar geri bas',zh:'再按一次返回即可离开',id:'Tekan kembali sekali lagi untuk keluar',ur:'باہر جانے کے لیے دوبارہ واپس دبائیں',hi:'छोड़ने के लिए फिर से वापस दबाएँ'},
+"Changer d'interface":{en:'Change interface',es:'Cambiar de interfaz',de:'Oberfläche wechseln',nl:'Interface wisselen',it:'Cambia interfaccia',pt:'Mudar de interface',ru:'Сменить интерфейс',tr:'Arayüzü değiştir',zh:'切换界面',id:'Ganti tampilan',ur:'انٹرفیس بدلیں',hi:'इंटरफ़ेस बदलें'},
 'Son activé':{en:'Sound on',es:'Sonido activado',de:'Ton an',nl:'Geluid aan',it:'Audio attivo',pt:'Som ligado',ru:'Звук включён',tr:'Ses açık',zh:'声音已开启',id:'Suara aktif',ur:'آواز آن',hi:'ध्वनि चालू'},
 'Son coupé':{en:'Sound off',es:'Sonido desactivado',de:'Ton aus',nl:'Geluid uit',it:'Audio disattivato',pt:'Som desligado',ru:'Звук выключен',tr:'Ses kapalı',zh:'声音已关闭',id:'Suara mati',ur:'آواز بند',hi:'ध्वनि बंद'},
 'Son activé — touche pour couper':{en:'Sound on — tap to mute',es:'Sonido activado — toca para silenciar',de:'Ton an — tippen zum Stummschalten',nl:'Geluid aan — tik om te dempen',it:'Audio attivo — tocca per disattivare',pt:'Som ligado — toque para silenciar',ru:'Звук включён — нажмите, чтобы выключить',tr:'Ses açık — kapatmak için dokun',zh:'声音已开启 — 点按静音',id:'Suara aktif — ketuk untuk membisukan',ur:'آواز آن — بند کرنے کے لیے چھوئیں',hi:'ध्वनि चालू — बंद करने के लिए छुएँ'},
@@ -20791,6 +20986,9 @@ function _boyScene(ca,reprise){
       /* Le texte se pose ENTRE les deux montures. */
       titre(creux,_bravoPuisPhrases(html),fr);
       bouton(p,label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});
+      /* v3.2.2 — en fin de lettre / de cours, le bouton du haut annonce la
+         suite au lieu de dire « retour ». */
+      try{if(window._retourVersAvant)_retourVersAvant(label||_HAB.retour,onRetour||function(){renderSessionsMap(ca);});}catch(e){}
     };
   };
 
@@ -23481,7 +23679,7 @@ function _fondDuMonde(){
 function _boyLetterJeu(ca,idx,premiere){
   /* Dans un cours, le retour ramene au choix de la lettre. */
   _retourEnfant(function(){
-    if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);});
+    if(_boySession)_boyLetterPicker(ca,_boySession);else renderSessionsMap(ca);},te('Lettres'));
   var L=CHILD_LETTERS[idx];
   var A=L.ar;
   _LETTRE_COURS=A;               /* c'est elle qui donne le décor des manches */
@@ -23556,7 +23754,7 @@ function _boyLetterJeu(ca,idx,premiere){
    on finit par les reconnaître à l'oreille. */
 function _boyVowelJeu(ca){
   /* Le cours des voyelles n'a pas de choix de lettre : on rend la carte. */
-  _retourEnfant(function(){renderSessionsMap(ca);});
+  _retourEnfant(function(){renderSessionsMap(ca);},te('Carte'));
   var B=_boyScene(ca,{cours:'voyelles',session:_boySession&&_boySession.id});
   var bete=_beteEtape();
   /* Le WAW et non le bā : chez les petits, les voyelles arrivent APRES alif,
@@ -25116,6 +25314,20 @@ function _showFinish(pct,ca){
     +'<div style="font-size:1.4rem;font-weight:900;color:'+(isOK?'#f5c842':'#fff')+';margin-bottom:8px">'+(isOK?(okMsg[L]||okMsg.fr):(koMsg[L]||koMsg.fr))+'</div>'
     +'<div style="font-size:1rem;color:rgba(255,255,255,.7)">'+Math.round(pct*100)+'%</div>';
   ov.appendChild(bx);document.body.appendChild(ov);
+  /* v3.2.2 — ADULTE : le cours fini, on dit où l'on va. La leçon suivante,
+     ou la liste ; l'écran attend le choix au lieu de repartir tout seul. */
+  if(st.profile!=='girl'&&st.profile!=='boy'){
+    var _i=ALL_S.indexOf(st.curLesson),_suite=(_i>=0&&_i<ALL_S.length-1)?ALL_S[_i+1]:null;
+    var _bt=document.createElement('div');_bt.className='fin-cours-btns';
+    if(_suite){var _b1=document.createElement('button');_b1.className='fc-suite';
+      _b1.textContent=te('Leçon suivante')+' ›';
+      _b1.onclick=function(){ov.remove();st._curPage='sessions';openLesson(_suite);};_bt.appendChild(_b1);}
+    var _b2=document.createElement('button');_b2.className='fc-liste';_b2.textContent=te('Toutes les leçons');
+    _b2.onclick=function(){ov.remove();st._curPage='sessions';renderSessions(ca);};_bt.appendChild(_b2);
+    bx.appendChild(_bt);
+    try{if(window._retourVersAvant&&_suite)_retourVersAvant(te('Leçon suivante'),function(){ov.remove();openLesson(_suite);});}catch(e){}
+    return;
+  }
   setTimeout(function(){ov.style.transition='opacity .5s';ov.style.opacity='0';setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov);
       /* CHACUN CHEZ SOI. La carte des mondes appartient aux interfaces
          enfant : un adulte qui finissait un cours se retrouvait devant les
@@ -25852,6 +26064,14 @@ function renderLLesson(ca,s,idx){
   /* L'entrainement, apres l'ecriture : on s'exerce sur ce qu'on vient
      d'apprendre, pas avant. */
   try{_entrainementAdulte(ca,s,idx);}catch(e){}
+  /* v3.2.2 — la suite, dite en clair : la lettre d'après dans ce cours. */
+  if(s.letters&&idx<s.letters.length-1){
+    var _nx=s.letters[idx+1],_sb=document.createElement('button');
+    _sb.type='button';_sb.className='suite-lettre';
+    _sb.innerHTML='<span>'+te('Lettre suivante')+'</span><b>'+(_nx.ar||'')+'</b><span class="sl-fl">'+(window._FL_AVANT||'›')+'</span>';
+    _sb.onclick=function(){ca.scrollTop=0;renderLLesson(ca,s,idx+1);};
+    ca.appendChild(_sb);
+  }
   ca.appendChild(mkFAB(s));
   // Audio automatique 1.5s après arrivée sur la page
   setTimeout(()=>{speak(letter.iso||letter.ar,.78);},500);
