@@ -5255,6 +5255,235 @@ body.age-petit .tuile-jauge>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
 })();
 </script>
+<!-- ════════════════════════════════════════════════════════════════════
+     REFONTE v3.2.1 (17 octobre) — source : outils/refonte-v321.html,
+     copiée TELLE QUELLE dans app/app.html juste après le bloc v3.2.0.
+     1. Les derniers cadres gris-noir de l'adulte en ivoire et or (la ligne
+        d'écriture des voyelles, les cartes de quiz, tout fond sombre posé
+        en ligne).
+     2. Le bouton du son : un haut-parleur 3D (barré quand c'est coupé) et
+        un petit message à chaque appui — le point qui clignotait ne disait
+        rien.
+     3. Les Jeux (6-11 ans) au style du menu ; le Memory et le Puzzle en 3D.
+     4. Les boutons : retour, changer d'interface, cartes d'interface et
+        d'âge, boutons « Retour aux jeux ».
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* ══ 1. PLUS DE CADRE SOMBRE CHEZ L'ADULTE ══ */
+#root.profile-adult #ca .vline-section,
+#root.profile-adult #ca .qz-q,
+#root.profile-adult #ca [style*="rgba(10,7,24"],
+#root.profile-adult #ca [style*="rgba(10, 7, 24"]{
+  background:linear-gradient(160deg,#fffdf7 0%,#fff3d6 100%)!important;
+  border:1px solid rgba(184,134,11,.3)!important;backdrop-filter:none!important;
+  box-shadow:0 6px 0 #e2bd63,0 16px 30px rgba(150,95,0,.16),inset 0 2px 0 #fff!important;
+  --txt:#2a1a00;--txt2:#7a5a20;--txt3:#b08a50;color:#2a1a00}
+#root.profile-adult #ca .vline-section{border-radius:24px!important}
+#root.profile-adult #ca .wline-lbl{color:#8a5c00!important}
+#root.profile-adult #ca .wline{background:linear-gradient(90deg,transparent,#c99316,transparent)!important;height:3px}
+#root.profile-adult #ca .qz-q::before{display:none!important}
+#root.profile-adult #ca .q-big{-webkit-text-fill-color:#8a5c00!important;background:none!important;color:#8a5c00!important}
+
+/* ══ 2. LE BOUTON DU SON ══ */
+#root .sound-dot{position:relative;width:36px!important;height:36px!important;border-radius:50%!important;cursor:pointer;
+  flex:none;animation:none!important;
+  background:radial-gradient(circle at 30% 24%,var(--sg1) 0%,var(--sg2) 50%,var(--sg3) 100%)!important;
+  box-shadow:0 4px 0 var(--sg3),0 8px 14px rgba(0,0,0,.22),inset 0 2px 3px rgba(255,255,255,.55)!important;
+  --sg1:#fff0b8;--sg2:#e6a817;--sg3:#9a6700;transition:translate .12s,box-shadow .12s}
+#root.profile-girl .sound-dot{--sg1:#ffd0ef;--sg2:#ec4899;--sg3:#93164f}
+#root.profile-boy .sound-dot{--sg1:#bfe3ff;--sg2:#2b8be8;--sg3:#0d3f8f}
+#root .sound-dot::before{content:'';position:absolute;inset:7px;background:#fff;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%23000'/%3E%3Cpath d='M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%23000'/%3E%3Cpath d='M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+#root .sound-dot.off{--sg1:#e8e8ec;--sg2:#9ca3af;--sg3:#5b616e}
+#root .sound-dot.off::before{
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%23000'/%3E%3Cpath d='M16 9l6 6M22 9l-6 6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%23000'/%3E%3Cpath d='M16 9l6 6M22 9l-6 6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+#root .sound-dot:active{translate:0 3px;box-shadow:0 1px 0 var(--sg3)!important}
+#root .sound-dot:focus-visible{outline:2px solid var(--sg2);outline-offset:3px}
+.son-bulle{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top,0px));translate:-50% 0;z-index:950;
+  display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;font:800 .9rem Outfit,system-ui,sans-serif;
+  color:#fff;background:linear-gradient(160deg,#2a2f3d,#14171f);box-shadow:0 5px 0 #000,0 12px 24px rgba(0,0,0,.3);
+  animation:sonBulle 1.8s both cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+@keyframes sonBulle{0%{opacity:0;scale:.6}12%{opacity:1;scale:1}80%{opacity:1;scale:1}100%{opacity:0;scale:.9}}
+
+/* ══ 3. LES JEUX ══ */
+#root .mg-list-wrap{display:flex;flex-direction:column;gap:16px!important;perspective:1000px;padding-left:16px;padding-right:16px}
+#root .mg-list-wrap .nav-card{position:relative;overflow:visible!important;min-height:86px;gap:14px!important;
+  padding:12px 14px 12px 12px!important;border-radius:24px!important;
+  background:linear-gradient(165deg,var(--m-f1) 0%,var(--m-f2) 100%)!important;
+  border:1px solid var(--m-bord)!important;backdrop-filter:none!important;
+  box-shadow:0 7px 0 var(--m-tranche),0 18px 30px var(--m-ombre),inset 0 2px 0 rgba(255,255,255,.75)!important}
+#root.profile-boy .mg-list-wrap .nav-card{box-shadow:0 7px 0 var(--m-tranche),0 18px 30px var(--m-ombre),inset 0 1px 0 rgba(140,210,255,.55),0 0 22px rgba(56,189,248,.18)!important}
+#root .mg-list-wrap .nav-card::before,#root .mg-list-wrap .nav-card-shimmer{display:none!important}
+#root .mg-list-wrap .nav-card:active{translate:0 5px}
+#root .mg-list-wrap .nav-title{font-size:1.08rem!important;font-weight:800!important;color:var(--m-titre)!important;
+  -webkit-text-fill-color:var(--m-titre)!important;background:none!important}
+#root .mg-list-wrap .nav-desc{color:var(--m-desc)!important}
+#root .mg-list-wrap .nav-icon{position:relative;flex:none;width:60px!important;height:60px!important;min-width:60px!important;
+  border-radius:19px!important;border:none!important;display:grid!important;place-items:center;overflow:hidden;
+  background:radial-gradient(circle at 30% 22%,var(--g1,#fff0b8) 0%,var(--g2,#e6a817) 46%,var(--g3,#9a6700) 100%)!important;
+  box-shadow:0 6px 0 var(--g3,#9a6700),0 12px 18px rgba(0,0,0,.22),inset 0 3px 4px rgba(255,255,255,.55)!important;
+  rotate:-6deg;animation:gemFlotte 3.6s ease-in-out infinite}
+#root .mg-list-wrap .nav-icon svg{width:32px;height:32px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
+#root .mg-list-wrap .nav-icon img{border-radius:16px!important;box-shadow:inset 0 0 0 3px #fff}
+#root .mg-list-wrap .nav-card[data-jeu="memory"]{--g1:#c4f1ff;--g2:#06b6d4;--g3:#0e6f86}
+#root .mg-list-wrap .nav-card[data-jeu="puzzle"]{--g1:#b9f5d5;--g2:#13b886;--g3:#056b4c}
+#root .mg-list-wrap .nav-card[data-jeu="carte"]{--g1:#ffe0b8;--g2:#f97316;--g3:#a83a07}
+#root .mg-list-wrap .nav-card[data-jeu="deck"]{--g1:#fff;--g2:#fff;--g3:var(--m-tranche)}
+#root .mg-list-wrap .nav-arrow{width:30px;height:30px;flex:none;border-radius:50%;display:grid!important;place-items:center;
+  font-size:1.2rem!important;font-weight:800;color:#fff!important;-webkit-text-fill-color:#fff!important;padding-bottom:2px;
+  background:linear-gradient(160deg,var(--g2,#e6a817),var(--g3,#9a6700))!important;box-shadow:0 3px 0 var(--g3,#9a6700)!important}
+#root .mg-list-wrap .nav-card[data-jeu="deck"] .nav-arrow{background:linear-gradient(160deg,var(--m-tranche),var(--m-titre))!important;box-shadow:none!important}
+/* les boutons ronds du bas (« Retour aux jeux », « Carte ») */
+#root #ca .rbtn-m{border-radius:99px!important;border:none!important;font-weight:800!important;
+  box-shadow:0 5px 0 rgba(0,0,0,.22),0 10px 18px rgba(0,0,0,.16),inset 0 2px 0 rgba(255,255,255,.35)!important;
+  transition:translate .12s,box-shadow .12s!important}
+#root #ca .rbtn-m:active{translate:0 4px;box-shadow:0 1px 0 rgba(0,0,0,.22)!important}
+
+/* — Memory — */
+#root .mem-grid{gap:9px!important;perspective:900px}
+#root .mem-card{border-radius:16px!important;animation:memDonne .55s both cubic-bezier(.34,1.56,.64,1)}
+#root .mem-card-front,#root .mem-card-back{border-radius:16px!important;
+  box-shadow:0 5px 0 var(--m-tranche),0 10px 16px var(--m-ombre)!important;border:3px solid #fff!important}
+#root.profile-boy .mem-card-front,#root.profile-boy .mem-card-back{border-color:rgba(140,210,255,.7)!important}
+#root .mem-card-back{background:linear-gradient(165deg,var(--m-f1),var(--m-f2))!important;color:var(--m-titre)!important}
+#root .mem-card:not(.matched):not(.flipped):hover .mem-card-inner{translate:0 -4px}
+#root .mem-card.matched .mem-card-back{opacity:1!important;box-shadow:0 0 0 3px #22c55e,0 5px 0 #15803d,0 0 22px rgba(34,197,94,.45)!important;
+  animation:memGagne .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes memGagne{0%{scale:1}40%{scale:1.12}100%{scale:1}}
+@keyframes memDonne{from{opacity:0;translate:0 -60px;rotate:-12deg;scale:.6}to{opacity:1;translate:0 0;rotate:0deg;scale:1}}
+#root .mem-card:nth-child(2){animation-delay:.05s}#root .mem-card:nth-child(3){animation-delay:.1s}
+#root .mem-card:nth-child(4){animation-delay:.15s}#root .mem-card:nth-child(5){animation-delay:.2s}
+#root .mem-card:nth-child(6){animation-delay:.25s}#root .mem-card:nth-child(7){animation-delay:.3s}
+#root .mem-card:nth-child(8){animation-delay:.35s}#root .mem-card:nth-child(9){animation-delay:.4s}
+#root .mem-card:nth-child(10){animation-delay:.45s}#root .mem-card:nth-child(11){animation-delay:.5s}
+#root .mem-card:nth-child(12){animation-delay:.55s}#root .mem-card:nth-child(n+13){animation-delay:.6s}
+#root .mem-score,#root .mem-timer{padding:5px 14px!important;border-radius:99px!important;font-weight:800!important;
+  color:var(--m-titre)!important;background:linear-gradient(165deg,var(--m-f1),var(--m-f2))!important;
+  box-shadow:0 3px 0 var(--m-tranche),0 6px 10px var(--m-ombre)!important;font-variant-numeric:tabular-nums}
+
+/* — Puzzle — */
+#root .puzzle-card{border-radius:30px!important;backdrop-filter:none!important;
+  background:linear-gradient(165deg,var(--m-f1),var(--m-f2))!important;border:1px solid var(--m-bord)!important;
+  box-shadow:0 8px 0 var(--m-tranche),0 22px 40px var(--m-ombre),inset 0 2px 0 rgba(255,255,255,.7)!important;
+  color:var(--m-titre);animation:exCarte .7s both cubic-bezier(.34,1.56,.64,1)}
+#root .puzzle-score-row{color:var(--m-titre)!important}
+#root .puzzle-audio-btn{width:84px!important;height:84px!important;border:none!important;font-size:2rem;
+  background:radial-gradient(circle at 30% 24%,#fff0b8 0%,#e6a817 50%,#9a6700 100%)!important;
+  box-shadow:0 6px 0 #7a5200,0 14px 22px rgba(150,95,0,.35),inset 0 3px 5px rgba(255,255,255,.6)!important;
+  animation:puzPulse 2.2s ease-in-out infinite}
+#root .puzzle-audio-btn:active{translate:0 4px;box-shadow:0 2px 0 #7a5200!important}
+@keyframes puzPulse{0%,100%{scale:1}50%{scale:1.06}}
+#root .puzzle-blank{border-radius:14px!important;border:none!important;font-size:1.8rem;
+  background:rgba(0,0,0,.06)!important;box-shadow:inset 0 3px 6px rgba(0,0,0,.18),inset 0 -1px 0 rgba(255,255,255,.6)!important}
+#root.profile-boy .puzzle-blank{background:rgba(0,0,0,.25)!important}
+#root .puzzle-blank.filled{background:linear-gradient(165deg,#fff,#fff3d6)!important;color:#2a1a00!important;
+  box-shadow:0 4px 0 #e2bd63,0 6px 10px rgba(0,0,0,.15)!important;animation:puzPose .35s cubic-bezier(.34,1.56,.64,1)}
+#root .puzzle-blank.correct{background:linear-gradient(165deg,#dcfce7,#86efac)!important;color:#14532d!important;box-shadow:0 4px 0 #16a34a!important}
+#root .puzzle-blank.wrong{background:linear-gradient(165deg,#fee2e2,#fca5a5)!important;color:#7f1d1d!important;box-shadow:0 4px 0 #dc2626!important}
+@keyframes puzPose{from{scale:.5}to{scale:1}}
+#root .puzzle-choice{border-radius:16px!important;border:none!important;font-size:1.8rem;color:var(--m-titre)!important;
+  background:linear-gradient(165deg,#ffffff,var(--m-f2))!important;
+  box-shadow:0 6px 0 var(--m-tranche),0 10px 16px var(--m-ombre),inset 0 2px 0 #fff!important;
+  transition:translate .12s,box-shadow .12s!important;animation:memDonne .5s both cubic-bezier(.34,1.56,.64,1)}
+#root.profile-boy .puzzle-choice{background:linear-gradient(165deg,#2a5aa8,#163a78)!important;color:#fff!important;
+  box-shadow:0 6px 0 #071736,0 10px 16px rgba(0,0,0,.4),inset 0 1px 0 rgba(140,210,255,.6)!important}
+#root .puzzle-choice:active{translate:0 5px;box-shadow:0 1px 0 var(--m-tranche)!important}
+#root .puzzle-choice:nth-child(2){animation-delay:.07s}#root .puzzle-choice:nth-child(3){animation-delay:.14s}
+#root .puzzle-choice:nth-child(4){animation-delay:.21s}#root .puzzle-choice:nth-child(n+5){animation-delay:.28s}
+#root .puzzle-hint{color:var(--m-desc)!important}
+
+/* ══ 4. LES BOUTONS ══ */
+/* retour : une pilule en relief, flèche dans une pastille ronde */
+#root .tb-back{gap:8px!important;padding:5px 14px 5px 5px!important;border-radius:99px!important;font-weight:800!important;
+  background:linear-gradient(165deg,var(--m-f1),var(--m-f2))!important;border:1px solid var(--m-bord)!important;
+  color:var(--m-titre)!important;backdrop-filter:none!important;
+  box-shadow:0 4px 0 var(--m-tranche),0 8px 14px var(--m-ombre)!important;transition:translate .12s,box-shadow .12s!important}
+#root .tb-back:active{translate:0 3px;box-shadow:0 1px 0 var(--m-tranche)!important;transform:none!important}
+#root .tb-back::before{display:none!important}
+#root .tb-back .tb-fl{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:radial-gradient(circle at 30% 24%,var(--sg1,#fff0b8),var(--sg2,#e6a817) 55%,var(--sg3,#9a6700));
+  box-shadow:0 2px 0 var(--sg3,#9a6700),inset 0 1px 2px rgba(255,255,255,.6);
+  --sg1:#fff0b8;--sg2:#e6a817;--sg3:#9a6700;transition:translate .3s}
+#root.profile-girl .tb-back .tb-fl{--sg1:#ffd0ef;--sg2:#ec4899;--sg3:#93164f}
+#root.profile-boy .tb-back .tb-fl{--sg1:#bfe3ff;--sg2:#2b8be8;--sg3:#0d3f8f}
+#root .tb-back .tb-fl svg{width:14px;height:14px}
+#root .tb-back:hover .tb-fl{translate:-3px 0}
+/* changer d'interface : une gemme avec deux flèches */
+#root .tb-inter{width:36px!important;height:36px!important;border-radius:50%!important;font-size:0!important;border:none!important;
+  display:grid!important;place-items:center;
+  background:radial-gradient(circle at 30% 24%,#ead4ff 0%,#9b5de5 50%,#55209e 100%)!important;
+  box-shadow:0 4px 0 #3d1478,0 8px 14px rgba(0,0,0,.22),inset 0 2px 3px rgba(255,255,255,.5)!important;transition:translate .12s,rotate .4s}
+#root .tb-inter svg{width:20px;height:20px}
+#root .tb-inter:hover{rotate:180deg}
+#root .tb-inter:active{translate:0 3px}
+/* cartes du choix d'interface et d'âge : la même dalle que le menu */
+#s-welcome .prof-card,#s-age .prof-card{border-radius:26px!important;
+  box-shadow:0 7px 0 var(--pc-tr,#c9a24a),0 18px 30px rgba(0,0,0,.28),inset 0 2px 0 rgba(255,255,255,.7)!important}
+#s-welcome .prof-card.girl{--pc-tr:#e57fb2}
+#s-welcome .prof-card.boy{--pc-tr:#5aa9d6}
+#s-welcome .prof-card.adult{--pc-tr:#d2a640}
+#s-welcome .prof-card:active,#s-age .prof-card:active{translate:0 5px}
+#s-welcome .prof-emoji img{width:60px!important;height:60px!important;border:3px solid #fff;
+  box-shadow:0 4px 0 var(--pc-tr,#c9a24a),0 8px 14px rgba(0,0,0,.25)}
+#s-age .prof-card{background:linear-gradient(165deg,#1d4486,#0f2a5c)!important;border:1px solid rgba(56,189,248,.45)!important;--pc-tr:#071736}
+#s-age .prof-card .prof-name{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#s-age .prof-card .prof-desc{color:rgba(205,230,255,.85)!important}
+#s-age .prof-emoji{width:64px;height:64px;flex:none;border-radius:20px;display:grid;place-items:center;font-size:2.2rem!important;
+  background:radial-gradient(circle at 30% 24%,var(--ag1) 0%,var(--ag2) 50%,var(--ag3) 100%);rotate:-6deg;
+  box-shadow:0 5px 0 var(--ag3),0 10px 16px rgba(0,0,0,.3),inset 0 3px 4px rgba(255,255,255,.55);animation:gemFlotte 3.4s ease-in-out infinite}
+#s-age .prof-card.age-petit{--ag1:#d9f99d;--ag2:#65a30d;--ag3:#365314}
+#s-age .prof-card.age-grand{--ag1:#bfe3ff;--ag2:#2b8be8;--ag3:#0d3f8f}
+#s-age .prof-card .prof-arrow{color:#fff!important}
+@media (prefers-reduced-motion:reduce){
+  #root .mem-card,#root .puzzle-choice,#root .puzzle-card,#root .puzzle-audio-btn,#root .mg-list-wrap .nav-icon,#s-age .prof-emoji{animation:none!important}
+}
+</style>
+<script>
+(function(){
+  var FLECHE='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+  var ECHANGE='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>';
+  window._GLYPHE3D=window._GLYPHE3D||{};
+  function g(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';}
+  _GLYPHE3D.memory=g('<rect x="3" y="5" width="9" height="13" rx="2" transform="rotate(-8 7.5 11.5)"/><rect x="11" y="5" width="9" height="13" rx="2" fill="rgba(255,255,255,.3)" transform="rotate(8 15.5 11.5)"/>');
+  _GLYPHE3D.puzzle=g('<path d="M5 8h3a2 2 0 114 0h3v3a2 2 0 110 4v3H5v-3a2 2 0 100-4z"/>');
+  _GLYPHE3D.carte=g('<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>');
+  function arme(){
+    /* la flèche du bouton retour */
+    var b=document.getElementById('tb-back');
+    if(b&&!b.querySelector('.tb-fl')){
+      for(var i=0;i<b.childNodes.length;i++){var n=b.childNodes[i];
+        if(n.nodeType===3&&n.nodeValue.indexOf('‹')>=0){n.nodeValue=n.nodeValue.replace('‹','');break;}}
+      var s=document.createElement('span');s.className='tb-fl';s.setAttribute('aria-hidden','true');s.innerHTML=FLECHE;
+      b.insertBefore(s,b.firstChild);
+    }
+    /* changer d'interface */
+    ['tb-inter','menu-inter'].forEach(function(id){var e=document.getElementById(id);if(e&&!e.querySelector('svg'))e.innerHTML=ECHANGE;});
+    /* le son : un titre qui dit ce que fait le bouton */
+    titreSon();
+  }
+  function titreSon(){
+    document.querySelectorAll('.sound-dot').forEach(function(d){
+      var on=!(typeof st!=='undefined'&&st&&st.soundOn===false);
+      var tx=on?te('Son activé — touche pour couper'):te('Son coupé — touche pour remettre');
+      d.title=tx;d.setAttribute('aria-label',tx);d.setAttribute('role','button');
+    });
+  }
+  var bulle=null;
+  window._sonBulle=function(){
+    var on=!(typeof st!=='undefined'&&st&&st.soundOn===false);
+    if(bulle)bulle.remove();
+    bulle=document.createElement('div');bulle.className='son-bulle';
+    bulle.textContent=(on?'🔊 ':'🔇 ')+(on?te('Son activé'):te('Son coupé'));
+    document.body.appendChild(bulle);
+    var b2=bulle;setTimeout(function(){if(b2.parentNode)b2.remove();},1900);
+    titreSon();
+  };
+  window._armeBoutons3D=arme;
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
+})();
+</script>
 
 
   <!-- SEO multilingue -->
@@ -7603,7 +7832,11 @@ function speak(txt,rate){
     },500);
   }
 }
-function toggleSound(){st.soundOn=!st.soundOn;document.querySelectorAll('.sound-dot').forEach(d=>d.classList.toggle('off',!st.soundOn));}
+function toggleSound(){st.soundOn=!st.soundOn;document.querySelectorAll('.sound-dot').forEach(d=>d.classList.toggle('off',!st.soundOn));
+  /* v3.2.1 : couper le son coupe aussi la lecture en cours, et un petit
+     message dit ce qui vient de se passer. */
+  if(!st.soundOn)try{stopSpeech();}catch(e){}
+  try{if(window._sonBulle)_sonBulle();}catch(e){}}
 
 // I18N — update ALL non-Arabic text
 function applyI18N(){
@@ -8519,7 +8752,37 @@ function _playFromIdx(idx){
   }
 }
 
+/* ── LECTURE / PAUSE / REPRISE AVEC LES VOIX ENREGISTRÉES (v3.2.1) ──
+   Le client : « on avait fait : un clic lit, un deuxième met en pause, un
+   troisième reprend au début de la dernière phrase entamée, et changer de
+   page arrête la lecture — ce n'est plus le cas depuis la voix Narrateur ».
+   La synthèse du navigateur le faisait phrase par phrase (`_spkChunks`).
+   Un enregistrement, lui, est UN fichier : on le met en pause, et pour
+   reprendre on estime où commence la phrase en cours, au prorata des
+   caractères (la voix lit à vitesse régulière), un souffle avant. */
+var _rec={el:null,a:null,txt:'',paused:false};
+function _recStop(){
+  try{if(_rec.a)_rec.a.pause();}catch(e){}
+  try{if(_rec.el)_rec.el.style.opacity='1';}catch(e){}
+  _rec={el:null,a:null,txt:'',paused:false};
+}
+function _recDebutPhrase(){
+  var a=_rec.a;if(!a)return 0;
+  var b=_BORNES[a.currentSrc||a.src]||{};
+  var d0=b.d||0,d1=(b.f&&b.f>d0)?b.f:(a.duration||0);
+  if(!(d1>d0))return Math.max(0,a.currentTime-1.5);
+  var ph=String(_rec.txt).match(/[^.!?…\n]+[.!?…\n]*/g)||[_rec.txt];
+  var tot=ph.reduce(function(s,x){return s+x.length;},0)||1;
+  var f=(a.currentTime-d0)/(d1-d0),cumul=0,debut=0;
+  for(var i=0;i<ph.length;i++){
+    var c=cumul/tot;
+    if(c<=f+0.005)debut=c;else break;
+    cumul+=ph[i].length;
+  }
+  return Math.max(d0,d0+debut*(d1-d0)-0.2);
+}
 function stopSpeech(){
+  _recStop();
   if(window.speechSynthesis)window.speechSynthesis.cancel();
   if(_spkEl)_spkEl.style.opacity='1';
   _spkEl=null;_spkPaused=false;_spkChunks=[];_spkIdx=0;
@@ -8596,7 +8859,16 @@ function speakText(txt,lang,el){
      « tresse ». Elle vaut maintenant pour toute phrase. */
   try{
     var _enr=_sonEnregistre(txt);
+    if(_enr&&el&&_rec.el===el&&_rec.a&&!_rec.a.ended){
+      /* 2e clic : pause. 3e clic : reprise au début de la phrase entamée. */
+      if(!_rec.paused){_rec.a.pause();_rec.paused=true;el.style.opacity='0.4';return;}
+      try{_rec.a.currentTime=_recDebutPhrase();}catch(e){}
+      _rec.paused=false;el.style.opacity='0.6';
+      try{var _pp=_rec.a.play();if(_pp&&_pp['catch'])_pp['catch'](function(){});}catch(e){}
+      return;
+    }
     if(_enr){
+      if(el)stopSpeech();
       /* ── LES SONS DU CLIENT D'ABORD ──
          « Augmenter le son de mes enregistrements, ils ne sont pas assez
          forts par rapport à la voix narrateur. » Mesure : les deux sont au
@@ -8606,6 +8878,11 @@ function speakText(txt,lang,el){
          phrases, et les sons arabes restent pleins. */
       var _lect=_joueSon(_enr);
       try{if(_lect)_lect.volume=/[\u0600-\u06FF]/.test(String(txt))?1:_VOLUME_PHRASES;}catch(e){}
+      if(el&&_lect){
+        _rec={el:el,a:_lect,txt:String(txt),paused:false};
+        el.style.opacity='0.6';
+        _lect.addEventListener('ended',function(){if(_rec.a===_lect)_recStop();},{once:true});
+      }
       return;
     }
   }catch(e){}
@@ -8653,6 +8930,19 @@ function speakText(txt,lang,el){
   _spkEl=el||null;
   _playFromIdx(0);
 }
+
+/* Changer de page arrête la lecture : dès que le texte en cours de
+   lecture n'est plus à l'écran (la page a été remplacée), on coupe. */
+(function(){
+  function surveille(){
+    var ca=document.getElementById('ca');if(!ca||!window.MutationObserver)return;
+    new MutationObserver(function(){
+      var e=_rec.el||_spkEl;
+      if(e&&!e.isConnected)stopSpeech();
+    }).observe(ca,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',surveille);else surveille();
+})();
 
 // speakQueue : séquence [{txt,lang}] avec pause/reprise/restart
 // Même logique que speakText mais pour des items multi-langues
@@ -8746,10 +9036,17 @@ function _runQueue(){
 }
 
 
+/* v3.2.1 — la doua d'ouverture se lit d'UN bloc par speakText : la voix
+   Narrateur enregistrée la dit (clé « long| » + empreinte, comme les autres
+   textes adultes), avec lecture / pause / reprise. Avant, speakQueue la
+   confiait à la voix du navigateur. */
+function _texteDua(){
+  return t('intro_dua')+'. '+t('intro_dua2')+'. '+t('intro_dua_tr')+' '+t('intro_dua_tr2');
+}
 function renderIntro(ca){
   ca.innerHTML=`
     <div style="font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7">${t('click_to_listen')}</div>
-    <div class="dua-box" onclick="speakQueue([{txt:t('intro_dua').replace(/اللَّه/g,'الله'),lang:'ar-SA'},{txt:t('intro_dua2'),lang:'ar-SA'},{txt:t('intro_dua_tr'),lang:getLang()},{txt:t('intro_dua_tr2'),lang:getLang()}],this)" style="cursor:pointer" title="🔊 Cliquer pour écouter">
+    <div class="dua-box" onclick="speakText(_texteDua(),getLang(),this)" style="cursor:pointer">
       <div class="dua-ar">${t('intro_dua')}</div>
       <div class="dua-ar" style="font-size:1.2rem;margin-bottom:10px">${t('intro_dua2')}</div>
       <div class="dua-tr" style="border-bottom:1px dashed rgba(255,255,255,0.2)">${t('intro_dua_tr')}</div>
@@ -11937,8 +12234,9 @@ function renderMiniGames(ca){
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;'+(g.locked?'opacity:0;transform:translateX(-110%);filter:grayscale(.7);':'');
     var lockedNote=g.locked?'<span style="display:inline-block;margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.38)">🔒 '+({'fr':'Continue les leçons pour débloquer','en':'Complete lessons to unlock','es':'Completa lecciones para desbloquear','de':'Lektionen abschließen','nl':'Voltooi lessen om te ontgrendelen','it':'Completa lezioni per sbloccare','pt':'Complete lições para desbloquear','ru':'Пройди уроки для разблокировки','tr':'Dersleri tamamla','zh':'完成课程以解锁','id':'Selesaikan pelajaran','ur':'سبق مکمل کریں','hi':'पाठ पूरा करें'}[st.lang]||'Continue les leçons pour débloquer')+'</span>':'';
     var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur'))+' : '+g.best+'</span>':'';
+    card.dataset.jeu=g.id;
     card.innerHTML='<div class="nav-card-shimmer"></div>'
-      +'<div class="nav-icon '+gameCls[g.id]+'">'+(gameIcons[g.id]||g.icon)+'</div>'
+      +'<div class="nav-icon '+gameCls[g.id]+'">'+((window._GLYPHE3D&&_GLYPHE3D[g.id])||gameIcons[g.id]||g.icon)+'</div>'
       +'<div class="nav-text">'
         +'<div class="nav-title">'+g.name+'</div>'
         +'<div class="nav-desc">'+g.desc+'</div>'
@@ -11997,8 +12295,9 @@ function renderMemoryDeckList(ca,decks){
   ca.innerHTML='';ca.style.padding='';ca.style.paddingTop='64px';ca.style.overflowY='';
   var wrap=document.createElement('div');
   wrap.style.cssText='padding:16px 14px 80px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px';
+  wrap.className='mg-list-wrap';
     decks.forEach(function(deck,di){
-    var card=document.createElement('div');card.className='nav-card';
+    var card=document.createElement('div');card.className='nav-card';card.dataset.jeu='deck';
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;';
     var best=localStorage.getItem('mg_mem_best_'+deck.idx);
     card.innerHTML='<div class="nav-card-shimmer"></div>'
@@ -12767,7 +13066,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.0';
+var _VERSION_REPLI='v3.2.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16120,6 +16419,10 @@ function _decorMonde(ca,actif){
    couleur dans la phrase aurait obligé à la retraduire treize fois. */
 /* DEBUT TRADUCTIONS ENFANT */
 var _TE={
+'Son activé':{en:'Sound on',es:'Sonido activado',de:'Ton an',nl:'Geluid aan',it:'Audio attivo',pt:'Som ligado',ru:'Звук включён',tr:'Ses açık',zh:'声音已开启',id:'Suara aktif',ur:'آواز آن',hi:'ध्वनि चालू'},
+'Son coupé':{en:'Sound off',es:'Sonido desactivado',de:'Ton aus',nl:'Geluid uit',it:'Audio disattivato',pt:'Som desligado',ru:'Звук выключен',tr:'Ses kapalı',zh:'声音已关闭',id:'Suara mati',ur:'آواز بند',hi:'ध्वनि बंद'},
+'Son activé — touche pour couper':{en:'Sound on — tap to mute',es:'Sonido activado — toca para silenciar',de:'Ton an — tippen zum Stummschalten',nl:'Geluid aan — tik om te dempen',it:'Audio attivo — tocca per disattivare',pt:'Som ligado — toque para silenciar',ru:'Звук включён — нажмите, чтобы выключить',tr:'Ses açık — kapatmak için dokun',zh:'声音已开启 — 点按静音',id:'Suara aktif — ketuk untuk membisukan',ur:'آواز آن — بند کرنے کے لیے چھوئیں',hi:'ध्वनि चालू — बंद करने के लिए छुएँ'},
+'Son coupé — touche pour remettre':{en:'Sound off — tap to turn on',es:'Sonido desactivado — toca para activar',de:'Ton aus — tippen zum Einschalten',nl:'Geluid uit — tik om aan te zetten',it:'Audio disattivato — tocca per attivare',pt:'Som desligado — toque para ligar',ru:'Звук выключен — нажмите, чтобы включить',tr:'Ses kapalı — açmak için dokun',zh:'声音已关闭 — 点按开启',id:'Suara mati — ketuk untuk menyalakan',ur:'آواز بند — آن کرنے کے لیے چھوئیں',hi:'ध्वनि बंद — चालू करने के लिए छुएँ'},
 'Déconnexion':{en:'Log out',es:'Cerrar sesión',de:'Abmelden',nl:'Uitloggen',it:'Esci',pt:'Terminar sessão',ru:'Выйти',tr:'Çıkış yap',zh:'退出登录',id:'Keluar',ur:'لاگ آؤٹ',hi:'लॉग आउट'},
 'Langue':{en:'Language',es:'Idioma',de:'Sprache',nl:'Taal',it:'Lingua',pt:'Idioma',ru:'Язык',tr:'Dil',zh:'语言',id:'Bahasa',ur:'زبان',hi:'भाषा'},
 /* Les cinq exercices ajoutes a la lecon de lettre. */

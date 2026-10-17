@@ -183,7 +183,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.0), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.1), du plus récent au plus ancien :**
+
+- **v3.2.1 (17 octobre).** Bloc `outils/refonte-v321.html`, copié tel quel
+  juste après le bloc v3.2.0.
+  * **Lecture / pause / reprise avec les voix enregistrées** (`_rec`,
+    `_recStop`, `_recDebutPhrase` près de `stopSpeech`) : 1er clic lit,
+    2e met en pause, 3e reprend au début de la phrase entamée (estimée au
+    prorata des caractères, entre les bornes `_BORNES` du fichier, 0,2 s
+    avant). `stopSpeech` coupe aussi l'enregistrement. Un
+    MutationObserver sur `#ca` arrête la lecture dès que le texte lu
+    quitte l'écran (changement de page, d'onglet, de leçon). Testé avec un
+    faux enregistrement : pause à 2,5 s → reprise à 1,8 s.
+  * **Doua de l'introduction** (`_texteDua()`) : lue d'un bloc par
+    `speakText` (clé `long|` + empreinte), donc par le Narrateur DÈS QUE
+    l'enregistrement existe. **Il n'existe pas encore** : la doua passait
+    par `speakQueue`, que l'inventaire des voix ne voyait pas. À générer
+    (v4, `--mixte`) dans les langues voulues, après accord du client.
+  * **Bouton du son** : haut-parleur 3D (barré si coupé), titre explicite
+    traduit, bulle « Son activé / Son coupé » à chaque appui
+    (`_sonBulle`) ; couper le son arrête la lecture en cours.
+  * **Plus de cadre sombre chez l'adulte** : `.vline-section` (ligne
+    d'écriture des voyelles), `.qz-q`, et tout fond `rgba(10,7,24…)` posé
+    en ligne dans `#ca`.
+  * **Jeux 6-11 ans** : cartes au style du menu (`.mg-list-wrap`,
+    `data-jeu` memory/puzzle/deck, glyphes `_GLYPHE3D.memory/puzzle`).
+    Memory : cartes épaisses distribuées une à une, paire trouvée qui
+    rebondit en vert. Puzzle : carte en dalle, haut-parleur en sphère d'or,
+    cases en creux, lettres en touches de clavier 3D.
+  * **Boutons** : retour en pilule avec flèche dans une pastille (la
+    flèche « ‹ » est retirée du texte au démarrage), changer d'interface
+    en gemme violette à deux flèches, cartes d'interface et d'âge en
+    dalles, emoji de l'âge dans une gemme, boutons « Retour aux jeux » en
+    relief.
 
 - **v3.2.0 (17 octobre) — REFONTE.** Tout dans `outils/refonte-v32.html`
   (une balise `<style>` + un `<script>`), copié tel quel dans
