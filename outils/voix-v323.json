@@ -206,38 +206,56 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
+  "cle": "أَبٌ",
+  "dire": "أَبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تَبَّ",
+  "dire": "تَبَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
   "cle": "بَابٌ",
   "dire": "بَابٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَاتَ",
-  "dire": "بَاتَ"
+  "cle": "بَيْتٌ",
+  "dire": "بَيْتٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَبٌّ",
-  "dire": "تَبٌّ"
+  "cle": "بَحْرٌ",
+  "dire": "بَحْرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَثَّ",
-  "dire": "بَثَّ"
+  "cle": "كَبِيرٌ",
+  "dire": "كَبِيرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ثَبَتَ",
-  "dire": "ثَبَتَ"
+  "cle": "بَقَرَةٌ",
+  "dire": "بَقَرَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَبَتَ",
-  "dire": "تَبَتَ"
+  "cle": "مَكْتَبَةٌ",
+  "dire": "مَكْتَبَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَتَّ",
+  "dire": "بَتَّ"
  },
  {
   "groupe": "200-questions",
@@ -248,20 +266,62 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَتَبَّتَ",
-  "dire": "تَتَبَّتَ"
+  "cle": "بِنْتٌ",
+  "dire": "بِنْتٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بِتٌّ",
-  "dire": "بِتٌّ"
+  "cle": "تَمْرٌ",
+  "dire": "تَمْرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَبِتَ",
-  "dire": "تَبِتَ"
+  "cle": "تُوتٌ",
+  "dire": "تُوتٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كِتَابٌ",
+  "dire": "كِتَابٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تِلْمِيذٌ",
+  "dire": "تِلْمِيذٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "تُفَّاحَةٌ",
+  "dire": "تُفَّاحَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَثَّ",
+  "dire": "بَثَّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَوْبٌ",
+  "dire": "ثَوْبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَلْجٌ",
+  "dire": "ثَلْجٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ثَمَرٌ",
+  "dire": "ثَمَرٌ"
  },
  {
   "groupe": "200-questions",
@@ -272,26 +332,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَثَبَّتَ",
-  "dire": "تَثَبَّتَ"
+  "cle": "ثَعْلَبٌ",
+  "dire": "ثَعْلَبٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بِثٌّ",
-  "dire": "بِثٌّ"
+  "cle": "حَدِيثٌ",
+  "dire": "حَدِيثٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَابَثَ",
-  "dire": "تَابَثَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "جَبٌّ",
-  "dire": "جَبٌّ"
+  "cle": "ثَلَاثَةٌ",
+  "dire": "ثَلَاثَةٌ"
  },
  {
   "groupe": "200-questions",
@@ -302,26 +356,38 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَجَحَ",
-  "dire": "بَجَحَ"
+  "cle": "جَمَلٌ",
+  "dire": "جَمَلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَجِبُ",
-  "dire": "تَجِبُ"
+  "cle": "جَبَلٌ",
+  "dire": "جَبَلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَثَّ",
-  "dire": "جَثَّ"
+  "cle": "رَجُلٌ",
+  "dire": "رَجُلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "حَجَبَ",
-  "dire": "حَجَبَ"
+  "cle": "دَجَاجٌ",
+  "dire": "دَجَاجٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَمِيلٌ",
+  "dire": "جَمِيلٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَسْجِدٌ",
+  "dire": "مَسْجِدٌ"
  },
  {
   "groupe": "200-questions",
@@ -332,74 +398,68 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَحَثَ",
-  "dire": "بَحَثَ"
+  "cle": "حُوتٌ",
+  "dire": "حُوتٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَحَبَّ",
-  "dire": "تَحَبَّ"
+  "cle": "لَحْمٌ",
+  "dire": "لَحْمٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَحَدَ",
-  "dire": "جَحَدَ"
+  "cle": "قَمْحٌ",
+  "dire": "قَمْحٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ثَحَبَ",
-  "dire": "ثَحَبَ"
+  "cle": "فَرِحَ",
+  "dire": "فَرِحَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "خَبَّ",
-  "dire": "خَبَّ"
+  "cle": "حَلِيبٌ",
+  "dire": "حَلِيبٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَخِلَ",
-  "dire": "بَخِلَ"
+  "cle": "صَبَاحٌ",
+  "dire": "صَبَاحٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "تَخَبَّثَ",
-  "dire": "تَخَبَّثَ"
+  "cle": "حَدِيقَةٌ",
+  "dire": "حَدِيقَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "خَجِلَ",
-  "dire": "خَجِلَ"
+  "cle": "أَخٌ",
+  "dire": "أَخٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "حَخَبَ",
-  "dire": "حَخَبَ"
+  "cle": "خَطَّ",
+  "dire": "خَطَّ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "خَبُثَ",
-  "dire": "خَبُثَ"
+  "cle": "خُبْزٌ",
+  "dire": "خُبْزٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَبَّ",
-  "dire": "دَبَّ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "بَدَأَ",
-  "dire": "بَدَأَ"
+  "cle": "خَرَجَ",
+  "dire": "خَرَجَ"
  },
  {
   "groupe": "200-questions",
@@ -410,26 +470,98 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ثَدَبَ",
-  "dire": "ثَدَبَ"
+  "cle": "بَخِيلٌ",
+  "dire": "بَخِيلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَجَجَ",
-  "dire": "دَجَجَ"
+  "cle": "خَرُوفٌ",
+  "dire": "خَرُوفٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ذَبَّ",
-  "dire": "ذَبَّ"
+  "cle": "مَطْبَخٌ",
+  "dire": "مَطْبَخٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَذَخَ",
-  "dire": "بَذَخَ"
+  "cle": "يَدٌ",
+  "dire": "يَدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَمٌ",
+  "dire": "دَمٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "وَلَدٌ",
+  "dire": "وَلَدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَرَسَ",
+  "dire": "دَرَسَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَلَدٌ",
+  "dire": "بَلَدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "دَفْتَرٌ",
+  "dire": "دَفْتَرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "جَدِيدٌ",
+  "dire": "جَدِيدٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَدْرَسَةٌ",
+  "dire": "مَدْرَسَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذَهَبٌ",
+  "dire": "ذَهَبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "أَخَذَ",
+  "dire": "أَخَذَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذِئْبٌ",
+  "dire": "ذِئْبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَذِيذٌ",
+  "dire": "لَذِيذٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ذُبَابٌ",
+  "dire": "ذُبَابٌ"
  },
  {
   "groupe": "200-questions",
@@ -440,20 +572,8 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَذَبَ",
-  "dire": "جَذَبَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "ذَخَرَ",
-  "dire": "ذَخَرَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "دَذَبَ",
-  "dire": "دَذَبَ"
+  "cle": "نَافِذَةٌ",
+  "dire": "نَافِذَةٌ"
  },
  {
   "groupe": "200-questions",
@@ -464,80 +584,98 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَرَدَ",
-  "dire": "بَرَدَ"
+  "cle": "مَرَّ",
+  "dire": "مَرَّ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَرَحَ",
-  "dire": "جَرَحَ"
+  "cle": "نَارٌ",
+  "dire": "نَارٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ثَرَى",
-  "dire": "ثَرَى"
+  "cle": "نَهْرٌ",
+  "dire": "نَهْرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ذَرٌّ",
-  "dire": "ذَرٌّ"
+  "cle": "قَمَرٌ",
+  "dire": "قَمَرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَرَجَ",
-  "dire": "دَرَجَ"
+  "cle": "رَسُولٌ",
+  "dire": "رَسُولٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "زَجَّ",
-  "dire": "زَجَّ"
+  "cle": "كُرْسِيٌّ",
+  "dire": "كُرْسِيٌّ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَزَّ",
-  "dire": "رَزَّ"
+  "cle": "سَيَّارَةٌ",
+  "dire": "سَيَّارَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَزَخَ",
-  "dire": "بَزَخَ"
+  "cle": "رُزٌّ",
+  "dire": "رُزٌّ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَزَأَ",
-  "dire": "جَزَأَ"
+  "cle": "زَيْتٌ",
+  "dire": "زَيْتٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ذَرَزَ",
-  "dire": "ذَرَزَ"
+  "cle": "مَوْزٌ",
+  "dire": "مَوْزٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَزَجَ",
-  "dire": "دَزَجَ"
+  "cle": "زَرَعَ",
+  "dire": "زَرَعَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "زَهْرَةٌ",
+  "dire": "زَهْرَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عَزِيزٌ",
+  "dire": "عَزِيزٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مَنْزِلٌ",
+  "dire": "مَنْزِلٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "زَرَافَةٌ",
+  "dire": "زَرَافَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
   "cle": "سَبَبٌ",
   "dire": "سَبَبٌ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "بَسَطَ",
-  "dire": "بَسَطَ"
  },
  {
   "groupe": "200-questions",
@@ -560,20 +698,26 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَرَسَ",
-  "dire": "دَرَسَ"
+  "cle": "شَمْسٌ",
+  "dire": "شَمْسٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "سَرَدَ",
-  "dire": "سَرَدَ"
+  "cle": "سَمَكٌ",
+  "dire": "سَمَكٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ذَسَبَ",
-  "dire": "ذَسَبَ"
+  "cle": "سَلَامٌ",
+  "dire": "سَلَامٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سَمَاءٌ",
+  "dire": "سَمَاءٌ"
  },
  {
   "groupe": "200-questions",
@@ -590,38 +734,44 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَشَعٌ",
-  "dire": "جَشَعٌ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "شَرِبَ",
   "dire": "شَرِبَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَشَدَ",
-  "dire": "رَشَدَ"
+  "cle": "شَعْرٌ",
+  "dire": "شَعْرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَشَجَ",
-  "dire": "دَشَجَ"
+  "cle": "شَيْءٌ",
+  "dire": "شَيْءٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "سَشَبَ",
-  "dire": "سَشَبَ"
+  "cle": "شَبَابٌ",
+  "dire": "شَبَابٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَرَسَ",
-  "dire": "شَرَسَ"
+  "cle": "شَجَرَةٌ",
+  "dire": "شَجَرَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "مِشْمِشٌ",
+  "dire": "مِشْمِشٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَصَّ",
+  "dire": "قَصَّ"
  },
  {
   "groupe": "200-questions",
@@ -632,44 +782,44 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَصَدَ",
-  "dire": "رَصَدَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "شَصَبَ",
-  "dire": "شَصَبَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "صَدَرَ",
-  "dire": "صَدَرَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "بَصَرٌ",
   "dire": "بَصَرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "جَصٌّ",
-  "dire": "جَصٌّ"
+  "cle": "صَوْتٌ",
+  "dire": "صَوْتٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَصَبَ",
-  "dire": "دَصَبَ"
+  "cle": "صَيْفٌ",
+  "dire": "صَيْفٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "صَرَجَ",
-  "dire": "صَرَجَ"
+  "cle": "صَدِيقٌ",
+  "dire": "صَدِيقٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "قَصِيرٌ",
+  "dire": "قَصِيرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "صُورَةٌ",
+  "dire": "صُورَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "ضَمَّ",
+  "dire": "ضَمَّ"
  },
  {
   "groupe": "200-questions",
@@ -680,44 +830,50 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَضَعَ",
-  "dire": "رَضَعَ"
+  "cle": "أَرْضٌ",
+  "dire": "أَرْضٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَضَعَ",
-  "dire": "بَضَعَ"
+  "cle": "ضَحِكَ",
+  "dire": "ضَحِكَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "صَضَبَ",
-  "dire": "صَضَبَ"
+  "cle": "بَيْضٌ",
+  "dire": "بَيْضٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَضَّ",
-  "dire": "شَضَّ"
+  "cle": "ضَيْفٌ",
+  "dire": "ضَيْفٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ضَجَرَ",
-  "dire": "ضَجَرَ"
+  "cle": "مَرِيضٌ",
+  "dire": "مَرِيضٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَضَبَ",
-  "dire": "دَضَبَ"
+  "cle": "رَمَضَانُ",
+  "dire": "رَمَضَانُ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ضَصَبَ",
-  "dire": "ضَصَبَ"
+  "cle": "قِطٌّ",
+  "dire": "قِطٌّ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "بَطٌّ",
+  "dire": "بَطٌّ"
  },
  {
   "groupe": "200-questions",
@@ -740,32 +896,26 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَطَرَ",
-  "dire": "شَطَرَ"
+  "cle": "طَعَامٌ",
+  "dire": "طَعَامٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ضَطَبَ",
-  "dire": "ضَطَبَ"
+  "cle": "طَرِيقٌ",
+  "dire": "طَرِيقٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "صَطَبَ",
-  "dire": "صَطَبَ"
+  "cle": "طَاوِلَةٌ",
+  "dire": "طَاوِلَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "طَرَشَ",
-  "dire": "طَرَشَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "دَطَجَ",
-  "dire": "دَطَجَ"
+  "cle": "ظِلٌّ",
+  "dire": "ظِلٌّ"
  },
  {
   "groupe": "200-questions",
@@ -776,44 +926,44 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَظَلَ",
-  "dire": "بَظَلَ"
+  "cle": "ظُهْرٌ",
+  "dire": "ظُهْرٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَظَّ",
-  "dire": "شَظَّ"
+  "cle": "حَفِظَ",
+  "dire": "حَفِظَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "صَظَبَ",
-  "dire": "صَظَبَ"
+  "cle": "نَظَرَ",
+  "dire": "نَظَرَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ظَرُفَ",
-  "dire": "ظَرُفَ"
+  "cle": "عَظِيمٌ",
+  "dire": "عَظِيمٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "طَظَبَ",
-  "dire": "طَظَبَ"
+  "cle": "نَظِيفٌ",
+  "dire": "نَظِيفٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَظَجَ",
-  "dire": "رَظَجَ"
+  "cle": "مِظَلَّةٌ",
+  "dire": "مِظَلَّةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَظَبَ",
-  "dire": "دَظَبَ"
+  "cle": "عَمٌّ",
+  "dire": "عَمٌّ"
  },
  {
   "groupe": "200-questions",
@@ -824,8 +974,14 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَعَدَ",
-  "dire": "رَعَدَ"
+  "cle": "عَيْنٌ",
+  "dire": "عَيْنٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عِلْمٌ",
+  "dire": "عِلْمٌ"
  },
  {
   "groupe": "200-questions",
@@ -836,44 +992,32 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَعَرَ",
-  "dire": "شَعَرَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "طَعِمَ",
-  "dire": "طَعِمَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "ضَعُفَ",
-  "dire": "ضَعُفَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "عَصَرَ",
   "dire": "عَصَرَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَعَجَ",
-  "dire": "دَعَجَ"
+  "cle": "سَاعَةٌ",
+  "dire": "سَاعَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "عُصْفُورٌ",
+  "dire": "عُصْفُورٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "غَدٌ",
+  "dire": "غَدٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
   "cle": "غَضِبَ",
   "dire": "غَضِبَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "بَغَى",
-  "dire": "بَغَى"
  },
  {
   "groupe": "200-questions",
@@ -890,8 +1034,8 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "عَغَبَ",
-  "dire": "عَغَبَ"
+  "cle": "ضَغَطَ",
+  "dire": "ضَغَطَ"
  },
  {
   "groupe": "200-questions",
@@ -902,14 +1046,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "ضَغَطَ",
-  "dire": "ضَغَطَ"
+  "cle": "غُرَابٌ",
+  "dire": "غُرَابٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "دَغَجَ",
-  "dire": "دَغَجَ"
+  "cle": "صَغِيرٌ",
+  "dire": "صَغِيرٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَمٌ",
+  "dire": "فَمٌ"
  },
  {
   "groupe": "200-questions",
@@ -926,26 +1076,8 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَفَقَ",
-  "dire": "شَفَقَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "عَفَا",
-  "dire": "عَفَا"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "طِفْلٌ",
   "dire": "طِفْلٌ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "كَفَرَ",
-  "dire": "كَفَرَ"
  },
  {
   "groupe": "200-questions",
@@ -956,26 +1088,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "بَفَثَ",
-  "dire": "بَفَثَ"
+  "cle": "فِيلٌ",
+  "dire": "فِيلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "قَلَمٌ",
-  "dire": "قَلَمٌ"
+  "cle": "فُنْدُقٌ",
+  "dire": "فُنْدُقٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَقَدَ",
-  "dire": "رَقَدَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "فَقَدَ",
-  "dire": "فَقَدَ"
+  "cle": "فَرَاشَةٌ",
+  "dire": "فَرَاشَةٌ"
  },
  {
   "groupe": "200-questions",
@@ -986,14 +1112,26 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "عَقَدَ",
-  "dire": "عَقَدَ"
+  "cle": "قَلَمٌ",
+  "dire": "قَلَمٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "طَقْسٌ",
-  "dire": "طَقْسٌ"
+  "cle": "قَلْبٌ",
+  "dire": "قَلْبٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "سُوقٌ",
+  "dire": "سُوقٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "فَقَدَ",
+  "dire": "فَقَدَ"
  },
  {
   "groupe": "200-questions",
@@ -1004,8 +1142,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "كَقَفَ",
-  "dire": "كَقَفَ"
+  "cle": "قِطَارٌ",
+  "dire": "قِطَارٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "حَقِيبَةٌ",
+  "dire": "حَقِيبَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَمْ",
+  "dire": "كَمْ"
  },
  {
   "groupe": "200-questions",
@@ -1034,26 +1184,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "عَكَسَ",
-  "dire": "عَكَسَ"
+  "cle": "كَلْبٌ",
+  "dire": "كَلْبٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "قَكَبَ",
-  "dire": "قَكَبَ"
+  "cle": "كُرَةٌ",
+  "dire": "كُرَةٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "طَكَفَ",
-  "dire": "طَكَفَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "بَكَرَ",
-  "dire": "بَكَرَ"
+  "cle": "سُكَّرٌ",
+  "dire": "سُكَّرٌ"
  },
  {
   "groupe": "200-questions",
@@ -1064,26 +1208,44 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "كَلِمَةٌ",
-  "dire": "كَلِمَةٌ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "فَلَكٌ",
   "dire": "فَلَكٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "شَلَلٌ",
-  "dire": "شَلَلٌ"
+  "cle": "لَيْلٌ",
+  "dire": "لَيْلٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَلَكَ",
-  "dire": "رَلَكَ"
+  "cle": "لَبَنٌ",
+  "dire": "لَبَنٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لَوْنٌ",
+  "dire": "لَوْنٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "لُغَةٌ",
+  "dire": "لُغَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "كَلِمَةٌ",
+  "dire": "كَلِمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "أُمٌّ",
+  "dire": "أُمٌّ"
  },
  {
   "groupe": "200-questions",
@@ -1094,20 +1256,8 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "نَلَسَ",
-  "dire": "نَلَسَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "كَتَمَ",
   "dire": "كَتَمَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "شَمَلَ",
-  "dire": "شَمَلَ"
  },
  {
   "groupe": "200-questions",
@@ -1124,38 +1274,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "نَمَا",
-  "dire": "نَمَا"
+  "cle": "مَاءٌ",
+  "dire": "مَاءٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "قَمَرٌ",
-  "dire": "قَمَرٌ"
+  "cle": "مِفْتَاحٌ",
+  "dire": "مِفْتَاحٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "نَجَحَ",
-  "dire": "نَجَحَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "كِتَابٌ",
-  "dire": "كِتَابٌ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "مَنَعَ",
-  "dire": "مَنَعَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "شَنَّ",
-  "dire": "شَنَّ"
+  "cle": "مِنْ",
+  "dire": "مِنْ"
  },
  {
   "groupe": "200-questions",
@@ -1166,26 +1298,44 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "رَنَمَ",
-  "dire": "رَنَمَ"
+  "cle": "نَجَحَ",
+  "dire": "نَجَحَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "لَنَكَ",
-  "dire": "لَنَكَ"
+  "cle": "مَنَعَ",
+  "dire": "مَنَعَ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "قَنَطَ",
-  "dire": "قَنَطَ"
+  "cle": "لِسَانٌ",
+  "dire": "لِسَانٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "هَنَأَ",
-  "dire": "هَنَأَ"
+  "cle": "نَجْمَةٌ",
+  "dire": "نَجْمَةٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "إِنْسَانٌ",
+  "dire": "إِنْسَانٌ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "هُوَ",
+  "dire": "هُوَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "هِيَ",
+  "dire": "هِيَ"
  },
  {
   "groupe": "200-questions",
@@ -1208,20 +1358,20 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "مَهَرَ",
-  "dire": "مَهَرَ"
+  "cle": "وَجْهٌ",
+  "dire": "وَجْهٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "لَهَثَ",
-  "dire": "لَهَثَ"
+  "cle": "هِلَالٌ",
+  "dire": "هِلَالٌ"
  },
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "قَهَرَ",
-  "dire": "قَهَرَ"
+  "cle": "قَهْوَةٌ",
+  "dire": "قَهْوَةٌ"
  },
  {
   "groupe": "200-questions",
@@ -1238,20 +1388,8 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
-  "cle": "نَأَى",
-  "dire": "نَأَى"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
   "cle": "قَرَأَ",
   "dire": "قَرَأَ"
- },
- {
-  "groupe": "200-questions",
-  "langue": "ar",
-  "cle": "هَيَّأَ",
-  "dire": "هَيَّأَ"
  },
  {
   "groupe": "200-questions",
@@ -1262,8 +1400,26 @@
  {
   "groupe": "200-questions",
   "langue": "ar",
+  "cle": "بَدَأَ",
+  "dire": "بَدَأَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
   "cle": "جَاءَ",
   "dire": "جَاءَ"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "أَنَا",
+  "dire": "أَنَا"
+ },
+ {
+  "groupe": "200-questions",
+  "langue": "ar",
+  "cle": "أَسَدٌ",
+  "dire": "أَسَدٌ"
  },
  {
   "groupe": "200-questions",

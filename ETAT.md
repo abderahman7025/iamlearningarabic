@@ -183,7 +183,20 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.4), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.5), du plus récent au plus ancien :**
+
+- **v3.2.5 (18 octobre) — DE VRAIS MOTS.** Le client : « pourquoi ne
+  remplaces-tu pas les mots inventés par de vrais mots ? Commence par des
+  mots à 2 lettres, puis 3, 4, 5 ». Les listes `words` des 27 lettres (8
+  chacune) ne contiennent plus que des mots réels (أَبٌ, بَيْتٌ, تُفَّاحَةٌ,
+  مَدْرَسَةٌ…), chacun contenant sa lettre. Les anciens pseudo-mots venaient de
+  la règle « seulement les lettres déjà vues », inutile ici (les listes ne
+  servent qu'aux 200 questions, au puzzle et aux mots des cours enfants).
+  Les 200 questions vont du plus COURT au plus LONG (lettres écrites
+  comptées, voyelles à part : 2, 3, 4, 5), mélangées à l'intérieur d'une
+  longueur, chaque mot une fois ; surplus retiré dans la longueur la plus
+  fournie. Liste des voix (`outils/voix-v323.json`) refaite sur ces mots,
+  sans ceux déjà enregistrés au studio (جَدٌّ, ذَا, لَا, نُورٌ).
 
 - **v3.2.4 (18 octobre) — voix manquantes, préparées.** Relevé du banc
   (13 langues, chaque page adulte, tous les `onclick`) comparé aux sons en

@@ -14,7 +14,8 @@
  *  - explications : les deux phrases sous les versets (solaire / lunaire),
  *    12 langues — l'ourdou reste de côté (ETAT, v3.0.8) ; l'arabe y est
  *    écrit en toutes lettres par `pourLaVoix` ;
- *  - 200-questions : les mots arabes, dits en entier, voyelles comprises.
+ *  - 200-questions : les mots arabes (de VRAIS mots depuis la v3.2.5), dits en
+ *    entier, voyelles comprises ; ceux déjà enregistrés au studio sont exclus.
  * Narrateur, eleven_v4, [calm]. La clé = le texte affiché (« long| » + hachage
  * au-delà de 180 caractères / 360 octets, comme `_clesSon`).
  */
