@@ -183,7 +183,55 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.2), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.3), du plus récent au plus ancien :**
+
+- **v3.2.3 (18 octobre) — demandes du client sur l'interface adulte.** Bloc
+  `outils/refonte-v323.html` copié TEL QUEL après celui de la v3.2.2 (il est
+  lu AVANT le script principal : ses crochets sur `speakText`, `speak`,
+  `toggleSound` se posent au `DOMContentLoaded`).
+  * **Suite d'une lettre** : plus de « Lettre suivante » sous le cours. La
+    suite (`.fin-lettre`) apparaît quand TOUTES les questions de
+    l'entraînement sont réussies (`_entrainementAdulte(ca,s,idx,auBout)`
+    compte ses questions et rend leur nombre) : « Lettre suivante » ou, à la
+    dernière lettre, « Cours suivant », plus « Toutes les leçons ». Sans
+    entraînement, la suite est montrée tout de suite.
+  * **200 questions** : titre « Lecture / Écriture » (13 langues) ; les
+    questions d'écriture restaient BLOQUÉES après Oui/Non — `session` et
+    `total` n'existaient pas dans `renderExPage` (ReferenceError dans
+    `handleWriteSR`). Mots corrigés (voyelles fausses ou transcription qui ne
+    correspondait pas : كَرِهَ kariha, طِفْلٌ, طَقْسٌ, رُطَبٌ, جَدٌّ, رَبٌّ…) ;
+    beaucoup de mots de la liste sont des pseudo-mots d'entraînement à la
+    lecture, laissés tels quels.
+  * « رِحْلَتِي » à droite de « Mon parcours » (`.par-titre`).
+  * Bouton « Changer d'interface » du menu du compte : texte centré.
+  * **L'arabe dans une phrase** (`_arabeDansPhrases`, adulte, pas en
+    ourdou) : enveloppé dans `.ar-in` (1,75 em, police arabe) et décollé du
+    mot d'avant par une MARGE — le texte n'est pas modifié, c'est la clé de
+    l'enregistrement. Un signe seul (ّ ْ…) est dessiné sur un cercle
+    pointillé par `::before` (`data-s`), le vrai caractère à taille 0.
+  * **LECTURE AUTOMATIQUE** (proposée par le client) : à l'arrivée sur une
+    page adulte, le Narrateur lit les textes à la suite (`_lectureAuto`).
+    Lisibles = éléments dont `onclick` appelle `speakText` ET dont le texte a
+    un enregistrement (jamais la voix du navigateur) ; on le sait en appelant
+    l'`onclick` une fois, voix coupées. Toucher le texte lu = pause,
+    retoucher = reprise (le mécanisme de la v3.2.1) ; toucher un autre texte
+    = la lecture continue à partir de lui ; changer de page = arrêt ; son
+    coupé = rien. Pas sur les exercices.
+  * **ALERTER** : bouton rouge en bas à droite (adulte, écran principal). Il
+    capture l'écran (html-to-image chargé à la demande depuis jsdelivr —
+    html2canvas échouait sur `color-mix`), l'élève ajoute un message, envoi
+    par POST /api/audio {alerte} → `api/_alerte.js` (jeton de l'élève exigé,
+    6 alertes / 10 min) : capture dans le bucket Supabase « alertes »
+    (public, nom aléatoire), e-mail Brevo à `ALERTE_EMAIL` (défaut
+    contact@iamlearningarabic.com) avec la capture, et WhatsApp via
+    CallMeBot SI `CALLMEBOT_APIKEY` et `ALERTE_WHATSAPP` sont posées dans
+    Vercel (sinon e-mail seul).
+  * **Bonus solaires/lunaires** : versets en TEXTE (ال marqué, or pour la
+    solaire, bleu pour la lunaire), deux phrases d'explication (13 langues),
+    fleurs comme celles des cours (sphères 3D, cœur doré ☀️ / argenté 🌙,
+    toucher = son du studio, doigt entre deux pétales → le plus proche).
+  * « En arabe, on écrit de droite à gauche » passe par `speakText` (voix
+    enregistrée) au lieu de `speak`.
 
 - **v3.2.2 (17 octobre) — NAVIGATION.** Règles proposées puis VALIDÉES par
   le client (en tête de `outils/refonte-v322.html`, bloc copié tel quel

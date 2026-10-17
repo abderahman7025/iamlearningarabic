@@ -1,0 +1,332 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.2.3 (18 octobre) — source : outils/refonte-v323.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.2.2.
+     1. « Changer d'interface » : le texte centré dans le bouton.
+     2. La suite d'une lettre (« Lettre suivante » / « Cours suivant ») ne
+        paraît qu'à la FIN de l'entraînement.
+     3. L'arabe glissé dans une phrase française (ou d'une autre langue) :
+        plus gros, et détaché du mot d'avant.
+     4. LECTURE AUTOMATIQUE (ados/adultes) : le Narrateur lit les textes de
+        la page l'un après l'autre. Même règle qu'au clic : toucher le texte
+        en cours = pause, retoucher = reprise au début de la phrase entamée ;
+        changer de page arrête tout. Couper le son = lire seul.
+     5. Le bouton « Alerter » en bas à droite : capture d'écran + message,
+        envoyés au propriétaire (POST /api/audio {alerte}, voir api/_alerte.js).
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* 1 — le texte au milieu du bouton, l'icône calée à gauche */
+.cp-inter{position:relative;justify-content:center!important;text-align:center;padding-left:44px!important;padding-right:44px!important}
+.cp-inter svg{position:absolute;left:14px;top:50%;translate:0 -50%}
+
+/* 2 — la suite, après l'entraînement */
+.fin-lettre{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px auto 4px;max-width:520px}
+.fin-lettre:empty{display:none}
+.fin-lettre .suite-lettre{margin:10px 0 0}
+.liste-lecons{width:100%;max-width:520px;border-radius:99px;padding:12px 20px;cursor:pointer;
+  font:700 .95rem Outfit,system-ui,sans-serif;color:#7a4a00;background:#fffaf0;
+  border:1.5px solid rgba(184,134,11,.45);box-shadow:0 4px 0 rgba(184,134,11,.25);transition:translate .12s,box-shadow .12s}
+.liste-lecons:active{translate:0 3px;box-shadow:0 1px 0 rgba(184,134,11,.25)}
+.liste-lecons:focus-visible{outline:2px solid #b8860b;outline-offset:3px}
+
+/* 3 — l'arabe dans une phrase */
+.ar-in{font-family:'Scheherazade New','Amiri',serif;font-size:1.75em;line-height:.9;vertical-align:-.12em;
+  unicode-bidi:isolate;margin:0 .12em;font-weight:700;letter-spacing:0}
+.ar-in.ar-colle{margin-left:.32em}
+/* le signe réel est caché (taille 0) : le cercle ET le signe sont dessinés
+   ensemble par ::before, pour que le signe se pose bien sur le cercle */
+.ar-in.ar-signe{font-size:0!important;margin:0 .25em}
+.ar-in.ar-signe::before{content:'\25CC' attr(data-s);font-family:'Scheherazade New',serif;font-size:26px;line-height:1;vertical-align:-.3em}
+
+/* 4 — le texte que le Narrateur est en train de lire */
+.lecture-en-cours{box-shadow:0 0 0 2px rgba(232,160,32,.55),0 0 22px rgba(232,160,32,.35)!important;
+  border-radius:14px;transition:box-shadow .3s}
+
+/* 5 — Alerter */
+.alerte-btn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:9000;
+  display:none;align-items:center;gap:8px;border:none;cursor:pointer;border-radius:99px;padding:10px 16px 10px 12px;
+  font:800 .85rem Outfit,system-ui,sans-serif;color:#fff;
+  background:linear-gradient(160deg,#ff7a59,#d9343f);box-shadow:0 5px 0 #8f1f28,0 12px 24px rgba(160,30,40,.35),inset 0 2px 0 rgba(255,255,255,.35);
+  transition:translate .12s,box-shadow .12s,opacity .3s}
+.alerte-btn svg{width:22px;height:22px;flex:none}
+.alerte-btn:active{translate:0 4px;box-shadow:0 1px 0 #8f1f28}
+.alerte-btn:focus-visible{outline:2px solid #2a1a00;outline-offset:3px}
+body.alerte-ok .alerte-btn{display:inline-flex}
+body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+.alerte-voile{position:fixed;inset:0;z-index:10050;background:rgba(20,12,0,.55);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:16px}
+.alerte-boite{width:100%;max-width:420px;background:#fffaf0;color:#3a2600;border-radius:24px;padding:20px 18px 16px;
+  box-shadow:0 24px 60px rgba(0,0,0,.35);border:1.5px solid rgba(184,134,11,.35);font-family:Outfit,system-ui,sans-serif}
+.alerte-boite h3{margin:0 0 6px;font-size:1.12rem;font-weight:900;text-align:center}
+.alerte-boite p{margin:0 0 10px;font-size:.84rem;opacity:.8;text-align:center}
+.alerte-boite img{display:block;width:100%;max-height:200px;object-fit:contain;border-radius:12px;
+  background:#f1e6cc;border:1px solid rgba(184,134,11,.25);margin-bottom:10px}
+.alerte-boite textarea{width:100%;box-sizing:border-box;min-height:84px;border-radius:14px;padding:10px 12px;
+  border:1.5px solid rgba(184,134,11,.4);background:#fff;color:#3a2600;font:500 .95rem Outfit,system-ui,sans-serif;resize:vertical}
+.alerte-boite textarea:focus{outline:2px solid #e8a020;outline-offset:1px}
+.alerte-btns{display:flex;gap:10px;margin-top:12px}
+.alerte-btns button{flex:1;border:none;border-radius:99px;padding:12px;cursor:pointer;font:800 .95rem Outfit,system-ui,sans-serif}
+.alerte-envoi{color:#fff;background:linear-gradient(160deg,#ff7a59,#d9343f);box-shadow:0 4px 0 #8f1f28}
+.alerte-annule{color:#7a4a00;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(184,134,11,.45)}
+.alerte-btns button:disabled{opacity:.6;cursor:default}
+.alerte-msg{position:fixed;left:50%;bottom:90px;translate:-50% 0;z-index:10060;max-width:88vw;padding:12px 18px;border-radius:16px;
+  background:#2a1a00;color:#fff;font:700 .9rem Outfit,system-ui,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.3);text-align:center}
+</style>
+<script>
+(function(){
+  function adulte(){try{return st.profile!=='girl'&&st.profile!=='boy';}catch(e){return false;}}
+  function langue(){try{return st.lang||'fr';}catch(e){return 'fr';}}
+
+  /* ── 3. L'ARABE DANS UNE PHRASE ──────────────────────────────────────
+     On ENVELOPPE, on ne change pas le texte : `textContent` reste le même
+     (c'est la clé de l'enregistrement, voir `_clesSon`). L'espace avec le
+     mot d'avant est donc une marge, pas un caractère. */
+  var AR='[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]';
+  var reAr=new RegExp(AR), reRun=new RegExp(AR+'+(?:[\\s\\u00A0]+'+AR+'+)*','g');
+  var reAutre=/[A-Za-zÀ-ɏЀ-ӿऀ-ॿ぀-ヿ一-鿿]/;
+  var POLICE_AR=/scheherazade|amiri|naskh|kufi|arab|lateef|reem|cairo|tajawal/i;
+  var EXCLU='.ar-in,script,style,textarea,input,select,svg,canvas,[contenteditable],.no-ar-in,.fleur3d,.pos-c';
+  function arabeDansPhrases(root){
+    if(!root||!adulte()||langue()==='ur')return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),L=[];
+    while(w.nextNode()){
+      var n=w.currentNode,v=n.nodeValue;
+      if(!v||!reAr.test(v))continue;
+      var p=n.parentElement;if(!p||p.closest(EXCLU))continue;
+      var cs=getComputedStyle(p);
+      if(POLICE_AR.test(cs.fontFamily))continue;          // déjà en police arabe : voulu
+      if(parseFloat(cs.fontSize)>26)continue;              // déjà grand
+      if(reAutre.test(v)){L.push(n);continue;}
+      /* Arabe seul dans un <b>/<span> au milieu d'une phrase : « le ل » */
+      if(v.trim().length<=14&&/^(B|STRONG|EM|I|SPAN|U)$/.test(p.tagName)){
+        var bloc=p.parentElement;
+        if(bloc&&reAutre.test(bloc.textContent||''))L.push(n);
+      }
+    }
+    L.forEach(function(n){
+      var v=n.nodeValue,frag=document.createDocumentFragment(),last=0,m;
+      reRun.lastIndex=0;
+      while((m=reRun.exec(v))){
+        if(m.index>last)frag.appendChild(document.createTextNode(v.slice(last,m.index)));
+        var s=document.createElement('span');
+        var avant=m.index>0?v[m.index-1]:(n.previousSibling&&n.previousSibling.textContent||'').slice(-1);
+        s.className='ar-in'+(avant&&!/[\s(«"'’ ]/.test(avant)?' ar-colle':'');
+        /* un signe seul (ّ, ْ…) : posé sur un cercle pointillé, ajouté par le
+           CSS — le texte, lui, ne change pas. */
+        if(/^[\u064B-\u0652\u0670\s]+$/.test(m[0])){s.className+=' ar-signe';s.setAttribute('data-s',m[0].trim());}
+        s.textContent=m[0];frag.appendChild(s);last=m.index+m[0].length;
+      }
+      if(last<v.length)frag.appendChild(document.createTextNode(v.slice(last)));
+      if(n.parentNode)n.parentNode.replaceChild(frag,n);
+    });
+  }
+  window._arabeDansPhrases=arabeDansPhrases;
+
+  /* ── 4. LECTURE AUTOMATIQUE ──────────────────────────────────────────
+     Les textes lisibles d'une page sont ceux dont le clic appelle
+     `speakText`. Pour savoir CE qu'ils diraient sans rien jouer, on appelle
+     leur `onclick` une fois, voix coupées (`capt`), et on ne garde que ce
+     qui a un enregistrement : jamais la voix du navigateur en lecture
+     automatique. */
+  var AL={q:[],i:-1,cur:null,auto:false,attente:0,page:''};
+  window._lectureAuto=AL;
+  var capt=null;
+  /* Ce bloc est lu AVANT le script principal : on se branche une fois la
+     page chargée, sinon la déclaration de `speakText` nous écraserait. */
+  function crochets(){
+    if(window.speakText&&window.speakText._v323)return;
+    var _vraiSpeakText=window.speakText,_vraiSpeak=window.speak,_vraiToggle=window.toggleSound;
+    if(typeof _vraiSpeakText!=='function'){setTimeout(crochets,300);return;}
+    window.speakText=function(txt,lang,el){
+      if(capt){capt.push(String(txt));return;}
+      if(AL.auto&&!el)el=AL.cur;
+      return _vraiSpeakText.call(this,txt,lang,el);
+    };
+    window.speakText._v323=1;
+    if(typeof _vraiSpeak==='function')window.speak=function(){if(capt)return;return _vraiSpeak.apply(this,arguments);};
+    /* Le son remis : on reprend la lecture de la page. */
+    if(typeof _vraiToggle==='function')window.toggleSound=function(){
+      var r=_vraiToggle.apply(this,arguments);
+      if(!st.soundOn)arret();else setTimeout(function(){try{construit();}catch(e){}},600);
+      return r;
+    };
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',crochets);else crochets();
+  var NAV=/navToPage|openLesson|startExercise|showS\(|renderPage|location|handleBack|_showFinish|renderSessions|logout/;
+  var faux={preventDefault:function(){},stopPropagation:function(){},stopImmediatePropagation:function(){}};
+  function ceQuIlDit(e){
+    var f=e.onclick;if(typeof f!=='function')return null;
+    var src=String(f);if(src.indexOf('speakText')<0||NAV.test(src))return null;
+    capt=[];
+    var _jo=window._joueSon,_pc=window.playChildSound;
+    window._joueSon=function(){return null;};window.playChildSound=function(){};
+    try{f.call(e,Object.assign({currentTarget:e,target:e},faux));}catch(x){}
+    window._joueSon=_jo;window.playChildSound=_pc;
+    var c=capt;capt=null;
+    try{if(e.style.opacity==='0.6'||e.style.opacity==='0.4')e.style.opacity='1';}catch(x){}
+    return c.length?c[0]:null;
+  }
+  function visible(e){return !!(e.offsetWidth||e.offsetHeight||e.getClientRects().length);}
+  function surligne(e){
+    document.querySelectorAll('.lecture-en-cours').forEach(function(x){if(x!==e)x.classList.remove('lecture-en-cours');});
+    if(e)e.classList.add('lecture-en-cours');
+  }
+  function arret(){AL.q=[];AL.i=-1;AL.cur=null;surligne(null);}
+  window._lectureAutoArret=arret;
+  function pageExclue(){
+    var ca=document.getElementById('ca');var p=(ca&&ca.dataset.page)||'';
+    try{if(st._curPage==='exercise'||p==='exercises'||st._curPage==='exercises')return true;}catch(e){}
+    return false;
+  }
+  function construit(){
+    arret();
+    var ca=document.getElementById('ca'),scr=document.getElementById('s-main');
+    if(!ca||!scr||!scr.classList.contains('on'))return;
+    if(!adulte()||!st.soundOn||pageExclue())return;
+    if(document.querySelector('.alerte-voile,.nav-voile'))return;
+    var vus={},q=[];
+    ca.querySelectorAll('*').forEach(function(e){
+      if(!e.onclick||!visible(e))return;
+      var t=ceQuIlDit(e);if(!t)return;
+      var k=t.replace(/\s+/g,' ').trim();if(!k||vus[k])return;
+      try{if(!_sonEnregistre(t))return;}catch(x){return;}
+      /* un texte DANS un autre déjà retenu : le parent suffit */
+      if(q.some(function(p){return p.contains(e);}))return;
+      vus[k]=1;q.push(e);
+    });
+    AL.q=q;AL.i=-1;
+    if(q.length)suivant();
+  }
+  function suivant(){
+    var k=AL.i+1;
+    while(k<AL.q.length&&!AL.q[k].isConnected)k++;
+    if(k>=AL.q.length){arret();return;}
+    AL.i=k;var e=AL.q[k];AL.cur=e;
+    var r=e.getBoundingClientRect();
+    if(r.bottom<60||r.top>innerHeight-60)try{e.scrollIntoView({behavior:'smooth',block:'center'});}catch(x){}
+    AL.auto=true;
+    try{e.onclick.call(e,Object.assign({currentTarget:e,target:e},faux));}catch(x){}
+    AL.auto=false;
+    surligne(e);AL.attente=Date.now();
+  }
+  /* La surveillance : fin d'un texte → le suivant ; un clic sur un autre
+     texte de la liste → on continue À PARTIR de lui ; pause → on attend. */
+  setInterval(function(){
+    if(!AL.q.length)return;
+    var e=AL.q[AL.i];
+    if(!e||!e.isConnected||!st.soundOn||!adulte()){arret();return;}
+    if(typeof _rec==='undefined')return;
+    if(_rec.el===e){surligne(e);return;}                 // en cours, ou en pause
+    if(_rec.el){var j=AL.q.indexOf(_rec.el);
+      if(j>=0){AL.i=j;AL.cur=_rec.el;surligne(_rec.el);}
+      return;}                                           // l'élève écoute autre chose
+    if(Date.now()-AL.attente<700)return;                 // le son démarre
+    if(!AL.pause){AL.pause=Date.now();return;}           // un souffle entre deux textes
+    if(Date.now()-AL.pause<450)return;
+    AL.pause=0;suivant();
+  },250);
+
+  /* Le déclencheur : un nouveau contenu dans #ca. On attend que la page
+     soit posée (les apparitions durent environ une seconde). */
+  var tLect=null,tAr=null;
+  function surChangement(muts){
+    clearTimeout(tAr);tAr=setTimeout(function(){try{arabeDansPhrases(document.getElementById('ca'));}catch(e){}},90);
+    var neuf=muts.some(function(m){return m.type==='childList'&&m.target.id==='ca'&&m.addedNodes.length;})
+          ||muts.some(function(m){return m.type==='attributes';});
+    if(!neuf)return;
+    /* la lettre suivante, les onglets… : si le texte lu a disparu, on
+       repart de la nouvelle page. */
+    if(AL.cur&&AL.cur.isConnected)return;
+    clearTimeout(tLect);tLect=setTimeout(function(){try{construit();}catch(e){}},1400);
+  }
+  function branche(){
+    var ca=document.getElementById('ca');if(!ca){setTimeout(branche,400);return;}
+    new MutationObserver(surChangement).observe(ca,{childList:true,subtree:true,attributes:true,attributeFilter:['data-page']});
+  }
+  branche();
+
+  /* ── 5. ALERTER ──────────────────────────────────────────────────────── */
+  var ICONE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.5L4.5 15.5h15L18 12.5V9a6 6 0 0 0-6-6z" fill="rgba(255,255,255,.22)"/><path d="M9.8 18.5a2.3 2.3 0 0 0 4.4 0"/><path d="M12 7.2v3.6"/><circle cx="12" cy="13" r=".6" fill="currentColor"/></svg>';
+  var btn=document.createElement('button');btn.type='button';btn.className='alerte-btn';
+  function libelle(){btn.innerHTML=ICONE+'<span>'+te('Alerter')+'</span>';btn.setAttribute('aria-label',te("Tu n'as pas compris quelque chose ?"));}
+  function place(){
+    if(!document.body.contains(btn))document.body.appendChild(btn);
+    var scr=document.getElementById('s-main');
+    var ok=!!(scr&&scr.classList.contains('on')&&adulte()&&!document.querySelector('.alerte-voile'));
+    document.body.classList.toggle('alerte-ok',ok);
+    var ca=document.getElementById('ca');
+    document.body.classList.toggle('alerte-haut',!!(ca&&ca.dataset.page==='contact'));
+    if(btn._lang!==langue()){btn._lang=langue();libelle();}
+  }
+  setInterval(place,700);
+  function toast(t){var d=document.createElement('div');d.className='alerte-msg';d.textContent=t;document.body.appendChild(d);
+    setTimeout(function(){d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(function(){d.remove();},450);},3200);}
+  /* La capture : html-to-image, qui fait dessiner la page PAR LE
+     NAVIGATEUR (une image SVG) — html2canvas, lui, refait le rendu et
+     échoue sur les couleurs modernes (color-mix) de nos styles. */
+  var _hti=null;
+  function outilCapture(){
+    if(window.htmlToImage)return Promise.resolve(window.htmlToImage);
+    if(_hti)return _hti;
+    _hti=new Promise(function(ok,ko){var s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
+      s.onload=function(){ok(window.htmlToImage);};s.onerror=function(){_hti=null;ko();};document.head.appendChild(s);});
+    return _hti;
+  }
+  function capture(){
+    var k=Math.min(window.devicePixelRatio||1,1100/Math.max(1,innerWidth),1.5);
+    return outilCapture().then(function(h){
+      var o={pixelRatio:k,quality:.72,cacheBust:false,width:innerWidth,height:innerHeight,skipFonts:false,
+        style:{width:innerWidth+'px',height:innerHeight+'px',overflow:'hidden'},
+        backgroundColor:getComputedStyle(document.body).backgroundColor||'#fff8ec',
+        filter:function(n){return !(n.classList&&(n.classList.contains('alerte-btn')||n.classList.contains('alerte-msg')||n.classList.contains('alerte-voile')||n.id==='bandeau-consentement'));}};
+      /* Le contenu défilé (#ca) : la copie repartirait du haut. On le
+         décale le temps de la capture, pour montrer ce que l'élève voit. */
+      var ca=document.getElementById('ca'),y=ca?ca.scrollTop:0,av=ca&&ca.style.cssText;
+      if(ca&&y){ca.style.overflow='hidden';ca.scrollTop=0;
+        [].forEach.call(ca.children,function(c){c.style.translate='0 '+(-y)+'px';});}
+      function remet(){if(ca&&y){[].forEach.call(ca.children,function(c){c.style.translate='';});
+        ca.style.cssText=av;ca.scrollTop=y;}}
+      return h.toJpeg(document.body,o).then(function(u){remet();return u;},function(e){remet();throw e;});
+    }).then(function(u){return /^data:image\/jpeg/.test(u)?u:'';}).catch(function(){return '';});
+  }
+  function ouLonEst(){
+    var ca=document.getElementById('ca'),tt=document.getElementById('tb-title');
+    var s='';try{s=(st._curPage||'')+(ca&&ca.dataset.page?' · '+ca.dataset.page:'');}catch(e){}
+    try{if(st.curLesson&&(st._curPage==='lesson'||(ca&&ca.dataset.page==='lesson')))s+=' · '+(st.curLesson.title||st.curLesson.name||('cours '+st.curLesson.id));}catch(e){}
+    var t=tt&&tt.textContent.trim();if(t)s+=' · « '+t+' »';
+    var lt=document.querySelector('#ca .ltab.on');if(lt)s+=' · '+lt.textContent.trim();
+    return s;
+  }
+  btn.onclick=function(){
+    try{stopSpeech();}catch(e){}arret();
+    btn.disabled=true;
+    capture().then(function(img){
+      btn.disabled=false;
+      var v=document.createElement('div');v.className='alerte-voile';
+      v.innerHTML='<div class="alerte-boite" role="dialog" aria-modal="true">'
+        +'<h3>'+te("Tu n'as pas compris quelque chose ?")+'</h3>'
+        +'<p>'+te("Dis-nous ce qui te bloque (facultatif). Une capture de l'écran est jointe.")+'</p>'
+        +(img?'<img alt="" src="'+img+'">':'')
+        +'<textarea maxlength="1500"></textarea>'
+        +'<div class="alerte-btns"><button type="button" class="alerte-annule">'+te('Annuler')+'</button>'
+        +'<button type="button" class="alerte-envoi">'+te('Envoyer')+'</button></div></div>';
+      document.body.appendChild(v);place();
+      var ta=v.querySelector('textarea'),env=v.querySelector('.alerte-envoi');
+      setTimeout(function(){try{ta.focus();}catch(e){}},80);
+      function ferme(){v.remove();place();}
+      v.querySelector('.alerte-annule').onclick=ferme;
+      v.addEventListener('click',function(e){if(e.target===v)ferme();});
+      env.onclick=function(){
+        env.disabled=true;env.textContent=te('Envoi…');
+        var tok='';try{tok=localStorage.getItem('arab_token')||'';}catch(e){}
+        fetch(API_URL+'/api/audio',{method:'POST',credentials:'same-origin',
+          headers:Object.assign({'Content-Type':'application/json'},tok?{Authorization:'Bearer '+tok}:{}),
+          body:JSON.stringify({alerte:{message:ta.value.trim(),page:ouLonEst(),profil:String(st.profile||''),
+            langue:langue(),appareil:navigator.userAgent+' · '+innerWidth+'×'+innerHeight,capture:img}})})
+        .then(function(r){if(!r.ok)throw 0;ferme();toast(te('Message envoyé ! Tu auras une réponse très vite.'));})
+        .catch(function(){env.disabled=false;env.textContent=te('Envoyer');toast(te("L'envoi n'a pas marché. Réessaie dans un instant."));});
+      };
+    });
+  };
+})();
+</script>

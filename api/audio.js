@@ -234,6 +234,8 @@ module.exports = async (req, res) => {
 
   const ip = getClientIp(req);
   if (req.method === 'GET') return lireLesSons(req, res, ip);
+  /* v3.2.3 — le bouton « Alerter » des élèves passe par ici (12 fonctions max). */
+  if (req.method === 'POST' && req.body && req.body.alerte) return require('./_alerte')(req, res, ip);
   if (req.method === 'POST') return deposerUnSon(req, res, ip);
   if (req.method === 'DELETE') return effacerUnSon(req, res, ip);
   return res.status(405).json({ error: 'Method not allowed' });
