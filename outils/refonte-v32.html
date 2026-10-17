@@ -1,0 +1,460 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     REFONTE v3.2.0 (17 octobre) — source : outils/refonte-v32.html, copiée
+     TELLE QUELLE dans app/app.html, juste après la balise du style doré.
+     Sa propre balise <style> : la grande feuille a un bloc non fermé qui
+     avale les règles posées à sa fin (voir ETAT, « Pièges »).
+     1. Le menu principal en 3D (adulte, fille, garçon — pas les 3-5 ans,
+        qui n'ont pas de menu) : cartes en dalle avec tranche, gemme 3D par
+        rubrique, glyphe blanc qui flotte.
+     2. Le menu du compte, sur la pastille en haut à droite : la langue par
+        DRAPEAU (dessinés en SVG : Windows n'affiche pas les drapeaux emoji)
+        et la déconnexion, traduite. Quitter / Langue quittent le bas.
+     3. Les pages Introduction, Exercices, Bonus, Contact (adulte), chacune
+        son dessin : le manuscrit enluminé, l'arène du quiz, les tuiles
+        d'or, la lettre scellée.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* ══ 1. LE MENU PRINCIPAL ══ */
+#root{--m-f1:#fffdf7;--m-f2:#fff1cf;--m-tranche:#e2bd63;--m-bord:rgba(184,134,11,.32);
+  --m-ombre:rgba(150,95,0,.22);--m-titre:#2a1a00;--m-desc:#7a5a20}
+#root.profile-girl{--m-f1:#ffffff;--m-f2:#ffe1ef;--m-tranche:#f3a0c8;--m-bord:rgba(233,30,140,.28);
+  --m-ombre:rgba(233,30,140,.22);--m-titre:#ad1457;--m-desc:#8a3a64}
+#root.profile-boy{--m-f1:#1d4486;--m-f2:#0f2a5c;--m-tranche:#071736;--m-bord:rgba(56,189,248,.45);
+  --m-ombre:rgba(0,10,40,.55);--m-titre:#ffffff;--m-desc:rgba(205,230,255,.85)}
+#root #menu-nav{gap:16px!important;padding:6px 16px 26px!important;perspective:1000px}
+#root #menu-nav .nav-card{position:relative;overflow:visible!important;min-height:86px;gap:14px!important;
+  padding:12px 14px 12px 12px!important;border-radius:24px!important;
+  background:linear-gradient(165deg,var(--m-f1) 0%,var(--m-f2) 100%)!important;
+  border:1px solid var(--m-bord)!important;backdrop-filter:none!important;
+  box-shadow:0 7px 0 var(--m-tranche),0 18px 30px var(--m-ombre),inset 0 2px 0 rgba(255,255,255,.75)!important}
+#root.profile-boy #menu-nav .nav-card{box-shadow:0 7px 0 var(--m-tranche),0 18px 30px var(--m-ombre),
+  inset 0 1px 0 rgba(140,210,255,.55),0 0 22px rgba(56,189,248,.18)!important}
+#root #menu-nav .nav-card::before,#root #menu-nav .nav-card-shimmer{display:none!important}
+#root #menu-nav .nav-card::after{content:'';position:absolute;left:10%;right:10%;top:3px;height:38%;
+  border-radius:20px 20px 50% 50%;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0))}
+#root.profile-boy #menu-nav .nav-card::after{background:linear-gradient(180deg,rgba(140,200,255,.18),rgba(140,200,255,0))}
+#root #menu-nav .nav-card:active{translate:0 5px;
+  box-shadow:0 2px 0 var(--m-tranche),0 8px 16px var(--m-ombre),inset 0 2px 0 rgba(255,255,255,.75)!important}
+#root #menu-nav .nav-title{font-size:1.08rem!important;font-weight:800!important;letter-spacing:.2px;
+  color:var(--m-titre)!important;-webkit-text-fill-color:var(--m-titre)!important;background:none!important}
+#root #menu-nav .nav-desc{color:var(--m-desc)!important;font-size:.74rem!important}
+/* la gemme */
+#root #menu-nav .nav-card .nav-icon{position:relative;flex:none;width:60px!important;height:60px!important;
+  margin:0!important;border-radius:19px!important;border:none!important;display:grid!important;place-items:center;
+  background:radial-gradient(circle at 30% 22%,var(--g1) 0%,var(--g2) 46%,var(--g3) 100%)!important;
+  box-shadow:0 6px 0 var(--g3),0 12px 18px rgba(0,0,0,.22),inset 0 3px 4px rgba(255,255,255,.55),inset 0 -4px 6px rgba(0,0,0,.18)!important;
+  rotate:-7deg;animation:gemFlotte 3.6s ease-in-out infinite;animation-delay:calc(var(--n,0)*-.7s)}
+#root #menu-nav .nav-card .nav-icon::after{content:'';position:absolute;top:6px;left:9px;width:44%;height:26%;
+  border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
+#root #menu-nav .nav-card .nav-icon svg{width:32px;height:32px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28))}
+@keyframes gemFlotte{0%,100%{translate:0 0}50%{translate:0 -4px}}
+#root #menu-nav .nav-card:hover .nav-icon{rotate:4deg;scale:1.08;transition:rotate .4s,scale .4s}
+#root #menu-nav .nav-card[data-page="intro"]{--g1:#bfe3ff;--g2:#3b8cf0;--g3:#1747a6}
+#root #menu-nav .nav-card[data-page="sessions"]{--g1:#fff0b8;--g2:#e6a817;--g3:#9a6700}
+#root #menu-nav .nav-card[data-page="exercises"]{--g1:#b9f5d5;--g2:#13b886;--g3:#056b4c}
+#root #menu-nav .nav-card[data-page="bonus"]{--g1:#ead4ff;--g2:#9b5de5;--g3:#55209e}
+#root #menu-nav .nav-card[data-page="contact"]{--g1:#ffd0d6;--g2:#f0506e;--g3:#a4173a}
+#root #menu-nav .nav-card[data-page="minigames"]{--g1:#ffd0ef;--g2:#ec4899;--g3:#93164f}
+#root #menu-nav .nav-card[data-page="album"]{--g1:#ffe0b8;--g2:#f97316;--g3:#a83a07}
+/* la flèche : un petit bouton rond de la couleur de la gemme */
+#root #menu-nav .nav-arrow{width:30px;height:30px;flex:none;border-radius:50%;display:grid!important;place-items:center;
+  font-size:1.2rem!important;font-weight:800;line-height:1;color:#fff!important;-webkit-text-fill-color:#fff!important;
+  background:linear-gradient(160deg,var(--g2),var(--g3))!important;box-shadow:0 3px 0 var(--g3),0 5px 10px rgba(0,0,0,.18)!important;
+  padding-bottom:2px;transition:translate .3s}
+#root #menu-nav .nav-card:hover .nav-arrow{translate:4px 0}
+/* le bas : Quitter et Langue passent dans le menu du compte */
+#root #s-menu .mb-actions{display:none!important}
+#root #s-menu .menu-bottom{justify-content:center!important}
+/* « Choisis ton parcours » retiré (fille, garçon) : le client le juge inutile. */
+#w-sub-age{display:none!important}
+
+/* ══ 2. LE MENU DU COMPTE ══ */
+#root #m-avatar{cursor:pointer;position:relative;transition:scale .2s}
+#root #m-avatar:active{scale:.92}
+#m-avatar .cp-drap{position:absolute;right:-5px;bottom:-4px;width:20px;height:14px;border-radius:3px;overflow:hidden;
+  box-shadow:0 0 0 2px #fff,0 2px 5px rgba(0,0,0,.3);pointer-events:none}
+.cp-drap svg,.cp-ligne svg,.cp-langue svg{display:block;width:100%;height:100%}
+.cp-pop{position:fixed;z-index:900;width:min(290px,calc(100vw - 32px));border-radius:22px;padding:12px;
+  background:linear-gradient(165deg,#fffdf7,#fff1cf);border:1px solid rgba(184,134,11,.35);color:#2a1a00;
+  box-shadow:0 7px 0 #e2bd63,0 24px 48px rgba(90,60,0,.3);font-family:Outfit,system-ui,sans-serif;
+  transform-origin:top right;animation:cpOuvre .35s cubic-bezier(.34,1.56,.64,1)}
+body.profile-girl .cp-pop{background:linear-gradient(165deg,#fff,#ffe6f2);border-color:rgba(233,30,140,.3);
+  box-shadow:0 7px 0 #f3a0c8,0 24px 48px rgba(173,20,87,.25);color:#5a1235}
+body.profile-boy .cp-pop{background:linear-gradient(165deg,#1d4486,#0f2a5c);border-color:rgba(56,189,248,.45);
+  box-shadow:0 7px 0 #071736,0 24px 48px rgba(0,0,0,.5);color:#fff}
+@keyframes cpOuvre{from{opacity:0;scale:.6;translate:10px -14px}to{opacity:1;scale:1;translate:0 0}}
+.cp-qui{font-size:.74rem;opacity:.7;padding:2px 6px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cp-titre{font-size:.64rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.65;padding:0 6px 6px}
+.cp-langue,.cp-sortir,.cp-ligne{width:100%;display:flex;align-items:center;gap:12px;border:none;cursor:pointer;
+  font:700 .95rem Outfit,system-ui,sans-serif;color:inherit;text-align:left;border-radius:14px}
+.cp-langue{padding:10px 12px;background:rgba(255,255,255,.75);box-shadow:inset 0 0 0 1px rgba(184,134,11,.25),0 3px 0 rgba(184,134,11,.25)}
+body.profile-boy .cp-langue{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(56,189,248,.4),0 3px 0 #071736}
+.cp-langue .cp-f{width:34px;height:23px;border-radius:5px;overflow:hidden;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.cp-langue .cp-fl{margin-left:auto;transition:rotate .3s;opacity:.6}
+.cp-pop.ouvert .cp-langue .cp-fl{rotate:180deg}
+.cp-liste{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.cp-pop.ouvert .cp-liste{grid-template-rows:1fr}
+.cp-liste>div{overflow:hidden;min-height:0}
+.cp-liste-in{max-height:46vh;overflow-y:auto;padding:8px 2px 2px;display:grid;gap:2px}
+.cp-ligne{padding:8px 10px;background:none;font-weight:600;font-size:.9rem}
+.cp-ligne:hover{background:rgba(184,134,11,.1)}
+body.profile-boy .cp-ligne:hover{background:rgba(56,189,248,.15)}
+.cp-ligne.on{background:rgba(184,134,11,.16);font-weight:800}
+body.profile-boy .cp-ligne.on{background:rgba(56,189,248,.25)}
+.cp-ligne .cp-f{width:30px;height:20px;border-radius:4px;overflow:hidden;flex:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.cp-pop.ouvert .cp-ligne{animation:cpLigne .4s both cubic-bezier(.22,1,.36,1);animation-delay:calc(var(--i)*25ms)}
+@keyframes cpLigne{from{opacity:0;translate:-12px 0}to{opacity:1;translate:0 0}}
+.cp-sortir{margin-top:10px;padding:11px 12px;justify-content:center;color:#fff;
+  background:linear-gradient(160deg,#ef5a6f,#c22143);box-shadow:0 4px 0 #8c1530,0 8px 16px rgba(194,33,67,.3)}
+.cp-sortir:active{translate:0 3px;box-shadow:0 1px 0 #8c1530}
+.cp-sortir svg{width:18px;height:18px}
+.cp-langue:focus-visible,.cp-ligne:focus-visible,.cp-sortir:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+
+/* ══ 3. LES PAGES (adulte) ══
+   Chaque page reçoit `data-page` sur #ca (renderPage). Le défilement les
+   révèle (`.rv` → `.rv-in`, l'observateur des cours) ; chaque page donne
+   SA façon d'arriver. */
+#root.profile-adult #ca[data-page] .rv{transition:opacity .8s ease,translate 1s cubic-bezier(.22,1,.36,1),rotate 1s cubic-bezier(.22,1,.36,1),scale .9s cubic-bezier(.34,1.56,.64,1)!important}
+
+/* — Introduction : le manuscrit enluminé — */
+#root.profile-adult #ca[data-page="intro"]{counter-reset:chap;perspective:1100px}
+#root.profile-adult #ca[data-page="intro"]>div:first-child{display:none}
+#root.profile-adult #ca[data-page="intro"] .dua-box{position:relative;overflow:hidden;isolation:isolate;
+  max-width:720px;margin:6px auto 26px!important;padding:34px 22px 26px!important;border-radius:30px!important;text-align:center;
+  background:radial-gradient(ellipse at 50% 0%,#fff8dc 0%,#fdebb5 55%,#f3d27a 100%)!important;
+  border:none!important;
+  box-shadow:inset 0 0 0 2px #fff,inset 0 0 0 5px #c99316,inset 0 0 0 7px #fff4c4,
+    0 8px 0 #b8860b,0 26px 44px rgba(150,95,0,.32)!important}
+#root.profile-adult #ca[data-page="intro"] .dua-box::before{content:'';position:absolute;inset:-60%;z-index:-1;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.55) 0 6deg,rgba(255,255,255,0) 6deg 18deg);
+  animation:introRayons 40s linear infinite;opacity:.55}
+#root.profile-adult #ca[data-page="intro"] .dua-box::after{content:'';position:absolute;inset:12px;border-radius:22px;pointer-events:none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='%23b8860b'/%3E%3C/svg%3E") top left/26px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='%23b8860b'/%3E%3C/svg%3E") top right/26px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='%23b8860b'/%3E%3C/svg%3E") bottom left/26px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 2l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='%23b8860b'/%3E%3C/svg%3E") bottom right/26px no-repeat}
+@keyframes introRayons{to{rotate:360deg}}
+#root.profile-adult #ca[data-page="intro"] .dua-ar{font-size:2.3rem!important;line-height:1.7!important;
+  background:linear-gradient(100deg,#8a5c00 0%,#c99316 35%,#fff3c4 50%,#c99316 65%,#8a5c00 100%)!important;
+  background-size:250% 100%!important;-webkit-background-clip:text!important;background-clip:text!important;
+  -webkit-text-fill-color:transparent!important;filter:drop-shadow(0 2px 0 rgba(255,255,255,.8));
+  animation:introOr 5s ease-in-out infinite}
+@keyframes introOr{0%,100%{background-position:100% 0}50%{background-position:0 0}}
+#root.profile-adult #ca[data-page="intro"] .dua-tr{color:#7a5a20!important;border-bottom-color:rgba(184,134,11,.3)!important;font-size:.84rem}
+#root.profile-adult #ca[data-page="intro"] .p-section{counter-increment:chap;position:relative;max-width:720px;overflow:visible!important;
+  margin:40px auto 26px!important;padding:40px 20px 20px!important;border-radius:24px!important;
+  background:linear-gradient(160deg,#fffdf7,#fff3d6)!important;border:1px solid rgba(184,134,11,.28)!important;
+  box-shadow:0 6px 0 #e2bd63,0 18px 34px rgba(150,95,0,.18)!important;transform-style:preserve-3d}
+#root.profile-adult #ca[data-page="intro"] .p-section::before{content:counter(chap,arabic-indic);position:absolute;
+  left:20px;top:-27px;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  font:700 1.7rem/1 'Scheherazade New',serif;color:#fff;text-shadow:0 2px 4px rgba(90,50,0,.5);
+  background:radial-gradient(circle at 32% 26%,#fff3c4 0%,#f0c75a 30%,#c99316 70%,#8a5c00 100%);
+  box-shadow:0 5px 0 #8a5c00,0 10px 18px rgba(150,95,0,.35),inset 0 2px 4px rgba(255,255,255,.6)}
+#root.profile-adult #ca[data-page="intro"] .p-sec-title{font-size:1.12rem!important;font-weight:800!important;
+  color:#8a5c00!important;-webkit-text-fill-color:#8a5c00!important;padding-bottom:10px;margin-bottom:10px!important;
+  background:linear-gradient(90deg,#c99316,rgba(201,147,22,0)) bottom left/100% 2px no-repeat!important}
+#root.profile-adult #ca[data-page="intro"] .p-sec-body{color:#4a3510!important;line-height:1.75!important}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv:nth-of-type(odd){translate:-70px 0;rotate:y 28deg}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv:nth-of-type(even){translate:70px 0;rotate:y -28deg}
+#root.profile-adult #ca[data-page="intro"] .dua-box.rv{scale:.82;translate:0 30px}
+#root.profile-adult #ca[data-page="intro"] .rv.rv-in{translate:0 0;rotate:y 0deg;scale:1}
+
+/* — Exercices : l'arène du quiz — */
+#root.profile-adult #ca[data-page="exercises"] .ex-tete{position:relative;overflow:hidden;color:#fff!important;
+  max-width:760px;margin:4px auto 14px!important;padding:18px 18px 16px!important;border-radius:24px!important;
+  background:linear-gradient(125deg,#056b4c 0%,#13b886 55%,#7be3b6 100%)!important;
+  box-shadow:0 7px 0 #04563d,0 18px 34px rgba(4,86,61,.3),inset 0 1px 0 rgba(255,255,255,.4)!important}
+#root.profile-adult #ca[data-page="exercises"] .ex-tete::before{content:'';position:absolute;inset:0;opacity:.18;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cpath d='M24 4l5 15 15 5-15 5-5 15-5-15-15-5 15-5z' fill='none' stroke='%23fff'/%3E%3C/svg%3E") 0 0/48px;
+  animation:parMotif 40s linear infinite}
+#root.profile-adult #ca[data-page="exercises"] .ex-tete::after{content:'';position:absolute;top:0;bottom:0;width:40%;left:-50%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);animation:parReflet 5s 1s ease-in-out infinite}
+#root.profile-adult #ca[data-page="exercises"] .ex-tete>div{position:relative;z-index:1;font-size:1.15rem!important;letter-spacing:.3px;
+  text-shadow:0 2px 6px rgba(0,60,40,.4)}
+#root.profile-adult #ca[data-page="exercises"] .qz-prog{max-width:760px;margin:0 auto 16px!important}
+#root.profile-adult #ca[data-page="exercises"] .qpb{height:14px!important;border-radius:99px!important;
+  background:#f3e6c4!important;box-shadow:inset 0 2px 4px rgba(120,80,0,.25)!important;overflow:hidden}
+#root.profile-adult #ca[data-page="exercises"] .qpf{border-radius:99px!important;min-width:14px;
+  background:repeating-linear-gradient(115deg,#13b886 0 10px,#0fa074 10px 20px)!important;background-size:28px 100%!important;
+  box-shadow:0 0 12px rgba(19,184,134,.6),inset 0 2px 0 rgba(255,255,255,.4)!important;animation:exRayures 1s linear infinite}
+@keyframes exRayures{to{background-position:28px 0}}
+#root.profile-adult #ca[data-page="exercises"] .qs-lbl{color:#056b4c!important;font-weight:800!important;font-variant-numeric:tabular-nums}
+#root.profile-adult #ca[data-page="exercises"] .qz-q{max-width:760px;margin:0 auto 18px!important;border-radius:28px!important;
+  padding:20px 18px!important;background:linear-gradient(165deg,#fffdf7,#fff1cf)!important;border:1px solid rgba(184,134,11,.3)!important;
+  box-shadow:0 8px 0 #e2bd63,0 22px 40px rgba(150,95,0,.2),inset 0 2px 0 #fff!important;color:#2a1a00!important;
+  animation:exCarte .7s both cubic-bezier(.34,1.56,.64,1);transform-origin:50% 100%}
+#root.profile-adult #ca[data-page="exercises"] .qz-q::before{display:none!important}
+@keyframes exCarte{from{opacity:0;rotate:x 55deg;translate:0 40px;scale:.9}to{opacity:1;rotate:x 0deg;translate:0 0;scale:1}}
+#root.profile-adult #ca[data-page="exercises"] .q-lbl{color:#7a5a20!important;text-align:center;font-weight:600}
+#root.profile-adult #ca[data-page="exercises"] .q-big{font-size:3.4rem!important;color:#8a5c00!important;
+  text-shadow:0 3px 0 #fff,0 8px 16px rgba(150,95,0,.25);animation:exMot 1s .25s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes exMot{from{opacity:0;scale:.4;filter:blur(8px)}to{opacity:1;scale:1;filter:none}}
+#root.profile-adult #ca[data-page="exercises"] .qz-q [style*="color:rgba(255,255,255"]{color:#7a5a20!important}
+#root.profile-adult #ca[data-page="exercises"] .qz-q [style*="background:rgba(255,255,255,.0"]{background:#fff8e6!important;
+  border:1px solid rgba(184,134,11,.25)!important;box-shadow:inset 0 2px 6px rgba(120,80,0,.12)}
+#root.profile-adult #ca[data-page="exercises"] .fab{border-radius:99px!important;color:#fff!important;
+  background:linear-gradient(160deg,#18c792,#0a8a62)!important;
+  box-shadow:0 6px 0 #056b4c,0 14px 24px rgba(5,107,76,.3),inset 0 2px 0 rgba(255,255,255,.4)!important;
+  animation:exBouton .7s .45s both cubic-bezier(.34,1.56,.64,1);transition:translate .15s,box-shadow .15s!important}
+#root.profile-adult #ca[data-page="exercises"] .fab:active{translate:0 4px;box-shadow:0 2px 0 #056b4c!important}
+@keyframes exBouton{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
+#root.profile-adult #ca[data-page="exercises"] .rbtn-m{border-radius:99px!important}
+
+/* — Bonus : les tuiles d'or — */
+#root.profile-adult #ca[data-page="bonus"]{perspective:1000px}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille{max-width:760px;margin:0 auto;gap:16px!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card{position:relative;overflow:hidden;min-height:170px!important;
+  border-radius:26px!important;padding:16px 8px 14px!important;justify-content:space-between!important;
+  background:linear-gradient(165deg,#fffdf7,#fff1cf)!important;border:1px solid rgba(184,134,11,.3)!important;
+  box-shadow:0 7px 0 #e2bd63,0 18px 30px rgba(150,95,0,.2),inset 0 2px 0 #fff!important;
+  transition:translate .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s!important;transform-style:preserve-3d}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card::before{content:'';position:absolute;inset:0;opacity:.13;pointer-events:none;
+  background-size:44px;background-image:var(--motif)}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1){--motif:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Ccircle cx='22' cy='22' r='9' fill='none' stroke='%23b8860b' stroke-width='2'/%3E%3C/svg%3E")}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(2){--motif:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M6 40V22a16 16 0 0132 0v18' fill='none' stroke='%23b8860b' stroke-width='2'/%3E%3C/svg%3E")}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(3){--motif:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M22 4l5 13 13 5-13 5-5 13-5-13-13-5 13-5z' fill='none' stroke='%23b8860b' stroke-width='1.5'/%3E%3C/svg%3E")}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(4){--motif:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cpath d='M28 8a14 14 0 100 28 11 11 0 110-28z' fill='none' stroke='%23b8860b' stroke-width='2'/%3E%3C/svg%3E")}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card::after{content:'';position:absolute;top:0;bottom:0;width:45%;left:-60%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);transition:left .7s ease;pointer-events:none}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:hover{translate:0 -6px;
+  box-shadow:0 12px 0 #e2bd63,0 26px 40px rgba(150,95,0,.26),inset 0 2px 0 #fff!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:hover::after{left:130%}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:active{translate:0 4px}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card>div:first-child{position:relative;z-index:1;
+  color:#8a5c00!important;font-size:1rem!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-medaille{position:relative;z-index:1;width:92px;height:92px;border-radius:50%;
+  display:grid;place-items:center;margin:6px auto 2px!important;color:#fff!important;font-size:2.6rem!important;
+  text-shadow:0 3px 6px rgba(90,50,0,.5);line-height:1!important;
+  background:radial-gradient(circle at 32% 26%,#fff3c4 0%,#f0c75a 30%,#c99316 70%,#8a5c00 100%);
+  box-shadow:0 6px 0 #8a5c00,0 14px 22px rgba(150,95,0,.35),inset 0 3px 6px rgba(255,255,255,.6)}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:hover .bonus-medaille{animation:bonusTourne .9s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bonusTourne{from{rotate:y 0deg}to{rotate:y 360deg}}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille.rv .sess-card{opacity:0;rotate:y -90deg}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille.rv{translate:0 0!important;opacity:1!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille.rv-in .sess-card,
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille:not(.rv) .sess-card{animation:bonusArrive .9s both cubic-bezier(.34,1.56,.64,1);
+  animation-delay:calc(var(--n,0)*130ms)}
+@keyframes bonusArrive{from{opacity:0;rotate:y -90deg;scale:.85}to{opacity:1;rotate:y 0deg;scale:1}}
+
+/* — Contact : la lettre scellée — */
+#root.profile-adult #ca[data-page="contact"]{perspective:1200px}
+#root.profile-adult #ca[data-page="contact"] .p-section{position:relative;max-width:560px;margin:22px auto 26px!important;
+  padding:76px 22px 24px!important;border-radius:26px!important;overflow:visible!important;
+  background:linear-gradient(170deg,#fffdf7 0%,#fff3d6 100%)!important;border:1px solid rgba(184,134,11,.3)!important;
+  box-shadow:0 8px 0 #e2bd63,0 26px 44px rgba(150,95,0,.24)!important;transform-style:preserve-3d}
+#root.profile-adult #ca[data-page="contact"] .p-section::before{content:'';position:absolute;left:0;right:0;top:0;height:92px;
+  border-radius:26px 26px 0 0;transform-origin:50% 0;backface-visibility:hidden;
+  background:linear-gradient(180deg,#f0c75a,#c99316);clip-path:polygon(0 0,100% 0,50% 100%);
+  filter:drop-shadow(0 6px 6px rgba(120,80,0,.25));animation:contactRabat 1.1s .35s both cubic-bezier(.22,1,.36,1)}
+@keyframes contactRabat{from{rotate:x 0deg}to{rotate:x 165deg;opacity:.0}}
+#root.profile-adult #ca[data-page="contact"] .p-section::after{content:'';position:absolute;left:50%;top:-26px;translate:-50% 0;
+  width:64px;height:64px;border-radius:50%;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='M3 7l9 6 9-6'/%3E%3C/svg%3E") center/30px no-repeat,
+    radial-gradient(circle at 32% 26%,#ff9aa8 0%,#e0354f 45%,#8c1530 100%);
+  box-shadow:0 5px 0 #6e0f25,0 12px 20px rgba(140,21,48,.35),inset 0 3px 5px rgba(255,255,255,.45);
+  animation:contactSceau .9s 1.1s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes contactSceau{from{scale:0;rotate:-120deg}to{scale:1;rotate:0deg}}
+#root.profile-adult #ca[data-page="contact"] .p-sec-title{text-align:center;font-size:1.3rem!important;font-weight:800!important;
+  color:#8a5c00!important;-webkit-text-fill-color:#8a5c00!important;background:none!important}
+#root.profile-adult #ca[data-page="contact"] .p-sec-body{text-align:center;color:#7a5a20!important}
+#root.profile-adult #ca[data-page="contact"] .cform-input{border-radius:16px!important;padding:14px 16px!important;
+  background:#fffaf0!important;border:1.5px solid rgba(184,134,11,.25)!important;color:#2a1a00!important;
+  box-shadow:inset 0 3px 6px rgba(120,80,0,.1)!important;transition:border-color .25s,box-shadow .25s,translate .25s!important}
+#root.profile-adult #ca[data-page="contact"] .cform-input:focus{border-color:#e8a020!important;translate:0 -2px;
+  box-shadow:inset 0 2px 4px rgba(120,80,0,.08),0 0 0 4px rgba(232,160,32,.2),0 8px 18px rgba(150,95,0,.15)!important}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:not(.p-sec-title){animation:contactChamp .6s both cubic-bezier(.22,1,.36,1)}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(2){animation-delay:1.25s}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(3){animation-delay:1.35s}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(4){animation-delay:1.45s}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(5){animation-delay:1.55s}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(6){animation-delay:1.65s}
+#root.profile-adult #ca[data-page="contact"] .p-section>*:nth-child(7){animation-delay:1.8s}
+#root.profile-adult #ca[data-page="contact"] .p-sec-title{animation:contactChamp .6s 1.15s both cubic-bezier(.22,1,.36,1)}
+@keyframes contactChamp{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
+#root.profile-adult #ca[data-page="contact"] .cform-btn{position:relative;border-radius:99px!important;padding:15px!important;
+  color:#fff!important;font-weight:800!important;letter-spacing:.3px;
+  background:linear-gradient(160deg,#e8a020,#b8860b)!important;
+  box-shadow:0 6px 0 #8a5c00,0 14px 24px rgba(150,95,0,.3),inset 0 2px 0 rgba(255,255,255,.4)!important;
+  transition:translate .15s,box-shadow .15s!important}
+#root.profile-adult #ca[data-page="contact"] .cform-btn::after{content:'';display:inline-block;width:18px;height:18px;margin-left:10px;vertical-align:-3px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M2 21l21-9L2 3v7l15 2-15 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  transition:translate .4s cubic-bezier(.34,1.56,.64,1)}
+#root.profile-adult #ca[data-page="contact"] .cform-btn:hover::after{translate:8px -4px}
+#root.profile-adult #ca[data-page="contact"] .cform-btn:active{translate:0 4px;box-shadow:0 2px 0 #8a5c00!important}
+
+/* ══ 4. LA CARTE DES ANIMAUX (3-5 ans) EN 3D ══
+   Le plateau se couche en perspective, le sentier se dessine, les
+   médaillons tombent un à un en pièces épaisses et flottent, des nuages
+   passent, l'étape du moment pulse et montre « à toi ». */
+body.age-petit .sess-map-wrap{perspective:1400px}
+body.age-petit .sess-map-title{font-size:1.5rem!important;letter-spacing:.06em;
+  text-shadow:0 2px 0 #fff,0 4px 0 rgba(0,0,0,.08),0 8px 14px rgba(0,0,0,.12)!important;
+  animation:carteTitre .8s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes carteTitre{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+body.age-petit .carte-monde{transform-origin:50% 100%;rotate:x 9deg;
+  border:6px solid #fff;
+  box-shadow:0 10px 0 #b9d7a8,0 30px 50px rgba(60,90,50,.3),inset 0 0 0 1px rgba(0,0,0,.05)!important;
+  animation:carteLeve 1.1s both cubic-bezier(.22,1,.36,1)}
+@keyframes carteLeve{from{opacity:0;rotate:x 55deg;translate:0 60px}to{opacity:1;rotate:x 9deg;translate:0 0}}
+body.age-petit .carte-sentier .sol,body.age-petit .carte-sentier .bord{stroke-dasharray:1;stroke-dashoffset:1;
+  animation:carteTrace 2.2s .5s forwards cubic-bezier(.45,0,.2,1)}
+@keyframes carteTrace{to{stroke-dashoffset:0}}
+body.age-petit .carte-sentier .pas{fill:none;stroke:#fff;stroke-width:1.3;stroke-linecap:round;
+  stroke-dasharray:.1 3.2;opacity:0;animation:cartePas 2.4s linear infinite,carteApparait .6s 2.6s forwards}
+@keyframes cartePas{to{stroke-dashoffset:-3.3}}
+@keyframes carteApparait{to{opacity:.9}}
+/* les nuages */
+.carte-nuage{position:absolute;z-index:1;pointer-events:none;width:22%;aspect-ratio:2.2;opacity:.85;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 50'%3E%3Cpath d='M22 44h68a16 16 0 000-32 22 22 0 00-41-6A16 16 0 0022 44z' fill='%23fff'/%3E%3C/svg%3E") center/contain no-repeat;
+  filter:drop-shadow(0 6px 6px rgba(60,90,120,.18));animation:carteNuage 38s linear infinite}
+.carte-nuage.n0{top:9%;animation-duration:42s;animation-delay:-6s}
+.carte-nuage.n1{top:43%;width:16%;animation-duration:55s;animation-delay:-30s;opacity:.7}
+.carte-nuage.n2{top:72%;width:19%;animation-duration:48s;animation-delay:-18s}
+@keyframes carteNuage{from{left:-25%}to{left:105%}}
+/* les médaillons : des pièces épaisses */
+body.age-petit .carte-etape{z-index:2;animation:etapeTombe .8s both cubic-bezier(.34,1.56,.64,1);
+  animation-delay:calc(.55s + var(--i,0)*110ms)}
+@keyframes etapeTombe{from{opacity:0;translate:0 -70px;scale:.4}to{opacity:1;translate:0 0;scale:1}}
+body.age-petit .carte-etape::after{content:'';position:absolute;left:18%;right:18%;top:calc(100% - 26%);height:10%;
+  border-radius:50%;background:rgba(40,70,30,.28);filter:blur(3px);z-index:-1;animation:ombreFlotte 3.2s ease-in-out infinite;
+  animation-delay:calc(var(--i,0)*-.45s)}
+body.age-petit .carte-rond{overflow:visible!important;
+  box-shadow:0 6px 0 color-mix(in srgb,var(--tc) 70%,#000),0 12px 18px rgba(0,0,0,.22),
+    inset 0 4px 6px rgba(255,255,255,.8),inset 0 -6px 10px color-mix(in srgb,var(--tc) 30%,transparent)!important;
+  animation:rondFlotte 3.2s ease-in-out infinite;animation-delay:calc(var(--i,0)*-.45s);transition:scale .25s}
+body.age-petit .carte-rond::before{content:'';position:absolute;top:7%;left:18%;width:38%;height:22%;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,255,255,.9),rgba(255,255,255,0));z-index:2;pointer-events:none}
+body.age-petit .carte-rond img{border-radius:50%;transition:rotate .3s}
+@keyframes rondFlotte{0%,100%{translate:0 0}50%{translate:0 -6px}}
+@keyframes ombreFlotte{0%,100%{scale:1;opacity:.9}50%{scale:.78;opacity:.55}}
+body.age-petit .carte-etape:not(.fermee):hover .carte-rond{scale:1.08}
+body.age-petit .carte-etape:not(.fermee):hover .carte-rond img{animation:animalDanse .6s ease-in-out}
+@keyframes animalDanse{0%,100%{rotate:0deg}25%{rotate:-10deg}75%{rotate:10deg}}
+body.age-petit .carte-nom{box-shadow:0 3px 0 rgba(0,0,0,.12),0 6px 10px rgba(60,90,50,.18)!important;
+  border:1.5px solid color-mix(in srgb,var(--tc) 45%,#fff)}
+body.age-petit .carte-etat{box-shadow:0 2px 0 rgba(0,0,0,.15),0 3px 6px rgba(0,0,0,.2)!important;z-index:3}
+/* l'étape du moment */
+body.age-petit .carte-etape.courante .carte-rond{box-shadow:0 6px 0 color-mix(in srgb,var(--tc) 70%,#000),0 0 0 6px #fff,
+  0 0 0 10px var(--tc),0 14px 24px rgba(0,0,0,.25),inset 0 4px 6px rgba(255,255,255,.8)!important}
+/* elle bondit au lieu de flotter (le ▶ est déjà sur son badge) */
+body.age-petit .carte-etape.courante .carte-rond{animation:courBondit 1.1s ease-in-out infinite}
+@keyframes courBondit{0%,100%{translate:0 0;scale:1}40%{translate:0 -9px;scale:1.05}60%{translate:0 -9px;scale:1.05}}
+body.age-petit .carte-etape.courante .carte-rond::after{content:'';position:absolute;inset:-14px;border-radius:50%;
+  border:3px solid var(--tc);animation:courOnde 1.8s ease-out infinite;pointer-events:none}
+@keyframes courOnde{from{scale:.85;opacity:.9}to{scale:1.35;opacity:0}}
+/* l'album, en cartes épaisses */
+body.age-petit .alb-vig{box-shadow:0 5px 0 color-mix(in srgb,var(--tc) 55%,#999),0 10px 18px rgba(0,0,0,.14)!important;
+  animation:etapeTombe .7s both cubic-bezier(.34,1.56,.64,1)}
+body.age-petit .tuile-jauge{height:16px!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.15)}
+body.age-petit .tuile-jauge>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
+@media (prefers-reduced-motion:reduce){
+  body.age-petit .carte-monde,body.age-petit .carte-etape,body.age-petit .carte-rond,body.age-petit .carte-etape::after,
+  body.age-petit .carte-sentier *,.carte-nuage,
+  body.age-petit .carte-etape.courante .carte-rond::after{animation:none!important}
+  body.age-petit .carte-sentier .sol,body.age-petit .carte-sentier .bord{stroke-dashoffset:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  #root #menu-nav .nav-card .nav-icon,#root.profile-adult #ca[data-page] *,#root.profile-adult #ca[data-page] *::before,
+  #root.profile-adult #ca[data-page] *::after,.cp-pop,.cp-ligne{animation:none!important}
+}
+</style>
+<script>
+(function(){
+  /* ── Les glyphes blancs des gemmes du menu ── */
+  function g(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';}
+  window._GLYPHE3D={
+    intro:g('<circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".6" fill="#fff"/>'),
+    sessions:g('<path d="M2 5.5C4.5 4 8 4 12 6c4-2 7.5-2 10-.5V19c-2.5-1.5-6-1.5-10 .5-4-2-7.5-2-10-.5z"/><path d="M12 6v13.5"/>'),
+    exercises:g('<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/><path d="M13 20h7"/>'),
+    bonus:g('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="rgba(255,255,255,.25)"/>'),
+    contact:g('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/>'),
+    minigames:g('<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11" r=".9" fill="#fff"/><circle cx="17.8" cy="13.6" r=".9" fill="#fff"/>'),
+    album:g('<circle cx="12" cy="9" r="5.5"/><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"/><path d="M12 6.5l.9 1.9 2 .3-1.4 1.4.3 2L12 11.2l-1.8.9.3-2-1.4-1.4 2-.3z" fill="#fff" stroke="none"/>')
+  };
+
+  /* ── Les drapeaux (viewBox 30 x 20) ── */
+  function f(x){return '<svg viewBox="0 0 30 20" preserveAspectRatio="none">'+x+'</svg>';}
+  function v3(a,b,c){return f('<rect width="10" height="20" fill="'+a+'"/><rect x="10" width="10" height="20" fill="'+b+'"/><rect x="20" width="10" height="20" fill="'+c+'"/>');}
+  function h3(a,b,c){return f('<rect width="30" height="7" fill="'+a+'"/><rect y="6.6" width="30" height="7" fill="'+b+'"/><rect y="13.3" width="30" height="6.7" fill="'+c+'"/>');}
+  var DRAPEAUX={
+    fr:v3('#002395','#fff','#ed2939'),
+    it:v3('#009246','#fff','#ce2b37'),
+    de:h3('#000','#dd0000','#ffce00'),
+    nl:h3('#ae1c28','#fff','#21468b'),
+    ru:h3('#fff','#0039a6','#d52b1e'),
+    id:f('<rect width="30" height="10" fill="#ce1126"/><rect y="10" width="30" height="10" fill="#fff"/>'),
+    es:f('<rect width="30" height="20" fill="#c60b1e"/><rect y="5" width="30" height="10" fill="#ffc400"/>'),
+    en:f('<rect width="30" height="20" fill="#012169"/><path d="M0 0l30 20M30 0L0 20" stroke="#fff" stroke-width="4"/><path d="M0 0l30 20M30 0L0 20" stroke="#c8102e" stroke-width="1.6"/><path d="M15 0v20M0 10h30" stroke="#fff" stroke-width="6"/><path d="M15 0v20M0 10h30" stroke="#c8102e" stroke-width="3.4"/>'),
+    zh:f('<rect width="30" height="20" fill="#de2910"/><path d="M5 2.2l1.2 3.6H10L7 8l1.1 3.6L5 9.4 1.9 11.6 3 8 0 5.8h3.8z" fill="#ffde00"/><g fill="#ffde00"><circle cx="10.5" cy="2" r=".9"/><circle cx="12.2" cy="4" r=".9"/><circle cx="12.2" cy="6.8" r=".9"/><circle cx="10.5" cy="8.8" r=".9"/></g>'),
+    tr:f('<rect width="30" height="20" fill="#e30a17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#e30a17"/><path d="M15.4 10l3.4-1.1-2.1 2.9V8.2l2.1 2.9z" fill="#fff"/>'),
+    pt:f('<rect width="30" height="20" fill="#da291c"/><rect width="12" height="20" fill="#046a38"/><circle cx="12" cy="10" r="3.6" fill="#ffe900"/><circle cx="12" cy="10" r="2.2" fill="#da291c"/>'),
+    ur:f('<rect width="30" height="20" fill="#01411c"/><rect width="7.5" height="20" fill="#fff"/><circle cx="19" cy="10" r="5" fill="#fff"/><circle cx="20.4" cy="8.8" r="4.3" fill="#01411c"/><path d="M22.5 6.5l.6 1.8 1.9-.1-1.5 1.1.6 1.8-1.6-1.1-1.5 1.1.6-1.8-1.6-1.1 1.9.1z" fill="#fff"/>'),
+    hi:f('<rect width="30" height="7" fill="#ff9933"/><rect y="6.6" width="30" height="7" fill="#fff"/><rect y="13.3" width="30" height="6.7" fill="#138808"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width=".6"/><circle cx="15" cy="10" r=".5" fill="#000080"/>')
+  };
+  window._DRAPEAUX=DRAPEAUX;
+  var SORTIR='<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>';
+
+  /* ── Le menu du compte ── */
+  var pop=null;
+  function ferme(){if(pop){pop.remove();pop=null;}}
+  function changeLangue(c){
+    st.lang=c;
+    try{localStorage.setItem('arab_lang',c);}catch(e){}
+    ferme();
+    try{applyI18N();}catch(e){}
+    poseDrapeau();
+  }
+  function ouvre(av){
+    if(pop){ferme();return;}
+    var cur=(LANGS.filter(function(l){return l.c===st.lang;})[0])||LANGS[0];
+    pop=document.createElement('div');pop.className='cp-pop';pop.setAttribute('role','dialog');
+    var email='';try{email=(st.user&&st.user.email)||localStorage.getItem('arab_email')||'';}catch(e){}
+    var h='';
+    if(email)h+='<div class="cp-qui">'+email.replace(/</g,'&lt;')+'</div>';
+    h+='<div class="cp-titre">'+te('Langue')+'</div>'
+      +'<button type="button" class="cp-langue" aria-expanded="false"><span class="cp-f">'+(DRAPEAUX[cur.c]||'')+'</span>'
+      +'<span>'+cur.l+'</span><span class="cp-fl">▾</span></button>'
+      +'<div class="cp-liste"><div><div class="cp-liste-in">'
+      +LANGS.map(function(l,i){return '<button type="button" class="cp-ligne'+(l.c===st.lang?' on':'')+'" data-l="'+l.c+'" style="--i:'+i+'">'
+        +'<span class="cp-f">'+(DRAPEAUX[l.c]||'')+'</span><span>'+l.l+'</span></button>';}).join('')
+      +'</div></div></div>'
+      +'<button type="button" class="cp-sortir">'+SORTIR+'<span>'+te('Déconnexion')+'</span></button>';
+    pop.innerHTML=h;
+    document.body.appendChild(pop);
+    var r=av.getBoundingClientRect();
+    pop.style.top=Math.round(r.bottom+10)+'px';
+    pop.style.right=Math.max(16,Math.round(innerWidth-r.right))+'px';
+    var bl=pop.querySelector('.cp-langue');
+    bl.onclick=function(e){e.stopPropagation();var o=pop.classList.toggle('ouvert');bl.setAttribute('aria-expanded',o?'true':'false');};
+    [].forEach.call(pop.querySelectorAll('.cp-ligne'),function(b){
+      b.onclick=function(e){e.stopPropagation();changeLangue(b.getAttribute('data-l'));};
+    });
+    pop.querySelector('.cp-sortir').onclick=function(e){e.stopPropagation();ferme();doLogout();};
+    pop.addEventListener('click',function(e){e.stopPropagation();});
+  }
+  function poseDrapeau(){
+    var av=document.getElementById('m-avatar');if(!av)return;
+    var d=av.querySelector('.cp-drap');
+    if(!d){d=document.createElement('span');d.className='cp-drap';d.setAttribute('aria-hidden','true');av.appendChild(d);}
+    d.innerHTML=DRAPEAUX[st.lang]||'';
+  }
+  window._poseDrapeauCompte=poseDrapeau;
+  function arme(){
+    var av=document.getElementById('m-avatar');if(!av||av._cp)return;
+    av._cp=1;av.setAttribute('role','button');av.setAttribute('tabindex','0');
+    av.title=te('Langue')+' · '+te('Déconnexion');
+    av.addEventListener('click',function(e){e.stopPropagation();ouvre(av);});
+    av.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();ouvre(av);}});
+    /* `textContent` réécrit l'initiale (et efface le drapeau) : on le repose. */
+    if(window.MutationObserver)new MutationObserver(function(){if(!av.querySelector('.cp-drap'))poseDrapeau();})
+      .observe(av,{childList:true});
+    poseDrapeau();
+  }
+  document.addEventListener('click',ferme);
+  window.addEventListener('resize',ferme);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arme);else arme();
+})();
+</script>

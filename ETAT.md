@@ -183,7 +183,39 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.10), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.0), du plus récent au plus ancien :**
+
+- **v3.2.0 (17 octobre) — REFONTE.** Tout dans `outils/refonte-v32.html`
+  (une balise `<style>` + un `<script>`), copié tel quel dans
+  `app/app.html` juste après la balise du titre centré (v3.1.7). Pour
+  retoucher : modifier le fichier, puis remplacer le bloc à l'identique.
+  * **Menu principal 3D** (adulte, fille, garçon) : dalles à tranche,
+    gemme 3D par rubrique (`data-page` posé par `buildMenu`, couleurs
+    `--g1/--g2/--g3`), glyphes blancs `_GLYPHE3D`, flèche ronde. Couleurs
+    de dalle par profil (`--m-*` sur `#root.profile-*`).
+  * **Menu du compte** sur `#m-avatar` : langue par drapeau (SVG —
+    Windows n'affiche pas les drapeaux emoji) qui se déroule, et
+    « Déconnexion » traduite (`_TE['Déconnexion']`, `_TE['Langue']`).
+    Petit drapeau de la langue en cours sur la pastille. `.mb-actions`
+    (Langue/Quitter du bas) cachés.
+  * **Pages adultes**, `#ca[data-page]` (posé par `renderPage`, et
+    `'lesson'` par `openLesson`) : Introduction = manuscrit enluminé
+    (rayons, coins étoilés, Bismillah or qui miroite, chapitres numérotés
+    ١ ٢ ٣ qui arrivent en 3D de part et d'autre) ; Exercices = arène verte
+    émeraude (bandeau, barre à rayures, carte qui bascule en 3D, mot qui
+    surgit, bouton en dalle — `hdr.className='ex-tete'`) ; Bonus = tuiles
+    d'or qui se retournent une à une (`.bonus-grille`, `.bonus-medaille`) ;
+    Contact = lettre scellée (rabat qui s'ouvre, sceau rouge, champs en
+    cascade, avion en papier). L'observateur de révélation couvre aussi
+    `intro` et `bonus`.
+  * « Choisis ton parcours » caché (`#w-sub-age`).
+  * **Carte des animaux 3-5 ans** (`body.age-petit`) : plateau incliné qui
+    se lève, sentier qui se trace (`pathLength=1`) puis des pas blancs y
+    cheminent (`.pas`), médaillons en pièces épaisses qui tombent un à un
+    (note de musique chacun) et flottent avec leur ombre, nuages
+    (`.carte-nuage`), étape du moment (`.courante`) qui bondit avec une onde.
+  * Le point qui clignote à gauche de la pastille = `#sound-dot`
+    (`toggleSound`) : son de l'application allumé/éteint.
 
 - **v3.1.10 (17 octobre).**
   * **Récapitulatif 6-11 ans : la lettre du milieu « trop haute » (bā).**
