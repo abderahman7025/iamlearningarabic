@@ -918,7 +918,7 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
    3D, plus grosses ». Sphères nacrées à reflet, cœur d'or, légère
    bascule de toute la fleur, pétales qui jaillissent du cœur un à un. */
 .orb-wrap.fleur3d{perspective:900px;margin:22px auto}
-.orb-wrap.fleur3d::before{width:46%;height:46%;margin:0;translate:-50% -50%;
+.orb-wrap.fleur3d::before{width:46%;height:46%;margin:0;translate:-50% -50%;pointer-events:none;
   border:1.5px dashed rgba(184,134,11,.35)}
 .orb-wrap.fleur3d::after{content:'';position:absolute;inset:6%;border-radius:50%;pointer-events:none;
   background:radial-gradient(circle,rgba(245,200,66,.22) 0%,rgba(245,200,66,0) 65%)}
@@ -12284,7 +12284,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.1.8';
+var _VERSION_REPLI='v3.1.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -24912,12 +24912,14 @@ function renderLLesson(ca,s,idx){
        n'existe pas — elles restent donc blanches, toutes les quatre. */
     const sansCode=(letter.ar==='ع'||letter.ar==='غ');
     const isoBox=document.createElement('div');isoBox.className='pos-c';
-    /* ── LES COULEURS DE L'INTERFACE 6-11 ANS (v3.1.8) ──
-       Le client : « reprends exactement la même chose que les 6-11 ans ».
-       Orange pour l'isolée et ce qui en dérive (la fin), violet pour le
-       début et ce qui en dérive (le milieu), trait de liaison gris-bleu —
-       les constantes ISO, DEB, LIEN de `_boyScene`. */
-    const _ISO='#e65100',_DEB='#6a1b9a',_LIEN='#90a4ae';
+    /* ── LES COULEURS (v3.1.9) ──
+       Bleu pour l'isolée et ce qui en dérive (la fin), vert pour le début et
+       ce qui en dérive (le milieu) — le client tient à son bleu et à son
+       vert (l'orange et le violet des 6-11 ans, essayés en v3.1.8, sont
+       refusés). Le trait de liaison, lui, reste gris-bleu comme dans le
+       récapitulatif des 6-11 ans (LIEN de `_boyScene`) : seule la part
+       qui vient de la forme de base est en couleur. */
+    const _ISO='var(--blue)',_DEB='var(--green)',_LIEN='#90a4ae';
     const coulIso=sansCode?'var(--txt)':_ISO;
     /* La couleur va sur une balise INTÉRIEURE, jamais sur .pos-ar : une règle
        !important de l'habillage adulte force .pos-ar en blanc, et l'isolée
@@ -24997,7 +24999,10 @@ function renderLLesson(ca,s,idx){
   layout.appendChild(pronLine);
 
   const ctr=document.createElement('div');ctr.className='orb-ctr';ctr.textContent=letter.ar;
-  ctr.onclick=()=>{speak(letter.name,.72);ctr.classList.add('rpl');setTimeout(()=>ctr.classList.remove('rpl'),500);};
+  /* La lettre nue est enregistrée au studio, et c'est justement son NOM :
+     on la dit par son caractère arabe. `letter.name` (« ba ») n'a pas
+     d'enregistrement et partait à la voix du navigateur (v3.1.9). */
+  ctr.onclick=()=>{speak(letter.ar,.72);ctr.classList.add('rpl');setTimeout(()=>ctr.classList.remove('rpl'),500);};
   orbWrap.appendChild(ctr);
   /* Adulte : une fleur plus grande (jusqu'à 350 px) et en relief. Les
      autres profils gardent 270 px. */
@@ -25013,6 +25018,21 @@ function renderLLesson(ca,s,idx){
     orb.innerHTML=`<span class="orb-ar">${hk.ar}</span><span class="orb-lat">${hk.lat}</span>`;
     orb.onclick=function(){document.querySelectorAll('.orb-sat').forEach(o=>o.classList.remove('lit'));this.classList.add('lit');speak(hk.ar,.78);};
     orbWrap.appendChild(orb);
+  });
+  /* ── UN TOUCHER NE RATE PLUS SA VOYELLE (v3.1.9) ──
+     Le client : « j'appuie sur une variante et elle n'est pas sélectionnée ».
+     Un doigt tombe souvent entre deux pétales, ou au bord d'un pétale que
+     la fleur, qui bascule, vient de déplacer d'un cheveu. Le toucher est donc
+     pris sur toute la fleur et donné au pétale (ou au cœur) le plus proche. */
+  orbWrap.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('.orb-sat,.orb-ctr'))return;
+    var best=null,bd=1e9;
+    [].forEach.call(orbWrap.querySelectorAll('.orb-sat,.orb-ctr'),function(el){
+      var r=el.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
+      var d=Math.sqrt(dx*dx+dy*dy)/(r.width/2);
+      if(d<bd){bd=d;best=el;}
+    });
+    if(best&&bd<1.7&&best.onclick)best.onclick.call(best,e);
   });
   layout.appendChild(orbWrap);ca.appendChild(layout);
   // Module d'écriture

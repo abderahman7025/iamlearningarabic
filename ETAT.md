@@ -183,7 +183,20 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.1.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.1.9), du plus récent au plus ancien :**
+
+- **v3.1.9 (17 octobre).**
+  * Formes adultes : le client garde SON bleu (isolée, fin) et SON vert
+    (début, milieu) — l'orange/violet de la v3.1.8 est refusé. Le trait de
+    liaison reste gris-bleu `#90a4ae` et le modèle du canevas aussi.
+  * Fleur : « j'appuie sur une variante et elle n'est pas sélectionnée ».
+    Cause probable : `.orb-sat:active{scale(.82)}` rétrécit le pétale sous
+    le doigt, le relâcher tombe hors du pétale et le clic part sur la fleur.
+    Un écouteur sur `.orb-wrap` donne désormais tout toucher hors pétale au
+    pétale (ou au cœur) le plus proche (jusqu'à 1,7 rayon). Testé : 10
+    touchers entre les pétales → 10 voyelles dites.
+  * Cœur de la fleur : disait `letter.name` (« ba », pas d'enregistrement →
+    voix du navigateur). Dit maintenant `letter.ar`, enregistré au studio.
 
 - **v3.1.8 (17 octobre). Cours adulte = mêmes couleurs et même modèle que
   les 6-11 ans.** Le client : « regarde l'interface 6/11 ans et reprends
