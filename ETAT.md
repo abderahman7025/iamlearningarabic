@@ -183,7 +183,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.9), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.0), du plus récent au plus ancien :**
+
+- **v3.4.0 (18 octobre)** — L'OURDOU RETIRÉ du site (listes LANGS de
+  app.html et public/index.html, détection ; qui l'avait choisi passe à
+  l'anglais). Lecture : la ligne lue est gardée au milieu de l'écran
+  (adultes ; pas si l'élève vient de défiler) — bloc v330. Bonus soukoun :
+  « ce petit o » → « ce ْ » (12 langues), plus de fonds colorés, pastilles
+  violet / jaune / rose. `voix-allah.json` : 84 textes (~25 200 car.) —
+  sans l'ourdou, + soukoun (12 langues) + tanwin : نْ partout, « न' » en
+  hindi, « n' » en français.
 
 - **v3.3.9 (18 octobre)** — `_texteDua` inclut « رَبِّ زِدْنِي عِلْمًا » (il
   n'était pas lu ; la clé change). « Alla, » (indonésien) corrigé. Bloc v338 :

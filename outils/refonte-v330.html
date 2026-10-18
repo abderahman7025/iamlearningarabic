@@ -109,6 +109,20 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
   function efface(el){
     (el._km||[]).forEach(function(s){s.classList.remove('km-lu','km-ici');});
   }
+  /* v3.4.0 — le client : « que le paragraphe lu soit toujours au milieu de
+     l'écran » (adultes). À chaque nouvelle LIGNE lue, la page glisse pour
+     la mettre au centre ; pas si l'élève vient de faire défiler lui-même. */
+  var _mainLe=0;
+  ['wheel','touchmove','keydown'].forEach(function(ev){addEventListener(ev,function(){_mainLe=Date.now();},{passive:true});});
+  function suit(s){
+    if(!s||Date.now()-_mainLe<2500)return;
+    var r=document.getElementById('root');if(!r||!r.classList.contains('profile-adult'))return;
+    if(Date.now()-(suit._t||0)<700)return;
+    var rc=s.getBoundingClientRect();
+    if(Math.abs(rc.top+rc.height/2-innerHeight/2)<innerHeight*.12)return;
+    suit._t=Date.now();
+    try{s.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});}catch(e){}
+  }
   function boucle(el){
     cancelAnimationFrame(el._kmRaf);
     var a=el._kmA;if(!a)return;
@@ -118,10 +132,13 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
       var d0=b.d||0,d1=(b.f&&b.f>d0)?b.f:(a.duration||0);
       if(d1>d0){
         var p=Math.max(0,Math.min(1,(a.currentTime-d0)/(d1-d0))),pos=p*el._kmTot;
+        var cur=null;
         el._km.forEach(function(s){
           var lu=s._f<=pos,ici=!lu&&s._d<=pos;
           s.classList.toggle('km-lu',lu);s.classList.toggle('km-ici',ici);
+          if(ici)cur=s;
         });
+        suit(cur);
       }
       if(!a.paused&&!a.ended)el._kmRaf=requestAnimationFrame(pas);
     })();
