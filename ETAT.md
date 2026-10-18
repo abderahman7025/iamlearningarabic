@@ -183,7 +183,18 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.9), du plus récent au plus ancien :**
+
+- **v3.2.9 (18 octobre) — retour du TÉLÉPHONE.** Le client : retour depuis
+  un cours bonus → les leçons normales. Cause : la sous-page bonus ne
+  posait pas d'entrée d'historique, et le `popstate` suivait l'ADRESSE de
+  l'entrée précédente (une vieille « /lecon »). Maintenant : la sous-page
+  bonus pousse une entrée (`bonusSub`, retirée par `history.back()` +
+  `_ignorePop` quand on revient par le bouton de l'écran) ; et dès que
+  `#s-main` est affiché, le `popstate` appelle `handleBack()` — le retour du
+  téléphone fait exactement ce que fait le bouton (règle 2). Sur le menu,
+  `_gardeMenu` ne laisse plus rouvrir une rubrique restée dans
+  l'historique : 1er appui = bulle, 2e appui = on quitte (`history.go(-n)`).
 
 - **v3.2.8 (18 octobre) — ALERTE : l'élève choisit le canal.** Dans la
   fenêtre d'alerte : « Comment veux-tu qu'on te réponde ? » E-mail /

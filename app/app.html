@@ -5650,9 +5650,13 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
   window._gardeMenu=function(e){
     var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
     if(!menuOn)return false;
-    var vers=(e.state&&e.state.screen)||'';
-    if(vers==='s-main'||vers==='s-menu'||(e.state&&e.state._appState))return false;
-    if(Date.now()-averti<2500)return false;     /* deuxième appui : on laisse partir */
+    /* v3.2.9 — le menu est la RACINE : un retour ne rouvre jamais une rubrique
+       restée dans l'historique (avant, une vieille entrée « leçons » passait).
+       1er appui : on reste, avec la bulle ; 2e appui dans les 2,5 s : on
+       quitte, en sautant toutes les entrées de l'application. */
+    if(Date.now()-averti<2500){averti=0;
+      try{var n=history.length-1;if(n>0)history.go(-n);}catch(x){}
+      return true;}
     averti=Date.now();
     try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
     bulle(te('Appuie encore sur retour pour quitter'));
@@ -8147,8 +8151,15 @@ function showS(id,fwd,noHistory){
   }
 }
 window.addEventListener('popstate',function(e){
+  if(window._ignorePop){window._ignorePop=false;return;}
   /* v3.2.2 : sur le menu, le premier retour du téléphone ne fait pas sortir. */
   if(window._gardeMenu&&_gardeMenu(e))return;
+  /* v3.2.9 — DANS une rubrique, le retour du téléphone fait EXACTEMENT ce que
+     fait le bouton retour de l'écran (règle 2 de la navigation) : il suit
+     l'état de l'application, pas l'adresse de l'entrée d'historique — qui
+     pouvait être une vieille page (« Bonus » ramenait aux leçons). */
+  var _sm=document.getElementById('s-main');
+  if(_sm&&_sm.classList.contains('on')){_navPopping=true;try{handleBack();}finally{_navPopping=false;}return;}
   var path=window.location.pathname;
   var hash=(e.state&&e.state.hash)||'';
   /* Retour vers le menu principal (/fille/accueil) */
@@ -9240,7 +9251,11 @@ function handleBack(){
   var _stbR=document.getElementById('topbar');
   if(_stbR){_stbR.style.maxHeight='200px';_stbR.style.opacity='1';_stbR.style.transform='translateY(0)';_stbR.style.pointerEvents='';}
   /* Sous-page bonus */
-  if(st._bonusSubPage){st._bonusSubPage=false;var _bca=document.getElementById('ca');renderBonus(_bca);return;}
+  if(st._bonusSubPage){st._bonusSubPage=false;
+    /* retour par le bouton de l'écran : on retire aussi l'entrée d'historique
+       de la sous-page, sans que le « popstate » qui suit ne refasse un retour */
+    if(!_navPopping&&history.state&&history.state.bonusSub){window._ignorePop=true;try{history.back();}catch(e){window._ignorePop=false;}}
+    var _bca=document.getElementById('ca');renderBonus(_bca);return;}
 
   var parent=_navParent(st._curPage);
 
@@ -9729,6 +9744,10 @@ function renderBonus(ca){
           document.body.removeChild(clone);
           ca.innerHTML='';
           st._bonusSubPage=true;
+          /* v3.2.9 — une entrée d'historique pour la sous-page : le retour du
+             TÉLÉPHONE ramène à la liste des bonus (avant, il remontait plus
+             loin dans l'historique — vers une leçon). */
+          try{history.pushState({_appState:'page',hash:'bonus/sous',bonusSub:1},'',location.pathname);}catch(e){}
           var hint2=document.createElement('div');
           hint2.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:12px;opacity:.7';
           hint2.textContent=t('click_to_listen');
@@ -13697,7 +13716,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.8';
+var _VERSION_REPLI='v3.2.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

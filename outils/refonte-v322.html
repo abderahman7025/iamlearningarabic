@@ -134,9 +134,13 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
   window._gardeMenu=function(e){
     var menuOn=document.getElementById('s-menu')&&document.getElementById('s-menu').classList.contains('on');
     if(!menuOn)return false;
-    var vers=(e.state&&e.state.screen)||'';
-    if(vers==='s-main'||vers==='s-menu'||(e.state&&e.state._appState))return false;
-    if(Date.now()-averti<2500)return false;     /* deuxième appui : on laisse partir */
+    /* v3.2.9 — le menu est la RACINE : un retour ne rouvre jamais une rubrique
+       restée dans l'historique (avant, une vieille entrée « leçons » passait).
+       1er appui : on reste, avec la bulle ; 2e appui dans les 2,5 s : on
+       quitte, en sautant toutes les entrées de l'application. */
+    if(Date.now()-averti<2500){averti=0;
+      try{var n=history.length-1;if(n>0)history.go(-n);}catch(x){}
+      return true;}
     averti=Date.now();
     try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
     bulle(te('Appuie encore sur retour pour quitter'));
