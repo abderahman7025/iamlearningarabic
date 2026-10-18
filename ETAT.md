@@ -6048,3 +6048,8 @@ nécessaire — les éléments du site servent de décor.
 - 3-5 ans « Attrape-la » : grille choisie selon la forme de l'aire (2, 3, 4 ou 6 de front) pour les plus grosses bulles ; recalculée au redimensionnement. Aire non plus bornée à 620 px (paysage : 6 bulles d'un bord à l'autre).
 - 3-5 ans « Les ballons » : l'aire ne coupe plus les ballons (coupés seulement au bord du grand cadre) ; toute la largeur.
 - Carte des animaux couchée : 4 par rangée (4, 4, 3 centrés), toute la largeur, on fait défiler.
+
+## v3.5.1
+- 3-5 ans : manche « Écoute bien » retirée (leçons des lettres et leçon des voyelles) — doublon d'« Attrape-la ».
+- « Attrape-la » leçon des voyelles : plus seulement « Bravo ! » à chaque prise, la suite Encore / Continue / Bravo / Génial puis Supeeeer, comme les autres jeux.
+- Tracé 3-5 ans : canevas plus haut (360×500 debout, 560×330 couché), marge 20 : la lettre est bien plus grande.
