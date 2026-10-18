@@ -183,7 +183,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.0), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.2), du plus récent au plus ancien :**
+
+- **v3.4.2 (18 octobre)** — sans l'ourdou : « 13 langues » → « 12 langues »
+  partout (accueil public/index.html et app, toutes langues, 34 endroits) ;
+  lien hreflang « ur » retiré. v3.4.1 : trait des signes seuls à 1 px, plus
+  clair, 12 px sous le soukoun.
 
 - **v3.4.0 (18 octobre)** — L'OURDOU RETIRÉ du site (listes LANGS de
   app.html et public/index.html, détection ; qui l'avait choisi passe à
