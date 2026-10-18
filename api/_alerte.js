@@ -138,8 +138,11 @@ module.exports = async function alerte(req, res, ip) {
     return 'email';
   }
 
-  const ordre = { email: [parEmail, parTelegram], whatsapp: [parWhatsapp, parEmail, parTelegram],
-    telegram: [parTelegram, parEmail] }[canal];
+  /* v3.3.1 — le propriétaire reçoit TOUJOURS par e-mail, Telegram en
+     secours ; le choix de l'élève ne sert plus qu'au lien « Répondre ».
+     (parWhatsapp reste prêt, non branché.) */
+  void parWhatsapp;
+  const ordre = [parEmail, parTelegram];
   const ko = [];
   let par = null;
   for (const f of ordre) {
