@@ -36,9 +36,17 @@
 /* le signe réel est caché (taille 0) : le cercle ET le signe sont dessinés
    ensemble par ::before, pour que le signe se pose bien sur le cercle */
 .ar-in.ar-signe{font-size:0!important;margin:0 .25em}
-/* v3.2.6 — plus de cercle pointillé : une toute petite ligne d'écriture
-   (tatwîl ـ) porte la voyelle, en gras */
-.ar-in.ar-signe::before{content:'\0640' attr(data-s);font-family:'Scheherazade New',serif;font-weight:700;font-size:28px;line-height:1;vertical-align:-.25em}
+/* v3.2.7 — la ligne d'écriture : un trait FIN dessiné par ::after, posé sur
+   la ligne de base du texte français (un bloc vide aligné sur la ligne de
+   base y pose son bord bas), un peu plus large que le signe. La voyelle, en
+   gras, est écrite sur un tatwîl (ـ) — c'est lui qui la place au-dessus ou
+   au-dessous, comme sur une lettre — mais le tatwîl est EFFACÉ par un masque
+   (bande transparente à sa hauteur) : on ne voit que la voyelle et le trait. */
+.ar-in.ar-signe{position:relative;margin:0 2px}
+.ar-in.ar-signe::after{content:'';display:inline-block;width:18px;height:1.3px;background:currentColor;opacity:.7;vertical-align:baseline}
+.ar-in.ar-signe::before{content:'\0640' attr(data-s);position:absolute;left:50%;bottom:-16px;translate:-50% 0;padding:10px 0;
+  font-family:'Scheherazade New',serif;font-weight:700;font-size:26px;line-height:1;white-space:nowrap;
+  -webkit-mask-image:linear-gradient(#000 0 27px,transparent 27px 32.5px,#000 32.5px);mask-image:linear-gradient(#000 0 27px,transparent 27px 32.5px,#000 32.5px)}
 /* les mots longs (4 lettres et plus) un peu moins grands */
 .ar-in.ar-long{font-size:1.4em}
 

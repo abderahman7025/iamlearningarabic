@@ -183,7 +183,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.6), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.7), du plus récent au plus ancien :**
+
+- **v3.2.7 (18 octobre) — la voyelle seule dans une phrase.** Trait FIN
+  (`::after`, bloc vide de 18 × 1,3 px aligné sur la ligne de base du texte
+  français), la voyelle en gras dessinée par `::before` sur un tatwîl que
+  masque une bande transparente (`mask-image`) : la police place elle-même
+  le signe au-dessus (fatḥa, ḍamma, sukūn, chadda) ou au-dessous (kasra)
+  du trait. Un ESPACE INSÉCABLE comme support ne marchait pas (kasra
+  perdue, signes décalés). Alerte : Brevo débloqué par le client (blocage
+  IP désactivé pour les clés API) — test en ligne : 200, e-mail parti.
 
 - **v3.2.6 (18 octobre) — retouches du client.** « Mon parcours » et
   « رِحْلَتِي » en blanc, remontés (les points du ي touchaient les pastilles).
