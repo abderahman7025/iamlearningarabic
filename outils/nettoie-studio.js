@@ -25,7 +25,11 @@ const env = {};
 try { fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/).forEach((l) => {
   const m = l.match(/^([A-Z_]+)=(.*)$/); if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, ''); }); } catch (e) {}
 const depot = process.argv.includes('--depot');
-const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'sons-studio.json'), 'utf8'));
+let LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'sons-studio.json'), 'utf8'));
+/* --refaire=رٌ,ش,… : seulement ces sons, RÉENREGISTRÉS au studio — on jette
+   les anciennes copies et l'on reprend la nouvelle version en ligne. */
+const _r = (process.argv.find((a) => a.startsWith('--refaire=')) || '').slice(10);
+const REFAIRE = _r ? _r.split(',').map((x) => x.trim()).filter(Boolean) : null;
 const dest = path.join(__dirname, 'captures', 'studio-propre');
 /* v2 (client : « volume trop bas ») : compression douce puis gain jusqu'à une
    SONIE cible (-10 LUFS par défaut, --cible=-8 pour plus fort), limiteur
@@ -35,6 +39,7 @@ const CIBLE = _c ? parseFloat(_c) : -10;
 const avant = path.join(dest, 'avant'), apres = path.join(dest, 'apres-fort');
 [avant, apres].forEach((d) => fs.mkdirSync(d, { recursive: true }));
 const hex = (s) => Buffer.from(s).toString('hex');
+if (REFAIRE) LISTE = LISTE.filter((s) => REFAIRE.includes(s.ar) || REFAIRE.includes(hex(s.ar)));
 function ff(args) { return execFileSync(FF, ['-hide_banner', '-loglevel', 'info', '-y'].concat(args), { stdio: ['ignore', 'pipe', 'pipe'] }); }
 function sonie(fichier) {
   const r = require('child_process').spawnSync(FF, ['-hide_banner', '-i', fichier, '-af', 'ebur128', '-f', 'null', '-'], { encoding: 'utf8' });
@@ -59,6 +64,8 @@ function picVolume(fichier) {
     const ext = (url.split('?')[0].match(/\.(\w+)$/) || [, 'webm'])[1];
     const fa = path.join(avant, h + '.' + ext), tmp = path.join(apres, h + '.tmp.wav'), fp = path.join(apres, h + '.mp3');
     try {
+      if (REFAIRE) [avant, apres].forEach((d) => fs.readdirSync(d)
+        .filter((f) => f.startsWith(h + '.')).forEach((f) => fs.unlinkSync(path.join(d, f))));
       if (!fs.existsSync(fa)) fs.writeFileSync(fa, Buffer.from(await (await fetch(url)).arrayBuffer()));
       if (!fs.existsSync(fp)) {
         ff(['-i', fa, '-af', 'highpass=f=70,lowpass=f=11000,afftdn=nr=14:nf=-38,acompressor=threshold=0.1:ratio=4:attack=10:release=120:knee=4', '-ac', '1', '-ar', '44100', tmp]);
@@ -99,6 +106,6 @@ function picVolume(fichier) {
   for (const x of lignes) html += '<div class="s"><div class="a">' + esc(x.s.ar) + '</div><div class="lat">' + esc(x.s.label) + '</div>'
     + '<button class="av" onclick="j(\'' + esc(x.a) + '\')">Avant</button><button class="ap" onclick="j(\'' + esc(x.p) + '\')">Après</button></div>';
   html += '</div><script>var A=new Audio();function j(u){A.pause();A.src=u;A.play();}</script></body></html>';
-  fs.writeFileSync(path.join(dest, 'ecoute-propre.html'), html);
+  if (!REFAIRE) fs.writeFileSync(path.join(dest, 'ecoute-propre.html'), html);
   console.log('\nTermine :', ok, 'sons,', echecs, 'echec(s),', absents, 'absents du site.', depot ? 'Mis en ligne.' : 'Rien n\'a ete mis en ligne.');
 })();
