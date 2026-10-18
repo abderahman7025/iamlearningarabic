@@ -6600,6 +6600,101 @@ body.age-petit .carte-etat{box-shadow:0 3px 0 rgba(0,0,0,.25),0 5px 10px rgba(0,
 body.age-petit #tb-back,body.age-petit .sound-dot,body.age-petit #topbar .tb-son{
   box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 5px 0 rgba(var(--sk-rgb-f),.45),0 10px 16px rgba(var(--sk-rgb-f),.25)!important}
 </style>
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.4.7 (18 octobre) — source : outils/refonte-v347.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.4.4.
+     3-5 ANS : LES FONDS DES JEUX EN MOTION. Le client n'aimait pas les
+     décors plats (images fond-*.svg). Chaque aire de jeu (.mj-aire) devient
+     un petit paysage vivant, à la couleur de l'habitat de l'animal du cours
+     (savane, banquise, mare, nuit…, posé en data-hab sur la manche) :
+       – ciel en dégradé, collines en trois plans qui ondulent doucement
+         (parallaxe : chaque plan à sa vitesse) ;
+       – un soleil (une lune la nuit) qui rayonne en tournant ;
+       – des nuages qui passent et des particules de l'habitat (pollen,
+         sable, neige, pétales, bulles, lucioles) qui montent ou tombent.
+     Tout en CSS ; rien ne capte le doigt (pointer-events:none) ; arrêté
+     pour « réduire les animations ».
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+body.age-petit .mj{--s1:#9fd8ff;--s2:#e9f8ff;--h1:#b9e79c;--h2:#8fd36e;--h3:#6cc04f;--sun:#fff3b0;--pt:rgba(255,250,200,.95)}
+body.age-petit .mj[data-hab="prairie"]{--s1:#9fd8ff;--s2:#e9f8ff;--h1:#b9e79c;--h2:#8fd36e;--h3:#6cc04f;--sun:#fff3b0;--pt:rgba(255,250,200,.95)}
+body.age-petit .mj[data-hab="pre"]{--s1:#a8dcff;--s2:#eefaff;--h1:#c4eba6;--h2:#9bd97a;--h3:#77c75a;--sun:#fff3b0;--pt:rgba(255,255,255,.95)}
+body.age-petit .mj[data-hab="savane"]{--s1:#ffcf8a;--s2:#fff1d6;--h1:#f3cf8a;--h2:#e8b46a;--h3:#d39a4c;--sun:#ffe28a;--pt:rgba(255,236,190,.9)}
+body.age-petit .mj[data-hab="savane"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj[data-hab="savane"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="desert"]{--s1:#ffc982;--s2:#fff0d4;--h1:#f6d39a;--h2:#ebbc72;--h3:#dba258;--sun:#fff0a0;--pt:rgba(255,230,180,.9)}
+body.age-petit .mj[data-hab="desert"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj[data-hab="desert"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="banquise"]{--s1:#bfe3ff;--s2:#f3fbff;--h1:#ffffff;--h2:#e6f4ff;--h3:#cfe8fb;--sun:#ffffff;--pt:rgba(255,255,255,1)}
+body.age-petit .mj[data-hab="banquise"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj[data-hab="ciel"]{--s1:#7cc6ff;--s2:#e2f4ff;--h1:#ffffff;--h2:#f3fbff;--h3:#e6f4ff;--sun:#fff6c4;--pt:rgba(255,255,255,.95)}
+body.age-petit .mj[data-hab="foret"]{--s1:#bde6c6;--s2:#f0fbf2;--h1:#6fb27a;--h2:#4f9a5a;--h3:#3a854a;--sun:#fff6c4;--pt:rgba(255,240,170,.95)}
+body.age-petit .mj[data-hab="foret"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="jardin"]{--s1:#ffd6ea;--s2:#fff7fb;--h1:#b4e39a;--h2:#92d276;--h3:#74c25a;--sun:#fff1c4;--pt:rgba(255,170,210,.95)}
+body.age-petit .mj[data-hab="jardin"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj[data-hab="jungle"]{--s1:#a6e3bf;--s2:#ebfff2;--h1:#4fbb78;--h2:#35a462;--h3:#228a4c;--sun:#fff3b0;--pt:rgba(220,255,170,.9)}
+body.age-petit .mj[data-hab="jungle"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="marais"]{--s1:#cde4d4;--s2:#f2f9f4;--h1:#9cc4a6;--h2:#82b18f;--h3:#669b76;--sun:#f6f1c8;--pt:rgba(255,255,255,.85)}
+body.age-petit .mj[data-hab="marais"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="mare"]{--s1:#b8e4ff;--s2:#effaff;--h1:#8fd3a0;--h2:#6ec6f0;--h3:#4fb3e6;--sun:#fff3b0;--pt:rgba(255,255,255,.95)}
+body.age-petit .mj[data-hab="nuit"]{--s1:#1f2460;--s2:#5b4fa0;--h1:#3a4380;--h2:#2b3470;--h3:#1d2656;--sun:#f5f3d8;--pt:rgba(255,245,170,.95)}
+body.age-petit .mj[data-hab="nuit"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="bambouseraie"]{--s1:#d4f0c8;--s2:#f5fff0;--h1:#9bd27a;--h2:#7cbf5e;--h3:#5fa947;--sun:#fff6c4;--pt:rgba(220,255,190,.95)}
+body.age-petit .mj[data-hab="bambouseraie"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj[data-hab="bambouseraie"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="plage"]{--s1:#8fd4ff;--s2:#eafaff;--h1:#7fd0f0;--h2:#5fbde6;--h3:#f2d79a;--sun:#fff0a0;--pt:rgba(255,255,255,.95)}
+body.age-petit .mj[data-hab="sousleau"]{--s1:#39a6d9;--s2:#a8e6ff;--h1:#1f8fc4;--h2:#f0d59a;--h3:#e5c37a;--sun:#c8f2ff;--pt:rgba(255,255,255,.85)}
+body.age-petit .mj[data-hab="sousleau"] .mj-aire::after{--nuage:transparent}
+body.age-petit .mj[data-hab="verger"]{--s1:#bfe6ff;--s2:#f3fbff;--h1:#b8e39a;--h2:#96d27a;--h3:#78c25e;--sun:#fff3b0;--pt:rgba(255,190,150,.95)}
+body.age-petit .mj[data-hab="verger"] .mj-aire::after{animation-name:aireTombe}
+body.age-petit .mj-aire{isolation:isolate;border:none!important;
+  background:
+    radial-gradient(85% 24% at 12% 100%,color-mix(in srgb,var(--h3) 88%,#000) 0 40%,var(--h3) 80%,color-mix(in srgb,var(--h3) 60%,#fff) 98%,transparent 100%),
+    radial-gradient(95% 33% at 92% 102%,color-mix(in srgb,var(--h2) 90%,#000) 0 40%,var(--h2) 80%,color-mix(in srgb,var(--h2) 60%,#fff) 98%,transparent 100%),
+    radial-gradient(130% 44% at 45% 106%,var(--h1) 0 82%,color-mix(in srgb,var(--h1) 55%,#fff) 98%,transparent 100%),
+    linear-gradient(180deg,var(--s1) 0%,var(--s2) 78%)!important;
+  background-size:118% 100%,124% 100%,112% 100%,100% 100%!important;
+  background-repeat:no-repeat!important;
+  animation:aireCollines 9s ease-in-out infinite alternate;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.7),inset 0 -14px 24px rgba(0,0,0,.08),
+    0 9px 0 color-mix(in srgb,var(--mc) 45%,#fff),0 18px 30px color-mix(in srgb,var(--mc) 25%,transparent)!important}
+@keyframes aireCollines{
+  from{background-position:0% 0,100% 0,50% 0,0 0}
+  to{background-position:10% 4px,88% 2px,46% 1px,0 0}}
+/* le soleil qui rayonne */
+body.age-petit .mj-aire::before{content:'';position:absolute;z-index:0;pointer-events:none;
+  width:240px;height:240px;top:-96px;right:-70px;border-radius:50%;
+  background:radial-gradient(circle,var(--sun) 0 17%,color-mix(in srgb,var(--sun) 55%,transparent) 22%,transparent 46%),
+    repeating-conic-gradient(from 0deg,rgba(255,255,255,.42) 0 7deg,transparent 7deg 22deg);
+  -webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%);
+  animation:aireSoleil 40s linear infinite}
+@keyframes aireSoleil{to{rotate:360deg}}
+/* les nuages et les particules de l'habitat */
+body.age-petit .mj-aire::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;--nuage:rgba(255,255,255,.85);
+  background:
+    radial-gradient(3px 3px at 20px 30px,var(--pt),transparent),radial-gradient(2px 2px at 90px 120px,var(--pt),transparent),
+    radial-gradient(4px 4px at 150px 60px,var(--pt),transparent),radial-gradient(2.5px 2.5px at 60px 170px,var(--pt),transparent),
+    radial-gradient(3px 3px at 130px 200px,var(--pt),transparent),
+    radial-gradient(70px 22px at 50% 50%,var(--nuage) 0 60%,transparent 64%),
+    radial-gradient(46px 18px at 50% 50%,var(--nuage) 0 60%,transparent 64%);
+  background-size:180px 230px,180px 230px,180px 230px,180px 230px,180px 230px,260px 120px,200px 140px;
+  background-repeat:repeat,repeat,repeat,repeat,repeat,repeat-x,repeat-x;
+  background-position:0 0,0 0,0 0,0 0,0 0,0 6%,60px 18%;
+  animation:aireMonte 16s linear infinite}
+@keyframes aireMonte{
+  from{background-position:0 0,0 0,0 0,0 0,0 0,0 6%,60px 18%}
+  to{background-position:10px -230px,-14px -230px,6px -230px,-8px -230px,12px -230px,260px 6%,260px 18%}}
+@keyframes aireTombe{
+  from{background-position:0 0,0 0,0 0,0 0,0 0,0 6%,60px 18%}
+  to{background-position:-30px 230px,24px 230px,-18px 230px,30px 230px,-24px 230px,260px 6%,260px 18%}}
+body.age-petit .mj[data-hab="nuit"] .mj-aire::before{
+  background:radial-gradient(circle,#fdf9e0 0 15%,rgba(253,249,224,.35) 22%,transparent 46%);animation:none}
+body.age-petit .mj[data-hab="sousleau"] .mj-aire::before{top:-120px;left:50%;right:auto;translate:-50% 0;width:320px;height:320px}
+/* les pièces au-dessus du paysage */
+body.age-petit .mj-aire>*{z-index:1}
+@media (prefers-reduced-motion:reduce){
+  body.age-petit .mj-aire,body.age-petit .mj-aire::before,body.age-petit .mj-aire::after{animation:none!important}}
+</style>
 
 
   <!-- SEO multilingue -->
@@ -14272,7 +14367,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.4.6';
+var _VERSION_REPLI='v3.4.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18438,6 +18533,10 @@ function _boyScene(ca,reprise){
       if(!(st&&st.age==='petit'))return;
       var t=ev.target;
       if(t&&t.closest&&t.closest('.boy-bord,.boy-retour,.boy-nav'))return;
+      /* Les JEUX restent libres (le client, v3.0.5 : « c'est sur les leçons
+         qu'on doit attendre, pas les jeux des leçons ») : les manches sont
+         des `.panneau-jeu`. */
+      if(t&&t.closest&&t.closest('.panneau-jeu'))return;
       var occ=false;try{occ=N.occupe();}catch(x){}
       if(!occ)return;
       ev.stopPropagation();ev.stopImmediatePropagation();
@@ -22103,6 +22202,8 @@ function _boyScene(ca,reprise){
        demandent un (`.mj-aire`), mais il est posé ici, une fois, sur la
        manche entière : les aires n'ont pas à savoir d'où il vient. */
     try{z.style.setProperty('--fond','url("'+_fondDuMonde()+'")');}catch(e){}
+    /* v3.4.7 — l'habitat, pour le paysage animé des 3-5 ans (bloc v347) */
+    try{var _hb=(_fondDuMonde().match(/fond-([a-z]+)\.svg/)||[])[1];if(_hb)z.setAttribute('data-hab',_hb);}catch(e){}
     p.appendChild(z);
     /* ── DANS UN JEU, ON N'ATTEND PAS LA VOIX ──
        v2.9.8 arrêtait ici tout toucher tant que la narration parlait (« tant

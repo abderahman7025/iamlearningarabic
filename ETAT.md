@@ -183,7 +183,15 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.6), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.7), du plus récent au plus ancien :**
+
+- **v3.4.7 (18 octobre) — bloc `outils/refonte-v347.html`** (après v3.4.4) :
+  3-5 ans, aires de jeu (.mj-aire) en paysages animés CSS selon l'habitat
+  (data-hab posé sur .mj d'après `_fondDuMonde`) : ciel, trois collines qui
+  ondulent, soleil qui rayonne (lune la nuit), nuages et particules. Le
+  garde « voix » de v3.4.6 laisse libres les JEUX (.panneau-jeu) — règle du
+  client v3.0.5 : on attend la voix sur les leçons, pas dans les jeux.
+  Voix des 200 questions : les 210 mots sont en ligne (vérifié).
 
 - **v3.4.6 (18 octobre)** — menu : une entrée d'historique « garde » est
   reposée chaque fois que le menu revient (bloc v322) ; sans elle, après une
