@@ -183,7 +183,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.8), du plus récent au plus ancien :**
+
+- **v3.4.8 (18 octobre)** — 3-5 ans. Garde « voix » : SEULS les jeux paires,
+  relie, attrape-la et ballons restent libres (.mj-paires/.mj-relier/
+  .mj-attrape/.mj-bulles). « De droite à gauche » : 1 s après la voix
+  (`m.gagne(1000)`, gagne accepte un délai). Le paysage animé couvre tout le
+  cadre du jeu (data-hab aussi sur le panneau, aire sans fond ni bord).
+  `ajusteEcran` (dernière passe, 3-5 ans) rend le vide du bas au dernier
+  cadre : aire allongée, sinon cadre (min-height) au contenu centré ;
+  annulé à chaque mesure (data-allonge). Carte : étapes en sentier
+  sinueux, courbe Catmull-Rom ; couchée 100×53 sur deux bandes (étape 10,5 %).
 
 - **v3.4.7 (18 octobre) — bloc `outils/refonte-v347.html`** (après v3.4.4) :
   3-5 ans, aires de jeu (.mj-aire) en paysages animés CSS selon l'habitat
