@@ -183,7 +183,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.9), du plus récent au plus ancien :**
+
+- **v3.3.9 (18 octobre)** — `_texteDua` inclut « رَبِّ زِدْنِي عِلْمًا » (il
+  n'était pas lu ; la clé change). « Alla, » (indonésien) corrigé. Bloc v338 :
+  nouvelle apparition de l'introduction (montée + flou qui se dissipe,
+  pastille qui tombe en tournant, trait du titre qui se dessine) ; bonus :
+  soukoun deux fois plus petit, cartes qui arrivent de leur coin puis
+  médailles qui pivotent. `voix-allah.json` : 66 textes (~25 200 car.) —
+  + doua des 13 langues (dite « …عِلْمَا », sans pourLaVoix) et la phrase du
+  tanwin en français, son écrit « n' » (essai n° 3 choisi par le client).
 
 - **v3.3.8 (18 octobre) — bloc `outils/refonte-v338.html`** (après v3.3.3) :
   introduction sans animation des blocs, invocation arabe réduite (police

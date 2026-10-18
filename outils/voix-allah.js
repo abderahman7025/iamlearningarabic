@@ -11,6 +11,9 @@
  * introduction et bonus, 13 langues, textes contenant Allah ou un de ces
  * signes) — `dire` = le texte avec ces remplacements (ﷺ → صَلَّى اللَّهُ
  * عَلَيْهِ وَسَلَّمَ), puis `pourLaVoix` pour les lettres seules.
+ * v3.3.9 : + la doua de l'introduction avec « رَبِّ زِدْنِي عِلْمَا » (13 langues),
+ * et la phrase du tanwin en français, le son écrit « n' » (essai choisi
+ * par le client : la voix disait « èn »).
  * Narrateur, eleven_v4, [calm]. La clé = le texte tel que `speakText` le
  * reçoit (« long| » + hachage au-delà de 180 caractères / 360 octets, comme
  * `_clesSon` dans app/app.html).
@@ -46,7 +49,8 @@ fs.mkdirSync(dest, { recursive: true });
   let car = 0, ok = 0, echecs = 0;
   for (const e of LISTE) {
     const k = cle(e.cle);
-    const dire = pourLaVoix(e.dire).replace(/\s+([:;!?])/g, '$1');
+    /* `brut` (la doua) : pas de pourLaVoix, qui toucherait la basmala */
+    const dire = (e.brut ? e.dire : pourLaVoix(e.dire)).replace(/\s+([:;!?])/g, '$1');
     const f = path.join(dest, e.langue + '-' + Buffer.from(k, 'utf8').toString('hex').slice(0, 100) + '.mp3');
     try {
       if (!fs.existsSync(f) || fs.statSync(f).size < 500) {

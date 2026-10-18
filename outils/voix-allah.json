@@ -1,11 +1,6 @@
 [
  {
   "langue": "fr",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux. Seigneur, accroîs mes connaissances.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Au nom d'الله, le Tout Miséricordieux, le Très Miséricordieux. Seigneur, accroîs mes connaissances."
- },
- {
-  "langue": "fr",
   "cle": "L'importance de l'intention (النِّيَّة). L'intention est une des deux conditions capitales pour qu'une action soit acceptée par Allah ﷻ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n'étaient pas les mêmes.\n\nLe prophète Muhammad ﷺ a dit : \"Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention\".",
   "dire": "L'importance de l'intention (النِّيَّة). L'intention est une des deux conditions capitales pour qu'une action soit acceptée par الله جَلَّ جَلَالُهُ. De plus, deux personnes peuvent effectuer exactement la même action, mais avoir des récompenses extrêmement différentes, et cela car leurs intentions initiales n'étaient pas les mêmes. Le prophète Muhammad صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ a dit : \"Les actions ne valent que par les intentions, et chacun sera rétribué en fonction de son intention\"."
  },
@@ -23,11 +18,6 @@
   "langue": "fr",
   "cle": "Le nom d'Allah a une particularité. En effet, le deuxième ل peut être emphatique مُفَخَّمَةٌ ou neutre مُرَقَّقَةٌ . Tout dépend de la voyelle qui précède ce ل : Si c'est une ِ , le ل sera neutre. Si c'est une َ ou une ُ , le ل sera emphatique. Si c'est un ْ , on regarde la voyelle avant, et on reproduit le raisonnement... Dans l'exemple, la dernière voyelle qui précède le deuxième ل de الله, et qui n'est pas un ْ , est la ِ sous le م de بِسْمِ . On dira : بِسْمِ اللَّهِ . Autre exemple :",
   "dire": "Le nom d'الله a une particularité. En effet, le deuxième ل peut être emphatique مُفَخَّمَةٌ ou neutre مُرَقَّقَةٌ. Tout dépend de la voyelle qui précède ce ل : Si c'est une ِ , le ل sera neutre. Si c'est une َ ou une ُ , le ل sera emphatique. Si c'est un ْ , on regarde la voyelle avant, et on reproduit le raisonnement... Dans l'exemple, la dernière voyelle qui précède le deuxième ل de الله, et qui n'est pas un ْ , est la ِ sous le م de بِسْمِ. On dira : بِسْمِ اللَّهِ. Autre exemple :"
- },
- {
-  "langue": "en",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In the name of Allah, the Most Gracious, the Most Merciful. My Lord, increase me in knowledge.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In the name of الله, the Most Gracious, the Most Merciful. My Lord, increase me in knowledge."
  },
  {
   "langue": "en",
@@ -51,11 +41,6 @@
  },
  {
   "langue": "es",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. En el nombre de Allah, el Misericordioso. Señor, aumenta mi conocimiento.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. En el nombre de الله, el Misericordioso. Señor, aumenta mi conocimiento."
- },
- {
-  "langue": "es",
   "cle": "La importancia de la intención (النِّيَّة). La intención es una de las dos condiciones esenciales para que Allah ﷻ acepte una acción. Además, dos personas pueden realizar exactamente la misma acción, pero recibir recompensas muy diferentes, porque sus intenciones iniciales no eran las mismas.\n\nEl Profeta Muhammad ﷺ dijo: \"Las acciones no valen sino por las intenciones, y cada persona será recompensada según su intención.\"",
   "dire": "La importancia de la intención (النِّيَّة). La intención es una de las dos condiciones esenciales para que الله جَلَّ جَلَالُهُ acepte una acción. Además, dos personas pueden realizar exactamente la misma acción, pero recibir recompensas muy diferentes, porque sus intenciones iniciales no eran las mismas. El Profeta Muhammad صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ dijo: \"Las acciones no valen sino por las intenciones, y cada persona será recompensada según su intención.\""
  },
@@ -73,11 +58,6 @@
   "langue": "es",
   "cle": "El nombre de Allah tiene una particularidad. En efecto, la segunda ل puede ser enfática o neutra. Todo depende de la vocal que precede a esta ل: Si es una kasra, la ل será neutra. Si es una fatha o una damma, la ل será enfática. Si es un sukun, miramos la vocal anterior y repetimos el razonamiento... En el ejemplo, la última vocal que precede a la segunda ل de Allah, y que no es un sukun, es la kasra bajo la م de bismillah. Diremos: bismillah. Otro ejemplo:",
   "dire": "El nombre de الله tiene una particularidad. En efecto, la segunda ل puede ser enfática o neutra. Todo depende de la vocal que precede a esta ل: Si es una kasra, la ل será neutra. Si es una fatha o una damma, la ل será enfática. Si es un sukun, miramos la vocal anterior y repetimos el razonamiento... En el ejemplo, la última vocal que precede a la segunda ل de الله, y que no es un sukun, es la kasra bajo la م de bismillah. Diremos: bismillah. Otro ejemplo:"
- },
- {
-  "langue": "de",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Im Namen Allahs, des Allbarmherzigen. Mein Herr, vermehre mein Wissen.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Im Namen Allahs, des Allbarmherzigen. Mein Herr, vermehre mein Wissen."
  },
  {
   "langue": "de",
@@ -101,11 +81,6 @@
  },
  {
   "langue": "nl",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In de naam van Allah, de Barmhartige. Heer, vergroot mijn kennis.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In de naam van الله, de Barmhartige. Heer, vergroot mijn kennis."
- },
- {
-  "langue": "nl",
   "cle": "Het belang van intentie (النِّيَّة). Intentie is een van de twee essentiële voorwaarden opdat Allah ﷻ een handeling aanvaardt. Bovendien kunnen twee personen precies dezelfde handeling verrichten, maar heel verschillende beloningen ontvangen, omdat hun oorspronkelijke intenties niet dezelfde waren.\n\nDe Profeet Muhammad ﷺ zei: \"Daden worden slechts beoordeeld op basis van intenties, en iedereen zal beloond worden overeenkomstig zijn intentie.\"",
   "dire": "Het belang van intentie (النِّيَّة). Intentie is een van de twee essentiële voorwaarden opdat الله جَلَّ جَلَالُهُ een handeling aanvaardt. Bovendien kunnen twee personen precies dezelfde handeling verrichten, maar heel verschillende beloningen ontvangen, omdat hun oorspronkelijke intenties niet dezelfde waren. De Profeet Muhammad صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ zei: \"Daden worden slechts beoordeeld op basis van intenties, en iedereen zal beloond worden overeenkomstig zijn intentie.\""
  },
@@ -123,11 +98,6 @@
   "langue": "nl",
   "cle": "De naam Allah heeft een bijzonderheid. De tweede ل kan emfatisch of neutraal zijn. Het hangt allemaal af van de klinker die aan deze ل voorafgaat: Als het een kasra is, zal de ل neutraal zijn. Als het een fatha of damma is, zal de ل emfatisch zijn. Als het een sukun is, kijkt men naar de vorige klinker en herhaalt men de redenering... In het voorbeeld is de laatste klinker vóór de tweede ل van Allah, die geen sukun is, de kasra onder de م van Bismillah. We zullen zeggen: Bismillah. Ander voorbeeld:",
   "dire": "De naam الله heeft een bijzonderheid. De tweede ل kan emfatisch of neutraal zijn. Het hangt allemaal af van de klinker die aan deze ل voorafgaat: Als het een kasra is, zal de ل neutraal zijn. Als het een fatha of damma is, zal de ل emfatisch zijn. Als het een sukun is, kijkt men naar de vorige klinker en herhaalt men de redenering... In het voorbeeld is de laatste klinker vóór de tweede ل van الله, die geen sukun is, de kasra onder de م van Bismillah. We zullen zeggen: Bismillah. Ander voorbeeld:"
- },
- {
-  "langue": "it",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In nome di Allah, il Compassionevole. Signore, aumenta la mia conoscenza.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. In nome di الله, il Compassionevole. Signore, aumenta la mia conoscenza."
  },
  {
   "langue": "it",
@@ -151,11 +121,6 @@
  },
  {
   "langue": "pt",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Em nome de Allah, o Misericordioso. Senhor, aumenta o meu conhecimento.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Em nome de الله, o Misericordioso. Senhor, aumenta o meu conhecimento."
- },
- {
-  "langue": "pt",
   "cle": "A importância da intenção (النِّيَّة). A intenção é uma das duas condições essenciais para que Allah ﷻ aceite uma ação. Além disso, duas pessoas podem realizar exatamente a mesma ação, mas obter recompensas muito diferentes, porque as suas intenções iniciais não eram as mesmas.\n\nO Profeta Muhammad ﷺ disse: \"As ações valem apenas pelas intenções, e cada um será recompensado de acordo com a sua intenção.\"",
   "dire": "A importância da intenção (النِّيَّة). A intenção é uma das duas condições essenciais para que الله جَلَّ جَلَالُهُ aceite uma ação. Além disso, duas pessoas podem realizar exatamente a mesma ação, mas obter recompensas muito diferentes, porque as suas intenções iniciais não eram as mesmas. O Profeta Muhammad صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ disse: \"As ações valem apenas pelas intenções, e cada um será recompensado de acordo com a sua intenção.\""
  },
@@ -173,11 +138,6 @@
   "langue": "pt",
   "cle": "O nome de Allah tem uma particularidade. O segundo ل pode ser enfático ou neutro. Tudo depende da vogal que precede este ل: Se for uma kasra, o ل será neutro. Se for uma fatha ou damma, o ل será enfático. Se for um sukun, olha-se para a vogal anterior e repete-se o raciocínio... No exemplo, a última vogal que precede o segundo ل de Allah, que não é um sukun, é a kasra sob o م de Bismillah. Diremos: Bismillah. Outro exemplo:",
   "dire": "O nome de الله tem uma particularidade. O segundo ل pode ser enfático ou neutro. Tudo depende da vogal que precede este ل: Se for uma kasra, o ل será neutro. Se for uma fatha ou damma, o ل será enfático. Se for um sukun, olha-se para a vogal anterior e repete-se o raciocínio... No exemplo, a última vogal que precede o segundo ل de الله, que não é um sukun, é a kasra sob o م de Bismillah. Diremos: Bismillah. Outro exemplo:"
- },
- {
-  "langue": "ru",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Во имя Аллаха, Милостивого. Господь мой, прибавь мне знания.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Во имя الله, Милостивого. Господь мой, прибавь мне знания."
  },
  {
   "langue": "ru",
@@ -201,11 +161,6 @@
  },
  {
   "langue": "tr",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Rahman ve Rahim olan Allah'ın adıyla. Rabbim, ilmimi artır.",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Rahman ve Rahim olan الله'ın adıyla. Rabbim, ilmimi artır."
- },
- {
-  "langue": "tr",
   "cle": "Niyetin önemi (النِّيَّة). Niyet, Allah'ın bir ameli kabul etmesi için iki temel şarttan biridir. Ayrıca, iki kişi tamamen aynı eylemi gerçekleştirebilir, ancak son derece farklı ödüller alabilir.\n\nHz. Muhammed ﷺ şöyle buyurmuştur : «Ameller yalnızca niyetlere göredir ve herkes niyetine göre karşılık alır.»",
   "dire": "Niyetin önemi (النِّيَّة). Niyet, الله'ın bir ameli kabul etmesi için iki temel şarttan biridir. Ayrıca, iki kişi tamamen aynı eylemi gerçekleştirebilir, ancak son derece farklı ödüller alabilir. Hz. Muhammed صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ şöyle buyurmuştur : «Ameller yalnızca niyetlere göredir ve herkes niyetine göre karşılık alır.»"
  },
@@ -223,11 +178,6 @@
   "langue": "tr",
   "cle": "Allah'ın isminin bir özelliği vardır. İkinci ل tevcid veya düz (ince) okunabilir. Her şey bu ل'den önceki harekete bağlıdır: Eğer kesra ise, ل ince okunur. Eğer fetha veya ötüreyse, ل tevcid okunur. Eğer sükun ise, önceki harekete bakılır ve aynı kural uygulanır... Örnekte, Allah'ın ikinci ل'inden önceki, sükun olmayan son harekesi; Besmele'deki م'nin altındaki kesradır. Besmele diyeceğiz. Başka bir örnek:",
   "dire": "الله'ın isminin bir özelliği vardır. İkinci ل tevcid veya düz (ince) okunabilir. Her şey bu ل'den önceki harekete bağlıdır: Eğer kesra ise, ل ince okunur. Eğer fetha veya ötüreyse, ل tevcid okunur. Eğer sükun ise, önceki harekete bakılır ve aynı kural uygulanır... Örnekte, الله'ın ikinci ل'inden önceki, sükun olmayan son harekesi; Besmele'deki م'nin altındaki kesradır. Besmele diyeceğiz. Başka bir örnek:"
- },
- {
-  "langue": "zh",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. 奉真主之名，最仁慈的。 主啊，增加我的知识。",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. 奉الله之名，最仁慈的。 主啊，增加我的知识。"
  },
  {
   "langue": "zh",
@@ -271,11 +221,6 @@
  },
  {
   "langue": "ur",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Allah کے نام سے جو بڑا مہربان، نہایت رحم والا ہے۔ اے میرے رب، میرے علم میں اضافہ فرما۔",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. الله کے نام سے جو بڑا مہربان، نہایت رحم والا ہے۔ اے میرے رب، میرے علم میں اضافہ فرما۔"
- },
- {
-  "langue": "ur",
   "cle": "نیت کی اہمیت (النِّيَّة). نیت دو بنیادی شرائط میں سے ایک ہے جن سے Allah ﷻ کسی عمل کو قبول فرماتا ہے۔ اس کے علاوہ، دو افراد بالکل ایک جیسا عمل کر سکتے ہیں لیکن بہت مختلف اجر پا سکتے ہیں، کیونکہ ان کی ابتدائی نیتیں ایک جیسی نہیں تھیں۔\n\nنبی محمد ﷺ نے فرمایا: \"اعمال کا دارومدار نیتوں پر ہے، اور ہر شخص کو اس کی نیت کے مطابق بدلہ ملے گا۔\"",
   "dire": "نیت کی اہمیت (النِّيَّة). نیت دو بنیادی شرائط میں سے ایک ہے جن سے الله جَلَّ جَلَالُهُ کسی عمل کو قبول فرماتا ہے۔ اس کے علاوہ، دو افراد بالکل ایک جیسا عمل کر سکتے ہیں لیکن بہت مختلف اجر پا سکتے ہیں، کیونکہ ان کی ابتدائی نیتیں ایک جیسی نہیں تھیں۔ نبی محمد صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نے فرمایا: \"اعمال کا دارومدار نیتوں پر ہے، اور ہر شخص کو اس کی نیت کے مطابق بدلہ ملے گا۔\""
  },
@@ -296,11 +241,6 @@
  },
  {
   "langue": "hi",
-  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. Allah के नाम से जो बड़ा कृपालु, अत्यंत दयावान है। हे मेरे रब, मेरे ज्ञान में वृद्धि कर।",
-  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. الله के नाम से जो बड़ा कृपालु, अत्यंत दयावान है। हे मेरे रब, मेरे ज्ञान में वृद्धि कर।"
- },
- {
-  "langue": "hi",
   "cle": "नियत का महत्व (النِّيَّة). नियत दो मूलभूत शर्तों में से एक है जिससे Allah ﷻ किसी कार्य को स्वीकार करते हैं। इसके अलावा, दो लोग बिल्कुल एक जैसा काम कर सकते हैं लेकिन बहुत अलग-अलग पुरस्कार पा सकते हैं, क्योंकि उनकी प्रारंभिक नियतें समान नहीं थीं।\n\nपैगंबर मुहम्मद ﷺ ने कहा: \"कर्म केवल नियतों पर निर्भर हैं, और प्रत्येक व्यक्ति को उसकी नियत के अनुसार बदला मिलेगा।\"",
   "dire": "नियत का महत्व (النِّيَّة). नियत दो मूलभूत शर्तों में से एक है जिससे الله جَلَّ جَلَالُهُ किसी कार्य को स्वीकार करते हैं। इसके अलावा, दो लोग बिल्कुल एक जैसा काम कर सकते हैं लेकिन बहुत अलग-अलग पुरस्कार पा सकते हैं, क्योंकि उनकी प्रारंभिक नियतें समान नहीं थीं। पैगंबर मुहम्मद صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ ने कहा: \"कर्म केवल नियतों पर निर्भर हैं, और प्रत्येक व्यक्ति को उसकी नियत के अनुसार बदला मिलेगा।\""
  },
@@ -318,5 +258,88 @@
   "langue": "hi",
   "cle": "अल्लाह के नाम की एक विशेषता है। दूसरी ل भारी या हल्की हो सकती है। सब कुछ इस ل से पहले के स्वर पर निर्भर करता है: यदि ज़ेर हो, तो ل हल्की होगी। यदि ज़बर या पेश हो, तो ल भारी होगी। यदि सुकून हो, तो पहले वाले स्वर को देखें और वही नियम लगाएं... उदाहरण में, अल्लाह की दूसरी ل से पहले आखिरी गैर-सुकून स्वर, बिस्मिल्लाह के م के नीचे ज़ेर है। हम कहेंगे: बिस्मिल्लाह। एक और उदाहरण:",
   "dire": "الله के नाम की एक विशेषता है। दूसरी ل भारी या हल्की हो सकती है। सब कुछ इस ل से पहले के स्वर पर निर्भर करता है: यदि ज़ेर हो, तो ل हल्की होगी। यदि ज़बर या पेश हो, तो ल भारी होगी। यदि सुकून हो, तो पहले वाले स्वर को देखें और वही नियम लगाएं... उदाहरण में, الله की दूसरी ل से पहले आखिरी गैर-सुकून स्वर, बिस्मिल्लाह के م के नीचे ज़ेर है। हम कहेंगे: बिस्मिल्लाह। एक और उदाहरण:"
+ },
+ {
+  "langue": "fr",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux. Seigneur, accroîs mes connaissances.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Au nom d'الله, le Tout Miséricordieux, le Très Miséricordieux. Seigneur, accroîs mes connaissances.",
+  "brut": true
+ },
+ {
+  "langue": "en",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. In the name of Allah, the Most Gracious, the Most Merciful. My Lord, increase me in knowledge.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. In the name of الله, the Most Gracious, the Most Merciful. My Lord, increase me in knowledge.",
+  "brut": true
+ },
+ {
+  "langue": "es",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. En el nombre de Allah, el Misericordioso. Señor, aumenta mi conocimiento.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. En el nombre de الله, el Misericordioso. Señor, aumenta mi conocimiento.",
+  "brut": true
+ },
+ {
+  "langue": "de",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Im Namen Allahs, des Allbarmherzigen. Mein Herr, vermehre mein Wissen.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Im Namen Allahs, des Allbarmherzigen. Mein Herr, vermehre mein Wissen.",
+  "brut": true
+ },
+ {
+  "langue": "nl",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. In de naam van Allah, de Barmhartige. Heer, vergroot mijn kennis.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. In de naam van الله, de Barmhartige. Heer, vergroot mijn kennis.",
+  "brut": true
+ },
+ {
+  "langue": "it",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. In nome di Allah, il Compassionevole. Signore, aumenta la mia conoscenza.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. In nome di الله, il Compassionevole. Signore, aumenta la mia conoscenza.",
+  "brut": true
+ },
+ {
+  "langue": "pt",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Em nome de Allah, o Misericordioso. Senhor, aumenta o meu conhecimento.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Em nome de الله, o Misericordioso. Senhor, aumenta o meu conhecimento.",
+  "brut": true
+ },
+ {
+  "langue": "ru",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Во имя Аллаха, Милостивого. Господь мой, прибавь мне знания.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Во имя الله, Милостивого. Господь мой, прибавь мне знания.",
+  "brut": true
+ },
+ {
+  "langue": "tr",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Rahman ve Rahim olan Allah'ın adıyla. Rabbim, ilmimi artır.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Rahman ve Rahim olan الله'ın adıyla. Rabbim, ilmimi artır.",
+  "brut": true
+ },
+ {
+  "langue": "zh",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. 奉真主之名，最仁慈的。 主啊，增加我的知识。",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. 奉الله之名，最仁慈的。 主啊，增加我的知识。",
+  "brut": true
+ },
+ {
+  "langue": "id",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Dengan nama Allah, Yang Maha Pengasih, Yang Maha Penyayang. Ya Tuhan, tambahkanlah ilmuku.",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. Dengan nama الله, Yang Maha Pengasih, Yang Maha Penyayang. Ya Tuhan, tambahkanlah ilmuku.",
+  "brut": true
+ },
+ {
+  "langue": "ur",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Allah کے نام سے جو بڑا مہربان، نہایت رحم والا ہے۔ اے میرے رب، میرے علم میں اضافہ فرما۔",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. الله کے نام سے جو بڑا مہربان، نہایت رحم والا ہے۔ اے میرے رب، میرے علم میں اضافہ فرما۔",
+  "brut": true
+ },
+ {
+  "langue": "hi",
+  "cle": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمًا. Allah के नाम से जो बड़ा कृपालु, अत्यंत दयावान है। हे मेरे रब, मेरे ज्ञान में वृद्धि कर।",
+  "dire": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيم. رَبِّ زِدْنِي عِلْمَا. الله के नाम से जो बड़ा कृपालु, अत्यंत दयावान है। हे मेरे रब, मेरे ज्ञान में वृद्धि कर।",
+  "brut": true
+ },
+ {
+  "langue": "fr",
+  "cle": "Lorsque l'on double une des trois voyelles, on ajoute le son n.",
+  "dire": "Lorsque l'on double une des trois voyelles, on ajoute le son « n' »."
  }
 ]

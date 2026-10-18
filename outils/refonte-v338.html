@@ -10,11 +10,19 @@
         à remplir — bord, ombre intérieure, texte d'exemple — en rouge.
      ════════════════════════════════════════════════════════════════════ -->
 <style>
-/* 1 — Introduction */
-#root.profile-adult #ca[data-page="intro"] .p-section.rv,
-#root.profile-adult #ca[data-page="intro"] .dua-box.rv{translate:none!important;rotate:none!important;scale:none!important;
-  opacity:1!important;transition:none!important;animation:none!important}
+/* 1 — Introduction. v3.3.9 : une autre apparition (le client) — chaque
+   bloc monte doucement en sortant du flou, puis sa pastille tombe en
+   tournant et le trait d'or sous le titre se dessine. */
 #root.profile-adult #ca[data-page="intro"]{perspective:none}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv,
+#root.profile-adult #ca[data-page="intro"] .dua-box.rv{rotate:none!important;opacity:0;translate:0 34px!important;scale:.97!important;
+  filter:blur(8px);transition:opacity .8s ease,translate 1s cubic-bezier(.22,1,.36,1),scale 1s cubic-bezier(.22,1,.36,1),filter .9s ease!important}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv.rv-in,
+#root.profile-adult #ca[data-page="intro"] .dua-box.rv.rv-in{opacity:1;translate:0 0!important;scale:1!important;filter:none}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv-in::before{animation:introPastille .8s .35s both cubic-bezier(.34,1.56,.64,1)}
+@keyframes introPastille{from{scale:0;rotate:-200deg;translate:0 -30px}to{scale:1;rotate:0deg;translate:0 0}}
+#root.profile-adult #ca[data-page="intro"] .p-section.rv-in .p-sec-title{animation:introTrait 1s .45s both cubic-bezier(.22,1,.36,1)}
+@keyframes introTrait{from{background-size:0% 2px}to{background-size:100% 2px}}
 #root.profile-adult #ca[data-page="intro"] .dua-box .dua-ar{font-family:inherit!important;font-size:1.12rem!important;
   line-height:1.9!important;font-weight:700!important;margin-bottom:2px!important}
 #root.profile-adult #ca[data-page="intro"] .dua-box::after{
@@ -25,8 +33,27 @@
 #root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1) .bonus-medaille{
   color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}
 #root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1) .bonus-medaille::after{content:'';position:absolute;
-  inset:18px;filter:drop-shadow(0 3px 4px rgba(90,50,0,.5));
+  inset:32px;filter:drop-shadow(0 2px 3px rgba(90,50,0,.5));
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cellipse cx='20' cy='20' rx='13' ry='11.5' fill='none' stroke='%23fff' stroke-width='6.5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* 2 bis — Bonus : les quatre cartes arrivent chacune de son coin, en
+   tournant, sortent du flou et rebondissent ; puis leur médaille surgit en
+   pivotant sur elle-même (v3.3.9). */
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille.rv .sess-card{opacity:0;rotate:none!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille.rv-in .sess-card,
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille:not(.rv) .sess-card{animation:bonusVole 1s both cubic-bezier(.34,1.56,.64,1)!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1){--dx:-90px;--dy:-60px;--dr:-14deg;animation-delay:.05s!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(2){--dx:90px;--dy:-60px;--dr:14deg;animation-delay:.2s!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(3){--dx:-90px;--dy:70px;--dr:12deg;animation-delay:.35s!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(4){--dx:90px;--dy:70px;--dr:-12deg;animation-delay:.5s!important}
+@keyframes bonusVole{from{opacity:0;translate:var(--dx) var(--dy);rotate:var(--dr);scale:.55;filter:blur(8px)}
+  60%{opacity:1;filter:none}to{opacity:1;translate:0 0;rotate:0deg;scale:1;filter:none}}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card .bonus-medaille{animation:bonusMedaille .9s both cubic-bezier(.34,1.56,.64,1)}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1) .bonus-medaille{animation-delay:.55s}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(2) .bonus-medaille{animation-delay:.7s}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(3) .bonus-medaille{animation-delay:.85s}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(4) .bonus-medaille{animation-delay:1s}
+@keyframes bonusMedaille{from{scale:0;rotate:y 540deg}to{scale:1;rotate:y 0deg}}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:hover .bonus-medaille{animation:bonusTourne .9s cubic-bezier(.34,1.56,.64,1)}
 /* 3 — Contact en rouge */
 #root.profile-adult #ca[data-page="contact"] .cform-btn{
   background:linear-gradient(160deg,#f0506e,#c0213f)!important;
