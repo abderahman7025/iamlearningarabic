@@ -63,7 +63,11 @@ function picVolume(fichier) {
       if (!fs.existsSync(fp)) {
         ff(['-i', fa, '-af', 'highpass=f=70,lowpass=f=11000,afftdn=nr=14:nf=-38,acompressor=threshold=0.1:ratio=4:attack=10:release=120:knee=4', '-ac', '1', '-ar', '44100', tmp]);
         const I = sonie(tmp);
-        const gain = I === null ? 0 : Math.max(0, Math.min(30, CIBLE - I));
+        /* un enregistrement presque VIDE (ءْ, ◌ْ… mesurés à -67 / -77 dB) : le
+           monter de 30 dB ne fait sortir que du souffle — le « gros bruit
+           bizarre ». On le laisse tel quel et on le signale. */
+        if (I === null || I < -50) { console.log('VIDE (a reenregistrer) :', s.ar); }
+        const gain = (I === null || I < -50) ? 0 : Math.max(0, Math.min(30, CIBLE - I));
         ff(['-i', tmp, '-af', 'volume=' + gain.toFixed(1) + 'dB,alimiter=limit=0.89:attack=5:release=60:asc=1:level=false', '-b:a', '128k', fp]);
         fs.unlinkSync(tmp);
         console.log('ok', s.label, '(+' + gain.toFixed(1) + ' dB)');
