@@ -1,0 +1,40 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.3.8 (18 octobre) — source : outils/refonte-v338.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.3.3.
+     1. INTRODUCTION : plus d'animation des blocs de texte (ils pivotaient
+        en 3D en arrivant — « je n'aime pas ») ; l'invocation en arabe
+        réduite, dans la police du texte français ; les étoiles des coins
+        deviennent des HEXAGONES.
+     2. BONUS : le soukoun de la première carte, beaucoup plus gros.
+     3. CONTACT : bouton « Envoyer » en rouge (comme le sceau) ; les cases
+        à remplir — bord, ombre intérieure, texte d'exemple — en rouge.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* 1 — Introduction */
+#root.profile-adult #ca[data-page="intro"] .p-section.rv,
+#root.profile-adult #ca[data-page="intro"] .dua-box.rv{translate:none!important;rotate:none!important;scale:none!important;
+  opacity:1!important;transition:none!important;animation:none!important}
+#root.profile-adult #ca[data-page="intro"]{perspective:none}
+#root.profile-adult #ca[data-page="intro"] .dua-box .dua-ar{font-family:inherit!important;font-size:1.12rem!important;
+  line-height:1.9!important;font-weight:700!important;margin-bottom:2px!important}
+#root.profile-adult #ca[data-page="intro"] .dua-box::after{
+  --hx:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 3l14.7 8.5v17L20 37 5.3 28.5v-17z' fill='%23b8860b'/%3E%3Cpath d='M20 11l7.8 4.5v9L20 29l-7.8-4.5v-9z' fill='%23fff3c4'/%3E%3C/svg%3E");
+  background:var(--hx) top left/24px no-repeat,var(--hx) top right/24px no-repeat,
+    var(--hx) bottom left/24px no-repeat,var(--hx) bottom right/24px no-repeat!important}
+/* 2 — Bonus : le soukoun */
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1) .bonus-medaille{
+  color:transparent!important;-webkit-text-fill-color:transparent!important;text-shadow:none!important}
+#root.profile-adult #ca[data-page="bonus"] .bonus-grille .sess-card:nth-child(1) .bonus-medaille::after{content:'';position:absolute;
+  inset:18px;filter:drop-shadow(0 3px 4px rgba(90,50,0,.5));
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cellipse cx='20' cy='20' rx='13' ry='11.5' fill='none' stroke='%23fff' stroke-width='6.5'/%3E%3C/svg%3E") center/contain no-repeat}
+/* 3 — Contact en rouge */
+#root.profile-adult #ca[data-page="contact"] .cform-btn{
+  background:linear-gradient(160deg,#f0506e,#c0213f)!important;
+  box-shadow:0 6px 0 #8c1530,0 14px 24px rgba(140,21,48,.3),inset 0 2px 0 rgba(255,255,255,.4)!important}
+#root.profile-adult #ca[data-page="contact"] .cform-btn:active{box-shadow:0 2px 0 #8c1530!important}
+#root.profile-adult #ca[data-page="contact"] .cform-input{border-color:rgba(224,53,79,.28)!important;
+  box-shadow:inset 0 3px 6px rgba(160,20,50,.12)!important}
+#root.profile-adult #ca[data-page="contact"] .cform-input:focus{border-color:#e0354f!important;
+  box-shadow:inset 0 2px 4px rgba(160,20,50,.1),0 0 0 4px rgba(224,53,79,.18),0 8px 18px rgba(140,21,48,.15)!important}
+#root.profile-adult #ca[data-page="contact"] .cform-input::placeholder{color:rgba(192,33,63,.55)!important}
+</style>

@@ -183,7 +183,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.8), du plus récent au plus ancien :**
+
+- **v3.3.8 (18 octobre) — bloc `outils/refonte-v338.html`** (après v3.3.3) :
+  introduction sans animation des blocs, invocation arabe réduite (police
+  du texte), hexagones aux coins ; bonus : grand soukoun dessiné (anneau
+  SVG) ; contact : bouton et cases en rouge. Textes : « (an-niyyah) » →
+  « (النِّيَّة) » dans les 13 langues ; « Alla » corrigé en « Allah » (id,
+  ur, hi — 17 fois). VOIX À REFAIRE (payant, accord du client attendu) :
+  `outils/voix-allah.js` + `voix-allah.json` — 64 textes (intro + bonus,
+  13 langues, ~24 700 caractères) où « Allah » est dit الله, ﷻ جَلَّ جَلَالُهُ,
+  ﷺ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ.
 
 - **v3.3.7 (18 octobre)** — la lecture automatique continuait après avoir
   quitté la page (les textes de l'écran caché restaient « connectés », la
