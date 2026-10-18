@@ -5760,6 +5760,16 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   border:1.5px solid rgba(184,134,11,.4);background:#fff;color:#3a2600;font:500 .95rem Outfit,system-ui,sans-serif;resize:vertical}
 .alerte-boite textarea:focus{outline:2px solid #e8a020;outline-offset:1px}
 .alerte-btns{display:flex;gap:10px;margin-top:12px}
+.alerte-canal-t{margin:12px 0 6px;font-size:.84rem;font-weight:800;text-align:center}
+.alerte-canaux{display:flex;gap:8px}
+.alerte-canaux button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:14px;padding:9px 6px;cursor:pointer;
+  font:700 .85rem Outfit,system-ui,sans-serif;color:#7a4a00;background:#fff;border:1.5px solid rgba(184,134,11,.35);transition:all .15s}
+.alerte-canaux button.on{color:#fff;background:linear-gradient(160deg,#e8a020,#b8860b);border-color:#b8860b;box-shadow:0 3px 0 #8a5c00}
+.alerte-canaux button:focus-visible{outline:2px solid #e8a020;outline-offset:2px}
+.alerte-contact{width:100%;box-sizing:border-box;margin-top:8px;border-radius:12px;padding:10px 12px;border:1.5px solid rgba(184,134,11,.4);
+  background:#fff;color:#3a2600;font:500 .95rem Outfit,system-ui,sans-serif}
+.alerte-contact.manque{border-color:#d9343f;box-shadow:0 0 0 3px rgba(217,52,63,.18)}
+.alerte-aide{font-size:.76rem;opacity:.7;text-align:center;margin-top:6px;min-height:1px}
 .alerte-btns button{flex:1;border:none;border-radius:99px;padding:12px;cursor:pointer;font:800 .95rem Outfit,system-ui,sans-serif}
 .alerte-envoi{color:#fff;background:linear-gradient(160deg,#ff7a59,#d9343f);box-shadow:0 4px 0 #8f1f28}
 .alerte-annule{color:#7a4a00;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(184,134,11,.45)}
@@ -6014,20 +6024,47 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
         +'<p>'+te("Dis-nous ce qui te bloque (facultatif). Une capture de l'écran est jointe.")+'</p>'
         +(img?'<img alt="" src="'+img+'">':'')
         +'<textarea maxlength="1500"></textarea>'
+        /* v3.2.8 — l'élève choisit OÙ on lui répond ; l'alerte part sur ce
+           seul canal (plus de triple envoi). Choix gardé pour la fois suivante. */
+        +'<div class="alerte-canal-t">'+te("Comment veux-tu qu'on te réponde ?")+'</div>'
+        +'<div class="alerte-canaux" role="radiogroup">'
+        +[['email',te('E-mail'),'✉️'],['whatsapp','WhatsApp','🟢'],['telegram','Telegram','✈️']].map(function(c){
+          return '<button type="button" role="radio" data-c="'+c[0]+'"><span aria-hidden="true">'+c[2]+'</span>'+c[1]+'</button>';}).join('')
+        +'</div>'
+        +'<input class="alerte-contact" type="text" maxlength="60" autocomplete="off">'
+        +'<div class="alerte-aide"></div>'
         +'<div class="alerte-btns"><button type="button" class="alerte-annule">'+te('Annuler')+'</button>'
         +'<button type="button" class="alerte-envoi">'+te('Envoyer')+'</button></div></div>';
       document.body.appendChild(v);place();
       var ta=v.querySelector('textarea'),env=v.querySelector('.alerte-envoi');
+      var champ=v.querySelector('.alerte-contact'),aide=v.querySelector('.alerte-aide'),canal='email',contacts={};
+      try{canal=localStorage.getItem('alerte_canal')||'email';contacts=JSON.parse(localStorage.getItem('alerte_contacts')||'{}');}catch(e){}
+      function choisit(c){
+        if(champ.value.trim())contacts[canal]=champ.value.trim();
+        canal=c;
+        [].forEach.call(v.querySelectorAll('.alerte-canaux button'),function(b){var on=b.dataset.c===c;b.classList.toggle('on',on);b.setAttribute('aria-checked',on?'true':'false');});
+        champ.style.display=c==='email'?'none':'block';
+        champ.placeholder=c==='whatsapp'?te('Ton numéro WhatsApp (ex. +33 6 12 34 56 78)'):te('Ton pseudo Telegram (ex. @prenom)');
+        champ.inputMode=c==='whatsapp'?'tel':'text';
+        champ.value=contacts[c]||'';champ.classList.remove('manque');
+        aide.textContent=c==='email'?te("On te répondra à l'adresse e-mail de ton compte."):'';
+      }
+      [].forEach.call(v.querySelectorAll('.alerte-canaux button'),function(b){b.onclick=function(){choisit(b.dataset.c);};});
+      choisit(canal);
       setTimeout(function(){try{ta.focus();}catch(e){}},80);
       function ferme(){v.remove();place();}
       v.querySelector('.alerte-annule').onclick=ferme;
       v.addEventListener('click',function(e){if(e.target===v)ferme();});
       env.onclick=function(){
+        var contact=champ.value.trim();
+        if(canal!=='email'&&!contact){champ.classList.add('manque');try{champ.focus();}catch(e){}return;}
+        if(contact)contacts[canal]=contact;
+        try{localStorage.setItem('alerte_canal',canal);localStorage.setItem('alerte_contacts',JSON.stringify(contacts));}catch(e){}
         env.disabled=true;env.textContent=te('Envoi…');
         var tok='';try{tok=localStorage.getItem('arab_token')||'';}catch(e){}
         fetch(API_URL+'/api/audio',{method:'POST',credentials:'same-origin',
           headers:Object.assign({'Content-Type':'application/json'},tok?{Authorization:'Bearer '+tok}:{}),
-          body:JSON.stringify({alerte:{message:ta.value.trim(),page:ouLonEst(),profil:String(st.profile||''),
+          body:JSON.stringify({alerte:{canal:canal,contact:contact,message:ta.value.trim(),page:ouLonEst(),profil:String(st.profile||''),
             langue:langue(),appareil:navigator.userAgent+' · '+innerWidth+'×'+innerHeight,capture:img}})})
         .then(function(r){if(!r.ok)throw 0;ferme();toast(te('Message envoyé ! Tu auras une réponse très vite.'));})
         .catch(function(){env.disabled=false;env.textContent=te('Envoyer');toast(te("L'envoi n'a pas marché. Réessaie dans un instant."));});
@@ -13660,7 +13697,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.7';
+var _VERSION_REPLI='v3.2.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17031,6 +17068,11 @@ var _TE={
 'Ici, le ل est suivi du ك, qui est une lettre lunaire. Il a un سُكُون : on prononce donc le ل.':{en:'Here, the ل is followed by the ك, which is a lunar letter. It has a سُكُون: so the ل is pronounced.',es:'Aquí, la ل va seguida de la ك, que es una letra lunar. Tiene un سُكُون: por tanto, la ل se pronuncia.',de:'Hier folgt auf das ل das ك, ein Mondbuchstabe. Es hat ein سُكُون: Das ل wird also ausgesprochen.',nl:'Hier wordt de ل gevolgd door de ك, een maanletter. Hij heeft een سُكُون: de ل wordt dus uitgesproken.',it:'Qui, la ل è seguita dalla ك, che è una lettera lunare. Ha un سُكُون: quindi la ل si pronuncia.',pt:'Aqui, o ل é seguido do ك, que é uma letra lunar. Tem um سُكُون: por isso, o ل pronuncia-se.',ru:'Здесь за ل следует ك — лунная буква. Над ل стоит سُكُون: значит, ل произносится.',tr:'Burada ل harfinden sonra bir kamerî harf olan ك gelir. ل\'de bir سُكُون vardır: bu yüzden ل okunur.',zh:'这里，ل 后面是 ك，它是月亮字母。ل 上有 سُكُون：所以 ل 要发音。',id:'Di sini, ل diikuti oleh ك, yang merupakan huruf qamariyah. Ia memiliki سُكُون: jadi ل dibaca.',ur:'یہاں ل کے بعد ك ہے، جو قمری حرف ہے۔ ل پر سُكُون ہے: اس لیے ل پڑھا جاتا ہے۔',hi:'यहाँ ل के बाद ك है, जो एक क़मरी (चंद्र) अक्षर है। ل पर سُكُون है: इसलिए ل पढ़ा जाता है।'},
 'Lettres solaires':{en:'Solar letters',es:'Letras solares',de:'Sonnenbuchstaben',nl:'Zonneletters',it:'Lettere solari',pt:'Letras solares',ru:'Солнечные буквы',tr:'Şemsî harfler',zh:'太阳字母',id:'Huruf syamsiyah',ur:'شمسی حروف',hi:'शम्सी अक्षर'},
 'Lettres lunaires':{en:'Lunar letters',es:'Letras lunares',de:'Mondbuchstaben',nl:'Maanletters',it:'Lettere lunari',pt:'Letras lunares',ru:'Лунные буквы',tr:'Kamerî harfler',zh:'月亮字母',id:'Huruf qamariyah',ur:'قمری حروف',hi:'क़मरी अक्षर'},
+'Comment veux-tu qu\'on te réponde ?':{en:'How would you like us to reply?',es:'¿Cómo quieres que te respondamos?',de:'Wie sollen wir dir antworten?',nl:'Hoe wil je dat we je antwoorden?',it:'Come vuoi che ti rispondiamo?',pt:'Como queres que te respondamos?',ru:'Как тебе ответить?',tr:'Sana nasıl cevap verelim?',zh:'你希望我们通过什么方式回复你？',id:'Bagaimana kamu ingin kami membalas?',ur:'ہم آپ کو کیسے جواب دیں؟',hi:'हम आपको कैसे जवाब दें?'},
+'E-mail':{en:'Email',es:'Correo',de:'E-Mail',nl:'E-mail',it:'Email',pt:'E-mail',ru:'Почта',tr:'E-posta',zh:'邮件',id:'Email',ur:'ای میل',hi:'ईमेल'},
+'Ton numéro WhatsApp (ex. +33 6 12 34 56 78)':{en:'Your WhatsApp number (e.g. +44 7700 900123)',es:'Tu número de WhatsApp (ej. +34 612 34 56 78)',de:'Deine WhatsApp-Nummer (z. B. +49 151 23456789)',nl:'Je WhatsApp-nummer (bijv. +31 6 12345678)',it:'Il tuo numero WhatsApp (es. +39 312 345 6789)',pt:'O teu número de WhatsApp (ex. +351 912 345 678)',ru:'Твой номер WhatsApp (напр. +7 912 345-67-89)',tr:'WhatsApp numaran (örn. +90 532 123 45 67)',zh:'你的 WhatsApp 号码（例如 +86 138 0013 8000）',id:'Nomor WhatsApp-mu (mis. +62 812 3456 7890)',ur:'آپ کا واٹس ایپ نمبر (مثلاً +92 300 1234567)',hi:'आपका व्हाट्सऐप नंबर (जैसे +91 98765 43210)'},
+'Ton pseudo Telegram (ex. @prenom)':{en:'Your Telegram username (e.g. @name)',es:'Tu usuario de Telegram (ej. @nombre)',de:'Dein Telegram-Benutzername (z. B. @name)',nl:'Je Telegram-gebruikersnaam (bijv. @naam)',it:'Il tuo username Telegram (es. @nome)',pt:'O teu nome de utilizador do Telegram (ex. @nome)',ru:'Твой ник в Telegram (напр. @imya)',tr:'Telegram kullanıcı adın (örn. @isim)',zh:'你的 Telegram 用户名（例如 @name）',id:'Username Telegram-mu (mis. @nama)',ur:'آپ کا ٹیلیگرام یوزر نیم (مثلاً @name)',hi:'आपका टेलीग्राम यूज़रनेम (जैसे @naam)'},
+'On te répondra à l\'adresse e-mail de ton compte.':{en:'We will reply to your account email address.',es:'Te responderemos al correo de tu cuenta.',de:'Wir antworten an die E-Mail-Adresse deines Kontos.',nl:'We antwoorden op het e-mailadres van je account.',it:'Ti risponderemo all\'indirizzo email del tuo account.',pt:'Vamos responder para o e-mail da tua conta.',ru:'Мы ответим на почту твоего аккаунта.',tr:'Hesabındaki e-posta adresine cevap vereceğiz.',zh:'我们会回复到你账户的邮箱。',id:'Kami akan membalas ke email akunmu.',ur:'ہم آپ کے اکاؤنٹ کے ای میل پر جواب دیں گے۔',hi:'हम आपके अकाउंट के ईमेल पर जवाब देंगे।'},
 'Cours suivant':{en:'Next lesson',es:'Lección siguiente',de:'Nächste Lektion',nl:'Volgende les',it:'Lezione successiva',pt:'Lição seguinte',ru:'Следующий урок',tr:'Sonraki ders',zh:'下一课',id:'Pelajaran berikutnya',ur:'اگلا سبق',hi:'अगला पाठ'},
 'Toutes les leçons':{en:'All lessons',es:'Todas las lecciones',de:'Alle Lektionen',nl:'Alle lessen',it:'Tutte le lezioni',pt:'Todas as lições',ru:'Все уроки',tr:'Tüm dersler',zh:'所有课程',id:'Semua pelajaran',ur:'تمام اسباق',hi:'सभी पाठ'},
 'Quitter le cours ?':{en:'Leave the lesson?',es:'¿Salir de la lección?',de:'Lektion verlassen?',nl:'Les verlaten?',it:'Uscire dalla lezione?',pt:'Sair da lição?',ru:'Выйти из урока?',tr:'Dersten çıkılsın mı?',zh:'离开这节课？',id:'Keluar dari pelajaran?',ur:'سبق چھوڑیں؟',hi:'पाठ छोड़ें?'},

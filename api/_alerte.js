@@ -21,7 +21,8 @@ const { sendEmail } = require('./_brevo');
  *                        (+33612345678)
  *   TELEGRAM_TOKEN     — jeton du bot (@BotFather)
  *   TELEGRAM_CHAT_ID   — la discussion qui reçoit (getUpdates)
- *   Chaque canal configuré reçoit l'alerte ; l'e-mail part toujours.
+ *   L'élève choisit le canal (e-mail, WhatsApp, Telegram) : l'alerte part sur
+ *   celui-là seulement ; à défaut, e-mail puis Telegram.
  *   BREVO : l'envoi exige que le blocage par adresse IP soit DÉSACTIVÉ dans
  *   Brevo (Sécurité → IP autorisées) — Vercel change d'adresse à chaque appel.
  *
@@ -77,57 +78,77 @@ module.exports = async function alerte(req, res, ip) {
     } catch (e) { console.error('[Alerte] capture :', e.message); }
   }
 
-  const envois = [];
-  /* 1. WhatsApp (CallMeBot) — texte et lien de la capture. */
-  if (process.env.CALLMEBOT_APIKEY && process.env.ALERTE_WHATSAPP) {
-    const texte = '🔔 Alerte iamlearningarabic\n' +
-      'De : ' + email + '\nPage : ' + page + (profil ? ' (' + profil + ')' : '') +
-      (message ? '\nMessage : ' + message : '') + (lien ? '\nCapture : ' + lien : '');
+  /* v3.2.8 — L'ÉLÈVE CHOISIT où on lui répond (e-mail, WhatsApp, Telegram) :
+     l'alerte part sur CE canal seulement. S'il n'est pas configuré ou
+     échoue, on se rabat sur l'e-mail, puis sur Telegram. */
+  const canal = ['email', 'whatsapp', 'telegram'].includes(a.canal) ? a.canal : 'email';
+  const contact = String(a.contact || '').replace(/[<>]/g, '').trim().slice(0, 60);
+  const chiffres = contact.replace(/[^\d]/g, '');
+  const pseudo = contact.replace(/^@/, '').replace(/[^\w]/g, '');
+  const repondre = canal === 'whatsapp' && chiffres ? 'Répondre sur WhatsApp : https://wa.me/' + chiffres + ' (' + contact + ')'
+    : canal === 'telegram' && pseudo ? 'Répondre sur Telegram : https://t.me/' + pseudo + ' (@' + pseudo + ')'
+    : 'Répondre par e-mail : ' + email;
+  const entete = '🔔 Alerte iamlearningarabic\nDe : ' + email + '\nPage : ' + page + (profil ? ' (' + profil + ')' : '') +
+    (message ? '\nMessage : ' + message : '') + '\n' + repondre;
+
+  async function parWhatsapp() {
+    if (!process.env.CALLMEBOT_APIKEY || !process.env.ALERTE_WHATSAPP) throw new Error('whatsapp non configuré');
     const u = 'https://api.callmebot.com/whatsapp.php?phone=' +
       encodeURIComponent(process.env.ALERTE_WHATSAPP.replace(/[^\d+]/g, '')) +
-      '&text=' + encodeURIComponent(texte) + '&apikey=' + encodeURIComponent(process.env.CALLMEBOT_APIKEY);
-    envois.push(fetch(u).then((r) => { if (!r.ok) throw new Error('callmebot ' + r.status); return 'whatsapp'; }));
+      '&text=' + encodeURIComponent(entete + (lien ? '\nCapture : ' + lien : '')) +
+      '&apikey=' + encodeURIComponent(process.env.CALLMEBOT_APIKEY);
+    const r = await fetch(u);
+    const t = await r.text();
+    /* CallMeBot répond 200 même quand il refuse : on lit la réponse */
+    if (!r.ok || /error|invalid|not allowed/i.test(t)) throw new Error('callmebot ' + r.status + ' ' + t.replace(/<[^>]+>/g, ' ').slice(0, 120));
+    return 'whatsapp';
   }
-  /* 2. Telegram (bot) — la VRAIE image dans la discussion, le texte en
-        légende. TELEGRAM_TOKEN (donné par @BotFather) et TELEGRAM_CHAT_ID. */
-  if (process.env.TELEGRAM_TOKEN && process.env.TELEGRAM_CHAT_ID) {
-    const legende = ('🔔 Alerte iamlearningarabic\nDe : ' + email + '\nPage : ' + page +
-      (profil ? ' (' + profil + ')' : '') + (message ? '\nMessage : ' + message : '')).slice(0, 1000);
+  async function parTelegram() {
+    if (!process.env.TELEGRAM_TOKEN || !process.env.TELEGRAM_CHAT_ID) throw new Error('telegram non configuré');
     const base = 'https://api.telegram.org/bot' + process.env.TELEGRAM_TOKEN;
-    let envoi;
+    const legende = entete.slice(0, 1000);
+    let r;
     if (m) {
       const fd = new FormData();
       fd.append('chat_id', process.env.TELEGRAM_CHAT_ID);
       fd.append('caption', legende);
       fd.append('photo', new Blob([Buffer.from(m[2], 'base64')], { type: 'image/' + m[1] }), 'capture.' + (m[1] === 'png' ? 'png' : 'jpg'));
-      envoi = fetch(base + '/sendPhoto', { method: 'POST', body: fd });
+      r = await fetch(base + '/sendPhoto', { method: 'POST', body: fd });
     } else {
-      envoi = fetch(base + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      r = await fetch(base + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: legende }) });
     }
-    envois.push(envoi.then(async (r) => { if (!r.ok) throw new Error('telegram ' + r.status + ' ' + (await r.text()).slice(0, 120)); return 'telegram'; }));
+    if (!r.ok) throw new Error('telegram ' + r.status + ' ' + (await r.text()).slice(0, 120));
+    return 'telegram';
   }
-  /* 3. E-mail (Brevo), toujours : la capture y est visible directement, et
-        « Répondre » écrit à l'élève. */
-  envois.push(sendEmail({
-    to: process.env.ALERTE_EMAIL || 'contact@iamlearningarabic.com',
-    subject: '🔔 Alerte de ' + email + ' — ' + (page || 'page ?'),
-    html: '<div style="font-family:Arial,sans-serif;font-size:15px">' +
-      '<p><b>' + echappe(email) + '</b> n’a pas compris quelque chose.</p>' +
-      '<p>Page : <b>' + echappe(page) + '</b> · profil ' + echappe(profil) + ' · langue ' + echappe(langue) + '</p>' +
-      (message ? '<p style="padding:12px;background:#fff7e0;border-radius:8px">' + echappe(message).replace(/\n/g, '<br>') + '</p>' : '<p><i>Pas de message.</i></p>') +
-      (lien ? '<p><img src="' + echappe(lien) + '" style="max-width:420px;border:1px solid #ddd;border-radius:8px"></p><p><a href="' + echappe(lien) + '">Ouvrir la capture</a></p>' : '<p><i>Pas de capture.</i></p>') +
-      '<p style="color:#888;font-size:12px">' + echappe(appareil) + '</p>' +
-      '<p><a href="mailto:' + echappe(email) + '">Répondre à ' + echappe(email) + '</a></p></div>',
-  }).then(() => 'email'));
+  async function parEmail() {
+    const lienRep = canal === 'whatsapp' && chiffres ? 'https://wa.me/' + chiffres
+      : canal === 'telegram' && pseudo ? 'https://t.me/' + pseudo : 'mailto:' + email;
+    await sendEmail({
+      to: process.env.ALERTE_EMAIL || 'contact@iamlearningarabic.com',
+      subject: '🔔 Alerte de ' + email + ' — ' + (page || 'page ?'),
+      html: '<div style="font-family:Arial,sans-serif;font-size:15px">' +
+        '<p><b>' + echappe(email) + '</b> n’a pas compris quelque chose.</p>' +
+        '<p>Page : <b>' + echappe(page) + '</b> · profil ' + echappe(profil) + ' · langue ' + echappe(langue) + '</p>' +
+        (message ? '<p style="padding:12px;background:#fff7e0;border-radius:8px">' + echappe(message).replace(/\n/g, '<br>') + '</p>' : '<p><i>Pas de message.</i></p>') +
+        (lien ? '<p><img src="' + echappe(lien) + '" style="max-width:420px;border:1px solid #ddd;border-radius:8px"></p><p><a href="' + echappe(lien) + '">Ouvrir la capture</a></p>' : '<p><i>Pas de capture.</i></p>') +
+        '<p><b><a href="' + echappe(lienRep) + '">' + echappe(repondre) + '</a></b></p>' +
+        '<p style="color:#888;font-size:12px">' + echappe(appareil) + '</p></div>',
+    });
+    return 'email';
+  }
 
-  const r = await Promise.allSettled(envois);
-  const ok = r.filter((x) => x.status === 'fulfilled').map((x) => x.value);
-  const ko = r.filter((x) => x.status === 'rejected').map((x) => String(x.reason && x.reason.message || x.reason).slice(0, 200));
-  ko.forEach((m) => console.error('[Alerte] envoi :', m));
-  logEvent('alerte', { email, page, ok: ok.join(','), ko: ko.join(' | ') });
+  const ordre = { email: [parEmail, parTelegram], whatsapp: [parWhatsapp, parEmail, parTelegram],
+    telegram: [parTelegram, parEmail] }[canal];
+  const ko = [];
+  let par = null;
+  for (const f of ordre) {
+    try { par = await f(); break; } catch (e) { ko.push(String(e.message || e).slice(0, 200)); }
+  }
+  ko.forEach((x) => console.error('[Alerte] envoi :', x));
+  logEvent('alerte', { email, page, canal, par, ko: ko.join(' | ') });
   /* 500 et non 502 : Cloudflare remplace les réponses 502 par sa propre page,
      et l'on perdait la raison de l'échec. */
-  if (!ok.length) return res.status(500).json({ error: 'Envoi impossible.', raisons: ko, capture: !!lien });
-  return res.status(200).json({ ok: true, par: ok });
+  if (!par) return res.status(500).json({ error: 'Envoi impossible.', raisons: ko, capture: !!lien });
+  return res.status(200).json({ ok: true, par: [par], canal, secours: ko.length ? ko : undefined });
 };

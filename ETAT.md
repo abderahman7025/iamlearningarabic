@@ -183,7 +183,18 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.7), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.8), du plus récent au plus ancien :**
+
+- **v3.2.8 (18 octobre) — ALERTE : l'élève choisit le canal.** Dans la
+  fenêtre d'alerte : « Comment veux-tu qu'on te réponde ? » E-mail /
+  WhatsApp / Telegram (13 langues) ; WhatsApp demande son numéro, Telegram
+  son pseudo (obligatoires, gardés dans le navigateur avec le choix).
+  `api/_alerte.js` n'envoie QUE sur ce canal, avec un lien pour lui répondre
+  (wa.me/…, t.me/…, mailto) ; à défaut (non configuré ou échec) : e-mail,
+  puis Telegram. CallMeBot répond 200 même en cas de refus : on lit le
+  corps. Telegram configuré par le client (bot @I_Am_Learning_Arabic_bot,
+  `TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID` dans Vercel) et testé : texte et
+  photo reçus.
 
 - **v3.2.7 (18 octobre) — la voyelle seule dans une phrase.** Trait FIN
   (`::after`, bloc vide de 18 × 1,3 px aligné sur la ligne de base du texte
