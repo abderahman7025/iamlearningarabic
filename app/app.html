@@ -9842,6 +9842,7 @@ function repriseRejouer(e){
 }
 
 function navToPage(page){
+  _coupeSceneEnfant();
   stopSpeech();
   st._curPage=page;showS('s-main',true);
   window._tbLastScroll=0;
@@ -9895,6 +9896,7 @@ function handleBack(){
     _demandeQuitterCours(function(){handleBack._ok=true;try{handleBack();}finally{handleBack._ok=false;}});
     return;
   }
+  _coupeSceneEnfant();
   stopSpeech();
   /* v3.2.2 — une partie de Memory ramène à la liste des jeux de Memory. */
   if(st&&st._curPage==='memory'&&typeof renderMemoryGame==='function'){renderMemoryGame(document.getElementById('ca'));return;}
@@ -12555,7 +12557,7 @@ function _retourEnfant(vers,libelle){
   b._enfant=libelle||te('Retour');
   var l=document.getElementById('back-lbl');if(l)l.textContent=b._enfant;
   b.onclick=function(){
-    function part(){try{stopSpeech();}catch(e){}vers();}
+    function part(){_coupeSceneEnfant();try{stopSpeech();}catch(e){}vers();}
     /* Dans une manche ou un cours entamé, on demande d'abord. */
     if(document.querySelector('#ca .boy-wrap')&&!document.querySelector('#ca [data-fin]'))_demandeQuitterCours(part);
     else part();
@@ -12840,6 +12842,7 @@ function renderTuilesAnimaux(ca){
 function _melangeTab(t){return t.slice().sort(function(){return Math.random()-0.5;});}
 
 function renderSessionsMap(ca){
+  _coupeSceneEnfant();
   /* Les 3-5 ans n'ont pas de chemin qui serpente : le detour se prend ICI,
      une fois, plutot qu'aux douze endroits qui rappellent la carte. */
   if(st&&st.age==='petit'&&(st.profile==='boy'||st.profile==='girl'))
@@ -14300,6 +14303,7 @@ function _boyLetterPickerJeu(ca,session){
 }
 
 function _boyLetterPicker(ca,session){
+  _coupeSceneEnfant();
   if(st&&st.age==='petit')return _boyLetterPickerJeu(ca,session);
   _boySession=session;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
@@ -14407,7 +14411,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.1';
+var _VERSION_REPLI='v3.5.2';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14685,8 +14689,18 @@ var _CL_JUMELLES={
    parler, et « … » n'est jamais prononcé.
    Il y en avait DEUX, une par interface, à corriger deux fois. Celle-ci
    est la seule qui reste. */
+var _boyNActif=null;
+function _coupeSceneEnfant(){
+  var n=_boyNActif;_boyNActif=null;
+  if(n){try{n.tue();}catch(e){}}
+}
 function _boyNarration(){
   var q=[],busy=false,tmr=null,timers=[];
+  /* v3.5.2 — « quand on quitte le jeu ou un cours, il faut arrêter le son ».
+     `stopSpeech` coupait la phrase en cours, mais la file et les gestes
+     différés continuaient : la phrase suivante partait sur la page d'après.
+     Une narration « morte » ne dit plus rien. */
+  var mort=false;
   /* ── LA PAUSE ──
      Le bouton du bas suspend TOUT ce qui se joue tout seul : la voix en
      train d'etre dite, la file de celles qui suivent, l'attente du silence
@@ -14812,6 +14826,7 @@ function _boyNarration(){
      de jouer. Une phrase mise en file sera dite : autant la chercher tout de
      suite, pendant que la precedente occupe l'oreille. */
   function enFile(t){
+    if(mort)return;
     q.push(t);
     try{if(typeof _prechargeSons==='function')_prechargeSons([t]);}catch(e){}
     pump();
@@ -14862,7 +14877,9 @@ function _boyNarration(){
       try{if(window._kidAudio){window._kidAudio.pause();window._kidAudio=null;}}catch(e){}},
     /* En pause, le geste attend son tour au lieu de se jouer dans le vide. */
     plusTard:function(fn,ms){
+      if(mort)return 0;
       var id=setTimeout(function(){
+        if(mort)return;
         if(enPause){differes.push(fn);return;}
         fn();
       },ms);
@@ -14900,7 +14917,14 @@ function _boyNarration(){
       },80);
       timers.push(id);return id;
     },
-    videTimers:function(){timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];differes=[];}
+    videTimers:function(){timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];differes=[];},
+    tue:function(){
+      mort=true;enPause=false;differes=[];enCours=null;
+      timers.forEach(function(id){clearTimeout(id);clearInterval(id);});timers=[];
+      q=[];busy=false;if(tmr){clearInterval(tmr);tmr=null;}
+      try{stopSpeech();}catch(e){}
+      try{if(window._kidAudio){window._kidAudio.pause();window._kidAudio=null;}}catch(e){}
+    }
   };
 }
 
@@ -18559,7 +18583,9 @@ function _boyScene(ca,reprise){
   /* Le cours entier se joue en plein écran paysage, dès l'arrivée sur la
      lettre — pas seulement sur les écrans de tracé. */
   _armePleinEcran(ca);
+  _coupeSceneEnfant();
   var N=_boyNarration();
+  _boyNActif=N;
   var api={wrap:wrap,dire:N.dire,plusTard:N.plusTard,aEnreg:N.aEnreg};
   /* v3.4.6 — 3-5 ANS : RIEN NE SE TOUCHE PENDANT QUE LA VOIX PARLE.
      `N.occupe()` existait (vrai tant qu'une phrase joue ou attend, faux dès

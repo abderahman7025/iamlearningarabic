@@ -6053,3 +6053,6 @@ nécessaire — les éléments du site servent de décor.
 - 3-5 ans : manche « Écoute bien » retirée (leçons des lettres et leçon des voyelles) — doublon d'« Attrape-la ».
 - « Attrape-la » leçon des voyelles : plus seulement « Bravo ! » à chaque prise, la suite Encore / Continue / Bravo / Génial puis Supeeeer, comme les autres jeux.
 - Tracé 3-5 ans : canevas plus haut (360×500 debout, 560×330 couché), marge 20 : la lettre est bien plus grande.
+
+## v3.5.2
+- Enfants : quitter un jeu ou un cours coupe tout le son. `stopSpeech` ne coupait que la phrase en cours ; la file de la narration et les gestes différés (`plusTard`) relançaient la suite sur la page d'après. Nouvelle `N.tue()` (narration « morte » : plus rien ne s'y dit), appelée par `_coupeSceneEnfant()` au bouton retour, au retour du téléphone (`handleBack`), à `navToPage`, à `renderSessionsMap`, `_boyLetterPicker` et au lancement d'une nouvelle scène.
