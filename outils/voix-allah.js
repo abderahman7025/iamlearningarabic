@@ -14,6 +14,8 @@
  * v3.3.9 : + la doua de l'introduction avec « رَبِّ زِدْنِي عِلْمَا » (13 langues),
  * et la phrase du tanwin en français, le son écrit « n' » (essai choisi
  * par le client : la voix disait « èn »).
+ * v3.4.6 : ﷺ — la voix v4 le traduisait (« que la paix… »), même écrit en
+ * arabe ; on l'écrit en lettres de chaque langue (essai n° 4 du client).
  * Narrateur, eleven_v4, [calm]. La clé = le texte tel que `speakText` le
  * reçoit (« long| » + hachage au-delà de 180 caractères / 360 octets, comme
  * `_clesSon` dans app/app.html).
