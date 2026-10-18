@@ -1,0 +1,44 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.3.4 (18 octobre) — source : outils/refonte-v334.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.3.3.
+     ESSAI : chaque rubrique du menu (adulte) prend le fond de SA couleur
+     (celle de sa gemme au menu) avec un motif de mosquée différent, pour
+     que le client choisisse : arcs (Introduction, bleu),
+     alvéoles hexagonales (Exercices, vert), rub el-hizb (Bonus, violet), rosaces
+     (Contact, rose). Leçons (or) : bloc v3.3.3.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+@keyframes pageFond{to{background-position:0 0,560px 280px,0 0}}
+@keyframes pageReflet{0%,55%{background-position-x:130%}100%{background-position-x:-30%}}
+/* intro — Arcs de mosquée */
+#root.profile-adult #ca[data-page="intro"]{background-color:#3b8cf0;
+  background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='72' viewBox='0 0 56 72'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.1'%3E%3Cpath d='M6 72V36Q6 16 28 6Q50 16 50 36V72'/%3E%3Cpath d='M14 72V40Q14 24 28 16Q42 24 42 40V72'/%3E%3Ccircle cx='28' cy='30' r='3'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#1747a6 0%,#3b8cf0 55%,color-mix(in srgb,#3b8cf0 55%,#bfe3ff) 100%);
+  background-size:300% 100%,56px 72px,100% 100%;background-attachment:fixed,local,fixed;
+  animation:pageFond 40s linear infinite,pageReflet 7s ease-in-out infinite}
+/* exercises — Alvéoles hexagonales (girih) */
+#root.profile-adult #ca[data-page="exercises"]{background-color:#13b886;
+  background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.1'%3E%3Cpath d='M14 0L28 8V24L14 32L0 24V8Z'/%3E%3Cpath d='M42 16L56 24V40L42 48L28 40V24Z'/%3E%3Cpath d='M42 -16L56 -8V8L42 16L28 8V-8Z'/%3E%3Ccircle cx='14' cy='16' r='4'/%3E%3Ccircle cx='42' cy='32' r='4'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#056b4c 0%,#13b886 55%,color-mix(in srgb,#13b886 55%,#b9f5d5) 100%);
+  background-size:300% 100%,56px 48px,100% 100%;background-attachment:fixed,local,fixed;
+  animation:pageFond 40s linear infinite,pageReflet 7s ease-in-out infinite}
+/* bonus — Rub el-hizb (étoile à 8 branches) */
+#root.profile-adult #ca[data-page="bonus"]{background-color:#9b5de5;
+  background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.1'%3E%3Crect x='16' y='16' width='24' height='24'/%3E%3Crect x='16' y='16' width='24' height='24' transform='rotate(45 28 28)'/%3E%3Ccircle cx='28' cy='28' r='5'/%3E%3Cpath d='M0 0L10 10M56 0L46 10M0 56L10 46M56 56L46 46'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#55209e 0%,#9b5de5 55%,color-mix(in srgb,#9b5de5 55%,#ead4ff) 100%);
+  background-size:300% 100%,56px 56px,100% 100%;background-attachment:fixed,local,fixed;
+  animation:pageFond 40s linear infinite,pageReflet 7s ease-in-out infinite}
+/* contact — Rosaces entrelacées */
+#root.profile-adult #ca[data-page="contact"]{background-color:#f0506e;
+  background-image:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.22' stroke-width='1.1'%3E%3Ccircle cx='28' cy='28' r='20'/%3E%3Ccircle cx='0' cy='0' r='20'/%3E%3Ccircle cx='56' cy='0' r='20'/%3E%3Ccircle cx='0' cy='56' r='20'/%3E%3Ccircle cx='56' cy='56' r='20'/%3E%3Ccircle cx='28' cy='28' r='6'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#a4173a 0%,#f0506e 55%,color-mix(in srgb,#f0506e 55%,#ffd0d6) 100%);
+  background-size:300% 100%,56px 56px,100% 100%;background-attachment:fixed,local,fixed;
+  animation:pageFond 40s linear infinite,pageReflet 7s ease-in-out infinite}
+/* le titre de la barre du haut, en blanc sur la couleur */
+body:has(#root.profile-adult #ca:is([data-page="intro"],[data-page="exercises"],[data-page="bonus"],[data-page="contact"])) #tb-title{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+/* les petits textes posés directement sur la couleur : en blanc */
+#root.profile-adult #ca[data-page="exercises"] .qz-prog .qs-lbl,
+#root.profile-adult #ca[data-page="bonus"]>div[style*="--txt2"]{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:.95;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+@media (prefers-reduced-motion:reduce){#root.profile-adult #ca[data-page]{animation:none}}
+</style>

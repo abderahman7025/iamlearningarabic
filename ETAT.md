@@ -183,7 +183,13 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.3), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.4), du plus récent au plus ancien :**
+
+- **v3.3.4 (18 octobre) — bloc `outils/refonte-v334.html`** (après v3.3.3),
+  ESSAI : fond de la couleur de la rubrique + motif différent par page
+  (adulte) — Introduction bleu/arcs, Exercices vert/alvéoles hexagonales,
+  Bonus violet/rub el-hizb, Contact rose/rosaces ; reflet qui passe. Le
+  client choisira un motif ou plusieurs.
 
 - **v3.3.3 (18 octobre) — bloc `outils/refonte-v333.html`** (après v3.3.0) :
   page Leçons à l'essai — le bandeau « Mon parcours · رِحْلَتِي » prend le fond
