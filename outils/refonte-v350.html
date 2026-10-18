@@ -1,0 +1,13 @@
+<style id="refonte-v350">
+/* v3.5.0 — « Attrape-la » : la taille des bulles suit la grille choisie
+   par `grillePetit` (--cols x --rows) au lieu d'être bornée à 138 px. */
+body.age-petit .mj-attrape .mj-flotte{--d:min(230px,calc(94cqw / var(--cols,2)),calc(86cqh / var(--rows,3)))}
+/* « Les ballons » : des ballons coupés à moitié sur les côtés. L'aire
+   coupait tout ce qui en dépassait, alors que le paysage continue autour.
+   On ne coupe plus qu'au bord du grand cadre. */
+body.age-petit .mj-bulles .mj-aire{overflow:visible!important}
+body.age-petit .boy-panel.panneau-jeu:has(.mj-bulles){overflow:hidden!important}
+/* L'aire était bornée à 620 px au milieu d'un cadre bien plus large
+   (paysage) : bulles et ballons prennent maintenant toute la largeur. */
+body.age-petit .mj.mj-attrape,body.age-petit .mj.mj-bulles{max-width:none!important}
+</style>

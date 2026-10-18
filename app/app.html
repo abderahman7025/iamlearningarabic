@@ -4400,8 +4400,8 @@ body.age-petit.profile-girl #girl-bg-anim{display:none !important}
    cadre est posée par le code (`poseLeRepere`), pas ici : elle dépend du
    repère choisi. */
 .carte-monde.couchee{max-width:min(1100px,100%)}
-.carte-monde.couchee .carte-etape{width:9.5%}
-.carte-monde.couchee .carte-nom{font-size:.72rem;padding:1px 6px}
+.carte-monde.couchee .carte-etape{width:13%}
+.carte-monde.couchee .carte-nom{font-size:.85rem;padding:2px 8px}
 .carte-monde.couchee .carte-ar{font-size:.8rem}
 .carte-sentier{position:absolute;inset:0;width:100%;height:100%;
   pointer-events:none}
@@ -6711,6 +6711,19 @@ body.age-petit .mj-flotte{--d:min(138px,42cqw,30cqh);width:var(--d)!important;he
 body.age-petit .mj-bulle{--d:min(138px,38cqw);width:var(--d)!important;height:calc(var(--d) * 1.17)!important;font-size:calc(var(--d) * .42)!important}
 @media (prefers-reduced-motion:reduce){
   body.age-petit .boy-panel.panneau-jeu,body.age-petit .boy-panel.panneau-jeu::before,body.age-petit .boy-panel.panneau-jeu:has(.mj-aire)::after{animation:none!important}}
+</style>
+<style id="refonte-v350">
+/* v3.5.0 — « Attrape-la » : la taille des bulles suit la grille choisie
+   par `grillePetit` (--cols x --rows) au lieu d'être bornée à 138 px. */
+body.age-petit .mj-attrape .mj-flotte{--d:min(230px,calc(94cqw / var(--cols,2)),calc(86cqh / var(--rows,3)))}
+/* « Les ballons » : des ballons coupés à moitié sur les côtés. L'aire
+   coupait tout ce qui en dépassait, alors que le paysage continue autour.
+   On ne coupe plus qu'au bord du grand cadre. */
+body.age-petit .mj-bulles .mj-aire{overflow:visible!important}
+body.age-petit .boy-panel.panneau-jeu:has(.mj-bulles){overflow:hidden!important}
+/* L'aire était bornée à 620 px au milieu d'un cadre bien plus large
+   (paysage) : bulles et ballons prennent maintenant toute la largeur. */
+body.age-petit .mj.mj-attrape,body.age-petit .mj.mj-bulles{max-width:none!important}
 </style>
 
 
@@ -12636,8 +12649,12 @@ function renderTuilesAnimaux(ca){
   /* v3.4.8 — couchée : « trop de place sur les côtés ». La carte est
      beaucoup plus large que haute (100 × 50) et le sentier serpente sur deux
      bandes, d'un bord à l'autre de l'écran. */
-  var CARTE_COUCHEE={h:47,pts:[[6,11],[23,19],[40,9],[57,18],[74,8],[92,15],
-                               [94,33],[76,40],[57,32],[38,41],[19,34]]};
+  /* v3.5.0 — le client : « fais 4 animaux par ligne, bien espacés en
+     largeur, comme interface 6/11 ans ». Toute la largeur de l'écran, trois
+     rangées (4, 4, 3 centrés), on fait défiler s'il le faut. */
+  var CARTE_COUCHEE={h:66,pts:[[12,9],[37,14],[63,8],[88,13],
+                               [87,33],[62,38],[38,32],[13,37],
+                               [25,56],[50,61],[75,55]]};
   function carteDebout(){
     try{return window.innerHeight>=window.innerWidth*0.95;}catch(e){return true;}
   }
@@ -12661,7 +12678,7 @@ function renderTuilesAnimaux(ca){
       var _dispo=(wrap.clientWidth||innerWidth/_z)-8;
       /* trop peu de hauteur (téléphone couché) : on garde au moins 60 % de la
          largeur, et l'on fait défiler un peu */
-      var _larg=Math.max(240,Math.min(_dispo,Math.max(_haut*100/CARTE.h,_dispo*0.6)));
+      var _larg=CARTE===CARTE_COUCHEE?Math.max(240,_dispo):Math.max(240,Math.min(_dispo,Math.max(_haut*100/CARTE.h,_dispo*0.6)));
       carte.style.width=_larg+'px';carte.style.maxWidth='none';
       /* le % d'un padding se rapporte au PARENT : avec une largeur propre, la
          hauteur vient du rapport d'aspect */
@@ -14390,7 +14407,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.4.9';
+var _VERSION_REPLI='v3.5.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -22468,6 +22485,32 @@ function _boyScene(ca,reprise){
       jauge.innerHTML='<i></i>';m.zone.appendChild(jauge);
       var aire=document.createElement('div');aire.className='mj-aire';
       m.zone.appendChild(aire);
+      /* v3.5.0 — le client : « augmente la taille des bulles ». La taille
+         venait d'une grille fixe (2 ou 3 colonnes) : en paysage, trois
+         colonnes sur deux rangées dans une aire basse donnaient de petites
+         bulles. On essaie toutes les grilles régulières (2, 3, 4, 6 de
+         front) et l'on garde celle qui donne les PLUS GROSSES bulles ; on
+         recommence quand l'aire change de taille (rotation, allongement). */
+      function grillePetit(){
+        if(!(st&&st.age==='petit')||!aire.isConnected)return;
+        var fs=[].slice.call(aire.querySelectorAll('.mj-flotte[data-k]'));
+        var n=fs.length;if(!n)return;
+        var W=aire.offsetWidth||300,H=aire.offsetHeight||300,best=null;
+        [2,3,4,6].forEach(function(c){
+          if(c>n||n%c)return;
+          var r=n/c,d=Math.min(W*0.94/c,H*0.86/r);
+          if(!best||d>best.d)best={c:c,r:r,d:d};
+        });
+        if(!best)best={c:n,r:1};
+        aire.style.setProperty('--cols',best.c);aire.style.setProperty('--rows',best.r);
+        fs.forEach(function(f){
+          var k=+f.dataset.k,_c=k%best.c,_r=Math.floor(k/best.c);
+          var _fx=best.c>1?_c/(best.c-1):0.5,_fy=best.r>1?_r/(best.r-1):0.5;
+          f.style.left='calc((100% - var(--d,138px) - 14px) * '+_fx.toFixed(3)+' + '+f.dataset.jx+'px)';
+          f.style.top='calc((100% - var(--d,138px) - 24px) * '+_fy.toFixed(3)+' + '+f.dataset.jy+'px)';
+        });
+      }
+      try{if(st&&st.age==='petit'&&window.ResizeObserver)new ResizeObserver(function(){grillePetit();}).observe(aire);}catch(e){}
       function tour(premier){
         jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
         aire.innerHTML='';
@@ -22505,12 +22548,11 @@ function _boyScene(ca,reprise){
           /* v3.4.9 — 3-5 ans : bulles une fois et demie plus grosses, et
              réparties sur TOUTE la largeur et toute la hauteur de l'aire
              (bords compris), au lieu de rester serrées au milieu. */
+          /* v3.5.0 — la grille est choisie par `grillePetit` selon la forme
+             de l'aire (2, 3, 4 ou 6 colonnes) : on garde ici le léger
+             décalage de chaque bulle, pour qu'il ne change pas. */
           if(st&&st.age==='petit'){
-            var _col=etroite||multi?2:3,_rg=Math.ceil(lot.length/_col);
-            var _c=k%_col,_r=Math.floor(k/_col);
-            var _fx=_col>1?_c/(_col-1):0.5,_fy=_rg>1?_r/(_rg-1):0.5;
-            f.style.left='calc((100% - var(--d,138px) - 14px) * '+_fx.toFixed(3)+' + '+(4+Math.random()*6).toFixed(0)+'px)';
-            f.style.top='calc((100% - var(--d,138px) - 24px) * '+_fy.toFixed(3)+' + '+(8+Math.random()*12).toFixed(0)+'px)';
+            f.dataset.k=k;f.dataset.jx=(4+Math.random()*6).toFixed(0);f.dataset.jy=(8+Math.random()*12).toFixed(0);
           }
           f.style.animationDuration=(4+Math.random()*4).toFixed(1)+'s';
           f.style.animationDelay=(-Math.random()*5).toFixed(1)+'s';
@@ -22555,6 +22597,7 @@ function _boyScene(ca,reprise){
           };
           aire.appendChild(f);
         });
+        grillePetit();
         /* Une seule cible : on la nomme une fois. Plusieurs : a chaque tour,
            pour que l'enfant sache laquelle attraper maintenant. */
         if(premier)N.plusTard(function(){

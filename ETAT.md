@@ -6043,3 +6043,8 @@ Tout simulé en CSS/GSAP (scale + layers superposés). Aucune vraie vidéo
 nécessaire — les éléments du site servent de décor.
 
 ### Statut : EN ATTENTE — à faire dans la conversation iamlearningarabic
+
+## v3.5.0
+- 3-5 ans « Attrape-la » : grille choisie selon la forme de l'aire (2, 3, 4 ou 6 de front) pour les plus grosses bulles ; recalculée au redimensionnement. Aire non plus bornée à 620 px (paysage : 6 bulles d'un bord à l'autre).
+- 3-5 ans « Les ballons » : l'aire ne coupe plus les ballons (coupés seulement au bord du grand cadre) ; toute la largeur.
+- Carte des animaux couchée : 4 par rangée (4, 4, 3 centrés), toute la largeur, on fait défiler.
