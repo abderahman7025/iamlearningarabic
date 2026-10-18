@@ -72,7 +72,11 @@ function picVolume(fichier) {
         fs.unlinkSync(tmp);
         console.log('ok', s.label, '(+' + gain.toFixed(1) + ' dB)');
       }
-      if (depot) {
+      /* un original presque vide n'est jamais mis en ligne nettoyé : il
+         faut le réenregistrer */
+      const vide = depot && (sonie(fa) === null || sonie(fa) < -50);
+      if (vide) console.log('NON MIS EN LIGNE (vide, a reenregistrer) :', s.ar);
+      if (depot && !vide) {
         const r = await fetch('https://iamlearningarabic.com/api/audio', { method: 'POST',
           headers: { Authorization: 'Bearer ' + env.ADMIN_SECRET, 'Content-Type': 'application/json' },
           body: JSON.stringify({ ar: s.ar, audioBase64: fs.readFileSync(fp).toString('base64') }) });
