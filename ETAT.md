@@ -183,7 +183,13 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.2), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.3), du plus récent au plus ancien :**
+
+- **v3.3.3 (18 octobre) — bloc `outils/refonte-v333.html`** (après v3.3.0) :
+  page Leçons à l'essai — le bandeau « Mon parcours · رِحْلَتِي » prend le fond
+  crème des cartes ; le dégradé or + motif d'étoiles + reflet passent sur
+  toute la page (`#ca:has(>.par-page)`). Chapitres, rail et titre du haut en
+  blanc sur l'or.
 
 - **v3.3.2 (18 octobre)** — sur le téléphone du client, html-to-image ne se
   chargeait pas depuis jsdelivr (« capture : outil: non chargé ») : copie

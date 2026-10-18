@@ -6255,6 +6255,54 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
   };
 })();
 </script>
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.3.3 (18 octobre) — source : outils/refonte-v333.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.3.0.
+     LA PAGE LEÇONS (« Mon parcours · رِحْلَتِي ») : le client — « mets le
+     fond simple comme les cases de chaque leçon, et ce fond doré stylé
+     mets-le pour tout le reste de la page ». Le bandeau du haut prend le
+     fond crème des cartes ; le dégradé or, son motif d'étoiles qui défile
+     et le reflet passent sur TOUTE la page. Cette page seulement (essai).
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* le fond de la page : dégradé or + motif d'étoiles blanches qui défile */
+#ca:has(>.par-page){
+  background-color:#b8860b;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.2' stroke-width='1'%3E%3Cpath d='M28 6l6 16 16 6-16 6-6 16-6-16-16-6 16-6z'/%3E%3Crect x='18' y='18' width='20' height='20' transform='rotate(45 28 28)'/%3E%3C/g%3E%3C/svg%3E"),
+    linear-gradient(160deg,#7a4a00 0%,#b8860b 38%,#e8b33a 72%,#f6d987 100%);
+  background-size:56px 56px,100% 100%;
+  background-attachment:local,fixed;
+  animation:parFondMotif 40s linear infinite}
+@keyframes parFondMotif{from{background-position:0 0,0 0}to{background-position:560px 280px,0 0}}
+/* le reflet qui passe, sur toute la page */
+.par-page{position:relative}
+.par-page::after{content:'';position:absolute;top:0;bottom:0;width:40%;left:-50%;pointer-events:none;z-index:0;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.22),transparent);
+  animation:parReflet 7s 1.2s ease-in-out infinite}
+.par-page>*{position:relative;z-index:1}
+/* le bandeau du haut : le fond simple des cartes de leçon */
+#ca .par-tete{color:#5a3a00;background:linear-gradient(140deg,#fffdf7 0%,#fff6e0 100%);
+  border:1px solid rgba(184,134,11,.22);box-shadow:0 14px 34px rgba(90,50,0,.28),0 2px 6px rgba(120,80,0,.08)}
+#ca .par-tete::before,#ca .par-tete::after{display:none}
+#ca .par-tete .par-titre .par-sur{color:#8a6200!important}
+#ca .par-tete .par-titre .par-calli{color:#7a4a00!important;text-shadow:none}
+#ca .par-tete .par-chiffres span{background:rgba(184,134,11,.1);border-color:rgba(184,134,11,.3);color:#6b4a00}
+#ca .par-tete .par-anneau .fond{stroke:rgba(184,134,11,.18)}
+#ca .par-tete .par-anneau .plein{stroke:#c99316;filter:drop-shadow(0 0 5px rgba(232,179,58,.6))}
+#ca .par-tete .par-pct{color:#8a6200}
+#ca .par-tete .par-barre{background:rgba(184,134,11,.16)}
+#ca .par-tete .par-remplie{background:linear-gradient(90deg,#b8860b,#e8b33a);box-shadow:0 0 10px rgba(232,179,58,.6)}
+/* sur le fond or : titres de chapitre et rail en blanc */
+#ca .par-chap{color:#fff;text-shadow:0 1px 6px rgba(90,50,0,.45)}
+#ca .par-chap::before{background:#fff;box-shadow:0 0 10px rgba(255,255,255,.7)}
+#ca .par-chap::after{background:linear-gradient(90deg,rgba(255,255,255,.75),rgba(255,255,255,0))}
+#ca .par-rail::before{background:repeating-linear-gradient(180deg,rgba(255,255,255,.55) 0 5px,transparent 5px 10px)}
+#ca .par-ligne.faite .par-rail::before,#ca .par-ligne.en-cours .par-rail::before{background:linear-gradient(180deg,#fff,rgba(255,255,255,.5))}
+#ca .par-carte{box-shadow:0 10px 26px rgba(90,50,0,.22),0 2px 6px rgba(120,80,0,.08)}
+@media (prefers-reduced-motion:reduce){#ca:has(>.par-page){animation:none}.par-page::after{display:none}}
+/* le titre de la barre du haut passe sur l'or : en blanc */
+body:has(#ca>.par-page) #tb-title{color:#fff!important;-webkit-text-fill-color:#fff!important;background:none!important;text-shadow:0 1px 8px rgba(90,50,0,.5)}
+</style>
 
 
   <!-- SEO multilingue -->
@@ -13910,7 +13958,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.3.2';
+var _VERSION_REPLI='v3.3.3';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
