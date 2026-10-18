@@ -28,10 +28,10 @@ const depot = process.argv.includes('--depot');
 const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'sons-studio.json'), 'utf8'));
 const dest = path.join(__dirname, 'captures', 'studio-propre');
 /* v2 (client : « volume trop bas ») : compression douce puis gain jusqu'à une
-   SONIE cible (-12 LUFS par défaut, --cible=-10 pour plus fort), limiteur
+   SONIE cible (-10 LUFS par défaut, --cible=-8 pour plus fort), limiteur
    à -1 dB. Dossier « apres-fort » : les anciens résultats restent à côté. */
 const _c = (process.argv.find((a) => a.startsWith('--cible=')) || '').slice(8);
-const CIBLE = _c ? parseFloat(_c) : -12;
+const CIBLE = _c ? parseFloat(_c) : -10;
 const avant = path.join(dest, 'avant'), apres = path.join(dest, 'apres-fort');
 [avant, apres].forEach((d) => fs.mkdirSync(d, { recursive: true }));
 const hex = (s) => Buffer.from(s).toString('hex');
