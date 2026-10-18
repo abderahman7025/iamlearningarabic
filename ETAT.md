@@ -183,7 +183,18 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.5), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.6), du plus récent au plus ancien :**
+
+- **v3.4.6 (18 octobre)** — menu : une entrée d'historique « garde » est
+  reposée chaque fois que le menu revient (bloc v322) ; sans elle, après une
+  rubrique, le retour du téléphone sortait vers la page de connexion sans
+  la fenêtre de confirmation (testé : 2 retours de suite → fenêtre). 3-5 ans :
+  le garde « rien ne se touche pendant que la voix parle » remis (capture
+  sur .boy-wrap, `N.occupe()`, flèches de côté libres) — plus aucun écouteur
+  ne consultait `occupe`. ATTENTION envoi vers le PC : `device_commit_files`
+  a redéposé d'anciennes versions d'un même chemin préparé ; toujours
+  préparer sous un NOUVEAU dossier (outputs/v346…) et relire le fichier sur
+  le PC.
 
 - **v3.4.5 (18 octobre)** — la ligne lue se centre en faisant défiler #ca
   seul (scrollIntoView faisait défiler l'intérieur de la basmala, qui coupe

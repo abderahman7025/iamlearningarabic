@@ -5667,7 +5667,7 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
     /* v3.4.5 — le client : « un message disant qu'on va être déconnecté
        (boutons annuler et confirmer) ». On reste sur le menu ; Confirmer
        déconnecte, Annuler referme. */
-    try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
+    try{history.pushState({screen:'s-menu',garde:1},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
     if(document.querySelector('.quitte-voile'))return true;
     var v=document.createElement('div');v.className='quitte-voile';
     v.innerHTML='<div class="quitte-boite" role="dialog" aria-modal="true"><p></p>'
@@ -5682,6 +5682,29 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
     document.body.appendChild(v);
     return true;
   };
+
+  /* v3.4.6 — une entrée « garde » sous le menu, chaque fois qu'il revient.
+     Sans elle, après être allé dans une rubrique puis revenu, le retour du
+     téléphone remontait à l'entrée d'AVANT l'application (la page de
+     connexion) : le navigateur changeait de page, sans passer par la
+     fenêtre de confirmation. */
+  var tGarde=null;
+  function poseGarde(){
+    clearTimeout(tGarde);
+    tGarde=setTimeout(function(){
+      var m=document.getElementById('s-menu');
+      if(!m||!m.classList.contains('on'))return;
+      if(history.state&&history.state.garde)return;
+      try{history.pushState({screen:'s-menu',garde:1},'',location.pathname);}catch(x){}
+    },450);
+  }
+  function armeGarde(){
+    var m=document.getElementById('s-menu');if(!m){setTimeout(armeGarde,400);return;}
+    new MutationObserver(function(){if(m.classList.contains('on'))poseGarde();})
+      .observe(m,{attributes:true,attributeFilter:['class']});
+    if(m.classList.contains('on'))poseGarde();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',armeGarde);else armeGarde();
 
   function arme(){
     var ca=document.getElementById('ca');
@@ -14249,7 +14272,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.4.5';
+var _VERSION_REPLI='v3.4.6';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18403,6 +18426,27 @@ function _boyScene(ca,reprise){
   _armePleinEcran(ca);
   var N=_boyNarration();
   var api={wrap:wrap,dire:N.dire,plusTard:N.plusTard,aEnreg:N.aEnreg};
+  /* v3.4.6 — 3-5 ANS : RIEN NE SE TOUCHE PENDANT QUE LA VOIX PARLE.
+     `N.occupe()` existait (vrai tant qu'une phrase joue ou attend, faux dès
+     la dernière demi-seconde — « autorisez l'appui pendant la dernière
+     syllabe ») mais plus aucun écouteur ne le consultait : on pouvait
+     répondre en pleine consigne. Le garde est posé en phase de CAPTURE sur
+     le cours entier ; les flèches de côté et la barre du haut restent
+     libres. */
+  (function(){
+    function garde(ev){
+      if(!(st&&st.age==='petit'))return;
+      var t=ev.target;
+      if(t&&t.closest&&t.closest('.boy-bord,.boy-retour,.boy-nav'))return;
+      var occ=false;try{occ=N.occupe();}catch(x){}
+      if(!occ)return;
+      ev.stopPropagation();ev.stopImmediatePropagation();
+      if(ev.cancelable&&ev.type!=='touchstart')ev.preventDefault();
+    }
+    ['click','pointerdown','mousedown','touchstart'].forEach(function(n){
+      wrap.addEventListener(n,garde,{capture:true,passive:false});
+    });
+  })();
 
   var i=0,scenes=[],fini=function(){renderSessionsMap(ca);};
   /* ── LA CONSIGNE DU TRACE ──

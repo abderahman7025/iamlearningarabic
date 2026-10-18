@@ -141,7 +141,7 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
     /* v3.4.5 — le client : « un message disant qu'on va être déconnecté
        (boutons annuler et confirmer) ». On reste sur le menu ; Confirmer
        déconnecte, Annuler referme. */
-    try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
+    try{history.pushState({screen:'s-menu',garde:1},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
     if(document.querySelector('.quitte-voile'))return true;
     var v=document.createElement('div');v.className='quitte-voile';
     v.innerHTML='<div class="quitte-boite" role="dialog" aria-modal="true"><p></p>'
@@ -156,6 +156,29 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
     document.body.appendChild(v);
     return true;
   };
+
+  /* v3.4.6 — une entrée « garde » sous le menu, chaque fois qu'il revient.
+     Sans elle, après être allé dans une rubrique puis revenu, le retour du
+     téléphone remontait à l'entrée d'AVANT l'application (la page de
+     connexion) : le navigateur changeait de page, sans passer par la
+     fenêtre de confirmation. */
+  var tGarde=null;
+  function poseGarde(){
+    clearTimeout(tGarde);
+    tGarde=setTimeout(function(){
+      var m=document.getElementById('s-menu');
+      if(!m||!m.classList.contains('on'))return;
+      if(history.state&&history.state.garde)return;
+      try{history.pushState({screen:'s-menu',garde:1},'',location.pathname);}catch(x){}
+    },450);
+  }
+  function armeGarde(){
+    var m=document.getElementById('s-menu');if(!m){setTimeout(armeGarde,400);return;}
+    new MutationObserver(function(){if(m.classList.contains('on'))poseGarde();})
+      .observe(m,{attributes:true,attributeFilter:['class']});
+    if(m.classList.contains('on'))poseGarde();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',armeGarde);else armeGarde();
 
   function arme(){
     var ca=document.getElementById('ca');
