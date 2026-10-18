@@ -134,6 +134,9 @@ module.exports = async function alerte(req, res, ip) {
         (lien ? '<p><img src="' + echappe(lien) + '" style="max-width:420px;border:1px solid #ddd;border-radius:8px"></p><p><a href="' + echappe(lien) + '">Ouvrir la capture</a></p>' : '<p><i>Pas de capture.</i></p>') +
         '<p><b><a href="' + echappe(lienRep) + '">' + echappe(repondre) + '</a></b></p>' +
         '<p style="color:#888;font-size:12px">' + echappe(appareil) + '</p></div>',
+      /* la capture aussi en PIÈCE JOINTE : visible même si la messagerie
+         bloque les images distantes, ou si le dépôt Supabase a échoué */
+      attachment: m ? [{ content: m[2], name: 'capture.' + (m[1] === 'png' ? 'png' : 'jpg') }] : undefined,
     });
     return 'email';
   }

@@ -27,7 +27,7 @@ function sender() {
 /**
  * Envoyer un email transactionnel
  */
-async function sendEmail({ to, subject, html }) {
+async function sendEmail({ to, subject, html, attachment }) {
   const res = await fetch(`${API}/smtp/email`, {
     method: 'POST',
     headers: headers(),
@@ -36,6 +36,7 @@ async function sendEmail({ to, subject, html }) {
       to: [{ email: to }],
       subject,
       htmlContent: html,
+      ...(attachment ? { attachment } : {}),
     }),
   });
   if (!res.ok) {
