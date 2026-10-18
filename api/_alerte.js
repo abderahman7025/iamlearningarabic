@@ -100,8 +100,11 @@ module.exports = async function alerte(req, res, ip) {
 
   const r = await Promise.allSettled(envois);
   const ok = r.filter((x) => x.status === 'fulfilled').map((x) => x.value);
-  r.filter((x) => x.status === 'rejected').forEach((x) => console.error('[Alerte] envoi :', x.reason && x.reason.message));
-  logEvent('alerte', { email, page, ok: ok.join(',') });
-  if (!ok.length) return res.status(502).json({ error: 'Envoi impossible.' });
+  const ko = r.filter((x) => x.status === 'rejected').map((x) => String(x.reason && x.reason.message || x.reason).slice(0, 200));
+  ko.forEach((m) => console.error('[Alerte] envoi :', m));
+  logEvent('alerte', { email, page, ok: ok.join(','), ko: ko.join(' | ') });
+  /* 500 et non 502 : Cloudflare remplace les réponses 502 par sa propre page,
+     et l'on perdait la raison de l'échec. */
+  if (!ok.length) return res.status(500).json({ error: 'Envoi impossible.', raisons: ko, capture: !!lien });
   return res.status(200).json({ ok: true, par: ok });
 };

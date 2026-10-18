@@ -15,8 +15,9 @@
      ════════════════════════════════════════════════════════════════════ -->
 <style>
 /* 1 — le texte au milieu du bouton, l'icône calée à gauche */
-.cp-inter{position:relative;justify-content:center!important;text-align:center;padding-left:44px!important;padding-right:44px!important}
-.cp-inter svg{position:absolute;left:14px;top:50%;translate:0 -50%}
+/* v3.2.6 — l'icône fait partie du libellé : les deux centrés ensemble,
+   comme « Déconnexion » */
+.cp-inter{justify-content:center!important;text-align:center}
 
 /* 2 — la suite, après l'entraînement */
 .fin-lettre{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px auto 4px;max-width:520px}
@@ -35,7 +36,11 @@
 /* le signe réel est caché (taille 0) : le cercle ET le signe sont dessinés
    ensemble par ::before, pour que le signe se pose bien sur le cercle */
 .ar-in.ar-signe{font-size:0!important;margin:0 .25em}
-.ar-in.ar-signe::before{content:'\25CC' attr(data-s);font-family:'Scheherazade New',serif;font-size:26px;line-height:1;vertical-align:-.3em}
+/* v3.2.6 — plus de cercle pointillé : une toute petite ligne d'écriture
+   (tatwîl ـ) porte la voyelle, en gras */
+.ar-in.ar-signe::before{content:'\0640' attr(data-s);font-family:'Scheherazade New',serif;font-weight:700;font-size:28px;line-height:1;vertical-align:-.25em}
+/* les mots longs (4 lettres et plus) un peu moins grands */
+.ar-in.ar-long{font-size:1.4em}
 
 /* 4 — le texte que le Narrateur est en train de lire */
 .lecture-en-cours{box-shadow:0 0 0 2px rgba(232,160,32,.55),0 0 22px rgba(232,160,32,.35)!important;
@@ -85,7 +90,16 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   var reAutre=/[A-Za-zÀ-ɏЀ-ӿऀ-ॿ぀-ヿ一-鿿]/;
   var POLICE_AR=/scheherazade|amiri|naskh|kufi|arab|lateef|reem|cairo|tajawal/i;
   var EXCLU='.ar-in,script,style,textarea,input,select,svg,canvas,[contenteditable],.no-ar-in,.fleur3d,.pos-c';
+  /* v3.2.6 — « اللَّه » s'affiche « الله » : la police dessine elle-même la
+     chadda et le petit alif ; écrites en plus, elles faisaient doublon. La
+     clé des voix n'en souffre pas (`_clesSon` cherche les deux). */
+  var reAllah=/([\u0627\u0671])\u0644\u0644(?:\u064e\u0651|\u0651\u064e)\u0647/g;
+  function allah(root){
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),n;
+    while((n=w.nextNode())){if(reAllah.test(n.nodeValue)){reAllah.lastIndex=0;n.nodeValue=n.nodeValue.replace(reAllah,'$1\u0644\u0644\u0647');}reAllah.lastIndex=0;}
+  }
   function arabeDansPhrases(root){
+    try{if(root&&adulte())allah(root);}catch(e){}
     if(!root||!adulte()||langue()==='ur')return;
     var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null),L=[];
     while(w.nextNode()){
@@ -113,6 +127,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
         /* un signe seul (ّ, ْ…) : posé sur un cercle pointillé, ajouté par le
            CSS — le texte, lui, ne change pas. */
         if(/^[\u064B-\u0652\u0670\s]+$/.test(m[0])){s.className+=' ar-signe';s.setAttribute('data-s',m[0].trim());}
+        else if((m[0].match(/[\u0621-\u064A]/g)||[]).length>=4)s.className+=' ar-long';
         s.textContent=m[0];frag.appendChild(s);last=m.index+m[0].length;
       }
       if(last<v.length)frag.appendChild(document.createTextNode(v.slice(last)));
