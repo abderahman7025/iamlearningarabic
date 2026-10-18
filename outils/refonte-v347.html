@@ -2,7 +2,8 @@
      v3.4.7 (18 octobre) — source : outils/refonte-v347.html, copiée TELLE
      QUELLE dans app/app.html juste après le bloc v3.4.4.
      v3.4.8 : le paysage couvre TOUT le grand cadre du jeu (plus de petit
-     cadre dedans).
+     cadre dedans). v3.4.9 : seulement les jeux qui avaient un paysage
+     (attrape-la, ballons) ; les autres gardent le cadre clair.
      3-5 ANS : LES FONDS DES JEUX EN MOTION. Le client n'aimait pas les
      décors plats (images fond-*.svg). Chaque aire de jeu (.mj-aire) devient
      un petit paysage vivant, à la couleur de l'habitat de l'animal du cours
@@ -20,34 +21,34 @@ body.age-petit .panneau-jeu{--s1:#9fd8ff;--s2:#e9f8ff;--h1:#b9e79c;--h2:#8fd36e;
 body.age-petit [data-hab="prairie"]{--s1:#9fd8ff;--s2:#e9f8ff;--h1:#b9e79c;--h2:#8fd36e;--h3:#6cc04f;--sun:#fff3b0;--pt:rgba(255,250,200,.95)}
 body.age-petit [data-hab="pre"]{--s1:#a8dcff;--s2:#eefaff;--h1:#c4eba6;--h2:#9bd97a;--h3:#77c75a;--sun:#fff3b0;--pt:rgba(255,255,255,.95)}
 body.age-petit [data-hab="savane"]{--s1:#ffcf8a;--s2:#fff1d6;--h1:#f3cf8a;--h2:#e8b46a;--h3:#d39a4c;--sun:#ffe28a;--pt:rgba(255,236,190,.9)}
-body.age-petit .panneau-jeu[data-hab="savane"]::after{animation-name:aireTombe}
-body.age-petit .panneau-jeu[data-hab="savane"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="savane"]::after{animation-name:aireTombe}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="savane"]::after{--nuage:transparent}
 body.age-petit [data-hab="desert"]{--s1:#ffc982;--s2:#fff0d4;--h1:#f6d39a;--h2:#ebbc72;--h3:#dba258;--sun:#fff0a0;--pt:rgba(255,230,180,.9)}
-body.age-petit .panneau-jeu[data-hab="desert"]::after{animation-name:aireTombe}
-body.age-petit .panneau-jeu[data-hab="desert"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="desert"]::after{animation-name:aireTombe}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="desert"]::after{--nuage:transparent}
 body.age-petit [data-hab="banquise"]{--s1:#bfe3ff;--s2:#f3fbff;--h1:#ffffff;--h2:#e6f4ff;--h3:#cfe8fb;--sun:#ffffff;--pt:rgba(255,255,255,1)}
-body.age-petit .panneau-jeu[data-hab="banquise"]::after{animation-name:aireTombe}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="banquise"]::after{animation-name:aireTombe}
 body.age-petit [data-hab="ciel"]{--s1:#7cc6ff;--s2:#e2f4ff;--h1:#ffffff;--h2:#f3fbff;--h3:#e6f4ff;--sun:#fff6c4;--pt:rgba(255,255,255,.95)}
 body.age-petit [data-hab="foret"]{--s1:#bde6c6;--s2:#f0fbf2;--h1:#6fb27a;--h2:#4f9a5a;--h3:#3a854a;--sun:#fff6c4;--pt:rgba(255,240,170,.95)}
-body.age-petit .panneau-jeu[data-hab="foret"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="foret"]::after{--nuage:transparent}
 body.age-petit [data-hab="jardin"]{--s1:#ffd6ea;--s2:#fff7fb;--h1:#b4e39a;--h2:#92d276;--h3:#74c25a;--sun:#fff1c4;--pt:rgba(255,170,210,.95)}
-body.age-petit .panneau-jeu[data-hab="jardin"]::after{animation-name:aireTombe}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="jardin"]::after{animation-name:aireTombe}
 body.age-petit [data-hab="jungle"]{--s1:#a6e3bf;--s2:#ebfff2;--h1:#4fbb78;--h2:#35a462;--h3:#228a4c;--sun:#fff3b0;--pt:rgba(220,255,170,.9)}
-body.age-petit .panneau-jeu[data-hab="jungle"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="jungle"]::after{--nuage:transparent}
 body.age-petit [data-hab="marais"]{--s1:#cde4d4;--s2:#f2f9f4;--h1:#9cc4a6;--h2:#82b18f;--h3:#669b76;--sun:#f6f1c8;--pt:rgba(255,255,255,.85)}
-body.age-petit .panneau-jeu[data-hab="marais"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="marais"]::after{--nuage:transparent}
 body.age-petit [data-hab="mare"]{--s1:#b8e4ff;--s2:#effaff;--h1:#8fd3a0;--h2:#6ec6f0;--h3:#4fb3e6;--sun:#fff3b0;--pt:rgba(255,255,255,.95)}
 body.age-petit [data-hab="nuit"]{--s1:#1f2460;--s2:#5b4fa0;--h1:#3a4380;--h2:#2b3470;--h3:#1d2656;--sun:#f5f3d8;--pt:rgba(255,245,170,.95)}
-body.age-petit .panneau-jeu[data-hab="nuit"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="nuit"]::after{--nuage:transparent}
 body.age-petit [data-hab="bambouseraie"]{--s1:#d4f0c8;--s2:#f5fff0;--h1:#9bd27a;--h2:#7cbf5e;--h3:#5fa947;--sun:#fff6c4;--pt:rgba(220,255,190,.95)}
-body.age-petit .panneau-jeu[data-hab="bambouseraie"]::after{animation-name:aireTombe}
-body.age-petit .panneau-jeu[data-hab="bambouseraie"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="bambouseraie"]::after{animation-name:aireTombe}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="bambouseraie"]::after{--nuage:transparent}
 body.age-petit [data-hab="plage"]{--s1:#8fd4ff;--s2:#eafaff;--h1:#7fd0f0;--h2:#5fbde6;--h3:#f2d79a;--sun:#fff0a0;--pt:rgba(255,255,255,.95)}
 body.age-petit [data-hab="sousleau"]{--s1:#39a6d9;--s2:#a8e6ff;--h1:#1f8fc4;--h2:#f0d59a;--h3:#e5c37a;--sun:#c8f2ff;--pt:rgba(255,255,255,.85)}
-body.age-petit .panneau-jeu[data-hab="sousleau"]::after{--nuage:transparent}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="sousleau"]::after{--nuage:transparent}
 body.age-petit [data-hab="verger"]{--s1:#bfe6ff;--s2:#f3fbff;--h1:#b8e39a;--h2:#96d27a;--h3:#78c25e;--sun:#fff3b0;--pt:rgba(255,190,150,.95)}
-body.age-petit .panneau-jeu[data-hab="verger"]::after{animation-name:aireTombe}
-body.age-petit .boy-panel.panneau-jeu{isolation:isolate;
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="verger"]::after{animation-name:aireTombe}
+body.age-petit .boy-panel.panneau-jeu:has(.mj-aire){isolation:isolate;
   background:
     radial-gradient(85% 24% at 12% 100%,color-mix(in srgb,var(--h3) 88%,#000) 0 40%,var(--h3) 80%,color-mix(in srgb,var(--h3) 60%,#fff) 98%,transparent 100%),
     radial-gradient(95% 33% at 92% 102%,color-mix(in srgb,var(--h2) 90%,#000) 0 40%,var(--h2) 80%,color-mix(in srgb,var(--h2) 60%,#fff) 98%,transparent 100%),
@@ -62,7 +63,7 @@ body.age-petit .boy-panel.panneau-jeu{isolation:isolate;
   from{background-position:0% 0,100% 0,50% 0,0 0}
   to{background-position:10% 4px,88% 2px,46% 1px,0 0}}
 /* le soleil qui rayonne */
-body.age-petit .boy-panel.panneau-jeu::before{content:'';position:absolute;z-index:-1;height:auto;left:auto;pointer-events:none;
+body.age-petit .boy-panel.panneau-jeu:has(.mj-aire)::before{content:'';position:absolute;z-index:-1;height:auto;left:auto;pointer-events:none;
   width:240px;height:240px;top:-96px;right:-70px;border-radius:50%;
   background:radial-gradient(circle,var(--sun) 0 17%,color-mix(in srgb,var(--sun) 55%,transparent) 22%,transparent 46%),
     repeating-conic-gradient(from 0deg,rgba(255,255,255,.42) 0 7deg,transparent 7deg 22deg);
@@ -70,7 +71,7 @@ body.age-petit .boy-panel.panneau-jeu::before{content:'';position:absolute;z-ind
   animation:aireSoleil 40s linear infinite}
 @keyframes aireSoleil{to{rotate:360deg}}
 /* les nuages et les particules de l'habitat */
-body.age-petit .boy-panel.panneau-jeu::after{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;--nuage:rgba(255,255,255,.85);
+body.age-petit .boy-panel.panneau-jeu:has(.mj-aire)::after{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;--nuage:rgba(255,255,255,.85);
   background:
     radial-gradient(3px 3px at 20px 30px,var(--pt),transparent),radial-gradient(2px 2px at 90px 120px,var(--pt),transparent),
     radial-gradient(4px 4px at 150px 60px,var(--pt),transparent),radial-gradient(2.5px 2.5px at 60px 170px,var(--pt),transparent),
@@ -87,15 +88,25 @@ body.age-petit .boy-panel.panneau-jeu::after{content:'';position:absolute;inset:
 @keyframes aireTombe{
   from{background-position:0 0,0 0,0 0,0 0,0 0,0 6%,60px 18%}
   to{background-position:-30px 230px,24px 230px,-18px 230px,30px 230px,-24px 230px,260px 6%,260px 18%}}
-body.age-petit .panneau-jeu[data-hab="nuit"]::before{
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="nuit"]::before{
   background:radial-gradient(circle,#fdf9e0 0 15%,rgba(253,249,224,.35) 22%,transparent 46%);animation:none}
-body.age-petit .panneau-jeu[data-hab="sousleau"]::before{top:-120px;left:50%;right:auto;translate:-50% 0;width:320px;height:320px}
+body.age-petit .panneau-jeu:has(.mj-aire)[data-hab="sousleau"]::before{top:-120px;left:50%;right:auto;translate:-50% 0;width:320px;height:320px}
 /* v3.4.8 — PLUS DE PETIT CADRE DANS LE GRAND (le client) : le paysage est
    le fond du grand cadre ; l'aire de jeu n'a plus ni fond ni bord, et
    `ajusteEcran` l'allonge jusqu'au bas de l'écran. */
 body.age-petit .panneau-jeu .mj-aire{background:none!important;border:none!important;box-shadow:none!important;border-radius:0!important}
 body.age-petit .panneau-jeu .mj-aire>*{z-index:1}
-body.age-petit .panneau-jeu .mj-cadre{background:rgba(255,255,255,.82)!important}
+/* v3.4.9 — le client : « dans le reste des pages, pas de petit cadre » :
+   le cadre du tracé (blanc bordé de couleur) disparaît, le tracé est posé
+   sur le grand cadre clair d'avant. */
+body.age-petit .panneau-jeu .mj-cadre{background:none!important;border:none!important;box-shadow:none!important}
+/* v3.4.9 — bulles et ballons une fois et demie plus gros */
+body.age-petit .panneau-jeu .mj-aire{container-type:size}
+body.age-petit .mj-attrape .mj-aire{overflow:visible!important}
+body.age-petit .mj-flotte{--d:min(138px,42cqw,30cqh);width:var(--d)!important;height:var(--d)!important;font-size:calc(var(--d) * .44)!important;
+  animation-name:mjDerivePetit!important}
+@keyframes mjDerivePetit{0%{transform:translate(-6px,4px) rotate(-6deg)}100%{transform:translate(6px,-8px) rotate(6deg)}}
+body.age-petit .mj-bulle{--d:min(138px,38cqw);width:var(--d)!important;height:calc(var(--d) * 1.17)!important;font-size:calc(var(--d) * .42)!important}
 @media (prefers-reduced-motion:reduce){
-  body.age-petit .boy-panel.panneau-jeu,body.age-petit .boy-panel.panneau-jeu::before,body.age-petit .boy-panel.panneau-jeu::after{animation:none!important}}
+  body.age-petit .boy-panel.panneau-jeu,body.age-petit .boy-panel.panneau-jeu::before,body.age-petit .boy-panel.panneau-jeu:has(.mj-aire)::after{animation:none!important}}
 </style>

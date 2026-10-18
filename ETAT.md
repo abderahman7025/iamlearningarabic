@@ -183,7 +183,16 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.8), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.9), du plus récent au plus ancien :**
+
+- **v3.4.9 (18 octobre)** — 3-5 ans. Paysage seulement sur les cadres qui
+  ont une aire (:has(.mj-aire) : attrape-la, ballons) ; cadre du tracé
+  (.mj-cadre) sans fond ni bord. Bulles et ballons ×1,5 bornés à l'aire
+  (container query : min(138px,42cqw,30cqh) / min(138px,38cqw)), répartis
+  sur toute la largeur et la hauteur (calc avec --d). Allongement mesuré sur
+  le bas réel du dernier cadre (les ballons cachés sous l'aire faussaient la
+  mesure). Carte : étapes écartées sur la largeur (debout 12→88 %, couchée
+  100×47, étape 9,5 %).
 
 - **v3.4.8 (18 octobre)** — 3-5 ans. Garde « voix » : SEULS les jeux paires,
   relie, attrape-la et ballons restent libres (.mj-paires/.mj-relier/
