@@ -183,7 +183,11 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.1), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.2), du plus récent au plus ancien :**
+
+- **v3.3.2 (18 octobre)** — sur le téléphone du client, html-to-image ne se
+  chargeait pas depuis jsdelivr (« capture : outil: non chargé ») : copie
+  servie par le site, `public/html-to-image.js` (1.11.11), CDN en secours.
 
 - **v3.3.1 (18 octobre) — l'alerte** : le propriétaire la reçoit TOUJOURS par
   e-mail (Telegram en secours) ; le choix de l'élève ne sert qu'au lien

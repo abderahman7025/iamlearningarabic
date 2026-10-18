@@ -300,9 +300,15 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   function outilCapture(){
     if(window.htmlToImage)return Promise.resolve(window.htmlToImage);
     if(_hti)return _hti;
-    _hti=new Promise(function(ok,ko){var s=document.createElement('script');
-      s.src='https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
-      s.onload=function(){ok(window.htmlToImage);};s.onerror=function(){_hti=null;ko();};document.head.appendChild(s);});
+    /* v3.3.1 — sur le téléphone du client le CDN ne se chargeait pas
+       (« outil : non chargé ») : copie servie par le site d'abord, le CDN
+       en secours. */
+    function charge(src){return new Promise(function(ok,ko){var s=document.createElement('script');s.src=src;
+      s.onload=function(){window.htmlToImage?ok(window.htmlToImage):ko(new Error('vide'));};
+      s.onerror=function(){s.remove();ko(new Error('non chargé : '+src));};document.head.appendChild(s);});}
+    _hti=charge('/html-to-image.js?v=1.11.11')
+      .catch(function(){return charge('https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js');})
+      .catch(function(e){_hti=null;throw e;});
     return _hti;
   }
   function capture(){
