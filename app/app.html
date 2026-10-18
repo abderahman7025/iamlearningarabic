@@ -5923,10 +5923,30 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
       if(q.some(function(p){return p.contains(e);}))return;
       vus[k]=1;q.push(e);
     });
-    AL.q=q;AL.i=-1;
+    AL.q=q;AL.i=-1;AL.page=cle();
     if(q.length)suivant();
   }
+  /* v3.3.7 — en quittant la page (menu, retour, autre rubrique), la
+     lecture automatique continuait : les textes de l'ancienne page restent
+     dans le document (écran caché), la surveillance passait au suivant et
+     le son repartait. On note la page au départ et l'on s'arrête dès
+     qu'elle change ou que l'écran est caché. */
+  function cle(){
+    var ca=document.getElementById('ca'),s='';
+    try{s=((ca&&ca.dataset.page)||'')+'|'+(st._curPage||'')+'|'+((st.curLesson&&st.curLesson.id)||'');}catch(e){}
+    return s;
+  }
+  function horsPage(){
+    var scr=document.getElementById('s-main');
+    return !scr||!scr.classList.contains('on')||AL.page!==cle();
+  }
+  function coupe(){
+    var jouait=false;try{jouait=!!(_rec&&_rec.el&&AL.q.indexOf(_rec.el)>=0);}catch(e){}
+    arret();
+    if(jouait)try{stopSpeech();}catch(e){}
+  }
   function suivant(){
+    if(horsPage()){coupe();return;}
     var k=AL.i+1;
     while(k<AL.q.length&&!AL.q[k].isConnected)k++;
     if(k>=AL.q.length){arret();return;}
@@ -5942,6 +5962,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
      texte de la liste → on continue À PARTIR de lui ; pause → on attend. */
   setInterval(function(){
     if(!AL.q.length)return;
+    if(horsPage()){coupe();return;}
     var e=AL.q[AL.i];
     if(!e||!e.isConnected||!st.soundOn||!adulte()){arret();return;}
     if(typeof _rec==='undefined')return;
@@ -13958,7 +13979,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.3.6';
+var _VERSION_REPLI='v3.3.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

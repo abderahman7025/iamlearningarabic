@@ -183,7 +183,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.6), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.7), du plus récent au plus ancien :**
+
+- **v3.3.7 (18 octobre)** — la lecture automatique continuait après avoir
+  quitté la page (les textes de l'écran caché restaient « connectés », la
+  surveillance passait au suivant). Page notée au départ (`cle()`), arrêt +
+  `stopSpeech` dès qu'elle change ou que s-main est caché (refonte-v323).
 
 - **v3.3.6 (18 octobre)** — le client : retour à la v3.3.3. Les essais
   v3.3.4 (fond coloré + motif par rubrique) et v3.3.5 (l'or teinté à la
