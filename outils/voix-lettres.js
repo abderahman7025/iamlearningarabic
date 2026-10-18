@@ -65,6 +65,42 @@ const dest = path.join(__dirname, 'captures', 'voix-lettres');
       } catch (e) { echecs++; console.log('ECHEC', s.nom, String(e.message).slice(0, 200)); }
     }
   }
+  /* LA PAGE D'ÉCOUTE : toutes les lettres sur une seule page, la voix du
+     Narrateur (fichiers d'essai) à côté de la voix du studio (en ligne). */
+  let studio = {};
+  try { studio = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {}; } catch (e) {}
+  const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  let html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>Lettres — Narrateur ou studio</title><style>'
+    + 'body{margin:0;font-family:system-ui,sans-serif;background:#fdf8ee;color:#3a2600;padding:16px}'
+    + 'h1{font-size:1.3rem;margin:4px 0 4px}p{margin:0 0 16px;opacity:.75;font-size:.9rem}'
+    + '.l{background:#fff;border:1px solid #ecd9a8;border-radius:16px;padding:12px;margin-bottom:12px}'
+    + '.t{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}.t b{font:700 2.2rem "Scheherazade New",serif}'
+    + '.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}'
+    + '.s{border:1px solid #f0e2bd;border-radius:12px;padding:6px 8px;text-align:center}'
+    + '.a{font:700 1.9rem "Scheherazade New",serif;line-height:1.3}.lat{font-size:.75rem;opacity:.7}'
+    + 'button{border:0;border-radius:99px;padding:5px 9px;margin:3px 2px 0;font-weight:700;cursor:pointer;font-size:.78rem}'
+    + '.n{background:#e8a020;color:#fff}.m{background:#0ea5e9;color:#fff}button:disabled{opacity:.3;cursor:default}'
+    + '</style><link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet"></head><body>'
+    + '<h1>Les lettres : Narrateur ou ta voix ?</h1><p>Orange = Narrateur (essai, pas en ligne). Bleu = ta voix du studio (en ligne).</p>';
+  for (const L of LISTE) {
+    const dossier = path.join(dest, L.lat.replace(/[^\w]/g, '_') + '-' + Buffer.from(L.ar).toString('hex'));
+    const sons = [{ cle: L.ar, a: L.ar, lat: L.nom, nom: '00-' + L.ar + '-nom' }]
+      .concat(L.variantes.map((v, i) => ({ cle: v[0], a: v[0], lat: v[1], nom: String(i + 1).padStart(2, '0') + '-' + v[1] })));
+    html += '<div class="l"><div class="t"><b>' + esc(L.ar) + '</b><span>' + esc(L.nom) + '</span></div><div class="g">';
+    for (const s of sons) {
+      const f = path.join(dossier, s.nom.replace(/[\\/:*?"<>|]/g, '_') + '.mp3');
+      const rel = fs.existsSync(f) ? path.relative(dest, f).split(path.sep).map(encodeURIComponent).join('/') : '';
+      const st = studio[s.cle] || '';
+      html += '<div class="s"><div class="a">' + esc(s.a) + '</div><div class="lat">' + esc(s.lat) + '</div>'
+        + '<button class="n" ' + (rel ? 'onclick="j(\'' + rel + '\')"' : 'disabled') + '>Narrateur</button>'
+        + '<button class="m" ' + (st ? 'onclick="j(\'' + esc(st) + '\')"' : 'disabled') + '>Ma voix</button></div>';
+    }
+    html += '</div></div>';
+  }
+  html += '<script>var A=new Audio();function j(u){A.pause();A.src=u;A.play();}</script></body></html>';
+  fs.mkdirSync(dest, { recursive: true });
+  fs.writeFileSync(path.join(dest, 'ecoute.html'), html);
   console.log('\nTermine :', ok, 'ok,', echecs, 'echec(s),', car, 'caracteres generes.');
   console.log(depot ? 'Mis en ligne.' : 'Rien n\'a ete mis en ligne : ecoute les fichiers dans outils\\captures\\voix-lettres');
 })();
