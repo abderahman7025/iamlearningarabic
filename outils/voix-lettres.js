@@ -9,7 +9,9 @@
  * Liste : outils/voix-lettres.json (nom de la lettre + ses variantes, celles
  * des cours : بَ بَا بً بِ بِي بٍ بُ بُو بٌ بْ). Le nom est dit pour la lettre
  * seule (ETAT : l'IA dit « L » devant une lettre isolée), chaque variante
- * telle qu'écrite. Narrateur, eleven_v4, langue « ar ».
+ * telle qu'écrite, PRÉCÉDÉE D'UN ESPACE (idée du client : sur le site, le
+ * Narrateur dit bien « lām » quand la lettre suit un espace dans la phrase).
+ * Narrateur, eleven_v4, langue « ar ».
  *
  * ATTENTION — LE DÉPÔT REMPLACE LES SONS DU STUDIO : la clé d'une variante
  * (« بَ ») est celle de l'enregistrement fait par le client avec SA voix.
@@ -38,7 +40,7 @@ const dest = path.join(__dirname, 'captures', 'voix-lettres');
     const dossier = path.join(dest, L.lat.replace(/[^\w]/g, '_') + '-' + Buffer.from(L.ar).toString('hex'));
     fs.mkdirSync(dossier, { recursive: true });
     const sons = [{ cle: L.ar, dire: L.nom, nom: '00-' + L.ar + '-nom' }]
-      .concat(L.variantes.map((v, i) => ({ cle: v[0], dire: v[0], nom: String(i + 1).padStart(2, '0') + '-' + v[1] })));
+      .concat(L.variantes.map((v, i) => ({ cle: v[0], dire: ' ' + v[0], nom: String(i + 1).padStart(2, '0') + '-' + v[1] })));
     for (const s of sons) {
       const f = path.join(dossier, s.nom.replace(/[\\/:*?"<>|]/g, '_') + '.mp3');
       try {
