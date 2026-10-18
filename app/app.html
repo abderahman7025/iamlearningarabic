@@ -6422,6 +6422,130 @@ body:has(#ca>.par-page) #tb-title{color:#fff!important;-webkit-text-fill-color:#
   box-shadow:inset 0 2px 4px rgba(160,20,50,.1),0 0 0 4px rgba(224,53,79,.18),0 8px 18px rgba(140,21,48,.15)!important}
 #root.profile-adult #ca[data-page="contact"] .cform-input::placeholder{color:rgba(192,33,63,.55)!important}
 </style>
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.4.4 (18 octobre) — source : outils/refonte-v344.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.3.8.
+     LES 3-5 ANS EN 3D (fille et garçon). Le client : « refais toute
+     l'interface 3/5 ans au niveau design 3D de tout : les jeux, la page
+     Choisis ta lettre (écriture noire moche), les cases animaux en 3D
+     stylées ». Tout reste en CSS, sans toucher aux scripts des jeux : les
+     couleurs viennent de --mc (manche) / --tc (vignette) / --sk-* (profil).
+     Recette commune « bonbon » : remplissage en dégradé de la couleur, reflet
+     blanc en haut à gauche, ombre intérieure en bas, TRANCHE plus foncée
+     sous la pièce (ombre décalée sans flou), ombre portée douce.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+/* les couleurs du profil, pour tout l'écran (elles n'existaient que dans
+   le cours : la carte et « Choisis ta lettre » restaient sans) */
+body.age-petit.profile-boy{--sk-fonce:#01579b;--sk-moyen:#0277bd;--sk-vif:#0288d1;--sk-clair:#039be5;
+  --sk-pale:#e8f6ff;--sk-rgb:2,136,209;--sk-rgb-f:1,87,155;--sk-jauge:#4fc3f7}
+body.age-petit.profile-girl{--sk-fonce:#7b1747;--sk-moyen:#b3195f;--sk-vif:#d81b78;--sk-clair:#f0629f;
+  --sk-pale:#fff0f7;--sk-rgb:216,27,120;--sk-rgb-f:123,23,71;--sk-jauge:#f9a8d4}
+/* ── Les titres : plus de noir, une lettre « bonbon » en relief ── */
+body.fond-prairie.age-petit #root .sess-map-title,body.age-petit #root .sess-map-title{color:#fff!important;-webkit-text-fill-color:#fff!important;
+  font-weight:900!important;letter-spacing:.05em!important;
+  text-shadow:0 1px 0 var(--sk-clair),0 2px 0 var(--sk-clair),0 3px 0 var(--sk-vif),0 4px 0 var(--sk-vif),
+    0 5px 0 var(--sk-moyen),0 6px 0 var(--sk-fonce),0 10px 14px rgba(var(--sk-rgb-f),.45),
+    0 0 1px var(--sk-fonce)!important;
+  paint-order:stroke fill;-webkit-text-stroke:1.2px var(--sk-fonce)}
+
+/* ── Choisis ta lettre : les vignettes deviennent des cartes épaisses ── */
+body.age-petit .tuile{border:none!important;border-radius:30px!important;overflow:visible;
+  background:linear-gradient(165deg,#ffffff 0%,color-mix(in srgb,var(--tc) 18%,#ffffff) 55%,
+    color-mix(in srgb,var(--tc) 34%,#ffffff) 100%)!important;
+  box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--tc) 55%,#ffffff),
+    inset 0 -10px 18px color-mix(in srgb,var(--tc) 22%,transparent),inset 0 6px 10px rgba(255,255,255,.9),
+    0 10px 0 color-mix(in srgb,var(--tc) 72%,#000),0 22px 30px color-mix(in srgb,var(--tc) 38%,transparent)!important;
+  margin-bottom:10px;transform:perspective(700px) rotateX(6deg);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s!important}
+body.age-petit .tuile::before{content:'';position:absolute;left:14px;right:40%;top:8px;height:28%;border-radius:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
+body.age-petit .tuile:hover{transform:perspective(700px) rotateX(0deg) translateY(-6px)!important}
+body.age-petit .tuile:active{transform:perspective(700px) rotateX(0deg) translateY(8px)!important;
+  box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--tc) 55%,#ffffff),0 2px 0 color-mix(in srgb,var(--tc) 72%,#000)!important}
+body.age-petit .tuile-emo-img{filter:drop-shadow(0 10px 8px rgba(0,0,0,.22));transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+body.age-petit .tuile:not(.fermee):hover .tuile-emo-img{transform:scale(1.1) rotate(-6deg) translateY(-6px)}
+body.age-petit .tuile-lettre-ar{color:var(--tc)!important;-webkit-text-fill-color:var(--tc);font-weight:700;
+  -webkit-text-stroke:5px #fff;paint-order:stroke fill;
+  text-shadow:0 3px 0 color-mix(in srgb,var(--tc) 75%,#000),0 5px 0 color-mix(in srgb,var(--tc) 60%,#000),
+    0 12px 14px color-mix(in srgb,var(--tc) 45%,transparent)}
+body.age-petit .tuile.fermee .tuile-lettre-ar{color:#9aa1ad!important;-webkit-text-fill-color:#9aa1ad}
+body.age-petit .tuile-etat{background:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;
+  box-shadow:0 4px 0 color-mix(in srgb,var(--tc) 60%,#000),0 6px 10px rgba(0,0,0,.18);font-size:.95rem}
+body.age-petit .tuile.fermee{filter:grayscale(.85) brightness(1.05);opacity:.7}
+
+/* ── Les boutons ── */
+body.age-petit .jeu-retour{border:none!important;color:#fff!important;
+  background:linear-gradient(180deg,var(--sk-clair),var(--sk-vif))!important;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 7px 0 var(--sk-fonce),0 14px 22px rgba(var(--sk-rgb-f),.35)!important;
+  text-shadow:0 2px 0 rgba(0,0,0,.18);transition:transform .12s,box-shadow .12s}
+body.age-petit .jeu-retour:active{transform:translateY(6px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 1px 0 var(--sk-fonce)!important}
+body.age-petit .boy-btn{border-radius:20px!important;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.35),0 7px 0 var(--sk-fonce),0 14px 24px rgba(var(--sk-rgb-f),.35)!important}
+body.age-petit .boy-btn:active{transform:translateY(6px)!important;box-shadow:0 1px 0 var(--sk-fonce)!important}
+
+/* ── La carte du cours ── */
+body.age-petit .boy-panel{border:none!important;border-radius:30px!important;
+  box-shadow:inset 0 0 0 3px rgba(var(--sk-rgb),.22),inset 0 -12px 22px rgba(var(--sk-rgb),.08),
+    0 12px 0 rgba(var(--sk-rgb-f),.22),0 26px 40px rgba(var(--sk-rgb-f),.22)!important}
+body.age-petit .boy-step{display:inline-flex!important;margin:0 auto 12px!important;padding:7px 16px;border-radius:99px;
+  font-size:.74rem!important;color:#fff!important;background:linear-gradient(180deg,var(--sk-clair),var(--sk-vif));
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 4px 0 var(--sk-fonce),0 8px 14px rgba(var(--sk-rgb-f),.3);
+  text-shadow:0 1px 0 rgba(0,0,0,.2)}
+body.age-petit .boy-step i{background:#fff!important}
+body.age-petit .boy-jauge .rail{height:16px!important;border-radius:99px!important;
+  background:rgba(var(--sk-rgb),.14)!important;box-shadow:inset 0 3px 5px rgba(var(--sk-rgb-f),.25),0 1px 0 #fff}
+body.age-petit .boy-jauge .feu{border-radius:99px!important;position:relative;
+  background:linear-gradient(180deg,rgba(255,255,255,.55) 0 35%,transparent 36%),linear-gradient(90deg,var(--sk-jauge),var(--sk-vif))!important;
+  box-shadow:0 0 10px rgba(var(--sk-rgb),.5)}
+
+/* ── Les pièces des jeux : des bonbons ── */
+body.age-petit .mj-flotte,body.age-petit .mj-bulleV,body.age-petit .mjr-case,body.age-petit .mj-hp{
+  border:3px solid rgba(255,255,255,.75)!important;color:#fff!important;
+  background:radial-gradient(circle at 32% 24%,#fff 0 6%,color-mix(in srgb,var(--mc) 45%,#fff) 20%,
+    var(--mc) 62%,color-mix(in srgb,var(--mc) 70%,#000) 100%)!important;
+  text-shadow:0 2px 0 color-mix(in srgb,var(--mc) 60%,#000),0 4px 8px rgba(0,0,0,.3);
+  box-shadow:inset 0 -8px 14px rgba(0,0,0,.22),inset 0 6px 10px rgba(255,255,255,.5),
+    0 8px 0 color-mix(in srgb,var(--mc) 55%,#000),0 16px 24px color-mix(in srgb,var(--mc) 45%,transparent)!important}
+body.age-petit .mj-flotte.non,body.age-petit .mj-bulleV.non,body.age-petit .mjr-case.non{--mc:#e53935}
+body.age-petit .mj-bulleV.juste{--mc:#10B981}
+body.age-petit .mjr-case{border-radius:28px!important}
+body.age-petit .mjr-case.vise{box-shadow:0 0 0 5px #fff,0 0 0 9px var(--mc),0 8px 0 color-mix(in srgb,var(--mc) 55%,#000)!important}
+/* les ballons : de vrais ballons brillants */
+body.age-petit .mj-bulle{border:none!important;color:#fff!important;
+  background:radial-gradient(ellipse at 34% 26%,#fff 0 7%,color-mix(in srgb,var(--mc) 40%,#fff) 18%,
+    var(--mc) 58%,color-mix(in srgb,var(--mc) 68%,#000) 100%)!important;
+  text-shadow:0 2px 0 color-mix(in srgb,var(--mc) 60%,#000),0 3px 8px rgba(0,0,0,.3);
+  box-shadow:inset -8px -12px 18px rgba(0,0,0,.2),inset 6px 8px 12px rgba(255,255,255,.35),0 14px 22px rgba(0,0,0,.18)!important}
+/* le grand disque de la lettre : une sphère posée */
+body.age-petit .mj-disque{box-shadow:inset 0 -14px 26px color-mix(in srgb,var(--mc) 30%,transparent),
+  inset 0 10px 20px rgba(255,255,255,.8),0 14px 0 color-mix(in srgb,var(--mc) 45%,#fff),
+  0 30px 44px color-mix(in srgb,var(--mc) 40%,transparent)!important;
+  text-shadow:0 3px 0 color-mix(in srgb,var(--mc) 55%,#000),0 8px 14px color-mix(in srgb,var(--mc) 35%,transparent)}
+/* le cadre de tracé : un plateau */
+body.age-petit .mj-cadre{border:none!important;
+  box-shadow:inset 0 0 0 5px var(--mc),inset 0 8px 16px rgba(0,0,0,.08),
+    0 9px 0 color-mix(in srgb,var(--mc) 60%,#000),0 20px 30px color-mix(in srgb,var(--mc) 35%,transparent)!important}
+/* les paires : cartes épaisses */
+body.age-petit .mjc-dos{border:none!important;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),inset 0 -8px 14px rgba(0,0,0,.2),
+    0 7px 0 color-mix(in srgb,var(--mc) 50%,#000),0 14px 20px color-mix(in srgb,var(--mc) 40%,transparent)!important}
+body.age-petit .mjc-dos::after{content:'';position:absolute;left:8%;right:35%;top:5%;height:22%;border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none}
+body.age-petit .mjc-face{box-shadow:0 7px 0 color-mix(in srgb,var(--mc) 55%,#000),0 14px 20px color-mix(in srgb,var(--mc) 35%,transparent)!important}
+/* le mot (trouve la lettre) : les lettres en relief */
+body.age-petit .mj-motar{text-shadow:0 3px 0 rgba(0,0,0,.12),0 8px 14px rgba(0,0,0,.12)}
+
+/* ── La carte des animaux : des médaillons plus épais, plus brillants ── */
+body.age-petit .carte-rond{box-shadow:inset 0 -10px 16px rgba(0,0,0,.18),inset 0 8px 12px rgba(255,255,255,.55),
+  0 9px 0 color-mix(in srgb,var(--tc) 62%,#000),0 0 0 5px #fff,0 18px 24px rgba(40,60,30,.3)!important}
+body.age-petit .carte-rond img{filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+body.age-petit .carte-etat{box-shadow:0 3px 0 rgba(0,0,0,.25),0 5px 10px rgba(0,0,0,.25)!important}
+
+/* ── La barre du haut ── */
+body.age-petit #tb-back,body.age-petit .sound-dot,body.age-petit #topbar .tb-son{
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 5px 0 rgba(var(--sk-rgb-f),.45),0 10px 16px rgba(var(--sk-rgb-f),.25)!important}
+</style>
 
 
   <!-- SEO multilingue -->
@@ -14094,7 +14218,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.4.3';
+var _VERSION_REPLI='v3.4.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

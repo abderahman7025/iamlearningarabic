@@ -183,7 +183,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.3), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.4), du plus récent au plus ancien :**
+
+- **v3.4.4 (18 octobre) — bloc `outils/refonte-v344.html`** (après v3.3.8) :
+  les 3-5 ans en 3D, fille et garçon, en CSS seul. Couleurs du profil
+  (--sk-*) posées sur body.age-petit (elles manquaient hors du cours).
+  Titres en lettres « bonbon » (plus de noir), vignettes « Choisis ta
+  lettre » en cartes épaisses inclinées (lettre colorée détourée de blanc),
+  boutons à tranche, carte du cours épaisse, étiquette d'étape en pastille,
+  jauge en tube, pièces des jeux (attrape, écoute, relie, bouton son) en
+  bonbons brillants, ballons brillants, disque-sphère, cadre de tracé en
+  plateau, cartes des paires épaisses, médaillons de la carte plus épais.
 
 - **v3.4.3 (18 octobre)** — fin de l'introduction : « …en cliquant sur le
   bouton "Alerter" ou via la rubrique "contact"… » (12 langues). Un son que
