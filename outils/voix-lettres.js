@@ -26,12 +26,16 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
   const m = l.match(/^([A-Z_]+)=(.*)$/);
   if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
 });
-const VOIX = 'Wm3eSTpNFfFtDgCxf6AU'; // Narrateur
+/* --voix=ID : essayer une autre voix (par ex. une voix ARABE de la
+   bibliothèque ElevenLabs, ajoutée à « Mes voix ») ; ses fichiers vont dans
+   un dossier à part, suffixé de l'identifiant. */
+const _vArg = (process.argv.find((a) => a.startsWith('--voix=')) || '').slice(7);
+const VOIX = _vArg || 'Wm3eSTpNFfFtDgCxf6AU'; // Narrateur par défaut
 const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'voix-lettres.json'), 'utf8'));
 const depot = process.argv.includes('--depot');
 const demandees = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const toutes = demandees.includes('tout') || !demandees.length;
-const dest = path.join(__dirname, 'captures', 'voix-lettres');
+const dest = path.join(__dirname, 'captures', 'voix-lettres' + (_vArg ? '-' + _vArg : ''));
 
 (async () => {
   let ok = 0, echecs = 0, car = 0;
