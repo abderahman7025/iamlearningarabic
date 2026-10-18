@@ -1,0 +1,242 @@
+[
+ {
+  "langue": "en",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "When one of the three vowels is doubled, the sound n is added."
+   ],
+   [
+    "3",
+    "« n' »",
+    "When one of the three vowels is doubled, the sound « n' » is added."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "When one of the three vowels is doubled, the sound نْ is added."
+   ]
+  ]
+ },
+ {
+  "langue": "es",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Cuando se duplica una de las tres vocales, se añade el sonido n."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Cuando se duplica una de las tres vocales, se añade el sonido « n' »."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Cuando se duplica una de las tres vocales, se añade el sonido نْ."
+   ]
+  ]
+ },
+ {
+  "langue": "de",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Wenn einer der drei Vokale verdoppelt wird, kommt der Laut n dazu."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Wenn einer der drei Vokale verdoppelt wird, kommt der Laut « n' » dazu."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Wenn einer der drei Vokale verdoppelt wird, kommt der Laut نْ dazu."
+   ]
+  ]
+ },
+ {
+  "langue": "nl",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Als een van de drie klinkers wordt verdubbeld, komt de klank n erbij."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Als een van de drie klinkers wordt verdubbeld, komt de klank « n' » erbij."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Als een van de drie klinkers wordt verdubbeld, komt de klank نْ erbij."
+   ]
+  ]
+ },
+ {
+  "langue": "it",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Quando si raddoppia una delle tre vocali, si aggiunge il suono n."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Quando si raddoppia una delle tre vocali, si aggiunge il suono « n' »."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Quando si raddoppia una delle tre vocali, si aggiunge il suono نْ."
+   ]
+  ]
+ },
+ {
+  "langue": "pt",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Quando se duplica uma das três vogais, acrescenta-se o som n."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Quando se duplica uma das três vogais, acrescenta-se o som « n' »."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Quando se duplica uma das três vogais, acrescenta-se o som نْ."
+   ]
+  ]
+ },
+ {
+  "langue": "ru",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Когда одна из трёх огласовок удваивается, добавляется звук н."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Когда одна из трёх огласовок удваивается, добавляется звук « н' »."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Когда одна из трёх огласовок удваивается, добавляется звук نْ."
+   ]
+  ]
+ },
+ {
+  "langue": "tr",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Üç harekeden biri ikilendiğinde n sesi eklenir."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Üç harekeden biri ikilendiğinde « n' » sesi eklenir."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Üç harekeden biri ikilendiğinde نْ sesi eklenir."
+   ]
+  ]
+ },
+ {
+  "langue": "zh",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "当三个元音符号之一被加倍时，会加上 n 的音。"
+   ],
+   [
+    "3",
+    "« n' »",
+    "当三个元音符号之一被加倍时，会加上 « n' » 的音。"
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "当三个元音符号之一被加倍时，会加上 نْ 的音。"
+   ]
+  ]
+ },
+ {
+  "langue": "id",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "Ketika salah satu dari tiga harakat digandakan, bunyi n ditambahkan."
+   ],
+   [
+    "3",
+    "« n' »",
+    "Ketika salah satu dari tiga harakat digandakan, bunyi « n' » ditambahkan."
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "Ketika salah satu dari tiga harakat digandakan, bunyi نْ ditambahkan."
+   ]
+  ]
+ },
+ {
+  "langue": "ur",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "جب تین حرکتوں میں سے کسی ایک کو دگنا کیا جاتا ہے تو ن کی آواز شامل ہو جاتی ہے۔"
+   ],
+   [
+    "3",
+    "« n' »",
+    "جب تین حرکتوں میں سے کسی ایک کو دگنا کیا جاتا ہے تو « ن' » کی آواز شامل ہو جاتی ہے۔"
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "جب تین حرکتوں میں سے کسی ایک کو دگنا کیا جاتا ہے تو نْ کی آواز شامل ہو جاتی ہے۔"
+   ]
+  ]
+ },
+ {
+  "langue": "hi",
+  "essais": [
+   [
+    "1",
+    "comme aujourd'hui",
+    "जब तीन स्वर-चिह्नों में से किसी एक को दोगुना किया जाता है, तो न की ध्वनि जुड़ जाती है।"
+   ],
+   [
+    "3",
+    "« n' »",
+    "जब तीन स्वर-चिह्नों में से किसी एक को दोगुना किया जाता है, तो « न' » की ध्वनि जुड़ जाती है।"
+   ],
+   [
+    "4",
+    "arabe نْ",
+    "जब तीन स्वर-चिह्नों में से किसी एक को दोगुना किया जाता है, तो نْ की ध्वनि जुड़ जाती है।"
+   ]
+  ]
+ }
+]
