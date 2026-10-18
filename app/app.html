@@ -955,6 +955,16 @@ body.choix-age.profile-boy #boy-bg-anim{display:none !important}
 @keyframes petale{from{translate:var(--dx) var(--dy);scale:.2;opacity:0}to{translate:0 0;scale:1;opacity:1}}
 @keyframes coeur{from{scale:0;rotate:-90deg}to{scale:1;rotate:0deg}}
 
+/* ── VERSETS DES BONUS EN TEXTE (v3.3.0) : surlignages des anciennes images ── */
+.verset-bonus{font-size:clamp(1.5rem,6.4vw,2.2rem);line-height:2.3}
+.verset-bonus [class^=hl-]{border-radius:.3em;padding:0 .04em}
+.hl-violet{background:rgba(168,85,247,.32);box-shadow:0 0 0 1.5px rgba(147,51,234,.55)}
+.hl-jaune{background:rgba(234,179,8,.38);box-shadow:0 0 0 1.5px rgba(202,138,4,.6)}
+.hl-rose{background:rgba(244,114,182,.35);box-shadow:0 0 0 1.5px rgba(219,39,119,.55)}
+.hl-rouge{box-shadow:0 0 0 2px rgba(220,38,38,.8);border-radius:50%!important;background:rgba(254,202,202,.35)}
+.hl-vert{box-shadow:0 0 0 2px rgba(22,163,74,.8);border-radius:50%!important}
+.hl-bleu{box-shadow:0 0 0 2.5px rgba(14,165,233,.9);border-radius:45%!important;padding:0 .12em!important}
+.no-ayah{font-size:.7em;color:#a16207}
 /* ── BONUS SOLAIRES / LUNAIRES (v3.2.3) ── */
 .verset-sl{direction:rtl;text-align:center;font-family:'Scheherazade New','Amiri',serif;font-size:clamp(1.7rem,7.4vw,2.3rem);
   line-height:2.1;padding:12px 14px;margin:12px 0 6px;border-radius:18px;color:#3a2600;
@@ -6077,6 +6087,159 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   };
 })();
 </script>
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.3.0 (18 octobre) — source : outils/refonte-v330.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.2.3.
+     1. LE TEXTE LU : plus d'assombrissement (opacité 0,6 / 0,4). Le client :
+        « je préfère que le texte change de couleur pendant qu'il est lu ».
+        Les mots se colorent un à un au fil de la voix (karaoké), calés sur
+        la durée réelle de l'enregistrement (repères `_BORNES`, comme la
+        reprise de la v3.2.1) ; en pause, la couleur s'arrête où on en est.
+        Les mots sont enveloppés dans des <span class="km"> : le TEXTE de
+        l'élément ne change pas (il sert de clé aux enregistrements).
+     2. GRANDS ÉCRANS (tablette, ordinateur) : tout était à la taille d'un
+        téléphone — un petit mot au milieu d'un grand vide. L'application est
+        AGRANDIE en entier (`zoom` sur #root) selon la place disponible :
+        z = min(largeur / 430, hauteur / 740 — 650 en paysage), entre 1 et 1,9 ; recalculé à
+        chaque changement de taille ou d'ORIENTATION. En paysage, le contenu
+        est centré dans une colonne de 860 px (avant agrandissement).
+        Téléphones (moins de 700 px de large) : rien ne change.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+html.grand-ecran #root{right:auto;bottom:auto}
+html.grand-ecran.paysage #ca,html.grand-ecran.paysage #menu-nav{max-width:860px;margin-left:auto;margin-right:auto;width:100%}
+/* le mot à lire des 200 questions, plus grand partout */
+#ca .q-big{font-size:3.3rem!important;line-height:1.7!important}
+/* 3 — LA CARTE DES 3-5 ANS : plus de cadre ni de paysage derrière les
+   animaux — le chemin et les médaillons seulement ; plus de nom ni de
+   lettres sous les médaillons (inutile à cet âge, dit le client). La
+   colonne s'élargit à tout l'écran ; la largeur de la carte est réglée par
+   le code pour qu'elle tienne en hauteur. */
+body.age-petit .sess-map-wrap{max-width:none}
+body.age-petit .carte-monde{background:none!important;border:0!important;box-shadow:none!important;
+  border-radius:0!important;overflow:visible!important;rotate:none!important;animation:carteApparait2 .6s both}
+@keyframes carteApparait2{from{opacity:0}to{opacity:1}}
+body.age-petit .carte-nom{display:none!important}
+body.age-petit .carte-sentier .sol{stroke:#f2dfb0;stroke-width:7}
+body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
+/* 4 — LES JEUX (6-11 ans) : la carte s'allonge avec son texte (le titre
+   sortait par le haut, la mention « verrouillé » par le bas) ; la mention
+   est une pastille lisible ; « Carte des îles » devient une carte 3D. */
+#root .mg-list-wrap .nav-card{height:auto!important;min-height:96px!important;padding:16px 14px!important;align-items:center!important}
+#root .mg-list-wrap .nav-text{min-width:0;flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#root .mg-list-wrap .nav-title{white-space:normal!important;line-height:1.2!important;position:static!important;transform:none!important;margin:0!important}
+#root .mg-list-wrap .nav-desc{white-space:normal!important;line-height:1.35!important;position:static!important}
+#root .mg-verrou{display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:.72rem;font-weight:700;
+  padding:3px 9px;border-radius:99px;background:rgba(0,0,0,.08);color:var(--m-desc,#555)}
+#root.profile-boy .mg-verrou{background:rgba(255,255,255,.12);color:rgba(220,235,255,.85)}
+#root .mg-list-wrap .nav-card[data-jeu="carte"]{min-height:76px!important;margin-top:6px}
+#root .mg-list-wrap .nav-card[data-jeu="carte"] .nav-title{font-size:1.12rem!important}
+/* le texte en cours de lecture : un rien plus grand, la couleur avance */
+.lit-en-cours{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.lit-en-cours:not(.lit-bloc){transform:scale(1.035)}
+.km{transition:color .25s ease,text-shadow .25s ease}
+.km.km-lu{color:#b45309;-webkit-text-fill-color:#b45309}
+.km.km-ici{color:#e8a020;-webkit-text-fill-color:#e8a020;text-shadow:0 0 12px rgba(232,160,32,.45)}
+#root.profile-girl .km.km-lu{color:#be185d;-webkit-text-fill-color:#be185d}
+#root.profile-girl .km.km-ici{color:#ec4899;-webkit-text-fill-color:#ec4899;text-shadow:0 0 12px rgba(236,72,153,.4)}
+#root.profile-boy .km.km-lu{color:#1d4ed8;-webkit-text-fill-color:#1d4ed8}
+#root.profile-boy .km.km-ici{color:#0ea5e9;-webkit-text-fill-color:#0ea5e9;text-shadow:0 0 12px rgba(14,165,233,.4)}
+@media (prefers-reduced-motion:reduce){.lit-en-cours:not(.lit-bloc){transform:none}}
+</style>
+<script>
+(function(){
+  /* ── 4. Glyphes blancs des gemmes : les jeux et la carte des îles ── */
+  function glyphes(){
+    if(!window._GLYPHE3D){setTimeout(glyphes,200);return;}
+    function g(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';}
+    _GLYPHE3D.memory=g('<rect x="3" y="5" width="9" height="13" rx="2" transform="rotate(-8 7.5 11.5)" fill="rgba(255,255,255,.22)"/><rect x="12" y="6" width="9" height="13" rx="2" transform="rotate(8 16.5 12.5)"/><path d="M15.2 10.8l1.5 1.5-1.5 1.5-1.5-1.5z" fill="#fff"/>');
+    _GLYPHE3D.puzzle=g('<path d="M5 9h3a2 2 0 114 0h3v3a2 2 0 110 4v3H5v-3a2 2 0 100-4z" fill="rgba(255,255,255,.22)"/><path d="M15 9V5h4v4"/>');
+    _GLYPHE3D.carte=g('<path d="M3 6.5l5.5-2 7 2.5 5.5-2v13l-5.5 2-7-2.5-5.5 2z" fill="rgba(255,255,255,.18)"/><path d="M8.5 4.5v13M15.5 7v13"/><circle cx="12" cy="11" r="1.6" fill="#fff" stroke="none"/>');
+  }
+  glyphes();
+  /* ── 2. L'AGRANDISSEMENT SELON L'ÉCRAN ── */
+  function taille(){
+    var r=document.getElementById('root');if(!r)return;
+    var W=innerWidth,H=innerHeight,h=document.documentElement;
+    var z=(W>=700&&H>=520)?Math.max(1,Math.min(1.9,W/430,H/(W>H?650:740))):1;
+    z=Math.round(z*100)/100;
+    h.classList.toggle('grand-ecran',z>1);
+    h.classList.toggle('paysage',W>H);
+    if(z>1){r.style.zoom=z;r.style.width=(W/z)+'px';r.style.height=(H/z)+'px';}
+    else{r.style.zoom='';r.style.width='';r.style.height='';}
+    window._zoomApp=z;
+  }
+  var tz=null;
+  function plusTard(){clearTimeout(tz);tz=setTimeout(taille,120);}
+  addEventListener('resize',plusTard);addEventListener('orientationchange',plusTard);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',taille);else taille();
+})();
+(function(){
+  var EXCLU='script,style,textarea,input,svg,canvas,.km';
+  /* découpe une fois les textes de l'élément en mots (espaces gardés tels quels) */
+  function mots(el){
+    if(el._km&&el._km.length&&el._km[0].isConnected&&el.contains(el._km[0]))return el._km;
+    var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),L=[],n;
+    while((n=w.nextNode())){var p=n.parentElement;if(!p||p.closest(EXCLU)||!/\S/.test(n.nodeValue))continue;L.push(n);}
+    var out=[];
+    L.forEach(function(t){
+      var parts=t.nodeValue.split(/(\s+)/),f=document.createDocumentFragment();
+      parts.forEach(function(x){
+        if(!x)return;
+        if(/^\s+$/.test(x)){f.appendChild(document.createTextNode(x));return;}
+        var s=document.createElement('span');s.className='km';s.textContent=x;f.appendChild(s);out.push(s);
+      });
+      t.parentNode.replaceChild(f,t);
+    });
+    el._km=out;
+    var tot=0;out.forEach(function(s){s._d=tot;tot+=s.textContent.length+1;s._f=tot;});el._kmTot=tot||1;
+    return out;
+  }
+  function efface(el){
+    (el._km||[]).forEach(function(s){s.classList.remove('km-lu','km-ici');});
+  }
+  function boucle(el){
+    cancelAnimationFrame(el._kmRaf);
+    var a=el._kmA;if(!a)return;
+    (function pas(){
+      if(!el.classList.contains('lit-en-cours'))return;
+      var b=(window._BORNES&&_BORNES[a.currentSrc||a.src])||{};
+      var d0=b.d||0,d1=(b.f&&b.f>d0)?b.f:(a.duration||0);
+      if(d1>d0){
+        var p=Math.max(0,Math.min(1,(a.currentTime-d0)/(d1-d0))),pos=p*el._kmTot;
+        el._km.forEach(function(s){
+          var lu=s._f<=pos,ici=!lu&&s._d<=pos;
+          s.classList.toggle('km-lu',lu);s.classList.toggle('km-ici',ici);
+        });
+      }
+      if(!a.paused&&!a.ended)el._kmRaf=requestAnimationFrame(pas);
+    })();
+  }
+  window._lecture=function(el,etat,audio){
+    if(!el||!el.classList)return;
+    try{el.style.opacity='';}catch(e){}
+    if(etat==='fin'){
+      cancelAnimationFrame(el._kmRaf);
+      el.classList.remove('lit-en-cours');
+      /* la phrase finit toute colorée, puis reprend sa couleur */
+      (el._km||[]).forEach(function(s){s.classList.add('km-lu');s.classList.remove('km-ici');});
+      clearTimeout(el._kmT);el._kmT=setTimeout(function(){efface(el);},700);
+      return;
+    }
+    clearTimeout(el._kmT);
+    el.classList.add('lit-en-cours');
+    /* un grand bloc ne grossit pas (il bougerait toute la page) */
+    el.classList.toggle('lit-bloc',el.offsetHeight>140||el.offsetWidth>(innerWidth*0.92));
+    if(etat==='pause'){cancelAnimationFrame(el._kmRaf);return;}
+    if(audio){
+      try{mots(el);}catch(e){return;}
+      if(el._kmA!==audio){efface(el);el._kmA=audio;
+        audio.addEventListener('play',function(){if(el._kmA===audio)boucle(el);});}
+      boucle(el);
+    }
+  };
+})();
+</script>
 
 
   <!-- SEO multilingue -->
@@ -9337,10 +9500,10 @@ function _playFromIdx(idx){
   window.speechSynthesis.cancel();
   _spkIdx=idx;
   _spkPaused=false;
-  if(_spkEl)_spkEl.style.opacity='0.6';
+  if(_spkEl)_lecture(_spkEl,'joue');
   function doSpeak(){
     if(_spkPaused||_spkIdx>=_spkChunks.length){
-      if(!_spkPaused&&_spkEl){_spkEl.style.opacity='1';_spkEl=null;}
+      if(!_spkPaused&&_spkEl){_lecture(_spkEl,'fin');_spkEl=null;}
       return;
     }
     var currentIdx=_spkIdx;
@@ -9384,7 +9547,7 @@ function _playFromIdx(idx){
 var _rec={el:null,a:null,txt:'',paused:false};
 function _recStop(){
   try{if(_rec.a)_rec.a.pause();}catch(e){}
-  try{if(_rec.el)_rec.el.style.opacity='1';}catch(e){}
+  try{if(_rec.el)_lecture(_rec.el,'fin');}catch(e){}
   _rec={el:null,a:null,txt:'',paused:false};
 }
 function _recDebutPhrase(){
@@ -9405,7 +9568,7 @@ function _recDebutPhrase(){
 function stopSpeech(){
   _recStop();
   if(window.speechSynthesis)window.speechSynthesis.cancel();
-  if(_spkEl)_spkEl.style.opacity='1';
+  if(_spkEl)_lecture(_spkEl,'fin');
   _spkEl=null;_spkPaused=false;_spkChunks=[];_spkIdx=0;
   _spkQueueItems=null;_spkQueueIdx=0;_spkQueueEl=null;
 }
@@ -9482,9 +9645,9 @@ function speakText(txt,lang,el){
     var _enr=_sonEnregistre(txt);
     if(_enr&&el&&_rec.el===el&&_rec.a&&!_rec.a.ended){
       /* 2e clic : pause. 3e clic : reprise au début de la phrase entamée. */
-      if(!_rec.paused){_rec.a.pause();_rec.paused=true;el.style.opacity='0.4';return;}
+      if(!_rec.paused){_rec.a.pause();_rec.paused=true;_lecture(el,'pause');return;}
       try{_rec.a.currentTime=_recDebutPhrase();}catch(e){}
-      _rec.paused=false;el.style.opacity='0.6';
+      _rec.paused=false;_lecture(el,'joue',_rec.a);
       try{var _pp=_rec.a.play();if(_pp&&_pp['catch'])_pp['catch'](function(){});}catch(e){}
       return;
     }
@@ -9501,7 +9664,7 @@ function speakText(txt,lang,el){
       try{if(_lect)_lect.volume=/[\u0600-\u06FF]/.test(String(txt))?1:_VOLUME_PHRASES;}catch(e){}
       if(el&&_lect){
         _rec={el:el,a:_lect,txt:String(txt),paused:false};
-        el.style.opacity='0.6';
+        _lecture(el,'joue',_lect);
         _lect.addEventListener('ended',function(){if(_rec.a===_lect)_recStop();},{once:true});
       }
       return;
@@ -9530,7 +9693,7 @@ function speakText(txt,lang,el){
     window.speechSynthesis.cancel();
     // Recule d'un chunk car le chunk en cours a été interrompu
     _spkIdx=Math.max(0,_spkCurrentChunkIdx);
-    if(_spkEl)_spkEl.style.opacity='0.4';
+    if(_spkEl)_lecture(_spkEl,'pause');
     return;
   }
 
@@ -9586,7 +9749,7 @@ function speakQueue(items,el){
   if(sameEl&&!_spkPaused&&(_spkQueueItems||_spkChunks.length)){
     _spkPaused=true;
     window.speechSynthesis.cancel();
-    if(_spkEl)_spkEl.style.opacity='0.4';
+    if(_spkEl)_lecture(_spkEl,'pause');
     return;
   }
 
@@ -9602,13 +9765,13 @@ function speakQueue(items,el){
   if(!items||!items.length)return;
   _spkQueueItems=items;_spkQueueEl=el;_spkQueueIdx=0;_spkPaused=false;
   _spkEl=el||null;
-  if(_spkEl)_spkEl.style.opacity='0.6';
+  if(_spkEl)_lecture(_spkEl,'joue');
   _runQueue();
 }
 
 function _runQueue(){
   if(_spkPaused||!_spkQueueItems||_spkQueueIdx>=_spkQueueItems.length){
-    if(!_spkPaused&&_spkEl){_spkEl.style.opacity='1';_spkEl=null;_spkQueueItems=null;}
+    if(!_spkPaused&&_spkEl){_lecture(_spkEl,'fin');_spkEl=null;_spkQueueItems=null;}
     return;
   }
   var item=_spkQueueItems[_spkQueueIdx++];
@@ -9801,6 +9964,13 @@ function _mkVerset(html, speakAr){
   d.title='🔊';
   return d;
 }
+/* v3.3.0 — les images de versets des bonus, refaites en TEXTE (police
+   Scheherazade New, signes du Mushaf : ۡ ۟ ۠ ٰ ٓ ۦ ٞ ٗ). Les surlignages
+   reprennent ceux des images : un <span class="hl-…"> autour de la lettre
+   et de son signe — la forme liée de la lettre est conservée. */
+function _versetBonus(html){
+  var d=document.createElement('div');d.className='verset-sl verset-bonus';d.innerHTML=html;return d;
+}
 function _mkBox(pc){
   var d=document.createElement('div');
   d.style.cssText='background:rgba(255,255,255,.04);border-radius:18px;padding:16px;margin-bottom:16px;border:1px solid rgba(255,255,255,.07);';
@@ -9817,10 +9987,8 @@ function renderBonusSoukoune(ca, pc, pcHex){
   var box=_mkBox(pc); ca.appendChild(box);
   box.appendChild(_mkBonusAr('السُّكُون', pc));
   box.appendChild(_mkBonusSec(t('bonus_s1_intro'), pc));
-  var img1=document.createElement('img');
-  img1.src=IMG_soukoune;
-  img1.className='bonus-img';
-  box.appendChild(img1);
+  box.appendChild(_versetBonus('يَٰبَنِيٓ إِ<span class="hl-violet">سۡ</span>رَٰٓءِيلَ ٱ<span class="hl-violet">ذۡ</span>كُرُو<span class="hl-jaune">ا۟</span> نِ<span class="hl-violet">عۡ</span>مَتِيَ ٱلَّتِيٓ أَ<span class="hl-violet">نۡ</span>عَ<span class="hl-violet">مۡ</span>تُ عَلَيۡكُ<span class="hl-violet">مۡ</span>'));
+  box.appendChild(_versetBonus('ٱلۡبَحۡرُ قَبۡلَ أَن تَنفَدَ كَلِمَٰتُ رَبِّي وَلَوۡ جِئۡنَا بِمِثۡلِهِۦ مَدَدٗا <span class="no-ayah">﴿١٠٩﴾</span> قُلۡ إِنَّمَآ أَنَ<span class="hl-rose">ا۠</span> بَشَرٞ مِّثۡلُكُمۡ يُوحَىٰٓ إِلَيَّ أَنَّمَآ إِلَٰهُكُمۡ إِلَٰهٞ وَٰحِدٞۖ فَمَن كَانَ يَرۡجُوا۟'));
   [{c:'rgba(168,85,247,.4)',key:'bonus_s1_violet'},{c:'rgba(234,179,8,.4)',key:'bonus_s1_jaune'},{c:'rgba(244,114,182,.4)',key:'bonus_s1_rose'}].forEach(function(item){
     var d=document.createElement('div');
     d.style.cssText='background:'+item.c+';border-radius:10px;padding:10px 12px;font-size:.88rem;margin:5px 0;cursor:pointer;';
@@ -9836,15 +10004,9 @@ function renderBonusWasla(ca, pc, pcHex){
   var box=_mkBox(pc); ca.appendChild(box);
   box.appendChild(_mkBonusAr('هَمْزَةُ الْوَصْلِ', pc));
   box.appendChild(_mkBonusGroup([t('bonus_s2_p1'),t('bonus_s2_p2'),t('bonus_s2_p3')], pc));
-  var img2=document.createElement('img');
-  img2.src=IMG_wasla_p1;
-  img2.className='bonus-img';
-  box.appendChild(img2);
+  box.appendChild(_versetBonus('بِسۡمِ <span class="hl-rouge">ٱ</span>للَّهِ <span class="hl-rouge">ٱ</span>لرَّحۡمَٰنِ <span class="hl-rouge">ٱ</span>لرَّحِيمِ'));
   box.appendChild(_mkBonusGroup([t('bonus_s2_p4'),t('bonus_s2_bonus')], pc));
-  var img3=document.createElement('img');
-  img3.src=IMG_wasla_p2;
-  img3.className='bonus-img';
-  box.appendChild(img3);
+  box.appendChild(_versetBonus('بِسۡمِ ٱللَّهِ ٱلرَّحۡ<span class="hl-vert">مَٰ</span>نِ ٱلرَّحِيمِ'));
   box.appendChild(_mkBonusGroup([t('bonus_s2_p5')], pc));
 }
 
@@ -9852,10 +10014,7 @@ function renderBonusWasla(ca, pc, pcHex){
 function renderBonusAllah(ca, pc, pcHex){
   var box=_mkBox(pc); ca.appendChild(box);
   box.appendChild(_mkBonusAr('لَفْظُ الْجَلَالَةِ : الله', pc));
-  var img4=document.createElement('img');
-  img4.src=IMG_allah_photo;
-  img4.className='bonus-img';
-  box.appendChild(img4);
+  box.appendChild(_versetBonus('بِسۡمِ <span class="hl-bleu">ٱللَّهِ</span> ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ'));
   box.appendChild(_mkBonusGroup([t('bonus_s3_p1'),t('bonus_s3_p2'),t('bonus_s3_kasra'),t('bonus_s3_fatha'),t('bonus_s3_sukun'),t('bonus_s3_ex'),t('bonus_s3_ex2'),t('bonus_s3_ex3'),t('bonus_s3_ex4')], pc));
   ['\u0625\u0650\u0646\u064e\u0651\u0647\u064f \u0671\u0644\u0644\u064e\u0651\u0647\u064f','\u0671\u0644\u0644\u064e\u0651\u0647\u064f \u0623\u064e\u0643\u0652\u0628\u064e\u0631\u064f','\u0671\u062a\u064e\u0651\u0642\u0650 \u0671\u0644\u0644\u064e\u0651\u0647\u064e'].forEach(function(ar){
     box.appendChild(_mkBonusAr(ar, pc));
@@ -12002,6 +12161,20 @@ function renderTuilesAnimaux(ca){
     CARTE_ETAPES=CARTE.pts;
     carte.style.paddingBottom=CARTE.h+'%';
     carte.classList.toggle('couchee',CARTE===CARTE_COUCHEE);
+    /* v3.3.0 — la carte TIENT dans l'écran : sa largeur est bornée par la
+       hauteur disponible (moins la barre du haut, le titre et la jauge), quel
+       que soit l'appareil ou son orientation. */
+    try{
+      var _z=window._zoomApp||1,_haut=innerHeight/_z-64-(carte.offsetTop||120)-24;
+      var _dispo=(wrap.clientWidth||innerWidth/_z)-8;
+      /* trop peu de hauteur (téléphone couché) : on garde au moins 60 % de la
+         largeur, et l'on fait défiler un peu */
+      var _larg=Math.max(240,Math.min(_dispo,Math.max(_haut*100/CARTE.h,_dispo*0.6)));
+      carte.style.width=_larg+'px';carte.style.maxWidth='none';
+      /* le % d'un padding se rapporte au PARENT : avec une largeur propre, la
+         hauteur vient du rapport d'aspect */
+      carte.style.paddingBottom='0';carte.style.aspectRatio='100 / '+CARTE.h;
+    }catch(e){}
     sentier.setAttribute('viewBox','0 0 100 '+CARTE.h);
     dessineLeSentier();
     [].slice.call(carte.querySelectorAll('.carte-etape')).forEach(function(t,k){
@@ -12144,6 +12317,8 @@ function renderTuilesAnimaux(ca){
      D'UN COTE et les jeux DE L'AUTRE — les jeux sont maintenant DANS la
      lecon, ce sont ses manches. */
   ca.appendChild(wrap);
+  /* la carte est maintenant dans la page : on peut mesurer la place */
+  requestAnimationFrame(function(){if(carte.isConnected)poseLeRepere();});
 }
 
 
@@ -12888,7 +13063,7 @@ function renderMiniGames(ca){
     var card=document.createElement('div');
     card.className='nav-card';
     card.style.cssText='opacity:0;transform:translateX(-110%);transition:none;'+(g.locked?'opacity:0;transform:translateX(-110%);filter:grayscale(.7);':'');
-    var lockedNote=g.locked?'<span style="display:inline-block;margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.38)">🔒 '+({'fr':'Continue les leçons pour débloquer','en':'Complete lessons to unlock','es':'Completa lecciones para desbloquear','de':'Lektionen abschließen','nl':'Voltooi lessen om te ontgrendelen','it':'Completa lezioni per sbloccare','pt':'Complete lições para desbloquear','ru':'Пройди уроки для разблокировки','tr':'Dersleri tamamla','zh':'完成课程以解锁','id':'Selesaikan pelajaran','ur':'سبق مکمل کریں','hi':'पाठ पूरा करें'}[st.lang]||'Continue les leçons pour débloquer')+'</span>':'';
+    var lockedNote=g.locked?'<span class="mg-verrou">🔒 '+({'fr':'Continue les leçons pour débloquer','en':'Complete lessons to unlock','es':'Completa lecciones para desbloquear','de':'Lektionen abschließen','nl':'Voltooi lessen om te ontgrendelen','it':'Completa lezioni per sbloccare','pt':'Complete lições para desbloquear','ru':'Пройди уроки для разблокировки','tr':'Dersleri tamamla','zh':'完成课程以解锁','id':'Selesaikan pelajaran','ur':'سبق مکمل کریں','hi':'पाठ पूरा करें'}[st.lang]||'Continue les leçons pour débloquer')+'</span>':'';
     var bestNote=(!g.locked&&g.best)?'<span style="display:inline-block;margin-top:2px;font-size:.7rem;color:var(--gold)">🏅 '+(({'fr':'Meilleur','en':'Best','es':'Mejor','de':'Beste','nl':'Beste','it':'Migliore','pt':'Melhor','ru':'Лучший','tr':'En İyi','zh':'最佳','id':'Terbaik','ur':'بہترین','hi':'सर्वश्रेष्ठ'}[st.lang]||'Meilleur'))+' : '+g.best+'</span>':'';
     card.dataset.jeu=g.id;
     card.innerHTML='<div class="nav-card-shimmer"></div>'
@@ -12915,11 +13090,15 @@ function renderMiniGames(ca){
   });
 
   // Bouton retour
-  var backBtn=document.createElement('button');
-  backBtn.className='rbtn rbtn-m';
-  backBtn.style.marginTop='8px';
-  backBtn.textContent='🗺️ '+(({'fr':'Carte des îles','en':'Island Map','es':'Mapa de Islas','de':'Inselkarte','nl':'Eilandenkaart','it':'Mappa delle Isole','pt':'Mapa das Ilhas','ru':'Карта островов','tr':'Adalar Haritası','zh':'岛屿地图','id':'Peta Pulau','ur':'جزیروں کا نقشہ','hi':'द्वीप मानचित्र'}[st.lang]||'Carte des îles'));
+  /* v3.3.0 — « Carte des îles » : une carte 3D comme les jeux, avec son
+     icône de carte, au lieu d'un bouton à émoji. */
+  var backBtn=document.createElement('div');
+  backBtn.className='nav-card';backBtn.dataset.jeu='carte';backBtn.setAttribute('role','button');backBtn.tabIndex=0;
+  backBtn._lib=(({'fr':'Carte des îles','en':'Island Map','es':'Mapa de Islas','de':'Inselkarte','nl':'Eilandenkaart','it':'Mappa delle Isole','pt':'Mapa das Ilhas','ru':'Карта островов','tr':'Adalar Haritası','zh':'岛屿地图','id':'Peta Pulau','ur':'جزیروں کا نقشہ','hi':'द्वीप मानचित्र'}[st.lang]||'Carte des îles'));
+  backBtn.innerHTML='<div class="nav-icon">'+((window._GLYPHE3D&&_GLYPHE3D.carte)||'🗺️')+'</div>'
+    +'<div class="nav-text"><div class="nav-title">'+backBtn._lib+'</div></div><div class="nav-arrow">›</div>';
   backBtn.onclick=function(){st._curPage='sessions';renderPage('sessions',false);};
+  backBtn.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();backBtn.onclick();}};
   wrap.appendChild(backBtn);
 
   ca.appendChild(wrap);
@@ -13716,7 +13895,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.2.9';
+var _VERSION_REPLI='v3.3.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

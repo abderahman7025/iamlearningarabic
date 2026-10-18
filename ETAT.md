@@ -183,7 +183,34 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.9), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.0), du plus récent au plus ancien :**
+
+- **v3.3.0 (18 octobre) — bloc `outils/refonte-v330.html`** (copié tel quel
+  après celui de la v3.2.3).
+  * **Texte lu en KARAOKÉ** : plus d'opacité 0,6 / 0,4 ; `_lecture(el,
+    'joue'|'pause'|'fin', audio)` remplace toutes les opacités du moteur de
+    voix. Les mots sont enveloppés en `.km` (textContent intact) et se
+    colorent au fil de l'enregistrement (repères `_BORNES`) ; l'élément
+    grossit de 3,5 % (pas un grand bloc). Couleurs par profil.
+  * **GRANDS ÉCRANS** : `zoom` sur #root = min(L/430, H/740 — 650 en
+    paysage), entre 1 et 1,9, recalculé au redimensionnement / à la
+    rotation ; largeur et hauteur de #root compensées en px. En paysage,
+    #ca et le menu en colonne de 860 px. Vérifié : le tracé du canevas
+    tombe exactement sous le doigt (Chrome). À SURVEILLER sur Safari/iPad
+    (zoom non standard là-bas). `window._zoomApp` donne le facteur.
+  * **Carte des 3-5 ans** : plus de paysage ni de cadre, plus de nom ni de
+    lettres sous les médaillons ; la carte est dimensionnée pour TENIR en
+    hauteur (`poseLeRepere`, aspect-ratio — le % de padding se rapportait
+    au parent), au moins 60 % de la largeur sur téléphone couché.
+  * **Jeux 6-11 ans** : cartes qui s'allongent (titres qui sortaient),
+    mention « verrouillé » en pastille lisible, « Carte des îles » en carte
+    3D ; glyphes blancs memory / puzzle / carte dans `_GLYPHE3D`.
+  * **Bonus en texte** : les 4 dernières images (soukoun, wasla ×2, Allah)
+    refaites en texte du Mushaf (ۡ ۟ ۠ ٰ …) avec les mêmes surlignages
+    (`_versetBonus`, `.hl-violet/jaune/rose/rouge/vert/bleu`).
+  * Mot des 200 questions à 3,3 rem.
+  * 200 questions : le client avait lancé la génération avec l'ANCIENNE
+    liste (pseudo-mots) ; la nouvelle est sur son PC — à relancer.
 
 - **v3.2.9 (18 octobre) — retour du TÉLÉPHONE.** Le client : retour depuis
   un cours bonus → les leçons normales. Cause : la sous-page bonus ne

@@ -1,0 +1,153 @@
+<!-- ════════════════════════════════════════════════════════════════════
+     v3.3.0 (18 octobre) — source : outils/refonte-v330.html, copiée TELLE
+     QUELLE dans app/app.html juste après le bloc v3.2.3.
+     1. LE TEXTE LU : plus d'assombrissement (opacité 0,6 / 0,4). Le client :
+        « je préfère que le texte change de couleur pendant qu'il est lu ».
+        Les mots se colorent un à un au fil de la voix (karaoké), calés sur
+        la durée réelle de l'enregistrement (repères `_BORNES`, comme la
+        reprise de la v3.2.1) ; en pause, la couleur s'arrête où on en est.
+        Les mots sont enveloppés dans des <span class="km"> : le TEXTE de
+        l'élément ne change pas (il sert de clé aux enregistrements).
+     2. GRANDS ÉCRANS (tablette, ordinateur) : tout était à la taille d'un
+        téléphone — un petit mot au milieu d'un grand vide. L'application est
+        AGRANDIE en entier (`zoom` sur #root) selon la place disponible :
+        z = min(largeur / 430, hauteur / 740 — 650 en paysage), entre 1 et 1,9 ; recalculé à
+        chaque changement de taille ou d'ORIENTATION. En paysage, le contenu
+        est centré dans une colonne de 860 px (avant agrandissement).
+        Téléphones (moins de 700 px de large) : rien ne change.
+     ════════════════════════════════════════════════════════════════════ -->
+<style>
+html.grand-ecran #root{right:auto;bottom:auto}
+html.grand-ecran.paysage #ca,html.grand-ecran.paysage #menu-nav{max-width:860px;margin-left:auto;margin-right:auto;width:100%}
+/* le mot à lire des 200 questions, plus grand partout */
+#ca .q-big{font-size:3.3rem!important;line-height:1.7!important}
+/* 3 — LA CARTE DES 3-5 ANS : plus de cadre ni de paysage derrière les
+   animaux — le chemin et les médaillons seulement ; plus de nom ni de
+   lettres sous les médaillons (inutile à cet âge, dit le client). La
+   colonne s'élargit à tout l'écran ; la largeur de la carte est réglée par
+   le code pour qu'elle tienne en hauteur. */
+body.age-petit .sess-map-wrap{max-width:none}
+body.age-petit .carte-monde{background:none!important;border:0!important;box-shadow:none!important;
+  border-radius:0!important;overflow:visible!important;rotate:none!important;animation:carteApparait2 .6s both}
+@keyframes carteApparait2{from{opacity:0}to{opacity:1}}
+body.age-petit .carte-nom{display:none!important}
+body.age-petit .carte-sentier .sol{stroke:#f2dfb0;stroke-width:7}
+body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
+/* 4 — LES JEUX (6-11 ans) : la carte s'allonge avec son texte (le titre
+   sortait par le haut, la mention « verrouillé » par le bas) ; la mention
+   est une pastille lisible ; « Carte des îles » devient une carte 3D. */
+#root .mg-list-wrap .nav-card{height:auto!important;min-height:96px!important;padding:16px 14px!important;align-items:center!important}
+#root .mg-list-wrap .nav-text{min-width:0;flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+#root .mg-list-wrap .nav-title{white-space:normal!important;line-height:1.2!important;position:static!important;transform:none!important;margin:0!important}
+#root .mg-list-wrap .nav-desc{white-space:normal!important;line-height:1.35!important;position:static!important}
+#root .mg-verrou{display:inline-flex;align-items:center;gap:4px;margin-top:4px;font-size:.72rem;font-weight:700;
+  padding:3px 9px;border-radius:99px;background:rgba(0,0,0,.08);color:var(--m-desc,#555)}
+#root.profile-boy .mg-verrou{background:rgba(255,255,255,.12);color:rgba(220,235,255,.85)}
+#root .mg-list-wrap .nav-card[data-jeu="carte"]{min-height:76px!important;margin-top:6px}
+#root .mg-list-wrap .nav-card[data-jeu="carte"] .nav-title{font-size:1.12rem!important}
+/* le texte en cours de lecture : un rien plus grand, la couleur avance */
+.lit-en-cours{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+.lit-en-cours:not(.lit-bloc){transform:scale(1.035)}
+.km{transition:color .25s ease,text-shadow .25s ease}
+.km.km-lu{color:#b45309;-webkit-text-fill-color:#b45309}
+.km.km-ici{color:#e8a020;-webkit-text-fill-color:#e8a020;text-shadow:0 0 12px rgba(232,160,32,.45)}
+#root.profile-girl .km.km-lu{color:#be185d;-webkit-text-fill-color:#be185d}
+#root.profile-girl .km.km-ici{color:#ec4899;-webkit-text-fill-color:#ec4899;text-shadow:0 0 12px rgba(236,72,153,.4)}
+#root.profile-boy .km.km-lu{color:#1d4ed8;-webkit-text-fill-color:#1d4ed8}
+#root.profile-boy .km.km-ici{color:#0ea5e9;-webkit-text-fill-color:#0ea5e9;text-shadow:0 0 12px rgba(14,165,233,.4)}
+@media (prefers-reduced-motion:reduce){.lit-en-cours:not(.lit-bloc){transform:none}}
+</style>
+<script>
+(function(){
+  /* ── 4. Glyphes blancs des gemmes : les jeux et la carte des îles ── */
+  function glyphes(){
+    if(!window._GLYPHE3D){setTimeout(glyphes,200);return;}
+    function g(d){return '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>';}
+    _GLYPHE3D.memory=g('<rect x="3" y="5" width="9" height="13" rx="2" transform="rotate(-8 7.5 11.5)" fill="rgba(255,255,255,.22)"/><rect x="12" y="6" width="9" height="13" rx="2" transform="rotate(8 16.5 12.5)"/><path d="M15.2 10.8l1.5 1.5-1.5 1.5-1.5-1.5z" fill="#fff"/>');
+    _GLYPHE3D.puzzle=g('<path d="M5 9h3a2 2 0 114 0h3v3a2 2 0 110 4v3H5v-3a2 2 0 100-4z" fill="rgba(255,255,255,.22)"/><path d="M15 9V5h4v4"/>');
+    _GLYPHE3D.carte=g('<path d="M3 6.5l5.5-2 7 2.5 5.5-2v13l-5.5 2-7-2.5-5.5 2z" fill="rgba(255,255,255,.18)"/><path d="M8.5 4.5v13M15.5 7v13"/><circle cx="12" cy="11" r="1.6" fill="#fff" stroke="none"/>');
+  }
+  glyphes();
+  /* ── 2. L'AGRANDISSEMENT SELON L'ÉCRAN ── */
+  function taille(){
+    var r=document.getElementById('root');if(!r)return;
+    var W=innerWidth,H=innerHeight,h=document.documentElement;
+    var z=(W>=700&&H>=520)?Math.max(1,Math.min(1.9,W/430,H/(W>H?650:740))):1;
+    z=Math.round(z*100)/100;
+    h.classList.toggle('grand-ecran',z>1);
+    h.classList.toggle('paysage',W>H);
+    if(z>1){r.style.zoom=z;r.style.width=(W/z)+'px';r.style.height=(H/z)+'px';}
+    else{r.style.zoom='';r.style.width='';r.style.height='';}
+    window._zoomApp=z;
+  }
+  var tz=null;
+  function plusTard(){clearTimeout(tz);tz=setTimeout(taille,120);}
+  addEventListener('resize',plusTard);addEventListener('orientationchange',plusTard);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',taille);else taille();
+})();
+(function(){
+  var EXCLU='script,style,textarea,input,svg,canvas,.km';
+  /* découpe une fois les textes de l'élément en mots (espaces gardés tels quels) */
+  function mots(el){
+    if(el._km&&el._km.length&&el._km[0].isConnected&&el.contains(el._km[0]))return el._km;
+    var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),L=[],n;
+    while((n=w.nextNode())){var p=n.parentElement;if(!p||p.closest(EXCLU)||!/\S/.test(n.nodeValue))continue;L.push(n);}
+    var out=[];
+    L.forEach(function(t){
+      var parts=t.nodeValue.split(/(\s+)/),f=document.createDocumentFragment();
+      parts.forEach(function(x){
+        if(!x)return;
+        if(/^\s+$/.test(x)){f.appendChild(document.createTextNode(x));return;}
+        var s=document.createElement('span');s.className='km';s.textContent=x;f.appendChild(s);out.push(s);
+      });
+      t.parentNode.replaceChild(f,t);
+    });
+    el._km=out;
+    var tot=0;out.forEach(function(s){s._d=tot;tot+=s.textContent.length+1;s._f=tot;});el._kmTot=tot||1;
+    return out;
+  }
+  function efface(el){
+    (el._km||[]).forEach(function(s){s.classList.remove('km-lu','km-ici');});
+  }
+  function boucle(el){
+    cancelAnimationFrame(el._kmRaf);
+    var a=el._kmA;if(!a)return;
+    (function pas(){
+      if(!el.classList.contains('lit-en-cours'))return;
+      var b=(window._BORNES&&_BORNES[a.currentSrc||a.src])||{};
+      var d0=b.d||0,d1=(b.f&&b.f>d0)?b.f:(a.duration||0);
+      if(d1>d0){
+        var p=Math.max(0,Math.min(1,(a.currentTime-d0)/(d1-d0))),pos=p*el._kmTot;
+        el._km.forEach(function(s){
+          var lu=s._f<=pos,ici=!lu&&s._d<=pos;
+          s.classList.toggle('km-lu',lu);s.classList.toggle('km-ici',ici);
+        });
+      }
+      if(!a.paused&&!a.ended)el._kmRaf=requestAnimationFrame(pas);
+    })();
+  }
+  window._lecture=function(el,etat,audio){
+    if(!el||!el.classList)return;
+    try{el.style.opacity='';}catch(e){}
+    if(etat==='fin'){
+      cancelAnimationFrame(el._kmRaf);
+      el.classList.remove('lit-en-cours');
+      /* la phrase finit toute colorée, puis reprend sa couleur */
+      (el._km||[]).forEach(function(s){s.classList.add('km-lu');s.classList.remove('km-ici');});
+      clearTimeout(el._kmT);el._kmT=setTimeout(function(){efface(el);},700);
+      return;
+    }
+    clearTimeout(el._kmT);
+    el.classList.add('lit-en-cours');
+    /* un grand bloc ne grossit pas (il bougerait toute la page) */
+    el.classList.toggle('lit-bloc',el.offsetHeight>140||el.offsetWidth>(innerWidth*0.92));
+    if(etat==='pause'){cancelAnimationFrame(el._kmRaf);return;}
+    if(audio){
+      try{mots(el);}catch(e){return;}
+      if(el._kmA!==audio){efface(el);el._kmA=audio;
+        audio.addEventListener('play',function(){if(el._kmA===audio)boucle(el);});}
+      boucle(el);
+    }
+  };
+})();
+</script>
