@@ -183,7 +183,24 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.2.5), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.2.6), du plus récent au plus ancien :**
+
+- **v3.2.6 (18 octobre) — retouches du client.** « Mon parcours » et
+  « رِحْلَتِي » en blanc, remontés (les points du ي touchaient les pastilles).
+  « Changer d'interface » : icône et texte centrés ensemble. Arabe dans une
+  phrase : un signe seul est posé sur un tatwîl (ـ) en gras, plus de cercle
+  pointillé ; les mots de 4 lettres et plus à 1,4 em (مُفَخَّمَةٌ…). Bonus
+  solaires/lunaires : le signe ْ au lieu du mot سُكُون (affichage seulement,
+  la voix garde sa clé). **« الله » affiché SANS chadda ni fatha** (la police
+  Scheherazade dessine elle-même chadda et petit alif ; écrites en plus,
+  elles faisaient doublon) — transformation à l'affichage dans `#ca`
+  (`allah()` du bloc v3.2.3), et `_clesSon` cherche aussi la clé écrite
+  avec اللَّه. **ALERTE : Brevo refusait l'envoi** (« unrecognised IP
+  address » — Vercel change d'adresse) : le client doit désactiver le
+  blocage par IP dans Brevo (Sécurité → IP autorisées) ; cela touche AUSSI
+  les autres e-mails du site. Ajout de Telegram (`TELEGRAM_TOKEN`,
+  `TELEGRAM_CHAT_ID`, la capture envoyée comme photo). Le refus renvoie
+  maintenant 500 avec ses raisons (un 502 était masqué par Cloudflare).
 
 - **v3.2.5 (18 octobre) — DE VRAIS MOTS.** Le client : « pourquoi ne
   remplaces-tu pas les mots inventés par de vrais mots ? Commence par des

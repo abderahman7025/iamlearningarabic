@@ -19,7 +19,11 @@ const { sendEmail } = require('./_brevo');
  *   CALLMEBOT_APIKEY   — clé CallMeBot, pour le WhatsApp
  *   ALERTE_WHATSAPP    — le numéro qui reçoit, au format international
  *                        (+33612345678)
- *   Sans les deux dernières, l'alerte part par e-mail seulement.
+ *   TELEGRAM_TOKEN     — jeton du bot (@BotFather)
+ *   TELEGRAM_CHAT_ID   — la discussion qui reçoit (getUpdates)
+ *   Chaque canal configuré reçoit l'alerte ; l'e-mail part toujours.
+ *   BREVO : l'envoi exige que le blocage par adresse IP soit DÉSACTIVÉ dans
+ *   Brevo (Sécurité → IP autorisées) — Vercel change d'adresse à chaque appel.
  *
  * La capture va dans le bucket Supabase « alertes » (créé au premier envoi,
  * public — le lien est envoyé au propriétaire ; le nom est aléatoire).
@@ -84,7 +88,26 @@ module.exports = async function alerte(req, res, ip) {
       '&text=' + encodeURIComponent(texte) + '&apikey=' + encodeURIComponent(process.env.CALLMEBOT_APIKEY);
     envois.push(fetch(u).then((r) => { if (!r.ok) throw new Error('callmebot ' + r.status); return 'whatsapp'; }));
   }
-  /* 2. E-mail (Brevo), toujours : la capture y est visible directement, et
+  /* 2. Telegram (bot) — la VRAIE image dans la discussion, le texte en
+        légende. TELEGRAM_TOKEN (donné par @BotFather) et TELEGRAM_CHAT_ID. */
+  if (process.env.TELEGRAM_TOKEN && process.env.TELEGRAM_CHAT_ID) {
+    const legende = ('🔔 Alerte iamlearningarabic\nDe : ' + email + '\nPage : ' + page +
+      (profil ? ' (' + profil + ')' : '') + (message ? '\nMessage : ' + message : '')).slice(0, 1000);
+    const base = 'https://api.telegram.org/bot' + process.env.TELEGRAM_TOKEN;
+    let envoi;
+    if (m) {
+      const fd = new FormData();
+      fd.append('chat_id', process.env.TELEGRAM_CHAT_ID);
+      fd.append('caption', legende);
+      fd.append('photo', new Blob([Buffer.from(m[2], 'base64')], { type: 'image/' + m[1] }), 'capture.' + (m[1] === 'png' ? 'png' : 'jpg'));
+      envoi = fetch(base + '/sendPhoto', { method: 'POST', body: fd });
+    } else {
+      envoi = fetch(base + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text: legende }) });
+    }
+    envois.push(envoi.then(async (r) => { if (!r.ok) throw new Error('telegram ' + r.status + ' ' + (await r.text()).slice(0, 120)); return 'telegram'; }));
+  }
+  /* 3. E-mail (Brevo), toujours : la capture y est visible directement, et
         « Répondre » écrit à l'élève. */
   envois.push(sendEmail({
     to: process.env.ALERTE_EMAIL || 'contact@iamlearningarabic.com',
