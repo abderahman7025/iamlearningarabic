@@ -264,7 +264,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
     AL.auto=true;
     try{e.onclick.call(e,Object.assign({currentTarget:e,target:e},faux));}catch(x){}
     AL.auto=false;
-    surligne(e);AL.attente=Date.now();
+    surligne(e);AL.attente=Date.now();AL.relance=0;
   }
   /* La surveillance : fin d'un texte → le suivant ; un clic sur un autre
      texte de la liste → on continue À PARTIR de lui ; pause → on attend. */
@@ -274,7 +274,12 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
     var e=AL.q[AL.i];
     if(!e||!e.isConnected||!st.soundOn||!adulte()){arret();return;}
     if(typeof _rec==='undefined')return;
-    if(_rec.el===e){surligne(e);return;}                 // en cours, ou en pause
+    if(_rec.el===e){surligne(e);                         // en cours, ou en pause
+      /* v3.4.3 — le téléphone a refusé de démarrer le son (premier de la
+         page) : on réessaie une fois, sans rester bloqué dessus. */
+      try{var a=_rec.a;if(a&&a.paused&&!_rec.paused&&a.currentTime<0.3&&Date.now()-AL.attente>1500&&!AL.relance){
+        AL.relance=1;var pr=a.play();if(pr&&pr['catch'])pr['catch'](function(){});}}catch(x){}
+      return;}
     if(_rec.el){var j=AL.q.indexOf(_rec.el);
       if(j>=0){AL.i=j;AL.cur=_rec.el;surligne(_rec.el);}
       return;}                                           // l'élève écoute autre chose

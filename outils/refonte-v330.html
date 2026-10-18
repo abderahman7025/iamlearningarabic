@@ -103,7 +103,11 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
       t.parentNode.replaceChild(f,t);
     });
     el._km=out;
-    var tot=0;out.forEach(function(s){s._d=tot;tot+=s.textContent.length+1;s._f=tot;});el._kmTot=tot||1;
+    /* v3.4.3 — ﷺ et ﷻ : un signe à l'écran, mais une longue formule dite
+       (ṣallā llāhu ʿalayhi wa sallam, jalla jalāluhu) ; comptés comme tels,
+       sinon la couleur filait trop vite au mot suivant. */
+    function poids(x){return x.length+(x.match(/\uFDFA/g)||[]).length*30+(x.match(/\uFDFB/g)||[]).length*16;}
+    var tot=0;out.forEach(function(s){s._d=tot;tot+=poids(s.textContent)+1;s._f=tot;});el._kmTot=tot||1;
     return out;
   }
   function efface(el){

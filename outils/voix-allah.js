@@ -40,9 +40,12 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
   if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
 });
 const VOIX = 'Wm3eSTpNFfFtDgCxf6AU'; // Narrateur
-const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'voix-allah.json'), 'utf8'));
+/* v3.4.3 : une autre liste en argument (node outils/voix-allah.js voix-correction.json),
+   rangée dans son propre dossier — les fichiers déjà faits ne sont pas repris. */
+const NOM = (process.argv.slice(2).find((a) => a.endsWith('.json')) || 'voix-allah.json');
+const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, NOM), 'utf8'));
 const sansDepot = process.argv.includes('--sans-depot');
-const dest = path.join(__dirname, 'captures', 'voix-allah');
+const dest = path.join(__dirname, 'captures', NOM.replace(/\.json$/, ''));
 fs.mkdirSync(dest, { recursive: true });
 
 (async () => {

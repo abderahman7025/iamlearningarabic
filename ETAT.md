@@ -183,7 +183,17 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.2), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.3), du plus récent au plus ancien :**
+
+- **v3.4.3 (18 octobre)** — fin de l'introduction : « …en cliquant sur le
+  bouton "Alerter" ou via la rubrique "contact"… » (12 langues). Un son que
+  le téléphone n'a jamais démarré (lecture automatique refusée) : le clic le
+  LANCE au lieu de le « mettre en pause » ; la lecture auto réessaie une
+  fois. Karaoké : ﷺ compte 30 caractères, ﷻ 16. VOIX : ﷺ traduit en
+  français par la voix quand on lui écrivait صَلَّى اللَّهُ… → on lui laisse
+  le signe ﷺ (elle dit la formule en arabe, comme avant).
+  `outils/voix-correction.json` (60 textes, ~18 000 car.) :
+  `node outils/voix-allah.js voix-correction.json`.
 
 - **v3.4.2 (18 octobre)** — sans l'ourdou : « 13 langues » → « 12 langues »
   partout (accueil public/index.html et app, toutes langues, 34 endroits) ;
