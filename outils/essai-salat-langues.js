@@ -16,7 +16,9 @@ const dest = path.join(__dirname, 'captures', 'essai-salat');
 fs.mkdirSync(dest, { recursive: true });
 (async () => {
   for (const x of LISTE) {
-    const f = path.join(dest, 'l-' + x.langue + '.mp3');
+    if (process.argv[2] && x.langue !== process.argv[2]) continue;
+    x.f = 'l-' + x.langue + '-' + Buffer.from(x.texte).toString('hex').slice(-16) + '.mp3';
+    const f = path.join(dest, x.f);
     if (fs.existsSync(f)) continue;
     const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + VOIX + '?output_format=mp3_44100_128', {
       method: 'POST', headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
@@ -28,7 +30,8 @@ fs.mkdirSync(dest, { recursive: true });
     console.log('ok', x.langue);
   }
   let h = '<!doctype html><meta charset="utf-8"><title>ﷺ langues</title><body style="font-family:system-ui;background:#fdf8ee;padding:20px;max-width:640px;margin:auto"><h2>ﷺ : la formule est-elle bien dite ?</h2>';
-  for (const x of LISTE) h += '<p style="background:#fff;padding:12px 16px;border-radius:12px"><b>' + NOMS[x.langue] + '</b><br><small>' + x.texte + '</small><br><audio controls src="l-' + x.langue + '.mp3"></audio></p>';
+  const seul = process.argv[2];
+  for (const x of LISTE) if (!seul || x.langue === seul) h += '<p style="background:#fff;padding:12px 16px;border-radius:12px"><b>' + NOMS[x.langue] + '</b><br><small>' + x.texte + '</small><br><audio controls src="' + x.f + '"></audio></p>';
   fs.writeFileSync(path.join(dest, 'ecoute-langues.html'), h);
   console.log('\nTermine. La page s\'ouvre dans Chrome.');
   require('child_process').exec('start chrome "' + path.join(dest, 'ecoute-langues.html') + '"');
