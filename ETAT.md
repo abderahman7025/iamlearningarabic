@@ -183,7 +183,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.5), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.6), du plus récent au plus ancien :**
+
+- **v3.3.6 (18 octobre)** — le client : retour à la v3.3.3. Les essais
+  v3.3.4 (fond coloré + motif par rubrique) et v3.3.5 (l'or teinté à la
+  couleur de la rubrique) sont RETIRÉS de app.html ; leurs blocs restent
+  dans outils/refonte-v334.html et refonte-v335.html si on y revient.
 
 - **v3.3.5 (18 octobre) — bloc `outils/refonte-v335.html`** (après v3.3.4),
   ESSAI : dans chaque rubrique adulte, tout ce qui est doré prend la couleur
