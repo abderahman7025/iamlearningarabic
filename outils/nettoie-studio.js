@@ -1,0 +1,83 @@
+/*
+ * NETTOYER ET MONTER LE VOLUME des sons du studio — À NE PAS DÉPLOYER.
+ * Gratuit : tout se fait sur l'ordinateur avec ffmpeg (paquet ffmpeg-static,
+ * installé par le .bat). Aucune IA, aucun crédit : c'est TA voix, nettoyée.
+ *
+ *   node outils/nettoie-studio.js            → traite les 373 sons, rien en ligne
+ *   node outils/nettoie-studio.js --depot    → et les met en ligne (après accord)
+ *
+ * Pour chaque son arabe du studio (outils/sons-studio.json, tiré de
+ * ADMIN_SOUNDS) :
+ *   1. on retire les graves sourds (< 70 Hz : souffle, chocs du micro) et les
+ *      aigus inutiles (> 11 kHz), puis le BRUIT DE FOND (afftdn, débruitage
+ *      par spectre) ;
+ *   2. on mesure le point le plus fort, et l'on monte le tout jusqu'à -1 dB
+ *      (le maximum sans saturer), un limiteur en sécurité.
+ * Avant / après : outils/captures/studio-propre/, page ecoute-propre.html.
+ */
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
+let FF;
+try { FF = require('ffmpeg-static'); } catch (e) { console.log('ffmpeg-static manquant : npm i --no-save ffmpeg-static'); process.exit(1); }
+
+const env = {};
+try { fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/).forEach((l) => {
+  const m = l.match(/^([A-Z_]+)=(.*)$/); if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, ''); }); } catch (e) {}
+const depot = process.argv.includes('--depot');
+const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, 'sons-studio.json'), 'utf8'));
+const dest = path.join(__dirname, 'captures', 'studio-propre');
+const avant = path.join(dest, 'avant'), apres = path.join(dest, 'apres');
+[avant, apres].forEach((d) => fs.mkdirSync(d, { recursive: true }));
+const hex = (s) => Buffer.from(s).toString('hex');
+function ff(args) { return execFileSync(FF, ['-hide_banner', '-loglevel', 'info', '-y'].concat(args), { stdio: ['ignore', 'pipe', 'pipe'] }); }
+function picVolume(fichier) {
+  const r = require('child_process').spawnSync(FF, ['-hide_banner', '-i', fichier, '-af', 'volumedetect', '-f', 'null', '-'], { encoding: 'utf8' });
+  const m = /max_volume:\s*(-?[\d.]+) dB/.exec(r.stderr || '');
+  return m ? parseFloat(m[1]) : null;
+}
+
+(async () => {
+  const urls = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {};
+  let ok = 0, absents = 0, echecs = 0;
+  const lignes = [];
+  for (const s of LISTE) {
+    const url = urls[s.ar];
+    if (!url) { absents++; continue; }
+    const h = hex(s.ar).slice(0, 100);
+    const ext = (url.split('?')[0].match(/\.(\w+)$/) || [, 'webm'])[1];
+    const fa = path.join(avant, h + '.' + ext), tmp = path.join(apres, h + '.tmp.wav'), fp = path.join(apres, h + '.mp3');
+    try {
+      if (!fs.existsSync(fa)) fs.writeFileSync(fa, Buffer.from(await (await fetch(url)).arrayBuffer()));
+      if (!fs.existsSync(fp)) {
+        ff(['-i', fa, '-af', 'highpass=f=70,lowpass=f=11000,afftdn=nr=14:nf=-38', '-ac', '1', '-ar', '44100', tmp]);
+        const p = picVolume(tmp);
+        const gain = p === null ? 0 : Math.max(0, Math.min(24, -1 - p));
+        ff(['-i', tmp, '-af', 'volume=' + gain.toFixed(1) + 'dB,alimiter=limit=0.95:level=false', '-b:a', '128k', fp]);
+        fs.unlinkSync(tmp);
+        console.log('ok', s.label, '(+' + gain.toFixed(1) + ' dB)');
+      }
+      if (depot) {
+        const r = await fetch('https://iamlearningarabic.com/api/audio', { method: 'POST',
+          headers: { Authorization: 'Bearer ' + env.ADMIN_SECRET, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ar: s.ar, audioBase64: fs.readFileSync(fp).toString('base64') }) });
+        if (!r.ok) throw new Error('depot ' + r.status);
+      }
+      ok++;
+      lignes.push({ s, a: 'avant/' + path.basename(fa), p: 'apres/' + path.basename(fp) });
+    } catch (e) { echecs++; console.log('ECHEC', s.label, String(e.message).slice(0, 160)); try { fs.unlinkSync(tmp); } catch (x) {} }
+  }
+  const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  let html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ta voix nettoyée</title>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap" rel="stylesheet"><style>'
+    + 'body{margin:0;font-family:system-ui,sans-serif;background:#fdf8ee;color:#3a2600;padding:16px}h1{font-size:1.3rem;margin:0 0 4px}p{margin:0 0 14px;opacity:.75;font-size:.9rem}'
+    + '.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}.s{background:#fff;border:1px solid #f0e2bd;border-radius:12px;padding:6px 8px;text-align:center}'
+    + '.a{font:700 1.9rem "Scheherazade New",serif;line-height:1.3}.lat{font-size:.72rem;opacity:.7;min-height:1.2em}'
+    + 'button{border:0;border-radius:99px;padding:5px 10px;margin:3px 2px 0;font-weight:700;cursor:pointer;font-size:.78rem}.av{background:#94a3b8;color:#fff}.ap{background:#16a34a;color:#fff}'
+    + '</style></head><body><h1>Ta voix : avant / après nettoyage</h1><p>Gris = avant (en ligne aujourd\'hui). Vert = après : bruit de fond retiré, volume monté. Rien n\'est encore en ligne.</p><div class="g">';
+  for (const x of lignes) html += '<div class="s"><div class="a">' + esc(x.s.ar) + '</div><div class="lat">' + esc(x.s.label) + '</div>'
+    + '<button class="av" onclick="j(\'' + esc(x.a) + '\')">Avant</button><button class="ap" onclick="j(\'' + esc(x.p) + '\')">Après</button></div>';
+  html += '</div><script>var A=new Audio();function j(u){A.pause();A.src=u;A.play();}</script></body></html>';
+  fs.writeFileSync(path.join(dest, 'ecoute-propre.html'), html);
+  console.log('\nTermine :', ok, 'sons,', echecs, 'echec(s),', absents, 'absents du site.', depot ? 'Mis en ligne.' : 'Rien n\'a ete mis en ligne.');
+})();

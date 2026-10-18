@@ -1,0 +1,1494 @@
+[
+{
+"ar": "اَ",
+"label": "voyelle seule : a  (اَ)"
+},
+{
+"ar": "اِ",
+"label": "voyelle seule : i  (اِ)"
+},
+{
+"ar": "اُ",
+"label": "voyelle seule : ou (اُ)"
+},
+{
+"ar": "اً",
+"label": "voyelle doublée : an  (اً)"
+},
+{
+"ar": "اٍ",
+"label": "voyelle doublée : in  (اٍ)"
+},
+{
+"ar": "اٌ",
+"label": "voyelle doublée : oun (اٌ)"
+},
+{
+"ar": "ا",
+"label": "alif"
+},
+{
+"ar": "آ",
+"label": "ā"
+},
+{
+"ar": "ب",
+"label": "ba"
+},
+{
+"ar": "بَ",
+"label": "ba"
+},
+{
+"ar": "بَا",
+"label": "bā"
+},
+{
+"ar": "بً",
+"label": "ban"
+},
+{
+"ar": "بُ",
+"label": "bu"
+},
+{
+"ar": "بُو",
+"label": "bū"
+},
+{
+"ar": "بٌ",
+"label": "bun"
+},
+{
+"ar": "بِ",
+"label": "bi"
+},
+{
+"ar": "بِي",
+"label": "bī"
+},
+{
+"ar": "بٍ",
+"label": "bin"
+},
+{
+"ar": "بْ",
+"label": "b (soukoun)"
+},
+{
+"ar": "ت",
+"label": "ta"
+},
+{
+"ar": "تَ",
+"label": "ta"
+},
+{
+"ar": "تَا",
+"label": "tā"
+},
+{
+"ar": "تً",
+"label": "tan"
+},
+{
+"ar": "تُ",
+"label": "tu"
+},
+{
+"ar": "تُو",
+"label": "tū"
+},
+{
+"ar": "تٌ",
+"label": "tun"
+},
+{
+"ar": "تِ",
+"label": "ti"
+},
+{
+"ar": "تِي",
+"label": "tī"
+},
+{
+"ar": "تٍ",
+"label": "tin"
+},
+{
+"ar": "تْ",
+"label": "t (soukoun)"
+},
+{
+"ar": "ث",
+"label": "tha"
+},
+{
+"ar": "ثَ",
+"label": "tha"
+},
+{
+"ar": "ثَا",
+"label": "thā"
+},
+{
+"ar": "ثً",
+"label": "than"
+},
+{
+"ar": "ثُ",
+"label": "thu"
+},
+{
+"ar": "ثُو",
+"label": "thū"
+},
+{
+"ar": "ثٌ",
+"label": "thun"
+},
+{
+"ar": "ثِ",
+"label": "thi"
+},
+{
+"ar": "ثِي",
+"label": "thī"
+},
+{
+"ar": "ثٍ",
+"label": "thin"
+},
+{
+"ar": "ثْ",
+"label": "th (soukoun)"
+},
+{
+"ar": "ج",
+"label": "djim"
+},
+{
+"ar": "جَ",
+"label": "dja"
+},
+{
+"ar": "جَا",
+"label": "djā"
+},
+{
+"ar": "جً",
+"label": "djan"
+},
+{
+"ar": "جُ",
+"label": "dju"
+},
+{
+"ar": "جُو",
+"label": "djū"
+},
+{
+"ar": "جٌ",
+"label": "djun"
+},
+{
+"ar": "جِ",
+"label": "dji"
+},
+{
+"ar": "جِي",
+"label": "djī"
+},
+{
+"ar": "جٍ",
+"label": "djin"
+},
+{
+"ar": "جْ",
+"label": "dj (soukoun)"
+},
+{
+"ar": "ح",
+"label": "Ha"
+},
+{
+"ar": "حَ",
+"label": "Ha"
+},
+{
+"ar": "حَا",
+"label": "Hā"
+},
+{
+"ar": "حً",
+"label": "Han"
+},
+{
+"ar": "حُ",
+"label": "Hu"
+},
+{
+"ar": "حُو",
+"label": "Hū"
+},
+{
+"ar": "حٌ",
+"label": "Hun"
+},
+{
+"ar": "حِ",
+"label": "Hi"
+},
+{
+"ar": "حِي",
+"label": "Hī"
+},
+{
+"ar": "حٍ",
+"label": "Hin"
+},
+{
+"ar": "حْ",
+"label": "H (soukoun)"
+},
+{
+"ar": "خ",
+"label": "kha"
+},
+{
+"ar": "خَ",
+"label": "kha"
+},
+{
+"ar": "خَا",
+"label": "khā"
+},
+{
+"ar": "خً",
+"label": "khan"
+},
+{
+"ar": "خُ",
+"label": "khu"
+},
+{
+"ar": "خُو",
+"label": "khū"
+},
+{
+"ar": "خٌ",
+"label": "khun"
+},
+{
+"ar": "خِ",
+"label": "khi"
+},
+{
+"ar": "خِي",
+"label": "khī"
+},
+{
+"ar": "خٍ",
+"label": "khin"
+},
+{
+"ar": "خْ",
+"label": "kh (soukoun)"
+},
+{
+"ar": "د",
+"label": "dal"
+},
+{
+"ar": "دَ",
+"label": "da"
+},
+{
+"ar": "دَا",
+"label": "dā"
+},
+{
+"ar": "دً",
+"label": "dan"
+},
+{
+"ar": "دُ",
+"label": "du"
+},
+{
+"ar": "دُو",
+"label": "dū"
+},
+{
+"ar": "دٌ",
+"label": "dun"
+},
+{
+"ar": "دِ",
+"label": "di"
+},
+{
+"ar": "دِي",
+"label": "dī"
+},
+{
+"ar": "دٍ",
+"label": "din"
+},
+{
+"ar": "دْ",
+"label": "d (soukoun)"
+},
+{
+"ar": "ذ",
+"label": "dhal"
+},
+{
+"ar": "ذَ",
+"label": "dha"
+},
+{
+"ar": "ذَا",
+"label": "dhā"
+},
+{
+"ar": "ذً",
+"label": "dhan"
+},
+{
+"ar": "ذُ",
+"label": "dhu"
+},
+{
+"ar": "ذُو",
+"label": "dhū"
+},
+{
+"ar": "ذٌ",
+"label": "dhun"
+},
+{
+"ar": "ذِ",
+"label": "dhi"
+},
+{
+"ar": "ذِي",
+"label": "dhī"
+},
+{
+"ar": "ذٍ",
+"label": "dhin"
+},
+{
+"ar": "ذْ",
+"label": "dh (soukoun)"
+},
+{
+"ar": "ر",
+"label": "ra"
+},
+{
+"ar": "رَ",
+"label": "ra"
+},
+{
+"ar": "رَا",
+"label": "rā"
+},
+{
+"ar": "رً",
+"label": "ran"
+},
+{
+"ar": "رُ",
+"label": "ru"
+},
+{
+"ar": "رُو",
+"label": "rū"
+},
+{
+"ar": "رٌ",
+"label": "run"
+},
+{
+"ar": "رِ",
+"label": "ri"
+},
+{
+"ar": "رِي",
+"label": "rī"
+},
+{
+"ar": "رٍ",
+"label": "rin"
+},
+{
+"ar": "رْ",
+"label": "r (soukoun)"
+},
+{
+"ar": "ز",
+"label": "zay"
+},
+{
+"ar": "زَ",
+"label": "za"
+},
+{
+"ar": "زَا",
+"label": "zā"
+},
+{
+"ar": "زً",
+"label": "zan"
+},
+{
+"ar": "زُ",
+"label": "zu"
+},
+{
+"ar": "زُو",
+"label": "zū"
+},
+{
+"ar": "زٌ",
+"label": "zun"
+},
+{
+"ar": "زِ",
+"label": "zi"
+},
+{
+"ar": "زِي",
+"label": "zī"
+},
+{
+"ar": "زٍ",
+"label": "zin"
+},
+{
+"ar": "زْ",
+"label": "z (soukoun)"
+},
+{
+"ar": "س",
+"label": "sin"
+},
+{
+"ar": "سَ",
+"label": "sa"
+},
+{
+"ar": "سَا",
+"label": "sā"
+},
+{
+"ar": "سً",
+"label": "san"
+},
+{
+"ar": "سُ",
+"label": "su"
+},
+{
+"ar": "سُو",
+"label": "sū"
+},
+{
+"ar": "سٌ",
+"label": "sun"
+},
+{
+"ar": "سِ",
+"label": "si"
+},
+{
+"ar": "سِي",
+"label": "sī"
+},
+{
+"ar": "سٍ",
+"label": "sin"
+},
+{
+"ar": "سْ",
+"label": "s (soukoun)"
+},
+{
+"ar": "ش",
+"label": "chin"
+},
+{
+"ar": "شَ",
+"label": "cha"
+},
+{
+"ar": "شَا",
+"label": "chā"
+},
+{
+"ar": "شً",
+"label": "chan"
+},
+{
+"ar": "شُ",
+"label": "chu"
+},
+{
+"ar": "شُو",
+"label": "chū"
+},
+{
+"ar": "شٌ",
+"label": "chun"
+},
+{
+"ar": "شِ",
+"label": "chi"
+},
+{
+"ar": "شِي",
+"label": "chī"
+},
+{
+"ar": "شٍ",
+"label": "chin"
+},
+{
+"ar": "شْ",
+"label": "ch (soukoun)"
+},
+{
+"ar": "ص",
+"label": "Sad"
+},
+{
+"ar": "صَ",
+"label": "Sa"
+},
+{
+"ar": "صَا",
+"label": "Sā"
+},
+{
+"ar": "صً",
+"label": "San"
+},
+{
+"ar": "صُ",
+"label": "Su"
+},
+{
+"ar": "صُو",
+"label": "Sū"
+},
+{
+"ar": "صٌ",
+"label": "Sun"
+},
+{
+"ar": "صِ",
+"label": "Si"
+},
+{
+"ar": "صِي",
+"label": "Sī"
+},
+{
+"ar": "صٍ",
+"label": "Sin"
+},
+{
+"ar": "صْ",
+"label": "S (soukoun)"
+},
+{
+"ar": "ض",
+"label": "Dad"
+},
+{
+"ar": "ضَ",
+"label": "Da"
+},
+{
+"ar": "ضَا",
+"label": "Dā"
+},
+{
+"ar": "ضً",
+"label": "Dan"
+},
+{
+"ar": "ضُ",
+"label": "Du"
+},
+{
+"ar": "ضُو",
+"label": "Dū"
+},
+{
+"ar": "ضٌ",
+"label": "Dun"
+},
+{
+"ar": "ضِ",
+"label": "Di"
+},
+{
+"ar": "ضِي",
+"label": "Dī"
+},
+{
+"ar": "ضٍ",
+"label": "Din"
+},
+{
+"ar": "ضْ",
+"label": "D (soukoun)"
+},
+{
+"ar": "ط",
+"label": "Ta"
+},
+{
+"ar": "طَ",
+"label": "Ta"
+},
+{
+"ar": "طَا",
+"label": "Tā"
+},
+{
+"ar": "طً",
+"label": "Tan"
+},
+{
+"ar": "طُ",
+"label": "Tu"
+},
+{
+"ar": "طُو",
+"label": "Tū"
+},
+{
+"ar": "طٌ",
+"label": "Tun"
+},
+{
+"ar": "طِ",
+"label": "Ti"
+},
+{
+"ar": "طِي",
+"label": "Tī"
+},
+{
+"ar": "طٍ",
+"label": "Tin"
+},
+{
+"ar": "طْ",
+"label": "T (soukoun)"
+},
+{
+"ar": "ظ",
+"label": "DHa"
+},
+{
+"ar": "ظَ",
+"label": "DHa"
+},
+{
+"ar": "ظَا",
+"label": "DHā"
+},
+{
+"ar": "ظً",
+"label": "DHan"
+},
+{
+"ar": "ظُ",
+"label": "DHu"
+},
+{
+"ar": "ظُو",
+"label": "DHū"
+},
+{
+"ar": "ظٌ",
+"label": "DHun"
+},
+{
+"ar": "ظِ",
+"label": "DHi"
+},
+{
+"ar": "ظِي",
+"label": "DHī"
+},
+{
+"ar": "ظٍ",
+"label": "DHin"
+},
+{
+"ar": "ظْ",
+"label": "DH (soukoun)"
+},
+{
+"ar": "ع",
+"label": "ayn"
+},
+{
+"ar": "عَ",
+"label": "ʿa"
+},
+{
+"ar": "عَا",
+"label": "ʿā"
+},
+{
+"ar": "عً",
+"label": "ʿan"
+},
+{
+"ar": "عُ",
+"label": "ʿu"
+},
+{
+"ar": "عُو",
+"label": "ʿū"
+},
+{
+"ar": "عٌ",
+"label": "ʿun"
+},
+{
+"ar": "عِ",
+"label": "ʿi"
+},
+{
+"ar": "عِي",
+"label": "ʿī"
+},
+{
+"ar": "عٍ",
+"label": "ʿin"
+},
+{
+"ar": "عْ",
+"label": "ʿ (soukoun)"
+},
+{
+"ar": "غ",
+"label": "ghayn"
+},
+{
+"ar": "غَ",
+"label": "gha"
+},
+{
+"ar": "غَا",
+"label": "ghā"
+},
+{
+"ar": "غً",
+"label": "ghan"
+},
+{
+"ar": "غُ",
+"label": "ghu"
+},
+{
+"ar": "غُو",
+"label": "ghū"
+},
+{
+"ar": "غٌ",
+"label": "ghun"
+},
+{
+"ar": "غِ",
+"label": "ghi"
+},
+{
+"ar": "غِي",
+"label": "ghī"
+},
+{
+"ar": "غٍ",
+"label": "ghin"
+},
+{
+"ar": "غْ",
+"label": "gh (soukoun)"
+},
+{
+"ar": "ف",
+"label": "fa"
+},
+{
+"ar": "فَ",
+"label": "fa"
+},
+{
+"ar": "فَا",
+"label": "fā"
+},
+{
+"ar": "فً",
+"label": "fan"
+},
+{
+"ar": "فُ",
+"label": "fu"
+},
+{
+"ar": "فُو",
+"label": "fū"
+},
+{
+"ar": "فٌ",
+"label": "fun"
+},
+{
+"ar": "فِ",
+"label": "fi"
+},
+{
+"ar": "فِي",
+"label": "fī"
+},
+{
+"ar": "فٍ",
+"label": "fin"
+},
+{
+"ar": "فْ",
+"label": "f (soukoun)"
+},
+{
+"ar": "ق",
+"label": "qaf"
+},
+{
+"ar": "قَ",
+"label": "qa"
+},
+{
+"ar": "قَا",
+"label": "qā"
+},
+{
+"ar": "قً",
+"label": "qan"
+},
+{
+"ar": "قُ",
+"label": "qu"
+},
+{
+"ar": "قُو",
+"label": "qū"
+},
+{
+"ar": "قٌ",
+"label": "qun"
+},
+{
+"ar": "قِ",
+"label": "qi"
+},
+{
+"ar": "قِي",
+"label": "qī"
+},
+{
+"ar": "قٍ",
+"label": "qin"
+},
+{
+"ar": "قْ",
+"label": "q (soukoun)"
+},
+{
+"ar": "ك",
+"label": "kaf"
+},
+{
+"ar": "كَ",
+"label": "ka"
+},
+{
+"ar": "كَا",
+"label": "kā"
+},
+{
+"ar": "كً",
+"label": "kan"
+},
+{
+"ar": "كُ",
+"label": "ku"
+},
+{
+"ar": "كُو",
+"label": "kū"
+},
+{
+"ar": "كٌ",
+"label": "kun"
+},
+{
+"ar": "كِ",
+"label": "ki"
+},
+{
+"ar": "كِي",
+"label": "kī"
+},
+{
+"ar": "كٍ",
+"label": "kin"
+},
+{
+"ar": "كْ",
+"label": "k (soukoun)"
+},
+{
+"ar": "ل",
+"label": "lam"
+},
+{
+"ar": "لَ",
+"label": "la"
+},
+{
+"ar": "لَا",
+"label": "lā"
+},
+{
+"ar": "لً",
+"label": "lan"
+},
+{
+"ar": "لُ",
+"label": "lu"
+},
+{
+"ar": "لُو",
+"label": "lū"
+},
+{
+"ar": "لٌ",
+"label": "lun"
+},
+{
+"ar": "لِ",
+"label": "li"
+},
+{
+"ar": "لِي",
+"label": "lī"
+},
+{
+"ar": "لٍ",
+"label": "lin"
+},
+{
+"ar": "لْ",
+"label": "l (soukoun)"
+},
+{
+"ar": "م",
+"label": "mim"
+},
+{
+"ar": "مَ",
+"label": "ma"
+},
+{
+"ar": "مَا",
+"label": "mā"
+},
+{
+"ar": "مً",
+"label": "man"
+},
+{
+"ar": "مُ",
+"label": "mu"
+},
+{
+"ar": "مُو",
+"label": "mū"
+},
+{
+"ar": "مٌ",
+"label": "mun"
+},
+{
+"ar": "مِ",
+"label": "mi"
+},
+{
+"ar": "مِي",
+"label": "mī"
+},
+{
+"ar": "مٍ",
+"label": "min"
+},
+{
+"ar": "مْ",
+"label": "m (soukoun)"
+},
+{
+"ar": "ن",
+"label": "nun"
+},
+{
+"ar": "نَ",
+"label": "na"
+},
+{
+"ar": "نَا",
+"label": "nā"
+},
+{
+"ar": "نً",
+"label": "nan"
+},
+{
+"ar": "نُ",
+"label": "nu"
+},
+{
+"ar": "نُو",
+"label": "nū"
+},
+{
+"ar": "نٌ",
+"label": "nun"
+},
+{
+"ar": "نِ",
+"label": "ni"
+},
+{
+"ar": "نِي",
+"label": "nī"
+},
+{
+"ar": "نٍ",
+"label": "nin"
+},
+{
+"ar": "نْ",
+"label": "n (soukoun)"
+},
+{
+"ar": "ه",
+"label": "ha"
+},
+{
+"ar": "هَ",
+"label": "ha"
+},
+{
+"ar": "هَا",
+"label": "hā"
+},
+{
+"ar": "هً",
+"label": "han"
+},
+{
+"ar": "هُ",
+"label": "hu"
+},
+{
+"ar": "هُو",
+"label": "hū"
+},
+{
+"ar": "هٌ",
+"label": "hun"
+},
+{
+"ar": "هِ",
+"label": "hi"
+},
+{
+"ar": "هِي",
+"label": "hī"
+},
+{
+"ar": "هٍ",
+"label": "hin"
+},
+{
+"ar": "هْ",
+"label": "h (soukoun)"
+},
+{
+"ar": "و",
+"label": "waw"
+},
+{
+"ar": "وَ",
+"label": "wa"
+},
+{
+"ar": "وَا",
+"label": "wā"
+},
+{
+"ar": "وً",
+"label": "wan"
+},
+{
+"ar": "وُ",
+"label": "wu"
+},
+{
+"ar": "وُو",
+"label": "wū"
+},
+{
+"ar": "وٌ",
+"label": "wun"
+},
+{
+"ar": "وِ",
+"label": "wi"
+},
+{
+"ar": "وِي",
+"label": "wī"
+},
+{
+"ar": "وٍ",
+"label": "win"
+},
+{
+"ar": "وْ",
+"label": "w (soukoun)"
+},
+{
+"ar": "ي",
+"label": "ya"
+},
+{
+"ar": "يَ",
+"label": "ya"
+},
+{
+"ar": "يَا",
+"label": "yā"
+},
+{
+"ar": "يً",
+"label": "yan"
+},
+{
+"ar": "يُ",
+"label": "yu"
+},
+{
+"ar": "يُو",
+"label": "yū"
+},
+{
+"ar": "يٌ",
+"label": "yun"
+},
+{
+"ar": "يِ",
+"label": "yi"
+},
+{
+"ar": "يِي",
+"label": "yī"
+},
+{
+"ar": "يٍ",
+"label": "yin"
+},
+{
+"ar": "يْ",
+"label": "y (soukoun)"
+},
+{
+"ar": "ء",
+"label": "hamzah"
+},
+{
+"ar": "ءَ",
+"label": "ʾa"
+},
+{
+"ar": "ءَا",
+"label": "ʾā"
+},
+{
+"ar": "ءً",
+"label": "ʾan"
+},
+{
+"ar": "ءُ",
+"label": "ʾu"
+},
+{
+"ar": "ءُو",
+"label": "ʾū"
+},
+{
+"ar": "ءٌ",
+"label": "ʾun"
+},
+{
+"ar": "ءِ",
+"label": "ʾi"
+},
+{
+"ar": "ءِي",
+"label": "ʾī"
+},
+{
+"ar": "ءٍ",
+"label": "ʾin"
+},
+{
+"ar": "ءْ",
+"label": "ʾ (soukoun)"
+},
+{
+"ar": "ة",
+"label": "ta marbuTah"
+},
+{
+"ar": "ةَ",
+"label": "ta"
+},
+{
+"ar": "ةً",
+"label": "tan"
+},
+{
+"ar": "ةُ",
+"label": "tu"
+},
+{
+"ar": "ةٌ",
+"label": "tun"
+},
+{
+"ar": "ةِ",
+"label": "ti"
+},
+{
+"ar": "ةٍ",
+"label": "tin"
+},
+{
+"ar": "مُدُود",
+"label": "mudūd"
+},
+{
+"ar": "لَأُحِبُّك",
+"label": "la-uHibbuk"
+},
+{
+"ar": "لَا أُحِبُّك",
+"label": "lā-uHibbuk"
+},
+{
+"ar": "الشَّدَّة",
+"label": "asch-chaddah"
+},
+{
+"ar": "إِيَاكَ",
+"label": "iyâka"
+},
+{
+"ar": "إِيَّاكَ",
+"label": "iyyâka"
+},
+{
+"ar": "أَوَاهْ",
+"label": "awāh"
+},
+{
+"ar": "أَوَّاهْ",
+"label": "awwāh"
+},
+{
+"ar": "◌َ",
+"label": "fatḥa — le son a (voyelle seule)"
+},
+{
+"ar": "◌ِ",
+"label": "kasra — le son i (voyelle seule)"
+},
+{
+"ar": "◌ُ",
+"label": "ḍamma — le son ou (voyelle seule)"
+},
+{
+"ar": "◌ً",
+"label": "tanwīn fatḥ — le son an"
+},
+{
+"ar": "◌ٍ",
+"label": "tanwīn kasr — le son in"
+},
+{
+"ar": "◌ٌ",
+"label": "tanwīn ḍamm — le son oun"
+},
+{
+"ar": "◌ْ",
+"label": "soukoun — on ne prononce rien"
+},
+{
+"ar": "أَسَد",
+"label": "asad — lion 🦁"
+},
+{
+"ar": "وَرْدَة",
+"label": "warda — rose 🌹"
+},
+{
+"ar": "يَمَامَة",
+"label": "yamāma — colombe 🕊️"
+},
+{
+"ar": "بَقَرَة",
+"label": "baqara — vache 🐄"
+},
+{
+"ar": "تِمْسَاح",
+"label": "timsāh — crocodile 🐊"
+},
+{
+"ar": "جَمَل",
+"label": "jamal — chameau 🐪"
+},
+{
+"ar": "حِصَان",
+"label": "Hisān — cheval 🐴"
+},
+{
+"ar": "خَرُوف",
+"label": "kharūf — mouton 🐑"
+},
+{
+"ar": "دُبّ",
+"label": "dubb — ours 🐻"
+},
+{
+"ar": "رَوْضَة",
+"label": "rawDa — jardin 🌷"
+},
+{
+"ar": "زَرَافَة",
+"label": "zarāfa — girafe 🦒"
+},
+{
+"ar": "سَمَكَة",
+"label": "samaka — poisson 🐟"
+},
+{
+"ar": "شَجَرَة",
+"label": "shajara — arbre 🌳"
+},
+{
+"ar": "صَقْر",
+"label": "Saqr — faucon 🦅"
+},
+{
+"ar": "طَاوُوس",
+"label": "Tāwūs — paon 🦚"
+},
+{
+"ar": "ظَبْي",
+"label": "DHaby — gazelle 🦌"
+},
+{
+"ar": "غُورِيلَا",
+"label": "ghurīlā — gorille 🦍"
+},
+{
+"ar": "فَرَاشَة",
+"label": "farāsha — papillon 🦋"
+},
+{
+"ar": "قِطَّة",
+"label": "qiTTa — chatte 🐱"
+},
+{
+"ar": "كَلْب",
+"label": "kalb — chien 🐶"
+},
+{
+"ar": "لَقْلَق",
+"label": "laqlaq — cigogne 🦩"
+},
+{
+"ar": "مَوْز",
+"label": "mawz — banane 🍌"
+},
+{
+"ar": "نَمِر",
+"label": "namir — tigre 🐯"
+},
+{
+"ar": "هِرَّة",
+"label": "hirra — chatte 🐈"
+},
+{
+"ar": "تُفَّاحَة",
+"label": "tuffāHa — pomme 🍎"
+},
+{
+"ar": "جَدَ",
+"label": "jada — sans chaddah"
+},
+{
+"ar": "جَدّ",
+"label": "jad-d — grand-père 👴"
+},
+{
+"ar": "جَدٌ",
+"label": "jadoun (sans chaddah)"
+},
+{
+"ar": "جَدٌّ",
+"label": "jaddoun (avec chaddah)"
+},
+{
+"ar": "بَاِ",
+"label": "ba-ï"
+},
+{
+"ar": "بِيَ",
+"label": "biya"
+},
+{
+"ar": "بُوَ",
+"label": "bouwa"
+},
+{
+"ar": "بَوَ",
+"label": "bawa — waw vraie lettre"
+},
+{
+"ar": "بّ",
+"label": "b-b — chaddah"
+},
+{
+"ar": "نُورٌ",
+"label": "nūrun — une lumière"
+}
+]
