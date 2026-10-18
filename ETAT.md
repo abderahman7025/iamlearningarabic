@@ -183,7 +183,12 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.4), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.5), du plus récent au plus ancien :**
+
+- **v3.3.5 (18 octobre) — bloc `outils/refonte-v335.html`** (après v3.3.4),
+  ESSAI : dans chaque rubrique adulte, tout ce qui est doré prend la couleur
+  de la rubrique (script : couleurs « or » des styles calculés, pseudo-
+  éléments compris, tournées vers la teinte ; rendu en quittant la page).
 
 - **v3.3.4 (18 octobre) — bloc `outils/refonte-v334.html`** (après v3.3.3),
   ESSAI : fond de la couleur de la rubrique + motif différent par page
