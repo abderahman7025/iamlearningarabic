@@ -125,7 +125,13 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
     var rc=s.getBoundingClientRect();
     if(Math.abs(rc.top+rc.height/2-innerHeight/2)<innerHeight*.12)return;
     suit._t=Date.now();
-    try{s.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});}catch(e){}
+    /* v3.4.5 — on fait défiler LA PAGE seulement. scrollIntoView faisait
+       aussi défiler le contenu d'un bloc qui coupe ce qui dépasse (la
+       basmala : le texte montait dans son cadre immobile). */
+    var ca=document.getElementById('ca');if(!ca)return;
+    var cr=ca.getBoundingClientRect(),k=cr.height?ca.clientHeight/cr.height:1;
+    var dy=(rc.top+rc.height/2-(cr.top+cr.height/2))*k;
+    try{ca.scrollBy({top:dy,behavior:'smooth'});}catch(e){ca.scrollTop+=dy;}
   }
   function boucle(el){
     cancelAnimationFrame(el._kmRaf);

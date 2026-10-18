@@ -9,6 +9,8 @@
      Recette commune « bonbon » : remplissage en dégradé de la couleur, reflet
      blanc en haut à gauche, ombre intérieure en bas, TRANCHE plus foncée
      sous la pièce (ombre décalée sans flou), ombre portée douce.
+       v3.4.5 : reflets nettement adoucis (« la petite lumière en haut à gauche
+     est beaucoup trop forte »).
      ════════════════════════════════════════════════════════════════════ -->
 <style>
 /* les couleurs du profil, pour tout l'écran (elles n'existaient que dans
@@ -35,7 +37,7 @@ body.age-petit .tuile{border:none!important;border-radius:30px!important;overflo
   margin-bottom:10px;transform:perspective(700px) rotateX(6deg);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s!important}
 body.age-petit .tuile::before{content:'';position:absolute;left:14px;right:40%;top:8px;height:28%;border-radius:22px;
-  background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,0));pointer-events:none}
+  background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0));pointer-events:none}
 body.age-petit .tuile:hover{transform:perspective(700px) rotateX(0deg) translateY(-6px)!important}
 body.age-petit .tuile:active{transform:perspective(700px) rotateX(0deg) translateY(8px)!important;
   box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--tc) 55%,#ffffff),0 2px 0 color-mix(in srgb,var(--tc) 72%,#000)!important}
@@ -78,10 +80,10 @@ body.age-petit .boy-jauge .feu{border-radius:99px!important;position:relative;
 /* ── Les pièces des jeux : des bonbons ── */
 body.age-petit .mj-flotte,body.age-petit .mj-bulleV,body.age-petit .mjr-case,body.age-petit .mj-hp{
   border:3px solid rgba(255,255,255,.75)!important;color:#fff!important;
-  background:radial-gradient(circle at 32% 24%,#fff 0 6%,color-mix(in srgb,var(--mc) 45%,#fff) 20%,
+  background:radial-gradient(circle at 32% 24%,color-mix(in srgb,var(--mc) 55%,#fff) 0 8%,color-mix(in srgb,var(--mc) 75%,#fff) 26%,
     var(--mc) 62%,color-mix(in srgb,var(--mc) 70%,#000) 100%)!important;
   text-shadow:0 2px 0 color-mix(in srgb,var(--mc) 60%,#000),0 4px 8px rgba(0,0,0,.3);
-  box-shadow:inset 0 -8px 14px rgba(0,0,0,.22),inset 0 6px 10px rgba(255,255,255,.5),
+  box-shadow:inset 0 -8px 14px rgba(0,0,0,.22),inset 0 5px 8px rgba(255,255,255,.2),
     0 8px 0 color-mix(in srgb,var(--mc) 55%,#000),0 16px 24px color-mix(in srgb,var(--mc) 45%,transparent)!important}
 body.age-petit .mj-flotte.non,body.age-petit .mj-bulleV.non,body.age-petit .mjr-case.non{--mc:#e53935}
 body.age-petit .mj-bulleV.juste{--mc:#10B981}
@@ -89,13 +91,13 @@ body.age-petit .mjr-case{border-radius:28px!important}
 body.age-petit .mjr-case.vise{box-shadow:0 0 0 5px #fff,0 0 0 9px var(--mc),0 8px 0 color-mix(in srgb,var(--mc) 55%,#000)!important}
 /* les ballons : de vrais ballons brillants */
 body.age-petit .mj-bulle{border:none!important;color:#fff!important;
-  background:radial-gradient(ellipse at 34% 26%,#fff 0 7%,color-mix(in srgb,var(--mc) 40%,#fff) 18%,
+  background:radial-gradient(ellipse at 34% 26%,color-mix(in srgb,var(--mc) 55%,#fff) 0 8%,color-mix(in srgb,var(--mc) 75%,#fff) 24%,
     var(--mc) 58%,color-mix(in srgb,var(--mc) 68%,#000) 100%)!important;
   text-shadow:0 2px 0 color-mix(in srgb,var(--mc) 60%,#000),0 3px 8px rgba(0,0,0,.3);
-  box-shadow:inset -8px -12px 18px rgba(0,0,0,.2),inset 6px 8px 12px rgba(255,255,255,.35),0 14px 22px rgba(0,0,0,.18)!important}
+  box-shadow:inset -8px -12px 18px rgba(0,0,0,.2),inset 6px 8px 12px rgba(255,255,255,.15),0 14px 22px rgba(0,0,0,.18)!important}
 /* le grand disque de la lettre : une sphère posée */
 body.age-petit .mj-disque{box-shadow:inset 0 -14px 26px color-mix(in srgb,var(--mc) 30%,transparent),
-  inset 0 10px 20px rgba(255,255,255,.8),0 14px 0 color-mix(in srgb,var(--mc) 45%,#fff),
+  inset 0 8px 16px rgba(255,255,255,.4),0 14px 0 color-mix(in srgb,var(--mc) 45%,#fff),
   0 30px 44px color-mix(in srgb,var(--mc) 40%,transparent)!important;
   text-shadow:0 3px 0 color-mix(in srgb,var(--mc) 55%,#000),0 8px 14px color-mix(in srgb,var(--mc) 35%,transparent)}
 /* le cadre de tracé : un plateau */
@@ -107,17 +109,30 @@ body.age-petit .mjc-dos{border:none!important;
   box-shadow:inset 0 0 0 3px rgba(255,255,255,.45),inset 0 -8px 14px rgba(0,0,0,.2),
     0 7px 0 color-mix(in srgb,var(--mc) 50%,#000),0 14px 20px color-mix(in srgb,var(--mc) 40%,transparent)!important}
 body.age-petit .mjc-dos::after{content:'';position:absolute;left:8%;right:35%;top:5%;height:22%;border-radius:16px;
-  background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0));pointer-events:none}
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0));pointer-events:none}
 body.age-petit .mjc-face{box-shadow:0 7px 0 color-mix(in srgb,var(--mc) 55%,#000),0 14px 20px color-mix(in srgb,var(--mc) 35%,transparent)!important}
 /* le mot (trouve la lettre) : les lettres en relief */
 body.age-petit .mj-motar{text-shadow:0 3px 0 rgba(0,0,0,.12),0 8px 14px rgba(0,0,0,.12)}
 
 /* ── La carte des animaux : des médaillons plus épais, plus brillants ── */
-body.age-petit .carte-rond{box-shadow:inset 0 -10px 16px rgba(0,0,0,.18),inset 0 8px 12px rgba(255,255,255,.55),
+body.age-petit .carte-rond{box-shadow:inset 0 -10px 16px rgba(0,0,0,.18),inset 0 6px 10px rgba(255,255,255,.22),
   0 9px 0 color-mix(in srgb,var(--tc) 62%,#000),0 0 0 5px #fff,0 18px 24px rgba(40,60,30,.3)!important}
 body.age-petit .carte-rond img{filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
 body.age-petit .carte-etat{box-shadow:0 3px 0 rgba(0,0,0,.25),0 5px 10px rgba(0,0,0,.25)!important}
 
+/* v3.4.5 — la confirmation de déconnexion (retour du téléphone sur le menu) */
+.quitte-voile{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:rgba(20,14,4,.45);backdrop-filter:blur(3px);animation:quitteFondu .2s ease both}
+.quitte-boite{max-width:340px;width:100%;background:#fffaf0;border-radius:22px;padding:22px 20px 18px;text-align:center;
+  box-shadow:0 8px 0 #e2bd63,0 24px 50px rgba(0,0,0,.3);animation:quitteEntre .35s cubic-bezier(.34,1.56,.64,1) both}
+.quitte-boite p{margin:0 0 18px;font:700 1.02rem/1.45 Outfit,system-ui,sans-serif;color:#3a2600}
+.quitte-btns{display:flex;gap:10px}
+.quitte-btns button{flex:1;border:none;border-radius:99px;padding:13px 10px;font:800 .95rem Outfit,system-ui,sans-serif;cursor:pointer}
+.quitte-non{background:#f1e7d2;color:#5a4210;box-shadow:0 4px 0 #d6c5a0}
+.quitte-oui{background:linear-gradient(160deg,#f0506e,#c0213f);color:#fff;box-shadow:0 4px 0 #8c1530}
+.quitte-btns button:active{translate:0 3px;box-shadow:none}
+@keyframes quitteFondu{from{opacity:0}to{opacity:1}}
+@keyframes quitteEntre{from{opacity:0;scale:.85}to{opacity:1;scale:1}}
 /* ── La barre du haut ── */
 body.age-petit #tb-back,body.age-petit .sound-dot,body.age-petit #topbar .tb-son{
   box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 5px 0 rgba(var(--sk-rgb-f),.45),0 10px 16px rgba(var(--sk-rgb-f),.25)!important}

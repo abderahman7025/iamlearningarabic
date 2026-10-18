@@ -183,7 +183,14 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.4.4), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.4.5), du plus récent au plus ancien :**
+
+- **v3.4.5 (18 octobre)** — la ligne lue se centre en faisant défiler #ca
+  seul (scrollIntoView faisait défiler l'intérieur de la basmala, qui coupe
+  ce qui dépasse) ; retour du téléphone sur le menu : fenêtre « Tu vas être
+  déconnecté… » Annuler / Confirmer (→ doLogout), bloc v322 ; 3-5 ans :
+  reflets adoucis. Essai ﷺ préparé (`outils/essai-salat.js`) : la voix v4
+  le traduit en français.
 
 - **v3.4.4 (18 octobre) — bloc `outils/refonte-v344.html`** (après v3.3.8) :
   les 3-5 ans en 3D, fille et garçon, en CSS seul. Couleurs du profil

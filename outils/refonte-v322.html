@@ -138,12 +138,22 @@ body.profile-girl .nav-bulle{color:#ad1457;background:linear-gradient(165deg,#ff
        restée dans l'historique (avant, une vieille entrée « leçons » passait).
        1er appui : on reste, avec la bulle ; 2e appui dans les 2,5 s : on
        quitte, en sautant toutes les entrées de l'application. */
-    if(Date.now()-averti<2500){averti=0;
-      try{var n=history.length-1;if(n>0)history.go(-n);}catch(x){}
-      return true;}
-    averti=Date.now();
+    /* v3.4.5 — le client : « un message disant qu'on va être déconnecté
+       (boutons annuler et confirmer) ». On reste sur le menu ; Confirmer
+       déconnecte, Annuler referme. */
     try{history.pushState({screen:'s-menu'},'',location.pathname.replace(/\/[^\/]*$/,'')+'/accueil');}catch(x){}
-    bulle(te('Appuie encore sur retour pour quitter'));
+    if(document.querySelector('.quitte-voile'))return true;
+    var v=document.createElement('div');v.className='quitte-voile';
+    v.innerHTML='<div class="quitte-boite" role="dialog" aria-modal="true"><p></p>'
+      +'<div class="quitte-btns"><button type="button" class="quitte-non"></button><button type="button" class="quitte-oui"></button></div></div>';
+    v.querySelector('p').textContent=te('Tu vas être déconnecté. Veux-tu vraiment quitter ?');
+    v.querySelector('.quitte-non').textContent=te('Annuler');
+    v.querySelector('.quitte-oui').textContent=te('Confirmer');
+    function ferme(){v.remove();}
+    v.querySelector('.quitte-non').onclick=ferme;
+    v.addEventListener('click',function(ev){if(ev.target===v)ferme();});
+    v.querySelector('.quitte-oui').onclick=function(){ferme();try{doLogout();}catch(x){}};
+    document.body.appendChild(v);
     return true;
   };
 
