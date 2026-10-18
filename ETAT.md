@@ -183,7 +183,14 @@ distinct de la vipère de ء.
 
 ---
 
-**Fait et en ligne (v187 → v3.3.0), du plus récent au plus ancien :**
+**Fait et en ligne (v187 → v3.3.1), du plus récent au plus ancien :**
+
+- **v3.3.1 (18 octobre) — l'alerte** : le propriétaire la reçoit TOUJOURS par
+  e-mail (Telegram en secours) ; le choix de l'élève ne sert qu'au lien
+  « Répondre ». La capture est JOINTE à l'e-mail (Brevo `attachment`). Sur le
+  téléphone du client la capture revenait vide : second essai sans polices,
+  12 s max, et la raison de l'échec est écrite en bas de l'e-mail
+  (« capture : … »).
 
 - **v3.3.0 (18 octobre) — bloc `outils/refonte-v330.html`** (copié tel quel
   après celui de la v3.2.3).

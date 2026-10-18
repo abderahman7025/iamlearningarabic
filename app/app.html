@@ -6016,9 +6016,18 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
         [].forEach.call(ca.children,function(c){c.style.translate='0 '+(-y)+'px';});}
       function remet(){if(ca&&y){[].forEach.call(ca.children,function(c){c.style.translate='';});
         ca.style.cssText=av;ca.scrollTop=y;}}
-      return h.toJpeg(document.body,o).then(function(u){remet();return u;},function(e){remet();throw e;});
-    }).then(function(u){return /^data:image\/jpeg/.test(u)?u:'';}).catch(function(){return '';});
+      /* v3.3.1 — sur le téléphone du client la capture revenait VIDE
+         (« Pas de capture »). Deuxième essai sans les polices (le plus
+         lourd à copier), et la raison de l'échec part avec l'alerte. */
+      var o2=Object.assign({},o,{skipFonts:true,pixelRatio:1,imagePlaceholder:'data:image/gif;base64,R0lGODlhAQABAAAAACw='});
+      function essai(opt){return Promise.race([h.toJpeg(document.body,opt),
+        new Promise(function(_,ko){setTimeout(function(){ko(new Error('trop long'));},12000);})])
+        .then(function(u){if(!/^data:image\/jpeg;base64,./.test(u||''))throw new Error('image vide ('+String(u||'').slice(0,20)+')');return u;});}
+      return essai(o).catch(function(e){_capErr='1: '+((e&&(e.message||e.type))||e);return essai(o2);})
+        .then(function(u){remet();return u;},function(e){remet();_capErr+=' | 2: '+((e&&(e.message||e.type))||e);return '';});
+    }).catch(function(e){_capErr='outil: '+((e&&(e.message||e.type))||e||'non chargé');return '';});
   }
+  var _capErr='';
   function ouLonEst(){
     var ca=document.getElementById('ca'),tt=document.getElementById('tb-title');
     var s='';try{s=(st._curPage||'')+(ca&&ca.dataset.page?' · '+ca.dataset.page:'');}catch(e){}
@@ -6029,7 +6038,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   }
   btn.onclick=function(){
     try{stopSpeech();}catch(e){}arret();
-    btn.disabled=true;
+    btn.disabled=true;_capErr='';
     capture().then(function(img){
       btn.disabled=false;
       var v=document.createElement('div');v.className='alerte-voile';
@@ -6079,7 +6088,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
         fetch(API_URL+'/api/audio',{method:'POST',credentials:'same-origin',
           headers:Object.assign({'Content-Type':'application/json'},tok?{Authorization:'Bearer '+tok}:{}),
           body:JSON.stringify({alerte:{canal:canal,contact:contact,message:ta.value.trim(),page:ouLonEst(),profil:String(st.profile||''),
-            langue:langue(),appareil:navigator.userAgent+' · '+innerWidth+'×'+innerHeight,capture:img}})})
+            langue:langue(),appareil:navigator.userAgent+' · '+innerWidth+'×'+innerHeight+(_capErr?' · capture : '+_capErr:''),capture:img}})})
         .then(function(r){if(!r.ok)throw 0;ferme();toast(te('Message envoyé ! Tu auras une réponse très vite.'));})
         .catch(function(){env.disabled=false;env.textContent=te('Envoyer');toast(te("L'envoi n'a pas marché. Réessaie dans un instant."));});
       };
@@ -13895,7 +13904,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.3.0';
+var _VERSION_REPLI='v3.3.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
