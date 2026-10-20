@@ -86,6 +86,32 @@ body.age-petit.profile-boy .mj,body.age-petit.profile-boy .boy-panel{--mc:#1e88e
   .mj-mot .mj-motar{line-height:1.7!important}
 }
 body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
+/* ── v3.5.7 — 6-11 ANS : CHOIX DE LA LETTRE ──
+   La pastille verte d'une lettre faite, et, téléphone couché, les cartes
+   côte à côte comme chez les 3-5 ans. */
+.child-choix .child-fait{position:absolute;top:8px;right:10px;font-size:1.25rem;line-height:1}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-letters{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:14px!important;grid-template-columns:none!important}
+  body:not(.age-petit) .child-choix .child-card{flex-direction:column!important;justify-content:center!important;text-align:center!important;gap:6px!important;min-height:calc(100vh - 210px);margin:0!important}
+  body:not(.age-petit) .child-choix .child-infos{flex:none!important}
+  body:not(.age-petit) .child-choix .child-titre{margin-bottom:8px!important}
+}
+/* ── v3.5.7 — LE COMPTE SUR TOUTES LES PAGES, TOUTES LES INTERFACES ──
+   Le client : « mets le bouton déconnexion, langue, changer d'interface
+   dans toutes les pages de toutes les interfaces ». */
+#root #tb-compte{display:flex!important;width:38px!important;height:38px!important;margin-left:10px;position:relative;cursor:pointer;flex:none;font-size:.95rem}
+#root #topbar #sound-dot2{margin-left:auto}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-card{width:100%!important;max-width:none!important}
+  body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
+/* Debout : les cartes occupent la hauteur au lieu de laisser un grand vide. */
+@media (orientation:portrait){
+  body:not(.age-petit) .child-choix .child-card{min-height:min(150px,calc((100vh - 330px) / 3))}
+  body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
 </style>
 <script>
 (function(){

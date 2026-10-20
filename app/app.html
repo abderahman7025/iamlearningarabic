@@ -6814,6 +6814,32 @@ body.age-petit.profile-boy .mj,body.age-petit.profile-boy .boy-panel{--mc:#1e88e
   .mj-mot .mj-motar{line-height:1.7!important}
 }
 body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
+/* ── v3.5.7 — 6-11 ANS : CHOIX DE LA LETTRE ──
+   La pastille verte d'une lettre faite, et, téléphone couché, les cartes
+   côte à côte comme chez les 3-5 ans. */
+.child-choix .child-fait{position:absolute;top:8px;right:10px;font-size:1.25rem;line-height:1}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-letters{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:14px!important;grid-template-columns:none!important}
+  body:not(.age-petit) .child-choix .child-card{flex-direction:column!important;justify-content:center!important;text-align:center!important;gap:6px!important;min-height:calc(100vh - 210px);margin:0!important}
+  body:not(.age-petit) .child-choix .child-infos{flex:none!important}
+  body:not(.age-petit) .child-choix .child-titre{margin-bottom:8px!important}
+}
+/* ── v3.5.7 — LE COMPTE SUR TOUTES LES PAGES, TOUTES LES INTERFACES ──
+   Le client : « mets le bouton déconnexion, langue, changer d'interface
+   dans toutes les pages de toutes les interfaces ». */
+#root #tb-compte{display:flex!important;width:38px!important;height:38px!important;margin-left:10px;position:relative;cursor:pointer;flex:none;font-size:.95rem}
+#root #topbar #sound-dot2{margin-left:auto}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-card{width:100%!important;max-width:none!important}
+  body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
+/* Debout : les cartes occupent la hauteur au lieu de laisser un grand vide. */
+@media (orientation:portrait){
+  body:not(.age-petit) .child-choix .child-card{min-height:min(150px,calc((100vh - 330px) / 3))}
+  body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
 </style>
 <script>
 (function(){
@@ -14485,12 +14511,11 @@ function _boyLetterPicker(ca,session){
   var wrap=document.createElement('div');wrap.className='child-wrap child-choix';wrap.style.textAlign='center';
   wrap.style.position='relative';wrap.style.zIndex='1';
 
+  /* v3.5.7 — le client : « enlever le texte "les lettres" et garder que
+     "choisis ta lettre", comme chez les 3-5 ans ». */
   var titre=document.createElement('div');titre.className='child-titre';
-  titre.style.cssText='font-size:1.3rem;font-weight:900;color:var(--k2);margin-bottom:4px';
-  titre.textContent=session.title||'Les lettres';wrap.appendChild(titre);
-  var sous=document.createElement('div');sous.className='child-sous';
-  sous.style.cssText='font-size:.9rem;color:var(--k2);opacity:.75;margin-bottom:16px;font-weight:700';
-  sous.textContent='Choisis ta lettre ! 👇';wrap.appendChild(sous);
+  titre.style.cssText='font-size:1.45rem;font-weight:900;color:var(--k2);margin-bottom:14px';
+  titre.textContent='✋ '+te('Choisis ta lettre');wrap.appendChild(titre);
   try{speakText(t('say_choose_letter'),_voixEnfant(),null);}catch(e){}
 
   /* Deverrouillage sequentiel : au depart seule la 1re lettre est ouverte.
@@ -14527,10 +14552,12 @@ function _boyLetterPicker(ca,session){
     lettre.textContent=L.ar;carte.appendChild(lettre);
     var infos=document.createElement('div');infos.className='child-infos';
     infos.style.cssText='flex:1';
-    var etat=fait?'✅ Déjà vue — revoir':(ouverte?'▶ À découvrir':'🔒 Termine la précédente');
-    infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>'
-      +'<div style="font-size:.82rem;color:var(--k2);opacity:.75;font-weight:700">'+etat+'</div>';
+    /* v3.5.7 — plus de « Déjà vue — revoir » : juste la pastille verte
+       d'une lettre faite, comme chez les 3-5 ans. */
+    infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>';
     carte.appendChild(infos);
+    carte.style.position='relative';
+    if(fait){var ok=document.createElement('div');ok.className='child-fait';ok.textContent='✅';carte.appendChild(ok);}
     if(ouverte){
       carte.onclick=function(){try{stopSpeech();}catch(e){}
         /* le compte a rebours DECOLLAGE n'apparait que sur la 1re lettre */
@@ -14582,7 +14609,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.6';
+var _VERSION_REPLI='v3.5.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

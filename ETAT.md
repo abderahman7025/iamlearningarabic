@@ -6079,3 +6079,7 @@ nécessaire — les éléments du site servent de décor.
 
 ## v3.5.6
 - Trouve la lettre : lettre seule bien plus grosse (min(48vw,24vh) debout, min(20vw,34vh) couché). Le mot prend la plus grande taille qui tient en largeur : rapport largeur/taille mesuré une fois à 100 px hors page, puis font-size en cqw du conteneur (`.mj-mot-tx` en container inline-size), plafonné à 20vh debout / 25vh couché. Vérifié sur 390×844, 360×740, 915×412, 740×360 : rien ne déborde.
+
+## v3.5.7
+- 6-11 ans, choix de la lettre : plus de titre « Les lettres », seulement « ✋ Choisis ta lettre » ; plus de « Déjà vue — revoir / À découvrir / Termine la précédente », juste la pastille ✅ d'une lettre faite (`.child-fait`) ; couché, cartes côte à côte (grille en colonnes) ; debout, cartes plus hautes et lettres plus grosses.
+- Bouton du compte (langue, changer d'interface, déconnexion) dans la barre du haut de TOUTES les pages, toutes interfaces (#tb-compte affiché partout).
