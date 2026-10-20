@@ -6069,3 +6069,10 @@ nécessaire — les éléments du site servent de décor.
 ## v3.5.4
 - Son coupé = plus aucun son : garde global posé juste après `const st` — `AudioScheduledSourceNode.start` ne démarre plus (et `stop` ignore ces nœuds), `AudioContext.resume` ne réveille plus, `HTMLMediaElement.play` joue muet ; `_appliqueMuet()` (appelé par `toggleSound` et le réglage) suspend les contextes et rend muets les lecteurs déjà lancés.
 - Enfants, son coupé : la narration « dure » le temps qu'il faudrait pour dire la phrase (`muetFin`, même estimation que le garde-fou) — les pages ne s'enchaînent plus en rafale. Adultes : la lecture automatique s'arrêtait déjà au son coupé.
+
+## v3.5.5
+- Carte des animaux : retour à la carte pleine taille (4 par rangée couchée) qui défile de haut en bas, album de nouveau sous la carte. Le « pas de défilement » ne vaut que pendant les manches (#ca:has(>.boy-wrap)) ; jamais de défilement latéral.
+- 3-5 ans : aucun glissement du doigt ne tourne plus la page (`depart` : bon=false pour petit) ; on change de page par les flèches des bords.
+- 3-5 ans : --mc de toutes les manches = couleur du profil (#e8457f fille, #1e88e5 garçon) — fini l'orange (asad, disque de la lettre et son anneau en 4 quarts, Trouve la lettre…).
+- Trouve la lettre, couché : ligne de 2 et taille min(13vw,25vh) — les points des lettres qui descendent (ي…) ne sortent plus du cadre.
+- Audit : 132 écrans 3-5 ans (3 étapes × 11 manches × 4 formats d'écran) — aucun cadre ne dépasse le bas.
