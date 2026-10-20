@@ -52,6 +52,10 @@ const NOMS = [
   [/\bw[aā]w\b/gi, 'وَاو'], [/\balif\b/gi, 'أَلِف'], [/\by[aā]\b/gi, 'يَاء'], [/\bhamzah?\b/gi, 'هَمْزَة'],
 ];
 const enArabe = (t) => {
+  /* Le client : « la phrase 16 se lit bien avec le déterminant "la" devant
+     kasra ; mets-le aussi pour la damma et la fatha ». Pour la voix seulement :
+     à l'écran, la voyelle est dessinée. */
+  t = t.replace(/^(fat[hḥ]a|damma|kasra) est prolongé/i, 'la $1 est prolongée');
   NOMS.forEach(([re, ar]) => { t = t.replace(re, ar); });
   /* Le son du tanwin : « n' » — c'est la façon que le client a validée pour
      le français (voir voix-correction.json), sinon la voix dit « èn ». */
@@ -63,6 +67,11 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
 (async () => {
   let urls = {};
   try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
+  /* --refaire=14,15,16 : ces numéros (1 = première phrase) sont regénérés */
+  const _rf = (process.argv.find((x) => x.indexOf('--refaire=') === 0) || '').slice(10).split(',').map(Number).filter(Boolean);
+  _rf.forEach((n) => { const t = liste[n - 1]; if (!t) return;
+    const f0 = path.join(dest, Buffer.from(cle(t)).toString('hex').slice(0, 80) + '.mp3');
+    if (fs.existsSync(f0)) fs.unlinkSync(f0); });
   let car = 0; const rates = [];
   for (const t of liste) {
     const k = cle(t);
