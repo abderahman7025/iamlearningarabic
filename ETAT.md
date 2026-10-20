@@ -6089,3 +6089,9 @@ nécessaire — les éléments du site servent de décor.
 - Monde sans lettres (voyelles, prolongations) : `_boyLetterPicker` rend la carte au lieu d'une page « Choisis ta lettre » vide.
 - Carte 6-11 debout : segments du vol en un seul S (tangentes verticales) au lieu du crochet par le bord.
 - Carte 6-11 : un monde est fait selon `_sessionFaite` (même règle que l'ouverture du suivant) — la licorne part avec la fille dès le monde des licornes fini, la couronne après le sien. Le personnage se pose sur la DERNIÈRE ÎLE FAITE (`_ileDepart` = nombre d'îles faites d'affilée ; au départ du chemin au début) et son monde est centré à l'écran.
+
+## v3.5.9
+- Carte 6-11 : le personnage revient sur le monde QU'ON VIENT DE QUITTER (`arab_ile` en premier), sinon la dernière île faite.
+- Fille, carte couchée : au départ elle regarde déjà vers où part l'arc-en-ciel (sensVol posé d'après le 1er tronçon, dessin `piloteSansCouronneSens`), et le tronçon de l'arc-en-ciel se suit au lieu d'onduler (`_leLongDuChemin`).
+- 6-11 debout : tracés sur deux rangées (2+2 ou 2+1) dans un cadre plus haut (`RANGS`, `caseDe(x,y)`, lignes, gomme, révélateur par rangée) ; titres plafonnés à 30 px vus ; hublot à 80 % du cadre, glyphe en 46cqw.
+- Rotation autorisée : plus de `screen.orientation.lock('landscape')` (unlock), manifest `orientation: any`.

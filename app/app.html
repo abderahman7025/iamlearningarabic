@@ -6848,6 +6848,12 @@ body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!
   body:not(.age-petit) .child-choix .child-emoji{font-size:min(4.4rem,17vh)!important}
   body:not(.age-petit) .child-choix .child-glyphe{font-size:min(5.6rem,21vh)!important}
 }
+/* v3.5.9 — 6-11 ans debout : le hublot (la lettre, la voyelle) prend la
+   largeur du cadre, le texte rapetisse (voir `remplitLaLargeur`). */
+@media (orientation:portrait){
+  body:not(.age-petit) .boy-panel .boy-hublot{width:80%!important;max-width:340px!important;height:auto!important;aspect-ratio:1;margin:10px auto 26px!important;container-type:inline-size}
+  body:not(.age-petit) .boy-panel .boy-hublot span{font-size:46cqw!important}
+}
 </style>
 <script>
 (function(){
@@ -10889,6 +10895,17 @@ function _ileDepart(islandDefs){
      trouve sur la DERNIÈRE ÎLE FAITE, centré au milieu de l'écran » ; au
      tout début, seul au départ du chemin. 0 = le départ, i = posé sur
      l'île i (la i-ème, comptée depuis 1), en suivant l'ordre du chemin. */
+  /* v3.5.9 — précision du client : « quand on QUITTE un monde, la fille
+     (+ licorne) et le garçon dans la fusée doivent être sur le monde quitté ».
+     Le monde qu'on vient de quitter passe donc en premier ; sans lui (on
+     arrive du menu), la dernière île faite. */
+  try{
+    var v=localStorage.getItem('arab_ile');
+    if(v!==null&&v!==''){
+      var i0=parseInt(v,10);
+      if(i0>=0&&i0<islandDefs.length)return i0+1;
+    }
+  }catch(e){}
   var valide=0;
   for(var i=0;i<islandDefs.length;i++){
     var fait=islandDefs[i].sids.every(function(sid){return _sessionFaite(sid);});
@@ -11406,6 +11423,14 @@ function _volCarte(o){
      jusqu'a disparaitre. Le client l'a refuse cote garcon, et la fille a de
      toute facon deux dessins, un par sens. */
   var sensVol=1;
+  /* v3.5.9 — le client : « la fille au début de l'arc-en-ciel doit être
+     tournée vers la gauche, puisqu'elle va aller vers la gauche ». Au
+     départ du chemin, elle regarde déjà là où le premier tronçon l'emmène. */
+  try{var _s0=o.segments&&o.segments[0];
+    if(!(o.depart||0)&&_s0&&_s0.x3<_s0.x0-8)sensVol=-1;}catch(e){}
+  try{var _eq0=o.equipage;
+    if(!(o.depart||0)&&_eq0&&!_eq0.aVaisseau&&_eq0.pilote&&_HAB.piloteSansCouronneSens)
+      _eq0.pilote.src=(sensVol<0)?_HAB.piloteSansCouronneSens.dg:_HAB.piloteSansCouronneSens.gd;}catch(e){}
   /* D'ou part le voyage en cours. La fille ne porte la couronne qu'a partir
      du monde 2 : un vol qui PART du monde 1 se fait donc sans elle, et
      cette image-la n'existe que dans un seul sens. */
@@ -12319,7 +12344,11 @@ function _volCarte(o){
        a rien de dessine entre eux — les liaisons sont masquees — et c'est la
        que le client voyait le vol se casser en trois morceaux. On y prend
        donc la ligne droite, avec son ondulation. */
-    if(file.length>1||o.ondule){
+    /* v3.5.9 — « elle doit glisser le long du chemin, comme en portrait, pas
+       faire de S » : le premier tronçon est l'arc-en-ciel dessiné ; on le
+       suit au lieu d'onduler à côté. */
+    var _leLongDuChemin=file.length===1&&(partiDe===0||cible===0)&&_HAB&&_HAB.arcEnCiel;
+    if((file.length>1||o.ondule)&&!_leLongDuChemin){
       var der=file[file.length-1];
       /* On vise le SOMMET de l'etape, pas son milieu : c'est la qu'on se
          pose, et le trajet doit y mener directement. */
@@ -14621,7 +14650,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.8';
+var _VERSION_REPLI='v3.5.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16889,6 +16918,9 @@ var _boyPleinEcran=false;
    au premier contact avec le cours, ce qui suffit toujours. */
 /* On retient qu'on VOULAIT le plein ecran : voir `_rendLePleinEcran`. */
 var _voulaitPlein=false;
+/* v3.5.9 — le client : « autorise la rotation ». Le plein écran reste, mais
+   l'écran n'est plus bloqué en paysage : on tourne le téléphone, la page suit
+   (3-5 ans et 6-11 ans ont chacun leur mise en page debout). */
 function _pleinEcranPaysage(){
   try{
     var de=document.documentElement;
@@ -16897,13 +16929,13 @@ function _pleinEcranPaysage(){
     _voulaitPlein=true;
     if(document.fullscreenElement||document.webkitFullscreenElement){
       try{if(screen.orientation&&screen.orientation.lock)
-        screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
+        screen.orientation.unlock();}catch(e){}
       return;
     }
     var pr=rf.call(de);
     if(pr&&pr.then)pr.then(function(){
       try{if(screen.orientation&&screen.orientation.lock)
-        screen.orientation.lock('landscape')['catch'](function(){});}catch(e){}
+        screen.orientation.unlock();}catch(e){}
     })['catch'](function(){});
   }catch(e){}
 }
@@ -17052,7 +17084,17 @@ function _blocEcriture(hote,o){
      dans un cadre qui lui en offrait 262 — c'est la POLICE qui bridait, pas
      la place. On la laisse donc monter tres haut : les bornes de tenue,
      juste en dessous, ramenent le signe des qu'il touche un bord. */
-  var PX0=o.signeSeul?640:({1:205,2:172,3:142}[nb]||110);
+  /* ── v3.5.9 — DEBOUT, LES FORMES SUR DEUX RANGEES ──
+     Le client : « en portrait, l'illustration doit toujours être le plus
+     important, donc le plus gros ». Quatre formes de front dans un cadre
+     étroit faisaient des lettres minuscules. Debout, on les range sur deux
+     rangées (2 + 2, ou 2 + 1) dans un cadre plus haut : chaque forme a deux
+     fois plus de largeur. Couché, rien ne change (une seule rangée). */
+  var RANGS=(window.innerHeight>window.innerWidth&&nb>=3&&!o.signeSeul&&!o.deTete)?2:1;
+  var COLS=Math.ceil(nb/RANGS);
+  if(RANGS>1)CH0=BANDE0+Math.round((CH0-BANDE0)*1.75);
+  var PX0=o.signeSeul?640:({1:205,2:172,3:142}[COLS]||110);
+  if(RANGS>1)PX0=Math.round(PX0*1.25);
   var k=(o.dispoW||CW0)/CW0;
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
@@ -17155,7 +17197,13 @@ function _blocEcriture(hote,o){
     if(_e0.bas<0)       _part=0.82;    /* tout au-dessus : la ligne descend */
     else if(_e0.haut<0) _part=0.22;    /* tout en dessous : la ligne monte  */
   }catch(e){}
-  var baseY=BANDE+Math.round((CH-BANDE)*_part);
+  var RH=(CH-BANDE)/RANGS;
+  function rangDe(n){return Math.floor(n/COLS);}
+  function colDe(n){return n%COLS;}
+  function nbRang(r){return (r<RANGS-1)?COLS:(nb-COLS*(RANGS-1));}
+  function hautRang(r){return r===0?0:Math.round(BANDE+r*RH);}
+  function basRang(r){return r===RANGS-1?CH:Math.round(BANDE+(r+1)*RH);}
+  var baseY=BANDE+Math.round(RH*_part);
   /* ── UN SIGNE SEUL SE POSE CONTRE LA LIGNE ──
      Une fatha s'ecrit 0,7 em AU-DESSUS de la ligne : dessinee grande dans un
      cadre couche haut de 168 px, elle sortait entierement du canevas et le
@@ -17173,7 +17221,7 @@ function _blocEcriture(hote,o){
   /* Le modele est CENTRE dans sa case : c'est donc son cote le plus large
      qui decide, des deux. Une demi-case, marge deduite, doit le contenir. */
   function _tientEnLargeur(px){
-    var demi=((CW-MXd-MXg)/nb)/2-Math.round(9*k),pire=0;
+    var demi=((CW-MXd-MXg)/COLS)/2-Math.round(9*k),pire=0;
     try{
       liste.forEach(function(g){
         var e=_encreLargeur(g),w=Math.max(e.g,e.d);
@@ -17193,7 +17241,7 @@ function _blocEcriture(hote,o){
        et descend de (bas + ecart) en dessous : c'est cela qui doit tenir. */
     var _h=_e.haut-_ecart, _b=_e.bas+_ecart, _max=PX;
     if(_h>0.01)_max=Math.min(_max,(baseY-_mg)/_h);
-    if(_b>0.01)_max=Math.min(_max,(CH-baseY-_mg)/_b);
+    if(_b>0.01)_max=Math.min(_max,(BANDE+RH-baseY-_mg)/_b);
     _max=Math.min(_max,_tientEnLargeur(PX));
     PX=Math.max(48,Math.round(Math.min(PX,_max)));
     baseDessin=baseY+Math.round(_ecart*PX);
@@ -17213,23 +17261,30 @@ function _blocEcriture(hote,o){
     });
     var _maxT=PX;
     if(_hT>0.01)_maxT=Math.min(_maxT,(baseY-_mgT)/_hT);
-    if(_bT>0.01)_maxT=Math.min(_maxT,(CH-baseY-_mgT)/_bT);
+    if(_bT>0.01)_maxT=Math.min(_maxT,(BANDE+RH-baseY-_mgT)/_bT);
     _maxT=Math.min(_maxT,_tientEnLargeur(PX));
     PX=Math.max(40,Math.round(Math.min(PX,_maxT)));
   }
-  var pas=(CW-MXd-MXg)/nb;
+  var pas=(CW-MXd-MXg)/COLS;
+  function pasDe(n){return (CW-MXd-MXg)/nbRang(rangDe(n));}
+  function baseDe(n){return baseDessin+Math.round(rangDe(n)*RH);}
   /* L'arabe s'écrit de droite à gauche : la première forme est à droite. On
      garde les tableaux dans l'ordre logique (isolée, début, milieu, fin) et
      on pose la case n en partant de la droite. */
-  function caseX(n){return CW-MXd-pas*(n+0.5);}
+  function caseX(n){return CW-MXd-pasDe(n)*(colDe(n)+0.5);}
   /* La case où tombe un trait se lit dans sa seule position en x. */
-  function caseDe(x){return Math.max(0,Math.min(nb-1,Math.floor((CW-MXd-x)/pas)));}
+  function caseDe(x,y){
+    var r=0;
+    if(RANGS>1&&y!==undefined)r=Math.max(0,Math.min(RANGS-1,Math.floor((y-BANDE)/RH)));
+    var p=(CW-MXd-MXg)/nbRang(r);
+    var c=Math.max(0,Math.min(nbRang(r)-1,Math.floor((CW-MXd-x)/p)));
+    return Math.max(0,Math.min(nb-1,r*COLS+c));}
   /* Le modèle entier, d'un bloc : les cases où rien ne s'anime. */
   function modeleEntier(n){
     cx.save();
     cx.font=PX+"px 'Scheherazade New',serif";
     cx.textBaseline='alphabetic';cx.textAlign='center';cx.fillStyle=_TRACE_GRIS;
-    _dessineSurLigne(cx,liste[n],caseX(n),baseDessin,PX);
+    _dessineSurLigne(cx,liste[n],caseX(n),baseDe(n),PX);
     cx.restore();
   }
   /* DE TETE : rien a repasser. Les noms des cases et la ligne d'ecriture
@@ -17301,12 +17356,15 @@ function _blocEcriture(hote,o){
       /* Deux cases : la lettre suivie d'une prolongation ne peut être
          qu'en début ou au milieu d'un mot. */
       var noms=o.nomsCases||((nb===2)?['début','milieu']:['isolée','début','milieu','fin']);
-      for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),CH-8*k);
+      for(var j=0;j<nb;j++)cx.fillText(noms[j]||'',caseX(j),basRang(rangDe(j))-8*k);
       cx.restore();
     }
     cx.save();
     cx.strokeStyle='rgba('+_HAB.rgb+',0.32)';cx.lineWidth=2*k;cx.setLineDash([9*k,6*k]);
-    cx.beginPath();cx.moveTo(10*k,baseY);cx.lineTo(CW-10*k,baseY);cx.stroke();
+    for(var _rg=0;_rg<RANGS;_rg++){
+      var _by=baseY+Math.round(_rg*RH);
+      cx.beginPath();cx.moveTo(10*k,_by);cx.lineTo(CW-10*k,_by);cx.stroke();
+    }
     cx.restore();
   }
   /* ── Le modèle s'écrit tout seul ──
@@ -17355,10 +17413,12 @@ function _blocEcriture(hote,o){
        à chaque image. */
     /* La boîte déborde un peu de la case : certaines formes attachées
        sont plus larges qu'elle, et le calque les couperait. */
-    var xg=Math.max(0,Math.round(CW-MXd-pas*(n+1)-pas*0.18));
-    var xd=Math.min(CW,Math.round(CW-MXd-pas*n+pas*0.18));
+    var _p=(n>=0&&n<nb)?pasDe(n):pas,_c=(n>=0&&n<nb)?colDe(n):0;
+    var xg=Math.max(0,Math.round(CW-MXd-_p*(_c+1)-_p*0.18));
+    var xd=Math.min(CW,Math.round(CW-MXd-_p*_c+_p*0.18));
+    var _r0=(n>=0&&n<nb)?rangDe(n):0,_yh=hautRang(_r0),_yb=basRang(_r0);
     rev=(n>=0&&n<nb)
-      ? _revelateur(liste[n],caseX(n),baseDessin,PX,xg,0,xd-xg,CH)
+      ? _revelateur(liste[n],caseX(n),baseDe(n),PX,xg,_yh,xd-xg,_yb-_yh)
       : null;
     if(!rev){caseAnim=-1;guide(3);return;}
     caseAnim=n;depart=Date.now();dernier=0;
@@ -17404,11 +17464,12 @@ function _blocEcriture(hote,o){
     boite.classList.toggle('outil-pris',!!outil);
   }
   function appliqueOutil(q){
-    var n=caseDe(q.x);
+    var n=caseDe(q.x,q.y);
     if(outil==='gomme'){
-      var g0=(n===nb-1)?0:Math.round(CW-MXd-pas*(n+1));
-      var d0=(n===0)?CW:Math.round(CW-MXd-pas*n);
-      cxE.clearRect(g0,0,d0-g0,CH);
+      var _pg=pasDe(n),_cg=colDe(n),_rgm=rangDe(n),_cnt=nbRang(_rgm);
+      var g0=(_cg===_cnt-1)?0:Math.round(CW-MXd-_pg*(_cg+1));
+      var d0=(_cg===0)?CW:Math.round(CW-MXd-_pg*_cg);
+      cxE.clearRect(g0,hautRang(_rgm),d0-g0,basRang(_rgm)-hautRang(_rgm));
     }else if(outil==='oeil'){montres[n]=!montres[n];guide(3);}
   }
   /* La rangee du bas n'a plus rien a porter : on la cache, pour ne pas
@@ -17475,7 +17536,7 @@ function _blocEcriture(hote,o){
     if(outil){appliqueOutil(pos(e));e.preventDefault();return;}
     trace=true;if(o.siEcrit)o.siEcrit();var q=pos(e);
     _p1=q;_mil=q;
-    caseEcrite=caseDe(q.x);
+    caseEcrite=caseDe(q.x,q.y);
     /* la DERNIERE forme de la page est entamee : l'appelant le saura */
     if(caseEcrite===nb-1&&o.surDerniere){try{o.surDerniere();}catch(e2){}}
     /* Un cran à gauche de la case attaquée. On ne relance rien tant que
@@ -19581,6 +19642,10 @@ function _boyScene(ca,reprise){
        loin d'être pleine. On le monte à 72. Les phrases longues ne bougent
        pas — elles sont retenues par la LARGEUR, pas par le plafond. */
     var MIN=22/ech, MAX=72/ech;
+    /* v3.5.9 — le client : « en portrait, l'illustration (la lettre, la
+       voyelle, le hublot) doit toujours être le plus important, donc le plus
+       gros ; rapetisse le texte ». Debout, le texte plafonne à 30 px vus. */
+    if(window.innerHeight>window.innerWidth&&!(st&&st.age==='petit'))MAX=30/ech;
     var REF=40;
     t.style.fontSize=REF+'px';
     var large=laPlusLarge();
