@@ -76,6 +76,16 @@ body.age-petit.profile-boy .mj,body.age-petit.profile-boy .boy-panel{--mc:#1e88e
 @media (orientation:landscape){
   .mj-mot .mj-motar,.mj-mot .mj-lettre-seule{font-size:min(13vw,25vh)!important;line-height:2!important;padding:0!important}
 }
+/* v3.5.6 — « Trouve la lettre » : la lettre seule bien plus grosse, et une
+   ligne assez haute pour les lettres qui descendent (le mot, lui, est mis à
+   la taille par `ajusteMot`). */
+.mj-mot .mj-lettre-seule{font-size:min(48vw,24vh)!important;line-height:1.75!important;padding:0!important}
+.mj-mot .mj-motar{line-height:1.8!important}
+@media (orientation:landscape){
+  .mj-mot .mj-lettre-seule{font-size:min(20vw,34vh)!important;line-height:1.7!important}
+  .mj-mot .mj-motar{line-height:1.7!important}
+}
+body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
 </style>
 <script>
 (function(){

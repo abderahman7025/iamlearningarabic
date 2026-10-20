@@ -6076,3 +6076,6 @@ nécessaire — les éléments du site servent de décor.
 - 3-5 ans : --mc de toutes les manches = couleur du profil (#e8457f fille, #1e88e5 garçon) — fini l'orange (asad, disque de la lettre et son anneau en 4 quarts, Trouve la lettre…).
 - Trouve la lettre, couché : ligne de 2 et taille min(13vw,25vh) — les points des lettres qui descendent (ي…) ne sortent plus du cadre.
 - Audit : 132 écrans 3-5 ans (3 étapes × 11 manches × 4 formats d'écran) — aucun cadre ne dépasse le bas.
+
+## v3.5.6
+- Trouve la lettre : lettre seule bien plus grosse (min(48vw,24vh) debout, min(20vw,34vh) couché). Le mot prend la plus grande taille qui tient en largeur : rapport largeur/taille mesuré une fois à 100 px hors page, puis font-size en cqw du conteneur (`.mj-mot-tx` en container inline-size), plafonné à 20vh debout / 25vh couché. Vérifié sur 390×844, 360×740, 915×412, 740×360 : rien ne déborde.

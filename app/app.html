@@ -6804,6 +6804,16 @@ body.age-petit.profile-boy .mj,body.age-petit.profile-boy .boy-panel{--mc:#1e88e
 @media (orientation:landscape){
   .mj-mot .mj-motar,.mj-mot .mj-lettre-seule{font-size:min(13vw,25vh)!important;line-height:2!important;padding:0!important}
 }
+/* v3.5.6 — « Trouve la lettre » : la lettre seule bien plus grosse, et une
+   ligne assez haute pour les lettres qui descendent (le mot, lui, est mis à
+   la taille par `ajusteMot`). */
+.mj-mot .mj-lettre-seule{font-size:min(48vw,24vh)!important;line-height:1.75!important;padding:0!important}
+.mj-mot .mj-motar{line-height:1.8!important}
+@media (orientation:landscape){
+  .mj-mot .mj-lettre-seule{font-size:min(20vw,34vh)!important;line-height:1.7!important}
+  .mj-mot .mj-motar{line-height:1.7!important}
+}
+body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
 </style>
 <script>
 (function(){
@@ -14572,7 +14582,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.5';
+var _VERSION_REPLI='v3.5.6';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -24581,11 +24591,36 @@ function _boyScene(ca,reprise){
           if(best)repond(best);
         };
         zone.appendChild(boite);
+        requestAnimationFrame(function(){ajusteMot();});
         /* Le mot prend la place de la lettre, au moment où la voix l'annonce. */
         function montreLeMot(){
           if(seule&&seule.parentNode){seule.parentNode.removeChild(seule);seule=null;}
           boite.style.display='';
+          ajusteMot();
         }
+        /* v3.5.6 — le client : « la lettre et les mots doivent être plus
+           gros ». Le mot prend la plus grande taille qui tient dans la
+           largeur (un mot de trois lettres grandit plus qu'un de six), dans
+           la limite de la hauteur de l'écran. */
+        /* La largeur du mot, mesurée UNE fois à 100 px hors de la page, donne
+           son rapport largeur / taille. La taille est ensuite posée en unités
+           du conteneur (cqw) : le mot remplit la largeur quelle que soit la
+           mise à l'échelle de la page, sans jamais déborder. */
+        function ajusteMot(){
+          try{
+            if(boite.style.display==='none'||!boite.isConnected)return;
+            var t=document.createElement('span');
+            t.style.cssText='position:absolute;left:-9999px;top:0;white-space:nowrap;direction:rtl;font-family:\'Scheherazade New\',serif;font-size:100px;line-height:1';
+            t.textContent=boite.textContent;document.body.appendChild(t);
+            var r=(t.getBoundingClientRect().width||200)/100;t.remove();
+            var paysage=innerWidth>innerHeight;
+            boite.style.setProperty('font-size','min(calc(98cqw / '+r.toFixed(3)+'), '+(paysage?'25vh':'20vh')+')','important');
+          window.dispatchEvent(new Event('resize'));
+          }catch(e){}
+        }
+        try{zone.style.containerType='inline-size';}catch(e){}
+        N.plusTard(function(){ajusteMot();},400);
+        try{document.fonts&&document.fonts.ready.then(function(){ajusteMot();});}catch(e){}
         if(n===0)N.plusTard(function(){
           /* ── ON RAPPELLE LA LETTRE, ON NE LA RÉEXPLIQUE PAS ──
              Le client : « il ne faut pas dire "dans un mot, on prononce…",
