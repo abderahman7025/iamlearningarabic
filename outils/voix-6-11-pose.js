@@ -107,6 +107,15 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
       + (fs.existsSync(path.join(avant, nom)) ? 'avant <audio controls src="avant/' + nom + '"></audio><br>' : '')
       + 'nouveau <audio controls src="' + nom + '"></audio></div>';
   });
+  /* Lecture à la suite : les 25 nouveaux sons s'enchaînent, la phrase en
+     cours est surlignée. Chrome refuse parfois de jouer sans un premier
+     clic : le bouton est là pour ça. */
+  h += '<button id="go" style="position:fixed;top:12px;right:12px;font-size:1.1rem;padding:12px 18px;border-radius:12px;border:0;background:#1e88e5;color:#fff;cursor:pointer">▶ Tout écouter</button>'
+    + '<script>var L=[].slice.call(document.querySelectorAll("audio")).filter(function(a){return a.getAttribute("src").indexOf("avant/")<0;}),i=0;'
+    + 'function joue(){if(i>=L.length){document.getElementById("go").textContent="✔ Fini";return;}'
+    + 'document.querySelectorAll("div").forEach(function(d){d.style.outline="";});var a=L[i],d=a.closest("div");d.style.outline="4px solid #1e88e5";d.scrollIntoView({block:"center",behavior:"smooth"});'
+    + 'a.onended=function(){i++;setTimeout(joue,700);};a.play().catch(function(){document.getElementById("go").textContent="▶ Tout écouter (clique)";});}'
+    + 'document.getElementById("go").onclick=function(){i=0;joue();};setTimeout(joue,600);<\/script>';
   fs.writeFileSync(path.join(dest, 'ecoute.html'), h);
   require('child_process').exec('start chrome "' + path.join(dest, 'ecoute.html') + '"');
 })();
