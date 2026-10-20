@@ -48,7 +48,13 @@ const NOMS = [
   [/\bsoukoune?s?\b/gi, 'سُكُون'], [/\bchaddah?s?\b/gi, 'شَدَّة'], [/\btanw[iî]ne?s?\b/gi, 'تَنْوِين'],
   [/\bw[aā]w\b/gi, 'وَاو'], [/\balif\b/gi, 'أَلِف'], [/\by[aā]\b/gi, 'يَاء'], [/\bhamzah?\b/gi, 'هَمْزَة'],
 ];
-const enArabe = (t) => { NOMS.forEach(([re, ar]) => { t = t.replace(re, ar); }); return t; };
+const enArabe = (t) => {
+  NOMS.forEach(([re, ar]) => { t = t.replace(re, ar); });
+  /* Le son du tanwin : « n' » — c'est la façon que le client a validée pour
+     le français (voir voix-correction.json), sinon la voix dit « èn ». */
+  t = t.replace(/\bson n\b(?!')/g, 'son « n\' »');
+  return t;
+};
 const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').replace(/\.(?=[A-ZÀ-Ü])/g, '. ').replace(/\s+/g, ' ').trim();
 
 (async () => {
