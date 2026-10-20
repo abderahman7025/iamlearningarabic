@@ -49,7 +49,9 @@ fs.mkdirSync(avant, { recursive: true });
 const NOMS = [
   [/\bfat[hḥ]as?\b/gi, 'فَتْحَة'], [/\bdammas?\b/gi, 'ضَمَّة'], [/\bkasras?\b/gi, 'كَسْرَة'],
   [/\bsoukoune?s?\b/gi, 'سُكُون'], [/\bchaddah?s?\b/gi, 'شَدَّة'], [/\btanw[iî]ne?s?\b/gi, 'تَنْوِين'],
-  [/\bw[aā]w\b/gi, 'وَاو'], [/\balif\b/gi, 'أَلِف'], [/\by[aā]\b/gi, 'يَاء'], [/\bhamzah?\b/gi, 'هَمْزَة'],
+  [/\bw[aā]w\b/gi, 'وَاو'], [/\balif\b/gi, 'أَلِف'], [/\by[aā]\b/gi, 'يَاء'],
+  /* hamzah : laissé en lettres latines — le client l'a choisi à l'oreille
+     (« hamzah », chaleureux) ; en arabe la voix disait un ḥ fort. */
 ];
 const enArabe = (t) => {
   /* Le client : « la phrase 16 se lit bien avec le déterminant "la" devant
@@ -69,6 +71,7 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
   try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
   /* --refaire=14,15,16 : ces numéros (1 = première phrase) sont regénérés */
   const _rf = (process.argv.find((x) => x.indexOf('--refaire=') === 0) || '').slice(10).split(',').map(Number).filter(Boolean);
+  const _mo = (process.argv.find((x) => x.indexOf('--montrer=') === 0) || '').slice(10).split(',').map(Number).filter(Boolean);
   _rf.forEach((n) => { const t = liste[n - 1]; if (!t) return;
     const f0 = path.join(dest, Buffer.from(cle(t)).toString('hex').slice(0, 80) + '.mp3');
     if (fs.existsSync(f0)) fs.unlinkSync(f0); });
@@ -111,7 +114,8 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
   let h = '<!doctype html><meta charset="utf-8"><title>Voix 6-11</title><body style="font-family:system-ui;background:#eef6ff;padding:20px;max-width:720px;margin:auto"><h2>' + (sansDepot ? 'À écouter avant mise en ligne' : 'Mis en ligne') + '</h2>';
   /* Avec --refaire, la page ne montre QUE les phrases refaites. */
   liste.forEach((t, i) => {
-    if (_rf.length && _rf.indexOf(i + 1) < 0) return;
+    const _vu = _mo.length ? _mo : _rf;
+    if (_vu.length && _vu.indexOf(i + 1) < 0) return;
     const nom = Buffer.from(cle(t)).toString('hex').slice(0, 80) + '.mp3';
     h += '<div style="background:#fff;padding:10px 14px;border-radius:12px;margin:10px 0"><b>' + (i + 1) + '.</b> ' + t
       + '<br><small style="color:#567">dit : ' + enArabe(aDire(t)) + '</small><br>'
