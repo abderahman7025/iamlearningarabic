@@ -8787,6 +8787,47 @@ const ALL_LETTERS=LS.flatMap(s=>s.letters);
    seuls le parcours et l'habillage changent. 'grand' par defaut : c'est ce
    qu'ont deja les comptes ouverts avant ce choix, rien ne bouge pour eux. */
 const st={lang:'fr',profile:'adult',age:'grand',soundOn:true,scores:{},user:null,curLesson:null,quiz:null,backHistory:[],_curPage:null};
+/* ══ v3.5.4 — SON COUPÉ = PLUS AUCUN SON ══
+   Le client : « quand on coupe le son, il ne doit plus y avoir aucun son,
+   même pas les tululut de bonnes réponses ». Les petits sons de réussite,
+   d'erreur, de médaillon, de confettis… sont fabriqués à vingt endroits,
+   chacun avec son propre contexte audio ou son propre lecteur. Plutôt que de
+   les garder un par un, on coupe à la source : un son de synthèse ne
+   démarre pas, un lecteur joue muet, et ce qui jouait déjà se tait. */
+(function(){
+  function muet(){try{return st.soundOn===false;}catch(e){return false;}}
+  var ctxs=[],lecteurs=[];
+  try{
+    var SN=window.AudioScheduledSourceNode&&AudioScheduledSourceNode.prototype;
+    if(SN){
+      var S0=SN.start,S1=SN.stop;
+      SN.start=function(){
+        try{if(this.context&&ctxs.indexOf(this.context)<0)ctxs.push(this.context);}catch(e){}
+        if(muet()){this._muet=1;return;}
+        return S0.apply(this,arguments);};
+      SN.stop=function(){if(this._muet)return;return S1.apply(this,arguments);};
+    }
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(AC&&AC.prototype.resume){
+      var R0=AC.prototype.resume;
+      AC.prototype.resume=function(){if(muet())return Promise.resolve();return R0.apply(this,arguments);};
+    }
+    var MP=HTMLMediaElement.prototype,P0=MP.play;
+    MP.play=function(){
+      if(lecteurs.indexOf(this)<0){lecteurs.push(this);if(lecteurs.length>60)lecteurs.shift();}
+      if(muet()){this.muted=true;this._muetParNous=1;}
+      else if(this._muetParNous){this.muted=false;this._muetParNous=0;}
+      return P0.apply(this,arguments);};
+  }catch(e){}
+  window._appliqueMuet=function(){
+    var m=muet();
+    ctxs.forEach(function(c){try{if(m)c.suspend();else c.resume();}catch(e){}});
+    lecteurs.forEach(function(a){try{
+      if(m){if(!a.muted){a.muted=true;a._muetParNous=1;}}
+      else if(a._muetParNous){a.muted=false;a._muetParNous=0;}
+    }catch(e){}});
+  };
+})();
 try{
   var _savedAge=localStorage.getItem('arab_age');
   if(_savedAge==='petit'||_savedAge==='grand')st.age=_savedAge;
@@ -9227,6 +9268,7 @@ function toggleSound(){st.soundOn=!st.soundOn;document.querySelectorAll('.sound-
   /* v3.2.1 : couper le son coupe aussi la lecture en cours, et un petit
      message dit ce qui vient de se passer. */
   if(!st.soundOn)try{stopSpeech();}catch(e){}
+  try{if(window._appliqueMuet)_appliqueMuet();}catch(e){}
   try{if(window._sonBulle)_sonBulle();}catch(e){}}
 
 // I18N — update ALL non-Arabic text
@@ -14606,7 +14648,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.3';
+var _VERSION_REPLI='v3.5.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -14912,6 +14954,11 @@ function _boyNarration(){
     busy=true;
     var txt=q.shift(),maxMs=estim(txt);
     enCours=txt;
+    /* v3.5.4 — le client : « quand on coupe le son, les pages s'enchaînent
+       très vite ». La page suivante attend la fin de la voix ; sans voix, la
+       fin venait tout de suite. Son coupé, la phrase « dure » le temps qu'il
+       faudrait pour la dire (même estimation que le garde-fou). */
+    var muetFin=st.soundOn?0:Date.now()+estim(txt);
     /* La fete part AU MOMENT ou le mot est dit, pas avant. */
     try{_feteSiBravo(txt);}catch(e){}
     try{speakText(txt,_voixEnfant(),null);}catch(e){}
@@ -14960,7 +15007,8 @@ function _boyNarration(){
       }
       var parle=(ss&&(ss.speaking||ss.pending))
         ||(a&&!a._fini&&!a.ended&&(!a.paused||(Date.now()-(a._lance||0))<600))
-        ||enMorceaux;
+        ||enMorceaux
+        ||(muetFin&&!st.soundOn&&Date.now()<muetFin);
       /* ── UN ENREGISTREMENT DURE CE QU'IL DURE ──
          `estim` devine la duree sur la LONGUEUR DU TEXTE, et plafonne a 9 s :
          la phrase du soukoun, dite par le client, passe les 9 s, et le
@@ -28071,7 +28119,7 @@ function renderProgress(ca){
 
 // SETTINGS
 function renderSettings(ca){
-  ca.innerHTML=`<div class="set-row"><span>${t('sound_on')}</span><div class="tog ${st.soundOn?'on':''}" onclick="st.soundOn=!st.soundOn;this.classList.toggle('on')"></div></div><div class="set-row" style="cursor:pointer" onclick="if(confirm('${t('reset')}?')){st.scores={};renderProgress(document.getElementById('ca'))}"><span style="color:#ff7070">${t('reset')}</span></div><div class="set-row" style="cursor:pointer" onclick="doLogout()"><span style="color:#ff9090">🚪 ${t('quit')}</span></div>`;
+  ca.innerHTML=`<div class="set-row"><span>${t('sound_on')}</span><div class="tog ${st.soundOn?'on':''}" onclick="st.soundOn=!st.soundOn;this.classList.toggle('on');try{_appliqueMuet()}catch(e){}"></div></div><div class="set-row" style="cursor:pointer" onclick="if(confirm('${t('reset')}?')){st.scores={};renderProgress(document.getElementById('ca'))}"><span style="color:#ff7070">${t('reset')}</span></div><div class="set-row" style="cursor:pointer" onclick="doLogout()"><span style="color:#ff9090">🚪 ${t('quit')}</span></div>`;
 }
 
 // COMPLETION CHECK — 100% toutes les leçons

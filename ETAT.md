@@ -6065,3 +6065,7 @@ nécessaire — les éléments du site servent de décor.
 - Ballons : réagissent au pointerdown, aires en touch-action none (le doigt qui glisse faisait défiler la page et remesurer le cadre).
 - Textes 3-5 : couleur du profil (#0396c8 garçon, #c2185b fille), plus aucun texte noir (titre de barre, Progression, noms de l'album) ; titres en Fredoka, couleur cernée de blanc, casse normale.
 - Bouton du compte (langue, changer d'interface, déconnexion) dans la barre du haut sur chaque page 3-5 (`#tb-compte`, ouvre `_ouvreCompte`).
+
+## v3.5.4
+- Son coupé = plus aucun son : garde global posé juste après `const st` — `AudioScheduledSourceNode.start` ne démarre plus (et `stop` ignore ces nœuds), `AudioContext.resume` ne réveille plus, `HTMLMediaElement.play` joue muet ; `_appliqueMuet()` (appelé par `toggleSound` et le réglage) suspend les contextes et rend muets les lecteurs déjà lancés.
+- Enfants, son coupé : la narration « dure » le temps qu'il faudrait pour dire la phrase (`muetFin`, même estimation que le garde-fou) — les pages ne s'enchaînent plus en rafale. Adultes : la lecture automatique s'arrêtait déjà au son coupé.
