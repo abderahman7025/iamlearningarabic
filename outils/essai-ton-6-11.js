@@ -30,10 +30,10 @@ function cles(t) {
   const l = [t, t.replace(/([^\s])([!?;:…])/g, '$1 $2'), t.trim(), t + ' ', t.replace(/[.\s]+$/, '')];
   return l.filter((x, i) => l.indexOf(x) === i);
 }
-async function tts(texte, f) {
+async function tts(texte, f, balise) {
   const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + VOIX + '?output_format=mp3_44100_128', {
     method: 'POST', headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-    body: JSON.stringify({ text: '[calm] ' + texte, model_id: 'eleven_v4', language_code: 'fr',
+    body: JSON.stringify({ text: (balise || '[calm]') + ' ' + texte, model_id: 'eleven_v4', language_code: 'fr',
       voice_settings: { stability: 0.5, similarity_boost: 0.95, style: 0, use_speaker_boost: true } }),
   });
   if (!r.ok) { console.log('ECHEC', r.status, (await r.text()).slice(0, 160)); return false; }
@@ -47,7 +47,7 @@ fs.mkdirSync(dest, { recursive: true });
   const lignes = [];
   for (let i = 0; i < PHRASES.length; i++) {
     const p = PHRASES[i], n = String(i + 1);
-    const ligne = { p, actuelle: null, pose: null, arabe: null };
+    const ligne = { p, actuelle: null, pose: null, arabe: null, chaud: null };
     // 1. la version actuelle, telle qu'elle est en ligne
     const k = cles(p).find((x) => urls[x]);
     if (k) {
@@ -63,6 +63,9 @@ fs.mkdirSync(dest, { recursive: true });
     if (ar !== p) {
       const f3 = path.join(dest, n + '-pose-arabe.mp3');
       if (fs.existsSync(f3) || await tts(ar, f3)) ligne.arabe = n + '-pose-arabe.mp3';
+      // 4. v4 CHALEUREUX (le ton actuel), noms en arabe
+      const f4 = path.join(dest, n + '-chaud-arabe.mp3');
+      if (fs.existsSync(f4) || await tts(ar, f4, '[warmly]')) ligne.chaud = n + '-chaud-arabe.mp3';
     }
     console.log('ok', n, p);
     lignes.push(ligne);
@@ -71,7 +74,7 @@ fs.mkdirSync(dest, { recursive: true });
     + '<h2>Voix des 6-11 ans : actuelle ou posée ?</h2>';
   lignes.forEach((l, i) => {
     h += '<div style="background:#fff;padding:12px 16px;border-radius:14px;margin:14px 0"><b>' + (i + 1) + '. « ' + l.p + ' »</b>';
-    [['Actuelle (v4 chaleureux)', l.actuelle], ['v4 posé', l.pose], ['v4 posé, noms en arabe pour la voix', l.arabe]].forEach(([t, s]) => {
+    [['Actuelle (v4 chaleureux)', l.actuelle], ['v4 posé', l.pose], ['v4 posé, noms en arabe pour la voix', l.arabe], ['v4 chaleureux (ton actuel), noms en arabe pour la voix', l.chaud]].forEach(([t, s]) => {
       if (s) h += '<p style="margin:8px 0 0">' + t + '<br><audio controls src="' + s + '"></audio></p>';
     });
     h += '</div>';
