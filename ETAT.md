@@ -6095,3 +6095,11 @@ nécessaire — les éléments du site servent de décor.
 - Fille, carte couchée : au départ elle regarde déjà vers où part l'arc-en-ciel (sensVol posé d'après le 1er tronçon, dessin `piloteSansCouronneSens`), et le tronçon de l'arc-en-ciel se suit au lieu d'onduler (`_leLongDuChemin`).
 - 6-11 debout : tracés sur deux rangées (2+2 ou 2+1) dans un cadre plus haut (`RANGS`, `caseDe(x,y)`, lignes, gomme, révélateur par rangée) ; titres plafonnés à 30 px vus ; hublot à 80 % du cadre, glyphe en 46cqw.
 - Rotation autorisée : plus de `screen.orientation.lock('landscape')` (unlock), manifest `orientation: any`.
+
+## v3.6.0
+- 6-11 : plus de consignes « Appuie sur le hublot pour écouter (le mot) » ni « La ligne d'écriture — appuie sur un signe » (la voix lit la page). Toucher le hublot ou la ligne d'écriture pendant que la voix lit ne coupe plus la lecture (`N.occupe()`).
+- 6-11 debout : titres à une taille FIXE de 27 px vus, lignes qui coulent d'un trait (`.titre-coule`, `.boy-ligne` en inline, text-wrap:pretty) — plus de première ligne pleine et de suivantes à deux mots.
+- Hublots toujours ronds (min-height:0, flex:none) ; le texte du hublot réduit jusqu'à 78 % de sa largeur, en !important pour passer devant la règle 46cqw ; canevas du hublot à 74 %.
+- Tracé à deux formes debout : cadre plus haut, lettres plus grandes.
+- « À retenir » debout : vaisseau au-dessus, texte sur toute la largeur. Fin de cours debout : les deux montures sous le texte.
+- VOIX (non traité, en attente d'accord) : les phrases 6-11 françaises sont en eleven_v4 [warmly] ; les noms écrits en lettres latines (fatha, waw…) y sont lus à la française (« fata », « vaw »).

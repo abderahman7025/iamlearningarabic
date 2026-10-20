@@ -6854,6 +6854,28 @@ body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!
   body:not(.age-petit) .boy-panel .boy-hublot{width:80%!important;max-width:340px!important;height:auto!important;aspect-ratio:1;margin:10px auto 26px!important;container-type:inline-size}
   body:not(.age-petit) .boy-panel .boy-hublot span{font-size:46cqw!important}
 }
+/* v3.6.0 — hublots TOUJOURS ronds (jamais d'ovale, l'anneau pointillé non
+   plus) : le contenu ne peut plus étirer la boîte. Les signes dessinés sur
+   canevas (tanwin, syllabe en deux couleurs) suivent la taille du hublot. */
+body:not(.age-petit) .boy-panel .boy-hublot{min-height:0!important;min-width:0!important;flex:none!important;box-sizing:border-box}
+@media (orientation:portrait){
+  body:not(.age-petit) .boy-panel .boy-hublot{max-height:340px}
+  body:not(.age-petit) .boy-panel .boy-hublot>canvas{width:74%!important;height:74%!important}
+  /* le texte coule d'un trait (voir `remplitLaLargeur`) */
+  body:not(.age-petit) .boy-titre.titre-coule{max-width:none!important;text-wrap:pretty}
+  body:not(.age-petit) .boy-titre.titre-coule .boy-ligne{display:inline!important;white-space:normal!important}
+  body:not(.age-petit) .boy-titre.titre-coule .boy-ligne::after{content:' '}
+  /* « À retenir » : le vaisseau au-dessus, le texte sur toute la largeur */
+  body:not(.age-petit) .boy-panel>.res-liste{max-width:100%!important;width:100%}
+  body:not(.age-petit) .res-point{flex-direction:column!important;text-align:center!important;gap:4px!important;padding:8px 10px!important}
+  body:not(.age-petit) .res-point i img.res-puce{height:1.3em!important}
+  body:not(.age-petit) .res-point .res-tx{width:100%}
+  /* Fin de cours : les deux montures sous le texte, côte à côte, plus le
+     texte caché entre elles (« le texte est caché par les deux fusées »). */
+  body:not(.age-petit) .fete-rangee{display:grid!important;grid-template-columns:1fr 1fr;justify-items:center;row-gap:10px}
+  body:not(.age-petit) .fete-rangee>.fete-texte{grid-column:1 / -1;grid-row:1;width:100%}
+  body:not(.age-petit) .fete-rangee>.fete-monture{grid-row:2;width:clamp(70px,24vw,130px)!important}
+}
 </style>
 <script>
 (function(){
@@ -14650,7 +14672,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.9';
+var _VERSION_REPLI='v3.6.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17095,6 +17117,11 @@ function _blocEcriture(hote,o){
   if(RANGS>1)CH0=BANDE0+Math.round((CH0-BANDE0)*1.75);
   var PX0=o.signeSeul?640:({1:205,2:172,3:142}[COLS]||110);
   if(RANGS>1)PX0=Math.round(PX0*1.25);
+  /* Deux formes seulement, debout : un cadre plus haut et des lettres plus
+     grandes — elles ont toute la largeur pour elles. */
+  if(RANGS===1&&nb<=2&&window.innerHeight>window.innerWidth&&!o.signeSeul&&!o.deTete){
+    CH0=BANDE0+Math.round((CH0-BANDE0)*1.45);PX0=Math.round(PX0*1.3);
+  }
   var k=(o.dispoW||CW0)/CW0;
   if(o.dispoH)k=Math.min(k,o.dispoH/CH0);
   k=Math.max(1,k);
@@ -19592,6 +19619,27 @@ function _boyScene(ca,reprise){
     if(!lignes.length)return;
     /* l'equilibrage de `sansMotSeul` se pose APRES ce calcul, jamais avant */
     [].slice.call(lignes).forEach(function(l){l.style.textWrap='';});
+    /* ══ v3.6.0 — 6-11 ANS DEBOUT : UNE SEULE TAILLE, DES LIGNES PLEINES ══
+       Le client : « le texte est tout petit sur une page, deux fois plus gros
+       sur une autre » ; « la première ligne prend la largeur, les suivantes
+       non, alors qu'il n'y a que des petits mots » ; « jamais de ligne avec
+       si peu de caractères ». Debout, les lignes écrites ne sont plus des
+       blocs : le texte coule d'un trait sur toute la largeur, à une taille
+       FIXE à l'écran (celle de la page « enjeu »), et le navigateur équilibre
+       les fins de ligne. L'illustration reste ce qu'il y a de plus gros. */
+    if(window.innerHeight>window.innerWidth&&!(st&&st.age==='petit')&&!(t.closest&&t.closest('.boy-col-g'))){
+      var _e0=1;
+      try{var _cd=t.closest('.boy-wrap,.boy-plein')||t.parentNode,_w0=_cd.clientWidth;
+        if(_w0>0){var _v0=_cd.getBoundingClientRect().width/_w0;if(_v0>0.2&&_v0<6)_e0=_v0;}}catch(e){}
+      t.classList.add('titre-coule');
+      [].slice.call(lignes).forEach(function(l){l.style.whiteSpace='normal';});
+      var _vise=27/_e0;
+      t.style.fontSize=_vise.toFixed(1)+'px';
+      /* un mot trop long pour la colonne : on descend juste assez */
+      for(var _g=0;_g<12&&t.scrollWidth>t.clientWidth+1;_g++){
+        _vise*=0.94;t.style.fontSize=_vise.toFixed(1)+'px';}
+      return;
+    }
     /* On mesure a une taille de reference, puis on met a l'echelle d'un seul
        coup : les blocs ne se repliant pas, leur largeur est proportionnelle a
        la police et le calcul est exact. */
@@ -19962,7 +20010,7 @@ function _boyScene(ca,reprise){
       peint();
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peint);}catch(e){}
       h.appendChild(cvH);
-      h.onclick=function(){N.stop();N.dire(son||glyph);};
+      h.onclick=function(){if(N.occupe&&N.occupe())return;N.stop();N.dire(son||glyph);};
     }else if(_aTanwin(glyph)){
       /* ── DEUX SIGNES, PAS UNE LIGATURE ──
          Poser deux fois le texte doublerait la LETTRE avec le signe ; seul
@@ -19988,7 +20036,7 @@ function _boyScene(ca,reprise){
       peintT();
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(peintT);}catch(e){}
       h.appendChild(cvT);
-      h.onclick=function(){N.stop();N.dire(son||glyph);};
+      h.onclick=function(){if(N.occupe&&N.occupe())return;N.stop();N.dire(son||glyph);};
     }else{
       h.innerHTML='<span>'+_sansCercle(glyph)+'</span>';
       /* Un mot entier écrit à la taille d'une lettre débordait du hublot et
@@ -20018,11 +20066,15 @@ function _boyScene(ca,reprise){
            Et le span est FIGE : dans une boite en flex il se faisait raboter
            a la largeur du hublot, si bien que sa largeur mesuree ne disait
            plus rien de ce qui etait ecrit. */
-        var max=h.clientWidth-40;if(max<40)return;
+        /* v3.6.0 — « le texte du hublot ne doit jamais dépasser » (لا أحبك) :
+           la marge suit la taille du hublot, et la taille réduite passe
+           devant la règle qui grossit la lettre debout (!important). */
+        var max=Math.min(h.clientWidth-40,h.clientWidth*0.78);if(max<40)return;
         sp.style.flex='0 0 auto';
+        sp.style.removeProperty('font-size');
         var px=parseFloat(getComputedStyle(sp).fontSize)||74,garde=0;
-        while(sp.offsetWidth>max&&px>20&&garde++<60){
-          px-=3;sp.style.fontSize=px+'px';
+        while(sp.offsetWidth>max&&px>20&&garde++<80){
+          px-=3;sp.style.setProperty('font-size',px+'px','important');
         }
       };
       /* `requestAnimationFrame` ne bat pas dans un onglet cache : on repasse
@@ -20063,13 +20115,11 @@ function _boyScene(ca,reprise){
       requestAnimationFrame(ajustePuisPose);
       N.plusTard(ajustePuisPose,80);N.plusTard(ajustePuisPose,420);
       try{if(document.fonts&&document.fonts.ready)document.fonts.ready.then(ajustePuisPose);}catch(e){}
-      h.onclick=function(){N.stop();N.dire(son||glyph);};
+      h.onclick=function(){if(N.occupe&&N.occupe())return;N.stop();N.dire(son||glyph);};
     }
     p.appendChild(h);
-    if(note!==null){
-      var n=document.createElement('div');n.className='boy-note';
-      n.textContent=note||_HAB.noteBulle;p.appendChild(n);
-    }
+    /* v3.6.0 — le client : « "appuie sur le hublot pour écouter" ne sert à
+       rien : la voix lit la page toute seule ». La consigne n'est plus posée. */
     /* ── ON LAISSE LE TEXTE FINIR, PUIS ON ATTEND ──
        Le client : « pour toutes les voyelles, on doit attendre environ deux
        secondes après avoir lu le texte, puis donner le son de la voyelle ».
@@ -20135,11 +20185,13 @@ function _boyScene(ca,reprise){
          le signe touché */
       var k=n-1-Math.floor(((ev.clientX-r.left)/r.width)*n);
       var o=items[Math.max(0,Math.min(n-1,k))];
+      /* v3.6.0 — « quand on clique dessus, ça annule la lecture du texte » :
+         tant que la voix lit la page, le toucher attend. */
+      if(N.occupe&&N.occupe())return;
       if(o){N.stop();N.dire(o[2]||o[0]);}
     };
     p.appendChild(cv);
-    var lbl=document.createElement('div');lbl.className='boy-note';
-    lbl.textContent=_HAB.notePiste;p.appendChild(lbl);
+    /* v3.6.0 — plus de « la ligne d'écriture — appuie sur un signe… ». */
     return cv;
   }
   function bouton(p,label,fn,sec){
@@ -20643,6 +20695,7 @@ function _boyScene(ca,reprise){
   }
   function sansMotSeul(t){
     if(!t||!t.isConnected||!t.querySelector('.boy-ligne'))return;
+    if(t.classList.contains('titre-coule')&&window.innerHeight>window.innerWidth)return;
     if(!motsSeuls(t))return;
     /* d'abord l'equilibrage du navigateur, a taille egale */
     [].slice.call(t.querySelectorAll('.boy-ligne')).forEach(function(l){l.style.textWrap='balance';});

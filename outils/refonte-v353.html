@@ -126,6 +126,28 @@ body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!
   body:not(.age-petit) .boy-panel .boy-hublot{width:80%!important;max-width:340px!important;height:auto!important;aspect-ratio:1;margin:10px auto 26px!important;container-type:inline-size}
   body:not(.age-petit) .boy-panel .boy-hublot span{font-size:46cqw!important}
 }
+/* v3.6.0 — hublots TOUJOURS ronds (jamais d'ovale, l'anneau pointillé non
+   plus) : le contenu ne peut plus étirer la boîte. Les signes dessinés sur
+   canevas (tanwin, syllabe en deux couleurs) suivent la taille du hublot. */
+body:not(.age-petit) .boy-panel .boy-hublot{min-height:0!important;min-width:0!important;flex:none!important;box-sizing:border-box}
+@media (orientation:portrait){
+  body:not(.age-petit) .boy-panel .boy-hublot{max-height:340px}
+  body:not(.age-petit) .boy-panel .boy-hublot>canvas{width:74%!important;height:74%!important}
+  /* le texte coule d'un trait (voir `remplitLaLargeur`) */
+  body:not(.age-petit) .boy-titre.titre-coule{max-width:none!important;text-wrap:pretty}
+  body:not(.age-petit) .boy-titre.titre-coule .boy-ligne{display:inline!important;white-space:normal!important}
+  body:not(.age-petit) .boy-titre.titre-coule .boy-ligne::after{content:' '}
+  /* « À retenir » : le vaisseau au-dessus, le texte sur toute la largeur */
+  body:not(.age-petit) .boy-panel>.res-liste{max-width:100%!important;width:100%}
+  body:not(.age-petit) .res-point{flex-direction:column!important;text-align:center!important;gap:4px!important;padding:8px 10px!important}
+  body:not(.age-petit) .res-point i img.res-puce{height:1.3em!important}
+  body:not(.age-petit) .res-point .res-tx{width:100%}
+  /* Fin de cours : les deux montures sous le texte, côte à côte, plus le
+     texte caché entre elles (« le texte est caché par les deux fusées »). */
+  body:not(.age-petit) .fete-rangee{display:grid!important;grid-template-columns:1fr 1fr;justify-items:center;row-gap:10px}
+  body:not(.age-petit) .fete-rangee>.fete-texte{grid-column:1 / -1;grid-row:1;width:100%}
+  body:not(.age-petit) .fete-rangee>.fete-monture{grid-row:2;width:clamp(70px,24vw,130px)!important}
+}
 </style>
 <script>
 (function(){
