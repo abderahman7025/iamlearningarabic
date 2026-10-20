@@ -1,5 +1,5 @@
 /*
- * Voix 6-11 ans en v4 POSÉ — À NE PAS DÉPLOYER (hors de api/ et public/).
+ * Voix 6-11 ans : les phrases à NOMS ARABES (v4 CHALEUREUX, comme le reste) — À NE PAS DÉPLOYER (hors de api/ et public/).
  *
  * Choix du client (20 octobre, après l'essai `essai-ton-6-11.js`) : « v4 posé
  * arabe ». Les phrases françaises des 6-11 ans passent du v4 chaleureux
@@ -8,7 +8,10 @@
  * elle les lit à la française (« fata », « vaw »). Le texte affiché et la clé
  * ne changent pas.
  *
- *   node outils/voix-6-11-pose.js outils/voix-6-11-pose.json [--sans-depot]
+ *   node outils/voix-6-11-pose.js outils/voix-6-11-noms.json --sans-depot   (écoute)
+ *   node outils/voix-6-11-pose.js outils/voix-6-11-noms.json                (mise en ligne)
+ * Choix final du client : CHALEUREUX ([warmly]) + noms en arabe, seulement
+ * les 25 phrases concernées.
  *
  * Avant d'écraser, l'enregistrement actuel est téléchargé dans
  * captures/voix-6-11-pose/avant/ (retour arrière possible).
@@ -76,7 +79,7 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
           method: 'POST',
           headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
           body: JSON.stringify({
-            text: '[calm] ' + enArabe(aDire(t)), model_id: 'eleven_v4', language_code: 'fr',
+            text: '[warmly] ' + enArabe(aDire(t)), model_id: 'eleven_v4', language_code: 'fr',
             voice_settings: { stability: 0.5, similarity_boost: 0.95, style: 0, use_speaker_boost: true },
           }),
         });
@@ -96,4 +99,14 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
     } catch (e) { rates.push(t); console.log('ECHEC', t.slice(0, 40), String(e.message).slice(0, 200)); }
   }
   console.log('\nphrases', liste.length, '- caracteres generes', car, '- echecs', rates.length);
+  let h = '<!doctype html><meta charset="utf-8"><title>Voix 6-11</title><body style="font-family:system-ui;background:#eef6ff;padding:20px;max-width:720px;margin:auto"><h2>' + (sansDepot ? 'À écouter avant mise en ligne' : 'Mis en ligne') + '</h2>';
+  liste.forEach((t, i) => {
+    const nom = Buffer.from(cle(t)).toString('hex').slice(0, 80) + '.mp3';
+    h += '<div style="background:#fff;padding:10px 14px;border-radius:12px;margin:10px 0"><b>' + (i + 1) + '.</b> ' + t
+      + '<br><small style="color:#567">dit : ' + enArabe(aDire(t)) + '</small><br>'
+      + (fs.existsSync(path.join(avant, nom)) ? 'avant <audio controls src="avant/' + nom + '"></audio><br>' : '')
+      + 'nouveau <audio controls src="' + nom + '"></audio></div>';
+  });
+  fs.writeFileSync(path.join(dest, 'ecoute.html'), h);
+  require('child_process').exec('start chrome "' + path.join(dest, 'ecoute.html') + '"');
 })();
