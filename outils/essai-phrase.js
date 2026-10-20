@@ -1,6 +1,7 @@
 /*
  * ESSAI — une phrase, en v4 posé ET en v4 chaleureux, noms en arabe.
  *   node outils/essai-phrase.js "la kasra est prolongé par le"
+ *   node outils/essai-phrase.js --brut "…"   (texte envoyé tel quel)
  * ~2 × la longueur de la phrase en caractères. Rien en ligne.
  */
 const fs = require('fs');
@@ -10,14 +11,15 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
   const m = l.match(/^([A-Z_]+)=(.*)$/); if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '');
 });
 const VOIX = 'Wm3eSTpNFfFtDgCxf6AU';
-const t = process.argv.slice(2).join(' ').trim();
+const brut = process.argv.includes('--brut');
+const t = process.argv.slice(2).filter((x) => x !== '--brut').join(' ').trim();
 if (!t) { console.log('Il manque la phrase.'); process.exit(1); }
 const NOMS = [
   [/\bfat[hḥ]as?\b/gi, 'فَتْحَة'], [/\bdammas?\b/gi, 'ضَمَّة'], [/\bkasras?\b/gi, 'كَسْرَة'],
   [/\bsoukoune?s?\b/gi, 'سُكُون'], [/\bchaddah?s?\b/gi, 'شَدَّة'], [/\btanw[iî]ne?s?\b/gi, 'تَنْوِين'],
   [/\bw[aā]w\b/gi, 'وَاو'], [/\balif\b/gi, 'أَلِف'], [/\by[aā]\b/gi, 'يَاء'], [/\bhamzah?\b/gi, 'هَمْزَة'],
 ];
-let dit = t; NOMS.forEach(([re, ar]) => { dit = dit.replace(re, ar); });
+let dit = t; if (!brut) NOMS.forEach(([re, ar]) => { dit = dit.replace(re, ar); });
 const dest = path.join(__dirname, 'captures', 'essai-phrase');
 fs.mkdirSync(dest, { recursive: true });
 const base = Date.now().toString(36);
