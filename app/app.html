@@ -26,7 +26,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://iamlearningarabic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:wght@700;800;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -5279,6 +5279,7 @@ body.age-petit .tuile-jauge>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
     d.innerHTML=DRAPEAUX[st.lang]||'';
   }
   window._poseDrapeauCompte=poseDrapeau;
+  window._ouvreCompte=ouvre;
   function arme(){
     var av=document.getElementById('m-avatar');if(!av||av._cp)return;
     av._cp=1;av.setAttribute('role','button');av.setAttribute('tabindex','0');
@@ -6725,6 +6726,137 @@ body.age-petit .boy-panel.panneau-jeu:has(.mj-bulles){overflow:hidden!important}
    (paysage) : bulles et ballons prennent maintenant toute la largeur. */
 body.age-petit .mj.mj-attrape,body.age-petit .mj.mj-bulles{max-width:none!important}
 </style>
+<style id="refonte-v353">
+/* v3.5.3 — « Les voyelles » (3-5 ans) : le client, « les ronds réponses
+   doivent être beaucoup plus gros ». Toute la largeur du cadre ; debout sur
+   un téléphone, les trois ronds se rangent l'un sous l'autre pour être
+   grands. */
+body.age-petit .mj.mj-voyelles{max-width:none!important;container:voy/inline-size}
+body.age-petit .mj-voyelles .mj-rangee{gap:5cqw;flex-wrap:nowrap}
+body.age-petit .mj-voyelles .mj-bulleV{--d:min(200px,28cqw);width:var(--d)!important;height:var(--d)!important;font-size:calc(var(--d) * .5)!important}
+@container voy (max-width:480px){
+  body.age-petit .mj-voyelles .mj-rangee{flex-direction:column;gap:16px}
+  body.age-petit .mj-voyelles .mj-bulleV{--d:min(150px,46cqw,19vh)}
+}
+/* ── v3.5.3 — 3-5 ANS : AUCUN DÉFILEMENT ──
+   Le client : « on ne doit jamais pouvoir scroller pour cette interface ».
+   Chaque page est mise à la mesure de l'écran (`ajusteEcran` pour les
+   manches, `poseLeRepere` pour la carte) ; on ferme donc le défilement. */
+html:has(body.age-petit),body.age-petit{overflow:hidden!important;overscroll-behavior:none}
+body.age-petit #ca{overflow:hidden!important;overscroll-behavior:none;touch-action:manipulation}
+body.age-petit .carte-monde{margin-bottom:8px!important}
+body.age-petit .carte-monde.couchee .carte-etape{width:var(--etw,13%)!important}
+/* L'album : un bouton sous la carte, qui l'ouvre en grand. */
+body.age-petit .alb-ouvre{display:block;margin:0 auto;border:0;cursor:pointer;
+  font-family:'Fredoka','Nunito',sans-serif;font-weight:700;font-size:1.15rem;color:#fff;
+  padding:10px 26px;border-radius:999px;
+  background:linear-gradient(180deg,var(--sk-clair),var(--sk-vif));
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 6px 0 var(--sk-fonce),0 12px 20px rgba(var(--sk-rgb-f),.3)}
+body.age-petit .alb-ouvre:active{transform:translateY(5px);box-shadow:inset 0 3px 0 rgba(255,255,255,.45),0 1px 0 var(--sk-fonce)}
+.alb-voile{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
+  background:rgba(20,30,50,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:14px}
+.alb-voile.on{display:flex}
+.alb-boite{position:relative;width:min(100%,980px);max-height:100%;border-radius:28px;padding:14px 14px 16px;
+  background:var(--sk-pale,#fff);box-shadow:0 10px 0 rgba(var(--sk-rgb-f,0,0,0),.25),0 24px 50px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;overflow:hidden}
+.alb-boite .sess-map-title{margin:4px 44px 10px!important;font-size:1.25rem!important}
+.alb-ferme{position:absolute;top:10px;right:10px;width:42px;height:42px;border-radius:50%;border:0;
+  font-size:1.2rem;font-weight:900;color:#fff;cursor:pointer;
+  background:linear-gradient(180deg,var(--sk-clair,#888),var(--sk-vif,#555));box-shadow:0 4px 0 var(--sk-fonce,#333)}
+.alb-boite .alb-bande{grid-template-columns:repeat(3,1fr)!important;padding:0!important;gap:10px!important}
+.alb-boite .alb-vig img{height:min(74px,9vh)!important}
+@media (orientation:landscape){
+  .alb-boite .alb-bande{grid-template-columns:repeat(6,1fr)!important}
+  .alb-boite .alb-vig img{height:min(74px,16vh)!important}
+}
+/* Téléphone couché : peu de hauteur. Titre et jauge resserrés, le bouton
+   de l'album remonte sur la ligne du titre, à droite. */
+@media (orientation:landscape) and (max-height:560px){
+  body.age-petit .sess-map-wrap{position:relative}
+  body.age-petit #root .sess-map-wrap>.sess-map-title{font-size:1.3rem!important;margin:0 0 2px!important;padding:2px 0!important;line-height:1.2!important}
+  body.age-petit .sess-map-wrap>.alb-ouvre{position:absolute;top:0;right:6px;font-size:.95rem;padding:7px 16px}
+}
+/* Couchée, la carte est écrasée en hauteur (preserveAspectRatio none) : le
+   sentier s'épaississait d'autant. Son trait est donc posé en pixels, à la
+   mesure des médaillons. */
+body.age-petit .carte-monde.couchee .carte-sentier path{vector-effect:non-scaling-stroke}
+body.age-petit .carte-monde.couchee .carte-sentier .sol{stroke-width:calc(var(--etw,90px) * .36)}
+body.age-petit .carte-monde.couchee .carte-sentier .bord{stroke-width:calc(var(--etw,90px) * .46)}
+body.age-petit .carte-monde.couchee .carte-sentier .pas{stroke-width:6px;stroke-dasharray:.1 22;animation-name:cartePasPx,carteApparait}
+@keyframes cartePasPx{to{stroke-dashoffset:-22.1}}
+body.age-petit .carte-monde.couchee .carte-sentier .sol,body.age-petit .carte-monde.couchee .carte-sentier .bord{stroke-dasharray:none!important;animation:none!important}
+/* Choix de la lettre, téléphone couché : les vignettes côte à côte, à la
+   hauteur de l'écran, au lieu de s'empiler sous l'écran. */
+@media (orientation:landscape) and (max-height:560px){
+  body.age-petit .choix-lettre>.sess-map-title{font-size:1.3rem!important;margin:0 0 6px!important;padding:2px 0!important}
+  body.age-petit .choix-lettre .tuiles-large{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:16px!important;max-width:none!important}
+  body.age-petit .choix-lettre .tuile-lettre{height:calc(100vh - 200px)!important;min-height:0!important;margin:0!important;padding:8px!important}
+  body.age-petit .choix-lettre .tuile-duo{height:100%;justify-content:center}
+  body.age-petit .choix-lettre .jeu-retour{margin-top:10px!important;padding:6px 20px!important}
+}
+/* Ballons et bulles : aucun geste du doigt n'y fait défiler ou zoomer. */
+body.age-petit .mj-bulles .mj-aire,body.age-petit .mj-attrape .mj-aire,body.age-petit .boy-panel.panneau-jeu{touch-action:none;-webkit-user-select:none;user-select:none}
+/* ── v3.5.3 — LES TEXTES DES 3-5 ANS ──
+   Le client : « l'écriture doit être de la même couleur que celle des
+   interfaces 6/11 ans (rose foncé pour fille, bleu turquoise pour garçon) ;
+   aucun mot en noir ». Et « Choisis ta lettre » : « on ne voit pas bien les
+   mots, l'écriture est trop carrée — ce sont des enfants ». Les titres
+   passent dans une police ronde (Fredoka), en couleur pleine cernée de
+   blanc, au lieu du blanc sur blanc en capitales. */
+body.age-petit.profile-boy{--sk-txt:#0396c8;--sk-txt-f:#015f86}
+body.age-petit.profile-girl{--sk-txt:#c2185b;--sk-txt-f:#7b1747}
+body.age-petit #root #tb-title,body.age-petit #root .sess-gp-lbl,body.age-petit #root .sess-gp-lbl span,body.age-petit .alb-vig-nom,body.age-petit .carte-nom,
+body.age-petit .carte-etat,body.age-petit .tuile-etat,body.age-petit .alb-cadenas{color:var(--sk-txt)!important;-webkit-text-fill-color:var(--sk-txt)!important}
+body.age-petit #tb-title{font-family:'Fredoka','Nunito',sans-serif!important;font-weight:600!important;font-size:1.15rem!important}
+body.age-petit .sess-gp-lbl,body.age-petit .alb-vig-nom{font-family:'Fredoka','Nunito',sans-serif!important;font-weight:600!important}
+body.age-petit .sess-gp-lbl{font-size:.95rem!important}
+body.fond-prairie.age-petit #root .sess-map-title,body.age-petit #root .sess-map-title,body.age-petit .alb-boite .sess-map-title{
+  font-family:'Fredoka','Nunito',sans-serif!important;font-weight:700!important;text-transform:none!important;
+  letter-spacing:.01em!important;font-size:min(1.75rem,6.4vw)!important;line-height:1.15!important;text-wrap:balance;
+  color:var(--sk-txt)!important;-webkit-text-fill-color:var(--sk-txt)!important;-webkit-text-stroke:0!important;
+  text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff,0 -2px 0 #fff,0 2px 0 #fff,-2px 0 0 #fff,2px 0 0 #fff,
+    0 4px 0 #fff,0 6px 12px rgba(var(--sk-rgb-f),.28)!important}
+/* ── v3.5.3 — LE COMPTE SUR CHAQUE PAGE DES 3-5 ANS ──
+   Le client : « ajoute le bouton pour se déconnecter, changer d'interface
+   et de langue sur chaque page, comme les 6/11 ans ». C'est le même menu
+   que celui de l'avatar du menu principal, posé dans la barre du haut. */
+#tb-compte{display:none}
+body.age-petit #root #tb-compte{display:flex;width:38px!important;height:38px!important;margin-left:10px;position:relative;cursor:pointer;flex:none;font-size:.95rem}
+body.age-petit #root #tb-compte:active{scale:.92}
+#tb-compte .cp-drap{position:absolute;right:-5px;bottom:-4px;width:18px;height:12px;border-radius:3px;overflow:hidden;
+  box-shadow:0 0 0 2px #fff,0 2px 5px rgba(0,0,0,.3);pointer-events:none}
+body.age-petit #topbar #sound-dot2{margin-left:auto}
+</style>
+<script>
+(function(){
+  function initiale(){
+    var m=document.getElementById('m-avatar');if(!m)return '';
+    for(var i=0;i<m.childNodes.length;i++){var n=m.childNodes[i];if(n.nodeType===3&&n.textContent.trim())return n.textContent.trim();}
+    return '';
+  }
+  function maj(b){
+    b.textContent=initiale()||'•';
+    var d=document.createElement('span');d.className='cp-drap';d.setAttribute('aria-hidden','true');
+    try{d.innerHTML=(window._DRAPEAUX||{})[st.lang]||'';}catch(e){}
+    b.appendChild(d);
+  }
+  function pose(){
+    var tb=document.getElementById('topbar');
+    if(!tb){setTimeout(pose,400);return;}
+    if(document.getElementById('tb-compte'))return;
+    var b=document.createElement('div');b.id='tb-compte';b.className='menu-avatar';
+    b.setAttribute('role','button');b.tabIndex=0;
+    var sd=document.getElementById('sound-dot2');
+    tb.insertBefore(b,sd?sd.nextSibling:null);
+    maj(b);
+    b.addEventListener('click',function(e){e.stopPropagation();maj(b);if(window._ouvreCompte)window._ouvreCompte(b);});
+    /* l'initiale et le drapeau suivent ceux du menu principal */
+    var m=document.getElementById('m-avatar');
+    if(m&&window.MutationObserver)new MutationObserver(function(){maj(b);}).observe(m,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',pose);else pose();
+})();
+</script>
 
 
   <!-- SEO multilingue -->
@@ -12662,16 +12794,60 @@ function renderTuilesAnimaux(ca){
   }
   var CARTE=carteDebout()?CARTE_DEBOUT:CARTE_COUCHEE;
   var CARTE_ETAPES=CARTE.pts;
+  var albBtn=null;
   var carte=document.createElement('div');carte.className='carte-monde';
   var sentier=document.createElementNS('http://www.w3.org/2000/svg','svg');
   sentier.setAttribute('class','carte-sentier');
   sentier.setAttribute('preserveAspectRatio','none');
   sentier.setAttribute('aria-hidden','true');
   function poseLeRepere(){
-    CARTE=carteDebout()?CARTE_DEBOUT:CARTE_COUCHEE;
+    var _couchee=!carteDebout();
+    CARTE=_couchee?CARTE_COUCHEE:CARTE_DEBOUT;
     CARTE_ETAPES=CARTE.pts;
     carte.style.paddingBottom=CARTE.h+'%';
-    carte.classList.toggle('couchee',CARTE===CARTE_COUCHEE);
+    carte.classList.toggle('couchee',_couchee);
+    /* v3.5.3 — le client : « on ne doit JAMAIS pouvoir scroller » (3-5 ans).
+       La carte prend toute la place qui reste sous le titre, moins le
+       bouton de l'album, et pas un pixel de plus. Couchée, elle garde ses
+       4 animaux par rangée sur toute la largeur : c'est sa HAUTEUR qui
+       s'adapte (rangées resserrées, médaillons à la mesure des rangées). */
+    try{
+      var _z0=window._zoomApp||1;
+      /* offsetTop et non getBoundingClientRect : la page entre en glissant,
+         et la mesure prise pendant l'animation trompait de 80 px. */
+      var _top=0,_el=carte;while(_el){_top+=_el.offsetTop;_el=_el.offsetParent;}
+      try{_top-=(ca.scrollTop||0);}catch(e){}
+      /* couchée, le bouton de l'album est sur la ligne du titre */
+      var _albH=(albBtn&&!_couchee)?(albBtn.offsetHeight||48)+18:0;
+      var _h0=innerHeight/_z0-_top-_albH-12;
+      var _d0=(wrap.clientWidth||innerWidth/_z0)-8;
+      if(_top>0&&_h0>120){
+        if(_couchee){
+          var hh=Math.max(17,Math.min(66,_h0/_d0*100));
+          var _Hpx=hh/100*_d0;
+          /* médaillon : à la mesure d'une rangée (trois rangées) */
+          var _etw=Math.round(Math.min(_d0*0.13,_Hpx/3*0.74));
+          var _r=_etw*0.62;
+          CARTE={h:hh,pts:CARTE_COUCHEE.pts.map(function(p){
+            var f=(p[1]-8)/(61-8);
+            return [p[0],(_r+f*(_Hpx-2*_r))/_d0*100];})};
+          CARTE_ETAPES=CARTE.pts;
+          carte.style.setProperty('--etw',_etw+'px');
+          carte.style.width=_d0+'px';carte.style.maxWidth='none';
+        }else{
+          carte.style.removeProperty('--etw');
+          carte.style.width=Math.max(200,Math.min(_d0,_h0*100/CARTE.h))+'px';carte.style.maxWidth='none';
+        }
+        carte.style.paddingBottom='0';carte.style.aspectRatio='100 / '+CARTE.h;
+        sentier.setAttribute('viewBox','0 0 100 '+CARTE.h);
+        dessineLeSentier();
+        [].slice.call(carte.querySelectorAll('.carte-etape')).forEach(function(t,k){
+          var p=CARTE_ETAPES[k];if(!p)return;
+          t.style.left=p[0]+'%';t.style.top=(p[1]/CARTE.h*100)+'%';
+        });
+        return;
+      }
+    }catch(e){}
     /* v3.3.0 — la carte TIENT dans l'écran : sa largeur est bornée par la
        hauteur disponible (moins la barre du haut, le titre et la jauge), quel
        que soit l'appareil ou son orientation. */
@@ -12800,10 +12976,22 @@ function renderTuilesAnimaux(ca){
      quel. Un animal pas encore gagne reste une silhouette — c'est ce qui
      donne envie du suivant. */
   var faits=collection.filter(function(x){return x.finie;}).length;
-  var at=document.createElement('div');
-  at.className='sess-map-title';at.style.marginTop='6px';
-  at.textContent='🏅 '+te('Mon album')+'  '+faits+'/'+collection.length;
-  wrap.appendChild(at);
+  /* v3.5.3 — plus de défilement chez les 3-5 ans : l'album, qui était sous
+     la carte, s'ouvre par un bouton, en grand, par-dessus la carte. */
+  albBtn=document.createElement('button');albBtn.type='button';
+  albBtn.className='alb-ouvre';
+  albBtn.textContent='🏅 '+te('Mon album')+'  '+faits+'/'+collection.length;
+  wrap.appendChild(albBtn);
+  var albVoile=document.createElement('div');albVoile.className='alb-voile';
+  var albBoite=document.createElement('div');albBoite.className='alb-boite';
+  var albT=document.createElement('div');albT.className='sess-map-title';
+  albT.textContent='🏅 '+te('Mon album')+'  '+faits+'/'+collection.length;
+  var albX=document.createElement('button');albX.type='button';albX.className='alb-ferme';albX.textContent='✕';
+  albX.setAttribute('aria-label',te('Retour'));
+  albBoite.appendChild(albX);albBoite.appendChild(albT);
+  albVoile.appendChild(albBoite);
+  albVoile.onclick=function(ev){if(ev.target===albVoile||ev.target===albX)albVoile.classList.remove('on');};
+  albBtn.onclick=function(){albVoile.classList.add('on');};
   var alb=document.createElement('div');alb.className='alb-bande';
   collection.forEach(function(o){
     var c=document.createElement('div');
@@ -12825,7 +13013,11 @@ function renderTuilesAnimaux(ca){
     }
     alb.appendChild(c);
   });
-  wrap.appendChild(alb);
+  albBoite.appendChild(alb);
+  document.body.appendChild(albVoile);
+  /* le voile part avec la page */
+  (function(){var mo=new MutationObserver(function(){if(!wrap.isConnected){albVoile.remove();mo.disconnect();}});
+    mo.observe(ca,{childList:true});})();
 
   /* La rubrique « on joue » est retiree : le client ne veut pas les cours
      D'UN COTE et les jeux DE L'AUTRE — les jeux sont maintenant DANS la
@@ -12833,6 +13025,9 @@ function renderTuilesAnimaux(ca){
   ca.appendChild(wrap);
   /* la carte est maintenant dans la page : on peut mesurer la place */
   requestAnimationFrame(function(){if(carte.isConnected)poseLeRepere();});
+  /* une fois les polices et l'entrée de page passées, on remesure */
+  setTimeout(function(){if(carte.isConnected)poseLeRepere();},700);
+  try{document.fonts&&document.fonts.ready.then(function(){if(carte.isConnected)poseLeRepere();});}catch(e){}
 }
 
 
@@ -14411,7 +14606,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.2';
+var _VERSION_REPLI='v3.5.3';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -22537,6 +22732,7 @@ function _boyScene(ca,reprise){
         });
       }
       try{if(st&&st.age==='petit'&&window.ResizeObserver)new ResizeObserver(function(){grillePetit();}).observe(aire);}catch(e){}
+      var _placePrec=-1;
       function tour(premier){
         jauge.firstChild.style.width=Math.round(pris/BUT*100)+'%';
         aire.innerHTML='';
@@ -22553,6 +22749,16 @@ function _boyScene(ca,reprise){
           lot=_melangeTab(cibles.concat(leurres).filter(function(x){if(_vus[x])return false;_vus[x]=1;return true;}));
           aire.classList.add('mj-quatre');
         }
+        /* v3.5.3 — le client : « deux bonnes réponses d'affilée ne doivent
+           JAMAIS être à la même position ». La place de la bonne bulle est
+           son rang dans la grille : s'il est le même qu'au tour d'avant, on
+           l'échange avec une autre bulle prise au hasard. */
+        var _ici=lot.indexOf(c);
+        if(_ici>=0&&_ici===_placePrec&&lot.length>1){
+          var _aut=(_ici+1+Math.floor(Math.random()*(lot.length-1)))%lot.length;
+          var _tmp=lot[_aut];lot[_aut]=lot[_ici];lot[_ici]=_tmp;_ici=_aut;
+        }
+        _placePrec=_ici;
         lot.forEach(function(g,k){
           var f=document.createElement('div');f.className='mj-flotte';
           f.textContent=_sansCercle(g);
@@ -22713,6 +22919,15 @@ function _boyScene(ca,reprise){
   api.jeuTrace=function(glyph,passes){
     return function(){
       var m=manche(te('REMPLIS LA LETTRE'),'mj-trace',MJ_COUL[2]);
+      /* v3.5.3 — 3-5 ans : le client, « le remplissage en bleu turquoise
+         (garçon) / rose (fille) plutôt qu'en violet, et le contour de la
+         lettre et des voyelles en bleu foncé / rose foncé ». */
+      var REMPLI=m.coul,CONTOUR=m.coul,CONTOUR_A=.5;
+      if(st&&st.age==='petit'){
+        if(st.profile==='girl'){REMPLI='#f0629f';CONTOUR='#a3134f';}
+        else{REMPLI='#1ec8d8';CONTOUR='#0d3b8c';}
+        CONTOUR_A=.9;
+      }
       var cadre=document.createElement('div');cadre.className='mj-cadre';
       var cv=document.createElement('canvas');
       cadre.appendChild(cv);m.zone.appendChild(cadre);
@@ -23916,19 +24131,19 @@ function _boyScene(ca,reprise){
         cx.clearRect(0,0,W,H);
         poseLettre(cx,'rgba(20,24,32,.15)');
         if(fini){
-          poseLettre(cx,m.coul);
+          poseLettre(cx,REMPLI);
         }else{
           ex.clearRect(0,0,W,H);
           ex.drawImage(calque,0,0);
           ex.globalCompositeOperation='source-in';
-          poseLettre(ex,m.coul);
+          poseLettre(ex,REMPLI);
           ex.globalCompositeOperation='source-over';
           cx.drawImage(encre,0,0);
           cx.save();
           cx.font=PX+"px 'Scheherazade New',serif";
           cx.textAlign='center';cx.textBaseline='alphabetic';
-          cx.lineWidth=Math.max(2,PX*0.012);cx.strokeStyle=m.coul;
-          cx.globalAlpha=.5;
+          cx.lineWidth=Math.max(2,PX*0.012);cx.strokeStyle=CONTOUR;
+          cx.globalAlpha=CONTOUR_A;
           try{cx.strokeText(glyph,AX,AY+_descenteGlyphe(glyph,PX));}catch(e){}
           cx.restore();
 
@@ -24090,7 +24305,13 @@ function _boyScene(ca,reprise){
         if(st&&st.age==='petit')b.style.left='calc((100% - var(--d,138px)) * '+Math.max(0,Math.min(1,(xb-5)/_lg)).toFixed(3)+')';
         b.style.setProperty('--mc',MJ_VIF[rang%MJ_VIF.length]);
         b.style.animationDuration=(6+Math.random()*3).toFixed(1)+'s';
-        b.onclick=function(){
+        /* v3.5.3 — le client : « quand l'enfant touche mal l'écran, les
+           ballons disparaissent une fraction de seconde ». Un doigt qui
+           glisse un peu annulait le « clic » et faisait défiler la page
+           (barre du haut qui se replie, cadre remesuré). Le ballon répond
+           maintenant dès que le doigt se pose, et l'aire ne défile plus. */
+        var _tape=function(ev){
+          if(ev&&ev.cancelable)ev.preventDefault();
           if(b.classList.contains('creve'))return;
           if(g===cible){
             /* ── ON FIGE LE BALLON AVANT DE LE FAIRE ÉCLATER ──
@@ -24146,6 +24367,7 @@ function _boyScene(ca,reprise){
             N.plusTard(function(){b.classList.remove('non');},430);
           }
         };
+        b.addEventListener('pointerdown',_tape);
         b.addEventListener('animationend',function(){
           if(b.parentNode)b.parentNode.removeChild(b);
         });

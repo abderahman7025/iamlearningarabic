@@ -6056,3 +6056,12 @@ nécessaire — les éléments du site servent de décor.
 
 ## v3.5.2
 - Enfants : quitter un jeu ou un cours coupe tout le son. `stopSpeech` ne coupait que la phrase en cours ; la file de la narration et les gestes différés (`plusTard`) relançaient la suite sur la page d'après. Nouvelle `N.tue()` (narration « morte » : plus rien ne s'y dit), appelée par `_coupeSceneEnfant()` au bouton retour, au retour du téléphone (`handleBack`), à `navToPage`, à `renderSessionsMap`, `_boyLetterPicker` et au lancement d'une nouvelle scène.
+
+## v3.5.3 (bloc outils/refonte-v353.html)
+- Tracé 3-5 ans : remplissage turquoise (garçon) / rose (fille), contour bleu foncé / rose foncé.
+- Attrape-la : la bonne bulle n'est jamais au même rang deux tours de suite (`_placePrec`).
+- Les voyelles 3-5 : ronds bien plus gros (container query ; en colonne debout sur téléphone).
+- 3-5 ans sans défilement : #ca et body en overflow hidden ; carte mise à la hauteur restante (couchée : 4 par rangée, hauteur adaptée, médaillons à la mesure des rangées, sentier en pixels) ; l'album devient un bouton qui ouvre un voile ; choix de la lettre couché : vignettes côte à côte.
+- Ballons : réagissent au pointerdown, aires en touch-action none (le doigt qui glisse faisait défiler la page et remesurer le cadre).
+- Textes 3-5 : couleur du profil (#0396c8 garçon, #c2185b fille), plus aucun texte noir (titre de barre, Progression, noms de l'album) ; titres en Fredoka, couleur cernée de blanc, casse normale.
+- Bouton du compte (langue, changer d'interface, déconnexion) dans la barre du haut sur chaque page 3-5 (`#tb-compte`, ouvre `_ouvreCompte`).
