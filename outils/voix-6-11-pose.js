@@ -55,7 +55,7 @@ const enArabe = (t) => {
   /* Le client : « la phrase 16 se lit bien avec le déterminant "la" devant
      kasra ; mets-le aussi pour la damma et la fatha ». Pour la voix seulement :
      à l'écran, la voyelle est dessinée. */
-  t = t.replace(/^(fat[hḥ]a|damma|kasra) est prolongé/i, 'la $1 est prolongée');
+  t = t.replace(/^(fat[hḥ]a|damma|kasra) est prolongé/i, 'la $1 est prolongé');
   NOMS.forEach(([re, ar]) => { t = t.replace(re, ar); });
   /* Le son du tanwin : « n' » — c'est la façon que le client a validée pour
      le français (voir voix-correction.json), sinon la voix dit « èn ». */
