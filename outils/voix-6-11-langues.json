@@ -1,0 +1,1454 @@
+{
+ "en": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "When a vowel is doubled, we add the sound n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "When a letter has a sukūn, we say only the letter's sound."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "With an alif, the sound becomes long."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Without holding the fatha"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "But if you hold the fatha, you get"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "The fatḥa is written above the letter. It is held with the alif, which rises above the line."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "The kasra is written below the letter. It is held with the yā, which drops below the line."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "The ḍamma looks like a little wāw. So it is held with the wāw."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Here the alif has a kasra. We don't say"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Here the waw has a fatha. We don't say"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Where is the sound held by the wāw?"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Now one last little mark. It always sits above a letter and looks like a w: the shadda."
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "The fatha is held by the"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "The damma is held by the"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "The kasra is held by the"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "The shadda: we stress the letter."
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "With two fatḥa, it makes"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "With two kasra, it makes"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "With two ḍamma, it makes"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "With the sukūn, we say nothing."
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "With the sukūn, we say only the letter's sound"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "With the alif, we get"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "With the waw, we get"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "With the ya, we get"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "Sometimes you will see the hamza on the"
+  }
+ ],
+ "es": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Cuando se dobla una vocal, se añade el sonido n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Cuando una letra lleva sukūn, solo se pronuncia el sonido de la letra."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Con un alif, el sonido se alarga."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Sin alargar la fatha"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "En cambio, alargando la fatha, se obtiene"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "La fatḥa se escribe encima de la letra. Se alarga con el alif, que sube por encima de la línea."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "La kasra se escribe debajo de la letra. Se alarga con el yā, que baja por debajo de la línea."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "La ḍamma se parece a un pequeño wāw. Por eso se alarga con el wāw."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Aquí el alif lleva una kasra. No se dice"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Aquí la ya lleva una fatha. No se dice"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Aquí el waw lleva una fatha. No se dice"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "¿Dónde está el sonido alargado con el wāw?"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Veamos un último signo. Siempre va encima de una letra y parece una w: la shadda."
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "La fatha se alarga con el"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "La damma se alarga con el"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "La kasra se alarga con la"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "La shadda: se insiste en la letra."
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "¡Misión cumplida! Ya dominas las prolongaciones."
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Con dos fatḥa, da"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Con dos kasra, da"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Con dos ḍamma, da"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Con el sukūn, no se pronuncia nada."
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "¡Bravo! Ya dominas esta letra. ¡Sigue así!"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "Con el sukūn, solo se pronuncia el sonido de la letra"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "Con el alif, se obtiene"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "Con el waw, se obtiene"
+  },
+  {
+   "n": 27,
+   "fr": "",
+   "t": "Con la ya, se obtiene"
+  },
+  {
+   "n": 28,
+   "fr": "",
+   "t": "A veces verás la hamza sobre el"
+  }
+ ],
+ "de": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Wenn man einen Vokal verdoppelt, fügt man den Laut n hinzu."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Hat ein Buchstabe ein Sukūn, spricht man nur seinen Laut."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Mit einem Alif wird der Laut lang."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Ohne die Fatha zu dehnen, bedeutet"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Dehnt man die Fatha aber, erhält man"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "Die Fatḥa steht über dem Buchstaben. Sie wird mit dem Alif gedehnt, das über die Linie ragt."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "Die Kasra steht unter dem Buchstaben. Sie wird mit dem Yā gedehnt, das unter die Linie reicht."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "Die Ḍamma sieht aus wie ein kleines Wāw. Deshalb wird sie mit dem Wāw gedehnt."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Hier trägt das Alif eine Kasra. Man sagt nicht"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Hier trägt das Ya eine Fatha. Man sagt nicht"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Hier trägt das Waw eine Fatha. Man sagt nicht"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Wo ist der mit dem Wāw gedehnte Laut?"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Nun ein letztes Zeichen. Es steht immer über einem Buchstaben und sieht aus wie ein w: die Schadda."
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "Die Fatha wird durch das"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "Die Damma wird durch das"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "Die Kasra wird durch das"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Die Schadda: Man betont den Buchstaben."
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "Mit zwei Fatḥa ergibt das"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Mit zwei Kasra ergibt das"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Mit zwei Ḍamma ergibt das"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Mit dem Sukūn spricht man nichts."
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Mit dem Sukūn spricht man nur den Laut des Buchstabens"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "Mit dem Alif ergibt sich"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "Mit dem Waw ergibt sich"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "Mit dem Ya ergibt sich"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "Manchmal siehst du die Hamza auf dem"
+  }
+ ],
+ "nl": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Als je een klinker verdubbelt, voeg je de klank n toe."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Als er een sukūn op een letter staat, zeg je alleen de klank van de letter."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Met een alif wordt de klank lang."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Zonder de fatha te verlengen, betekent"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Maar als je de fatha verlengt, krijg je"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "De fatḥa staat boven de letter. Je verlengt hem met de alif, die boven de lijn uitkomt."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "De kasra staat onder de letter. Je verlengt hem met de yā, die onder de lijn zakt."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "De ḍamma lijkt op een kleine wāw. Daarom verleng je hem met de wāw."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Hier heeft de alif een kasra. Je zegt niet"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Hier heeft de ya een fatha. Je zegt niet"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Hier heeft de waw een fatha. Je zegt niet"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Waar is de klank die met de wāw verlengd wordt?"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Nu nog één teken. Het staat altijd boven een letter en lijkt op een w: de shadda."
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "De fatha wordt verlengd door de"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "De damma wordt verlengd door de"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "De kasra wordt verlengd door de"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "De shadda: je legt nadruk op de letter."
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "Met twee fatḥa wordt het"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Met twee kasra wordt het"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Met twee ḍamma wordt het"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Met de sukūn zeg je niets."
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Met de sukūn zeg je alleen de klank van de letter"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "Met de alif krijg je"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "Met de waw krijg je"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "Met de ya krijg je"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "Soms zie je de hamza op de"
+  }
+ ],
+ "it": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Quando si raddoppia una vocale, si aggiunge il suono n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Quando una lettera ha il sukūn, si pronuncia solo il suono della lettera."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Con un alif, il suono diventa lungo."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Senza allungare la fatha"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Invece, allungando la fatha, si ottiene"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "La fatḥa si scrive sopra la lettera. Si allunga con l'alif, che sale sopra la riga."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "La kasra si scrive sotto la lettera. Si allunga con lo yā, che scende sotto la riga."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "La ḍamma somiglia a un piccolo wāw. Perciò si allunga con il wāw."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Qui l'alif porta una kasra. Non si dice"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Qui il waw porta una fatha. Non si dice"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Dov'è il suono allungato con il wāw?"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Vediamo un ultimo segno. Sta sempre sopra una lettera e somiglia a una w: la shadda."
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "La fatha si allunga con la lettera"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "La damma si allunga con il"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "La kasra si allunga con lo"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "La shadda: si insiste sulla lettera."
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Con due fatḥa fa"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "Con due kasra fa"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Con due ḍamma fa"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Con il sukūn, non si pronuncia niente."
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Con il sukūn si pronuncia solo il suono della lettera"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Con l'alif si ottiene"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "Con il waw si ottiene"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "Con lo ya si ottiene"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "A volte vedrai la hamza sul"
+  }
+ ],
+ "pt": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Quando se duplica uma vogal, junta-se o som n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Quando uma letra tem sukūn, pronuncia-se só o som da letra."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Com um alif, o som fica longo."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Sem alongar a fatha"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Mas, alongando a fatha, obtém-se"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "A fatḥa escreve-se acima da letra. Alonga-se com o alif, que sobe acima da linha."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "A kasra escreve-se abaixo da letra. Alonga-se com o yā, que desce abaixo da linha."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "A ḍamma parece um pequeno wāw. Por isso alonga-se com o wāw."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Aqui o alif tem uma kasra. Não se diz"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Aqui o waw tem uma fatha. Não se diz"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Onde está o som alongado com o wāw?"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Vejamos um último sinal. Fica sempre acima de uma letra e parece um w: a shadda."
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "A fatha alonga-se com o"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "A damma alonga-se com o"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "A kasra alonga-se com o"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "A shadda: insiste-se na letra."
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Com duas fatḥa dá"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "Com duas kasra dá"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Com duas ḍamma dá"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Com o sukūn, não se pronuncia nada."
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Com o sukūn, pronuncia-se só o som da letra"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Com o alif, obtém-se"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "Com o waw, obtém-se"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "Com o ya, obtém-se"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "Às vezes verás a hamza sobre o"
+  }
+ ],
+ "ru": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Когда огласовка удваивается, добавляем звук n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Если над буквой стоит сукун, читаем только звук буквы."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "С алифом звук становится долгим."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Без удлинения фатхи"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "А если удлинить фатху, получится"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "Фатха пишется над буквой. Её удлиняет алиф, который поднимается над строкой."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "Касра пишется под буквой. Её удлиняет йа, который опускается под строку."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "Дамма похожа на маленький вав. Поэтому её удлиняет вав."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Здесь на алифе касра. Читаем не"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Здесь на йа фатха. Читаем не"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Здесь на ваве фатха. Читаем не"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Где звук, удлинённый вавом?"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Теперь последний знак. Он всегда стоит над буквой и похож на w: это шадда."
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "Фатха удлиняется буквой"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "Дамма удлиняется буквой"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "Касра удлиняется буквой"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Шадда: букву произносим с нажимом."
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "С двумя знаками фатха получается"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "С двумя знаками касра получается"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "С двумя знаками дамма получается"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "С сукуном ничего не читаем."
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "С сукуном читаем только звук буквы"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "С алифом получается"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "С вавом получается"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "С йа получается"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "Иногда ты увидишь хамзу на"
+  }
+ ],
+ "tr": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Bir sesli ikiye katlanınca n sesi eklenir."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Bir harfte sükûn varsa, yalnızca harfin sesi okunur."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Elif ile ses uzar."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Fetha uzatılmadan"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Ama fetha uzatılınca"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "Fetha harfin üstüne yazılır. Onu satırın üstüne çıkan elif uzatır."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "Esre harfin altına yazılır. Onu satırın altına inen ye uzatır."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "Ötre küçük bir vav gibidir. Bu yüzden onu vav uzatır."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Bu üç harf, üstlerinde ya da altlarında hareke yoksa sesliyi uzatır."
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Burada elifin üzerinde esre var."
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Burada yenin üzerinde fetha var."
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Vav ile uzatılan ses nerede?"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Şimdi son bir işaret. Her zaman harfin üstünde durur ve w harfine benzer: şedde."
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "Fetha"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "Ötre"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "Esre"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Şedde: harf vurgulanır."
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "İki fetha ile"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "İki esre ile"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "İki ötre ile"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Sükûn ile hiçbir şey okunmaz."
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Sükûn ile sadece harfin sesi okunur"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "elif ile"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "vav ile"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "ye ile"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "Bazen hamzeyi"
+  }
+ ],
+ "zh": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "元音重复时, 加上 n 的音。"
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "字母上有静符时，只读这个字母的音。"
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "加上艾利夫，音就变长。"
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "不拉长法特哈"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "但如果拉长法特哈, 就变成"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "法特哈写在字母上面。用高出行线的艾利夫来拉长它。"
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "卡斯拉写在字母下面。用降到行线以下的亚来拉长它。"
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "达姆看起来像一个小瓦乌，所以用瓦乌来拉长它。"
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "这里的艾利夫带着卡斯拉。不读"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "这里的瓦乌带着法特哈。不读"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "被瓦乌拉长的音在哪里？"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "现在看最后一个符号。它总是写在字母上面，形状像 w：沙达。"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "法特哈由"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "达姆由"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "卡斯拉由"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "沙达：把字母读得重一些。"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "这是字母 alif。独立时这样写。"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "两个法特哈, 读"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "两个卡斯拉, 读"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "两个达姆, 读"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "有静符时，什么都不读。"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "还记得吗？alif 这个字母在哪里？"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "这是字母 wāw。独立时这样写。"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "有静符时, 只读字母的音"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "还记得吗？wāw 这个字母在哪里？"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "这是字母 yā。独立时这样写。"
+  },
+  {
+   "n": 27,
+   "fr": "",
+   "t": "加上艾利夫, 读"
+  },
+  {
+   "n": 28,
+   "fr": "",
+   "t": "加上瓦乌, 读"
+  },
+  {
+   "n": 29,
+   "fr": "",
+   "t": "加上亚, 读"
+  },
+  {
+   "n": 30,
+   "fr": "",
+   "t": "还记得吗？yā 这个字母在哪里？"
+  }
+ ],
+ "id": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "Jika vokal digandakan, ditambah bunyi n."
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "Jika huruf memiliki sukun, hanya bunyi hurufnya yang dibaca."
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "Dengan alif, bunyinya jadi panjang."
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "Tanpa memanjangkan fatha"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "Tetapi jika fatha dipanjangkan, jadinya"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "Fatḥah ditulis di atas huruf. Dipanjangkan dengan alif yang naik di atas garis."
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "Kasrah ditulis di bawah huruf. Dipanjangkan dengan ya yang turun di bawah garis."
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "Ḍammah mirip wau kecil. Karena itu dipanjangkan dengan wau."
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "Di sini alif berharakat kasrah. Bukan dibaca"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "Di sini ya berharakat fatḥah. Bukan dibaca"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "Di sini wau berharakat fatḥah. Bukan dibaca"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "Fatḥah dipanjangkan oleh"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "Ḍammah dipanjangkan oleh"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "Kasrah dipanjangkan oleh huruf"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "Dengan dua fatḥah, bunyinya"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "Dengan dua kasrah, bunyinya"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "Dengan dua ḍammah, bunyinya"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "Dengan sukun, tidak dibaca apa-apa."
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "Dengan sukun, hanya bunyi hurufnya yang dibaca"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "Dengan alif, bunyinya"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "Dengan ya, bunyinya"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "Kadang kamu melihat hamzah di atas"
+  }
+ ],
+ "hi": [
+  {
+   "n": 1,
+   "fr": "",
+   "t": "जब स्वर दोहरा हो, तो n की आवाज़ जुड़ जाती है।"
+  },
+  {
+   "n": 2,
+   "fr": "",
+   "t": "जब अक्षर पर सुकून हो, तो सिर्फ़ अक्षर की आवाज़ बोली जाती है।"
+  },
+  {
+   "n": 3,
+   "fr": "",
+   "t": "अलिफ़ के साथ ध्वनि दीर्घ हो जाती है।"
+  },
+  {
+   "n": 4,
+   "fr": "",
+   "t": "लंबा या छोटा बोलना अर्थ पूरी तरह बदल सकता है।"
+  },
+  {
+   "n": 5,
+   "fr": "",
+   "t": "फ़तहा लंबा किए बिना"
+  },
+  {
+   "n": 6,
+   "fr": "",
+   "t": "पर फ़तहा लंबा करने पर"
+  },
+  {
+   "n": 7,
+   "fr": "",
+   "t": "फ़तहा अक्षर के ऊपर लिखा जाता है। इसे अलिफ़ लंबा करता है, जो रेखा के ऊपर उठता है।"
+  },
+  {
+   "n": 8,
+   "fr": "",
+   "t": "कसरा अक्षर के नीचे लिखा जाता है। इसे या लंबा करता है, जो रेखा के नीचे जाता है।"
+  },
+  {
+   "n": 9,
+   "fr": "",
+   "t": "ज़म्मा छोटे वाव जैसा दिखता है। इसलिए इसे वाव लंबा करता है।"
+  },
+  {
+   "n": 10,
+   "fr": "",
+   "t": "ये तीनों अक्षर स्वर को तभी लंबा करते हैं जब उनके ऊपर या नीचे कोई स्वर चिह्न न हो।"
+  },
+  {
+   "n": 11,
+   "fr": "",
+   "t": "यहाँ अलिफ़ पर कसरा है।"
+  },
+  {
+   "n": 12,
+   "fr": "",
+   "t": "यहाँ या पर फ़तहा है।"
+  },
+  {
+   "n": 13,
+   "fr": "",
+   "t": "वाव से लंबी होने वाली ध्वनि कहाँ है?"
+  },
+  {
+   "n": 14,
+   "fr": "",
+   "t": "अब एक अंतिम चिह्न। यह हमेशा अक्षर के ऊपर आता है और w जैसा दिखता है: शद्दा।"
+  },
+  {
+   "n": 15,
+   "fr": "",
+   "t": "फ़तहा को"
+  },
+  {
+   "n": 16,
+   "fr": "",
+   "t": "ज़म्मा को"
+  },
+  {
+   "n": 17,
+   "fr": "",
+   "t": "कसरा को"
+  },
+  {
+   "n": 18,
+   "fr": "",
+   "t": "शद्दा: अक्षर पर ज़ोर दिया जाता है।"
+  },
+  {
+   "n": 19,
+   "fr": "",
+   "t": "दो फ़तहा के साथ"
+  },
+  {
+   "n": 20,
+   "fr": "",
+   "t": "दो कसरा के साथ"
+  },
+  {
+   "n": 21,
+   "fr": "",
+   "t": "दो ज़म्मा के साथ"
+  },
+  {
+   "n": 22,
+   "fr": "",
+   "t": "सुकून के साथ कुछ नहीं बोला जाता।"
+  },
+  {
+   "n": 23,
+   "fr": "",
+   "t": "सुकून के साथ सिर्फ़ अक्षर की आवाज़ बोली जाती है"
+  },
+  {
+   "n": 24,
+   "fr": "",
+   "t": "अलिफ़ के साथ"
+  },
+  {
+   "n": 25,
+   "fr": "",
+   "t": "वाव के साथ"
+  },
+  {
+   "n": 26,
+   "fr": "",
+   "t": "या के साथ"
+  },
+  {
+   "n": 27,
+   "fr": "",
+   "t": "कभी हमज़ा को"
+  }
+ ]
+}
