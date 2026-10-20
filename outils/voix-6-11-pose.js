@@ -114,7 +114,9 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
     h += '<div style="background:#fff;padding:10px 14px;border-radius:12px;margin:10px 0"><b>' + (i + 1) + '.</b> ' + t
       + '<br><small style="color:#567">dit : ' + enArabe(aDire(t)) + '</small><br>'
       + (fs.existsSync(path.join(avant, nom)) ? 'avant <audio controls src="avant/' + nom + '"></audio><br>' : '')
-      + 'nouveau <audio controls src="' + nom + '"></audio></div>';
+      /* ?v= : sans lui, Chrome rejoue l'ancien son gardé en mémoire quand une
+         phrase est refaite sous le même nom de fichier. */
+      + 'nouveau <audio controls src="' + nom + '?v=' + (fs.existsSync(path.join(dest, nom)) ? Math.round(fs.statSync(path.join(dest, nom)).mtimeMs) : 0) + '"></audio></div>';
   });
   /* Lecture à la suite : les 25 nouveaux sons s'enchaînent, la phrase en
      cours est surlignée. Chrome refuse parfois de jouer sans un premier
