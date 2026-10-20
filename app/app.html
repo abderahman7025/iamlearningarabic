@@ -6822,7 +6822,7 @@ body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
   body:not(.age-petit) .child-choix .child-letters{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:14px!important;grid-template-columns:none!important}
   body:not(.age-petit) .child-choix .child-card{flex-direction:column!important;justify-content:center!important;text-align:center!important;gap:6px!important;min-height:calc(100vh - 210px);margin:0!important}
   body:not(.age-petit) .child-choix .child-infos{flex:none!important}
-  body:not(.age-petit) .child-choix .child-titre{margin-bottom:8px!important}
+  body:not(.age-petit) .child-choix .child-titre{margin:10px 0 8px!important}
 }
 /* ── v3.5.7 — LE COMPTE SUR TOUTES LES PAGES, TOUTES LES INTERFACES ──
    Le client : « mets le bouton déconnexion, langue, changer d'interface
@@ -6836,9 +6836,17 @@ body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
 }
 /* Debout : les cartes occupent la hauteur au lieu de laisser un grand vide. */
 @media (orientation:portrait){
-  body:not(.age-petit) .child-choix .child-card{min-height:min(150px,calc((100vh - 330px) / 3))}
+  body:not(.age-petit) .child-choix .child-card{min-height:min(170px,calc((100vh - 330px) / 3))}
   body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
   body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
+/* v3.5.8 — cases sans nom : le dessin et la lettre au plus grand. */
+body:not(.age-petit) .child-choix .child-card{justify-content:center!important;gap:clamp(14px,6vw,48px)!important}
+body:not(.age-petit) .child-choix .child-emoji{font-size:clamp(4rem,20vw,6.5rem)!important}
+body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!important;line-height:1.25!important}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-emoji{font-size:min(4.4rem,17vh)!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:min(5.6rem,21vh)!important}
 }
 </style>
 <script>
@@ -10823,7 +10831,9 @@ function showContactSuccess(){
    sur celle qui reste ; si les deux manquent, on retombe sur le personnage. */
 function _centreDeuxIles(ca,cartes,idx,repli){
   if(!ca)return;
-  var a=cartes&&cartes[idx-1],b=cartes&&cartes[idx];
+  /* v3.5.8 — on centre le monde où se tient le personnage (et, au départ,
+     le personnage lui-même) au milieu de l'écran. */
+  var a=cartes&&cartes[idx-1],b=null;
   var base=ca.getBoundingClientRect().top-ca.scrollTop;
   var haut=1e9,bas=-1e9;
   [a,b].forEach(function(el){
@@ -10875,33 +10885,13 @@ function _migreProgressionFille(){
   }catch(e){}
 }
 function _ileDepart(islandDefs){
-  var derniere=-1;
-  /* L'ETAPE QU'ON VIENT DE QUITTER gagne sur tout le reste. Elle etait
-     jusqu'ici mise en concurrence avec l'etape la plus avancee jamais
-     entamee : un enfant qui revenait sur son troisieme monde retrouvait sa
-     licorne posee sur le huitieme. C'est ce que le client demandait depuis
-     longtemps — en revenant du cours, on doit se retrouver LA. */
-  try{
-    var v=localStorage.getItem('arab_ile');
-    if(v!==null&&v!==''){
-      var i0=parseInt(v,10);
-      if(i0>=0&&i0<islandDefs.length)return i0+1;
-    }
-  }catch(e){}
-  islandDefs.forEach(function(isle,i){
-    var entamee=isle.sids.some(function(sid){
-      if(st.scores&&st.scores[sid]!==undefined)return true;
-      var a=(st.accuracy||{})[sid];
-      if(a&&a.t>0)return true;
-      try{return (JSON.parse(localStorage.getItem('boy_lettres_'+sid)||'[]')||[]).length>0;}catch(e){return false;}
-    });
-    if(entamee)derniere=Math.max(derniere,i);
-  });
-  if(derniere>=0)return Math.min(derniere+1,islandDefs.length);
+  /* v3.5.8 — le client : « quand on revient sur la carte, le personnage se
+     trouve sur la DERNIÈRE ÎLE FAITE, centré au milieu de l'écran » ; au
+     tout début, seul au départ du chemin. 0 = le départ, i = posé sur
+     l'île i (la i-ème, comptée depuis 1), en suivant l'ordre du chemin. */
   var valide=0;
   for(var i=0;i<islandDefs.length;i++){
-    var fait=islandDefs[i].sids.every(function(sid){
-      var a=(st.accuracy||{})[sid];return a&&a.t>0&&a.c/a.t>=0.8;});
+    var fait=islandDefs[i].sids.every(function(sid){return _sessionFaite(sid);});
     if(fait)valide=i+1;else break;
   }
   return valide;
@@ -13188,9 +13178,11 @@ var islandDefs=_ilesDefs();
      sa licorne l'y attend, et elle ne repart avec elle qu'une fois le monde
      fini. Meme chose pour la couronne, posee sur le monde 2. Un objet
      gagne disparait de son monde — c'est la regle dictee par le client. */
+  /* v3.5.8 — un monde est « fait » selon la MÊME règle que celle qui ouvre
+     le suivant (`_sessionFaite`). Avec deux règles, le monde suivant s'ouvrait
+     et la fille y partait seule, sa licorne restée sur le premier. */
   var _etapeFaite=islandDefs.map(function(isle){
-    return isle.sids.every(function(sid){
-      var a=(st.accuracy||{})[sid];return a&&a.t>0&&a.c/a.t>=0.8;});
+    return isle.sids.every(function(sid){return _sessionFaite(sid);});
   });
   var _montureGagnee=(!_HAB.montureEtape)||!!_etapeFaite[_HAB.montureEtape-1];
   var _couronneGagnee=(!_HAB.couronneEtape)||!!_etapeFaite[_HAB.couronneEtape-1];
@@ -13411,8 +13403,17 @@ var islandDefs=_ilesDefs();
             cp1x=cpMRight; cp2x=cpMRight;
           }
           var segLkM=(isleCardsMob[i]&&isleCardsMob[i].classList.contains('locked-isle'))||(isleCardsMob[i+1]&&isleCardsMob[i+1].classList.contains('locked-isle'));
-          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:sy,cpx2:cp2x,cpy2:ey,x3:ex,y3:ey});
-          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+sy+' '+cp2x+','+ey+' '+ex+','+ey, segLkM);
+          /* v3.5.8 — le client : « la trajectoire de la fusée n'est pas
+             fluide, elle fait trop de S au lieu d'un seul ». Les deux points
+             de contrôle étaient tirés à l'horizontale jusqu'au bord opposé :
+             la fusée partait de côté, longeait le bord, puis revenait — un
+             crochet. Elle part maintenant vers le bas et arrive par le haut :
+             un seul S, doux, d'un monde à l'autre. */
+          var _dy=ey-sy;
+          cp1x=sx;cp2x=ex;
+          var cp1y=sy+_dy*0.55,cp2y=ey-_dy*0.55;
+          segsMob.push({x0:sx,y0:sy,cpx1:cp1x,cpy1:cp1y,cpx2:cp2x,cpy2:cp2y,x3:ex,y3:ey});
+          drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey, segLkM);
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
         _poserObjets(globeDiv,isleCardsMob,_etapeFaite);
@@ -14501,9 +14502,20 @@ function _boyLetterPickerJeu(ca,session){
 
 function _boyLetterPicker(ca,session){
   _coupeSceneEnfant();
+  /* v3.5.8 — le client : « quand on quitte un monde, on arrive sur la page
+     choisis ta lettre avec aucune lettre ». Un monde sans lettres (les
+     voyelles, les prolongations) n'a pas de choix de lettre : on rend la
+     carte. */
+  try{
+    var _nbL=((session&&session.letters)||[]).filter(function(l){return _childIdxOf(l.ar)>=0;}).length;
+    if(!_nbL)return renderSessionsMap(ca);
+  }catch(e){}
   if(st&&st.age==='petit')return _boyLetterPickerJeu(ca,session);
   _boySession=session;
   ca.innerHTML='';ca.style.paddingTop='64px';st._curPage='child';
+  /* v3.5.8 — le bouton du haut gardait l'étiquette du cours quitté
+     (« Lettres ») : ici, il ramène à la carte et le dit. */
+  try{_retourEnfant(function(){renderSessionsMap(ca);},te('Carte'));}catch(e){}
   /* On est DEJA dans le monde : son decor doit y etre des l'ecran du choix
      de la lettre, pas seulement dans le cours. */
   _fondEnfant(true);
@@ -14554,8 +14566,8 @@ function _boyLetterPicker(ca,session){
     infos.style.cssText='flex:1';
     /* v3.5.7 — plus de « Déjà vue — revoir » : juste la pastille verte
        d'une lettre faite, comme chez les 3-5 ans. */
-    infos.innerHTML='<div style="font-weight:900;color:var(--k3);font-size:1.05rem">'+L.name+'</div>';
-    carte.appendChild(infos);
+    /* v3.5.8 — le client : « enlève les bâ, thâ… des cases, et agrandis au
+       maximum la lettre et le dessin ». */
     carte.style.position='relative';
     if(fait){var ok=document.createElement('div');ok.className='child-fait';ok.textContent='✅';carte.appendChild(ok);}
     if(ouverte){
@@ -14609,7 +14621,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.5.7';
+var _VERSION_REPLI='v3.5.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

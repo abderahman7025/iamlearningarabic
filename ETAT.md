@@ -6083,3 +6083,9 @@ nécessaire — les éléments du site servent de décor.
 ## v3.5.7
 - 6-11 ans, choix de la lettre : plus de titre « Les lettres », seulement « ✋ Choisis ta lettre » ; plus de « Déjà vue — revoir / À découvrir / Termine la précédente », juste la pastille ✅ d'une lettre faite (`.child-fait`) ; couché, cartes côte à côte (grille en colonnes) ; debout, cartes plus hautes et lettres plus grosses.
 - Bouton du compte (langue, changer d'interface, déconnexion) dans la barre du haut de TOUTES les pages, toutes interfaces (#tb-compte affiché partout).
+
+## v3.5.8
+- 6-11 choix de la lettre : le bouton du haut dit « Carte » (gardait « Lettres » du cours quitté) ; plus de nom dans les cases, dessin et lettre au plus grand.
+- Monde sans lettres (voyelles, prolongations) : `_boyLetterPicker` rend la carte au lieu d'une page « Choisis ta lettre » vide.
+- Carte 6-11 debout : segments du vol en un seul S (tangentes verticales) au lieu du crochet par le bord.
+- Carte 6-11 : un monde est fait selon `_sessionFaite` (même règle que l'ouverture du suivant) — la licorne part avec la fille dès le monde des licornes fini, la couronne après le sien. Le personnage se pose sur la DERNIÈRE ÎLE FAITE (`_ileDepart` = nombre d'îles faites d'affilée ; au départ du chemin au début) et son monde est centré à l'écran.

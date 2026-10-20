@@ -94,7 +94,7 @@ body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
   body:not(.age-petit) .child-choix .child-letters{display:grid!important;grid-auto-flow:column;grid-auto-columns:1fr;gap:14px!important;grid-template-columns:none!important}
   body:not(.age-petit) .child-choix .child-card{flex-direction:column!important;justify-content:center!important;text-align:center!important;gap:6px!important;min-height:calc(100vh - 210px);margin:0!important}
   body:not(.age-petit) .child-choix .child-infos{flex:none!important}
-  body:not(.age-petit) .child-choix .child-titre{margin-bottom:8px!important}
+  body:not(.age-petit) .child-choix .child-titre{margin:10px 0 8px!important}
 }
 /* ── v3.5.7 — LE COMPTE SUR TOUTES LES PAGES, TOUTES LES INTERFACES ──
    Le client : « mets le bouton déconnexion, langue, changer d'interface
@@ -108,9 +108,17 @@ body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
 }
 /* Debout : les cartes occupent la hauteur au lieu de laisser un grand vide. */
 @media (orientation:portrait){
-  body:not(.age-petit) .child-choix .child-card{min-height:min(150px,calc((100vh - 330px) / 3))}
+  body:not(.age-petit) .child-choix .child-card{min-height:min(170px,calc((100vh - 330px) / 3))}
   body:not(.age-petit) .child-choix .child-emoji{font-size:3.2rem!important}
   body:not(.age-petit) .child-choix .child-glyphe{font-size:3.8rem!important}
+}
+/* v3.5.8 — cases sans nom : le dessin et la lettre au plus grand. */
+body:not(.age-petit) .child-choix .child-card{justify-content:center!important;gap:clamp(14px,6vw,48px)!important}
+body:not(.age-petit) .child-choix .child-emoji{font-size:clamp(4rem,20vw,6.5rem)!important}
+body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!important;line-height:1.25!important}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-choix .child-emoji{font-size:min(4.4rem,17vh)!important}
+  body:not(.age-petit) .child-choix .child-glyphe{font-size:min(5.6rem,21vh)!important}
 }
 </style>
 <script>
