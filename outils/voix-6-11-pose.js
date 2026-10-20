@@ -109,7 +109,9 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
   }
   console.log('\nphrases', liste.length, '- caracteres generes', car, '- echecs', rates.length);
   let h = '<!doctype html><meta charset="utf-8"><title>Voix 6-11</title><body style="font-family:system-ui;background:#eef6ff;padding:20px;max-width:720px;margin:auto"><h2>' + (sansDepot ? 'À écouter avant mise en ligne' : 'Mis en ligne') + '</h2>';
+  /* Avec --refaire, la page ne montre QUE les phrases refaites. */
   liste.forEach((t, i) => {
+    if (_rf.length && _rf.indexOf(i + 1) < 0) return;
     const nom = Buffer.from(cle(t)).toString('hex').slice(0, 80) + '.mp3';
     h += '<div style="background:#fff;padding:10px 14px;border-radius:12px;margin:10px 0"><b>' + (i + 1) + '.</b> ' + t
       + '<br><small style="color:#567">dit : ' + enArabe(aDire(t)) + '</small><br>'
