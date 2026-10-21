@@ -23,10 +23,10 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
 });
 const SITE = 'https://iamlearningarabic.com';
 /* on ne touche pas : l'ancien est bon, ou aucune version ne va */
-const GARDER = { es: [5, 16, 17, 19, 20, 21], pt: [22, 24], id: [4, 5, 11, 15], hi: [6, 11, 12, 19, 20, 22, 23] };
+const GARDER = { es: [5, 16, 19, 20, 21], pt: [22, 24], id: [4, 5, 11, 15], hi: [6, 11, 12, 19, 20, 22, 23] };
 /* la façon choisie dans l'essai */
 const CHOIX = {
-  es: { 4: 'A', 25: 'B', 26: 'B', 27: 'A' },
+  es: { 4: 'A', 17: 'A', 25: 'B', 26: 'B', 27: 'A' },
   de: { 7: 'B', 8: 'A', 9: 'B', 11: 'B', 16: 'B', 19: 'B', 24: 'B' },
   nl: { 14: 'A', 16: 'B' },
   pt: { 5: 'A', 13: 'A', 14: 'A', 15: 'A', 23: 'A' },
