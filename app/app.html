@@ -6375,11 +6375,11 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 
 /* ══ v3.7.1 — VOL EMBARQUÉ (voir `_volEmbarqueScene`) ══ */
 .vol-emb{position:fixed;inset:0;z-index:99990;overflow:hidden;pointer-events:all;
-  opacity:0;transition:opacity .42s ease;contain:strict}
+  opacity:0;transition:opacity 1.3s cubic-bezier(.4,0,.7,1);contain:strict}
 .vol-emb.ve-on{opacity:1}
-.vol-emb .ve-noir{position:absolute;inset:0;background:#000;opacity:1;transition:opacity .4s ease;pointer-events:none;z-index:5}
+.vol-emb .ve-noir{position:absolute;inset:0;background:#000;opacity:1;transition:opacity .9s ease;pointer-events:none;z-index:5}
 .vol-emb.ve-voit .ve-noir{opacity:0}
-.vol-emb.ve-sort{opacity:0;transition:opacity .48s ease}
+.vol-emb.ve-sort{opacity:0;transition:opacity 1.4s cubic-bezier(.3,0,.6,1)}
 .vol-emb .ve-ciel{position:absolute;inset:0}
 .vol-emb-licorne .ve-ciel{background:linear-gradient(180deg,#9fc8ff 0%,#c9b8ff 38%,#ffd3ea 70%,#fff0f6 100%)}
 .vol-emb-fusee .ve-ciel{background:radial-gradient(circle at 50% 42%,#1d2f6b 0%,#0b1233 55%,#04061a 100%)}
@@ -6389,7 +6389,7 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 .vol-emb .ve-monde{position:absolute;left:0;top:0;width:min(70vw,70vh);height:auto;
   translate:-50% -50%;scale:.12;opacity:.85;
   filter:drop-shadow(0 0 18px rgba(255,255,255,.55));will-change:scale}
-.vol-emb.ve-on .ve-monde{animation:veApproche 3.4s cubic-bezier(.45,0,.9,.6) forwards}
+.vol-emb.ve-vol .ve-monde{animation:veApproche 3.4s cubic-bezier(.45,0,.9,.6) forwards}
 @keyframes veApproche{from{scale:.12;opacity:.7}to{scale:1.05;opacity:1}}
 /* Ce qui file : nuages (fille), étoiles (garçon). */
 .vol-emb .ve-defile{position:absolute;left:50%;top:40%;width:0;height:0}
@@ -11758,7 +11758,7 @@ window._volEmbarqueScene=function(o){
     m.style.setProperty('--dy',hy.toFixed(1)+'vh');
     var d=Math.max(700,Math.min(1500,fen/Math.max(1,ps.length)*1.6));
     m.style.animationDuration=d+'ms';
-    m.style.animationDelay=(250+k*(fen-d*0.4)/Math.max(1,ps.length))+'ms';
+    m.style.animationDelay=(1350+250+k*(fen-d*0.4)/Math.max(1,ps.length))+'ms';
     def.appendChild(m);
   });
   document.body.appendChild(sc);
@@ -11774,11 +11774,16 @@ window._volEmbarqueScene=function(o){
   requestAnimationFrame(function(){requestAnimationFrame(function(){sc.classList.add('ve-on');});});
   /* La carte s'efface dans le noir ; le noir se lève sur le vol ; à la fin
      il retombe, et se lève sur la carte où l'équipage finit son vol. */
+  /* v3.7.4 — « plus douce : le noir de plus en plus présent tout en voyant
+     la licorne voler » : le noir monte en 1,3 s sur le vol vu de loin, se
+     lève en 0,9 s sur le vol embarqué, retombe en 0,9 s, puis se dissipe en
+     1,4 s sur la carte où l'équipage finit son vol. */
+  var T0=1350;
   setTimeout(function(){try{if(o.quandCouvert)o.quandCouvert();}catch(e){}
-    sc.classList.add('ve-voit');},420);
-  setTimeout(function(){sc.classList.remove('ve-voit');},420+VOL_EMB_DUREE);
-  setTimeout(function(){sc.classList.add('ve-sort');try{if(o.quandSort)o.quandSort();}catch(e){}},420+VOL_EMB_DUREE+420);
-  setTimeout(termine,420+VOL_EMB_DUREE+420+480);
+    sc.classList.add('ve-voit','ve-vol');},T0);
+  setTimeout(function(){sc.classList.remove('ve-voit');},T0+VOL_EMB_DUREE);
+  setTimeout(function(){sc.classList.add('ve-sort');try{if(o.quandSort)o.quandSort();}catch(e){}},T0+VOL_EMB_DUREE+950);
+  setTimeout(termine,T0+VOL_EMB_DUREE+950+1450);
 };
 /* Quitter la page en plein vol : la scène ne reste pas en travers. */
 window.addEventListener('popstate',function(){
@@ -12750,7 +12755,7 @@ function _volCarte(o){
     /* Le point d'où il finira son vol, vu de loin : un peu avant le monde,
        dans l'axe d'où il vient. */
     var vx=but.x-ici.x,vy=but.y-ici.y,dist=Math.sqrt(vx*vx+vy*vy)||1;
-    var recul=Math.min(170,dist*0.45);
+    var recul=Math.min(240,dist*0.5);
     var reprise={x:but.x-vx/dist*recul,y:but.y-vy/dist*recul};
     idx=cible;
     /* 1. le décollage, vu de loin : le début du vol habituel. */
@@ -12771,10 +12776,10 @@ function _volCarte(o){
         /* 3. le fondu retour commence : il est déjà en train de finir son vol. */
         quandSort:function(){
           if(!el.isConnected)return;
-          volDroit(reprise,but,function(){arriver(fini,but);},1500);
+          volDroit(reprise,but,function(){arriver(fini,but);},2300);
         }
       });
-    },750);
+    },250);
   }
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
@@ -15259,7 +15264,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.3';
+var _VERSION_REPLI='v3.7.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

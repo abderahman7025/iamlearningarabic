@@ -106,6 +106,16 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.4 — 23 octobre 2026 : vol embarqué, fondus doux
+
+- Le client : « le noir doit être de plus en plus présent, tout en voyant la
+  licorne voler ». La scène commence 0,25 s après le décollage ; le noir
+  monte en 1,3 s sur le vol vu de loin (`T0=1350`), se lève en 0,9 s,
+  retombe en 0,9 s, puis se dissipe en 1,4 s pendant que l'équipage finit
+  son vol (2,3 s depuis 240 px avant le monde). Le monde d'arrivée et les
+  mondes survolés ne démarrent qu'une fois la scène visible (`ve-vol`).
+  Mesuré : scène visible à 1,7 s, retour carte à 5,7 s, cours à 12 s.
+
 ## v3.7.3 — 23 octobre 2026 : vol embarqué, transitions par le noir
 
 - **Noir entre les vues** (le client) : `.ve-noir` couvre la scène ; la carte
