@@ -106,6 +106,42 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.6.7 — 23 octobre 2026 : la carte des mondes sur tablette et téléphone
+
+Quatre défauts signalés par le client, tous corrigés et MESURÉS (pas vus :
+voir plus bas pourquoi).
+
+- **Tablette debout, mondes empilés et énormes.** La carte debout donnait à
+  chaque monde la moitié de l'ÉCRAN (384 px sur 768) alors que l'application
+  vit dans une colonne de 557 px (#root) et la carte dans 485 : chaque monde
+  remplissait la colonne. Désormais, au-delà de 600 px de large, un monde
+  prend la moitié de la colonne, plafonnée à 300 px (242 px mesurés), et ils
+  alternent. Sur téléphone, la taille d'avant (moitié de l'écran), que le
+  client aime. La fille suit la taille des mondes (`TQM`).
+- **Le nom trop bas sous la bulle (téléphone).** La boîte de l'image faisait
+  187 × 330 : la bulle ronde flottait au milieu, le nom collé au bas tombait
+  30 px dessous. Pour les `bulle-*`, boîte carrée et nom posé à 86 % de la
+  hauteur, juste sous la bulle, et 34 px de marge sous chaque monde.
+- **La fille seule, sans licorne ni couronne.** Elles ne se gagnent qu'en
+  FINISSANT les mondes 1 et 2 ; sur les comptes où tout est ouvert
+  (`_toutOuvert`, ceux du client), rien n'est fini. Pour ces comptes, elles
+  sont gagnées d'office (`_toutEstOuvert`, `_objetsPris` pour les objets posés
+  sur les mondes). Les élèves ne changent pas.
+- **La caméra ne suivait pas le vol (tablette).** Deux causes : elle n'était
+  appelée que dans certaines phases du vol, et elle visait le POINT du chemin.
+  Désormais `suivreCamera` la relance toutes les 33 ms pendant tout `allerA`,
+  et `camera()` vise le centre des IMAGES visibles de l'équipage
+  (getBoundingClientRect, rotations comprises). Mesuré pendant un vol de
+  plusieurs mondes : fille visible 100 % du temps sur téléphone debout et
+  couché, tablette debout et couchée, et la fusée du garçon aussi.
+- **Comment on a mesuré** : `requestAnimationFrame` ne tourne pas dans le
+  navigateur intégré (0 image/s). Pour tester un vol : remplacer
+  `window.requestAnimationFrame` par un `setTimeout` de 16 ms APRÈS le
+  chargement de la carte (ne pas rappeler `renderSessionsMap`, une deuxième
+  carte se superpose et fausse tout), puis cliquer un monde et relever la
+  position des images de l'équipage. Piège : deux éléments absolus portent des
+  images — prendre celui qui est enfant direct du conteneur des mondes.
+
 ## v3.6.6 — 23 octobre 2026 : LES DOUZE MONDES DE LA FILLE EN 3D, et la carte
 
 Le client a validé le monde papillons (« c'est trop beau ») et demandé la même

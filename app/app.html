@@ -12187,7 +12187,26 @@ function _volCarte(o){
     var ca=document.getElementById('ca');
     if(!ca)return;
     var haut=(globe.getBoundingClientRect().top+ca.scrollTop)-ca.getBoundingClientRect().top;
+    /* v3.6.7 — Le client : « sur tablette, on ne voit pas le vol de la
+       fille ». La caméra centrait le POINT du chemin ; la fille sur sa
+       licorne se dessine sous ce point et sortait par le bas (mesuré : jusqu'à
+       795 px pour une vue de 651). On centre donc sa boîte elle-même. */
     var vise=haut+y-ca.clientHeight/2;
+    /* On vise ce qu'on VOIT : les images visibles de l'équipage, telles que
+       le navigateur les dessine (rotations et décalages compris). */
+    if(el&&el.isConnected){
+      var hautE=Infinity,basE=-Infinity;
+      Array.prototype.forEach.call(el.querySelectorAll('img'),function(im){
+        if(parseFloat(getComputedStyle(im).opacity)<0.3)return;
+        var b=im.getBoundingClientRect();
+        if(b.height<2)return;
+        if(b.top<hautE)hautE=b.top;if(b.bottom>basE)basE=b.bottom;
+      });
+      if(basE>hautE){
+        var cr=ca.getBoundingClientRect();
+        vise=ca.scrollTop+((hautE+basE)/2-cr.top)-ca.clientHeight/2;
+      }
+    }
     ca.scrollTop=Math.max(0,Math.min(ca.scrollHeight-ca.clientHeight,vise));
   }
   /* Le point de repos de l'etape i : son sommet quand l'habillage le
@@ -12382,9 +12401,22 @@ function _volCarte(o){
     if(d2<=144){poser(but.x,but.y,null);poserPilote(fini);return;}
     approche(de,but,function(){poserPilote(fini);});
   }
+  /* v3.6.7 — LA CAMÉRA SUIT TOUT LE VOL. Elle n'était appelée que dans
+     certaines phases : à l'approche finale elle s'arrêtait, et sur la
+     tablette debout, où les mondes sont loin l'un de l'autre, la fille
+     sortait de l'écran par le bas (mesuré : 959 px pour une vue de 742).
+     Tant qu'un vol dure, on la recentre trente fois par seconde. */
+  var suiviCam=null;
+  function suivreCamera(oui){
+    if(suiviCam){clearInterval(suiviCam);suiviCam=null;}
+    if(oui&&o.camera)suiviCam=setInterval(function(){camera(0);},33);
+  }
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
     if(idx===cible){if(fini)fini();return;}
+    suivreCamera(true);
+    var _finiAvant=fini;
+    fini=function(){suivreCamera(false);camera(0);if(_finiAvant)_finiAvant();};
     /* D'ou l'on part, et vers ou : les deux se lisent AVANT que `idx` ne
        bouge. Le sens vient des abscisses des deux etapes ; un trajet
        rigoureusement vertical garde le sens precedent. */
@@ -13320,8 +13352,16 @@ var islandDefs=_ilesDefs();
   var _etapeFaite=islandDefs.map(function(isle){
     return isle.sids.every(function(sid){return _sessionFaite(sid);});
   });
-  var _montureGagnee=(!_HAB.montureEtape)||!!_etapeFaite[_HAB.montureEtape-1];
-  var _couronneGagnee=(!_HAB.couronneEtape)||!!_etapeFaite[_HAB.couronneEtape-1];
+  /* v3.6.7 — Le client : « la fille vole seule, sans couronne ni licorne,
+     alors que ces deux mondes sont débloqués ». Sur un compte où tout est
+     ouvert (`_toutOuvert`), les mondes ne sont pas FINIS : la licorne et la
+     couronne restaient donc posées sur leur monde. Pour ces comptes, elles
+     sont gagnées d'office. Les élèves, eux, les gagnent en finissant. */
+  var _toutEstOuvert=_toutOuvert();
+  var _montureGagnee=_toutEstOuvert||(!_HAB.montureEtape)||!!_etapeFaite[_HAB.montureEtape-1];
+  var _couronneGagnee=_toutEstOuvert||(!_HAB.couronneEtape)||!!_etapeFaite[_HAB.couronneEtape-1];
+  /* Les objets posés sur les mondes suivent la même règle. */
+  var _objetsPris=_etapeFaite.map(function(f){return f||_toutEstOuvert;});
 
   islandDefs.forEach(function(isle,isleIdx){
     // Statut des sessions de cette île
@@ -13461,7 +13501,16 @@ var islandDefs=_ilesDefs();
       Array.from(globeDiv.querySelectorAll('.isle-connector')).forEach(function(el){el.style.display='none';});
       var isleCardsMob=Array.from(globeDiv.querySelectorAll('.sess-island:not(.boss-isle)'));
       var bossElMob=globeDiv.querySelector('.boss-isle');
-      var IWmob=Math.floor(DW*0.50);
+      /* v3.6.7 — TABLETTE DEBOUT. La carte vivait dans une colonne de 520 px
+         alors que chaque monde prenait la moitié de l'ÉCRAN (384 px sur 768) :
+         il remplissait la colonne, et les mondes s'empilaient au lieu
+         d'alterner à gauche et à droite. On élargit la colonne sur grand
+         écran, et chaque monde prend la moitié de la COLONNE, plafonnée. */
+      if(DW>=600){wrap.style.maxWidth=Math.min(DW-32,760)+'px';}
+      var largeurCarte=Math.min(globeDiv.offsetWidth||DW,DW);
+      /* Sur téléphone, la taille d'avant (la moitié de l'écran), que le
+         client trouve bonne ; sur tablette, la moitié de la colonne. */
+      var IWmob=(DW<600)?Math.floor(DW*0.50):Math.floor(Math.min(largeurCarte*0.5,300));
       // Sauvegarde clics + layout 50% G/D
       isleCardsMob.forEach(function(el,i){
         el._mobOrigClick=el.onclick;
@@ -13471,6 +13520,17 @@ var islandDefs=_ilesDefs();
         el.style.position='relative';
         el.style.zIndex='5';
         el.style.alignSelf=(i%2===0)?'flex-end':'flex-start';
+        /* v3.6.7 — LE NOM SOUS LA BULLE. La boîte de l'image était plus haute
+           que large (187 × 330 sur téléphone) : la bulle, ronde, flottait au
+           milieu, et le nom, collé au bas de la boîte, tombait 30 px sous
+           elle. Boîte carrée, et le nom posé juste sous la bulle. */
+        var _im=el.querySelector('.isle-img');
+        if(_im&&/bulle-/.test(_im.getAttribute('src')||'')){
+          _im.style.height=IWmob+'px';
+          var _nm=el.querySelector('.isle-name');
+          if(_nm){_nm.style.top=Math.round(IWmob*0.86)+'px';_nm.style.bottom='auto';}
+          el.style.marginBottom='34px';
+        }
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
       globeDiv.style.paddingTop='80px';
@@ -13483,7 +13543,9 @@ var islandDefs=_ilesDefs();
          la main a chaque image. */
       /* Plus grande qu'avant : la fusee reste garee sur l'etape et
          l'enfant se tient devant elle — il faut la place pour les deux. */
-      var eqMob=_equipage(112,!_montureGagnee);
+      /* La fille suit la taille des mondes (112 px pour un monde de 187). */
+      var TQM=Math.max(112,Math.round(IWmob*0.6));
+      var eqMob=_equipage(TQM,!_montureGagnee);
       var charElMob=eqMob.el;
       globeDiv.appendChild(charElMob);
       _quandCartePrete(ca,1500,function(){
@@ -13552,11 +13614,11 @@ var islandDefs=_ilesDefs();
           drawMobPath('M '+sx+','+sy+' C '+cp1x+','+cp1y+' '+cp2x+','+cp2y+' '+ex+','+ey, segLkM);
         }/* charIdx : 0 = le coin, i+1 = posé sur l'île i */
         var charIdxM=_ileDepart(islandDefs);
-        _poserObjets(globeDiv,isleCardsMob,_etapeFaite);
+        _poserObjets(globeDiv,isleCardsMob,_objetsPris);
         _poserBetes(globeDiv,isleCardsMob);
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
           epaisseurTrainee:14,
-          equipage:eqMob,decalageX:56,decalageY:112,demiAssise:31,depart:charIdxM,
+          equipage:eqMob,decalageX:Math.round(TQM/2),decalageY:TQM,demiAssise:Math.round(TQM*0.279),depart:charIdxM,
           trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
           dureeTotale:9000,camera:true,
           pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null,
@@ -13812,7 +13874,7 @@ var islandDefs=_ilesDefs();
 
       /* charIdx : 0 = le coin, i+1 = posé sur l'étape i */
       var charIdx=_ileDepart(islandDefs);
-      _poserObjets(globeDiv,isleCards,_etapeFaite);
+      _poserObjets(globeDiv,isleCards,_objetsPris);
       _poserBetes(globeDiv,isleCards);
       var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
         epaisseurTrainee:Math.max(8,Math.round(18*TEQ/140)),
@@ -14757,7 +14819,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.6';
+var _VERSION_REPLI='v3.6.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
