@@ -106,6 +106,15 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.6.9 — 23 octobre 2026 : les têtes d'animaux sur le choix de la lettre
+
+Le client parlait du CHOIX DE LA LETTRE (6-11 ans, ex. monde de la couronne :
+alif, wāw, yā) : il y avait des EMOJI (lion, fleur, colombe). La carte prend
+maintenant `imageDuMot(L.ar)` (`mot-*.png`, ses têtes) à la taille de
+l'emoji (1,15 em) ; emoji en secours, cadenas pour une lettre fermée. Les
+`mot-*.png` eux-mêmes étaient DÉJÀ ses têtes depuis septembre (seuls
+poisson et crocodile ont changé en v3.6.8).
+
 ## v3.6.8 — 23 octobre 2026 : carte, son, cadres, têtes d'animaux
 
 - **Têtes d'animaux pour les lettres.** Le client les avait faites :

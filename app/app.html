@@ -14843,7 +14843,19 @@ function _boyLetterPicker(ca,session){
       +(aFaire?'border:3px solid var(--k1);box-shadow:0 0 0 0 rgba(var(--kA),.5);animation:kidPulse 1.8s infinite;':'');
     var em=document.createElement('div');em.className='child-emoji';
     em.style.cssText='font-size:2.6rem;line-height:1';
-    em.textContent=ouverte?L.emoji:'🔒';carte.appendChild(em);
+    /* v3.6.9 — Le client : « sur le choix de la lettre, il y a des emoji
+       (lion, fleur, colombe) : mets les têtes d'animaux ». Ses dessins
+       (`mot-*.png`, via `imageDuMot`) prennent la place de l'emoji, à la même
+       taille (1 em suit les réglages de police de .child-emoji). L'emoji ne
+       reste qu'en secours, et le cadenas pour une lettre fermée. */
+    var _tete=ouverte?imageDuMot(L.ar):null;
+    if(_tete){
+      var _ti=document.createElement('img');_ti.src=_tete;_ti.alt='';
+      _ti.style.cssText='height:1.15em;width:auto;max-width:2.2em;display:block;object-fit:contain;'
+        +'filter:drop-shadow(0 4px 6px rgba(0,0,0,.15))';
+      em.appendChild(_ti);
+    }else em.textContent=ouverte?L.emoji:'🔒';
+    carte.appendChild(em);
     var lettre=document.createElement('div');lettre.className='child-glyphe';
     lettre.style.cssText='font-family:var(--fa);font-size:3rem;color:var(--k1);min-width:60px;text-align:center;line-height:1.1';
     lettre.textContent=L.ar;carte.appendChild(lettre);
@@ -14946,7 +14958,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.8';
+var _VERSION_REPLI='v3.6.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
