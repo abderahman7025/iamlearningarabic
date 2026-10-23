@@ -106,6 +106,19 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.7 — 23 octobre 2026 : on la revoit en descente, droite
+
+- Le client : « on ne la revoit de loin QUE quand elle est au-dessus du
+  monde, haut en haut, et en mouvement (en descente) en sortant du noir ».
+  Sous le noir : équipage DROIT (`poser(...,null)`), au-dessus du monde
+  (1,3 × sa hauteur pour la fusée, 1 × pour la licorne), vue calée sur le
+  monde d'arrivée et caméra arrêtée (`cam.actif=false`) — sinon elle suivait
+  la descente et on ne la voyait pas bouger. La descente (2,3 s, ralentit à
+  la fin) démarre avec le fondu retour (1,4 s) : on la voit encore
+  descendre, puis se poser. Fusée : `poserPilote(fini,true)`, pose directe
+  sans vol stationnaire ; licorne : `arriver` (rebond).
+  Mesuré : fusée 252 → 366 px à l'écran, licorne 276 → 359, écran fixe.
+
 ## v3.7.6 — 23 octobre 2026 : à l'arrivée, seulement l'atterrissage
 
 - Le client : « on ne doit voir que l'atterrissage (fusée qui se pose,

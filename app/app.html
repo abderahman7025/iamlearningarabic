@@ -12171,7 +12171,7 @@ function _volCarte(o){
         PORTE_OUVRE*0.55+PORTE_DESCEND*0.7+Math.max(PORTE_FERME,PORTE_PAS));
     }
   }
-  function poserPilote(fini){
+  function poserPilote(fini,direct){
     if(!eq.aVaisseau){if(fini)fini();return;}
     if(eq.flamme)eq.flamme.style.display='none';
     habillePilote();
@@ -12180,13 +12180,15 @@ function _volCarte(o){
        son atterrissage, et le client y tient. La LICORNE, non — c'est
        exactement le va-et-vient dont il ne veut pas. Elle arrive, elle
        s'arrete, et la fille descend. */
-    var tientEnVol=!!o.aligne;
+    /* v3.7.7 — `direct` : elle arrive déjà en descente (vol embarqué), elle
+       ne tient pas en l'air avant de se poser. */
+    var tientEnVol=!!o.aligne&&!direct;
     leveLa(tientEnVol?0.34:0);
     /* v3.7.0 — Le client, cette fois : « fais-la remonter à peine et
        redescendre au-dessus du monde à son arrivée ». Un seul petit rebond
        (10 % de sa hauteur), pas le va-et-vient d'avant. */
     var rebond=0;
-    if(!tientEnVol&&eq.vaisseau&&eq.vaisseau.animate){
+    if(!o.aligne&&eq.vaisseau&&eq.vaisseau.animate){
       try{eq.vaisseau.animate([{transform:'translateY(0)',easing:'ease-out'},
         {transform:'translateY(-10%)',offset:.42,easing:'ease-in-out'},
         {transform:'translateY(0)'}],{duration:900});rebond=900;}catch(e){}
@@ -12764,7 +12766,10 @@ function _volCarte(o){
        poser. */
     var vx=but.x-ici.x,vy=but.y-ici.y,dist=Math.sqrt(vx*vx+vy*vy)||1;
     var garcon=!!o.aligne;
-    var reprise={x:but.x,y:but.y-(garcon?0:Math.max(40,(el.offsetHeight||100)*0.45))};
+    /* v3.7.7 — « on ne la revoit de loin QUE quand elle est au-dessus du
+       monde, haut en haut, et EN MOUVEMENT, en descente ». Elle part d'assez
+       haut pour que la descente commence pendant le fondu et se voie. */
+    var reprise={x:but.x,y:but.y-Math.max(80,(el.offsetHeight||100)*(garcon?1.3:1.0))};
     idx=cible;
     /* 1. le décollage, vu de loin : le début du vol habituel. */
     volDroit(ici,but,function(){},Math.max(1900,Math.min(7000,1300+dist*2)));
@@ -12778,24 +12783,29 @@ function _volCarte(o){
           try{var ca=document.getElementById('ca');
             if(ca&&o.camera){var k2=camK(ca),cr=ca.getBoundingClientRect();
               var hautG=ca.scrollTop+(globe.getBoundingClientRect().top-cr.top)/k2;
-              ca.scrollTop=Math.max(0,hautG+parseFloat(el.style.top)+el.offsetHeight/2+(cam.off||0)-ca.clientHeight/2);
-              cam.pos=null;cam.vue=null;}}catch(e){}
+              /* La vue se cale sur le monde d'ARRIVÉE et ne bouge plus : la
+                 descente doit se voir, pas être suivie par la caméra. */
+              ca.scrollTop=Math.max(0,hautG+(but.y-dy)+el.offsetHeight/2+(cam.off||0)-ca.clientHeight/2);
+              cam.actif=false;cam.jusqua=0;cam.pos=null;cam.vue=null;}}catch(e){}
         },
         /* 3. le noir se dissipe sur l'équipage au-dessus du monde ; une fois
            l'écran clair, il se pose. */
         quandSort:function(){
           if(!el.isConnected)return;
-          setTimeout(function(){
+          /* La descente démarre AVEC le fondu (1,4 s) : quand l'écran
+             s'éclaircit, elle est déjà en train de descendre, droite, et
+             finit de se poser sous nos yeux. */
+          var t0=Date.now(),D=2300;
+          (function tic(){
             if(!el.isConnected){fini&&fini();return;}
-            if(garcon){arriver(fini,but);return;}
-            var t0=Date.now(),D=850;
-            (function tic(){
-              var u=Math.min(1,(Date.now()-t0)/D),e=1-Math.pow(1-u,3);
-              poser(but.x,reprise.y+(but.y-reprise.y)*e,null);
-              if(u>=1){arriver(fini,but);return;}
-              raf=requestAnimationFrame(tic);
-            })();
-          },1300);
+            var u=Math.min(1,(Date.now()-t0)/D),e=1-Math.pow(1-u,2);
+            poser(but.x,reprise.y+(but.y-reprise.y)*e,null);
+            if(u>=1){
+              if(garcon)poserPilote(fini,true);else arriver(fini,but);
+              return;
+            }
+            raf=requestAnimationFrame(tic);
+          })();
         }
       });
     },0);   /* v3.7.5 — le fondu commence dès le décollage */
@@ -15290,7 +15300,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.6';
+var _VERSION_REPLI='v3.7.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
