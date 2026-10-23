@@ -10,8 +10,10 @@ fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/)
 const L = require('./voix-allah.json').filter((e) => e.langue === 'fr');
 /* 24 octobre : la fatha n'a rien changé ; l'essai n° 5 (alif suscrit,
    اللّٰه) est celui que le client a retenu (le 2, « Allâh », aussi). */
-const ALLAH = 'الل' + String.fromCharCode(0x651, 0x670) + 'ه';
-const dest = path.join(__dirname, 'captures', 'voix-allah-alif'); fs.mkdirSync(dest, { recursive: true });
+// 24 octobre, 2e essai : اللّٰه donnait encore « d'illah » et « Alla » →
+// « Allâh » (essai n° 2, retenu par le client).
+const ALLAH = 'All' + String.fromCharCode(0xE2) + 'h';
+const dest = path.join(__dirname, 'captures', 'voix-allah-allah2'); fs.mkdirSync(dest, { recursive: true });
 (async () => {
   for (const i of [2, 4]) {
     const e = L[i], k = cle(e.cle);

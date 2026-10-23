@@ -150,7 +150,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
   `outils/voix-allah-essais.js`) : le client retient **اللّٰه (alif suscrit,
   ل ل ّ ٰ)** et « Allâh ». Textes 3 et 5 refaits en اللّٰه (601 car.), en
   ligne (`voix-allah-fatha.js`, fichiers `captures/voix-allah-alif`).
-  **RÈGLE pour le Narrateur v4 : écrire Allah اللّٰه dans le texte donné à
+  **RÈGLE (corrigée) : اللّٰه ne marche PAS non plus ; écrire « Allâh » (latin, â) dans le texte donné à
   la voix.**
 
 ## v3.8.0 — 23 octobre 2026 : adultes, tout est lu, karaoké synchronisé
