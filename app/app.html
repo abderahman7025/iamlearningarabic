@@ -6377,6 +6377,8 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 .vol-emb{position:fixed;inset:0;z-index:99990;overflow:hidden;pointer-events:all;
   opacity:0;transition:opacity .42s ease;contain:strict}
 .vol-emb.ve-on{opacity:1}
+.vol-emb .ve-noir{position:absolute;inset:0;background:#000;opacity:1;transition:opacity .4s ease;pointer-events:none;z-index:5}
+.vol-emb.ve-voit .ve-noir{opacity:0}
 .vol-emb.ve-sort{opacity:0;transition:opacity .48s ease}
 .vol-emb .ve-ciel{position:absolute;inset:0}
 .vol-emb-licorne .ve-ciel{background:linear-gradient(180deg,#9fc8ff 0%,#c9b8ff 38%,#ffd3ea 70%,#fff0f6 100%)}
@@ -6406,8 +6408,8 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
   margin:calc(min(42vw,42vh) / -2) 0 0 calc(min(42vw,42vh) / -2);opacity:0;
   filter:drop-shadow(0 0 14px rgba(255,255,255,.5));
   animation:vePasse 1.2s cubic-bezier(.5,0,.9,.5) both}
-@keyframes vePasse{0%{transform:translate(0,0) scale(.08);opacity:0}12%{opacity:1}
-  100%{transform:translate(var(--dx),var(--dy)) scale(1.5);opacity:1}}
+@keyframes vePasse{0%{transform:translate(0,0) scale(.08);opacity:0}12%{opacity:1}80%{opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(1.6);opacity:0}}
 .vol-emb-fusee .ve-defile i{width:.5vmax;height:.5vmax;margin:-.25vmax 0 0 -.25vmax;border-radius:50%;background:#fff;
   box-shadow:0 0 6px 2px rgba(180,210,255,.8);animation:veEtoile 1.2s cubic-bezier(.6,0,1,1) infinite}
 @keyframes veEtoile{0%{transform:translate(0,0) scale(.2);opacity:0}20%{opacity:1}
@@ -6421,20 +6423,20 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 .vol-emb .ve-tete{position:absolute;left:0;bottom:calc(var(--W) * -.5);
   width:var(--W);height:auto;translate:-50% 0;
   filter:drop-shadow(0 -4px 14px rgba(120,60,160,.25))}
-.vol-emb .ve-aile{position:absolute;bottom:calc(var(--W) * .02);width:calc(var(--W) * .78);height:auto;
+.vol-emb .ve-aile{position:absolute;bottom:calc(var(--W) * -.2);width:calc(var(--W) * .78);height:auto;
   animation:veBat .62s ease-in-out infinite alternate}
 /* L'aile gauche : sa base (bord droit de l'image) est contre la licorne. */
 .vol-emb .ve-aile-g{right:calc(var(--W) * .14);transform-origin:100% 60%}
 .vol-emb .ve-aile-d{left:calc(var(--W) * .14);transform-origin:0% 60%}
-@keyframes veBat{from{rotate:2deg}to{rotate:30deg}}
+@keyframes veBat{from{rotate:-4deg}to{rotate:14deg}}
 .vol-emb .ve-aile-d{animation-name:veBatD}
-@keyframes veBatD{from{rotate:-2deg}to{rotate:-30deg}}
+@keyframes veBatD{from{rotate:4deg}to{rotate:-14deg}}
 /* Couché, la hauteur manque : la tête plus petite et plus enfoncée, pour
    laisser le ciel et le monde d'arrivée au-dessus. */
 @media (orientation:landscape){
   .vol-emb .ve-monture{--W:min(50vh,40vw)}
   .vol-emb .ve-tete{bottom:calc(var(--W) * -.78)}
-  .vol-emb .ve-aile{bottom:calc(var(--W) * -.1)}
+  .vol-emb .ve-aile{bottom:calc(var(--W) * -.2)}
   .vol-emb-licorne .ve-loin,.vol-emb-licorne .ve-defile{top:36%}
   .vol-emb .ve-monde{width:min(60vw,55vh)}
 }
@@ -11726,6 +11728,9 @@ window._volEmbarqueScene=function(o){
       +'<img class="ve-aile ve-aile-d" alt="" src="/images/vol-aile-d.webp">'
       +'<img class="ve-tete" alt="" src="/images/vol-licorne-dos.webp"></div>';
   }
+  /* v3.7.3 — « la transition doit passer par du noir qui cache tout
+     l'écran » : un voile noir, par-dessus tout, qu'on lève et qu'on remet. */
+  h+='<div class="ve-noir"></div>';
   sc.innerHTML=h;
   /* Ce qui file : des nuages pour la licorne, des étoiles pour la fusée.
      Chacun part du point de fuite (le monde) et file vers un bord. Les
@@ -11748,7 +11753,8 @@ window._volEmbarqueScene=function(o){
   ps.forEach(function(src,k){
     var m=document.createElement('img');m.className='ve-passe';m.alt='';m.src=src;
     var cote=(k%2?1:-1),hy=(Math.random()-.5)*30;
-    m.style.setProperty('--dx',(cote*(48+Math.random()*12)).toFixed(1)+'vw');
+    /* v3.7.3 — il sort de l'écran et s'efface : on ne les empile pas. */
+    m.style.setProperty('--dx',(cote*(78+Math.random()*12)).toFixed(1)+'vw');
     m.style.setProperty('--dy',hy.toFixed(1)+'vh');
     var d=Math.max(700,Math.min(1500,fen/Math.max(1,ps.length)*1.6));
     m.style.animationDuration=d+'ms';
@@ -11766,9 +11772,13 @@ window._volEmbarqueScene=function(o){
   }
   sc._coupe=termine;
   requestAnimationFrame(function(){requestAnimationFrame(function(){sc.classList.add('ve-on');});});
-  setTimeout(function(){try{if(o.quandCouvert)o.quandCouvert();}catch(e){}},420);
-  setTimeout(function(){sc.classList.add('ve-sort');try{if(o.quandSort)o.quandSort();}catch(e){}},420+VOL_EMB_DUREE);
-  setTimeout(termine,420+VOL_EMB_DUREE+480);
+  /* La carte s'efface dans le noir ; le noir se lève sur le vol ; à la fin
+     il retombe, et se lève sur la carte où l'équipage finit son vol. */
+  setTimeout(function(){try{if(o.quandCouvert)o.quandCouvert();}catch(e){}
+    sc.classList.add('ve-voit');},420);
+  setTimeout(function(){sc.classList.remove('ve-voit');},420+VOL_EMB_DUREE);
+  setTimeout(function(){sc.classList.add('ve-sort');try{if(o.quandSort)o.quandSort();}catch(e){}},420+VOL_EMB_DUREE+420);
+  setTimeout(termine,420+VOL_EMB_DUREE+420+480);
 };
 /* Quitter la page en plein vol : la scène ne reste pas en travers. */
 window.addEventListener('popstate',function(){
@@ -15249,7 +15259,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.2';
+var _VERSION_REPLI='v3.7.3';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

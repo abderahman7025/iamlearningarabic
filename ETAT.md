@@ -106,6 +106,19 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.3 — 23 octobre 2026 : vol embarqué, transitions par le noir
+
+- **Noir entre les vues** (le client) : `.ve-noir` couvre la scène ; la carte
+  s'efface dans le noir (0,42 s), le noir se lève sur le vol (`ve-voit`),
+  retombe à la fin, puis la scène entière s'efface sur la carte où
+  l'équipage finit son vol (`quandSort` 0,42 s après la retombée).
+- **Mondes dépassés** : ils sortent de l'écran (78-90 vw) et s'effacent à la
+  fin de leur passage (`vePasse` opacité 0 à 100 %), plus d'empilement.
+- **Ailes** : moitié de leur épaisseur sous le bord (`bottom -0.2 W`),
+  battement -4° → 14°.
+- **Test** : dans le navigateur intégré, les animations CSS n'avancent qu'au
+  moment des captures d'écran (`currentTime` reste à 0 entre deux).
+
 ## v3.7.2 — 23 octobre 2026 : vol embarqué revu
 
 - **Plus de zoom** (le client) : le décollage et l'atterrissage se voient de
