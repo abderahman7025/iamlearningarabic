@@ -104,6 +104,14 @@ const serveur = http.createServer((req, res) => {
   if (chemin === '/capture' && req.method === 'POST')
     return depose(req, res, url.searchParams.get('f'));
   if (chemin === '/banc') return pageApplication(res, 'banc.html', true);
+  /* La liste des enregistrements, copiée depuis le site en ligne
+     (`curl https://iamlearningarabic.com/api/audio > outils/captures/audio-urls.json`) :
+     sans elle, l'application locale croit qu'aucune voix n'existe. */
+  if (chemin === '/api/audio' && req.method === 'GET') {
+    const f = path.join(CAPTURES, 'audio-urls.json');
+    if (fs.existsSync(f)) return envoie(res, 200, TYPES['.json'], fs.readFileSync(f));
+    return envoie(res, 200, TYPES['.json'], '{"urls":{}}');
+  }
   /* La version d'essai, pour la verifier comme le fait un compte gratuit. */
   if (chemin === '/essai' || chemin.indexOf('/essai/') === 0)
     return pageApplication(res, 'app-essai.html', true);

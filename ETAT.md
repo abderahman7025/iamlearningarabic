@@ -106,6 +106,34 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.0 — 23 octobre 2026 : adultes, tout est lu, karaoké synchronisé
+
+- **Lecture automatique (adultes)** : elle ne prenait que les `onclick` qui
+  appellent `speakText` ; les sons ARABES (voyelles, tanwin, exemples des
+  prolongations, formes des lettres) passent par `speak` et étaient sautés.
+  `speak` est maintenant capté aussi, et en lecture automatique il passe par
+  `speakText(t,'ar',élément)` → enregistrement du studio + karaoké +
+  grossissement. Vérifié, cours des voyelles : « …trois voyelles » puis
+  َ ُ ِ (droite → gauche), « …on ajoute le son n » puis ً ٌ ٍ, puis le soukoun.
+- **Grossissement** : un signe/mot arabe seul lu (`.lit-ar`, ≤ 8 caractères)
+  ×1,4 et couleur du profil ; les grands blocs (`.lit-bloc`) ×1,012 au lieu
+  de rien (« le cadre lu doit toujours grossir un peu »).
+- **Karaoké synchronisé** : `_analyseSilences` relève aussi les plages de
+  voix (`r.v`, trames de 20 ms, pause ≥ 120 ms ; cache `bornes2_`) ; la
+  couleur n'avance que pendant que la voix parle. `poids()` ne compte plus
+  les signes des voyelles arabes ni la ponctuation (lettre arabe = 1,3).
+- **Audit des cours adultes** (renderVLesson, renderPLesson, renderLLesson
+  de chaque lettre, liste des voix du site) : il ne MANQUE que
+  7 textes français (« Exemple : », « "Je t'aime vraiment" se dit »,
+  « alors que... », « "Je ne t'aime pas" se dit », « Illustration : »,
+  « est différent de », la note « (Il n'est pas essentiel…) ») et 3 sons
+  arabes du studio (وَاِ, يُوَ, وِيُ). Payant / studio : accord du client attendu.
+- **Voix « Allah »** : `voix-allah.json` toujours PAS générée (fr : 7 textes,
+  2 197 car. ; 12 langues : 24 292 car.).
+- **Serveur local** : `GET /api/audio` sert `outils/captures/audio-urls.json`
+  (copie de la liste en ligne, hors dépôt) — sinon l'app locale croit
+  qu'aucune voix n'existe.
+
 ## v3.7.9 — 23 octobre 2026 : planètes 3D et leurs décors (garçon)
 
 - **12 planètes 3D réalistes** (Canva) : `astre-<slug>.webp`, 600 px,

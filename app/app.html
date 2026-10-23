@@ -6066,7 +6066,19 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
       return _vraiSpeakText.call(this,txt,lang,el);
     };
     window.speakText._v323=1;
-    if(typeof _vraiSpeak==='function')window.speak=function(){if(capt)return;return _vraiSpeak.apply(this,arguments);};
+    /* v3.8.0 — « tout doit être lu » (le client, cours adultes) : les
+       voyelles, le tanwin, les exemples et les formes des lettres sont des
+       sons ARABES joués par `speak` — la lecture automatique les sautait.
+       On les capte comme les phrases ; lus en automatique, ils passent par
+       `speakText` avec leur élément : enregistrement du studio, couleur et
+       grossissement pendant qu'ils sont dits. */
+    if(typeof _vraiSpeak==='function')window.speak=function(t){
+      if(capt){capt.push(String(t));return;}
+      if(AL.auto&&AL.cur&&/[؀-ۿ]/.test(String(t))){
+        try{if(_sonEnregistre(t))return window.speakText(t,'ar',AL.cur);}catch(e){}
+      }
+      return _vraiSpeak.apply(this,arguments);
+    };
     /* Le son remis : on reprend la lecture de la page. */
     if(typeof _vraiToggle==='function')window.toggleSound=function(){
       var r=_vraiToggle.apply(this,arguments);
@@ -6079,7 +6091,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   var faux={preventDefault:function(){},stopPropagation:function(){},stopImmediatePropagation:function(){}};
   function ceQuIlDit(e){
     var f=e.onclick;if(typeof f!=='function')return null;
-    var src=String(f);if(src.indexOf('speakText')<0||NAV.test(src))return null;
+    var src=String(f);if(!/speak(Text)?\(/.test(src)||NAV.test(src))return null;
     capt=[];
     var _jo=window._joueSon,_pc=window.playChildSound;
     window._joueSon=function(){return null;};window.playChildSound=function(){};
@@ -6372,6 +6384,16 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 /* le texte en cours de lecture : un rien plus grand, la couleur avance */
 .lit-en-cours{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
 .lit-en-cours:not(.lit-bloc){transform:scale(1.035)}
+/* v3.8.0 — le client : « le cadre qui contient le texte lu doit TOUJOURS
+   grossir un peu » (les grands blocs aussi, à peine) ; et un signe arabe
+   lu seul (voyelle, tanwin, lettre) grossit franchement et change de
+   couleur. */
+.lit-en-cours.lit-bloc{transform:scale(1.012)}
+.lit-en-cours.lit-ar .km{color:inherit!important;-webkit-text-fill-color:inherit!important}
+.lit-en-cours.lit-ar{transform:scale(1.4)!important;color:#e8a020!important;-webkit-text-fill-color:#e8a020!important;
+  text-shadow:0 0 14px rgba(232,160,32,.45)}
+#root.profile-girl .lit-en-cours.lit-ar{color:#ec4899!important;-webkit-text-fill-color:#ec4899!important}
+#root.profile-boy .lit-en-cours.lit-ar{color:#0ea5e9!important;-webkit-text-fill-color:#0ea5e9!important}
 .km{transition:color .25s ease,text-shadow .25s ease}
 .km.km-lu{color:#b45309;-webkit-text-fill-color:#b45309}
 .km.km-ici{color:#e8a020;-webkit-text-fill-color:#e8a020;text-shadow:0 0 12px rgba(232,160,32,.45)}
@@ -6511,8 +6533,16 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
     /* v3.4.3 — ﷺ et ﷻ : un signe à l'écran, mais une longue formule dite
        (ṣallā llāhu ʿalayhi wa sallam, jalla jalāluhu) ; comptés comme tels,
        sinon la couleur filait trop vite au mot suivant. */
-    function poids(x){return x.length+(x.match(/\uFDFA/g)||[]).length*30+(x.match(/\uFDFB/g)||[]).length*16;}
-    var tot=0;out.forEach(function(s){s._d=tot;tot+=poids(s.textContent)+1;s._f=tot;});el._kmTot=tot||1;
+    /* v3.8.0 — on compte ce qui se PRONONCE : les signes des voyelles
+       arabes et la ponctuation ne prennent pas de temps ; une lettre arabe
+       vocalisée se dit un peu plus lentement qu'une lettre française. */
+    function poids(x){
+      var ar=(x.match(/[\u0621-\u064A\u0671-\u06D3]/g)||[]).length;
+      var lat=(x.match(/[A-Za-z\u00C0-\u024F\u0400-\u04FF0-9]/g)||[]).length;
+      var autre=x.replace(/[\u0621-\u064A\u0671-\u06D3A-Za-z\u00C0-\u024F\u0400-\u04FF0-9\u064B-\u065F\u0670\u0640\s.,;:!?«»"'’()\-–—…]/g,'').length;
+      return ar*1.3+lat+autre+(x.match(/\uFDFA/g)||[]).length*30+(x.match(/\uFDFB/g)||[]).length*16;
+    }
+    var tot=0;out.forEach(function(s){s._d=tot;tot+=poids(s.textContent)+0.5;s._f=tot;});el._kmTot=tot||1;
     return out;
   }
   function efface(el){
@@ -6546,7 +6576,14 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
       var b=(window._BORNES&&_BORNES[a.currentSrc||a.src])||{};
       var d0=b.d||0,d1=(b.f&&b.f>d0)?b.f:(a.duration||0);
       if(d1>d0){
-        var p=Math.max(0,Math.min(1,(a.currentTime-d0)/(d1-d0))),pos=p*el._kmTot;
+        var p=Math.max(0,Math.min(1,(a.currentTime-d0)/(d1-d0)));
+        /* v3.8.0 — le temps de VOIX écoulé, pauses retirées (voir `_analyseSilences`). */
+        if(b.v&&b.v.length){
+          var tot=0,fait=0,t=a.currentTime;
+          b.v.forEach(function(q){var l=q[1]-q[0];tot+=l;if(t>=q[1])fait+=l;else if(t>q[0])fait+=t-q[0];});
+          if(tot>0)p=Math.max(0,Math.min(1,fait/tot));
+        }
+        var pos=p*el._kmTot;
         var cur=null;
         el._km.forEach(function(s){
           var lu=s._f<=pos,ici=!lu&&s._d<=pos;
@@ -6573,6 +6610,9 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
     el.classList.add('lit-en-cours');
     /* un grand bloc ne grossit pas (il bougerait toute la page) */
     el.classList.toggle('lit-bloc',el.offsetHeight>140||el.offsetWidth>(innerWidth*0.92));
+    /* un signe ou un mot arabe seul (voyelle, lettre) : il grossit pour de bon */
+    var _tx=(el.textContent||'').replace(/\s+/g,'');
+    el.classList.toggle('lit-ar',_tx.length>0&&_tx.length<=8&&/^[؀-ۿ◌]+$/.test(_tx));
     if(etat==='pause'){cancelAnimationFrame(el._kmRaf);return;}
     if(audio){
       try{mots(el);}catch(e){return;}
@@ -9413,7 +9453,7 @@ var _BORNES={};
 function _analyseSilences(src){
   if(!src||_BORNES.hasOwnProperty(src))return;
   _BORNES[src]=null;
-  try{var v=localStorage.getItem('bornes1_'+src);if(v){_BORNES[src]=JSON.parse(v);return;}}catch(e){}
+  try{var v=localStorage.getItem('bornes2_'+src);if(v){_BORNES[src]=JSON.parse(v);return;}}catch(e){}
   try{
     if(!window.fetch)return;
     var ac=_ctxSon();if(!ac)return;
@@ -9431,8 +9471,25 @@ function _analyseSilences(src){
          derniere trace — un souffle, une consonne douce ne sont pas mangees. */
       var r={d:Math.max(0,a/sr-0.08),f:Math.min(buf.duration,b/sr+0.15)};
       if(!(r.f>r.d+0.05))return;
+      /* v3.8.0 — LES MOMENTS OÙ LA VOIX PARLE VRAIMENT. Le client : « le
+         texte change de couleur en retard sur la voix, et ça se rattrape à
+         la fin ». La couleur avançait au même pas sur toute la durée, pauses
+         comprises. On relève les plages de voix (trames de 20 ms ; une pause
+         compte à partir de 120 ms de silence) : le karaoké n'avance que
+         pendant qu'elle parle. */
+      try{
+        var fr=Math.max(1,Math.round(sr*0.02)),seuil=Math.max(0.01,pk*0.05),plages=[],deb=-1,sil=0;
+        for(var i0=a;i0<=b;i0+=fr){
+          var m=0,i1=Math.min(b,i0+fr);
+          for(var k=i0;k<i1;k+=4){x=c[k]<0?-c[k]:c[k];if(x>m)m=x;}
+          if(m>=seuil){if(deb<0)deb=i0;sil=0;}
+          else if(deb>=0){sil+=fr;if(sil>=sr*0.12){plages.push([deb/sr,(i0-sil+fr)/sr]);deb=-1;sil=0;}}
+        }
+        if(deb>=0)plages.push([deb/sr,b/sr]);
+        if(plages.length>1&&plages.length<400)r.v=plages.map(function(p){return [+p[0].toFixed(3),+p[1].toFixed(3)];});
+      }catch(e){}
       _BORNES[src]=r;
-      try{localStorage.setItem('bornes1_'+src,JSON.stringify(r));}catch(e){}
+      try{localStorage.setItem('bornes2_'+src,JSON.stringify(r));}catch(e){}
     }).catch(function(){});
   }catch(e){}
 }
@@ -15340,7 +15397,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.9';
+var _VERSION_REPLI='v3.8.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
