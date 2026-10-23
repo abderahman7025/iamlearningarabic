@@ -87,7 +87,7 @@ manquent, la logique est décrite ici) :
   crédits/mois ; ~12 000 utilisés au 10 octobre.
 - dépôt : `POST /api/audio` `{ar: clé, audioBase64}` avec
   `Authorization: Bearer <ADMIN_SECRET>` (aussi dans `.env.local`).
-- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 16 (depuis v3.6.0 ; comparer à la version précédente).
+- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 18 (depuis v3.6.4 ; comparer à la version précédente).
 
 **Fichier de travail du client** : `Bureau/phrases-3-5-ans.txt` — une ligne
 par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
@@ -105,6 +105,37 @@ même façon : la page de récompense, la carte des animaux, et les écrans des
 voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
+
+## v3.6.4 — 23 octobre 2026 : plein écran partout, pas de zoom, pas de copie
+
+- **Plein écran : la cause.** Il n'était demandé qu'à l'ouverture d'un cours
+  de lettre (`_boyScene` → `_armePleinEcran`), et sur `pointerdown`. Or sur
+  écran tactile, `pointerdown` ne donne PAS le droit de demander le plein
+  écran (seuls `pointerup`, `touchend`, `click`, `keydown` le donnent) : la
+  demande était refusée en silence, et `_rendLePleinEcran` retirait aussitôt
+  ses écouteurs. Corrigé partout (`pointerup`).
+- **Le gardien** (juste après le `pageshow`) : sur écran tactile, CHAQUE
+  toucher dans l'application redemande le plein écran s'il n'y est pas.
+  Aucune orientation verrouillée : portrait ou paysage. Filet de 1,5 s : dans
+  le navigateur intégré de Claude, la promesse de `requestFullscreen` ne se
+  résout JAMAIS et bloquait toutes les demandes suivantes. Ce navigateur
+  refuse de toute façon le plein écran : on ne peut le voir que sur un vrai
+  téléphone. iPhone : Safari n'a pas de plein écran pour une page (seule
+  l'installation sur l'écran d'accueil le donne).
+- **Zoom** : bloqué dans l'application, iPhone compris (`maximum-scale=1`,
+  `html{touch-action:pan-x pan-y}`, `gesturestart` annulé). Page de vente :
+  zoom laissé PERMIS (accessibilité, v3.6.1).
+- **Copie** : `body{user-select:none;-webkit-touch-callout:none}` et
+  `copy`/`cut`/`contextmenu`/`selectstart` annulés, dans `app/app.html` ET
+  `public/index.html`, SAUF dans les champs (on colle son e-mail, son mot de
+  passe). Images non glissables. Pages légales laissées copiables.
+- **Contrôle de syntaxe : 18 blocs** depuis v3.6.4 (deux `<script>` ajoutés
+  en fin d'`app.html`).
+- **Mesuré, sans défaut** : rien ne déborde de l'écran sur les trois accueils,
+  la page de vente, les CGV et la 404, à 320×568, 375×812, 812×375, 768×1024,
+  1024×768 et 1440×900 ; contraste suffisant partout sur la page de vente et
+  les CGV. Laissé tel quel : les quatre papillons GIF (1,9 Mo) gagneraient
+  moitié en WebP animé, mais l'animation risque d'être déréglée.
 
 ## v3.6.1 et v3.6.2 — 23 octobre 2026 : la liste « 20 choses à vérifier avant de lancer »
 
