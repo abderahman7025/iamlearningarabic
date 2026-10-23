@@ -106,6 +106,33 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.6.5 — 23 octobre 2026 : premier monde en 3D, « papillons » (À VALIDER)
+
+Le client : « refais les mondes de la fille 6-11 ans en 3D animés ». Option
+choisie : images 3D générées sur Higgsfield (son compte), animées en CSS. Un
+seul monde d'abord, pour validation ; les onze autres attendent son accord.
+
+- **Décor** : `monde3d-papillons-large.webp` (1920 px) et
+  `monde3d-papillons-haut.webp` (1080 px), choisis par
+  `@media (orientation:portrait)`. Générés avec GPT Image 2.5 (high, 2k,
+  2,75 crédits chacun), référence de style `licorne-fille.png` ; la version
+  haute a eu la large pour référence, pour rester le même paysage. Centre
+  laissé libre pour le cours.
+- **Animation** : le décor respire (`monde3dRespire`, zoom lent 26 s), une
+  lueur dorée pulse côté soleil, 16 étincelles montent.
+- **Papillons 3D** : `papillon3d-1/2/3.webp` (fond transparent, 0,5 crédit
+  chacun), recadrés symétriquement autour du corps. Chaque papillon est
+  découpé en trois bandes d'une même image (aile gauche, corps, aile droite) ;
+  les ailes battent en `rotateY` autour du corps, le tout incliné en
+  `rotateX(42deg)` pour la vue de trois quarts. `teinte` varie la couleur
+  (`hue-rotate`). Plancher de taille en pixels pour le portrait.
+- **Branchement** : `_MONDES_3D` (avant `_decorMonde`) liste les mondes qui
+  ont leur 3D ; les autres gardent `ciel-<slug>.svg`. Les GIF `papillon1-4`
+  restent utilisés sur la CARTE (monde 6, `betesEtape`), pas dans le cours.
+- **Pour un nouveau monde** : générer `monde3d-<slug>-large/haut.webp`,
+  ajouter `<slug>:true` à `_MONDES_3D` et les deux règles CSS
+  `.decor-monde.monde3d-<slug>`.
+
 ## v3.6.4 — 23 octobre 2026 : plein écran partout, pas de zoom, pas de copie
 
 - **Plein écran : la cause.** Il n'était demandé qu'à l'ouverture d'un cours

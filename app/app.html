@@ -2827,6 +2827,57 @@ body.dans-un-monde #ca .child-wrap{
 /* UN PAPILLON TRAVERSE L'ECRAN. Il repart en sens inverse a mi-course : le
    dessin n'est pas retourne — pas de `scaleX(-1)` dans ce projet — il
    revient donc sur ses pas, comme un papillon qui butine. */
+
+/* ══ v3.6.5 — LES MONDES EN 3D (premier : « papillons ») ══════════════════
+   Le client : « refais les mondes en 3D animés ». Le décor est une image 3D
+   générée (Higgsfield, style des personnages), une en LARGE et une en HAUT,
+   choisie par l'orientation. Elle respire lentement ; des étincelles montent
+   par-dessus. Les mondes encore sans version 3D gardent leur `ciel-*.svg`. */
+.decor-monde.monde3d{background-color:#e9dcff;animation:monde3dRespire 26s ease-in-out infinite alternate;will-change:transform}
+.decor-monde.monde3d-papillons{background-image:url('/images/monde3d-papillons-large.webp')}
+@media (orientation:portrait){
+  .decor-monde.monde3d-papillons{background-image:url('/images/monde3d-papillons-haut.webp')}
+}
+@keyframes monde3dRespire{
+  from{transform:scale(1.03) translate3d(0,0,0)}
+  to  {transform:scale(1.09) translate3d(-1.2%,-0.8%,0)}
+}
+.monde3d-lueur{position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:radial-gradient(ellipse 60% 45% at 78% 62%,rgba(255,236,190,.55),rgba(255,236,190,0) 70%);
+  mix-blend-mode:screen;animation:monde3dLueur 7s ease-in-out infinite alternate}
+@media (orientation:portrait){
+  .monde3d-lueur{background:radial-gradient(ellipse 80% 30% at 82% 70%,rgba(255,236,190,.55),rgba(255,236,190,0) 70%)}
+}
+@keyframes monde3dLueur{from{opacity:.35}to{opacity:.9}}
+.monde3d-etincelle{position:fixed;z-index:-2;pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,#fff 0,#fff6c8 35%,rgba(255,240,180,0) 70%);
+  animation:monde3dMonte linear infinite}
+@keyframes monde3dMonte{
+  0%  {transform:translate3d(0,0,0) scale(.6);opacity:0}
+  15% {opacity:1}
+  50% {transform:translate3d(3vw,-18vh,0) scale(1);opacity:.9}
+  85% {opacity:.8}
+  100%{transform:translate3d(-2vw,-38vh,0) scale(.5);opacity:0}
+}
+/* Le papillon 3D : deux ailes qui battent autour du corps, vues de trois
+   quarts (rotateX), le corps immobile au milieu. Une seule image, découpée
+   en trois bandes par le fond. */
+.pap3d{display:block;position:relative;width:100%;aspect-ratio:360/306;
+  transform-style:preserve-3d;transform:perspective(700px) rotateX(42deg);
+  filter:drop-shadow(0 14px 12px rgba(90,50,120,.25))}
+.pap3d-aile,.pap3d-corps{position:absolute;top:0;height:100%;background-repeat:no-repeat;
+  backface-visibility:visible}
+.pap3d-aile{width:50%;background-size:200% 100%;animation-duration:.34s;
+  animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate}
+.pap3d-aile.g{left:0;background-position:0 0;transform-origin:100% 50%;animation-name:pap3dAileG}
+.pap3d-aile.d{right:0;background-position:100% 0;transform-origin:0 50%;animation-name:pap3dAileD}
+.pap3d-corps{left:44%;width:12%;background-size:833.4% 100%;background-position:50% 0;
+  transform:translateZ(1px)}
+@keyframes pap3dAileG{from{transform:rotateY(-8deg)}to{transform:rotateY(68deg)}}
+@keyframes pap3dAileD{from{transform:rotateY(8deg)}to{transform:rotateY(-68deg)}}
+@media (prefers-reduced-motion:reduce){
+  .decor-monde.monde3d,.monde3d-lueur,.monde3d-etincelle,.pap3d-aile{animation:none !important}
+}
 @keyframes beteTraverse{
   0%   {transform:translateX(0) translateY(0) rotate(-6deg)}
   25%  {transform:translateX(38vw) translateY(-8vh) rotate(6deg)}
@@ -14681,7 +14732,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.4';
+var _VERSION_REPLI='v3.6.5';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -17899,11 +17950,12 @@ var _HABILLAGES={
     scenesBetes:{
       /* Les papillons TRAVERSENT l'écran, et ils sont gros. */
       'papillons':[
-        {img:'/images/papillon3.gif',x:2,y:14,l:26,anim:'beteTraverse',dur:26,del:0},
-        {img:'/images/papillon1.gif',x:4,y:52,l:22,anim:'beteTraverse',dur:32,del:9},
-        {img:'/images/papillon2.gif',x:0,y:72,l:20,anim:'beteTraverse',dur:22,del:16},
-        {img:'/images/papillon4.gif',x:6,y:33,l:18,anim:'beteTraverse',dur:38,del:24},
-        {img:'/images/papillon2.gif',x:3,y:84,l:15,anim:'beteTraverse',dur:29,del:5}
+        /* v3.6.5 — papillons 3D à ailes battantes (Higgsfield). */
+        {img:'/images/papillon3d-1.webp',ailes3d:true,x:2,y:14,l:17,anim:'beteTraverse',dur:26,del:0},
+        {img:'/images/papillon3d-2.webp',ailes3d:true,x:4,y:52,l:15,anim:'beteTraverse',dur:32,del:9,teinte:-35},
+        {img:'/images/papillon3d-3.webp',ailes3d:true,x:0,y:72,l:14,anim:'beteTraverse',dur:22,del:16},
+        {img:'/images/papillon3d-1.webp',ailes3d:true,x:6,y:33,l:12,anim:'beteTraverse',dur:38,del:24,teinte:40},
+        {img:'/images/papillon3d-2.webp',ailes3d:true,x:3,y:84,l:11,anim:'beteTraverse',dur:29,del:5}
       ],
       /* Les pingouins ARRIVENT DE LOIN : petits au fond, ils grossissent en
          se dandinant — et LES PIEDS AU SOL, jamais en l'air. */
@@ -18068,10 +18120,12 @@ function _habDuProfil(){
 /* Le decor du monde ou l'on se trouve, derriere le cours. `_currentIsleSlug`
    est pose au clic sur la carte : c'est lui qui dit dans quel monde on est.
    Sans habillage qui les fournisse (le garcon), il n'y a rien a poser. */
+/* v3.6.5 — Les mondes qui ont leur décor 3D (`monde3d-<slug>-large/haut.webp`). */
+var _MONDES_3D={papillons:true};
 function _decorMonde(ca,actif){
   /* On nettoie partout : le decor a pu etre pose sur le body. */
   Array.prototype.forEach.call(
-    document.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours'),
+    document.querySelectorAll('.decor-monde,.decor-monde-img,.bete-cours,.monde3d-lueur,.monde3d-etincelle'),
     function(v){if(v.parentNode)v.parentNode.removeChild(v);});
   document.body.classList.remove('dans-un-monde');
   var r1=document.getElementById('root');if(r1)r1.classList.remove('dans-un-monde');
@@ -18083,8 +18137,26 @@ function _decorMonde(ca,actif){
   /* LE PAYSAGE, plein cadre, derriere tout le reste. */
   var d=document.createElement('div');
   d.className='decor-monde';
-  d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=117')";
-  document.body.insertBefore(d,document.body.firstChild);
+  if(_MONDES_3D[_currentIsleSlug]){
+    /* v3.6.5 — le monde a sa version 3D : l'image vient du CSS (large ou
+       haute selon l'orientation), avec la lueur et les étincelles. */
+    d.className+=' monde3d monde3d-'+_currentIsleSlug;
+    document.body.insertBefore(d,document.body.firstChild);
+    var lu=document.createElement('div');lu.className='monde3d-lueur';
+    document.body.insertBefore(lu,d.nextSibling);
+    for(var e=0;e<16;e++){
+      var et=document.createElement('span');et.className='monde3d-etincelle';
+      var t=4+Math.random()*7;
+      et.style.cssText='left:'+(Math.random()*100).toFixed(1)+'%;top:'+(45+Math.random()*55).toFixed(1)+'%;'
+        +'width:'+t.toFixed(1)+'px;height:'+t.toFixed(1)+'px;'
+        +'animation-duration:'+(7+Math.random()*7).toFixed(1)+'s;'
+        +'animation-delay:-'+(Math.random()*12).toFixed(1)+'s';
+      document.body.insertBefore(et,lu.nextSibling);
+    }
+  }else{
+    d.style.backgroundImage="url('/images/ciel-"+_currentIsleSlug+".svg?v=117')";
+    document.body.insertBefore(d,document.body.firstChild);
+  }
 
   /* LES BETES DU MONDE. Chaque monde a SA composition — un tres gros ours
      et ses petits, deux chiens-chats en grand, des tortues posees en bas,
@@ -18106,6 +18178,24 @@ function _decorMonde(ca,actif){
       +(b.anim?('animation:'+b.anim+' '+(b.dur||14)+'s '
         +(b.anim==='beteBalance'?'ease-in-out':'linear')+' infinite;'
         +'animation-delay:-'+(b.del||i*1.7)+'s;'):'');
+    if(b.ailes3d){
+      /* v3.6.5 — papillon 3D : aile gauche, corps, aile droite. */
+      /* En portrait, un pourcentage de la largeur fait des papillons
+         minuscules : un plancher en pixels les garde visibles. */
+      enveloppe.style.width='max('+b.l+'%,'+Math.round(b.l*5.5)+'px)';
+      var pp=document.createElement('span');pp.className='pap3d';
+      if(b.teinte)pp.style.filter='hue-rotate('+b.teinte+'deg) drop-shadow(0 14px 12px rgba(90,50,120,.25))';
+      ['g','corps','d'].forEach(function(k){
+        var part=document.createElement('span');
+        part.className=(k==='corps')?'pap3d-corps':('pap3d-aile '+k);
+        part.style.backgroundImage="url('"+b.img+"')";
+        if(k!=='corps')part.style.animationDelay='-'+((i*0.13)%0.34).toFixed(2)+'s';
+        pp.appendChild(part);
+      });
+      enveloppe.appendChild(pp);
+      document.body.insertBefore(enveloppe,document.body.firstChild);
+      return;
+    }
     var im=document.createElement('img');
     im.src=b.img;im.alt='';
     im.style.cssText='width:100%;height:auto;display:block;transform-origin:bottom center;'
