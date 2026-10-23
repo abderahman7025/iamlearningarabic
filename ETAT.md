@@ -152,11 +152,11 @@ du client) : la garantie légale de conformité reste citée.
   (`.liens-legaux`) et des trois pages.
 - **`window.choixCookies()`** dans `public/tag.js` rouvre le bandeau : il
   n'existait aucun moyen de retirer son accord, ce que le RGPD exige.
-- **Reste : le médiateur de la consommation.** Obligatoire pour vendre aux
-  particuliers ; le client n'en a pas. Les CGV disent seulement qu'on peut y
-  recourir. Dès qu'il est choisi, mettre son nom, son adresse et son site à
-  l'article 10 des CGV. La plateforme européenne ODR a fermé en juillet 2025 :
-  ne pas la remettre.
+- **Médiateur de la consommation (v3.6.3) : CM2C**, choisi et souscrit par le
+  client (48 € pour 3 ans, 36 € par litige traité). Article 10 des CGV :
+  saisine en ligne cm2c.net/declarer-un-litige.php, declarer-un-litige@cm2c.net,
+  49 rue de Ponthieu, 75008 Paris. À renouveler en octobre 2029. La
+  plateforme européenne ODR a fermé en juillet 2025 : ne pas la remettre.
 
 **À regarder à l'écran, pas encore fait** : contraste des textes, affichage
 téléphone de la page de vente, un seul bouton principal par écran.
