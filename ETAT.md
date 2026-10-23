@@ -106,6 +106,22 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.5 — 23 octobre 2026 : bouton de la carte, fondus calés, mots du hublot
+
+- **Carte des mondes (6-11)** : le bouton du haut disait « Carte » (et
+  rechargeait la carte) au retour d'un cours — `_retourEnfant(…,'Carte')`
+  n'était jamais défait. `renderSessionsMap` remet `tb-back` à zéro
+  (`handleBack`, libellé « Menu »).
+- **Vol embarqué** : le noir commence dès le décollage (scène lancée à 0 ms)
+  et le fondu de retour (1,4 s) s'achève juste avant la pose (fin de vol
+  1,55 s depuis 200 px avant le monde).
+- **Mots dans le hublot (fille et garçon)** : debout, la règle
+  `.boy-panel .boy-hublot span{font-size:46cqw!important}` s'imposait AUSSI
+  au mot (`.hub-mot`) : `ajusteMot` le réduisait sans effet, les mots longs
+  sortaient du cercle. Le mot prend désormais `--mot-px` (posé par
+  `ajusteMot`, règle plus précise en `!important`), ses morceaux en
+  héritent ; marge portée à `min(W-40, 0,76 W)` comme `hublot()`.
+
 ## v3.7.4 — 23 octobre 2026 : vol embarqué, fondus doux
 
 - Le client : « le noir doit être de plus en plus présent, tout en voyant la

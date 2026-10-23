@@ -7121,6 +7121,12 @@ body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-card{min-height:0!
   body:not(.age-petit) .boy-panel .boy-hublot{width:80%!important;max-width:340px!important;height:auto!important;aspect-ratio:1;margin:10px auto 26px!important;container-type:inline-size}
   body:not(.age-petit) .boy-panel .boy-hublot span{font-size:46cqw!important}
 }
+/* v3.7.5 — LE MOT DU HUBLOT GARDE LA TAILLE QUI LE FAIT TENIR. Debout, la
+   règle ci-dessus imposait 46 % du hublot à TOUT texte du hublot, mot
+   compris : `ajusteMot` le réduisait, mais rien ne changeait à l'écran, et
+   les mots longs sortaient du cercle. */
+body:not(.age-petit) .boy-panel .boy-hublot .hub-mot{font-size:var(--mot-px,inherit)!important}
+body:not(.age-petit) .boy-panel .boy-hublot .hub-mot span{font-size:inherit!important}
 /* v3.6.0 — hublots TOUJOURS ronds (jamais d'ovale, l'anneau pointillé non
    plus) : le contenu ne peut plus étirer la boîte. Les signes dessinés sur
    canevas (tanwin, syllabe en deux couleurs) suivent la taille du hublot. */
@@ -12755,7 +12761,7 @@ function _volCarte(o){
     /* Le point d'où il finira son vol, vu de loin : un peu avant le monde,
        dans l'axe d'où il vient. */
     var vx=but.x-ici.x,vy=but.y-ici.y,dist=Math.sqrt(vx*vx+vy*vy)||1;
-    var recul=Math.min(240,dist*0.5);
+    var recul=Math.min(200,dist*0.5);
     var reprise={x:but.x-vx/dist*recul,y:but.y-vy/dist*recul};
     idx=cible;
     /* 1. le décollage, vu de loin : le début du vol habituel. */
@@ -12776,10 +12782,11 @@ function _volCarte(o){
         /* 3. le fondu retour commence : il est déjà en train de finir son vol. */
         quandSort:function(){
           if(!el.isConnected)return;
-          volDroit(reprise,but,function(){arriver(fini,but);},2300);
+          /* v3.7.5 — le fondu (1,4 s) s'achève juste avant qu'elle se pose. */
+          volDroit(reprise,but,function(){arriver(fini,but);},1550);
         }
       });
-    },250);
+    },0);   /* v3.7.5 — le fondu commence dès le décollage */
   }
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
@@ -13585,6 +13592,13 @@ function renderSessionsMap(ca){
   ca.style.cssText='';
   ca.style.paddingTop='64px';
   st._curPage='sessions-map';
+  /* v3.7.5 — « sur la carte, le bouton du haut dit Carte au lieu de Menu » :
+     revenu d'un cours, il gardait le libellé et l'action posés par le cours
+     (`_retourEnfant(..., 'Carte')`). Sur la carte, il ramène au menu. */
+  try{var _bk=document.getElementById('tb-back');
+    if(_bk){_bk._enfant=null;_bk._avant=false;_bk.classList.remove('vers-avant');
+      _bk.style.display='flex';_bk.onclick=handleBack;
+      if(window._libelleRetour)_libelleRetour();}}catch(e){}
   // Rétablir topbar (le CSS le rend déjà transparent/fixed globalement)
   var _stb=document.getElementById('topbar');
   if(_stb){_stb.style.maxHeight='200px';_stb.style.opacity='1';_stb.style.transform='translateY(0)';_stb.style.pointerEvents='';}
@@ -15264,7 +15278,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.4';
+var _VERSION_REPLI='v3.7.5';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -22620,14 +22634,19 @@ function _boyScene(ca,reprise){
          qu'on lui donne d'emblee. */
       function ajusteMot(){
         if(!m.isConnected||!lettre.isConnected)return;
-        var max=h.clientWidth-24;if(max<40)return;
+        /* v3.7.5 — « aucun mot ne doit dépasser le hublot ». La marge d'avant
+           (24 px) laissait le mot toucher le cercle : la ligne d'écriture est
+           sous le centre, et l'encre monte et descend. Même marge que les mots
+           posés d'emblée dans le hublot. */
+        var max=Math.min(h.clientWidth-40,h.clientWidth*0.76);if(max<40)return;
+        function taille(v){m.style.fontSize=v+'px';m.style.setProperty('--mot-px',v+'px');}
         /* ── LE MOT AUSSI GRAND QUE LA LETTRE LE PERMET ──
            On part de la taille de la LETTRE — c'est elle la reference du
            hublot — et on ne reduit que ce qu'il faut pour que le mot tienne
            dans le cercle. Partir d'une taille fixe le laissait minuscule a
            cote d'elle. */
         var px=Math.round(parseFloat(getComputedStyle(lettre).fontSize)||60),garde=0;
-        m.style.fontSize=px+'px';
+        taille(px);
         /* LA LARGEUR DU MOT, PAS CELLE DE SA BOITE : celle-ci va d'un bord a
            l'autre du hublot, `scrollWidth` valait donc toujours la meme
            et le mot se reduisait jusqu'au plancher. */
@@ -22636,7 +22655,7 @@ function _boyScene(ca,reprise){
           [].slice.call(m.children).forEach(function(x){w+=x.offsetWidth;});
           return w;
         }
-        while(largeurMot()>max&&px>14&&garde++<160){px-=1;m.style.fontSize=px+'px';}
+        while(largeurMot()>max&&px>14&&garde++<160){px-=1;taille(px);}
       }
       /* ── LE MOT SE POSE SUR LA LIGNE D'ECRITURE ──
          Pas au milieu du hublot : sur la LIGNE, celle ou repose deja la
