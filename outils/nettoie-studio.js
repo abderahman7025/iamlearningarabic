@@ -39,7 +39,16 @@ const CIBLE = _c ? parseFloat(_c) : -10;
 const avant = path.join(dest, 'avant'), apres = path.join(dest, 'apres-fort');
 [avant, apres].forEach((d) => fs.mkdirSync(d, { recursive: true }));
 const hex = (s) => Buffer.from(s).toString('hex');
-if (REFAIRE) LISTE = LISTE.filter((s) => REFAIRE.includes(s.ar) || REFAIRE.includes(hex(s.ar)));
+if (REFAIRE) {
+  /* les sons absents de sons-studio.json (les sons FAUTIFS « خè »…) sont
+     pris quand même, sous leur propre clé */
+  const vus = LISTE.filter((s) => REFAIRE.includes(s.ar) || REFAIRE.includes(hex(s.ar)));
+  REFAIRE.forEach((x) => {
+    const ar = /^[0-9a-f]+$/.test(x) ? Buffer.from(x, 'hex').toString('utf8') : x;
+    if (!vus.some((s) => s.ar === ar)) vus.push({ ar, label: ar });
+  });
+  LISTE = vus;
+}
 function ff(args) { return execFileSync(FF, ['-hide_banner', '-loglevel', 'info', '-y'].concat(args), { stdio: ['ignore', 'pipe', 'pipe'] }); }
 function sonie(fichier) {
   const r = require('child_process').spawnSync(FF, ['-hide_banner', '-i', fichier, '-af', 'ebur128', '-f', 'null', '-'], { encoding: 'utf8' });
