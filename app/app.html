@@ -6,7 +6,7 @@
        Consent Mode soit pose avant la premiere balise. -->
   <script src="/tag.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>لنتعلم العربية</title>
 <!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
@@ -46,6 +46,15 @@
 }
 
 html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
+/* v3.6.4 — Pas de zoom à deux doigts ni au double appui, iPhone compris :
+   Safari ignore user-scalable=no, mais respecte touch-action. */
+html{touch-action:pan-x pan-y}
+/* v3.6.4 — Le client : « enlève la possibilité de copier-coller ». Rien ne se
+   sélectionne, sauf les champs à remplir (on doit pouvoir y coller son e-mail
+   ou son mot de passe). Le menu d'appui long sur iPhone est coupé aussi. */
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+
 
 /* ── BACKGROUND ANIMÉ ── */
 #root{
@@ -14672,7 +14681,7 @@ function _boyLetterPicker(ca,session){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.3';
+var _VERSION_REPLI='v3.6.4';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -16991,7 +17000,7 @@ function _rendLePleinEcran(){
   try{if(window.matchMedia&&!window.matchMedia('(pointer:coarse)').matches)return;}catch(e){}
   if(document.fullscreenElement||document.webkitFullscreenElement)return;
   var rendu=function(){
-    ['pointerdown','touchend','click','keydown'].forEach(function(e){
+    ['pointerup','touchend','click','keydown'].forEach(function(e){
       document.removeEventListener(e,rendu,true);});
     /* Le plein ecran, et LUI SEUL : on ne rebascule pas l'appareil en
        paysage. Le client revient telephone en portrait, et se retrouverait
@@ -17004,7 +17013,7 @@ function _rendLePleinEcran(){
       if(pr&&pr['catch'])pr['catch'](function(){});
     }catch(e){}
   };
-  ['pointerdown','touchend','click','keydown'].forEach(function(e){
+  ['pointerup','touchend','click','keydown'].forEach(function(e){
     document.addEventListener(e,rendu,true);});
 }
 document.addEventListener('visibilitychange',function(){
@@ -17014,12 +17023,48 @@ document.addEventListener('visibilitychange',function(){
    `visibilitychange` : `pageshow` est le seul signal. */
 window.addEventListener('pageshow',function(e){if(e.persisted)_rendLePleinEcran();});
 
+/* ── v3.6.4 — LE PLEIN ÉCRAN PARTOUT DANS L'APPLICATION ──
+   Le client : « une fois dans une interface, le site ne se met pas toujours
+   en plein écran, notamment en portrait ». Il n'était demandé qu'à
+   l'ouverture d'un cours de lettre, et au mauvais moment du toucher.
+   Désormais, sur un écran tactile, CHAQUE toucher vérifie : pas en plein
+   écran ? on le demande, au relâché du doigt — le seul instant où le
+   navigateur l'accepte. Portrait ou paysage, peu importe : on ne verrouille
+   aucune orientation. Sur iPhone, Safari n'a pas de plein écran pour une
+   page : seule l'installation sur l'écran d'accueil le donne. */
+(function(){
+  var tactile=false;
+  try{tactile=!!(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);}catch(e){}
+  if(!tactile)return;
+  var de=document.documentElement;
+  var rf=de.requestFullscreen||de.webkitRequestFullscreen;
+  if(!rf)return;
+  var enCours=false;
+  function fin(){enCours=false;}
+  function demande(){
+    if(enCours||document.hidden)return;
+    if(document.fullscreenElement||document.webkitFullscreenElement)return;
+    enCours=true;_voulaitPlein=true;
+    /* Filet : une demande restée sans réponse ne doit pas bloquer les
+       suivantes (vu dans un navigateur intégré, où la promesse ne se
+       résout jamais). */
+    setTimeout(fin,1500);
+    try{
+      var pr=rf.call(de);
+      if(pr&&pr.then)pr.then(fin,fin);
+    }catch(e){fin();}
+  }
+  ['pointerup','touchend','click','keydown'].forEach(function(n){
+    document.addEventListener(n,demande,true);
+  });
+})();
+
 /* Réarme la demande au premier contact, une seule fois. */
 function _armePleinEcran(el){
   if(!el)return;
   _pleinEcranPaysage();
-  el.addEventListener('pointerdown',function un(){
-    el.removeEventListener('pointerdown',un,true);
+  el.addEventListener('pointerup',function un(){
+    el.removeEventListener('pointerup',un,true);
     _pleinEcranPaysage();
   },true);
 }
@@ -21557,8 +21602,8 @@ function _boyScene(ca,reprise){
            navigateur REFUSE alors le plein écran natif et le verrouillage en
            paysage, qui exigent un geste. On redemande donc au premier
            contact de l'enfant avec le calque — le premier trait suffit. */
-        ov.addEventListener('pointerdown',function relance(){
-          ov.removeEventListener('pointerdown',relance);
+        ov.addEventListener('pointerup',function relance(){
+          ov.removeEventListener('pointerup',relance);
           pleinEcranNatif();
         },true);
         poser();
@@ -31347,6 +31392,25 @@ function markPracticeToday() {
   setTimeout(scan,1100);
   setTimeout(scan,2500);
 })();
+</script>
+<script>
+/* v3.6.4 — Pas de copie, pas de clic droit, pas d'image tirée hors de la page,
+   sauf dans les champs à remplir. */
+(function(){
+  function champ(t){
+    return !!(t&&t.closest&&t.closest('input,textarea,select,[contenteditable="true"]'));
+  }
+  ['copy','cut','contextmenu','selectstart'].forEach(function(n){
+    document.addEventListener(n,function(e){if(!champ(e.target))e.preventDefault();},true);
+  });
+  document.addEventListener('dragstart',function(e){
+    if(e.target&&e.target.tagName==='IMG')e.preventDefault();
+  },true);
+})();
+</script>
+<script>
+/* iPhone : le pincement passe par gesturestart, propre à Safari. */
+document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
 </script>
 </body>
 </html>
