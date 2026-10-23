@@ -296,6 +296,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
 }
 /* iPhone : un champ sous 16px fait zoomer la page au toucher, depuis que le zoom est permis */
 @media (max-width:768px){.linp,#forgot-email-input{font-size:16px !important}}
+.liens-legaux{text-align:center;margin-top:16px;font-size:.72rem;line-height:1.8;color:var(--txt3)}
+.liens-legaux a{color:var(--txt2);text-decoration:none}
+.liens-legaux a:hover,.liens-legaux a:focus-visible{color:var(--gold);text-decoration:underline}
+#pay-cgv{display:flex;gap:10px;align-items:flex-start;margin:2px 0 12px;font-size:.78rem;line-height:1.45;color:var(--txt2);text-align:left;cursor:pointer}
+#pay-cgv input{flex:none;width:18px;height:18px;margin-top:2px;accent-color:#f5c842;cursor:pointer}
+#pay-cgv a{color:var(--gold)}
 .linp::placeholder{color:var(--txt3)}
 .linp:focus{
   border-color:rgba(245,200,66,.5);
@@ -3463,6 +3469,7 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
         <span id="buy-already-lbl" style="font-size:.74rem;color:var(--txt2)"></span>
         <span style="font-size:.74rem;color:var(--gold);cursor:pointer;font-weight:600" id="buy-login-link" onclick="showS('s-login',true)"></span>
       </div>
+      <div class="liens-legaux"><a href="/mentions-legales">Mentions légales</a> · <a href="/cgv">CGV</a> · <a href="/confidentialite">Confidentialité</a> · <a href="#" onclick="if(window.choixCookies)window.choixCookies();return false">Cookies</a></div>
     </div>
   </div>
 </div>
@@ -3616,11 +3623,13 @@ body.kid-boy{--k1:#0277bd;--k2:#01579b;--k3:#00838f;--kA:2,136,209;--kB:1,87,155
       <div style="margin-bottom:12px;padding:14px 18px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);">
         <div id="pay-card-element"></div>
       </div>
+      <label id="pay-cgv"><input type="checkbox" id="pay-cgv-ok"><span>J'accepte les <a href="/cgv" target="_blank" rel="noopener">conditions générales de vente</a>. Je demande l'accès immédiat à la formation et je renonce donc à mon droit de rétractation.</span></label>
       <div class="lerr" id="pay-err"></div>
       <button class="lbtn" id="pay-btn" onclick="doPay()">Payer 74,99 €</button>
       <div style="text-align:center;margin-top:14px">
         <span style="font-size:.74rem;color:var(--txt2);cursor:pointer" onclick="showS('s-buy',false)">← Retour</span>
       </div>
+      <div class="liens-legaux"><a href="/mentions-legales">Mentions légales</a> · <a href="/cgv">CGV</a> · <a href="/confidentialite">Confidentialité</a> · <a href="#" onclick="if(window.choixCookies)window.choixCookies();return false">Cookies</a></div>
     </div>
   </div>
 </div>
@@ -3783,6 +3792,7 @@ async function doPay(){
   const errEl=document.getElementById('pay-err');
   const btn=document.getElementById('pay-btn');
   if(!prenom||!nom||!email||!email.includes('@')){errEl.textContent=t('err_fields')||'Veuillez remplir tous les champs.';return;}
+  if(!document.getElementById('pay-cgv-ok').checked){errEl.textContent='Cochez la case pour accepter les conditions de vente.';return;}
   btn.disabled=true;btn.textContent='Traitement...';errEl.textContent='';
   try{
     const res=await fetch(`${API_URL}/api/create-payment-intent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});

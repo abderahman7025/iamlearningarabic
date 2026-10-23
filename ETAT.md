@@ -106,7 +106,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
-## v3.6.1 — 23 octobre 2026 : la liste « 20 choses à vérifier avant de lancer »
+## v3.6.1 et v3.6.2 — 23 octobre 2026 : la liste « 20 choses à vérifier avant de lancer »
 
 Le client a montré une liste TikTok de 20 points. Bilan fait, puis corrigé :
 
@@ -136,13 +136,27 @@ Le client a montré une liste TikTok de 20 points. Bilan fait, puis corrigé :
   animés (papillons), les icônes. Comparaison visuelle faite sur une licorne :
   identique.
 
-**RESTE — les pages légales.** Aucune politique de confidentialité, aucune
-CGV, aucunes mentions légales en ligne, alors que le site encaisse. Le texte
-est prêt à part, il attend l'identité de l'éditeur (nom ou société, statut,
-SIRET, adresse, directeur de publication). Avec : une case « je renonce au
-droit de rétractation » avant le paiement (contenu numérique fourni tout de
-suite, art. L221-28 13°), les liens en bas de la page de vente, et les pages
-dans le sitemap.
+**v3.6.2 — les pages légales, en ligne.** `public/mentions-legales.html`,
+`public/cgv.html`, `public/confidentialite.html`, style commun
+`public/legal.css`, servies à `/mentions-legales`, `/cgv`, `/confidentialite`
+(réécriture en tête de `vercel.json`) et listées dans le sitemap. Éditeur :
+« I Am Learning Arabic EI » — Abderahman Ben Mohamed, entrepreneur individuel,
+micro-entreprise, SIRET 529 201 023 00025, 20 avenue de Montjoux, 25000
+Besançon, TVA non applicable (art. 293 B du CGI). Pas de remboursement (choix
+du client) : la garantie légale de conformité reste citée.
+- **Case obligatoire avant de payer** (`#pay-cgv-ok`, écran `s-payment`) :
+  accepter les CGV et renoncer à la rétractation. `doPay()` s'arrête sans
+  elle, avant tout appel à Stripe. Texte en français seulement, comme le
+  reste de cet écran.
+- **Liens légaux + « Cookies »** en bas des écrans d'achat et de paiement
+  (`.liens-legaux`) et des trois pages.
+- **`window.choixCookies()`** dans `public/tag.js` rouvre le bandeau : il
+  n'existait aucun moyen de retirer son accord, ce que le RGPD exige.
+- **Reste : le médiateur de la consommation.** Obligatoire pour vendre aux
+  particuliers ; le client n'en a pas. Les CGV disent seulement qu'on peut y
+  recourir. Dès qu'il est choisi, mettre son nom, son adresse et son site à
+  l'article 10 des CGV. La plateforme européenne ODR a fermé en juillet 2025 :
+  ne pas la remettre.
 
 **À regarder à l'écran, pas encore fait** : contraste des textes, affichage
 téléphone de la page de vente, un seul bouton principal par écran.

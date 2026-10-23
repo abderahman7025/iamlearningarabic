@@ -205,6 +205,10 @@
     }
   };
 
+  /* Revenir sur son choix : le RGPD veut qu'on retire son accord aussi
+     facilement qu'on l'a donné. Le lien « Cookies » des pages l'appelle. */
+  window.choixCookies = function () { bandeau(); };
+
   if (!deja) {
     if (document.body) bandeau();
     else document.addEventListener('DOMContentLoaded', bandeau);

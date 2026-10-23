@@ -130,6 +130,10 @@
   ],
   "rewrites": [
     {
+      "source": "/(mentions-legales|cgv|confidentialite)",
+      "destination": "/$1.html"
+    },
+    {
       "source": "/connexion",
       "destination": "/index.html"
     },
