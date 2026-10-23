@@ -6123,7 +6123,10 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
     ca.querySelectorAll('*').forEach(function(e){
       if(!e.onclick||!visible(e))return;
       var t=ceQuIlDit(e);if(!t)return;
-      var k=t.replace(/\s+/g,' ').trim();if(!k||vus[k])return;
+      /* v3.8.2 — un même petit texte revient plusieurs fois (« est
+         différent de », وَا…) : chacun se lit à sa place. On ne saute que
+         les longs textes en double. */
+      var k=t.replace(/\s+/g,' ').trim();if(!k||(vus[k]&&k.length>40))return;
       try{if(!_sonEnregistre(t))return;}catch(x){return;}
       /* un texte DANS un autre déjà retenu : le parent suffit */
       if(q.some(function(p){return p.contains(e);}))return;
@@ -15407,7 +15410,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.8.1';
+var _VERSION_REPLI='v3.8.2';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -27951,6 +27954,7 @@ function renderVLesson(ca,s){
 
   var note=document.createElement('div');note.className='tip-box';note.style.marginBottom='12px';note.style.marginTop='4px';
   note.innerHTML='<em style="color:var(--txt2);font-size:.85rem">'+t('not_essential')+'</em>';
+  note.style.cursor='pointer';note.onclick=function(){speakText(t('not_essential'),getLang(),this);};
   ca.appendChild(note);
 
   var b2=document.createElement('div');b2.className='info-box';b2.style.marginBottom='12px';b2.style.cursor='pointer';b2.title='🔊';
@@ -28074,7 +28078,7 @@ function renderPLesson(ca,s){
     var row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0;flex-wrap:wrap;';
     row.appendChild(mkOrb(a));
-    var txt=document.createElement('span');txt.style.cssText='color:var(--txt2);font-size:.9rem';txt.textContent=t('prolong_diff');row.appendChild(txt);
+    var txt=document.createElement('span');txt.style.cssText='color:var(--txt2);font-size:.9rem';txt.textContent=t('prolong_diff');txt.style.cursor='pointer';txt.onclick=function(){speakText(t('prolong_diff'),getLang(),this);};row.appendChild(txt);
     row.appendChild(mkOrb(b));
     return row;
   }
@@ -28090,13 +28094,17 @@ function renderPLesson(ca,s){
 
   // Bloc Exemple (séparé, avec orbes)
   var bEx=document.createElement('div');bEx.className='tip-box';bEx.style.marginBottom='12px';
-  bEx.innerHTML=t('prolong_exemple');
+  /* v3.8.2 — les bouts français se lisent (Narrateur), l'arabe d'à côté
+     est dit par la voix du studio, dans l'ordre de la page. */
+  var bExT=document.createElement('span');bExT.textContent=t('prolong_exemple');bExT.style.cursor='pointer';
+  bExT.onclick=function(){speakText(t('prolong_exemple'),getLang(),this);};
+  bEx.appendChild(bExT);
   var r1=document.createElement('div');r1.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0;flex-wrap:wrap;';
-  var t1=document.createElement('span');t1.style.cssText='color:var(--txt2);font-size:.9rem';t1.textContent=t('prolong_love');
+  var t1=document.createElement('span');t1.style.cssText='color:var(--txt2);font-size:.9rem';t1.textContent=t('prolong_love');t1.style.cursor='pointer';t1.onclick=function(){speakText(t('prolong_love'),getLang(),this);};
   r1.appendChild(t1);r1.appendChild(mkOrb('لَأُحِبُّك'));bEx.appendChild(r1);
-  var alors=document.createElement('div');alors.style.cssText='text-align:center;color:var(--txt2);margin:4px 0;font-size:.85rem';alors.textContent=t('prolong_alors');bEx.appendChild(alors);
+  var alors=document.createElement('div');alors.style.cssText='text-align:center;color:var(--txt2);margin:4px 0;font-size:.85rem';alors.textContent=t('prolong_alors');alors.style.cursor='pointer';alors.onclick=function(){speakText(t('prolong_alors'),getLang(),this);};bEx.appendChild(alors);
   var r2=document.createElement('div');r2.style.cssText='display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0;flex-wrap:wrap;';
-  var t2=document.createElement('span');t2.style.cssText='color:var(--txt2);font-size:.9rem';t2.textContent=t('prolong_nolove');
+  var t2=document.createElement('span');t2.style.cssText='color:var(--txt2);font-size:.9rem';t2.textContent=t('prolong_nolove');t2.style.cursor='pointer';t2.onclick=function(){speakText(t('prolong_nolove'),getLang(),this);};
   r2.appendChild(t2);r2.appendChild(mkOrb('لَا أُحِبُّك'));bEx.appendChild(r2);
   ca.appendChild(bEx);
 
@@ -28129,7 +28137,7 @@ function renderPLesson(ca,s){
 
   // Illustration prolongations (orbes séparés)
   var ill1=document.createElement('div');ill1.className='info-box';ill1.style.marginBottom='20px';
-  var ill1title=document.createElement('div');ill1title.innerHTML=t('prolong_illus');ill1title.style.marginBottom='8px';ill1.appendChild(ill1title);
+  var ill1title=document.createElement('div');ill1title.innerHTML=t('prolong_illus');ill1title.style.marginBottom='8px';ill1title.style.cursor='pointer';ill1title.onclick=function(){speakText(t('prolong_illus'),getLang(),this);};ill1.appendChild(ill1title);
   ill1.appendChild(mkDiffRow('وَاِ','وَا'));
   ill1.appendChild(mkDiffRow('يُوَ','يُو'));
   ill1.appendChild(mkDiffRow('وِيُ','وِي'));
@@ -28148,7 +28156,7 @@ function renderPLesson(ca,s){
 
   // Illustration chaddah (orbes séparés)
   var ill2=document.createElement('div');ill2.className='info-box';ill2.style.marginBottom='12px';
-  var ill2title=document.createElement('div');ill2title.innerHTML='<strong>'+t('prolong_illus')+'</strong>';ill2title.style.marginBottom='8px';ill2.appendChild(ill2title);
+  var ill2title=document.createElement('div');ill2title.innerHTML='<strong>'+t('prolong_illus')+'</strong>';ill2title.style.marginBottom='8px';ill2title.style.cursor='pointer';ill2title.onclick=function(){speakText(t('prolong_illus'),getLang(),this);};ill2.appendChild(ill2title);
   ill2.appendChild(mkDiffRow('إِيَاكَ','إِيَّاكَ'));
   /* v3.2.3 — écrit comme au studio (أَوَاهْ), sinon l'enregistrement n'était pas trouvé */
   ill2.appendChild(mkDiffRow('أَوَاهْ','أَوَّاهْ'));
@@ -30704,6 +30712,11 @@ var ADMIN_SOUNDS = [
   {ar:'و',label:'waw'},
   {ar:'وَ',label:'wa'},
   {ar:'وَا',label:'wā'},
+  /* v3.8.2 — illustrations des prolongations (« وَاِ est différent de وَا ») :
+     une lettre qui porte SA voyelle ne prolonge pas. À dire au studio. */
+  {ar:'وَاِ',label:'wa-i (illustration)'},
+  {ar:'يُوَ',label:'yu-wa (illustration)'},
+  {ar:'وِيُ',label:'wi-yu (illustration)'},
   {ar:'وً',label:'wan'},
   {ar:'وُ',label:'wu'},
   {ar:'وُو',label:'wū'},

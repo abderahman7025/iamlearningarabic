@@ -106,6 +106,27 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.2 — 24 octobre 2026 : prolongations, le français lu, l'arabe par le studio
+
+- **Principe (le client)** : dans les phrases mixtes des cours, le
+  Narrateur dit SEULEMENT le français, l'arabe est dit par SA voix du studio,
+  à la suite. (Erreur du 24 : j'ai d'abord fait lire des phrases mixtes
+  entières par l'IA — 786 crédits pour rien, fichiers inutilisés.)
+- Bouts français rendus lisibles (`speakText`) dans `renderPLesson`
+  (« Exemple : », « "Je t'aime vraiment" se dit », « alors que... »,
+  « "Je ne t'aime pas" se dit », « Illustration : » ×2, « est différent
+  de » dans `mkDiffRow`) et la note `not_essential` de `renderVLesson`.
+  Lecture auto : un petit texte (≤ 40 car.) peut revenir plusieurs fois.
+  Ordre vérifié : Exemple → phrase → لَأُحِبُّك (studio) → alors que…
+- **Voix (français, en ligne)** : 1, 5, 6, 7 en **v3 posé** ; 2, 3, 4 en
+  **v3 « sans émotion »** (`[neutral, flat, no emotion]`), choix du client
+  après écoute (`outils/voix-bouts-*.js`, dépôt `voix-bouts-depot.js`).
+  Le v4 posé lui a paru « abusé » sur ces phrases.
+- **Studio** : وَاِ, يُوَ, وِيُ ajoutés à `ADMIN_SOUNDS` (après وَا) — à
+  enregistrer par le client ; d'ici là l'illustration lit « est différent
+  de وَا » sans le premier mot.
+- **11 autres langues** : à faire, réglage à valider.
+
 ## v3.8.1 — 24 octobre 2026 : ordre de l'arabe, textes des prolongations
 
 - **MON ERREUR de la v3.8.0** : le karaoké découpait le texte mot par mot ;
