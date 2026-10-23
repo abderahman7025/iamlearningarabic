@@ -106,6 +106,22 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.2 — 23 octobre 2026 : vol embarqué revu
+
+- **Plus de zoom** (le client) : le décollage et l'atterrissage se voient de
+  loin, comme avant ; fondu vers la scène et retour. `volEmbarque` lance le
+  vol habituel (`volDroit`) 0,75 s, la scène couvre, l'équipage est replacé
+  à 170 px avant le monde d'arrivée (`reprise`), et au fondu retour
+  (`quandSort`) il finit son vol en 1,5 s puis `arriver`.
+- **Mondes survolés** : les images des étapes entre départ et arrivée
+  (`passes`) sortent du point de fuite et filent sur les côtés, en
+  alternance, réparties sur la durée de la scène.
+- **Nuages dessinés** : trois formes SVG (bosses + base plate) en
+  `background-image` (`.ve-n0/1/2`). Piège : un `background:` raccourci sur
+  `i.ve-nuage` remettait l'image à `none`.
+- **Ailes** en bas de l'écran, relevées en biais (battement 2°→30°) pour
+  que leur bout dépasse de la tête sur un téléphone debout.
+
 ## v3.7.1 — 23 octobre 2026 : le vol embarqué (licorne et fusée)
 
 - **Déroulé** (`volEmbarque` dans `_volCarte`, activé par `embarque:true` sur
