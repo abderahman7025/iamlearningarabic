@@ -74,5 +74,51 @@ def main():
     sauve(hub, 'vol-hublot.webp', 1000)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and len(sys.argv) == 1:
     main()
+
+
+# ── v3.7.8 — animaux 3D des mondes et cockpit de la fusee ─────────────────
+SRC2 = os.path.join(ICI, 'sources-canva')
+
+
+def animaux():
+    for src, nom, larg in [('ours-grand', 'bete3d-ours.webp', 640),
+                           ('ourson', 'bete3d-ourson.webp', 480),
+                           ('chienchat-a', 'bete3d-chienchat-a.webp', 700),
+                           ('chienchat-b', 'bete3d-chienchat-b.webp', 700)]:
+        im = rogne(D.detoure(Image.open(os.path.join(SRC2, src + '.png'))))
+        sauve(im, nom, larg)
+
+
+def cockpit():
+    """La vitre verte devient transparente ; on mesure le cercle (centre et
+    rayon, en fraction de l'image) pour y caler l'espace."""
+    for src, nom in [('cockpit-portrait', 'vol-cockpit-portrait.webp'),
+                     ('cockpit-paysage', 'vol-cockpit-paysage.webp')]:
+        a = np.asarray(Image.open(os.path.join(SRC2, src + '.png')).convert('RGB')).astype(np.int16)
+        r, g, b = a[:, :, 0], a[:, :, 1], a[:, :, 2]
+        vert = (g - np.maximum(r, b))
+        h, w = vert.shape
+        # Le hublot seulement : le radar et des boutons sont verts aussi. On
+        # mesure le rond dans le haut de l'image (le hublot est en haut, le
+        # tableau de bord en bas), puis on ne vide que ce disque.
+        m = vert > 80
+        m[int(h * 0.62):, :] = False
+        ys, xs = np.nonzero(m)
+        cx, cy = xs.mean() / w, ys.mean() / h
+        rr = np.sqrt(m.sum() / np.pi)
+        yy, xx = np.mgrid[0:h, 0:w]
+        disque = (xx - cx * w) ** 2 + (yy - cy * h) ** 2 <= (rr * 1.06) ** 2
+        alpha = np.where(disque, np.clip(255 - (vert - 40) * 4, 0, 255), 255).astype(np.uint8)
+        rgb = a.copy()
+        rgb[:, :, 1] = np.where(disque & (vert > 20), np.maximum(r, b), g)
+        im = Image.fromarray(np.dstack([rgb.astype(np.uint8), alpha]), 'RGBA')
+        print(nom, 'centre', round(cx, 4), round(cy, 4), 'rayon/largeur', round(rr / w, 4), 'rayon/hauteur', round(rr / h, 4))
+        im.save(os.path.join(DST, nom), 'WEBP', quality=86, method=6)
+        print(nom, im.size, os.path.getsize(os.path.join(DST, nom)) // 1024, 'Ko')
+
+
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'v378':
+    animaux()
+    cockpit()

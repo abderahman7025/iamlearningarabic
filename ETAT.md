@@ -106,6 +106,24 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.8 — 23 octobre 2026 : décollage court, cockpit, animaux 3D
+
+- **Décollage vu de loin, borné** (le client) : on ne la voit pas aller
+  au-delà de la MOITIÉ du chemin vers le monde suivant (le QUART si l'on va
+  au monde voisin). Le décollage (`volDroit` 1,5 s) vise ce point, vers le
+  monde suivant, et l'atteint quand le noir couvre tout.
+- **Fille** : nuages et mondes de la scène plus bas (`top` 49 %, 45 % couché).
+- **Fusée : cockpit** (Canva, `outils/sources-canva/cockpit-*.png`) —
+  tableau de bord, main de l'astronaute en gant sur le levier rouge, vitre
+  du hublot en vert incrusté rendue transparente (seul le disque du hublot :
+  le radar et des boutons sont verts aussi). `vol-cockpit-portrait.webp` /
+  `-paysage.webp` en `cover` (calé 60 % / 50 %, 22 % couché pour garder le
+  hublot entier) ; centre et rayon du hublot mesurés par
+  `python outils/vol-embarque.py v378` et recopiés dans `_volEmbarqueScene`.
+- **Animaux 3D** (Canva) : `bete3d-ours`, `bete3d-ourson`,
+  `bete3d-chienchat-a/-b` remplacent les dessins 2D, dans les mondes ET sur
+  la carte.
+
 ## v3.7.7 — 23 octobre 2026 : on la revoit en descente, droite
 
 - Le client : « on ne la revoit de loin QUE quand elle est au-dessus du

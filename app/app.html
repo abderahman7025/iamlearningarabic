@@ -6385,6 +6385,8 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 .vol-emb-fusee .ve-ciel{background:radial-gradient(circle at 50% 42%,#1d2f6b 0%,#0b1233 55%,#04061a 100%)}
 /* Le point de fuite : le monde d'arrivée, qui grossit tout le vol. */
 .vol-emb .ve-loin{position:absolute;left:50%;top:40%;width:0;height:0}
+/* v3.7.8 — fille : nuages et mondes un peu plus bas. */
+.vol-emb-licorne .ve-loin,.vol-emb-licorne .ve-defile{top:49%!important}
 .vol-emb-fusee .ve-loin{top:50%}
 .vol-emb .ve-monde{position:absolute;left:0;top:0;width:min(70vw,70vh);height:auto;
   translate:-50% -50%;scale:.12;opacity:.85;
@@ -6437,13 +6439,14 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
   .vol-emb .ve-monture{--W:min(50vh,40vw)}
   .vol-emb .ve-tete{bottom:calc(var(--W) * -.78)}
   .vol-emb .ve-aile{bottom:calc(var(--W) * -.2)}
-  .vol-emb-licorne .ve-loin,.vol-emb-licorne .ve-defile{top:36%}
+  .vol-emb-licorne .ve-loin,.vol-emb-licorne .ve-defile{top:45%!important}
   .vol-emb .ve-monde{width:min(60vw,55vh)}
 }
 /* Le hublot : la paroi de la fusée tout autour, percée d'un rond. */
 .vol-emb .ve-hublot{position:absolute;left:50%;top:50%;width:min(96vw,96vh);height:auto;translate:-50% -50%;
   animation:veHublot 2.6s ease-in-out infinite alternate}
 @keyframes veHublot{from{rotate:-1.2deg}to{rotate:1.2deg}}
+.vol-emb .ve-cockpit{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;z-index:2;pointer-events:none}
 .vol-emb .ve-paroi{position:absolute;inset:0;
   background:radial-gradient(circle at 50% 50%,transparent 0,transparent calc(min(96vw,96vh) * .40),
     #2a3b63 calc(min(96vw,96vh) * .40 + 1px),#1a2645 calc(min(96vw,96vh) * .75),#0f1730 100%)}
@@ -11727,8 +11730,11 @@ window._volEmbarqueScene=function(o){
   var h='<div class="ve-ciel"></div><div class="ve-loin">';
   if(o.monde)h+='<img class="ve-monde" alt="" src="'+o.monde+'">';
   h+='</div><div class="ve-defile"></div>';
+  /* v3.7.8 — fusée : le COCKPIT (Canva), vitre du hublot transparente ;
+     la main de l'astronaute tient le levier. Une image par orientation. */
+  var debout=innerHeight>=innerWidth;
   if(g){
-    h+='<div class="ve-paroi"></div><img class="ve-hublot" alt="" src="/images/vol-hublot.webp">';
+    h+='<img class="ve-cockpit" alt="" src="/images/vol-cockpit-'+(debout?'portrait':'paysage')+'.webp">';
   }else{
     h+='<div class="ve-monture"><img class="ve-aile ve-aile-g" alt="" src="/images/vol-aile.webp">'
       +'<img class="ve-aile ve-aile-d" alt="" src="/images/vol-aile-d.webp">'
@@ -11769,6 +11775,22 @@ window._volEmbarqueScene=function(o){
   });
   document.body.appendChild(sc);
   window._volEmbarqueEnCours=sc;
+  /* Le hublot du cockpit : centre et rayon mesurés sur l'image
+     (`outils/vol-embarque.py`). L'image couvre l'écran (`cover`, calée à
+     60 % en largeur pour garder la main) ; on y place le point de fuite. */
+  if(g){
+    var C=debout?{iw:1024,ih:1536,cx:.4969,cy:.3326,r:.2902}:{iw:1536,ih:1024,cx:.4994,cy:.3276,r:.152};
+    var W=innerWidth,H=innerHeight,k=Math.max(W/C.iw,H/C.ih);
+    /* Couché, l'image est rognée en hauteur : on la cale plus haut pour
+       garder le hublot entier. */
+    var PY=debout?0.5:0.22;
+    var ck=sc.querySelector('.ve-cockpit');if(ck)ck.style.objectPosition='60% '+(PY*100)+'%';
+    var X=(W-C.iw*k)*0.6+C.cx*C.iw*k, Y=(H-C.ih*k)*PY+C.cy*C.ih*k, R=C.r*C.iw*k;
+    [sc.querySelector('.ve-loin'),sc.querySelector('.ve-defile')].forEach(function(e){
+      e.style.left=X.toFixed(0)+'px';e.style.top=Y.toFixed(0)+'px';});
+    var mo=sc.querySelector('.ve-monde');
+    if(mo){mo.style.width=(R*1.7).toFixed(0)+'px';}
+  }
   var fini=false;
   function termine(){
     if(fini)return;fini=true;
@@ -12770,9 +12792,17 @@ function _volCarte(o){
        monde, haut en haut, et EN MOUVEMENT, en descente ». Elle part d'assez
        haut pour que la descente commence pendant le fondu et se voie. */
     var reprise={x:but.x,y:but.y-Math.max(80,(el.offsetHeight||100)*(garcon?1.3:1.0))};
+    /* v3.7.8 — « on ne doit pas la voir aller plus loin que la moitié du
+       chemin vers le monde suivant (le quart si l'on va au monde voisin) ».
+       Le décollage vise ce point-là, vers le monde SUIVANT, et l'atteint
+       quand le noir couvre tout. */
+    var suiv=ouSePoser(idx+(cible>idx?1:-1))||but;
+    var sx=suiv.x-ici.x,sy=suiv.y-ici.y,ds=Math.sqrt(sx*sx+sy*sy)||1;
+    var part=(Math.abs(cible-idx)===1)?0.25:0.5;
+    var limite={x:ici.x+sx*part,y:ici.y+sy*part};
     idx=cible;
     /* 1. le décollage, vu de loin : le début du vol habituel. */
-    volDroit(ici,but,function(){},Math.max(1900,Math.min(7000,1300+dist*2)));
+    volDroit(ici,limite,function(){},1500);
     setTimeout(function(){
       if(!el.isConnected){fini&&fini();return;}
       window._volEmbarqueScene({
@@ -15300,7 +15330,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.7';
+var _VERSION_REPLI='v3.7.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18506,10 +18536,10 @@ var _HABILLAGES={
          {img:'/images/papillon3d-3.webp',x:38,y:68,l:10,vol:true}],
       7:[{img:'/images/bete-tortue1.webp',x:26,y:38,l:28},
          {img:'/images/bete-tortue2.webp',x:50,y:50,l:24}],
-      8:[{img:'/images/bete-chienchat4.webp',x:24,y:36,l:30},
-         {img:'/images/bete-chienchat2.webp',x:50,y:50,l:26}],
-      9:[{img:'/images/bete-ours1.webp',x:26,y:34,l:26},
-         {img:'/images/bete-ours2.webp',x:50,y:46,l:24}]
+      8:[{img:'/images/bete3d-chienchat-a.webp',x:24,y:36,l:30},
+         {img:'/images/bete3d-chienchat-b.webp',x:50,y:50,l:26}],
+      9:[{img:'/images/bete3d-ours.webp',x:26,y:34,l:26},
+         {img:'/images/bete3d-ourson.webp',x:50,y:46,l:24}]
     },
     /* LE COURS D'UN MONDE EN EST PLEIN, et chaque monde a SA composition —
        le client les a dictées une par une le 20 août.
@@ -18544,19 +18574,19 @@ var _HABILLAGES={
       ],
       /* UN TRÈS GROS OURS, et ses petits autour — tous par terre. */
       'ours':[
-        {img:'/images/bete-ours1.webp',x:28,b:1,l:42,anim2:'beteBalance',dur2:5.4},
-        {img:'/images/bete-ours2.webp',x:1,b:2,l:13,anim2:'beteBalance',dur2:3.2},
-        {img:'/images/bete-ours2.webp',x:84,b:2,l:14,anim2:'beteBalance',dur2:3.8},
-        {img:'/images/bete-ours2.webp',x:71,b:1,l:11,anim2:'beteBalance',dur2:2.9},
-        {img:'/images/bete-ours2.webp',x:16,b:1,l:11,anim2:'beteBalance',dur2:4.4},
+        {img:'/images/bete3d-ours.webp',x:28,b:1,l:42,anim2:'beteBalance',dur2:5.4},
+        {img:'/images/bete3d-ourson.webp',x:1,b:2,l:13,anim2:'beteBalance',dur2:3.2},
+        {img:'/images/bete3d-ourson.webp',x:84,b:2,l:14,anim2:'beteBalance',dur2:3.8},
+        {img:'/images/bete3d-ourson.webp',x:71,b:1,l:11,anim2:'beteBalance',dur2:2.9},
+        {img:'/images/bete3d-ourson.webp',x:16,b:1,l:11,anim2:'beteBalance',dur2:4.4},
         /* Celui-ci se retrouvait sous le grand ours : il rejoint les deux de
            droite, un peu en retrait derrière eux. */
-        {img:'/images/bete-ours2.webp',x:78,b:7,l:8,anim2:'beteBalance',dur2:3.5}
+        {img:'/images/bete3d-ourson.webp',x:78,b:7,l:8,anim2:'beteBalance',dur2:3.5}
       ],
       /* Une seule fois chaque image, TRÈS GROS, et assis par terre. */
       'chats-chiens':[
-        {img:'/images/bete-chienchat4.webp',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
-        {img:'/images/bete-chienchat2.webp',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
+        {img:'/images/bete3d-chienchat-a.webp',x:0,b:0,l:50,anim2:'beteBalance',dur2:4.6},
+        {img:'/images/bete3d-chienchat-b.webp',x:52,b:0,l:48,anim2:'beteBalance',dur2:5.2}
       ],
       /* Le paysage des sucreries est recadré par `cover` : on n'en voyait
          presque rien. Il en faut donc AU PREMIER PLAN, posées en bas. */
