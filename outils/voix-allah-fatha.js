@@ -8,8 +8,10 @@ const cle = (t) => ((t.length > 180 || Buffer.byteLength(t, 'utf8') > 360) ? 'lo
 const env = {};
 fs.readFileSync(path.join(__dirname, '..', '.env.local'), 'utf8').split(/\r?\n/).forEach((l) => { const m = l.match(/^([A-Z_]+)=(.*)$/); if (m) env[m[1]] = m[2].trim().replace(/^["']|["']$/g, ''); });
 const L = require('./voix-allah.json').filter((e) => e.langue === 'fr');
-const ALLAH = 'اَللَّه';
-const dest = path.join(__dirname, 'captures', 'voix-allah-fatha'); fs.mkdirSync(dest, { recursive: true });
+/* 24 octobre : la fatha n'a rien changé ; l'essai n° 5 (alif suscrit,
+   اللّٰه) est celui que le client a retenu (le 2, « Allâh », aussi). */
+const ALLAH = 'الل' + String.fromCharCode(0x651, 0x670) + 'ه';
+const dest = path.join(__dirname, 'captures', 'voix-allah-alif'); fs.mkdirSync(dest, { recursive: true });
 (async () => {
   for (const i of [2, 4]) {
     const e = L[i], k = cle(e.cle);

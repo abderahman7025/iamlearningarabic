@@ -145,6 +145,13 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 - Les 7 petites phrases des prolongations (« Exemple : », « est différent
   de »…) : PAS générées, pas branchées — attendre le client.
 - `voix-allah.js` accepte `--langue=fr`.
+- **SUITE (24 octobre)** : la fatha (اَللَّه) n'a RIEN changé (« d'illah »,
+  « Alla »). Six écritures essayées sur une phrase courte (318 car.,
+  `outils/voix-allah-essais.js`) : le client retient **اللّٰه (alif suscrit,
+  ل ل ّ ٰ)** et « Allâh ». Textes 3 et 5 refaits en اللّٰه (601 car.), en
+  ligne (`voix-allah-fatha.js`, fichiers `captures/voix-allah-alif`).
+  **RÈGLE pour le Narrateur v4 : écrire Allah اللّٰه dans le texte donné à
+  la voix.**
 
 ## v3.8.0 — 23 octobre 2026 : adultes, tout est lu, karaoké synchronisé
 
