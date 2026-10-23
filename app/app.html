@@ -6520,13 +6520,23 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
     var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),L=[],n;
     while((n=w.nextNode())){var p=n.parentElement;if(!p||p.closest(EXCLU)||!/\S/.test(n.nodeValue))continue;L.push(n);}
     var out=[];
+    /* v3.8.1 — « tu as écrit uHibbuk laa au lieu de laa uHibbuk » (le
+       client). Découpé mot par mot, le texte arabe devenait des boîtes
+       posées de gauche à droite dans un cadre en flex : l'ordre s'inversait.
+       Les mots arabes qui se suivent restent ENSEMBLE, et dans un cadre en
+       flex ou en grille on ne découpe pas du tout. */
+    var _cs=getComputedStyle(el).display,_bloc=/flex|grid/.test(_cs);
+    var _ar=/[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
     L.forEach(function(t){
-      var parts=t.nodeValue.split(/(\s+)/),f=document.createDocumentFragment();
+      var parts=_bloc?[t.nodeValue]:t.nodeValue.split(/(\s+)/),f=document.createDocumentFragment(),der=null,blanc='';
       parts.forEach(function(x){
         if(!x)return;
-        if(/^\s+$/.test(x)){f.appendChild(document.createTextNode(x));return;}
-        var s=document.createElement('span');s.className='km';s.textContent=x;f.appendChild(s);out.push(s);
+        if(/^\s+$/.test(x)){blanc+=x;return;}
+        if(der&&_ar.test(x)&&_ar.test(der.textContent)){der.textContent+=blanc+x;blanc='';return;}
+        if(blanc){f.appendChild(document.createTextNode(blanc));blanc='';}
+        var s=document.createElement('span');s.className='km';s.textContent=x;f.appendChild(s);out.push(s);der=s;
       });
+      if(blanc)f.appendChild(document.createTextNode(blanc));
       t.parentNode.replaceChild(f,t);
     });
     el._km=out;
@@ -15397,7 +15407,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.8.0';
+var _VERSION_REPLI='v3.8.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -28011,6 +28021,26 @@ function renderVLesson(ca,s){
 }
 
 // PROLONG LESSON — cours unique scrollable
+/* v3.8.1 — le client : « deux virgules après "prolongée par le waw", deux
+   fois "sous" dans le paragraphe de la kasrah ». Le mot (ou la virgule)
+   ajouté par le code figurait AUSSI au début de la traduction, dans
+   presque toutes les langues (texte d'origine, 11 août). On l'ôte. */
+function _sansDebut(txt,mot){
+  txt=String(txt||'');mot=String(mot||'').trim();if(!mot)return txt;
+  var t2=txt.replace(/^\s+/,'');
+  if(t2.toLowerCase().indexOf(mot.toLowerCase())===0)return t2.slice(mot.length).replace(/^\s+/,'');
+  return txt;
+}
+/* La 2e phrase de la chaddah s'affichait sans son début (« chaddah" est sur
+   une lettre… », depuis le 11 août) : on montre celle que dit la voix
+   (`say_chaddah`), le mot « lettre » à sa couleur. */
+function _chaddahSuite(){
+  var d=String(t('say_chaddah')||''),m=d.match(/^(.+?[.。।])\s*([\s\S]+)$/);
+  var s2=m?m[2]:d,l=String(t('lettre_lbl')||''),i=l?s2.lastIndexOf(l):-1;
+  var esc=function(x){return x.replace(/&/g,'&amp;').replace(/</g,'&lt;');};
+  if(i<0)return esc(s2);
+  return esc(s2.slice(0,i))+'<span style="color:var(--gold)">'+esc(l)+'</span>'+esc(s2.slice(i+l.length));
+}
 function renderPLesson(ca,s){
   ca.innerHTML='';_navPush('sessions/lesson');repriseNoter({type:'lecon',session:s.id});
   var hintEl=document.createElement('div');hintEl.style.cssText='font-size:.7rem;color:var(--txt2);text-align:center;margin-bottom:8px;opacity:.7';hintEl.textContent=t('click_to_listen');ca.appendChild(hintEl);
@@ -28085,9 +28115,9 @@ function renderPLesson(ca,s){
 
   // Tip voyelles (couleurs différentes par phrase)
   var tip1=document.createElement('div');tip1.className='tip-box';tip1.style.marginBottom='12px';tip1.style.cursor='pointer';
-  tip1.innerHTML=t('prolong_tip1')+arV('ُ')+t('prolong_tip1b')+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--gold)"> و </span>, '+t('prolong_tip1c')+'<br><br>'
+  tip1.innerHTML=t('prolong_tip1')+arV('ُ')+t('prolong_tip1b')+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--gold)"> و </span>, '+_sansDebut(t('prolong_tip1c'),',')+'<br><br>'
     +t('prolong_tip2a')+' <span style="font-family:var(--fa);font-size:1.2em;color:#4fc3f7">&nbsp;&nbsp;َ&nbsp;&nbsp;</span> '+t('prolong_tip2b')+' <span style="color:#4fc3f7">'+t('au_dessus')+'</span> '+t('prolong_tip2c')+' <span style="font-family:var(--fa);font-size:1.2em;color:#4fc3f7"> ا </span> '+t('prolong_tip2d')+' <span style="color:#4fc3f7">'+t('au_dessus')+'</span> '+t('prolong_tip2e')+'<br><br>'
-    +t('prolong_tip3a')+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--orange)">&nbsp;&nbsp;ِ&nbsp;&nbsp;</span> '+t('prolong_tip3b')+' <span style="color:var(--orange)">'+t('sous_lbl')+'</span> '+t('prolong_tip3c')+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--orange)"> ي </span>'+t('prolong_tip3d')+' <span style="color:var(--orange)">'+t('sous_lbl')+'</span> '+t('prolong_tip3e');
+    +t('prolong_tip3a')+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--orange)">&nbsp;&nbsp;ِ&nbsp;&nbsp;</span> '+t('prolong_tip3b')+' <span style="color:var(--orange)">'+t('sous_lbl')+'</span> '+_sansDebut(t('prolong_tip3c'),t('sous_lbl'))+' <span style="font-family:var(--fa);font-size:1.2em;color:var(--orange)"> ي </span>'+t('prolong_tip3d')+' <span style="color:var(--orange)">'+t('sous_lbl')+'</span> '+_sansDebut(t('prolong_tip3e'),t('sous_lbl'));
   tip1.onclick=function(){speakText(t('say_prolong_tips'),getLang(),this);};
   ca.appendChild(tip1);
 
@@ -28112,8 +28142,7 @@ function renderPLesson(ca,s){
 
   var p2=document.createElement('div');p2.className='info-box';p2.style.marginBottom='12px';p2.style.cursor='pointer';p2.title='🔊';
   p2.innerHTML='<strong style="display:block;text-align:center;font-size:1rem;margin-bottom:10px">'+t('chaddah_title')+' · <span style="font-family:var(--fa);color:var(--gold)"> الشَّدَّة </span></strong>'
-    +t('chaddah_desc1')+'<br><br>'
-    +'<span style="color:var(--gold)">chaddah</span>" '+t('chaddah_desc2')+' <span style="color:var(--gold)">'+t('lettre_lbl')+'</span>'+t('chaddah_desc3');
+    +t('chaddah_desc1')+'<br><br>'+_chaddahSuite();
   p2.onclick=function(){speakText(t('say_chaddah'),getLang(),this);};
   ca.appendChild(p2);
 

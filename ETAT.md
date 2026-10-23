@@ -106,6 +106,29 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.1 — 24 octobre 2026 : ordre de l'arabe, textes des prolongations
+
+- **MON ERREUR de la v3.8.0** : le karaoké découpait le texte mot par mot ;
+  dans un cadre en flex (les « orbes » des prolongations), لَا أُحِبُّك
+  devenait deux boîtes posées de gauche à droite → « uHibbuk laa ». `mots()`
+  garde ensemble les mots arabes qui se suivent et ne découpe pas un cadre
+  en flex/grille.
+- **Défauts d'origine (11 août), signalés par le client** : « و , , »
+  (virgule du code + virgule de `prolong_tip1c`), « sous sous » ×2 (mot
+  `sous_lbl` ajouté par le code + début de `prolong_tip3c`/`tip3e`, dans
+  presque toutes les langues), 2e phrase de la chaddah sans son début
+  (« chaddah" est sur une lettre… »). `_sansDebut(txt, mot)` et
+  `_chaddahSuite()` (la 2e phrase de `say_chaddah`, « lettre » en or).
+- **Contrôle** : cours adultes (voyelles, prolongations, chaque lettre),
+  introduction, bonus et ses 4 pages, 12 langues — mots doublés,
+  ponctuation doublée, guillemets impairs : plus rien (faux positifs : un
+  titre suivi du même mot ; « „…" » en allemand, clé d'enregistrement,
+  laissé).
+- **Les 7 « phrases »** des prolongations sont des phrases MIXTES
+  (« "Je t'aime vraiment" se dit لَأُحِبُّك », « وَاِ est différent de وَا »…)
+  à lire d'un tenant par le Narrateur v4 posé, comme les autres mixtes.
+  Rien généré : liste à valider par le client.
+
 ## 24 octobre 2026 — voix « Allah » (sans changement du site)
 
 - **ERREUR À NE PAS REFAIRE** : `voix-allah.json` (fr) AVAIT été généré le
