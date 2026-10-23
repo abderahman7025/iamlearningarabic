@@ -106,6 +106,36 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.6.6 — 23 octobre 2026 : LES DOUZE MONDES DE LA FILLE EN 3D, et la carte
+
+Le client a validé le monde papillons (« c'est trop beau ») et demandé la même
+chose pour tous les mondes, carte comprise.
+
+- **Décors** : `monde3d-<slug>-large.webp` (16:9, GPT Image 2.5 high 2k,
+  2,75 crédits) et `monde3d-<slug>-haut.webp` (9:16, medium 2k, 1 crédit,
+  générée avec la large pour référence). Tous ont eu le décor papillons pour
+  référence de style. `.decor-monde.monde3d` lit `--m3d-large` / `--m3d-haut`,
+  posées par `_decorMonde` : plus une règle CSS par monde.
+- **Ce qui flotte** : `_MONDES_3D_AIR` — cœurs (coeurs, sucreries), neige
+  (pingouins, nuages), pétales qui voltigent (fleurs, papillons), étincelles
+  qui montent ailleurs.
+- **La carte** : `bulle-<slug>.webp` (440 px, fond transparent, high 1k,
+  1,5 crédit) remplacent `monde-*.svg` dans `images`. Elles flottent
+  (`ile3dFlotte`), sauf verrouillées. **Nommées `bulle-` exprès** : le
+  sommet d'un monde se lit sur le nom du fichier sans son préfixe
+  (`/^[a-z]+-/`), et `ile3d-` (avec un chiffre) n'était pas retiré. Les
+  `sommets` ont été MESURÉS sur les bulles (cercle le plus large → centre et
+  rayon) ; tortue et sucreries forcés (un palmier, une sucette dépassent).
+  `rmBg` (détourage des îles du garçon) saute `bulle-` : il rongeait leur bord
+  blanc et les réduisait à 300 px.
+- **Sur la carte, monde 6** : papillons 3D au lieu des GIF (plus aucun GIF
+  papillon n'est chargé).
+- **Sucreries** : les dix bonbons plats (`sucrerie-*.svg`) remplacés par
+  `sucrerie3d-*.webp` (medium 1k, 0,5 crédit).
+- Crédits Higgsfield utilisés pour v3.6.5 + v3.6.6 : environ 72.
+  Les anciens `monde-*.svg`, `ciel-*.svg`, `sucrerie-*.svg` et `papillon*.gif`
+  restent sur le disque, plus appelés.
+
 ## v3.6.5 — 23 octobre 2026 : premier monde en 3D, « papillons » (À VALIDER)
 
 Le client : « refais les mondes de la fille 6-11 ans en 3D animés ». Option
@@ -129,9 +159,8 @@ seul monde d'abord, pour validation ; les onze autres attendent son accord.
 - **Branchement** : `_MONDES_3D` (avant `_decorMonde`) liste les mondes qui
   ont leur 3D ; les autres gardent `ciel-<slug>.svg`. Les GIF `papillon1-4`
   restent utilisés sur la CARTE (monde 6, `betesEtape`), pas dans le cours.
-- **Pour un nouveau monde** : générer `monde3d-<slug>-large/haut.webp`,
-  ajouter `<slug>:true` à `_MONDES_3D` et les deux règles CSS
-  `.decor-monde.monde3d-<slug>`.
+- **Pour un nouveau monde** : générer `monde3d-<slug>-large/haut.webp` et
+  l'ajouter à `_MONDES_3D` (v3.6.6 : plus de règle CSS par monde).
 
 ## v3.6.4 — 23 octobre 2026 : plein écran partout, pas de zoom, pas de copie
 
