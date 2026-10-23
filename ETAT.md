@@ -87,7 +87,7 @@ manquent, la logique est décrite ici) :
   crédits/mois ; ~12 000 utilisés au 10 octobre.
 - dépôt : `POST /api/audio` `{ar: clé, audioBase64}` avec
   `Authorization: Bearer <ADMIN_SECRET>` (aussi dans `.env.local`).
-- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 18 (depuis v3.6.4 ; comparer à la version précédente).
+- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 19 (depuis v3.6.8 ; comparer à la version précédente).
 
 **Fichier de travail du client** : `Bureau/phrases-3-5-ans.txt` — une ligne
 par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
@@ -105,6 +105,39 @@ même façon : la page de récompense, la carte des animaux, et les écrans des
 voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
+
+## v3.6.8 — 23 octobre 2026 : carte, son, cadres, têtes d'animaux
+
+- **Têtes d'animaux pour les lettres.** Le client les avait faites :
+  `Téléchargements/Illustration d'éléphant enfant (1).zip` (33 têtes, même
+  ordre 1→33 que `outils/mots-lettres.py` ; le (2) est identique) et `(3).zip`
+  (poisson = 34, crocodile = 35, déjà transparents, posés sur blanc avant le
+  détourage). Les 33 sont en RGB avec un damier BLANC incrusté : le
+  détourage par silhouette de `detourage.py` l'enlève et garde les bêtes
+  blanches. `python outils/mots-lettres.py --source <dossier 1..35>` a
+  réécrit les 35 `mot-*.png`. Cigogne = flamant, gazelle = cerf : ce sont les
+  têtes fournies à ces numéros.
+- **#root porte un `zoom` sur tablette (1,38 mesuré à 768×1024)** : toute
+  l'application vit dans 557×742 px CSS. Toute mesure qui compare des
+  hauteurs doit prendre `getBoundingClientRect` des DEUX côtés — mélanger
+  avec `offsetHeight` fausse de 38 %.
+- **Choix de la lettre (6-11)** : `_ajusteChoix` resserre les cartes
+  (`data-fit`, `--fit`) jusqu'à ce que tout tienne, bouton « Retour à la
+  carte » compris ; relancé au chargement des dessins, des polices et au
+  redimensionnement. Tablette debout, monde de la couronne : de 1 088 px
+  (écran 1 019) à 994 px. Téléphone et tablette couchée : rien ne bouge.
+- **Le son se tait** dès que la page est cachée (verrouillage, autre appli,
+  sortie) : script en tête d'`app.html` qui recense balises audio
+  (`HTMLMediaElement.play`) et contextes Web Audio (`create*` du prototype),
+  plus la voix du navigateur. Au retour, la narration reprend au début de sa
+  phrase si c'est NOUS qui l'avions mise en pause. Le retour du téléphone
+  (`popstate`) coupe aussi. `_silenceTout()` est disponible partout.
+- **Carte** : nom entier sous la bulle (la carte avait `overflow:hidden`),
+  plus d'ombre floue sous les bulles (le « fond presque transparent »), nom en
+  contour serré. Caméra : zone morte de 8 px et rattrapage d'un quart à chaque
+  appel — elle suivait le balancement de la licorne et faisait vibrer l'écran
+  sur tablette. Fille ≈ 15 % plus petite (`TQM` 0,51, `TEQ` 0,41).
+- **Contrôle de syntaxe : 19 blocs** depuis v3.6.8.
 
 ## v3.6.7 — 23 octobre 2026 : la carte des mondes sur tablette et téléphone
 

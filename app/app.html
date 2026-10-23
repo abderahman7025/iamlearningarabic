@@ -7,6 +7,59 @@
   <script src="/tag.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script>
+/* ══ v3.6.8 — LE SON SE TAIT QUAND ON NE REGARDE PLUS ══════════════════════
+   Le client : « quand je verrouille la tablette ou le téléphone alors que la
+   voix parle, je l'entends toujours ; elle doit être coupée quand je change
+   de page, quand je quitte le site ou l'application, et quand je verrouille ».
+   Le son passe par trois chemins : des balises audio, des contextes Web Audio
+   et la voix du navigateur. On les recense dès le départ (ce script tourne
+   avant tous les autres), et on coupe tout dès que la page est cachée. Au
+   retour, la narration du cours reprend au début de sa phrase — sauf si
+   l'enfant l'avait mise en pause lui-même. */
+(function(){
+  var medias=[],ctxs=[];
+  function retient(liste,x){if(liste.indexOf(x)<0)liste.push(x);}
+  try{
+    var MP=HTMLMediaElement.prototype,joue=MP.play;
+    MP.play=function(){retient(medias,this);return joue.apply(this,arguments);};
+  }catch(e){}
+  try{
+    var AC=window.BaseAudioContext||window.AudioContext||window.webkitAudioContext;
+    if(AC&&AC.prototype){
+      ['createBufferSource','createOscillator','createMediaElementSource'].forEach(function(n){
+        var f=AC.prototype[n];if(!f)return;
+        AC.prototype[n]=function(){retient(ctxs,this);return f.apply(this,arguments);};
+      });
+    }
+  }catch(e){}
+  function silence(){
+    medias.forEach(function(m){try{if(!m.paused)m.pause();}catch(e){}});
+    ctxs.forEach(function(c){try{if(c.state==='running')c.suspend();}catch(e){}});
+    try{if(window.speechSynthesis)speechSynthesis.cancel();}catch(e){}
+  }
+  window._silenceTout=silence;
+  var narrationEnPauseParNous=null;
+  function cache(){
+    try{
+      var n=window._boyNActif;
+      if(n&&n.pause&&n.enPause&&!n.enPause()){n.pause();narrationEnPauseParNous=n;}
+    }catch(e){}
+    try{if(typeof stopSpeech==='function')stopSpeech();}catch(e){}
+    silence();
+  }
+  function revient(){
+    ctxs.forEach(function(c){try{if(c.state==='suspended')c.resume();}catch(e){}});
+    var n=narrationEnPauseParNous;narrationEnPauseParNous=null;
+    try{if(n&&n===window._boyNActif&&n.reprend)n.reprend();}catch(e){}
+  }
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden)cache();else revient();
+  });
+  window.addEventListener('pagehide',cache);
+})();
+</script>
+
 <title>لنتعلم العربية</title>
 <!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
@@ -2857,8 +2910,14 @@ body.dans-un-monde #ca .child-wrap{
   100%{transform:translate3d(5vw,55vh,0) rotate(420deg);opacity:0}
 }
 /* Sur la carte, les îles 3D flottent doucement. */
-.sess-island .isle-img[src*="bulle-"]{animation:ile3dFlotte 5.5s ease-in-out infinite;
-  filter:drop-shadow(0 10px 16px rgba(120,70,160,.28))}
+.sess-island .isle-img[src*="bulle-"]{animation:ile3dFlotte 5.5s ease-in-out infinite}
+/* v3.6.8 — Le client voyait « un fond presque transparent » derrière chaque
+   monde et son nom : c'étaient l'ombre floue de la bulle (16 px) et celle du
+   nom (8 px, noire). Plus d'ombre sous la bulle ; le nom garde un contour
+   serré, juste ce qu'il faut pour se lire. */
+.sess-island:has(.isle-img[src*="bulle-"]){overflow:visible}
+.sess-island:has(.isle-img[src*="bulle-"]) .isle-name{
+  text-shadow:0 1px 2px rgba(90,30,90,.9),0 0 1px rgba(90,30,90,.9);line-height:1.2}
 .sess-island:nth-child(2n) .isle-img[src*="bulle-"]{animation-delay:-2.6s}
 .sess-island.locked-isle .isle-img[src*="bulle-"]{animation:none}
 @keyframes ile3dFlotte{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -6929,6 +6988,22 @@ body .mj-mot .mj-mot-tx{flex:1 1 0;min-width:0;width:100%}
 body:not(.age-petit) .child-choix .child-card{justify-content:center!important;gap:clamp(14px,6vw,48px)!important}
 body:not(.age-petit) .child-choix .child-emoji{font-size:clamp(4rem,20vw,6.5rem)!important}
 body:not(.age-petit) .child-choix .child-glyphe{font-size:clamp(5rem,26vw,8rem)!important;line-height:1.25!important}
+/* ── v3.6.8 — LE CADRE DU CHOIX DE LA LETTRE TIENT DANS L'ÉCRAN ──
+   Le client : « monde de la couronne, sur tablette : le cadre (alif, wāw,
+   yā et le bouton retour à la carte) dépasse l'écran ; il doit toujours
+   s'adapter à l'appareil ». Les tailles suivaient la LARGEUR seule (jusqu'à
+   8rem) : sur une tablette debout, trois cartes de 267 px plus le bouton
+   faisaient 1 030 px pour 1 024. `_ajusteChoix` pose `data-fit` et `--fit`
+   quand ça dépasse, et tout se resserre jusqu'à tenir. */
+body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-emoji{font-size:calc(clamp(4rem,20vw,6.5rem) * var(--fit,1))!important}
+body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-glyphe{font-size:calc(clamp(5rem,26vw,8rem) * var(--fit,1))!important}
+body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-card{min-height:0!important;
+  padding-top:calc(22px * var(--fit,1))!important;padding-bottom:calc(22px * var(--fit,1))!important}
+@media (orientation:landscape) and (max-height:560px){
+  body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-emoji{font-size:calc(min(4.4rem,17vh) * var(--fit,1))!important}
+  body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-glyphe{font-size:calc(min(5.6rem,21vh) * var(--fit,1))!important}
+}
+
 @media (orientation:landscape) and (max-height:560px){
   body:not(.age-petit) .child-choix .child-emoji{font-size:min(4.4rem,17vh)!important}
   body:not(.age-petit) .child-choix .child-glyphe{font-size:min(5.6rem,21vh)!important}
@@ -9110,6 +9185,8 @@ function showS(id,fwd,noHistory){
 }
 window.addEventListener('popstate',function(e){
   if(window._ignorePop){window._ignorePop=false;return;}
+  /* v3.6.8 — changer de page coupe la voix, retour du téléphone compris. */
+  try{if(window._silenceTout)_silenceTout();}catch(_e){}
   /* v3.2.2 : sur le menu, le premier retour du téléphone ne fait pas sortir. */
   if(window._gardeMenu&&_gardeMenu(e))return;
   /* v3.2.9 — DANS une rubrique, le retour du téléphone fait EXACTEMENT ce que
@@ -12207,6 +12284,14 @@ function _volCarte(o){
         vise=ca.scrollTop+((hautE+basE)/2-cr.top)-ca.clientHeight/2;
       }
     }
+    /* v3.6.8 — « sur tablette, l'image vibre beaucoup pendant le vol ». La
+       caméra suivait aussi le balancement et la rotation de la licorne, au
+       pixel, trente fois par seconde. Elle ignore désormais les écarts de
+       moins de 8 px et ne rattrape qu'un quart de l'écart à chaque appel :
+       elle glisse au lieu de trembler. */
+    var ecart=vise-ca.scrollTop;
+    if(Math.abs(ecart)<8)return;
+    vise=ca.scrollTop+ecart*0.25;
     ca.scrollTop=Math.max(0,Math.min(ca.scrollHeight-ca.clientHeight,vise));
   }
   /* Le point de repos de l'etape i : son sommet quand l'habillage le
@@ -13530,6 +13615,7 @@ var islandDefs=_ilesDefs();
           var _nm=el.querySelector('.isle-name');
           if(_nm){_nm.style.top=Math.round(IWmob*0.86)+'px';_nm.style.bottom='auto';}
           el.style.marginBottom='34px';
+          el.style.overflow='visible';
         }
       });
       if(bossElMob){bossElMob.style.alignSelf='center';bossElMob.style.zIndex='5';}
@@ -13544,7 +13630,8 @@ var islandDefs=_ilesDefs();
       /* Plus grande qu'avant : la fusee reste garee sur l'etape et
          l'enfant se tient devant elle — il faut la place pour les deux. */
       /* La fille suit la taille des mondes (112 px pour un monde de 187). */
-      var TQM=Math.max(112,Math.round(IWmob*0.6));
+      /* v3.6.8 — un peu plus petite, à la demande du client (≈ 15 %). */
+      var TQM=Math.max(95,Math.round(IWmob*0.51));
       var eqMob=_equipage(TQM,!_montureGagnee);
       var charElMob=eqMob.el;
       globeDiv.appendChild(charElMob);
@@ -13867,7 +13954,7 @@ var islandDefs=_ilesDefs();
          fusee y devenait enorme. On garde donc le meme rapport — un peu moins
          de la moitie d'un monde — et tous les reglages qui en decoulent : le
          point d'ancrage, l'assise, l'epaisseur de la trainee. */
-      var TEQ=Math.max(64,Math.round(hMonde*0.48));
+      var TEQ=Math.max(56,Math.round(hMonde*0.41));   /* v3.6.8 : 0,48 → 0,41 */
       var eq=_equipage(TEQ,!_montureGagnee);
       var charEl=eq.el;
       globeDiv.appendChild(charEl);
@@ -14815,11 +14902,51 @@ function _boyLetterPicker(ca,session){
   wrap.appendChild(retour);
 
   ca.appendChild(wrap);
+  _ajusteChoix(wrap,ca);
+  /* Les polices arrivent après coup : on remesure une fois chargées. */
+  setTimeout(function(){_ajusteChoix(wrap,ca);},400);
+  /* Les dessins des mots arrivent après coup et grandissent les cartes. */
+  Array.prototype.forEach.call(wrap.querySelectorAll('img'),function(im){
+    if(!im.complete)im.addEventListener('load',function(){_ajusteChoix(wrap,ca);});
+  });
+  try{document.fonts.ready.then(function(){_ajusteChoix(wrap,ca);});}catch(e){}
+  if(!window._ajusteChoixResize){
+    window._ajusteChoixResize=true;
+    window.addEventListener('resize',function(){
+      var w=document.querySelector('.child-wrap.child-choix'),c=document.getElementById('ca');
+      if(w)_ajusteChoix(w,c);
+    });
+  }
+}
+
+/* v3.6.8 — Resserre le choix de la lettre jusqu'à ce qu'il tienne dans la
+   hauteur visible, bouton « Retour à la carte » compris. */
+function _ajusteChoix(w,ca){
+  if(!w||!w.isConnected||!ca)return;
+  w.removeAttribute('data-fit');w.style.removeProperty('--fit');
+  function dispo(){
+    var cr=ca.getBoundingClientRect(),wr=w.getBoundingClientRect();
+    return cr.bottom-(wr.top+ca.scrollTop)-12;
+  }
+  /* Hauteurs VUES à l'écran, des deux côtés : sur tablette, #root porte un
+     zoom (1,38 mesuré) — offsetHeight ne le compte pas, getBoundingClientRect
+     si. Mélanger les deux faussait tout. */
+  function haut(){return w.getBoundingClientRect().height;}
+  var d=dispo();
+  if(d<200||haut()<=d)return;
+  w.setAttribute('data-fit','1');
+  var f=1;
+  for(var k=0;k<6;k++){
+    var h=haut();
+    if(h<=d)break;
+    f=Math.max(0.35,f*(d/h)*0.97);
+    w.style.setProperty('--fit',f.toFixed(3));
+  }
 }
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.7';
+var _VERSION_REPLI='v3.6.8';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
