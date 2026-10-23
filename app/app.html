@@ -2839,6 +2839,13 @@ body.dans-un-monde.profile-girl,#root.dans-un-monde.profile-girl,
 body.dans-un-monde,#root.dans-un-monde{
   background:transparent !important;
 }
+/* v3.7.9 — le garçon aussi : son espace (`fond-espace`, trois classes en
+   !important) passait devant le décor de la planète. */
+body.dans-un-monde.profile-boy.fond-espace,#root.dans-un-monde.profile-boy.fond-espace,
+body.dans-un-monde.profile-boy #ca,body.dans-un-monde #root.profile-boy #ca{
+  background:transparent !important;
+}
+body.dans-un-monde.profile-boy #ca .child-wrap{box-shadow:0 10px 30px rgba(10,30,80,.25)}
 
 /* Dans un monde, le fond pastel de la carte disparaît sous le paysage :
    c'est le paysage qui EST le fond d'écran. Et l'écran du choix de la
@@ -2915,7 +2922,8 @@ body.dans-un-monde #ca .child-wrap{
    monde et son nom : c'étaient l'ombre floue de la bulle (16 px) et celle du
    nom (8 px, noire). Plus d'ombre sous la bulle ; le nom garde un contour
    serré, juste ce qu'il faut pour se lire. */
-.sess-island:has(.isle-img[src*="bulle-"]){overflow:visible}
+.sess-island:has(.isle-img[src*="bulle-"]),.sess-island:has(.isle-img[src*="astre-"]){overflow:visible}
+.sess-island:has(.isle-img[src*="astre-"]) .isle-name,
 .sess-island:has(.isle-img[src*="bulle-"]) .isle-name{
   text-shadow:0 1px 2px rgba(90,30,90,.9),0 0 1px rgba(90,30,90,.9);line-height:1.2}
 .sess-island:nth-child(2n) .isle-img[src*="bulle-"]{animation-delay:-2.6s}
@@ -13963,10 +13971,12 @@ var islandDefs=_ilesDefs();
            milieu, et le nom, collé au bas de la boîte, tombait 30 px sous
            elle. Boîte carrée, et le nom posé juste sous la bulle. */
         var _im=el.querySelector('.isle-img');
-        if(_im&&/bulle-/.test(_im.getAttribute('src')||'')){
+        /* v3.7.9 — idem pour les planètes 3D du garçon (`astre-`). */
+        if(_im&&/bulle-|astre-/.test(_im.getAttribute('src')||'')){
           _im.style.height=IWmob+'px';
           var _nm=el.querySelector('.isle-name');
-          if(_nm){_nm.style.top=Math.round(IWmob*0.86)+'px';_nm.style.bottom='auto';}
+          var _ast=/astre-/.test(_im.getAttribute('src')||'');
+          if(_nm){_nm.style.top=Math.round(IWmob*(_ast?0.82:0.86))+'px';_nm.style.bottom='auto';}
           el.style.marginBottom='34px';
           el.style.overflow='visible';
         }
@@ -15330,7 +15340,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.8';
+var _VERSION_REPLI='v3.7.9';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
@@ -18373,12 +18383,14 @@ var _HABILLAGES={
     /* Fabriquées par `outils/planetes.js`. Pour les remplacer par de vraies
        illustrations, déposer les fichiers sous le même nom et changer
        l'extension ici — rien d'autre à toucher. */
-    images:['/images/planete-soleil.svg','/images/planete-mercure.svg',
-            '/images/planete-venus.svg','/images/planete-terre.svg',
-            '/images/planete-lune.svg','/images/planete-mars.svg',
-            '/images/planete-jupiter.svg','/images/planete-saturne.svg',
-            '/images/planete-uranus.svg','/images/planete-neptune.svg',
-            '/images/planete-pluton.svg','/images/planete-comete.svg'],
+    /* v3.7.9 — planètes 3D réalistes (Canva), détourées par
+       `python outils/vol-embarque.py v379` (`astre-<slug>.webp`, 600 px). */
+    images:['/images/astre-soleil.webp','/images/astre-mercure.webp',
+            '/images/astre-venus.webp','/images/astre-terre.webp',
+            '/images/astre-lune.webp','/images/astre-mars.webp',
+            '/images/astre-jupiter.webp','/images/astre-saturne.webp',
+            '/images/astre-uranus.webp','/images/astre-neptune.webp',
+            '/images/astre-pluton.webp','/images/astre-comete.webp'],
     /* Huit planètes ne suffisent pas pour douze étapes : la Lune et le
        Soleil complètent, comme prévu, puis Pluton et une comète. */
     etapes:['Le Soleil','Mercure','Vénus','La Terre','La Lune','Mars',
@@ -18397,6 +18409,9 @@ var _HABILLAGES={
        bien moins de place qu'une ile peinte en paysage. Le client la veut
        une fois et demie plus grande. */
     decor:1.5,
+    /* v3.7.9 — chaque planète a son décor, comme les mondes de la fille
+       (`monde3d-<slug>-large/haut.webp`, Canva). */
+    scenesMonde:true,
     /* Le voyage se fait EN FUSEE, et l'enfant descend seul sur la planete :
        ce sont deux dessins differents, pas une mascotte unique. Les deux
        viennent du client, detoures de leur fond vert. */
@@ -18418,9 +18433,11 @@ var _HABILLAGES={
     aligne:true,
     /* Le sommet de chaque astre, en fraction de la hauteur de son image.
        Sorti par `node outils/planetes.js`, qui connait les rayons. */
-    sommets:{'soleil':0.18,'mercure':0.24,'venus':0.21,'terre':0.195,'lune':0.25,
-             'mars':0.225,'jupiter':0.17,'saturne':0.23,'uranus':0.22,
-             'neptune':0.215,'pluton':0.265,'comete':0.345},
+    /* v3.7.9 — mesurés sur les `astre-*.webp` (Uranus : le haut de la
+       sphère, pas de l'anneau ; comète : le haut du noyau). */
+    sommets:{'soleil':0.21,'mercure':0.198,'venus':0.198,'terre':0.198,'lune':0.198,
+             'mars':0.198,'jupiter':0.198,'saturne':0.308,'uranus':0.245,
+             'neptune':0.198,'pluton':0.198,'comete':0.40},
     /* Sur la Terre, il y a de l'air : l'enfant y descend SANS combinaison.
        Cle = rang de l'etape. */
     pilotesEtape:{3:'/images/enfant-garcon.png'},
@@ -18723,7 +18740,7 @@ function _habDuProfil(){
    est pose au clic sur la carte : c'est lui qui dit dans quel monde on est.
    Sans habillage qui les fournisse (le garcon), il n'y a rien a poser. */
 /* v3.6.5 — Les mondes qui ont leur décor 3D (`monde3d-<slug>-large/haut.webp`). */
-var _MONDES_3D={'licornes':1,'couronne':1,'nuages':1,'fleurs':1,'coeurs':1,'pingouins':1,'papillons':1,'tortue':1,'chats-chiens':1,'ours':1,'sucreries':1,'chateau':1};
+var _MONDES_3D={'soleil':1,'mercure':1,'venus':1,'terre':1,'lune':1,'mars':1,'jupiter':1,'saturne':1,'uranus':1,'neptune':1,'pluton':1,'comete':1,'licornes':1,'couronne':1,'nuages':1,'fleurs':1,'coeurs':1,'pingouins':1,'papillons':1,'tortue':1,'chats-chiens':1,'ours':1,'sucreries':1,'chateau':1};
 /* Ce qui flotte dans l'air de chaque monde : des étincelles par défaut. */
 var _MONDES_3D_AIR={'coeurs':'coeur','pingouins':'neige','fleurs':'petale','papillons':'petale',
   'nuages':'neige','sucreries':'coeur'};
@@ -32068,7 +32085,7 @@ function markPracticeToday() {
     if(/\.svg(\?|$)/i.test(img.getAttribute('src')||''))return;
     /* v3.6.6 — Les îles 3D de la fille sont déjà transparentes, et leur
        bord blanc brillant serait rongé par le remplissage ci-dessous. */
-    if(/bulle-/.test(img.getAttribute('src')||''))return;
+    if(/bulle-|astre-/.test(img.getAttribute('src')||''))return;
     var S=300,cv=document.createElement('canvas');
     cv.width=S;cv.height=S;
     var ctx=cv.getContext('2d');

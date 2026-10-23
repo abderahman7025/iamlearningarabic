@@ -122,3 +122,88 @@ def cockpit():
 if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'v378':
     animaux()
     cockpit()
+
+
+# ── v3.7.9 — planètes 3D (carte du garçon) et décors des planètes ─────────
+PLANETES = ['soleil', 'mercure', 'venus', 'terre', 'lune', 'mars', 'jupiter',
+            'saturne', 'uranus', 'neptune', 'pluton', 'comete']
+
+
+def planetes():
+    """Détoure chaque astre, le pose dans un carré de 600 px (diamètre 62 %
+    du carré, 92 % de large pour les astres à anneaux ou à queue) et
+    mesure son sommet (première ligne d'encre dense) pour `_HAB.sommets`."""
+    S = 600
+    som = {}
+    for n in PLANETES:
+        im = D.detoure(Image.open(os.path.join(SRC2, 'planetes', n + '.png')))
+        if n in ('saturne', 'uranus'):
+            # le blanc enfermé entre l'anneau et la planète est du FOND
+            t = np.asarray(im).copy()
+            blanc = t[:, :, :3].min(axis=2) >= 244
+            t[:, :, 3] = np.where(blanc, 0, t[:, :, 3])
+            im = Image.fromarray(t, 'RGBA')
+        im = rogne(im)
+        if n == 'comete':
+            comete(im, S, som)
+            continue
+        w, h = im.size
+        large = n in ('saturne', 'uranus', 'comete') or w > h * 1.15
+        k = (S * 0.92 / w) if large else (S * 0.62 / max(w, h))
+        if h * k > S * 0.92:
+            k = S * 0.92 / h
+        im = im.resize((max(1, int(w * k)), max(1, int(h * k))), Image.LANCZOS)
+        fond = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+        fond.paste(im, ((S - im.size[0]) // 2, (S - im.size[1]) // 2), im)
+        a = np.asarray(fond.getchannel('A')) >= 150
+        larg = a.sum(axis=1)
+        seuil = 0.22 * larg.max()
+        top = int(np.argmax(larg >= seuil))
+        som[n] = round(top / S, 3)
+        fond.save(os.path.join(DST, 'astre-' + n + '.webp'), 'WEBP', quality=88, method=6)
+    print('sommets', som)
+
+
+def comete(im, S, som):
+    """La fusée se pose au CENTRE de l'image : on y met le NOYAU, et la queue
+    part vers le haut à droite en s'effaçant au bord du carré."""
+    t = np.asarray(im).astype(np.float32)
+    al = t[:, :, 3] >= 150
+    ys, xs = np.nonzero(al)
+    h, w = al.shape
+    # le noyau : le coin bas-gauche de l'encre
+    i = np.argmax(ys - xs)
+    r = 0.06 * np.hypot(w, h)
+    cx, cy = xs[i] + r * 0.75, ys[i] - r * 0.75
+    k = (S * 0.30) / (2 * r)          # noyau = 30 % du carré
+    im2 = im.resize((max(1, int(w * k)), max(1, int(h * k))), Image.LANCZOS)
+    fond = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    ox, oy = int(S / 2 - cx * k), int(S * 0.56 - cy * k)
+    fond.paste(im2, (ox, oy), im2)
+    a = np.asarray(fond).copy().astype(np.float32)
+    yy, xx = np.mgrid[0:S, 0:S]
+    d = np.hypot(xx - S / 2, yy - S * 0.56)
+    fondu = np.clip((S * 0.48 - d) / (S * 0.16), 0, 1)
+    a[:, :, 3] *= np.maximum(fondu, (d < S * 0.2))
+    fond = Image.fromarray(a.astype(np.uint8), 'RGBA')
+    som['comete'] = round((S * 0.56 - r * k) / S, 3)
+    fond.save(os.path.join(DST, 'astre-comete.webp'), 'WEBP', quality=88, method=6)
+
+
+def decors():
+    for n in PLANETES:
+        for f in ('large', 'haut'):
+            im = Image.open(os.path.join(SRC2, 'decors', n + '-' + f + '.png')).convert('RGB')
+            lim = 1920
+            if max(im.size) > lim:
+                k = lim / max(im.size)
+                im = im.resize((int(im.size[0] * k), int(im.size[1] * k)), Image.LANCZOS)
+            p = os.path.join(DST, 'monde3d-' + n + '-' + f + '.webp')
+            im.save(p, 'WEBP', quality=80, method=6)
+    print('decors ok')
+
+
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] == 'v379':
+    planetes()
+    if len(sys.argv) < 3:
+        decors()

@@ -106,6 +106,26 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.9 — 23 octobre 2026 : planètes 3D et leurs décors (garçon)
+
+- **12 planètes 3D réalistes** (Canva) : `astre-<slug>.webp`, 600 px,
+  détourées et cadrées par `python outils/vol-embarque.py v379` (diamètre
+  62 % ; Saturne, Uranus 92 % de large ; le blanc enfermé dans les anneaux
+  vidé ; la comète recadrée NOYAU au centre, queue en fondu). `sommets`
+  remesurés (Uranus 0,245 = haut de la sphère, comète 0,40 = haut du noyau
+  — la mesure automatique prenait l'anneau / la queue). Les SVG
+  `planete-*.svg` ne servent plus. `rmBg` ignore `astre-`. Nom posé à 82 %
+  sous la planète (comme les `bulle-` de la fille).
+- **12 décors de planètes** (Canva, paysage + portrait) :
+  `monde3d-<slug>-large/haut.webp` (sources `outils/sources-canva/decors`).
+  `garcon.scenesMonde:true`, slugs ajoutés à `_MONDES_3D` ; l'espace du
+  garçon (`fond-espace`, !important) est rendu transparent dans un monde.
+- **Canva, pièges** : demander « Génère une NOUVELLE image … portrait » —
+  « le même décor au format portrait » ouvre un DESIGN (panneau latéral) où
+  la saisie suivante tombe dans une zone de texte du design, l'IA y ajoute
+  parfois un titre (« MERCURY »), et le téléchargement propose PDF par
+  défaut. Une conversation par planète.
+
 ## v3.7.8 — 23 octobre 2026 : décollage court, cockpit, animaux 3D
 
 - **Décollage vu de loin, borné** (le client) : on ne la voit pas aller
