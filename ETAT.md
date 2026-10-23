@@ -106,6 +106,31 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.1 — 23 octobre 2026 : le vol embarqué (licorne et fusée)
+
+- **Déroulé** (`volEmbarque` dans `_volCarte`, activé par `embarque:true` sur
+  les deux cartes) : clic sur un monde → la carte zoome ×2,6 sur l'équipage
+  (transform du globe, 0,95 s) pendant qu'il s'élève → à 0,7 s la scène
+  plein écran `_volEmbarqueScene` couvre tout (3 s) ; dessous, l'équipage est
+  posé sur le monde d'arrivée, la caméra l'y rejoint, le zoom est retiré →
+  la scène s'efface et `arriver` fait l'atterrissage habituel (rebond,
+  porte de lumière). Toujours ~4,6 s, voisin ou lointain. Mesuré : cours
+  ouvert à 9 s (fille) / 8,5 s (garçon), aucun zoom resté sur la carte.
+- **Scène fille** : ciel pastel, nuages qui filent du point de fuite vers les
+  bords, monde d'arrivée (image `.isle-img` de la carte, via `carteEtape`)
+  qui grossit ; en bas l'arrière de la tête (`vol-licorne-dos.webp`) et les
+  deux ailes qui battent (`vol-aile.webp`, `vol-aile-d.webp` = la même
+  retournée : un `scale:-1` CSS déplaçait le pivot). Tailles par `--W`,
+  réglage à part en paysage (la corne touchait le monde).
+- **Scène garçon** : espace, étoiles qui filent, planète d'arrivée dans le
+  hublot (`vol-hublot.webp`, vitre vidée), paroi de la fusée autour.
+- **Images** : générées sur le Canva du client (IA Canva, licorne actuelle
+  jointe comme modèle), sources dans `outils/sources-vol/`, détourées par
+  `python outils/vol-embarque.py` (seuil serré pour l'aile, presque aussi
+  blanche que le fond).
+- **Test** : la capture d'écran du navigateur intégré sort parfois zoomée
+  ×2 sur une scène fixe ; mesurer, recharger, recapturer.
+
 ## v3.7.0 — 23 octobre 2026 : vol sans vibration, choix couché, âge en images
 
 - **Caméra du vol (fille et garçon)** : elle visait les IMAGES de

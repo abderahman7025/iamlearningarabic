@@ -6372,6 +6372,72 @@ body.age-petit .carte-sentier .bord{stroke:#c9a86a;stroke-width:8.6;opacity:.8}
 #root.profile-boy .km.km-lu{color:#1d4ed8;-webkit-text-fill-color:#1d4ed8}
 #root.profile-boy .km.km-ici{color:#0ea5e9;-webkit-text-fill-color:#0ea5e9;text-shadow:0 0 12px rgba(14,165,233,.4)}
 @media (prefers-reduced-motion:reduce){.lit-en-cours:not(.lit-bloc){transform:none}}
+
+/* ══ v3.7.1 — VOL EMBARQUÉ (voir `_volEmbarqueScene`) ══ */
+.vol-emb{position:fixed;inset:0;z-index:99990;overflow:hidden;pointer-events:all;
+  opacity:0;transition:opacity .42s ease;contain:strict}
+.vol-emb.ve-on{opacity:1}
+.vol-emb.ve-sort{opacity:0;transition:opacity .48s ease}
+.vol-emb .ve-ciel{position:absolute;inset:0}
+.vol-emb-licorne .ve-ciel{background:linear-gradient(180deg,#9fc8ff 0%,#c9b8ff 38%,#ffd3ea 70%,#fff0f6 100%)}
+.vol-emb-fusee .ve-ciel{background:radial-gradient(circle at 50% 42%,#1d2f6b 0%,#0b1233 55%,#04061a 100%)}
+/* Le point de fuite : le monde d'arrivée, qui grossit tout le vol. */
+.vol-emb .ve-loin{position:absolute;left:50%;top:40%;width:0;height:0}
+.vol-emb-fusee .ve-loin{top:50%}
+.vol-emb .ve-monde{position:absolute;left:0;top:0;width:min(70vw,70vh);height:auto;
+  translate:-50% -50%;scale:.12;opacity:.85;
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.55));will-change:scale}
+.vol-emb.ve-on .ve-monde{animation:veApproche 3.4s cubic-bezier(.45,0,.9,.6) forwards}
+@keyframes veApproche{from{scale:.12;opacity:.7}to{scale:1.05;opacity:1}}
+/* Ce qui file : nuages (fille), étoiles (garçon). */
+.vol-emb .ve-defile{position:absolute;left:50%;top:40%;width:0;height:0}
+.vol-emb-fusee .ve-defile{top:50%}
+.vol-emb .ve-defile i{position:absolute;left:0;top:0;display:block;will-change:transform,opacity}
+.vol-emb-licorne .ve-defile i{width:30vmax;height:14vmax;margin:-7vmax 0 0 -15vmax;border-radius:50%;
+  background:radial-gradient(ellipse at 50% 60%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.75) 35%,rgba(255,255,255,0) 70%);
+  animation:veNuage calc(2.4s * var(--t,1)) linear infinite}
+@keyframes veNuage{0%{transform:translate(0,0) scale(.05);opacity:0}15%{opacity:.9}
+  100%{transform:translate(var(--dx),var(--dy)) scale(1.4);opacity:.95}}
+.vol-emb-fusee .ve-defile i{width:.5vmax;height:.5vmax;margin:-.25vmax 0 0 -.25vmax;border-radius:50%;background:#fff;
+  box-shadow:0 0 6px 2px rgba(180,210,255,.8);animation:veEtoile 1.2s cubic-bezier(.6,0,1,1) infinite}
+@keyframes veEtoile{0%{transform:translate(0,0) scale(.2);opacity:0}20%{opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(1.6);opacity:1}}
+/* La licorne vue de dos, et ses ailes. --W : la largeur de la tête ; on
+   en montre le haut (corne, oreilles, haut de la crinière), le reste est
+   sous le bord. Les ailes partent de derrière la crinière. */
+.vol-emb .ve-monture{--W:min(58vh,72vw);position:absolute;left:50%;bottom:0;width:0;height:0;
+  animation:veBerce .62s ease-in-out infinite alternate}
+@keyframes veBerce{from{translate:0 0}to{translate:0 -1.4vh}}
+.vol-emb .ve-tete{position:absolute;left:0;bottom:calc(var(--W) * -.5);
+  width:var(--W);height:auto;translate:-50% 0;
+  filter:drop-shadow(0 -4px 14px rgba(120,60,160,.25))}
+.vol-emb .ve-aile{position:absolute;bottom:calc(var(--W) * .3);width:calc(var(--W) * .78);height:auto;
+  animation:veBat .62s ease-in-out infinite alternate}
+/* L'aile gauche : sa base (bord droit de l'image) est contre la licorne. */
+.vol-emb .ve-aile-g{right:calc(var(--W) * .14);transform-origin:100% 60%}
+.vol-emb .ve-aile-d{left:calc(var(--W) * .14);transform-origin:0% 60%}
+@keyframes veBat{from{rotate:-18deg}to{rotate:12deg}}
+.vol-emb .ve-aile-d{animation-name:veBatD}
+@keyframes veBatD{from{rotate:18deg}to{rotate:-12deg}}
+/* Couché, la hauteur manque : la tête plus petite et plus enfoncée, pour
+   laisser le ciel et le monde d'arrivée au-dessus. */
+@media (orientation:landscape){
+  .vol-emb .ve-monture{--W:min(50vh,40vw)}
+  .vol-emb .ve-tete{bottom:calc(var(--W) * -.78)}
+  .vol-emb .ve-aile{bottom:calc(var(--W) * .14)}
+  .vol-emb-licorne .ve-loin,.vol-emb-licorne .ve-defile{top:36%}
+  .vol-emb .ve-monde{width:min(60vw,55vh)}
+}
+/* Le hublot : la paroi de la fusée tout autour, percée d'un rond. */
+.vol-emb .ve-hublot{position:absolute;left:50%;top:50%;width:min(96vw,96vh);height:auto;translate:-50% -50%;
+  animation:veHublot 2.6s ease-in-out infinite alternate}
+@keyframes veHublot{from{rotate:-1.2deg}to{rotate:1.2deg}}
+.vol-emb .ve-paroi{position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 50%,transparent 0,transparent calc(min(96vw,96vh) * .40),
+    #2a3b63 calc(min(96vw,96vh) * .40 + 1px),#1a2645 calc(min(96vw,96vh) * .75),#0f1730 100%)}
+@media (prefers-reduced-motion:reduce){
+  .vol-emb .ve-aile,.vol-emb .ve-monture,.vol-emb .ve-hublot{animation:none}
+}
 </style>
 <script>
 (function(){
@@ -11625,6 +11691,66 @@ function _finToboggan(carte,defaut){
 /* Vrai quand on vient de descendre dans un monde par la porte de lumière :
    au retour sur la carte, l'enfant en ressort au lieu d'apparaître. */
 var _porteRetour=false;
+/* ══ v3.7.1 — LA SCÈNE DU VOL EMBARQUÉ ══════════════════════════════════
+   Plein écran, posée sur <body> (hors du zoom de #root).
+   Fille : ciel pastel, nuages qui filent vers les bords, le monde d'arrivée
+   qui grossit à l'horizon ; en bas, l'arrière de la tête de la licorne
+   (corne, oreilles, crinière) et, de chaque côté, le bout d'une aile qui
+   bat. Garçon : l'espace vu par le hublot de la fusée, les étoiles qui
+   filent, la planète d'arrivée qui grossit dans la vitre.
+   Images : `outils/vol-embarque.py` (sources générées sur le Canva du
+   client). `o.quandCouvert` est appelé quand la scène cache tout,
+   `o.fini` quand elle s'est effacée. */
+var VOL_EMB_DUREE=3000;
+window._volEmbarqueScene=function(o){
+  var g=!!o.garcon;
+  var sc=document.createElement('div');
+  sc.className='vol-emb '+(g?'vol-emb-fusee':'vol-emb-licorne');
+  var h='<div class="ve-ciel"></div><div class="ve-loin">';
+  if(o.monde)h+='<img class="ve-monde" alt="" src="'+o.monde+'">';
+  h+='</div><div class="ve-defile"></div>';
+  if(g){
+    h+='<div class="ve-paroi"></div><img class="ve-hublot" alt="" src="/images/vol-hublot.webp">';
+  }else{
+    h+='<div class="ve-monture"><img class="ve-aile ve-aile-g" alt="" src="/images/vol-aile.webp">'
+      +'<img class="ve-aile ve-aile-d" alt="" src="/images/vol-aile-d.webp">'
+      +'<img class="ve-tete" alt="" src="/images/vol-licorne-dos.webp"></div>';
+  }
+  sc.innerHTML=h;
+  /* Ce qui file : des nuages pour la licorne, des étoiles pour la fusée.
+     Chacun part du point de fuite (le monde) et file vers un bord. */
+  var def=sc.querySelector('.ve-defile'),n=g?46:14;
+  for(var i=0;i<n;i++){
+    var p=document.createElement('i');
+    var a=Math.random()*Math.PI*2,r=60+Math.random()*40;
+    p.style.setProperty('--dx',(Math.cos(a)*r).toFixed(1)+'vmax');
+    p.style.setProperty('--dy',(Math.sin(a)*r*0.75).toFixed(1)+'vmax');
+    p.style.animationDelay=(-Math.random()*(g?1.2:2.4)).toFixed(2)+'s';
+    if(!g)p.style.setProperty('--t',(0.8+Math.random()*0.7).toFixed(2));
+    def.appendChild(p);
+  }
+  document.body.appendChild(sc);
+  window._volEmbarqueEnCours=sc;
+  var fini=false;
+  function termine(){
+    if(fini)return;fini=true;
+    if(sc.parentNode)sc.parentNode.removeChild(sc);
+    if(window._volEmbarqueEnCours===sc)window._volEmbarqueEnCours=null;
+    if(o.fini)o.fini();
+  }
+  sc._coupe=termine;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){sc.classList.add('ve-on');});});
+  setTimeout(function(){try{if(o.quandCouvert)o.quandCouvert();}catch(e){}},420);
+  setTimeout(function(){sc.classList.add('ve-sort');},420+VOL_EMB_DUREE);
+  setTimeout(termine,420+VOL_EMB_DUREE+480);
+};
+/* Quitter la page en plein vol : la scène ne reste pas en travers. */
+window.addEventListener('popstate',function(){
+  var sc=window._volEmbarqueEnCours;
+  if(sc&&sc.parentNode)sc.parentNode.removeChild(sc);
+  window._volEmbarqueEnCours=null;
+});
+
 function _volCarte(o){
   var segs=o.segments,el=o.charEl,globe=o.globe;
   var eq=o.equipage||{};
@@ -12564,6 +12690,55 @@ function _volCarte(o){
     else{cam.actif=false;cam.jusqua=now+1600;}
     camera(0);
   }
+  /* ── v3.7.1 — LE VOL EMBARQUÉ ──
+     Le client : « au décollage, vu de loin, puis un zoom pendant que la
+     licorne décolle ; pendant le vol, on voit le dos de la licorne et le
+     bout des ailes qui battent » — et la fusée vue par le hublot.
+     1. la carte zoome sur l'équipage (transform du globe, ~0,95 s) ;
+     2. la scène embarquée couvre l'écran (`_volEmbarqueScene`, ~3 s) ;
+        dessous, l'équipage est posé sur le monde d'arrivée et la caméra
+        l'y rejoint, le zoom est retiré ;
+     3. la scène s'efface, la carte réapparaît, et l'atterrissage habituel
+        (`arriver`, rebond de la licorne, porte de lumière) suit. */
+  function volEmbarque(cible,fini){
+    var but=ouSePoser(cible);
+    var carte=o.carteEtape&&o.carteEtape(cible);
+    var im=carte&&carte.querySelector('.isle-img');
+    var src=im?(im.currentSrc||im.src):'';
+    var ox=parseFloat(el.style.left||0)+el.offsetWidth/2;
+    var oy=parseFloat(el.style.top||0)+el.offsetHeight/2;
+    var gt=globe.style.transition,go=globe.style.transformOrigin,gtr=globe.style.transform;
+    globe.style.transformOrigin=ox+'px '+oy+'px';
+    globe.style.transition='transform .95s cubic-bezier(.55,0,.85,.35)';
+    void globe.offsetWidth;
+    globe.style.transform='scale(2.6)';
+    /* Elle s'élève un peu pendant le zoom : c'est le décollage. */
+    try{el.animate([{translate:'0 0'},{translate:'0 -18px'}],{duration:950,easing:'ease-in',fill:'forwards'});}catch(e){}
+    setTimeout(function(){
+      if(!el.isConnected){fini&&fini();return;}
+      window._volEmbarqueScene({
+        garcon:!!o.aligne, monde:src,
+        quandCouvert:function(){
+          globe.style.transition='none';
+          globe.style.transform=gtr||'';globe.style.transformOrigin=go||'';
+          try{el.getAnimations().forEach(function(a){if(a.effect&&a.effect.getKeyframes&&JSON.stringify(a.effect.getKeyframes()).indexOf('translate')>=0)a.cancel();});}catch(e){}
+          void globe.offsetWidth;globe.style.transition=gt||'';
+          idx=cible;
+          poser(but.x,but.y,null);
+          /* La caméra rejoint le monde d'arrivée sous la scène. */
+          try{var ca=document.getElementById('ca');
+            if(ca&&o.camera){var k=camK(ca),cr=ca.getBoundingClientRect();
+              var hautG=ca.scrollTop+(globe.getBoundingClientRect().top-cr.top)/k;
+              ca.scrollTop=Math.max(0,hautG+parseFloat(el.style.top)+el.offsetHeight/2-ca.clientHeight/2);
+              cam.pos=null;cam.vue=null;}}catch(e){}
+        },
+        fini:function(){
+          if(!el.isConnected){fini&&fini();return;}
+          arriver(fini,but);
+        }
+      });
+    },700);
+  }
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
     if(idx===cible){if(fini)fini();return;}
@@ -12594,6 +12769,8 @@ function _volCarte(o){
     contournera=descente&&!!o.aligne&&!o.ondule;
     if(_vers.x!==_de.x)sensVol=(_vers.x>_de.x)?1:-1;
     enVol();
+    /* v3.7.1 — LE VOL EMBARQUÉ : voir `volEmbarque`. */
+    if(o.embarque&&window._volEmbarqueScene){volEmbarque(cible,fini);return;}
     /* ── LE TRAJET EN DESCENDANT ──
        Un arc de cercle du cote ou l'on va, puis tout droit sur l'astre
        d'arrivee, puis on le contourne par l'autre cote. Rien n'est dessine
@@ -13771,7 +13948,7 @@ var islandDefs=_ilesDefs();
         var charIdxM=_ileDepart(islandDefs);
         _poserObjets(globeDiv,isleCardsMob,_objetsPris);
         _poserBetes(globeDiv,isleCardsMob);
-        var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
+        var volM=_volCarte({embarque:true,carteEtape:function(i){return isleCardsMob[i-1];},globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
           epaisseurTrainee:14,
           equipage:eqMob,decalageX:Math.round(TQM/2),decalageY:TQM,demiAssise:Math.round(TQM*0.279),depart:charIdxM,
           trainee:_HAB.trainee,duree:2100,dureeApproche:1000,aligne:_HAB.aligne,
@@ -14031,7 +14208,7 @@ var islandDefs=_ilesDefs();
       var charIdx=_ileDepart(islandDefs);
       _poserObjets(globeDiv,isleCards,_objetsPris);
       _poserBetes(globeDiv,isleCards);
-      var vol=_volCarte({globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
+      var vol=_volCarte({embarque:true,carteEtape:function(i){return isleCards[i-1];},globe:globeDiv,segments:segments,charEl:charEl,couronneGagnee:_couronneGagnee,
         epaisseurTrainee:Math.max(8,Math.round(18*TEQ/140)),
         equipage:eq,decalageX:Math.round(TEQ*0.5),decalageY:TEQ,
         demiAssise:Math.round(TEQ*0.279),depart:charIdx,
@@ -15045,7 +15222,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.0';
+var _VERSION_REPLI='v3.7.1';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
