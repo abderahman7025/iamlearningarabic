@@ -106,6 +106,40 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.0 — 23 octobre 2026 : vol sans vibration, choix couché, âge en images
+
+- **Caméra du vol (fille et garçon)** : elle visait les IMAGES de
+  l'équipage (qui se balancent et pivotent), poussée par deux horloges (vol à
+  60 i/s + minuteur à 30) avec une zone morte de 8 px : la vue tremblait.
+  Désormais une seule boucle `camTic` (requestAnimationFrame) vise le `top`
+  du personnage + un décalage mesuré une fois au départ (`cam.off`), lissée
+  deux fois (cible τ 70 ms, vue τ 110 ms), position gardée en flottant.
+  Mesuré tablette debout, vol 1→10 : fille entre 500 et 640 px d'une vue de
+  1 014, aucune inversion de la caméra. Avec τ 200/170 elle sortait par le
+  haut au décollage : ne pas remonter ces valeurs.
+- **Durées** : saut entre voisins 3,3 s → 2,1 s (fusée 3,7 → 2,3 ;
+  approche 1,4 → 1,0 s) ; long vol `1300 + 2 × distance` ms, borné 1,9–7 s
+  (avant : distance × 1,15, donc trop rapide sur les traversées).
+- **Atterrissage de la licorne** : petit rebond (monte de 10 %, redescend,
+  900 ms, Web Animations) dans `poserPilote` avant que la fille descende.
+- **Choix de la lettre couché (téléphone ET tablette)** : la règle « une
+  ligne » ne valait que sous 560 px de haut, la tablette couchée retombait
+  sur 2 + 1. Bloc `@media (orientation:landscape)` : grille de 3 colonnes,
+  cases qui suivent leur contenu, tête `1.25em` de `min(9rem,30vh)`, lettre
+  `min(10rem,32vh)`, × `--fit`. `_ajusteChoix` mesure maintenant le CONTENU
+  (somme des enfants) et non le cadre — couché, le cadre fait toute la
+  hauteur et « débordait » toujours, d'où un resserrement à 43 % — et cherche
+  le plus grand `--fit` par dichotomie. Mesuré : tablette couchée tête
+  212 px (3 sur une ligne, bouton à 706/768) ; téléphone couché tête 92 px ;
+  tablette debout inchangée (132 px, fit 0,80).
+- **Écran de l'âge** : images à la place des emoji — `mot-lion.png` (3-5 ans),
+  `licorne-seule-gd.webp` (fille) ou `fusee-garcon.webp` (garçon) ;
+  `licorne-fille.webp` est trop haute pour la case.
+- **Tester dans le navigateur intégré** : en plus de requestAnimationFrame,
+  les transitions d'écran y restent figées (`#ca` en matrix3d, `scale:0` sur
+  l'écran de l'âge) : les neutraliser par une feuille de style avant de
+  mesurer.
+
 ## v3.6.9 — 23 octobre 2026 : les têtes d'animaux sur le choix de la lettre
 
 Le client parlait du CHOIX DE LA LETTRE (6-11 ans, ex. monde de la couronne :

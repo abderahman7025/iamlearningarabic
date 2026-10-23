@@ -5618,6 +5618,9 @@ body.age-petit .tuile-jauge>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.5)}
 #s-age .prof-emoji{width:64px;height:64px;flex:none;border-radius:20px;display:grid;place-items:center;font-size:2.2rem!important;
   background:radial-gradient(circle at 30% 24%,var(--ag1) 0%,var(--ag2) 50%,var(--ag3) 100%);rotate:-6deg;
   box-shadow:0 5px 0 var(--ag3),0 10px 16px rgba(0,0,0,.3),inset 0 3px 4px rgba(255,255,255,.55);animation:gemFlotte 3.4s ease-in-out infinite}
+/* v3.7.0 — les images 3D de l'écran de l'âge (lion, licorne, fusée). */
+#s-age .prof-emoji .age-img{width:112%;height:112%;object-fit:contain;display:block;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));pointer-events:none;-webkit-user-drag:none}
 #s-age .prof-card.age-petit{--ag1:#d9f99d;--ag2:#65a30d;--ag3:#365314}
 #s-age .prof-card.age-grand{--ag1:#bfe3ff;--ag2:#2b8be8;--ag3:#0d3f8f}
 #s-age .prof-card .prof-arrow{color:#fff!important}
@@ -7008,6 +7011,32 @@ body:not(.age-petit) .child-wrap.child-choix[data-fit] .child-card{min-height:0!
   body:not(.age-petit) .child-choix .child-emoji{font-size:min(4.4rem,17vh)!important}
   body:not(.age-petit) .child-choix .child-glyphe{font-size:min(5.6rem,21vh)!important}
 }
+/* ── v3.7.0 — COUCHÉ, TÉLÉPHONE ET TABLETTE : TROIS CASES SUR UNE LIGNE,
+   ET LE DESSIN QUI REMPLIT LA CASE ──
+   Le client : « sur tablette, 2 cases en haut puis une plus bas, alors
+   qu'on doit avoir les 3 sur la même ligne comme sur le téléphone ; et
+   couché, les têtes d'animaux et la lettre sont toutes petites dans la
+   case ». La règle « une ligne » ne valait que sous 560 px de haut : la
+   tablette couchée (768) retombait sur l'ancienne mise en page à deux par
+   ligne. Elle vaut maintenant pour tout écran couché. Les cases ne sont
+   plus étirées à la hauteur de l'écran (c'est ce qui laissait le dessin
+   perdu au milieu) : elles suivent leur contenu, qu'on prend grand, et
+   `_ajusteChoix` le resserre juste assez pour tout faire tenir. */
+@media (orientation:landscape){
+  body:not(.age-petit) .child-wrap.child-choix{max-width:min(920px,96%)!important}
+  body:not(.age-petit) .child-choix .child-letters{display:grid!important;grid-auto-flow:column;
+    grid-auto-columns:minmax(0,1fr);grid-template-columns:none!important;gap:14px!important}
+  body:not(.age-petit) .child-wrap.child-choix .child-letters>.child-card{flex-direction:column!important;
+    justify-content:center!important;align-items:center!important;text-align:center!important;
+    gap:2px!important;width:100%!important;max-width:none!important;min-width:0!important;
+    flex:none!important;margin:0!important;min-height:0!important;
+    padding:calc(12px * var(--fit,1)) 8px!important}
+  body:not(.age-petit) .child-choix .child-letters>.child-card .child-emoji{
+    font-size:calc(min(9rem,30vh) * var(--fit,1))!important;line-height:1!important}
+  body:not(.age-petit) .child-choix .child-letters>.child-card .child-emoji img{height:1.25em!important;max-width:100%!important}
+  body:not(.age-petit) .child-choix .child-letters>.child-card .child-glyphe{
+    font-size:calc(min(10rem,32vh) * var(--fit,1))!important;line-height:1.2!important;min-width:0!important}
+}
 /* v3.5.9 — 6-11 ans debout : le hublot (la lettre, la voyelle) prend la
    largeur du cadre, le texte rapetisse (voir `remplitLaLargeur`). */
 @media (orientation:portrait){
@@ -8067,13 +8096,13 @@ body:not(.age-petit) .boy-panel .boy-hublot{min-height:0!important;min-width:0!i
   <div class="w-sub" id="w-sub-age">Choisis ton parcours</div>
   <div class="prof-cards">
     <div class="prof-card age-petit" onclick="chooseAge('petit')">
-      <div class="prof-emoji">🦁</div>
+      <div class="prof-emoji"><img class="age-img" src="/images/mot-lion.png" alt=""></div>
       <div class="prof-info"><div class="prof-name">3 – 5 ans</div>
         <div class="prof-desc">Le monde des animaux</div></div>
       <div class="prof-arrow">›</div>
     </div>
     <div class="prof-card age-grand" onclick="chooseAge('grand')">
-      <div class="prof-emoji" id="age-grand-emoji">🚀</div>
+      <div class="prof-emoji" id="age-grand-emoji"><img class="age-img" src="/images/fusee-garcon.webp" alt=""></div>
       <div class="prof-info"><div class="prof-name">6 – 11 ans</div>
         <div class="prof-desc" id="age-grand-desc">Le voyage dans l’espace</div></div>
       <div class="prof-arrow">›</div>
@@ -9966,7 +9995,8 @@ function chooseProfile(p){
      route par une question — l'age est alors celui qu'on avait garde. */
   if((p==='girl'||p==='boy')&&!window._skipProfileNav){
     var _mag=document.getElementById('age-grand-emoji');
-    if(_mag)_mag.textContent=(p==='girl')?'🦄':'🚀';
+    /* v3.7.0 — images 3D au lieu des emoji (le client). */
+    if(_mag)_mag.innerHTML='<img class="age-img" alt="" src="/images/'+((p==='girl')?'licorne-seule-gd.webp':'fusee-garcon.webp')+'">';
     var _mad=document.getElementById('age-grand-desc');
     if(_mad)_mad.textContent=(p==='girl')?'Le voyage des licornes':'Le voyage dans l\u2019espace';
     /* Le ciel du profil est deja allume — les licornes de la fille, l'espace
@@ -11746,7 +11776,8 @@ function _volCarte(o){
   function volDroit(de,vers,fini,duree){
     var vx=vers.x-de.x, vy=vers.y-de.y;
     var dist=Math.sqrt(vx*vx+vy*vy)||1;
-    var D=duree||Math.max(1600,Math.min(o.dureeTotale||9000,dist*1.15));
+    /* v3.7.0 — « les longs vols sont trop rapides, les sauts entre voisins trop lents » : une base fixe plus un temps qui suit la distance (≈ 2 s par 1 000 px), entre 1,9 et 7 s. */
+    var D=duree||Math.max(1900,Math.min(7000,1300+dist*2));
     /* La normale a la ligne, choisie pour pointer vers le HAUT de l'ecran :
        la premiere moitie du vol doit passer AU-DESSUS de la ligne, quel que
        soit le sens du deplacement. Sur un trajet vertical elle est
@@ -11978,6 +12009,15 @@ function _volCarte(o){
        s'arrete, et la fille descend. */
     var tientEnVol=!!o.aligne;
     leveLa(tientEnVol?0.34:0);
+    /* v3.7.0 — Le client, cette fois : « fais-la remonter à peine et
+       redescendre au-dessus du monde à son arrivée ». Un seul petit rebond
+       (10 % de sa hauteur), pas le va-et-vient d'avant. */
+    var rebond=0;
+    if(!tientEnVol&&eq.vaisseau&&eq.vaisseau.animate){
+      try{eq.vaisseau.animate([{transform:'translateY(0)',easing:'ease-out'},
+        {transform:'translateY(-10%)',offset:.42,easing:'ease-in-out'},
+        {transform:'translateY(0)'}],{duration:900});rebond=900;}catch(e){}
+    }
     /* Et elle cesse de flotter : le mouvement s'arrete ou elle se pose. */
     if(!tientEnVol&&eq.image)eq.image.style.animation='none';
     eq.pilote.style.transform='translateY('+(tientEnVol?-34:0)+'%) scale(.72)';
@@ -11995,7 +12035,7 @@ function _volCarte(o){
           porteLumiere(1,fini);
         },620);
       },780);
-    },tientEnVol?700:0);
+    },tientEnVol?700:rebond);
   }
   /* `part` : de 0 à 1, la part d'inclinaison qu'on applique. Elle vaut 0 au
      décollage et à l'atterrissage — le personnage y est droit — et 1 en
@@ -12259,40 +12299,66 @@ function _volCarte(o){
   /* La camera suit la fusee. Sans elle, un long voyage se joue hors de
      l'ecran : on clique, il ne se passe rien de visible, et le cours
      s'ouvre. On garde le vaisseau au milieu de la hauteur visible. */
+  /* ── v3.7.0 — LA CAMÉRA NE VIBRE PLUS ──
+     Le client : « l'écran vibre toujours pendant le vol, sur tablette et sur
+     téléphone, fille comme garçon ». Trois causes, toutes levées :
+     1. elle visait les IMAGES de l'équipage, qui se balancent et pivotent :
+        la cible tremblait avec elles. Elle vise maintenant la POSITION du
+        personnage sur son trajet (son `top`), plus un décalage mesuré une
+        fois au départ, au repos, pour garder l'image entière au centre ;
+     2. deux horloges la poussaient (le vol à 60 images/s, un minuteur à
+        30) et une zone morte de 8 px la faisait avancer par à-coups. Une
+        seule boucle, à chaque image, et pas de zone morte ;
+     3. `scrollTop` arrondi relu à chaque image perdait les fractions. On
+        garde notre propre position, en flottant.
+     Le mouvement est lissé deux fois (la cible, puis la vue) : la vue suit
+     en souplesse, avec un léger retard, au lieu de coller au pixel. */
+  var cam={actif:false,boucle:null,t:0,vue:null,pos:null,off:null,jusqua:0};
+  function camK(ca){var r=ca.getBoundingClientRect();return (ca.clientHeight&&r.height)?(r.height/ca.clientHeight):1;}
+  function camMesureDecalage(){
+    var ca=document.getElementById('ca');
+    if(!ca||!el||!el.isConnected)return 0;
+    var k=camK(ca),re=el.getBoundingClientRect(),hautE=Infinity,basE=-Infinity;
+    Array.prototype.forEach.call(el.querySelectorAll('img'),function(im){
+      if(parseFloat(getComputedStyle(im).opacity)<0.3)return;
+      var b=im.getBoundingClientRect();
+      if(b.height<2)return;
+      if(b.top<hautE)hautE=b.top;if(b.bottom>basE)basE=b.bottom;
+    });
+    if(!(basE>hautE)||!re.height)return 0;
+    return (((hautE+basE)/2)-(re.top+re.height/2))/k;
+  }
+  function camCible(ca){
+    if(!el||!el.isConnected||!globe)return null;
+    var k=camK(ca),cr=ca.getBoundingClientRect();
+    var hautG=ca.scrollTop+(globe.getBoundingClientRect().top-cr.top)/k;
+    var top=parseFloat(el.style.top);
+    if(isNaN(top))return null;
+    if(cam.off===null)cam.off=camMesureDecalage();
+    return hautG+top+el.offsetHeight/2+cam.off-ca.clientHeight/2;
+  }
+  function camTic(){
+    cam.boucle=null;
+    var ca=document.getElementById('ca');
+    if(!ca||!o.camera)return;
+    var now=(window.performance&&performance.now)?performance.now():Date.now();
+    var dt=cam.t?Math.min(64,Math.max(1,now-cam.t)):16;cam.t=now;
+    var v=camCible(ca);
+    if(v!==null)cam.vue=(cam.vue===null)?v:cam.vue+(v-cam.vue)*(1-Math.exp(-dt/70));
+    if(cam.vue!==null){
+      if(cam.pos===null)cam.pos=ca.scrollTop;
+      var max=Math.max(0,ca.scrollHeight-ca.clientHeight);
+      var but=Math.max(0,Math.min(max,cam.vue));
+      cam.pos+=(but-cam.pos)*(1-Math.exp(-dt/110));
+      ca.scrollTop=cam.pos;
+    }
+    var encore=cam.actif||(now<cam.jusqua&&cam.pos!==null&&cam.vue!==null&&Math.abs(cam.vue-cam.pos)>0.6);
+    if(encore)cam.boucle=requestAnimationFrame(camTic);
+    else{cam.vue=null;cam.pos=null;cam.t=0;cam.off=null;}
+  }
   function camera(y){
     if(!o.camera)return;
-    var ca=document.getElementById('ca');
-    if(!ca)return;
-    var haut=(globe.getBoundingClientRect().top+ca.scrollTop)-ca.getBoundingClientRect().top;
-    /* v3.6.7 — Le client : « sur tablette, on ne voit pas le vol de la
-       fille ». La caméra centrait le POINT du chemin ; la fille sur sa
-       licorne se dessine sous ce point et sortait par le bas (mesuré : jusqu'à
-       795 px pour une vue de 651). On centre donc sa boîte elle-même. */
-    var vise=haut+y-ca.clientHeight/2;
-    /* On vise ce qu'on VOIT : les images visibles de l'équipage, telles que
-       le navigateur les dessine (rotations et décalages compris). */
-    if(el&&el.isConnected){
-      var hautE=Infinity,basE=-Infinity;
-      Array.prototype.forEach.call(el.querySelectorAll('img'),function(im){
-        if(parseFloat(getComputedStyle(im).opacity)<0.3)return;
-        var b=im.getBoundingClientRect();
-        if(b.height<2)return;
-        if(b.top<hautE)hautE=b.top;if(b.bottom>basE)basE=b.bottom;
-      });
-      if(basE>hautE){
-        var cr=ca.getBoundingClientRect();
-        vise=ca.scrollTop+((hautE+basE)/2-cr.top)-ca.clientHeight/2;
-      }
-    }
-    /* v3.6.8 — « sur tablette, l'image vibre beaucoup pendant le vol ». La
-       caméra suivait aussi le balancement et la rotation de la licorne, au
-       pixel, trente fois par seconde. Elle ignore désormais les écarts de
-       moins de 8 px et ne rattrape qu'un quart de l'écart à chaque appel :
-       elle glisse au lieu de trembler. */
-    var ecart=vise-ca.scrollTop;
-    if(Math.abs(ecart)<8)return;
-    vise=ca.scrollTop+ecart*0.25;
-    ca.scrollTop=Math.max(0,Math.min(ca.scrollHeight-ca.clientHeight,vise));
+    if(!cam.boucle)cam.boucle=requestAnimationFrame(camTic);
   }
   /* Le point de repos de l'etape i : son sommet quand l'habillage le
      demande (le garcon se tient DEBOUT sur sa planete), sinon le point de
@@ -12491,10 +12557,12 @@ function _volCarte(o){
      tablette debout, où les mondes sont loin l'un de l'autre, la fille
      sortait de l'écran par le bas (mesuré : 959 px pour une vue de 742).
      Tant qu'un vol dure, on la recentre trente fois par seconde. */
-  var suiviCam=null;
   function suivreCamera(oui){
-    if(suiviCam){clearInterval(suiviCam);suiviCam=null;}
-    if(oui&&o.camera)suiviCam=setInterval(function(){camera(0);},33);
+    if(!o.camera)return;
+    var now=(window.performance&&performance.now)?performance.now():Date.now();
+    if(oui){if(!cam.actif)cam.off=null;cam.actif=true;}
+    else{cam.actif=false;cam.jusqua=now+1600;}
+    camera(0);
   }
   function allerA(cible,fini){
     if(raf){cancelAnimationFrame(raf);raf=null;}
@@ -13706,7 +13774,7 @@ var islandDefs=_ilesDefs();
         var volM=_volCarte({globe:globeDiv,segments:segsMob,charEl:charElMob,couronneGagnee:_couronneGagnee,
           epaisseurTrainee:14,
           equipage:eqMob,decalageX:Math.round(TQM/2),decalageY:TQM,demiAssise:Math.round(TQM*0.279),depart:charIdxM,
-          trainee:_HAB.trainee,duree:3300,dureeApproche:1400,aligne:_HAB.aligne,
+          trainee:_HAB.trainee,duree:2100,dureeApproche:1000,aligne:_HAB.aligne,
           dureeTotale:9000,camera:true,
           pose:_HAB.poseSommet?function(i){return _sommetEtape(isleCardsMob[i-1]);}:null,
           pilotePour:function(i){
@@ -13967,7 +14035,7 @@ var islandDefs=_ilesDefs();
         epaisseurTrainee:Math.max(8,Math.round(18*TEQ/140)),
         equipage:eq,decalageX:Math.round(TEQ*0.5),decalageY:TEQ,
         demiAssise:Math.round(TEQ*0.279),depart:charIdx,
-        trainee:_HAB.trainee,duree:3700,dureeApproche:1560,aligne:_HAB.aligne,
+        trainee:_HAB.trainee,duree:2300,dureeApproche:1100,aligne:_HAB.aligne,
         /* Voir `allerA` : en paysage rien n'est dessine entre les mondes, le
            vol prend donc la ligne droite et l'onde. */
         ondule:true,
@@ -14943,22 +15011,41 @@ function _ajusteChoix(w,ca){
   /* Hauteurs VUES à l'écran, des deux côtés : sur tablette, #root porte un
      zoom (1,38 mesuré) — offsetHeight ne le compte pas, getBoundingClientRect
      si. Mélanger les deux faussait tout. */
-  function haut(){return w.getBoundingClientRect().height;}
+  /* v3.7.0 — la hauteur du CONTENU, pas celle du cadre : couché, le cadre
+     prend toute la hauteur de l'écran et répartit l'espace entre ses
+     enfants — mesuré lui-même, il « débordait » toujours, et tout se
+     resserrait à 43 % : les têtes et la lettre devenaient minuscules. */
+  function haut(){
+    var wr=w.getBoundingClientRect(),k=(w.offsetHeight&&wr.height)?wr.height/w.offsetHeight:1;
+    var cs=getComputedStyle(w),n=0;
+    var t=(parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom))*k;
+    Array.prototype.forEach.call(w.children,function(e){
+      var c=getComputedStyle(e);
+      if(c.position==='absolute'||c.position==='fixed'||c.display==='none')return;
+      var r=e.getBoundingClientRect();if(!r.height)return;
+      t+=r.height+(parseFloat(c.marginTop)+parseFloat(c.marginBottom))*k;n++;
+    });
+    var g=parseFloat(cs.rowGap);if(g&&n>1)t+=g*(n-1)*k;
+    return t;
+  }
   var d=dispo();
   if(d<200||haut()<=d)return;
   w.setAttribute('data-fit','1');
-  var f=1;
-  for(var k=0;k<6;k++){
-    var h=haut();
-    if(h<=d)break;
-    f=Math.max(0.35,f*(d/h)*0.97);
-    w.style.setProperty('--fit',f.toFixed(3));
+  /* v3.7.0 — on cherche la PLUS GRANDE taille qui tient (dichotomie) : la
+     règle de trois d'avant ne savait pas que le titre et le bouton, eux, ne
+     rapetissent pas, et resserrait bien plus que nécessaire. */
+  var bas=0.35,hautF=1;
+  for(var k=0;k<8;k++){
+    var m=(bas+hautF)/2;
+    w.style.setProperty('--fit',m.toFixed(3));
+    if(haut()<=d)bas=m;else hautF=m;
   }
+  w.style.setProperty('--fit',bas.toFixed(3));
 }
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.6.9';
+var _VERSION_REPLI='v3.7.0';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
