@@ -12758,11 +12758,13 @@ function _volCarte(o){
     }
     var passes=[],pas=cible>idx?1:-1;
     for(var k=idx+pas;k!==cible;k+=pas){var p=image(k);if(p)passes.push(p);}
-    /* Le point d'où il finira son vol, vu de loin : un peu avant le monde,
-       dans l'axe d'où il vient. */
+    /* v3.7.6 — « à l'arrivée, on ne doit voir que l'atterrissage ». Sous le
+       noir, l'équipage est placé, droit, JUSTE AU-DESSUS du monde : la fusée
+       y tient en vol stationnaire avant de se poser, la licorne descend s'y
+       poser. */
     var vx=but.x-ici.x,vy=but.y-ici.y,dist=Math.sqrt(vx*vx+vy*vy)||1;
-    var recul=Math.min(200,dist*0.5);
-    var reprise={x:but.x-vx/dist*recul,y:but.y-vy/dist*recul};
+    var garcon=!!o.aligne;
+    var reprise={x:but.x,y:but.y-(garcon?0:Math.max(40,(el.offsetHeight||100)*0.45))};
     idx=cible;
     /* 1. le décollage, vu de loin : le début du vol habituel. */
     volDroit(ici,but,function(){},Math.max(1900,Math.min(7000,1300+dist*2)));
@@ -12772,18 +12774,28 @@ function _volCarte(o){
         garcon:!!o.aligne, monde:image(cible), passes:passes,
         quandCouvert:function(){
           if(raf){cancelAnimationFrame(raf);raf=null;}
-          poser(reprise.x,reprise.y,Math.atan2(vy,vx)*180/Math.PI,1);
+          poser(reprise.x,reprise.y,null);
           try{var ca=document.getElementById('ca');
             if(ca&&o.camera){var k2=camK(ca),cr=ca.getBoundingClientRect();
               var hautG=ca.scrollTop+(globe.getBoundingClientRect().top-cr.top)/k2;
               ca.scrollTop=Math.max(0,hautG+parseFloat(el.style.top)+el.offsetHeight/2+(cam.off||0)-ca.clientHeight/2);
               cam.pos=null;cam.vue=null;}}catch(e){}
         },
-        /* 3. le fondu retour commence : il est déjà en train de finir son vol. */
+        /* 3. le noir se dissipe sur l'équipage au-dessus du monde ; une fois
+           l'écran clair, il se pose. */
         quandSort:function(){
           if(!el.isConnected)return;
-          /* v3.7.5 — le fondu (1,4 s) s'achève juste avant qu'elle se pose. */
-          volDroit(reprise,but,function(){arriver(fini,but);},1550);
+          setTimeout(function(){
+            if(!el.isConnected){fini&&fini();return;}
+            if(garcon){arriver(fini,but);return;}
+            var t0=Date.now(),D=850;
+            (function tic(){
+              var u=Math.min(1,(Date.now()-t0)/D),e=1-Math.pow(1-u,3);
+              poser(but.x,reprise.y+(but.y-reprise.y)*e,null);
+              if(u>=1){arriver(fini,but);return;}
+              raf=requestAnimationFrame(tic);
+            })();
+          },1300);
         }
       });
     },0);   /* v3.7.5 — le fondu commence dès le décollage */
@@ -15278,7 +15290,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.7.5';
+var _VERSION_REPLI='v3.7.6';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */

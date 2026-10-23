@@ -106,6 +106,17 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.7.6 — 23 octobre 2026 : à l'arrivée, seulement l'atterrissage
+
+- Le client : « on ne doit voir que l'atterrissage (fusée qui se pose,
+  licorne qui se pose d'au-dessus du monde) ». Sous le noir, l'équipage est
+  posé DROIT au-dessus du monde (`reprise` : la fusée sur le sommet — sa
+  pose fait déjà le vol stationnaire puis la descente —, la licorne 45 % de
+  sa hauteur plus haut). 1,3 s après le début du fondu retour, la licorne
+  descend en 0,85 s puis `arriver` (rebond) ; la fusée passe directement à
+  `arriver`. Plus de fin de vol vue de loin. Mesuré : cours à 11,6 s (fille),
+  10,6 s (garçon).
+
 ## v3.7.5 — 23 octobre 2026 : bouton de la carte, fondus calés, mots du hublot
 
 - **Carte des mondes (6-11)** : le bouton du haut disait « Carte » (et
