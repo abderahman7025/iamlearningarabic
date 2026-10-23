@@ -45,7 +45,9 @@ const VOIX = 'Wm3eSTpNFfFtDgCxf6AU'; // Narrateur
 /* v3.4.3 : une autre liste en argument (node outils/voix-allah.js voix-correction.json),
    rangée dans son propre dossier — les fichiers déjà faits ne sont pas repris. */
 const NOM = (process.argv.slice(2).find((a) => a.endsWith('.json')) || 'voix-allah.json');
-const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, NOM), 'utf8'));
+/* v3.8.1 : --langue=fr → une seule langue (le client valide langue par langue). */
+const _lg = (process.argv.find((a) => a.startsWith('--langue=')) || '').slice(9);
+const LISTE = JSON.parse(fs.readFileSync(path.join(__dirname, NOM), 'utf8')).filter((e) => !_lg || e.langue === _lg);
 const sansDepot = process.argv.includes('--sans-depot');
 const dest = path.join(__dirname, 'captures', NOM.replace(/\.json$/, ''));
 fs.mkdirSync(dest, { recursive: true });

@@ -106,6 +106,23 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## 24 octobre 2026 — voix « Allah » (sans changement du site)
+
+- **ERREUR À NE PAS REFAIRE** : `voix-allah.json` (fr) AVAIT été généré le
+  18 octobre (fichiers dans `Bureau/arab-learn-backend/outils/captures/
+  voix-allah` et `voix-correction`) ; la fiche disait « pas généré ». Je l'ai
+  régénéré le 23 (2 341 crédits pour rien). Avant toute génération : faire
+  ÉCOUTER au client les voix actuelles (page HTML sur son Bureau, audios
+  intégrés) et ne refaire que ce qu'il désigne.
+- Le client : textes 3 (« Allah est l'unique but… », il disait « Alla ») et
+  5 (basmala de l'introduction, « au nom d'illah ») → Allah écrit اَللَّه
+  (fatha sur le alif) dans ce que la voix lit, basmala intacte :
+  `node outils/voix-allah-fatha.js` (606 car.), en ligne. Les 5 autres
+  restent dans la version du 23.
+- Les 7 petites phrases des prolongations (« Exemple : », « est différent
+  de »…) : PAS générées, pas branchées — attendre le client.
+- `voix-allah.js` accepte `--langue=fr`.
+
 ## v3.8.0 — 23 octobre 2026 : adultes, tout est lu, karaoké synchronisé
 
 - **Lecture automatique (adultes)** : elle ne prenait que les `onclick` qui
