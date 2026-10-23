@@ -6,7 +6,7 @@
        Consent Mode soit pose avant la premiere balise. -->
   <script src="/tag.js"></script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Apprendre à lire l'arabe — de l'alphabet au Coran</title>
 <!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
@@ -25,7 +25,14 @@
 <meta property="og:description" content="La méthode complète pour apprendre à lire l'arabe à partir de zéro. Accès à vie, en 12 langues.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://iamlearningarabic.com">
-  <meta property="og:image" content="https://iamlearningarabic.com/icon-512.png">
+<meta property="og:image" content="https://iamlearningarabic.com/images/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="I Am Learning Arabic — apprendre à lire l'arabe">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://iamlearningarabic.com/images/partage.png">
+<link rel="canonical" href="https://iamlearningarabic.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&family=Tajawal:wght@300;400;500;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -287,6 +294,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#04030a}
   transition:all .25s;
   backdrop-filter:blur(8px);
 }
+/* iPhone : un champ sous 16px fait zoomer la page au toucher, depuis que le zoom est permis */
+@media (max-width:768px){.linp,#forgot-email-input{font-size:16px !important}}
 .linp::placeholder{color:var(--txt3)}
 .linp:focus{
   border-color:rgba(245,200,66,.5);

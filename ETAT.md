@@ -87,7 +87,7 @@ manquent, la logique est décrite ici) :
   crédits/mois ; ~12 000 utilisés au 10 octobre.
 - dépôt : `POST /api/audio` `{ar: clé, audioBase64}` avec
   `Authorization: Bearer <ADMIN_SECRET>` (aussi dans `.env.local`).
-- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 9.
+- contrôle de syntaxe : `python outils/verif.py | grep -c " OK"` → 16 (depuis v3.6.0 ; comparer à la version précédente).
 
 **Fichier de travail du client** : `Bureau/phrases-3-5-ans.txt` — une ligne
 par phrase (numéro | phrase | émotion), qu'il corrige lui-même.
@@ -103,6 +103,49 @@ même façon : la page de récompense, la carte des animaux, et les écrans des
 
 **Le modèle du tracé** (v3.0.0 et v3.0.1) attend le regard du client, qui
 voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
+
+---
+
+## v3.6.1 — 23 octobre 2026 : la liste « 20 choses à vérifier avant de lancer »
+
+Le client a montré une liste TikTok de 20 points. Bilan fait, puis corrigé :
+
+- **Image de partage** : `og:image` visait `/icon-512.png`, qui n'existe pas
+  (404). Nouvelle image `public/images/partage.png` (1200×630, fond clair,
+  logo + « Apprendre à lire l'arabe »), plus `twitter:card`, `canonical`,
+  `og:image:width/height/alt`. Le générateur était un script jetable (PIL).
+- **`public/robots.txt` et `public/sitemap.xml`** créés. Le sitemap ne liste
+  que `/` : y ajouter les pages légales quand elles seront en ligne.
+- **`public/404.html`** : page d'erreur à nos couleurs, au lieu de la page
+  anglaise de Vercel.
+- **Zoom** : `user-scalable=no` retiré de `public/index.html` SEULEMENT (page
+  de vente). Gardé dans `app/app.html`, où il protège le tracé au doigt. Pour
+  que l'iPhone ne zoome pas au toucher d'un champ, `.linp` et
+  `#forgot-email-input` passent à 16px sous 768px.
+- **`alt=""`** sur les cinq `<img>` qui n'en avaient pas dans `app/app.html`
+  (toutes décoratives : à côté d'un titre qui dit la même chose).
+- **Copie locale en retard** : le dossier `Bureau/arab-learn-backend` était resté en
+  v3.1.0 alors que GitHub était en v3.6.0 (travail fait ailleurs). Ce
+  correctif a été refait dans `Bureau/arab-learn-maj` (worktree, branche
+  `correctifs-20-points`). **Toujours `git fetch` et comparer avant de toucher.**
+- **Contrôle de syntaxe : 16 blocs** depuis la v3.6.0 (plus 9).
+- **Images en WebP** : les 39 images de plus de 100 Ko citées en toutes
+  lettres dans `app/app.html` ont un double `.webp` (qualité 90, alpha 100),
+  et le code pointe dessus : 14,2 Mo → 1,8 Mo. Les originaux restent sur le
+  disque. Exclues : les `mot-*.png` (nom fabriqué `'mot-'+n+'.png'`), les GIF
+  animés (papillons), les icônes. Comparaison visuelle faite sur une licorne :
+  identique.
+
+**RESTE — les pages légales.** Aucune politique de confidentialité, aucune
+CGV, aucunes mentions légales en ligne, alors que le site encaisse. Le texte
+est prêt à part, il attend l'identité de l'éditeur (nom ou société, statut,
+SIRET, adresse, directeur de publication). Avec : une case « je renonce au
+droit de rétractation » avant le paiement (contenu numérique fourni tout de
+suite, art. L221-28 13°), les liens en bas de la page de vente, et les pages
+dans le sitemap.
+
+**À regarder à l'écran, pas encore fait** : contraste des textes, affichage
+téléphone de la page de vente, un seul bouton principal par écran.
 
 ---
 
