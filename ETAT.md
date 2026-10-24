@@ -41,8 +41,8 @@ navigateur.
 
 1. **Les sons arabes** (lettres, syllabes, mots) : enregistrés par le client
    au studio, avec SA voix. 378 en ligne, vérifiés un par un le 3 octobre.
-   Restent 24 sons « fautifs » des lettres graves (clés « خè », « خèn »,
-   « خèè »… onglet Sons du studio). L'IA prononce mal l'arabe isolé : on ne
+   Les 24 sons « fautifs » des lettres graves (clés « خè », « خèn »,
+   « خèè »…) sont FAITS par le client (confirmé le 24 octobre). L'IA prononce mal l'arabe isolé : on ne
    lui fait JAMAIS dire une lettre, un nom de lettre ou une syllabe.
 2. **Interface 6-11 ans, en français** : clone ElevenLabs du client
    (« Abderahman iamlearningarabic », voice_id `Uqmzt456J5LFX8R4qoZ8`),
@@ -154,7 +154,7 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
   après écoute (`outils/voix-bouts-*.js`, dépôt `voix-bouts-depot.js`).
   Le v4 posé lui a paru « abusé » sur ces phrases.
 - **Studio** : وَاِ, يُوَ, وِيُ ajoutés à `ADMIN_SOUNDS` (après وَا) — à
-  enregistrer par le client ; d'ici là l'illustration lit « est différent
+  enregistrer par le client (toujours absents en ligne le 24 octobre au soir) ; d'ici là l'illustration lit « est différent
   de وَا » sans le premier mot.
 - **11 autres langues** : à faire, réglage à valider.
 
