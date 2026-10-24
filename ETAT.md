@@ -106,6 +106,30 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.3 — 24 octobre 2026 : prolongations, 11 langues en phrases entières
+
+- **Hors français** (en, es, de, ru, pt, it, nl, zh, id, tr, hi — pas
+  l'ourdou, retiré du site) : chaque ligne « texte + arabe » de la leçon des
+  prolongations est dite D'UN SEUL TENANT par le Narrateur v4, SANS balise
+  de ton (choix du client). `_phraseEntiere` dans `renderPLesson` pose le
+  clic sur la ligne ; un rond arabe cliqué seul joue la voix du studio. Le
+  français ne change pas (bouts séparés, v3.8.2).
+- **Exception** `_BOUTS_SEPARES` : phrase 8 (وِيُ) en nl, ru, tr → voix du
+  studio pour l'arabe + « est différent de » seul (découpé dans une phrase).
+- **Recettes trouvées avec le client** (outils/voix-langues-prolong.js,
+  voix-groupe-couper.js) : un mot seul (« Exemple », « alors que »,
+  « Illustration ») sort en français → le dire avec la phrase d'après, ou
+  après une phrase d'intro dans la langue, puis couper grâce aux temps
+  `with-timestamps`. و lu « v » → phonétique de la langue (de « Uiju … Uih »,
+  it/id/hi, hi en lettres latines) ; إِيَاكَ écrit « إِ يَا كَ » pour la voix ;
+  وَاِ écrit « وَإِ » ; anglais 8 gardé en ton posé (le seul qui dit « wiyu »).
+- Anglais : « Illustration: » devient « Examples: » (texte affiché aussi).
+- 120 audios déposés (`outils/voix-langues-depot.js`, choix par langue dans
+  `CHOIX`). Le client doit encore enregistrer au studio وَاِ, يُوَ, وِيُ.
+- Traductions à revoir (signalé, pas touché) : turc (ordre des mots de
+  « farklıdır »), ourdou/hindi (« se dit » absent, Exemple = Illustration),
+  italien et espagnol `not_essential` en double dans la table.
+
 ## v3.8.2 — 24 octobre 2026 : prolongations, le français lu, l'arabe par le studio
 
 - **Principe (le client)** : dans les phrases mixtes des cours, le
