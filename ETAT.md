@@ -106,6 +106,13 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.6 — 24 octobre 2026 : hindi « A और B अलग हैं »
+
+- Hindi : `prolong_diff:'और'` + `prolong_diff2:'अलग हैं'` (« A et B sont
+  différents »), 5 lignes refaites groupées après une intro hindi (lettres
+  latines gardées pour و) ; 9 avec إِيَاكَ en un seul mot (choix du client).
+- Turc 9 : le client a gardé la PREMIÈRE version (`tr/9.mp3`), à son écoute.
+
 ## v3.8.5 — 24 octobre 2026 : traductions turc, hindi, doublon espagnol
 
 - **Turc** : « A farklıdır B » → « A ile B farklıdır » (`prolong_diff:'ile'`,

@@ -13,8 +13,8 @@ args.forEach((x) => {
   ns.split(',').map(Number).forEach((n) => {
     const lab = '<b>' + n + '.</b> ' + esc(P[n - 1].t).replace(/([\u0600-\u06FF]+)/g, '<span>$1</span>');
     const av = path.join(d, n + '.mp3');
-    if (fs.existsSync(av)) H += au(av, lab + ' <i>— avant</i>');
-    const LIB = { g: 'nouveau', auto: 'sans langue imposée', ar: 'langue arabe imposée', phon1: 'nouveau (phonétique)', dec: 'arabe décomposé وِ يُ', g2: 'intro néerlandaise plus longue', phon2: 'phonétique avec tirets', arwiyu: 'langue arabe imposée + وِي يو', arsep: 'langue arabe imposée + وِ يُ séparés' };
+    if (fs.existsSync(av) && !(filtre && filtre === 'ordre')) H += au(av, lab + ' <i>— avant</i>');
+    const LIB = { g: 'nouveau', auto: 'sans langue imposée', ar: 'langue arabe imposée', phon1: 'nouveau (phonétique)', dec: 'arabe décomposé وِ يُ', g2: 'intro néerlandaise plus longue', phon2: 'phonétique avec tirets', arwiyu: 'langue arabe imposée + وِي يو', mot: 'iyaaka en un seul mot', ordre: 'nouvel ordre « A और B अलग हैं »', arsep: 'langue arabe imposée + وِ يُ séparés' };
     fs.readdirSync(d).filter((f) => f.startsWith(n + '-') && f.endsWith('.mp3') && !/entier|separe|viyu/.test(f) && (!seul || seul.test(f))).forEach((f) => {
       const k = f.slice(String(n).length + 1, -4); H += au(path.join(d, f), lab + ' <i>— ' + (LIB[k] || k.replace('coupe', 'coupé à ') + ' s') + '</i>'); });
   });
