@@ -17,10 +17,10 @@ const CHOIX = {
   it: { 8: '8-phon1' },
   nl: { 5: '5-g2', 8: null },
   ru: { 8: null },
-  tr: { 8: null },
+  tr: { 6: '6-g', 7: '7-g', 8: null, 9: '9-g', 10: '10-g' },
   zh: { 1: '1-coupe0.90' },
   id: { 8: '8-phon1', 10: '10-phon1' },
-  hi: { 6: '6-phon1', 7: '7-phon1', 8: '8-phon1', 10: '10-phon1' },
+  hi: { 2: '2-g', 4: '4-g', 5: '5-g', 6: '6-phon1', 7: '7-phon1', 8: '8-phon1', 10: '10-phon1' },
 };
 const LANGS = ['en', 'es', 'de', 'ru', 'pt', 'it', 'nl', 'zh', 'id', 'tr', 'hi'];
 function h(t){var h1=0xdeadbeef,h2=0x41c6ce57,i,c;for(i=0;i<t.length;i++){c=t.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return ('0000000'+(h2>>>0).toString(16)).slice(-8)+('0000000'+(h1>>>0).toString(16)).slice(-8);}
@@ -36,6 +36,7 @@ LANGS.forEach((lg) => {
     L.push({ lg, n, k: p.t, f });
   });
   if (fs.existsSync(path.join(D, 'diff.mp3'))) L.push({ lg, n: 'diff', k: T[lg].prolong_diff, f: path.join(D, 'diff.mp3') });
+  if (T[lg].prolong_diff2 && fs.existsSync(path.join(D, 'diff2.mp3'))) L.push({ lg, n: 'diff2', k: T[lg].prolong_diff2, f: path.join(D, 'diff2.mp3') });
 });
 (async () => {
   const depot = process.argv.includes('--depot');

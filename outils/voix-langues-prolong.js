@@ -14,7 +14,7 @@ const { T } = require('./textes-prolong.js');
 const LOVE = 'لَأُحِبُّك', NOLOVE = 'لَا أُحِبُّك';
 const RANGS = [['وَاِ', 'وَا', 'وَإِ'], ['يُوَ', 'يُو'], ['وِيُ', 'وِي'], ['إِيَاكَ', 'إِيَّاكَ', 'إِ يَا كَ'], ['أَوَاهْ', 'أَوَّاهْ']];
 function phrases(lg) {
-  const x = T[lg], d = (r) => (r[2] || r[0]) + ' ' + x.prolong_diff + ' ' + r[1];
+  const x = T[lg], f2 = x.prolong_diff2 ? ' ' + x.prolong_diff2 : '', d = (r) => (r[2] || r[0]) + ' ' + x.prolong_diff + ' ' + r[1] + f2;
   const P = [
     { t: x.prolong_exemple, dire: x.prolong_exemple + ' ' + x.prolong_love + ' ' + LOVE, mot: x.prolong_exemple },
     { t: x.prolong_love + ' ' + LOVE },
@@ -24,7 +24,7 @@ function phrases(lg) {
   ];
   /* وِيُ : sans balise de ton, la voix dit « viyu » ; avec [calm] elle dit
      bien « wiyu » (validé en anglais). */
-  RANGS.forEach((r) => P.push({ t: r[0] + ' ' + x.prolong_diff + ' ' + r[1], dire: (r[0] === 'وِيُ' ? '[calm] ' : '') + d(r) }));
+  RANGS.forEach((r) => P.push({ t: r[0] + ' ' + x.prolong_diff + ' ' + r[1] + f2, dire: (r[0] === 'وِيُ' ? '[calm] ' : '') + d(r) }));
   P.push({ t: x.not_essential });
   return P;
 }

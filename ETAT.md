@@ -106,6 +106,23 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.5 — 24 octobre 2026 : traductions turc, hindi, doublon espagnol
+
+- **Turc** : « A farklıdır B » → « A ile B farklıdır » (`prolong_diff:'ile'`,
+  nouvelle clé `prolong_diff2:'farklıdır'`, 2e bout après B dans
+  `mkDiffRow`). Phrases 6, 7, 9, 10 refaites groupées après une intro turque ;
+  phrase 8 : voix du studio + « ile » + « farklıdır » seuls (découpés).
+- **Hindi** : « se dit » ajouté (« … ऐसे कहते हैं: », et « vraiment » = सच में),
+  Illustration = « कुछ उदाहरण: » (n'est plus le même mot qu'Exemple).
+  Reste : « A से अलग B » est aussi à l'envers en hindi (non signalé par le
+  client, pas touché).
+- **Espagnol** : un bloc de 12 textes italiens recopié dans la table `es`
+  (toujours écrasé par l'espagnol, donc invisible) est retiré ; table
+  vérifiée identique avant/après.
+- Constaté, pas touché : `ex_read_answer` vaut « Pengucapan: » (indonésien)
+  dans 10 langues, mais la clé ne sert nulle part.
+- 122 audios déposés. Page d'écoute : « Bureau/Turc hindi et bouts seuls ».
+
 ## v3.8.4 — 24 octobre 2026 : le alif des lettres lunaires
 
 - Bonus « Lettres lunaires / solaires » : le pétale أ jouait la voix du
