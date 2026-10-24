@@ -27,7 +27,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
   const data = require('./voix-6-11-langues.json');
   let urls = {};
-  try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('Site injoignable :', e.message); return; }
+  try { urls = (await (await fetch(SITE + '/api/audio', require('./_admin.js'))).json()).urls || {}; } catch (e) { console.log('Site injoignable :', e.message); return; }
   let h = '<!doctype html><meta charset="utf-8"><title>Voix 6-11 — langues</title><body style="font-family:system-ui;background:#eef6ff;padding:20px;max-width:760px;margin:auto">'
     + '<h2>Les phrases avec un nom de lettre ou de voyelle, telles qu\'elles sont sur le site</h2><p>Un bouton par langue lit ses phrases à la suite. La phrase en cours est encadrée.</p>';
   let manque = 0;

@@ -106,6 +106,30 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.8 — 24 octobre 2026 : protéger le code et les voix
+
+- **À CHAQUE MISE EN LIGNE, après le changement de version :**
+  `node outils/compacter.js` puis `python outils/verif.py app.min.html`
+  (19 OK), et pousser `app/app.min.html` avec le reste. Oubliée, rien ne
+  casse : `api/app.js` voit que l'empreinte ne correspond plus et sert
+  `app.html` (lisible) — mais la protection saute.
+- **Code** : le site sert `app/app.min.html` = app.html sans commentaires ni
+  blancs (2,20 → 1,49 Mo). Noms NON changés (la lecture automatique lit le
+  texte des fonctions). 1re ligne `<!--h:sha1-->` = empreinte d'app.html
+  (fins de ligne ramenées à LF). Modules : `npm install --no-save --prefix
+  outils terser html-minifier-terser` (outils/node_modules, ignoré par git).
+  Local : `http://localhost:3456/adulte/lecon?min=1` sert la version compacte.
+  Testé : 19 blocs OK, aucune erreur console, lecture auto (36 textes),
+  interface fille.
+- **Voix** : `GET /api/audio` (liste des ~3 400 enregistrements) est réservé
+  aux comptes PAYANTS (cookie arab_token vérifié + `paid` en base) ou à
+  l'admin (Bearer ADMIN_SECRET). Les outils passent par `outils/_admin.js`.
+  Rafraîchir la copie locale : curl avec l'en-tête Authorization.
+- Pas fait (à décider avec le client) : bucket « audio » privé + liens
+  signés. Les fichiers restent publics pour qui devine leur nom (hex du
+  texte) ; des liens signés changeraient à chaque visite → plus de cache
+  navigateur (tout retéléchargé), cache `bornes2_` à reclé.
+
 ## v3.8.7 — 24 octobre 2026 : le son ne repart plus quand on quitte l'onglet
 
 - Le client : « je mets pause, je vais sur YouTube, et le son du site se

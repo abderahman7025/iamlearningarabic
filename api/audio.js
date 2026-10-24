@@ -1,5 +1,29 @@
 const { createClient } = require('@supabase/supabase-js');
-const { applyMiddleware, isAdminRequest, isAdminIpAllowed, rateLimit, logEvent, getClientIp } = require('./_security');
+const { applyMiddleware, isAdminRequest, isAdminIpAllowed, rateLimit, logEvent, getClientIp, verifyToken } = require('./_security');
+
+/* ── LA LISTE DES SONS EST RÉSERVÉE (v3.8.8) ──
+   Le client : protéger ce qui a de la valeur. La liste donnait à n'importe
+   qui, sans compte, les adresses des ~3 400 enregistrements (sa voix du
+   studio, les voix du Narrateur). Elle n'est plus rendue qu'à un compte
+   PAYANT (le même cookie arab_token que l'application, qui n'est servie
+   qu'à lui) ou à l'admin (jeton ADMIN_SECRET, outils du dépôt). */
+function jetonDe(req) {
+  const auth = (req.headers && req.headers.authorization) || '';
+  if (auth.indexOf('Bearer ') === 0) return auth.slice(7);
+  const m = /(?:^|;\s*)arab_token=([^;]+)/.exec((req.headers && req.headers.cookie) || '');
+  return m ? decodeURIComponent(m[1]) : null;
+}
+async function compteAutorise(req) {
+  if (isAdminRequest(req)) return true;
+  const tk = jetonDe(req);
+  const email = tk ? String(tk).split(':')[0] : '';
+  if (!email || !verifyToken(tk, email)) return false;
+  try {
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { data: user } = await supabase.from('users').select('paid').eq('email', email.toLowerCase()).single();
+    return !!(user && user.paid);
+  } catch (e) { return false; }
+}
 
 /**
  * Les enregistrements du studio, en lecture et en écriture.
@@ -17,6 +41,10 @@ const { applyMiddleware, isAdminRequest, isAdminIpAllowed, rateLimit, logEvent, 
  */
 
 async function lireLesSons(req, res, ip) {
+  if (!(await compteAutorise(req))) {
+    logEvent('audio_get_no_auth', { ip });
+    return res.status(401).json({ error: 'Connexion requise.' });
+  }
   // ── Rate limit : 30 requêtes / min par IP ────────────────────────────────
   const { limited, retryAfter } = rateLimit(ip, 'audio-get', 30, 60 * 1000);
   if (limited) {

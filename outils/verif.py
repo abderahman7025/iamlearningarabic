@@ -11,7 +11,8 @@ import io, os, re, subprocess, sys, tempfile
 
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMP = tempfile.mkdtemp(prefix='verif-app-')
-s = io.open(os.path.join(R, 'app', 'app.html'), encoding='utf-8').read()
+FICHIER = sys.argv[1] if len(sys.argv) > 1 else 'app.html'   # app.min.html : la version compacte
+s = io.open(os.path.join(R, 'app', FICHIER), encoding='utf-8').read()
 
 MOTIF = re.compile(r'<script(?![^>]*\bsrc=)([^>]*)>(.*?)</script>', re.S)
 blocs = [b for a, b in MOTIF.findall(s) if 'json' not in a.lower()]

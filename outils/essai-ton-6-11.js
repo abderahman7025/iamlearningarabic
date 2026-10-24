@@ -43,7 +43,7 @@ const dest = path.join(__dirname, 'captures', 'essai-ton-6-11');
 fs.mkdirSync(dest, { recursive: true });
 (async () => {
   let urls = {};
-  try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('Site injoignable :', e.message); }
+  try { urls = (await (await fetch(SITE + '/api/audio', require('./_admin.js'))).json()).urls || {}; } catch (e) { console.log('Site injoignable :', e.message); }
   const lignes = [];
   for (let i = 0; i < PHRASES.length; i++) {
     const p = PHRASES[i], n = String(i + 1);

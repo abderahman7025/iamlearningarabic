@@ -1,4 +1,5 @@
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const { applyMiddleware, verifyToken, generateToken, DUREE_SESSION,
@@ -93,6 +94,25 @@ function versPagePublique(req, res, suite) {
   return res.status(302).end();
 }
 
+/* ── LA VERSION COMPACTE (v3.8.8) ──
+   outils/compacter.js écrit app.min.html : la même application sans ses
+   commentaires (qui racontaient tout le site à qui l'ouvrait). Sa première
+   ligne porte l'empreinte d'app.html ; si elle ne correspond pas (compacte
+   oubliée avant une mise en ligne), on sert app.html : jamais une version
+   périmée. */
+function versionCompacte(fichier, html) {
+  if (fichier !== 'app.html' || !html) return html;
+  try {
+    const min = lireFichier('app.min.html');
+    if (!min) return html;
+    const m = /^<!--h:([0-9a-f]{40})-->/.exec(min);
+    const h = crypto.createHash('sha1').update(html.replace(/\r\n/g, '\n')).digest('hex');
+    if (m && m[1] === h) return min.slice(m[0].length);
+    console.warn('[App] app.min.html périmée : app.html servie');
+  } catch (e) { /* on sert l'original */ }
+  return html;
+}
+
 module.exports = async (req, res) => {
   if (applyMiddleware(req, res)) return;
 
@@ -138,7 +158,7 @@ module.exports = async (req, res) => {
   const fichier = (veutLeBanc && BANC_AUTORISE.indexOf(email.toLowerCase()) >= 0)
     ? 'banc.html' : 'app.html';
 
-  const html = lireFichier(fichier);
+  const html = versionCompacte(fichier, lireFichier(fichier));
   if (!html) {
     console.error('[App] Fichier introuvable :', fichier);
     return res.status(500).json({ error: 'Application indisponible.' });

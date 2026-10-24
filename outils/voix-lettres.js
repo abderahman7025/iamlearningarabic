@@ -74,7 +74,7 @@ const dest = path.join(__dirname, 'captures', 'voix-lettres' + (_vArg ? '-' + _v
   /* LA PAGE D'ÉCOUTE : toutes les lettres sur une seule page, la voix du
      Narrateur (fichiers d'essai) à côté de la voix du studio (en ligne). */
   let studio = {};
-  try { studio = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {}; } catch (e) {}
+  try { studio = (await (await fetch('https://iamlearningarabic.com/api/audio', require('./_admin.js'))).json()).urls || {}; } catch (e) {}
   const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   let html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     + '<title>Lettres — Narrateur ou studio</title><style>'

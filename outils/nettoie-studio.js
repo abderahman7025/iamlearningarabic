@@ -63,7 +63,7 @@ function picVolume(fichier) {
 }
 
 (async () => {
-  const urls = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {};
+  const urls = (await (await fetch('https://iamlearningarabic.com/api/audio', require('./_admin.js'))).json()).urls || {};
   let ok = 0, absents = 0, echecs = 0;
   const lignes = [];
   for (const s of LISTE) {

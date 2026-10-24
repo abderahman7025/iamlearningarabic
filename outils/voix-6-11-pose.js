@@ -68,7 +68,7 @@ const aDire = (t) => t.replace(/\s*•\s*/g, ' ').replace(/\s+([.,])/g, '$1').re
 
 (async () => {
   let urls = {};
-  try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
+  try { urls = (await (await fetch(SITE + '/api/audio', require('./_admin.js'))).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
   /* --refaire=14,15,16 : ces numéros (1 = première phrase) sont regénérés */
   const _rf = (process.argv.find((x) => x.indexOf('--refaire=') === 0) || '').slice(10).split(',').map(Number).filter(Boolean);
   const _mo = (process.argv.find((x) => x.indexOf('--montrer=') === 0) || '').slice(10).split(',').map(Number).filter(Boolean);

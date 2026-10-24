@@ -71,7 +71,7 @@ const NOMS = { en: 'Anglais', es: 'Espagnol', de: 'Allemand', nl: 'Néerlandais'
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 (async () => {
   let urls = {};
-  try { urls = (await (await fetch(SITE + '/api/audio')).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
+  try { urls = (await (await fetch(SITE + '/api/audio', require('./_admin.js'))).json()).urls || {}; } catch (e) { console.log('liste en ligne illisible :', e.message); }
   let car = 0, rates = 0;
   let h = '<!doctype html><meta charset="utf-8"><title>Voix 6-11 — langues</title><body style="font-family:system-ui;background:#eef6ff;padding:20px;max-width:760px;margin:auto">'
     + '<h2>' + (sansDepot ? 'À écouter avant mise en ligne' : 'Mis en ligne') + '</h2><p>Un bouton par langue lit les NOUVEAUX sons à la suite.</p>';

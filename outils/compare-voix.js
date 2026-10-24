@@ -47,7 +47,7 @@ async function change(v, brut, ext, f) {
 }
 
 (async () => {
-  const studio = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {};
+  const studio = (await (await fetch('https://iamlearningarabic.com/api/audio', require('./_admin.js'))).json()).urls || {};
   const noms = {};
   for (const v of voix) {
     try { const r = await fetch('https://api.elevenlabs.io/v1/voices/' + v, { headers: H }); noms[v] = r.ok ? (await r.json()).name : v; }

@@ -40,7 +40,7 @@ const tts = path.join(__dirname, 'captures', 'voix-lettres');
 const hex = (s) => Buffer.from(s).toString('hex');
 
 (async () => {
-  const studio = (await (await fetch('https://iamlearningarabic.com/api/audio')).json()).urls || {};
+  const studio = (await (await fetch('https://iamlearningarabic.com/api/audio', require('./_admin.js'))).json()).urls || {};
   fs.mkdirSync(dest, { recursive: true });
   let ok = 0, echecs = 0, absents = 0, secondes = 0;
   const lignes = [];

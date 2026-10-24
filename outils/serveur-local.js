@@ -105,7 +105,7 @@ const serveur = http.createServer((req, res) => {
     return depose(req, res, url.searchParams.get('f'));
   if (chemin === '/banc') return pageApplication(res, 'banc.html', true);
   /* La liste des enregistrements, copiée depuis le site en ligne
-     (`curl https://iamlearningarabic.com/api/audio > outils/captures/audio-urls.json`) :
+     (`curl -H "Authorization: Bearer $ADMIN_SECRET" https://iamlearningarabic.com/api/audio > outils/captures/audio-urls.json`, liste réservée depuis v3.8.8) :
      sans elle, l'application locale croit qu'aucune voix n'existe. */
   if (chemin === '/api/audio' && req.method === 'GET') {
     const f = path.join(CAPTURES, 'audio-urls.json');
@@ -118,7 +118,8 @@ const serveur = http.createServer((req, res) => {
   /* Le banc appelle /app?f=… ; l'application elle-même arrive par ses
      adresses de profil. Dans les deux cas c'est app/app.html. */
   if (chemin === '/app' || /^\/(fille|garcon|adulte|girl|boy|adult|interface|cours|admin)(\/|$)/.test(chemin))
-    return pageApplication(res, 'app.html', true);
+    /* ?min=1 : la version compacte servie en ligne (outils/compacter.js) */
+    return pageApplication(res, /[?&]min=1/.test(req.url) ? 'app.min.html' : 'app.html', true);
 
   let rel = chemin === '/' ? '/index.html' : chemin;
   const f = path.join(RACINE, 'public', rel);
