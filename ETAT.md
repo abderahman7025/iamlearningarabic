@@ -106,6 +106,13 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.4 — 24 octobre 2026 : le alif des lettres lunaires
+
+- Bonus « Lettres lunaires / solaires » : le pétale أ jouait la voix du
+  navigateur (pas d'enregistrement « أ »). `_clesSon` cherche aussi « ا »
+  pour un « أ » seul → voix du studio. Les 27 autres pétales étaient déjà
+  enregistrés (mesuré).
+
 ## v3.8.3 — 24 octobre 2026 : prolongations, 11 langues en phrases entières
 
 - **Hors français** (en, es, de, ru, pt, it, nl, zh, id, tr, hi — pas
