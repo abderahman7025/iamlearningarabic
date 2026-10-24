@@ -106,6 +106,20 @@ voulait d'abord tous les cours ouverts sur ses deux comptes (fait, v3.0.2).
 
 ---
 
+## v3.8.7 — 24 octobre 2026 : le son ne repart plus quand on quitte l'onglet
+
+- Le client : « je mets pause, je vais sur YouTube, et le son du site se
+  remet en marche ». Cause : en quittant l'onglet, le script du haut coupe
+  tout (`stopSpeech`) ; la surveillance de la lecture automatique adulte
+  voyait « plus rien ne joue » et lançait le texte SUIVANT, onglet caché.
+- Correctif : le script du haut note `_recAvantCache` (texte, en pause ou
+  non) avant de couper ; la lecture automatique ne fait rien tant que
+  `document.hidden` ; au retour, un texte en pause reste en pause
+  (`AL.attendClic`, jusqu'au prochain clic sur un texte), un texte qui jouait
+  reprend au début de sa phrase. Vérifié dans le navigateur (onglet caché
+  simulé) : en pause → rien ne joue, ni caché ni au retour ; en lecture →
+  silence caché, reprise au retour.
+
 ## v3.8.6 — 24 octobre 2026 : hindi « A और B अलग हैं »
 
 - Hindi : `prolong_diff:'और'` + `prolong_diff2:'अलग हैं'` (« A et B sont

@@ -41,6 +41,9 @@
   window._silenceTout=silence;
   var narrationEnPauseParNous=null;
   function cache(){
+    /* v3.8.7 — on note ce que lisait la lecture automatique (cours adultes)
+       AVANT de tout couper : en pause, elle doit le rester. */
+    try{window._recAvantCache=(typeof _rec!=='undefined'&&_rec&&_rec.el)?{el:_rec.el,paused:!!_rec.paused}:null;}catch(e){}
     try{
       var n=window._boyNActif;
       if(n&&n.pause&&n.enPause&&!n.enPause()){n.pause();narrationEnPauseParNous=n;}
@@ -6106,7 +6109,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
     document.querySelectorAll('.lecture-en-cours').forEach(function(x){if(x!==e)x.classList.remove('lecture-en-cours');});
     if(e)e.classList.add('lecture-en-cours');
   }
-  function arret(){AL.q=[];AL.i=-1;AL.cur=null;surligne(null);}
+  function arret(){AL.q=[];AL.i=-1;AL.cur=null;AL.attendClic=false;AL.reprendre=false;surligne(null);}
   window._lectureAutoArret=arret;
   function pageExclue(){
     var ca=document.getElementById('ca');var p=(ca&&ca.dataset.page)||'';
@@ -6155,6 +6158,7 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
     if(jouait)try{stopSpeech();}catch(e){}
   }
   function suivant(){
+    if(document.hidden)return;
     if(horsPage()){coupe();return;}
     var k=AL.i+1;
     while(k<AL.q.length&&!AL.q[k].isConnected)k++;
@@ -6169,8 +6173,28 @@ body.alerte-haut .alerte-btn{bottom:calc(92px + env(safe-area-inset-bottom,0px))
   }
   /* La surveillance : fin d'un texte → le suivant ; un clic sur un autre
      texte de la liste → on continue À PARTIR de lui ; pause → on attend. */
-  setInterval(function(){
+  /* v3.8.7 — le client : « je mets pause, je vais sur YouTube, et le son du
+     site se remet en marche ». En quittant l'onglet, tout est coupé (script
+     du haut) : la surveillance voyait « plus rien ne joue » et passait au
+     texte suivant, onglet caché. Désormais : rien ne part tant que l'onglet
+     est caché ; au retour, un texte en pause reste en pause (on attend un
+     clic), un texte qui jouait reprend au début de sa phrase. */
+  document.addEventListener('visibilitychange',function(){
     if(!AL.q.length)return;
+    if(document.hidden){
+      var v=window._recAvantCache,cur=AL.q[AL.i];
+      AL.reprendre=!!(v&&cur&&v.el===cur&&!v.paused);
+      AL.attendClic=!AL.reprendre;
+      return;
+    }
+    if(AL.reprendre){AL.reprendre=false;AL.attendClic=false;AL.i=Math.max(-1,AL.i-1);AL.pause=0;suivant();}
+  });
+  setInterval(function(){
+    if(!AL.q.length||document.hidden)return;
+    if(AL.attendClic){
+      if(typeof _rec!=='undefined'&&_rec.el&&AL.q.indexOf(_rec.el)>=0){AL.attendClic=false;}
+      else return;
+    }
     if(horsPage()){coupe();return;}
     var e=AL.q[AL.i];
     if(!e||!e.isConnected||!st.soundOn||!adulte()){arret();return;}
@@ -15414,7 +15438,7 @@ function _ajusteChoix(w,ca){
 
 /* Numéro de version de secours, quand le cache n'est pas lisible. À tenir
    au même chiffre que `public/sw.js`, qui reste la référence. */
-var _VERSION_REPLI='v3.8.6';
+var _VERSION_REPLI='v3.8.7';
 var _TATWEEL='ـ';
 /* Formes enfant : on remplace le joint invisible (ZWJ) par un tiret VISIBLE (ـ)
    pour que les formes milieu/fin montrent clairement le trait de liaison. */
